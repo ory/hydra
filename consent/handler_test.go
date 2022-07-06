@@ -86,7 +86,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result RequestWasHandledResponse
+				var result HandledOAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
@@ -144,7 +144,7 @@ func TestGetLoginRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result RequestWasHandledResponse
+				var result HandledOAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
@@ -185,7 +185,7 @@ func TestGetConsentRequest(t *testing.T) {
 					ID: lr.ID,
 				})
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &OAuth2ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
 					Verifier:       challenge,
@@ -194,7 +194,7 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), &HandledConsentRequest{
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), &AcceptOAuth2ConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),
@@ -216,11 +216,11 @@ func TestGetConsentRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result RequestWasHandledResponse
+				var result HandledOAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
-				var result ConsentRequest
+				var result OAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, challenge, result.ID)
 				require.Equal(t, requestURL, result.RequestURL)

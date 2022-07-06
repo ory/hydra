@@ -30,7 +30,7 @@ import (
 type JanitorConsentTestHelper struct {
 	uniqueName           string
 	flushLoginRequests   []*consent.LoginRequest
-	flushConsentRequests []*consent.ConsentRequest
+	flushConsentRequests []*consent.OAuth2ConsentRequest
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest
@@ -362,7 +362,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 		}
 
 		// Create at least 1 consent request that has been accepted
-		_, err = cm.HandleConsentRequest(ctx, &consent.HandledConsentRequest{
+		_, err = cm.HandleConsentRequest(ctx, &consent.AcceptOAuth2ConsentRequest{
 			ID:              j.flushConsentRequests[0].ID,
 			WasHandled:      true,
 			HandledAt:       sqlxx.NullTime(time.Now()),
@@ -721,8 +721,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.Logi
 	}
 }
 
-func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.ConsentRequest {
-	return []*consent.ConsentRequest{
+func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.OAuth2ConsentRequest {
+	return []*consent.OAuth2ConsentRequest{
 		{
 			ID:                   fmt.Sprintf("%s_flush-consent-1", uniqueName),
 			RequestedScope:       []string{"foo", "bar"},

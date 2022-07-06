@@ -44,7 +44,7 @@ const (
 	loginRequestDeniedErrorName   = "login request denied"
 )
 
-// The response payload sent when accepting or rejecting a login or consent request.
+// The response payload sent when accepting or rejecting a login, consent, or logout request.
 //
 // swagger:model successfulOAuth2RequestResponse
 type RequestHandlerResponse struct {
@@ -153,10 +153,30 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
-// The response payload sent when there is an attempt to access already handled request.
+// The response payload sent when there is an attempt to access an already handled consent request.
 //
-// swagger:model handledOAuth2Request
-type RequestWasHandledResponse struct {
+// swagger:model handledOAuth2ConsentRequest
+type HandledOAuth2ConsentRequest struct {
+	// Original request URL to which you should redirect the user if request was already handled.
+	//
+	// required: true
+	RedirectTo string `json:"redirect_to"`
+}
+
+// The response payload sent when there is an attempt to access an already handled logout request.
+//
+// swagger:model handledOAuth2LogoutRequest
+type HandledOAuth2LogoutRequest struct {
+	// Original request URL to which you should redirect the user if request was already handled.
+	//
+	// required: true
+	RedirectTo string `json:"redirect_to"`
+}
+
+// The response payload sent when there is an attempt to access an already handled login request.
+//
+// swagger:model handledOAuth2LoginRequest
+type HandledOAuth2LoginRequest struct {
 	// Original request URL to which you should redirect the user if request was already handled.
 	//
 	// required: true
@@ -166,7 +186,7 @@ type RequestWasHandledResponse struct {
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptOAuth2ConsentRequest
-type HandledConsentRequest struct {
+type AcceptOAuth2ConsentRequest struct {
 	// ID instead of Challenge because of pop
 	ID string `json:"-"`
 
@@ -177,7 +197,7 @@ type HandledConsentRequest struct {
 	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session" faker:"-"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session" faker:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -196,27 +216,27 @@ type HandledConsentRequest struct {
 	// the flow.
 	WasHandled bool `json:"-"`
 
-	ConsentRequest  *ConsentRequest     `json:"-"`
-	Error           *RequestDeniedError `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-"`
+	ConsentRequest  *OAuth2ConsentRequest `json:"-"`
+	Error           *RequestDeniedError   `json:"-"`
+	RequestedAt     time.Time             `json:"-"`
+	AuthenticatedAt sqlxx.NullTime        `json:"-"`
 
 	SessionIDToken     sqlxx.MapStringInterface `json:"-" faker:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `json:"-" faker:"-"`
 }
 
-func (r *HandledConsentRequest) HasError() bool {
+func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-// swagger:model previousOAuth2ConsentSession
-type previousOAuth2ConsentSessions []PreviousConsentSession
+// swagger:model previousOAuth2ConsentSessions
+type previousOAuth2ConsentSessions []PreviousOAuth2ConsentSession
 
 // The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 //
 // swagger:model previousOAuth2ConsentSession
-type PreviousConsentSession struct {
+type PreviousOAuth2ConsentSession struct {
 	// Named ID because of pop
 	ID string `json:"-" db:"challenge"`
 
@@ -227,7 +247,7 @@ type PreviousConsentSession struct {
 	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session" db:"-"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session" db:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -246,10 +266,10 @@ type PreviousConsentSession struct {
 	// the flow.
 	WasHandled bool `json:"-" db:"was_used"`
 
-	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
-	Error           *RequestDeniedError `json:"-" db:"error"`
-	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
+	ConsentRequest  *OAuth2ConsentRequest `json:"consent_request" db:"-"`
+	Error           *RequestDeniedError   `json:"-" db:"error"`
+	RequestedAt     time.Time             `json:"-" db:"requested_at"`
+	AuthenticatedAt sqlxx.NullTime        `json:"-" db:"authenticated_at"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
@@ -328,8 +348,8 @@ func (r *HandledLoginRequest) HasError() bool {
 
 // Contains optional information about the OpenID Connect request.
 //
-// swagger:model openIDConnectContext
-type OpenIDConnectContext struct {
+// swagger:model oAuth2ConsentRequestOpenIDConnectContext
+type OAuth2ConsentRequestOpenIDConnectContext struct {
 	// ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.
 	// It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.
 	//
@@ -369,7 +389,7 @@ type OpenIDConnectContext struct {
 	LoginHint string `json:"login_hint,omitempty"`
 }
 
-func (n *OpenIDConnectContext) Scan(value interface{}) error {
+func (n *OAuth2ConsentRequestOpenIDConnectContext) Scan(value interface{}) error {
 	v := fmt.Sprintf("%s", value)
 	if len(v) == 0 {
 		return nil
@@ -377,7 +397,7 @@ func (n *OpenIDConnectContext) Scan(value interface{}) error {
 	return errorsx.WithStack(json.Unmarshal([]byte(v), n))
 }
 
-func (n *OpenIDConnectContext) Value() (driver.Value, error) {
+func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error) {
 	value, err := json.Marshal(n)
 	return value, errorsx.WithStack(err)
 }
@@ -484,7 +504,7 @@ type LoginRequest struct {
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
@@ -523,7 +543,7 @@ type LoginRequest struct {
 // Contains information on an ongoing consent request.
 //
 // swagger:model oAuth2ConsentRequest
-type ConsentRequest struct {
+type OAuth2ConsentRequest struct {
 	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
 	//
@@ -547,7 +567,7 @@ type ConsentRequest struct {
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	Client   *client.Client `json:"client"`
@@ -595,10 +615,10 @@ type ConsentRequest struct {
 	RequestedAt            time.Time      `json:"-"`
 }
 
-// Used to pass session data to a consent request.
+// Pass session data to a consent request.
 //
-// swagger:model consentRequestSession
-type ConsentRequestSessionData struct {
+// swagger:model acceptOAuth2ConsentRequestSession
+type AcceptOAuth2ConsentRequestSession struct {
 	// AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the
 	// refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
 	// If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties
@@ -608,12 +628,11 @@ type ConsentRequestSessionData struct {
 	// IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
 	// by anyone that has access to the ID Challenge. Use with care!
 	IDToken map[string]interface{} `json:"id_token"`
-
-	// UserInfo map[string]interface{} `json:"userinfo"`
 }
 
-func NewConsentRequestSessionData() *ConsentRequestSessionData {
-	return &ConsentRequestSessionData{
+// NewConsentRequestSessionData creates a new AcceptOAuth2ConsentRequestSession.
+func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
+	return &AcceptOAuth2ConsentRequestSession{
 		AccessToken: map[string]interface{}{},
 		IDToken:     map[string]interface{}{},
 	}

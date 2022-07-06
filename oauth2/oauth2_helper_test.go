@@ -42,19 +42,19 @@ type consentMock struct {
 	requestTime time.Time
 }
 
-func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.HandledConsentRequest, error) {
+func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.AcceptOAuth2ConsentRequest, error) {
 	if c.deny {
 		return nil, fosite.ErrRequestForbidden
 	}
 
-	return &consent.HandledConsentRequest{
-		ConsentRequest: &consent.ConsentRequest{
+	return &consent.AcceptOAuth2ConsentRequest{
+		ConsentRequest: &consent.OAuth2ConsentRequest{
 			Subject: "foo",
 			ACR:     "1",
 		},
 		AuthenticatedAt: sqlxx.NullTime(c.authTime),
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
-		Session: &consent.ConsentRequestSessionData{
+		Session: &consent.AcceptOAuth2ConsentRequestSession{
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},

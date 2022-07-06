@@ -266,7 +266,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
 			RequestedAt:       time.Now().Truncate(time.Second).UTC(),
 			SessionID:         sqlxx.NullString(sessionID),
-			OpenIDConnectContext: &OpenIDConnectContext{
+			OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
 				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
@@ -510,7 +510,7 @@ func (s *DefaultStrategy) requestConsent(ctx context.Context, w http.ResponseWri
 	return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 }
 
-func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *HandledConsentRequest) error {
+func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *AcceptOAuth2ConsentRequest) error {
 	skip := false
 	if cs != nil {
 		skip = true
@@ -528,7 +528,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		r.Context(),
-		&ConsentRequest{
+		&OAuth2ConsentRequest{
 			ID:                     challenge,
 			ACR:                    as.ACR,
 			AMR:                    as.AMR,
@@ -566,7 +566,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
+func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*AcceptOAuth2ConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
@@ -967,7 +967,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 	return s.completeLogout(ctx, w, r)
 }
 
-func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error) {
+func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*AcceptOAuth2ConsentRequest, error) {
 	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
 	if authenticationVerifier == "" && consentVerifier == "" {

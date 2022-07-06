@@ -48,7 +48,7 @@ func (f *Flow) setHandledLoginRequest(r *consent.HandledLoginRequest) {
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 }
 
-func (f *Flow) setConsentRequest(r consent.ConsentRequest) {
+func (f *Flow) setConsentRequest(r consent.OAuth2ConsentRequest) {
 	f.ConsentChallengeID = sqlxx.NullString(r.ID)
 	f.RequestedScope = r.RequestedScope
 	f.RequestedAudience = r.RequestedAudience
@@ -71,7 +71,7 @@ func (f *Flow) setConsentRequest(r consent.ConsentRequest) {
 	f.RequestedAt = r.RequestedAt
 }
 
-func (f *Flow) setHandledConsentRequest(r consent.HandledConsentRequest) {
+func (f *Flow) setHandledConsentRequest(r consent.AcceptOAuth2ConsentRequest) {
 	f.ConsentChallengeID = sqlxx.NullString(r.ID)
 	f.GrantedScope = r.GrantedScope
 	f.GrantedAudience = r.GrantedAudience
@@ -182,7 +182,7 @@ func TestFlow_InvalidateLoginRequest(t *testing.T) {
 func TestFlow_GetConsentRequest(t *testing.T) {
 	t.Run("GetConsentRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
-		expected := consent.ConsentRequest{}
+		expected := consent.OAuth2ConsentRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
 		f.setConsentRequest(expected)
 		actual := f.GetConsentRequest()
@@ -194,13 +194,13 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 	f := Flow{}
 	require.NoError(t, faker.FakeData(&f))
 
-	expected := consent.HandledConsentRequest{}
+	expected := consent.AcceptOAuth2ConsentRequest{}
 	require.NoError(t, faker.FakeData(&expected))
 
 	expected.ID = string(f.ConsentChallengeID)
 	expected.HandledAt = sqlxx.NullTime(time.Now())
 	expected.RequestedAt = f.RequestedAt
-	expected.Session = &consent.ConsentRequestSessionData{
+	expected.Session = &consent.AcceptOAuth2ConsentRequestSession{
 		IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
 		AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
 	}
@@ -211,7 +211,7 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 	f.ConsentWasHandled = false
 
 	fGood := deepcopy.Copy(f).(Flow)
-	eGood := deepcopy.Copy(expected).(consent.HandledConsentRequest)
+	eGood := deepcopy.Copy(expected).(consent.AcceptOAuth2ConsentRequest)
 	require.NoError(t, f.HandleConsentRequest(&expected))
 
 	t.Run("HandleConsentRequest should fail when already handled", func(t *testing.T) {
@@ -228,7 +228,7 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 
 	t.Run("HandleConsentRequest should fail when HandledAt in its argument is zero", func(t *testing.T) {
 		f := deepcopy.Copy(fGood).(Flow)
-		eBad := deepcopy.Copy(eGood).(consent.HandledConsentRequest)
+		eBad := deepcopy.Copy(eGood).(consent.AcceptOAuth2ConsentRequest)
 		eBad.HandledAt = sqlxx.NullTime(time.Time{})
 		require.Error(t, f.HandleConsentRequest(&eBad))
 	})
@@ -245,11 +245,11 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 func TestFlow_GetHandledConsentRequest(t *testing.T) {
 	t.Run("GetHandledConsentRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
-		expected := consent.HandledConsentRequest{}
+		expected := consent.AcceptOAuth2ConsentRequest{}
 
 		assert.NoError(t, faker.FakeData(&expected))
 		expected.ConsentRequest = nil
-		expected.Session = &consent.ConsentRequestSessionData{
+		expected.Session = &consent.AcceptOAuth2ConsentRequestSession{
 			IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
 			AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
 		}

@@ -8,6 +8,8 @@ package v1
 import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/internal/httpclient/client/v1"
 )
 
 // New creates a new v1 API client.
@@ -28,6 +30,12 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	AdminAcceptOAuth2ConsentRequest(params *AdminAcceptOAuth2ConsentRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2ConsentRequestOK, error)
+
+	AdminAcceptOAuth2LoginRequest(params *AdminAcceptOAuth2LoginRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2LoginRequestOK, error)
+
+	AdminAcceptOAuth2LogoutRequest(params *AdminAcceptOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2LogoutRequestOK, error)
+
 	AdminCreateJSONWebKeySet(params *AdminCreateJSONWebKeySetParams, opts ...ClientOption) (*AdminCreateJSONWebKeySetCreated, error)
 
 	AdminCreateOAuth2Client(params *AdminCreateOAuth2ClientParams, opts ...ClientOption) (*AdminCreateOAuth2ClientCreated, error)
@@ -44,9 +52,21 @@ type ClientService interface {
 
 	AdminGetOAuth2Client(params *AdminGetOAuth2ClientParams, opts ...ClientOption) (*AdminGetOAuth2ClientOK, error)
 
+	AdminGetOAuth2ConsentRequest(params *AdminGetOAuth2ConsentRequestParams, opts ...ClientOption) (*AdminGetOAuth2ConsentRequestOK, error)
+
+	AdminGetOAuth2LoginRequest(params *AdminGetOAuth2LoginRequestParams, opts ...ClientOption) (*AdminGetOAuth2LoginRequestOK, error)
+
 	AdminListOAuth2Clients(params *AdminListOAuth2ClientsParams, opts ...ClientOption) (*AdminListOAuth2ClientsOK, error)
 
+	AdminListOAuth2SubjectConsentSessions(params *AdminListOAuth2SubjectConsentSessionsParams, opts ...ClientOption) (*AdminListOAuth2SubjectConsentSessionsOK, error)
+
 	AdminPatchOAuth2Client(params *AdminPatchOAuth2ClientParams, opts ...ClientOption) (*AdminPatchOAuth2ClientOK, error)
+
+	AdminRejectOAuth2LogoutRequest(params *AdminRejectOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminRejectOAuth2LogoutRequestNoContent, error)
+
+	AdminRevokeOAuth2ConsentSessions(params *AdminRevokeOAuth2ConsentSessionsParams, opts ...ClientOption) (*AdminRevokeOAuth2ConsentSessionsNoContent, error)
+
+	AdminRevokeOAuth2LoginSessions(params *AdminRevokeOAuth2LoginSessionsParams, opts ...ClientOption) (*AdminRevokeOAuth2LoginSessionsNoContent, error)
 
 	AdminUpdateJSONWebKey(params *AdminUpdateJSONWebKeyParams, opts ...ClientOption) (*AdminUpdateJSONWebKeyOK, error)
 
@@ -64,7 +84,157 @@ type ClientService interface {
 
 	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
+	RejectOAuth2ConsentRequest(params *RejectOAuth2ConsentRequestParams, opts ...ClientOption) (*RejectOAuth2ConsentRequestOK, error)
+
+	RejectOAuth2LoginRequest(params *RejectOAuth2LoginRequestParams, opts ...ClientOption) (*RejectOAuth2LoginRequestOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+  AdminAcceptOAuth2ConsentRequest accepts an o auth 2 0 consent request
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
+grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+or rejected the request.
+
+This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
+The consent provider includes additional information, such as session data for access and ID tokens, and if the
+consent request should be used as basis for future requests.
+
+The response contains a redirect URL which the consent provider should redirect the user-agent to.
+*/
+func (a *Client) AdminAcceptOAuth2ConsentRequest(params *AdminAcceptOAuth2ConsentRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2ConsentRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminAcceptOAuth2ConsentRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminAcceptOAuth2ConsentRequest",
+		Method:             "PUT",
+		PathPattern:        "/admin/oauth2/auth/requests/consent/accept",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminAcceptOAuth2ConsentRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminAcceptOAuth2ConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminAcceptOAuth2ConsentRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminAcceptOAuth2LoginRequest accepts an o auth 2 0 login request
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
+
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+
+This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
+the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
+a cookie.
+
+The response contains a redirect URL which the login provider should redirect the user-agent to.
+*/
+func (a *Client) AdminAcceptOAuth2LoginRequest(params *AdminAcceptOAuth2LoginRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2LoginRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminAcceptOAuth2LoginRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminAcceptOAuth2LoginRequest",
+		Method:             "PUT",
+		PathPattern:        "/admin/oauth2/auth/requests/login/accept",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminAcceptOAuth2LoginRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminAcceptOAuth2LoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminAcceptOAuth2LoginRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminAcceptOAuth2LogoutRequest accepts an o auth 2 0 logout request
+
+  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
+
+The response contains a redirect URL which the consent provider should redirect the user-agent to.
+*/
+func (a *Client) AdminAcceptOAuth2LogoutRequest(params *AdminAcceptOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminAcceptOAuth2LogoutRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminAcceptOAuth2LogoutRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminAcceptOAuth2LogoutRequest",
+		Method:             "PUT",
+		PathPattern:        "/oauth2/auth/requests/logout/accept",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminAcceptOAuth2LogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminAcceptOAuth2LogoutRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminAcceptOAuth2LogoutRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -400,6 +570,99 @@ func (a *Client) AdminGetOAuth2Client(params *AdminGetOAuth2ClientParams, opts .
 }
 
 /*
+  AdminGetOAuth2ConsentRequest gets o auth 2 0 consent request information
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
+grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+or rejected the request.
+*/
+func (a *Client) AdminGetOAuth2ConsentRequest(params *AdminGetOAuth2ConsentRequestParams, opts ...ClientOption) (*AdminGetOAuth2ConsentRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminGetOAuth2ConsentRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminGetOAuth2ConsentRequest",
+		Method:             "GET",
+		PathPattern:        "/oauth2/auth/requests/consent",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminGetOAuth2ConsentRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminGetOAuth2ConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminGetOAuth2ConsentRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminGetOAuth2LoginRequest gets an o auth 2 0 login request
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
+
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+*/
+func (a *Client) AdminGetOAuth2LoginRequest(params *AdminGetOAuth2LoginRequestParams, opts ...ClientOption) (*AdminGetOAuth2LoginRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminGetOAuth2LoginRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminGetOAuth2LoginRequest",
+		Method:             "GET",
+		PathPattern:        "/admin/oauth2/auth/requests/login",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminGetOAuth2LoginRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminGetOAuth2LoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminGetOAuth2LoginRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminListOAuth2Clients lists o auth 2 0 clients
 
   This endpoint lists all clients in the database, and never returns client secrets.
@@ -409,8 +672,10 @@ but it has an upper bound at 500 objects. Pagination should be used to retrieve 
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
-The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
-Multiple links can be included in this header, and will be separated by a comma.
+The "Link" header is also included in successful responses, which contains one or more links for pagination,
+formatted like so: '<https://project-slug.projects.oryapis.com/admin/clients?limit={limit}&offset={offset}>; rel="{page}"',
+where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can
+be included in this header, and will be separated by a comma.
 */
 func (a *Client) AdminListOAuth2Clients(params *AdminListOAuth2ClientsParams, opts ...ClientOption) (*AdminListOAuth2ClientsOK, error) {
 	// TODO: Validate the params before sending
@@ -443,6 +708,50 @@ func (a *Client) AdminListOAuth2Clients(params *AdminListOAuth2ClientsParams, op
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*AdminListOAuth2ClientsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminListOAuth2SubjectConsentSessions lists o auth 2 0 consent sessions of a subject
+
+  This endpoint lists all subject's granted consent sessions, including client and granted scope.
+If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
+empty JSON array with status code 200 OK.
+
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+Multiple links can be included in this header, and will be separated by a comma.
+*/
+func (a *Client) AdminListOAuth2SubjectConsentSessions(params *AdminListOAuth2SubjectConsentSessionsParams, opts ...ClientOption) (*AdminListOAuth2SubjectConsentSessionsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminListOAuth2SubjectConsentSessionsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminListOAuth2SubjectConsentSessions",
+		Method:             "GET",
+		PathPattern:        "/admin/oauth2/auth/sessions/consent",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminListOAuth2SubjectConsentSessionsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminListOAuth2SubjectConsentSessionsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminListOAuth2SubjectConsentSessionsDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -487,6 +796,129 @@ func (a *Client) AdminPatchOAuth2Client(params *AdminPatchOAuth2ClientParams, op
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*AdminPatchOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminRejectOAuth2LogoutRequest rejects an o auth 2 0 logout request
+
+  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
+No body is required.
+
+The response is empty as the logout provider has to chose what action to perform next.
+*/
+func (a *Client) AdminRejectOAuth2LogoutRequest(params *AdminRejectOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminRejectOAuth2LogoutRequestNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminRejectOAuth2LogoutRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminRejectOAuth2LogoutRequest",
+		Method:             "PUT",
+		PathPattern:        "/oauth2/auth/requests/logout/reject",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminRejectOAuth2LogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminRejectOAuth2LogoutRequestNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminRejectOAuth2LogoutRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminRevokeOAuth2ConsentSessions revokes o auth 2 0 consent sessions of a subject for a specific o auth 2 0 client
+
+  This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
+associated OAuth 2.0 Access Tokens.
+*/
+func (a *Client) AdminRevokeOAuth2ConsentSessions(params *AdminRevokeOAuth2ConsentSessionsParams, opts ...ClientOption) (*AdminRevokeOAuth2ConsentSessionsNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminRevokeOAuth2ConsentSessionsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminRevokeOAuth2ConsentSessions",
+		Method:             "DELETE",
+		PathPattern:        "/admin/oauth2/auth/sessions/consent",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminRevokeOAuth2ConsentSessionsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminRevokeOAuth2ConsentSessionsNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminRevokeOAuth2ConsentSessionsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminRevokeOAuth2LoginSessions invalidates all o auth 2 0 login sessions of a certain user
+
+  This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
+has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+Front- or Back-channel logout.
+*/
+func (a *Client) AdminRevokeOAuth2LoginSessions(params *AdminRevokeOAuth2LoginSessionsParams, opts ...ClientOption) (*AdminRevokeOAuth2LoginSessionsNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminRevokeOAuth2LoginSessionsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminRevokeOAuth2LoginSessions",
+		Method:             "DELETE",
+		PathPattern:        "/admin/oauth2/auth/sessions/login",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminRevokeOAuth2LoginSessionsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminRevokeOAuth2LoginSessionsNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminRevokeOAuth2LoginSessionsDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -855,6 +1287,109 @@ func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClie
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*DynamicClientRegistrationUpdateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  RejectOAuth2ConsentRequest rejects an o auth 2 0 consent request
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
+grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+or rejected the request.
+
+This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
+The consent provider must include a reason why the consent was not granted.
+
+The response contains a redirect URL which the consent provider should redirect the user-agent to.
+*/
+func (a *Client) RejectOAuth2ConsentRequest(params *RejectOAuth2ConsentRequestParams, opts ...ClientOption) (*RejectOAuth2ConsentRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRejectOAuth2ConsentRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "rejectOAuth2ConsentRequest",
+		Method:             "PUT",
+		PathPattern:        "/admin/oauth2/auth/requests/consent/reject",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &RejectOAuth2ConsentRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RejectOAuth2ConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RejectOAuth2ConsentRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  RejectOAuth2LoginRequest rejects an o auth 2 0 login request
+
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
+
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+
+This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
+was denied.
+
+The response contains a redirect URL which the login provider should redirect the user-agent to.
+*/
+func (a *Client) RejectOAuth2LoginRequest(params *RejectOAuth2LoginRequestParams, opts ...ClientOption) (*RejectOAuth2LoginRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRejectOAuth2LoginRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "rejectOAuth2LoginRequest",
+		Method:             "PUT",
+		PathPattern:        "/admin/oauth2/auth/requests/login/reject",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &RejectOAuth2LoginRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RejectOAuth2LoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RejectOAuth2LoginRequestDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

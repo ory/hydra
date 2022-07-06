@@ -10,6 +10,8 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/internal/httpclient/client/v1"
 )
 
 // New creates a new admin API client.
@@ -30,21 +32,11 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	AcceptConsentRequest(params *AcceptConsentRequestParams, opts ...ClientOption) (*AcceptConsentRequestOK, error)
-
-	AcceptLoginRequest(params *AcceptLoginRequestParams, opts ...ClientOption) (*AcceptLoginRequestOK, error)
-
-	AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...ClientOption) (*AcceptLogoutRequestOK, error)
+	AdminGetOAuth2LogoutRequest(params *AdminGetOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminGetOAuth2LogoutRequestOK, error)
 
 	DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...ClientOption) (*DeleteOAuth2TokenNoContent, error)
 
 	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error)
-
-	GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error)
-
-	GetLoginRequest(params *GetLoginRequestParams, opts ...ClientOption) (*GetLoginRequestOK, error)
-
-	GetLogoutRequest(params *GetLogoutRequestParams, opts ...ClientOption) (*GetLogoutRequestOK, error)
 
 	GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams, opts ...ClientOption) (*GetTrustedJwtGrantIssuerOK, error)
 
@@ -54,19 +46,7 @@ type ClientService interface {
 
 	IsInstanceAlive(params *IsInstanceAliveParams, opts ...ClientOption) (*IsInstanceAliveOK, error)
 
-	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error)
-
 	ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams, opts ...ClientOption) (*ListTrustedJwtGrantIssuersOK, error)
-
-	RejectConsentRequest(params *RejectConsentRequestParams, opts ...ClientOption) (*RejectConsentRequestOK, error)
-
-	RejectLoginRequest(params *RejectLoginRequestParams, opts ...ClientOption) (*RejectLoginRequestOK, error)
-
-	RejectLogoutRequest(params *RejectLogoutRequestParams, opts ...ClientOption) (*RejectLogoutRequestNoContent, error)
-
-	RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams, opts ...ClientOption) (*RevokeAuthenticationSessionNoContent, error)
-
-	RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error)
 
 	TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error)
 
@@ -74,134 +54,24 @@ type ClientService interface {
 }
 
 /*
-  AcceptConsentRequest accepts a consent request
+  AdminGetOAuth2LogoutRequest gets an o auth 2 0 logout request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
-
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
-
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
-
-This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
-The consent provider includes additional information, such as session data for access and ID tokens, and if the
-consent request should be used as basis for future requests.
-
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
+  Use this endpoint to fetch a logout request.
 */
-func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams, opts ...ClientOption) (*AcceptConsentRequestOK, error) {
+func (a *Client) AdminGetOAuth2LogoutRequest(params *AdminGetOAuth2LogoutRequestParams, opts ...ClientOption) (*AdminGetOAuth2LogoutRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewAcceptConsentRequestParams()
+		params = NewAdminGetOAuth2LogoutRequestParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "acceptConsentRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/consent/accept",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &AcceptConsentRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*AcceptConsentRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for acceptConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  AcceptLoginRequest accepts a login request
-
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
-
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
-
-This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
-the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
-a cookie.
-
-The response contains a redirect URL which the login provider should redirect the user-agent to.
-*/
-func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams, opts ...ClientOption) (*AcceptLoginRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewAcceptLoginRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "acceptLoginRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/login/accept",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &AcceptLoginRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*AcceptLoginRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for acceptLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  AcceptLogoutRequest accepts a logout request
-
-  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
-No body is required.
-
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
-*/
-func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...ClientOption) (*AcceptLogoutRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewAcceptLogoutRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "acceptLogoutRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/logout/accept",
+		ID:                 "adminGetOAuth2LogoutRequest",
+		Method:             "GET",
+		PathPattern:        "/oauth2/auth/requests/logout",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &AcceptLogoutRequestReader{formats: a.formats},
+		Reader:             &AdminGetOAuth2LogoutRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -213,14 +83,13 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*AcceptLogoutRequestOK)
+	success, ok := result.(*AdminGetOAuth2LogoutRequestOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for acceptLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*AdminGetOAuth2LogoutRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -303,141 +172,6 @@ func (a *Client) DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuer
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetConsentRequest gets consent request information
-
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
-
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
-
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
-*/
-func (a *Client) GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetConsentRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getConsentRequest",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/requests/consent",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetConsentRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetConsentRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetLoginRequest gets a login request
-
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
-
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
-*/
-func (a *Client) GetLoginRequest(params *GetLoginRequestParams, opts ...ClientOption) (*GetLoginRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetLoginRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getLoginRequest",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/requests/login",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetLoginRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetLoginRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetLogoutRequest gets a logout request
-
-  Use this endpoint to fetch a logout request.
-*/
-func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams, opts ...ClientOption) (*GetLogoutRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetLogoutRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getLogoutRequest",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/requests/logout",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetLogoutRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetLogoutRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -616,52 +350,6 @@ func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams, opts ...ClientOp
 }
 
 /*
-  ListSubjectConsentSessions lists all consent sessions of a subject
-
-  This endpoint lists all subject's granted consent sessions, including client and granted scope.
-If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
-empty JSON array with status code 200 OK.
-
-
-The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
-Multiple links can be included in this header, and will be separated by a comma.
-*/
-func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewListSubjectConsentSessionsParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "listSubjectConsentSessions",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/sessions/consent",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &ListSubjectConsentSessionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*ListSubjectConsentSessionsOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for listSubjectConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
   ListTrustedJwtGrantIssuers lists trusted o auth2 j w t bearer grant type issuers
 
   Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
@@ -698,237 +386,6 @@ func (a *Client) ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersPa
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listTrustedJwtGrantIssuers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  RejectConsentRequest rejects a consent request
-
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
-
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
-
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
-
-This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
-The consent provider must include a reason why the consent was not granted.
-
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
-*/
-func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams, opts ...ClientOption) (*RejectConsentRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRejectConsentRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "rejectConsentRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/consent/reject",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RejectConsentRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RejectConsentRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for rejectConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  RejectLoginRequest rejects a login request
-
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
-
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
-
-This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
-was be denied.
-
-The response contains a redirect URL which the login provider should redirect the user-agent to.
-*/
-func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams, opts ...ClientOption) (*RejectLoginRequestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRejectLoginRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "rejectLoginRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/login/reject",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RejectLoginRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RejectLoginRequestOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for rejectLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  RejectLogoutRequest rejects a logout request
-
-  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
-No body is required.
-
-The response is empty as the logout provider has to chose what action to perform next.
-*/
-func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams, opts ...ClientOption) (*RejectLogoutRequestNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRejectLogoutRequestParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "rejectLogoutRequest",
-		Method:             "PUT",
-		PathPattern:        "/oauth2/auth/requests/logout/reject",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RejectLogoutRequestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RejectLogoutRequestNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for rejectLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  RevokeAuthenticationSession invalidates all login sessions of a certain user invalidates a subject s authentication session
-
-  This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
-Front- or Back-channel logout.
-*/
-func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams, opts ...ClientOption) (*RevokeAuthenticationSessionNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRevokeAuthenticationSessionParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "revokeAuthenticationSession",
-		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/login",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RevokeAuthenticationSessionReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RevokeAuthenticationSessionNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for revokeAuthenticationSession: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  RevokeConsentSessions revokes consent sessions of a subject for a specific o auth 2 0 client
-
-  This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
-associated OAuth 2.0 Access Tokens.
-*/
-func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRevokeConsentSessionsParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "revokeConsentSessions",
-		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/consent",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RevokeConsentSessionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*RevokeConsentSessionsNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for revokeConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

@@ -45,7 +45,7 @@ func sanitizeClient(c *client.Client) *client.Client {
 	return cc
 }
 
-func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledConsentRequest, requestedScope []string) *HandledConsentRequest {
+func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []AcceptOAuth2ConsentRequest, requestedScope []string) *AcceptOAuth2ConsentRequest {
 	for _, cs := range previousConsent {
 		var found = true
 		for _, scope := range requestedScope {

@@ -106,7 +106,7 @@ type adminCreateOAuth2Client struct {
 //
 //     Responses:
 //       201: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) adminCreateOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -114,7 +114,7 @@ func (h *Handler) adminCreateOAuth2Client(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.r.Writer().WriteCreated(w, r, "/admin"+ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 // swagger:parameters dynamicClientRegistrationCreateOAuth2Client
@@ -151,7 +151,7 @@ type dynamicClientRegistrationCreateOAuth2Client struct {
 //
 //     Responses:
 //       201: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) dynamicClientRegistrationCreateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -163,7 +163,7 @@ func (h *Handler) dynamicClientRegistrationCreateOAuth2Client(w http.ResponseWri
 		return
 	}
 
-	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	h.r.Writer().WriteCreated(w, r, "/admin"+ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
@@ -253,7 +253,7 @@ type adminUpdateOAuth2Client struct {
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) adminUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -333,8 +333,7 @@ type dynamicClientRegistrationUpdateOAuth2Client struct {
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: oAuth2ApiError
-//
+//       default: genericError
 func (h *Handler) dynamicClientRegistrationUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -389,7 +388,7 @@ type adminPatchOAuth2Client struct {
 	Body openapix.JSONPatchDocument
 }
 
-// swagger:route PATCH /clients/{id} v1 adminPatchOAuth2Client
+// swagger:route PATCH /admin/clients/{id} v1 adminPatchOAuth2Client
 //
 // Patch an OAuth 2.0 Client
 //
@@ -410,7 +409,7 @@ type adminPatchOAuth2Client struct {
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) adminPatchOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -471,7 +470,7 @@ type adminListOAuth2Clients struct {
 	Owner string `json:"owner"`
 }
 
-// swagger:route GET /clients v1 adminListOAuth2Clients
+// swagger:route GET /admin/clients v1 adminListOAuth2Clients
 //
 // List OAuth 2.0 Clients
 //
@@ -497,7 +496,7 @@ type adminListOAuth2Clients struct {
 //
 //     Responses:
 //       200: adminListOAuth2ClientsResponse
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) adminListOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	page, itemsPerPage := x.ParsePagination(r)
 	filters := Filter{
@@ -540,7 +539,7 @@ type adminGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /clients/{id} v1 adminGetOAuth2Client
+// swagger:route GET /admin/clients/{id} v1 adminGetOAuth2Client
 //
 // Get an OAuth 2.0 Client
 //
@@ -559,7 +558,7 @@ type adminGetOAuth2Client struct {
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -610,7 +609,7 @@ type dynamicClientRegistrationGetOAuth2Client struct {
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -644,7 +643,7 @@ type adminDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /clients/{id} v1 adminDeleteOAuth2Client
+// swagger:route DELETE /admin/clients/{id} v1 adminDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //
@@ -665,7 +664,7 @@ type adminDeleteOAuth2Client struct {
 //
 //     Responses:
 //       204: emptyResponse
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -711,7 +710,7 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 //
 //     Responses:
 //       204: emptyResponse
-//       default: oAuth2ApiError
+//       default: genericError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)

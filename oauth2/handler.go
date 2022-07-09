@@ -29,6 +29,8 @@ import (
 	"strings"
 	"time"
 
+	"go.step.sm/crypto/jose"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -214,7 +216,7 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
 // among others.
 //
 // swagger:model oidcConfiguration
-type oidcConfiguration struct {
+type OIDCConfiguration struct {
 	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
 	// If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
@@ -376,7 +378,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	h.r.Writer().Write(w, r, &oidcConfiguration{
+	h.r.Writer().Write(w, r, &OIDCConfiguration{
 		Issuer:                                 h.c.IssuerURL(r.Context()).String(),
 		AuthURL:                                h.c.OAuth2AuthURL(r.Context()).String(),
 		TokenURL:                               h.c.OAuth2TokenURL(r.Context()).String(),
@@ -629,7 +631,7 @@ type adminIntrospectOAuth2Token struct {
 	Scope string `json:"scope"`
 }
 
-// swagger:route POST /admin/oauth2/introspect adminIntrospectOAuth2Token
+// swagger:route POST /admin/oauth2/introspect v1 adminIntrospectOAuth2Token
 //
 // Introspect OAuth2 Access or Refresh Tokens
 //

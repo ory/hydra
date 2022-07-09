@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	outputOAuth2TokenIntrospection hydra.OAuth2TokenIntrospection
+	outputOAuth2TokenIntrospection hydra.IntrospectedOAuth2Token
 )
 
 func (_ outputOAuth2TokenIntrospection) Header() []string {

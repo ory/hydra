@@ -5,8 +5,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
+	hydrac "github.com/ory/hydra-client-go"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -15,11 +17,6 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
-
-	"github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/x/pointerx"
 
 	"github.com/cenkalti/backoff/v3"
 
@@ -119,14 +116,13 @@ var (
 
 	workdir string
 
-	hydra = client.NewHTTPClientWithConfig(nil, &client.TransportConfig{
-		Host:     "127.0.0.1:4445",
-		BasePath: "/",
-		Schemes:  []string{"https"}})
+	hydra = hydrac.NewAPIClient(hydrac.NewConfiguration())
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	hydra.GetConfig().HTTPClient = httpClient.HTTPClient
+	hydra.GetConfig().Servers = hydrac.ServerConfigurations{{URL: "http://127.0.0.1:4445"}}
 }
 
 func waitForServices(t *testing.T) {
@@ -277,9 +273,9 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								bo := conf.NextBackOff()
 								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
 
-								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient.StandardClient()).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
-									Alg: pointerx.String("RS256"),
-								}))
+								_, _, err = hydra.V1Api.AdminCreateJsonWebKeySet(context.Background(), "hydra.openid.id-token").AdminCreateJsonWebKeySetBody(hydrac.AdminCreateJsonWebKeySetBody{
+									Alg: "RS256",
+								}).Execute()
 								if err == nil {
 									break
 								}

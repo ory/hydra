@@ -2,18 +2,20 @@ package trust
 
 import (
 	"encoding/json"
-	"github.com/ory/hydra/x"
 	"net/http"
 	"time"
+
+	"github.com/ory/x/pagination/tokenpagination"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/x/httprouterx"
 
 	"github.com/google/uuid"
 
-	"github.com/ory/x/errorsx"
-	"github.com/ory/x/pagination"
-
 	"github.com/julienschmidt/httprouter"
+
+	"github.com/ory/x/errorsx"
 )
 
 const (
@@ -30,7 +32,7 @@ func NewHandler(r InternalRegistry) *Handler {
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(grantJWTBearerPath+"/:id", h.adminGetTrustedOAuth2JwtGrantIssuer)
-	admin.GET(grantJWTBearerPath, h.List)
+	admin.GET(grantJWTBearerPath, h.adminListTrustedOAuth2JwtGrantIssuers)
 	admin.POST(grantJWTBearerPath, h.adminTrustOAuth2JwtGrantIssuer)
 	admin.DELETE(grantJWTBearerPath+"/:id", h.adminDeleteTrustedOAuth2JwtGrantIssuer)
 }
@@ -207,6 +209,25 @@ func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, 
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:parameters adminListTrustedOAuth2JwtGrantIssuers
+type adminListTrustedOAuth2JwtGrantIssuers struct {
+	// If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
+	//
+	// in: query
+	// required: false
+	Issuer string `json:"issuer"`
+
+	tokenpagination.TokenPaginator
+
+	// The maximum amount of policies returned, upper bound is 500 policies
+	// in: query
+	Limit int `json:"limit"`
+
+	// The offset from where to start looking.
+	// in: query
+	Offset int `json:"offset"`
+}
+
 // swagger:route GET /admin/trust/grants/jwt-bearer/issuers v1 adminListTrustedOAuth2JwtGrantIssuers
 //
 // List Trusted OAuth2 JWT Bearer Grant Type Issuers
@@ -224,11 +245,11 @@ func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, 
 //     Responses:
 //       200: trustedOAuth2JwtGrantIssuers
 //       default: genericError
-func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	limit, offset := pagination.Parse(r, 100, 0, 500)
+func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	page, itemsPerPage := x.ParsePagination(r)
 	optionalIssuer := r.URL.Query().Get("issuer")
 
-	grants, err := h.registry.GrantManager().GetGrants(r.Context(), limit, offset, optionalIssuer)
+	grants, err := h.registry.GrantManager().GetGrants(r.Context(), itemsPerPage, page*itemsPerPage, optionalIssuer)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r, err)
 		return
@@ -240,7 +261,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	pagination.Header(w, r.URL, n, limit, offset)
+	x.PaginationHeader(w, r.URL, int64(n), page, itemsPerPage)
 	if grants == nil {
 		grants = []Grant{}
 	}

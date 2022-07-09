@@ -35,6 +35,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/ioutilx"
+
+	hydra "github.com/ory/hydra-client-go"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/x/assertx"
@@ -58,9 +62,6 @@ import (
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
 	hydraoauth2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pointerx"
@@ -118,7 +119,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 	}
 
-	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
+	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
+	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
 	getAuthorizeCode := func(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
 		if c == nil {
@@ -135,74 +137,76 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return q.Get("code"), resp
 	}
 
-	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*admin.GetLoginRequestOK) *models.AcceptLoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, err := adminClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+			rr, _, err := adminClient.V1Api.AdminGetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), rr.Payload.Client.ClientID)
-			assert.Empty(t, rr.Payload.Client.ClientSecret)
-			assert.EqualValues(t, c.GrantTypes, rr.Payload.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, rr.Payload.Client.LogoURI)
-			assert.EqualValues(t, c.RedirectURIs, rr.Payload.Client.RedirectUris)
-			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *rr.Payload.Challenge)
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
-			assert.Contains(t, *rr.Payload.RequestURL, reg.Config().OAuth2AuthURL(ctx).String())
+			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
+			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
+			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
+			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
+			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.Contains(t, rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
 
-			acceptBody := &models.AcceptLoginRequest{
-				Subject:  &subject,
-				Remember: !*rr.Payload.Skip,
-				Acr:      "1",
-				Amr:      models.StringSliceJSONFormat{"pwd"},
+			acceptBody := hydra.AcceptOAuth2LoginRequest{
+				Subject:  subject,
+				Remember: pointerx.Bool(!rr.Skip),
+				Acr:      pointerx.String("1"),
+				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
 			if checkRequestPayload != nil {
 				if b := checkRequestPayload(rr); b != nil {
-					acceptBody = b
+					acceptBody = *b
 				}
 			}
 
-			v, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-				WithBody(acceptBody))
+			v, _, err := adminClient.V1Api.AdminAcceptOAuth2LoginRequest(context.Background()).
+				LoginChallenge(r.URL.Query().Get("login_challenge")).
+				AcceptOAuth2LoginRequest(acceptBody).
+				Execute()
 			require.NoError(t, err)
-			require.NotEmpty(t, *v.Payload.RedirectTo)
-			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 		}
 	}
 
-	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*admin.GetConsentRequestOK)) http.HandlerFunc {
+	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, err := adminClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+			rr, _, err := adminClient.V1Api.AdminGetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), rr.Payload.Client.ClientID)
-			assert.Empty(t, rr.Payload.Client.ClientSecret)
-			assert.EqualValues(t, c.GrantTypes, rr.Payload.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, rr.Payload.Client.LogoURI)
-			assert.EqualValues(t, c.RedirectURIs, rr.Payload.Client.RedirectUris)
-			assert.EqualValues(t, subject, rr.Payload.Subject)
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
-			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *rr.Payload.Challenge)
-			assert.Contains(t, rr.Payload.RequestURL, reg.Config().OAuth2AuthURL(ctx).String())
+			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
+			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
+			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
+			assert.EqualValues(t, subject, pointerx.StringR(rr.Subject))
+			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
+			assert.Contains(t, *rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
 			if checkRequestPayload != nil {
 				checkRequestPayload(rr)
 			}
 
-			assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Payload.Context)
-			v, err := adminClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-				WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-				WithBody(&models.AcceptConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
-					GrantAccessTokenAudience: rr.Payload.RequestedAccessTokenAudience,
-					Session: &models.ConsentRequestSession{
+			assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Context)
+			v, _, err := adminClient.V1Api.AdminAcceptOAuth2ConsentRequest(context.Background()).
+				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
+					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Bool(true), RememberFor: pointerx.Int64(0),
+					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
-						IDToken:     map[string]interface{}{"bar": "baz"},
+						IdToken:     map[string]interface{}{"bar": "baz"},
 					},
-				}))
+				}).
+				Execute()
 			require.NoError(t, err)
-			require.NotEmpty(t, *v.Payload.RedirectTo)
-			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 		}
 	}
 
@@ -361,11 +365,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=checks if request fails when subject is empty", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
-			_, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(""), Remember: true}))
+			_, res, err := adminClient.V1Api.AdminAcceptOAuth2LoginRequest(ctx).
+				LoginChallenge(r.URL.Query().Get("login_challenge")).
+				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Bool(true)}).Execute()
 			require.Error(t, err) // expects 400
-			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload)
+			body := string(ioutilx.MustReadAll(res.Body))
+			assert.Contains(t, body, "Field 'subject' must not be empty", "%s", body)
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
@@ -377,14 +382,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		expectAud := "https://api.ory.sh/"
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				assert.False(t, *r.Payload.Skip)
-				assert.EqualValues(t, []string{expectAud}, r.Payload.RequestedAccessTokenAudience)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				assert.False(t, r.Skip)
+				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 				return nil
 			}),
-			acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-				assert.False(t, r.Payload.Skip)
-				assert.EqualValues(t, []string{expectAud}, r.Payload.RequestedAccessTokenAudience)
+			acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+				assert.False(t, *r.Skip)
+				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 			}))
 
 		code, _ := getAuthorizeCode(t, conf, nil,
@@ -524,14 +529,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		// Reset UI to check for skip values
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				require.True(t, *r.Payload.Skip)
-				require.EqualValues(t, subject, *r.Payload.Subject)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				require.True(t, r.Skip)
+				require.EqualValues(t, subject, r.Subject)
 				return nil
 			}),
-			acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-				require.True(t, r.Payload.Skip)
-				require.EqualValues(t, subject, r.Payload.Subject)
+			acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+				require.True(t, *r.Skip)
+				require.EqualValues(t, subject, *r.Subject)
 			}),
 		)
 
@@ -578,14 +583,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 			t.Run("followup=passes and resets skip when prompt=login", func(t *testing.T) {
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
-					acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-						require.False(t, *r.Payload.Skip)
-						require.Empty(t, *r.Payload.Subject)
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						require.False(t, r.Skip)
+						require.Empty(t, r.Subject)
 						return nil
 					}),
-					acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-						require.True(t, r.Payload.Skip)
-						require.EqualValues(t, subject, r.Payload.Subject)
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						require.True(t, *r.Skip)
+						require.EqualValues(t, subject, *r.Subject)
 					}),
 				)
 				code, _ := getAuthorizeCode(t, conf, oc,
@@ -619,9 +624,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=requires re-authentication when id_token_hint is set to a user 'patrik-neu' but the session is 'aeneas-rekkas' and then fails because the user id from the log in endpoint is 'aeneas-rekkas'", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				require.False(t, *r.Payload.Skip)
-				require.Empty(t, *r.Payload.Subject)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				require.False(t, r.Skip)
+				require.Empty(t, r.Subject)
 				return nil
 			}),
 			acceptConsentHandler(t, c, subject, nil),
@@ -643,7 +648,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=should not cause issues if max_age is very low and consent takes a long time", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				time.Sleep(time.Second * 2)
 				return nil
 			}),
@@ -1142,7 +1147,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
+						require.Equal(t, "An error occurred while executing the refresh token hook.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `access_denied` if hook denied the request", func(t *testing.T) {
@@ -1161,7 +1166,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrAccessDenied.GetDescription(), errBody.Description)
+						require.Equal(t, "The refresh token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook response is malformed", func(t *testing.T) {
@@ -1180,7 +1185,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
+						require.Equal(t, "The refresh token hook target responded with an error.", errBody.Description)
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {

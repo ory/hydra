@@ -25,11 +25,6 @@ require (
 	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
-	github.com/go-openapi/errors v0.20.1
-	github.com/go-openapi/runtime v0.20.0
-	github.com/go-openapi/strfmt v0.20.3
-	github.com/go-openapi/swag v0.19.15
-	github.com/go-openapi/validate v0.20.1
 	github.com/go-swagger/go-swagger v0.26.1
 	github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
@@ -50,7 +45,6 @@ require (
 	github.com/mikefarah/yq/v4 v4.19.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
-	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
 	github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 	github.com/ory/go-acc v0.2.8
@@ -116,11 +110,16 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.19.16 // indirect
+	github.com/go-openapi/errors v0.20.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.5 // indirect
 	github.com/go-openapi/loads v0.20.1 // indirect
+	github.com/go-openapi/runtime v0.20.0 // indirect
 	github.com/go-openapi/spec v0.20.2 // indirect
+	github.com/go-openapi/strfmt v0.20.3 // indirect
+	github.com/go-openapi/swag v0.19.15 // indirect
+	github.com/go-openapi/validate v0.20.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/envy v1.10.1 // indirect
@@ -168,7 +167,6 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mattn/go-runewidth v0.0.2 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mattn/goveralls v0.0.11 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
@@ -182,7 +180,6 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/opencontainers/runc v1.1.1 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/openzipkin/zipkin-go v0.4.0 // indirect
 	github.com/ory/dockertest/v3 v3.9.0 // indirect
 	github.com/ory/go-convenience v0.1.0 // indirect

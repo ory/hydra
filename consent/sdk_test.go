@@ -27,6 +27,8 @@ import (
 	"testing"
 	"time"
 
+	hydra "github.com/ory/hydra-client-go"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/stretchr/testify/assert"
@@ -35,13 +37,8 @@ import (
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
 )
 
 func makeID(base string, network string, key string) string {
@@ -62,7 +59,8 @@ func TestSDK(t *testing.T) {
 	h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL))
 	ts := httptest.NewServer(router)
 
-	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
+	sdk := hydra.NewAPIClient(hydra.NewConfiguration())
+	sdk.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
 
 	m := reg.ConsentManager()
 
@@ -120,90 +118,90 @@ func TestSDK(t *testing.T) {
 	lur2 := MockLogoutRequest("testsdk-2", false, network)
 	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
 
-	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(makeID("challenge", network, "1")))
+	crGot, _, err := sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
 	require.NoError(t, err)
-	compareSDKConsentRequest(t, cr1, *crGot.Payload)
+	compareSDKConsentRequest(t, cr1, *crGot)
 
-	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(makeID("challenge", network, "2")))
+	crGot, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.NoError(t, err)
-	compareSDKConsentRequest(t, cr2, *crGot.Payload)
+	compareSDKConsentRequest(t, cr2, *crGot)
 
-	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(makeID("challenge", network, "ar-1")))
+	arGot, _, err := sdk.V1Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-1")).Execute()
 	require.NoError(t, err)
-	compareSDKLoginRequest(t, ar1, *arGot.Payload)
+	compareSDKLoginRequest(t, ar1, *arGot)
 
-	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(makeID("challenge", network, "ar-2")))
+	arGot, _, err = sdk.V1Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-2")).Execute()
 	require.NoError(t, err)
-	compareSDKLoginRequest(t, ar2, *arGot.Payload)
+	compareSDKLoginRequest(t, ar2, *arGot)
 
-	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithSubject("subject1"))
+	_, err = sdk.V1Api.AdminRevokeOAuth2LoginSessions(ctx).Subject("subject1").Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
+	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").Execute()
 	require.Error(t, err)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject(cr4.Subject).WithClient(pointerx.String(cr4.Client.GetID())))
+	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject(cr4.Subject).Client(cr4.Client.GetID()).Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithAll(pointerx.Bool(true)))
+	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").All(true).Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(makeID("challenge", network, "1")))
+	_, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
 	require.Error(t, err)
 
-	crGot, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(makeID("challenge", network, "2")))
+	crGot, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.NoError(t, err)
-	compareSDKConsentRequest(t, cr2, *crGot.Payload)
+	compareSDKConsentRequest(t, cr2, *crGot)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithSubject("subject2").WithClient(pointerx.String("fk-client-2")))
+	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject2").Client("fk-client-2").Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(makeID("challenge", network, "2")))
+	_, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.Error(t, err)
 
-	csGot, err := sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject3"))
+	csGot, _, err := sdk.V1Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject3").Execute()
 	require.NoError(t, err)
-	assert.Equal(t, 1, len(csGot.Payload))
-	cs := csGot.Payload[0]
-	assert.Equal(t, makeID("challenge", network, "3"), *cs.ConsentRequest.Challenge)
+	assert.Equal(t, 1, len(csGot))
+	cs := csGot[0]
+	assert.Equal(t, makeID("challenge", network, "3"), cs.ConsentRequest.Challenge)
 
-	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
+	csGot, _, err = sdk.V1Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject2").Execute()
 	require.NoError(t, err)
-	assert.Equal(t, 0, len(csGot.Payload))
+	assert.Equal(t, 0, len(csGot))
 
-	luGot, err := sdk.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge(makeID("challenge", network, "testsdk-1")))
+	luGot, _, err := sdk.V1Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
 	require.NoError(t, err)
-	compareSDKLogoutRequest(t, lur1, luGot.Payload)
+	compareSDKLogoutRequest(t, lur1, luGot)
 
-	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(makeID("challenge", network, "testsdk-1")))
+	luaGot, _, err := sdk.V1Api.AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
 	require.NoError(t, err)
-	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier="+makeID("verifier", network, "testsdk-1"), *luaGot.Payload.RedirectTo)
+	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier="+makeID("verifier", network, "testsdk-1"), luaGot.RedirectTo)
 
-	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge(lur2.ID))
+	_, err = sdk.V1Api.AdminRejectOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge(lur2.ID))
+	_, _, err = sdk.V1Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
 	require.Error(t, err)
 }
 
-func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
-	assert.EqualValues(t, expected.ID, *got.Challenge)
-	assert.EqualValues(t, expected.Subject, *got.Subject)
-	assert.EqualValues(t, expected.Skip, *got.Skip)
-	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
-}
-
-func compareSDKConsentRequest(t *testing.T, expected *OAuth2ConsentRequest, got models.ConsentRequest) {
-	assert.EqualValues(t, expected.ID, *got.Challenge)
+func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got hydra.OAuth2LoginRequest) {
+	assert.EqualValues(t, expected.ID, got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
-	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
+	assert.EqualValues(t, expected.Client.GetID(), *got.Client.ClientId)
 }
 
-func compareSDKLogoutRequest(t *testing.T, expected *LogoutRequest, got *models.LogoutRequest) {
-	assert.EqualValues(t, expected.Subject, got.Subject)
-	assert.EqualValues(t, expected.SessionID, got.Sid)
-	assert.EqualValues(t, expected.SessionID, got.Sid)
-	assert.EqualValues(t, expected.RequestURL, got.RequestURL)
-	assert.EqualValues(t, expected.RPInitiated, got.RpInitiated)
+func compareSDKConsentRequest(t *testing.T, expected *OAuth2ConsentRequest, got hydra.OAuth2ConsentRequest) {
+	assert.EqualValues(t, expected.ID, got.Challenge)
+	assert.EqualValues(t, expected.Subject, *got.Subject)
+	assert.EqualValues(t, expected.Skip, *got.Skip)
+	assert.EqualValues(t, expected.Client.GetID(), *got.Client.ClientId)
+}
+
+func compareSDKLogoutRequest(t *testing.T, expected *LogoutRequest, got *hydra.OAuth2LogoutRequest) {
+	assert.EqualValues(t, expected.Subject, *got.Subject)
+	assert.EqualValues(t, expected.SessionID, *got.Sid)
+	assert.EqualValues(t, expected.SessionID, *got.Sid)
+	assert.EqualValues(t, expected.RequestURL, *got.RequestUrl)
+	assert.EqualValues(t, expected.RPInitiated, *got.RpInitiated)
 }

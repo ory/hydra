@@ -65,11 +65,11 @@ func NewHandler(
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(LoginPath, h.adminGetOAuth2LoginRequest)
 	admin.PUT(LoginPath+"/accept", h.adminAcceptOAuth2LoginRequest)
-	admin.PUT(LoginPath+"/reject", h.rejectOAuth2LoginRequest)
+	admin.PUT(LoginPath+"/reject", h.adminRejectOAuth2LoginRequest)
 
 	admin.GET(ConsentPath, h.adminGetOAuth2ConsentRequest)
 	admin.PUT(ConsentPath+"/accept", h.adminAcceptOAuth2ConsentRequest)
-	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
+	admin.PUT(ConsentPath+"/reject", h.adminRejectOAuth2ConsentRequest)
 
 	admin.DELETE(SessionsPath+"/login", h.adminRevokeOAuth2LoginSessions)
 	admin.GET(SessionsPath+"/consent", h.adminListOAuth2SubjectConsentSessions)
@@ -176,7 +176,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: previousOAuth2ConsentSession
+//       200: previousOAuth2ConsentSessions
 //       default: oAuth2ApiError
 func (h *Handler) adminListOAuth2SubjectConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
@@ -417,8 +417,8 @@ func (h *Handler) adminAcceptOAuth2LoginRequest(w http.ResponseWriter, r *http.R
 	})
 }
 
-// swagger:parameters rejectOAuth2LoginRequest
-type rejectOAuth2LoginRequest struct {
+// swagger:parameters adminRejectOAuth2LoginRequest
+type adminRejectOAuth2LoginRequest struct {
 	// in: query
 	// required: true
 	Challenge string `json:"login_challenge"`
@@ -427,7 +427,7 @@ type rejectOAuth2LoginRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/login/reject v1 rejectOAuth2LoginRequest
+// swagger:route PUT /admin/oauth2/auth/requests/login/reject v1 adminRejectOAuth2LoginRequest
 //
 // Reject an OAuth 2.0 Login Request
 //
@@ -455,7 +455,7 @@ type rejectOAuth2LoginRequest struct {
 //     Responses:
 //       200: successfulOAuth2RequestResponse
 //       default: oAuth2ApiError
-func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminRejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -509,7 +509,7 @@ type adminGetOAuth2ConsentRequest struct {
 	Challenge string `json:"consent_challenge"`
 }
 
-// swagger:route GET /oauth2/auth/requests/consent v1 adminGetOAuth2ConsentRequest
+// swagger:route GET /admin/oauth2/auth/requests/consent v1 adminGetOAuth2ConsentRequest
 //
 // Get OAuth 2.0 Consent Request Information
 //
@@ -659,8 +659,8 @@ func (h *Handler) adminAcceptOAuth2ConsentRequest(w http.ResponseWriter, r *http
 	})
 }
 
-// swagger:parameters rejectOAuth2ConsentRequest
-type rejectOAuth2ConsentRequest struct {
+// swagger:parameters adminRejectOAuth2ConsentRequest
+type adminRejectOAuth2ConsentRequest struct {
 	// in: query
 	// required: true
 	Challenge string `json:"consent_challenge"`
@@ -669,7 +669,7 @@ type rejectOAuth2ConsentRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/consent/reject v1 rejectOAuth2ConsentRequest
+// swagger:route PUT /admin/oauth2/auth/requests/consent/reject v1 adminRejectOAuth2ConsentRequest
 //
 // Reject an OAuth 2.0 Consent Request
 //
@@ -700,7 +700,7 @@ type rejectOAuth2ConsentRequest struct {
 //     Responses:
 //       200: handledOAuth2ConsentRequest
 //       default: oAuth2ApiError
-func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminRejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -755,7 +755,7 @@ type adminAcceptOAuth2LogoutRequest struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:route PUT /oauth2/auth/requests/logout/accept v1 adminAcceptOAuth2LogoutRequest
+// swagger:route PUT /admin/oauth2/auth/requests/logout/accept v1 adminAcceptOAuth2LogoutRequest
 //
 // Accept an OAuth 2.0 Logout Request
 //
@@ -798,7 +798,7 @@ type adminRejectOAuth2LogoutRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /oauth2/auth/requests/logout/reject v1 adminRejectOAuth2LogoutRequest
+// swagger:route PUT /admin/oauth2/auth/requests/logout/reject v1 adminRejectOAuth2LogoutRequest
 //
 // Reject an OAuth 2.0 Logout Request
 //
@@ -836,7 +836,7 @@ type adminGetOAuth2LogoutRequest struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:route GET /oauth2/auth/requests/logout admin adminGetOAuth2LogoutRequest
+// swagger:route GET /admin/oauth2/auth/requests/logout v1 adminGetOAuth2LogoutRequest
 //
 // Get an OAuth 2.0 Logout Request
 //

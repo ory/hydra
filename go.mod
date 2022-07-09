@@ -15,7 +15,7 @@ replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220623093045-
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
-replace github.com/ory/hydra-client-go => ./internal/httpclient-next
+replace github.com/ory/hydra-client-go => ./internal/httpclient
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -73,6 +73,7 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v1.7.0
+	go.step.sm/crypto v0.16.2
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/tools v0.1.10
@@ -81,6 +82,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect

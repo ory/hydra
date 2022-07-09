@@ -124,13 +124,9 @@ sdk: .bin/swagger .bin/ory node_modules
 					-p file://.schema/openapi/patches/security.yaml \
 					spec/swagger.json spec/api.json
 
-		rm -rf internal/httpclient internal/httpclient-next
-		mkdir -p internal/httpclient internal/httpclient-next
-		swagger generate client -f ./spec/swagger.json -t internal/httpclient -A Ory_Hydra
-
 		npm run openapi-generator-cli -- generate -i "spec/api.json" \
 				-g go \
-				-o "internal/httpclient-next" \
+				-o "internal/httpclient" \
 				--git-user-id ory \
 				--git-repo-id hydra-client-go \
 				--git-host github.com

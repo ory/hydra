@@ -28,23 +28,6 @@ import (
 	"time"
 )
 
-// swagger:parameters listTrustedJwtGrantIssuers
-type listTrustedJwtGrantIssuers struct {
-	// If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
-	//
-	// in: query
-	// required: false
-	Issuer string `json:"issuer"`
-
-	// The maximum amount of policies returned, upper bound is 500 policies
-	// in: query
-	Limit int `json:"limit"`
-
-	// The offset from where to start looking.
-	// in: query
-	Offset int `json:"offset"`
-}
-
 // swagger:model trustedOAuth2JwtGrantIssuers
 type trustedOAuth2JwtGrantIssuers []trustedOAuth2JwtGrantIssuer
 

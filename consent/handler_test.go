@@ -30,7 +30,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/x/pointerx"
 
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
@@ -41,6 +41,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 )
@@ -81,7 +82,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			defer ts.Close()
 
 			c := &http.Client{}
-			resp, err := c.Get(ts.URL + LogoutPath + "?challenge=" + challenge)
+			resp, err := c.Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
@@ -139,7 +140,7 @@ func TestGetLoginRequest(t *testing.T) {
 			defer ts.Close()
 
 			c := &http.Client{}
-			resp, err := c.Get(ts.URL + LoginPath + "?challenge=" + challenge)
+			resp, err := c.Get(ts.URL + "/admin" + LoginPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
@@ -211,7 +212,7 @@ func TestGetConsentRequest(t *testing.T) {
 			defer ts.Close()
 
 			c := &http.Client{}
-			resp, err := c.Get(ts.URL + ConsentPath + "?challenge=" + challenge)
+			resp, err := c.Get(ts.URL + "/admin" + ConsentPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
@@ -255,7 +256,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		c := &http.Client{}
 
 		sub := "sub123"
-		acceptLogin := &models.AcceptLoginRequest{Remember: true, Subject: &sub}
+		acceptLogin := &hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Bool(true), Subject: sub}
 
 		// marshal User to json
 		acceptLoginJson, err := json.Marshal(acceptLogin)
@@ -264,7 +265,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		}
 
 		// set the HTTP method, url, and request body
-		req, err := http.NewRequest(http.MethodPut, ts.URL+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
+		req, err := http.NewRequest(http.MethodPut, ts.URL+"/admin"+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
 		if err != nil {
 			panic(err)
 		}
@@ -278,7 +279,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NotNil(t, result.RedirectTo)
 		require.Contains(t, result.RedirectTo, "login_verifier")
 
-		req2, err := http.NewRequest(http.MethodPut, ts.URL+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
+		req2, err := http.NewRequest(http.MethodPut, ts.URL+"/admin"+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
 		if err != nil {
 			panic(err)
 		}

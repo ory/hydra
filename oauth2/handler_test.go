@@ -32,24 +32,24 @@ import (
 	"testing"
 	"time"
 
+	hydra "github.com/ory/hydra-client-go"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/x/snapshotx"
 
 	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/x/urlx"
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/internal"
 
 	jwt2 "github.com/ory/fosite/token/jwt"
 
@@ -57,7 +57,6 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/oauth2"
 )
 
@@ -93,8 +92,10 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-	_, err := c.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID("foobar"))
+	c := hydra.NewAPIClient(hydra.NewConfiguration())
+	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
+
+	_, err := c.V1Api.AdminDeleteOAuth2Token(context.Background()).ClientId("foobar").Execute()
 	require.NoError(t, err)
 
 	ds := new(oauth2.Session)
@@ -379,7 +380,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NoError(t, err)
 		defer res.Body.Close()
 
-		var wellKnownResp oauth2.oidcConfiguration
+		var wellKnownResp oauth2.OIDCConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 		snapshotx.SnapshotT(t, wellKnownResp)

@@ -30,6 +30,7 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/ory/x/jsonx"
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/fosite"
@@ -356,7 +357,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 	oldSecret := c.Secret
 
-	if err := x.ApplyJSONPatch(patchJSON, c, "/id"); err != nil {
+	if err := jsonx.ApplyJSONPatch(patchJSON, c, "/id"); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

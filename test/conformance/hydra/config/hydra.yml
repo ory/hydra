@@ -80,4 +80,5 @@ webfinger:
     userinfo_url: https://hydra:4444/userinfo
     token_url: https://hydra:4444/oauth2/token
     jwks_url: https://hydra:4444/.well-known/jwks.json
-    client_registration_url: https://hydra:4445/clients
+    client_registration_url: https://hydra:4445/admin/clients
+

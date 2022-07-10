@@ -122,7 +122,7 @@ var (
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	hydra.GetConfig().HTTPClient = httpClient.HTTPClient
-	hydra.GetConfig().Servers = hydrac.ServerConfigurations{{URL: "http://127.0.0.1:4445"}}
+	hydra.GetConfig().Servers = hydrac.ServerConfigurations{{URL: "https://127.0.0.1:4445"}}
 }
 
 func waitForServices(t *testing.T) {

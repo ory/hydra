@@ -307,7 +307,7 @@ func (h *Handler) adminGetOAuth2LoginRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &HandledOAuth2ConsentRequest{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestHandlerResponse{
 			RedirectTo: request.RequestURL,
 		})
 		return
@@ -698,7 +698,7 @@ type adminRejectOAuth2ConsentRequest struct {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: handledOAuth2ConsentRequest
+//       200: successfulOAuth2RequestResponse
 //       default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(

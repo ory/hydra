@@ -717,8 +717,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/handledOAuth2ConsentRequest'
-          description: handledOAuth2ConsentRequest
+                $ref: '#/components/schemas/successfulOAuth2RequestResponse'
+          description: successfulOAuth2RequestResponse
         default:
           content:
             application/json:
@@ -1919,8 +1919,6 @@ components:
       - message
       type: object
     handledOAuth2ConsentRequest:
-      example:
-        redirect_to: redirect_to
       properties:
         redirect_to:
           description: Original request URL to which you should redirect the user

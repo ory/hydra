@@ -2203,11 +2203,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/handledOAuth2ConsentRequest"
+                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
                 }
               }
             },
-            "description": "handledOAuth2ConsentRequest"
+            "description": "successfulOAuth2RequestResponse"
           },
           "default": {
             "content": {

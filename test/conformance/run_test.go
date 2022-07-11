@@ -8,7 +8,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	hydrac "github.com/ory/hydra-client-go"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -17,6 +16,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	hydrac "github.com/ory/hydra-client-go"
 
 	"github.com/cenkalti/backoff/v3"
 

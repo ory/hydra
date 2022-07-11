@@ -31,6 +31,7 @@ oidc:
     pairwise:
       salt: youReallyNeedToChangeThis
   dynamic_client_registration:
+    enabled: true
     default_scope:
       - email
       - offline_access

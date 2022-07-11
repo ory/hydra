@@ -827,9 +827,9 @@
         ],
         "responses": {
           "200": {
-            "description": "handledOAuth2ConsentRequest",
+            "description": "successfulOAuth2RequestResponse",
             "schema": {
-              "$ref": "#/definitions/handledOAuth2ConsentRequest"
+              "$ref": "#/definitions/successfulOAuth2RequestResponse"
             }
           },
           "default": {

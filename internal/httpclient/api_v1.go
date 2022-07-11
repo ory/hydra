@@ -2747,7 +2747,7 @@ func (r ApiAdminRejectOAuth2ConsentRequestRequest) RejectOAuth2Request(rejectOAu
 	return r
 }
 
-func (r ApiAdminRejectOAuth2ConsentRequestRequest) Execute() (*HandledOAuth2ConsentRequest, *http.Response, error) {
+func (r ApiAdminRejectOAuth2ConsentRequestRequest) Execute() (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	return r.ApiService.AdminRejectOAuth2ConsentRequestExecute(r)
 }
 
@@ -2781,13 +2781,13 @@ func (a *V1ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context) ApiA
 }
 
 // Execute executes the request
-//  @return HandledOAuth2ConsentRequest
-func (a *V1ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOAuth2ConsentRequestRequest) (*HandledOAuth2ConsentRequest, *http.Response, error) {
+//  @return SuccessfulOAuth2RequestResponse
+func (a *V1ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *HandledOAuth2ConsentRequest
+		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRejectOAuth2ConsentRequest")

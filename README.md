@@ -281,6 +281,12 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/buhta.svg" alt="Buhta"></td>
             <td><a href="https://buhta.com/">buhta.com</a></td>
         </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Connctd</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/connctd.svg" alt="Connctd"></td>
+            <td><a href="https://connctd.com/">connctd.com</a></td>
+        </tr>
     </tbody>
 </table>
 

@@ -67,11 +67,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '6.0'
-          memory: 4G
+          cpus: '1.5'
+          memory: 2G
         reservations:
-          cpus: '2.0'
-          memory: 1G
+          cpus: '0.5'
+          memory: 500M
 
   consent:
     image: oryd/hydra-login-consent-node:latest

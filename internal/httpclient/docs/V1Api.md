@@ -1567,7 +1567,7 @@ No authorization required
 
 ## AdminRejectOAuth2ConsentRequest
 
-> HandledOAuth2ConsentRequest AdminRejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+> SuccessfulOAuth2RequestResponse AdminRejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject an OAuth 2.0 Consent Request
 
@@ -1596,7 +1596,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRejectOAuth2ConsentRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `AdminRejectOAuth2ConsentRequest`: HandledOAuth2ConsentRequest
+    // response from `AdminRejectOAuth2ConsentRequest`: SuccessfulOAuth2RequestResponse
     fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminRejectOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
@@ -1617,7 +1617,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**HandledOAuth2ConsentRequest**](HandledOAuth2ConsentRequest.md)
+[**SuccessfulOAuth2RequestResponse**](SuccessfulOAuth2RequestResponse.md)
 
 ### Authorization
 

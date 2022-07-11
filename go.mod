@@ -11,8 +11,6 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220623093045-89faad818c4c
-
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
 replace github.com/ory/hydra-client-go => ./internal/httpclient
@@ -46,7 +44,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
+	github.com/ory/fosite v0.42.3-0.20220623093045-89faad818c4c
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13

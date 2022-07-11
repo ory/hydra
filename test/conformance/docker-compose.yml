@@ -64,11 +64,19 @@ services:
     networks:
       - intranet
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '6.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 1G
 
   consent:
     image: oryd/hydra-login-consent-node:latest
     environment:
-      HYDRA_ADMIN_URL: https://hydra:4445
+      HYDRA_ADMIN_URL: https://hydra:4445/admin
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       CONFORMITY_FAKE_CLAIMS: 1
 

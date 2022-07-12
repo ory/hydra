@@ -1304,7 +1304,7 @@ gitlab_rails['omniauth_providers'] = [
 #  "options" => {
 #    "stub_status" => "on", # Turn on stats
 #    "server_tokens" => "off", # Don't show the version of NGINX
-#    "access_log" => "off", # Disable logs for stats
+#    "request_log" => "off", # Disable logs for stats
 #    "allow" => "127.0.0.1", # Only allow access from localhost
 #    "deny" => "all" # Deny access to anyone else
 #  }

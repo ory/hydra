@@ -19,7 +19,7 @@ const (
 	KeySuffixSocketOwner            = "socket.owner"
 	KeySuffixSocketGroup            = "socket.group"
 	KeySuffixSocketMode             = "socket.mode"
-	KeySuffixDisableHealthAccessLog = "access_log.disable_for_health"
+	KeySuffixDisableHealthAccessLog = "request_log.disable_for_health"
 )
 
 var (

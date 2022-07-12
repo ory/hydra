@@ -24,7 +24,7 @@ serve:
       allow_credentials: true
       max_age: 1
       debug: false
-    access_log:
+    request_log:
       disable_for_health: false
   admin:
     port: 2
@@ -47,7 +47,7 @@ serve:
       allow_credentials: true
       max_age: 1
       debug: false
-    access_log:
+    request_log:
       disable_for_health: false
   tls:
     key:

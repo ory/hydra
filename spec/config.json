@@ -334,7 +334,7 @@
             "socket": {
               "$ref": "#/definitions/socket"
             },
-            "access_log": {
+            "request_log": {
               "type": "object",
               "additionalProperties": false,
               "description": "Access Log configuration for public server.",
@@ -376,7 +376,7 @@
             "socket": {
               "$ref": "#/definitions/socket"
             },
-            "access_log": {
+            "request_log": {
               "type": "object",
               "additionalProperties": false,
               "description": "Access Log configuration for admin server.",

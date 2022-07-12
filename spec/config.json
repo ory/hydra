@@ -811,8 +811,7 @@
           "description": "Defines how scopes are matched. For more details have a look at https://github.com/ory/fosite#scopes",
           "enum": [
             "exact",
-            "wildcard",
-            "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY"
+            "wildcard"
           ],
           "default": "wildcard"
         },

@@ -322,7 +322,7 @@
             },
             "host": {
               "type": "string",
-              "description": "The interface or unix socket Ory Hydra should listen and handle public API requests on. Use the prefix \"unix:\" to specify a path to a unix socket. Leave empty to listen on all interfaces.",
+              "description": "The interface or unix socket Ory Hydra should listen and handle public API requests on. Use the prefix `unix:` to specify a path to a unix socket. Leave empty to listen on all interfaces.",
               "default": "",
               "examples": [
                 "localhost"
@@ -366,7 +366,7 @@
             },
             "host": {
               "type": "string",
-              "description": "The interface or unix socket Ory Hydra should listen and handle administrative API requests on. Use the prefix \"unix:\" to specify a path to a unix socket. Leave empty to listen on all interfaces.",
+              "description": "The interface or unix socket Ory Hydra should listen and handle administrative API requests on. Use the prefix `unix:` to specify a path to a unix socket. Leave empty to listen on all interfaces.",
               "default": "",
               "examples": [
                 "localhost"
@@ -457,7 +457,7 @@
     },
     "dsn": {
       "type": "string",
-      "description": "Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is \"memory\", data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
+      "description": "Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is `memory`, data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
     },
     "clients": {
       "title": "Global outgoing network settings",
@@ -574,7 +574,7 @@
             },
             "supported_claims": {
               "type": "array",
-              "description": "A list of supported claims to be broadcasted. Claim \"sub\" is always included.",
+              "description": "A list of supported claims to be broadcasted. Claim `sub` is always included.",
               "items": {
                 "type": "string"
               },
@@ -684,7 +684,7 @@
             },
             "default_scope": {
               "type": "array",
-              "description": "The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the \"scope\" key in the registration payload, effectively disabling the concept of whitelisted scopes.",
+              "description": "The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the `scope` key in the registration payload, effectively disabling the concept of whitelisted scopes.",
               "items": {
                 "type": "string"
               },
@@ -710,7 +710,7 @@
           "properties": {
             "issuer": {
               "type": "string",
-              "description": "This value will be used as the \"issuer\" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dev is set. This should typically be equal to the public value.",
+              "description": "This value will be used as the `issuer` in access and ID tokens. It must be specified and using HTTPS protocol, unless --dev is set. This should typically be equal to the public value.",
               "format": "uri",
               "examples": [
                 "https://localhost:4444/"
@@ -973,7 +973,7 @@
           "properties": {
             "default_grant_allowed_scope": {
               "type": "boolean",
-              "description": "Defines how scopes are added if the request doesn't contains any scope",
+              "description": "Automatically grant authorized OAuth2 Scope in OAuth2 Client Credentials Flow. Each OAuth2 Client is allowed to request a predefined OAuth2 Scope (for example `read write`). If this option is enabled, the full\nscope is automatically granted when performing the OAuth2 Client Credentials flow.\n\nIf disabled, the OAuth2 Client has to request the scope in the OAuth2 request by providing the `scope` query parameter. Setting this option to true is common if you need compatibility with MITREid.",
               "examples": [
                 false
               ]
@@ -991,16 +991,16 @@
               "properties": {
                 "jti_optional": {
                   "type": "boolean",
-                  "description": "If false, JTI claim must be present in JWT assertion.",
+                  "description": "Configures if the JSON Web Token ID (`jti`) claim is required in the JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants (RFC7523). If set to `false`, the `jti` claim is required. Set this value to `true` only after careful consideration.",
                   "default": false
                 },
                 "iat_optional": {
                   "type": "boolean",
-                  "description": "If false, IAT claim must be present in JWT assertion.",
+                  "description": "Configures if the issued at (`iat`) claim is required in the JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants (RFC7523). If set to `false`, the `iat` claim is required. Set this value to `true` only after careful consideration.",
                   "default": false
                 },
                 "max_ttl": {
-                  "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
+                  "description": "Configures what the maximum age of a JWT assertion used in the JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants (RFC7523) can be. This feature uses the `exp` claim and `iat` claim to calculate assertion age. Assertions exceeding the max age will be denied. Useful as a safety measure and recommended to keep below 720h. This governs the `grant.jwt.max_ttl` setting.",
                   "default": "720h",
                   "allOf": [
                     {

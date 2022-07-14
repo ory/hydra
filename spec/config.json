@@ -245,32 +245,6 @@
           }
         }
       }
-    },
-    "grantJwt": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Authorization Grants using JWT configuration",
-      "properties": {
-        "jti_optional": {
-          "type": "boolean",
-          "description": "If false, JTI claim must be present in JWT assertion.",
-          "default": false
-        },
-        "iat_optional": {
-          "type": "boolean",
-          "description": "If false, IAT claim must be present in JWT assertion.",
-          "default": false
-        },
-        "max_ttl": {
-          "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
-          "default": "720h",
-          "allOf": [
-            {
-              "$ref": "#/definitions/duration"
-            }
-          ]
-        }
-      }
     }
   },
   "properties": {
@@ -687,7 +661,7 @@
         },
         "login": {
           "type": "string",
-          "description": "Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
+          "description": "Sets the OAuth2 Login Endpoint URL of the OAuth2 User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
           "format": "uri",
           "examples": ["https://my-login.app/login"]
         },
@@ -904,7 +878,30 @@
           "additionalProperties": false,
           "properties": {
             "jwt": {
-              "$ref": "#/definitions/grantJwt"
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Authorization Grants using JWT configuration",
+              "properties": {
+                "jti_optional": {
+                  "type": "boolean",
+                  "description": "If false, JTI claim must be present in JWT assertion.",
+                  "default": false
+                },
+                "iat_optional": {
+                  "type": "boolean",
+                  "description": "If false, IAT claim must be present in JWT assertion.",
+                  "default": false
+                },
+                "max_ttl": {
+                  "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
+                  "default": "720h",
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/duration"
+                    }
+                  ]
+                }
+              }
             }
           }
         },

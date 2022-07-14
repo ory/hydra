@@ -44,7 +44,6 @@ import (
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/ioutilx"
 )
@@ -110,11 +109,6 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	ctx := context.Background()
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
-	secrets := reg.Config().Source(ctx).Strings(config.KeyGetCookieSecrets)
-	bs := make([][]byte, len(secrets))
-	for k, s := range secrets {
-		bs[k] = []byte(s)
-	}
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
 	cookie, _ := reg.CookieStore(ctx).Get(hr, reg.Config().SessionCookieName(ctx))

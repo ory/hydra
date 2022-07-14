@@ -1,6 +1,40 @@
 package spec
 
-import _ "embed"
+import (
+	"bytes"
+	_ "embed"
+	"io"
+
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
+
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/tracing"
+)
 
 //go:embed config.json
 var ConfigValidationSchema []byte
+
+var ConfigSchemaID string
+
+func init() {
+	ConfigSchemaID = gjson.GetBytes(ConfigValidationSchema, "$id").String()
+	if ConfigSchemaID == "" {
+		ConfigSchemaID = uuid.Must(uuid.NewV4()).String() + ".json"
+	}
+}
+
+// AddConfigSchema should be used instead of the schema itself to auto-register the dependencies schemas.
+func AddConfigSchema(compiler interface {
+	AddResource(url string, r io.Reader) error
+}) error {
+	if err := tracing.AddConfigSchema(compiler); err != nil {
+		return err
+	}
+	if err := logrusx.AddConfigSchema(compiler); err != nil {
+		return err
+	}
+
+	return errors.WithStack(compiler.AddResource(ConfigSchemaID, bytes.NewReader(ConfigValidationSchema)))
+}

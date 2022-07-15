@@ -25,12 +25,38 @@
       "JoseJSONWebKeySet": {
         "type": "object"
       },
+      "NullBool": {
+        "nullable": true,
+        "type": "boolean"
+      },
+      "NullInt": {
+        "nullable": true,
+        "type": "integer"
+      },
+      "NullString": {
+        "nullable": true,
+        "type": "string"
+      },
+      "NullTime": {
+        "format": "date-time",
+        "nullable": true,
+        "type": "string"
+      },
+      "NullUUID": {
+        "format": "uuid4",
+        "nullable": true,
+        "type": "string"
+      },
       "StringSliceJSONFormat": {
         "items": {
           "type": "string"
         },
         "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
         "type": "array"
+      },
+      "Time": {
+        "format": "date-time",
+        "type": "string"
       },
       "UUID": {
         "format": "uuid4",
@@ -489,6 +515,15 @@
           }
         },
         "type": "object"
+      },
+      "nullDuration": {
+        "nullable": true,
+        "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+        "type": "string"
+      },
+      "nullInt64": {
+        "nullable": true,
+        "type": "integer"
       },
       "nullTime": {
         "format": "date-time",

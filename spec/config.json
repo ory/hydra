@@ -627,6 +627,7 @@
             "supported_types": {
               "type": "array",
               "description": "A list of algorithms to enable.",
+              "default": ["public"],
               "items": {
                 "type": "string",
                 "enum": [

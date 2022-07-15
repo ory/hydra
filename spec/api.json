@@ -191,9 +191,7 @@
             "type": "string"
           },
           "details": {
-            "additionalProperties": true,
-            "description": "Further error details",
-            "type": "object"
+            "description": "Further error details"
           },
           "id": {
             "description": "The error ID\n\nUseful when trying to identify various errors in application logic.",

@@ -120,6 +120,7 @@ sdk: .bin/swagger .bin/ory node_modules
 					-p file://.schema/openapi/patches/meta.yaml \
 					-p file://.schema/openapi/patches/health.yaml \
 					-p file://.schema/openapi/patches/oauth2.yaml \
+					-p file://.schema/openapi/patches/nulls.yaml \
 					-p file://.schema/openapi/patches/common.yaml \
 					-p file://.schema/openapi/patches/security.yaml \
 					spec/swagger.json spec/api.json

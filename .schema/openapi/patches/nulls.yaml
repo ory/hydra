@@ -1,0 +1,43 @@
+- op: replace
+  path: "#/components/schemas/NullUUID"
+  value:
+    type: string
+    format: uuid4
+    nullable: true
+- op: replace
+  path: "#/components/schemas/NullTime"
+  value:
+    format: date-time
+    type: string
+    nullable: true
+- op: replace
+  path: "#/components/schemas/Time"
+  value:
+    format: date-time
+    type: string
+- op: replace
+  path: "#/components/schemas/NullString"
+  value:
+    type: string
+    nullable: true
+- op: replace
+  path: "#/components/schemas/NullBool"
+  value:
+    type: boolean
+    nullable: true
+- op: replace
+  path: "#/components/schemas/NullInt"
+  value:
+    type: integer
+    nullable: true
+- op: replace
+  path: "#/components/schemas/nullInt64"
+  value:
+    type: integer
+    nullable: true
+- op: replace
+  path: "#/components/schemas/nullDuration"
+  value:
+    type: string
+    nullable: true
+    pattern: ^[0-9]+(ns|us|ms|s|m|h)$

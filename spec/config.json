@@ -1295,5 +1295,6 @@
       "description": "If true, disables critical security measures to allow easier local development. Do not use in production.",
       "default": false
     }
-  }
+  },
+  "additionalProperties": false
 }

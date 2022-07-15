@@ -785,7 +785,9 @@
               "$ref": "#/definitions/duration"
             },
             {
-              "enum": ["-1", -1]
+              "enum": [
+                "-1"
+              ]
             }
           ]
         },

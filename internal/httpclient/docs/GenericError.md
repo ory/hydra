@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Code** | Pointer to **int64** | The status code | [optional] 
 **Debug** | Pointer to **string** | Debug information  This field is often not exposed to protect against leaking sensitive information. | [optional] 
-**Details** | Pointer to **map[string]interface{}** | Further error details | [optional] 
+**Details** | Pointer to **interface{}** | Further error details | [optional] 
 **Id** | Pointer to **string** | The error ID  Useful when trying to identify various errors in application logic. | [optional] 
 **Message** | **string** | Error message  The error&#39;s message. | 
 **Reason** | Pointer to **string** | A human-readable reason for the error | [optional] 
@@ -84,20 +84,20 @@ HasDebug returns a boolean if a field has been set.
 
 ### GetDetails
 
-`func (o *GenericError) GetDetails() map[string]interface{}`
+`func (o *GenericError) GetDetails() interface{}`
 
 GetDetails returns the Details field if non-nil, zero value otherwise.
 
 ### GetDetailsOk
 
-`func (o *GenericError) GetDetailsOk() (*map[string]interface{}, bool)`
+`func (o *GenericError) GetDetailsOk() (*interface{}, bool)`
 
 GetDetailsOk returns a tuple with the Details field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetDetails
 
-`func (o *GenericError) SetDetails(v map[string]interface{})`
+`func (o *GenericError) SetDetails(v interface{})`
 
 SetDetails sets Details field to given value.
 
@@ -107,6 +107,16 @@ SetDetails sets Details field to given value.
 
 HasDetails returns a boolean if a field has been set.
 
+### SetDetailsNil
+
+`func (o *GenericError) SetDetailsNil(b bool)`
+
+ SetDetailsNil sets the value for Details to be an explicit nil
+
+### UnsetDetails
+`func (o *GenericError) UnsetDetails()`
+
+UnsetDetails ensures that no value is present for Details, not even an explicit nil
 ### GetId
 
 `func (o *GenericError) GetId() string`

@@ -6,4 +6,3 @@
   path: /components/schemas/genericError/properties/details/type
 - op: remove
   path: /components/schemas/genericError/properties/details/additionalProperties
-

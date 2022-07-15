@@ -600,18 +600,29 @@
               "required": ["salt"]
             }
           },
-          "if": {
-            "properties": {
-              "supported_types": {
-                "contains": {
-                  "const": "pairwise"
+          "anyOf": [
+            {
+              "if": {
+                "properties": {
+                  "supported_types": {
+                    "contains": {
+                      "const": "pairwise"
+                    }
+                  }
                 }
+              },
+              "then": {
+                "required": [
+                  "pairwise"
+                ]
+              }
+            },
+            {
+              "not": {
+                "required": ["supported_types"]
               }
             }
-          },
-          "then": {
-            "required": ["pairwise"]
-          },
+          ],
           "examples": [
             {
               "supported_types": ["public", "pairwise"],

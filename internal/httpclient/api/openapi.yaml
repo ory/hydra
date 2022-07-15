@@ -1883,9 +1883,7 @@ components:
           example: SQL field "foo" is not a bool.
           type: string
         details:
-          additionalProperties: true
           description: Further error details
-          type: object
         id:
           description: |-
             The error ID

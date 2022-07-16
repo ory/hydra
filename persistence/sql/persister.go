@@ -36,6 +36,7 @@ type (
 	Persister struct {
 		conn        *pop.Connection
 		mb          *popx.MigrationBox
+		mbs         popx.MigrationStatuses
 		r           Dependencies
 		config      *config.DefaultProvider
 		l           *logrusx.Logger

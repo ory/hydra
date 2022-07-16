@@ -12,8 +12,6 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
-replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
-
 replace github.com/ory/hydra-client-go => ./internal/httpclient
 
 require (
@@ -218,7 +216,7 @@ require (
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/spf13/viper v1.7.1 // indirect
+	github.com/spf13/viper v1.8.1 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/thales-e-security/pool v0.0.2 // indirect
 	github.com/tidwall/match v1.1.1 // indirect

@@ -21,9 +21,17 @@ import (
 var migrations embed.FS
 
 func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
+	if p.mbs != nil {
+		return p.mbs, nil
+	}
+
 	status, err := p.mb.Status(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if !status.HasPending() {
+		p.mbs = status
 	}
 
 	return status, nil

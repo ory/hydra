@@ -210,8 +210,11 @@
     },
     "duration": {
       "type": "string",
-      "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
-      "examples": ["1h"]
+      "pattern": "^(\\d+(ns|us|ms|s|m|h))+$",
+      "examples": [
+        "1h",
+        "1h5m1s"
+      ]
     },
     "tls_config": {
       "type": "object",

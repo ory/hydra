@@ -463,11 +463,13 @@
       "title": "Global outgoing network settings",
       "description": "Configure how outgoing network calls behave.",
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "http": {
           "title": "Global HTTP client configuration",
           "description": "Configure how outgoing HTTP calls behave.",
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "disallow_private_ip_ranges": {
               "title": "Disallow private IP ranges",
@@ -543,7 +545,7 @@
             "jwks_url": {
               "type": "string",
               "description": "Overwrites the JWKS URL",
-              "format": "uri",
+              "format": "uri-reference",
               "examples": [
                 "https://my-service.com/.well-known/jwks.json"
               ]
@@ -551,7 +553,7 @@
             "token_url": {
               "type": "string",
               "description": "Overwrites the OAuth2 Token URL",
-              "format": "uri",
+              "format": "uri-reference",
               "examples": [
                 "https://my-service.com/oauth2/token"
               ]
@@ -559,7 +561,7 @@
             "auth_url": {
               "type": "string",
               "description": "Overwrites the OAuth2 Auth URL",
-              "format": "uri",
+              "format": "uri-reference",
               "examples": [
                 "https://my-service.com/oauth2/auth"
               ]
@@ -567,7 +569,7 @@
             "client_registration_url": {
               "description": "Sets the OpenID Connect Dynamic Client Registration Endpoint",
               "type": "string",
-              "format": "uri",
+              "format": "uri-reference",
               "examples": [
                 "https://my-service.com/clients"
               ]
@@ -602,7 +604,7 @@
             "userinfo_url": {
               "type": "string",
               "description": "A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.",
-              "format": "uri",
+              "format": "uri-reference",
               "examples": [
                 "https://example.org/my-custom-userinfo-endpoint"
               ]
@@ -737,41 +739,46 @@
         "login": {
           "type": "string",
           "description": "Sets the OAuth2 Login Endpoint URL of the OAuth2 User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
-          "format": "uri",
+          "format": "uri-reference",
           "examples": [
-            "https://my-login.app/login"
+            "https://my-login.app/login",
+            "/ui/login"
           ]
         },
         "consent": {
           "type": "string",
           "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
-          "format": "uri",
+          "format": "uri-reference",
           "examples": [
-            "https://my-consent.app/consent"
+            "https://my-consent.app/consent",
+            "/ui/consent"
           ]
         },
         "logout": {
           "type": "string",
           "description": "Sets the logout endpoint. Defaults to an internal fallback URL showing an error.",
-          "format": "uri",
+          "format": "uri-reference",
           "examples": [
-            "https://my-logout.app/logout"
+            "https://my-logout.app/logout",
+            "/ui/logout"
           ]
         },
         "error": {
           "type": "string",
           "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",
-          "format": "uri",
+          "format": "uri-reference",
           "examples": [
-            "https://my-error.app/error"
+            "https://my-error.app/error",
+            "/ui/error"
           ]
         },
         "post_logout_redirect": {
           "type": "string",
           "description": "When a user agent requests to logout, it will be redirected to this url afterwards per default.",
-          "format": "uri",
+          "format": "uri-reference",
           "examples": [
-            "https://my-example.app/logout-successful"
+            "https://my-example.app/logout-successful",
+            "/ui"
           ]
         }
       }

@@ -12,7 +12,6 @@ func NewListCmd(root *cobra.Command) *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "List resources",
 	}
-	cmd.AddCommand(NewListClientsCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

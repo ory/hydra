@@ -19,10 +19,15 @@ func (_ outputOAuth2Token) Header() []string {
 
 func (i outputOAuth2Token) Columns() []string {
 	token := oauth2.Token(i)
+	printIDToken := "<empty>"
+	if idt := token.Extra("id_token"); idt != nil {
+		printIDToken = fmt.Sprintf("%s", token.Extra("id_token"))
+	}
+
 	return []string{
 		i.AccessToken,
 		stringsx.Coalesce(i.RefreshToken, "<empty>"),
-		stringsx.Coalesce(fmt.Sprintf("%s", token.Extra("id_token")), "<empty>"),
+		printIDToken,
 		i.Expiry.Round(time.Second).String(),
 	}
 }

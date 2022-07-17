@@ -11,7 +11,6 @@ func NewDeleteCmd(root *cobra.Command) *cobra.Command {
 		Use:   "delete",
 		Short: "Delete resources",
 	}
-	cmd.AddCommand(NewDeleteClientCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

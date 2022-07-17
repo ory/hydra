@@ -11,7 +11,6 @@ func NewImportCmd(root *cobra.Command) *cobra.Command {
 		Use:   "import",
 		Short: "Import resources",
 	}
-	cmd.AddCommand(NewImportClientCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

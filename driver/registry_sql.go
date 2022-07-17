@@ -86,6 +86,7 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 			Pool:                      pool,
 			UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
 			InstrumentedDriverOptions: opts,
+			Unsafe:                    m.C.DbIgnoreUnknownTableColumns(),
 		})
 		if err != nil {
 			return errorsx.WithStack(err)

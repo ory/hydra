@@ -62,6 +62,7 @@ const (
 	KeyPublicURL                                 = "urls.self.public"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
+	KeyDbIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
@@ -401,6 +402,10 @@ func (p *Provider) TokenRefreshHookURL() *url.URL {
 
 func (p *Provider) AccessTokenStrategy() string {
 	return strings.ToLower(p.p.StringF(KeyAccessTokenStrategy, "opaque"))
+}
+
+func (p *Provider) DbIgnoreUnknownTableColumns() bool {
+	return p.p.Bool(KeyDbIgnoreUnknownTableColumns)
 }
 
 func (p *Provider) SubjectIdentifierAlgorithmSalt() string {

@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
@@ -199,6 +200,29 @@ func TestClientCredentials(t *testing.T) {
 				// We reset this so that introspectToken is going to check for the default scope.
 				conf.Scopes = defaultScope
 				inspectToken(t, token, cl, conf, strategy)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=should respect TTL", func(t *testing.T) {
+		duration := time.Hour * 24 * 7
+		reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, duration.String())
+
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				cl, conf := newClient(t)
+				conf.Scopes = []string{}
+				token, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				assert.EqualValues(t, time.Now().Add(duration).Round(time.Minute), token.Expiry.Round(time.Minute))
+
+				introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token, admin)
+				assert.EqualValues(t, time.Now().Add(duration).Round(time.Minute), time.Unix(introspection.Get("exp").Int(), 0).Round(time.Minute))
 			}
 		}
 

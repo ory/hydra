@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/ory/x/pointerx"
 	"strings"
 
 	hydra "github.com/ory/hydra-client-go"
@@ -20,11 +21,11 @@ func (_ outputOAuth2Client) Header() []string {
 
 func (i outputOAuth2Client) Columns() []string {
 	data := [7]string{
-		fmt.Sprintf("%v", i.ClientId),
-		fmt.Sprintf("%v", i.ClientSecret),
+		fmt.Sprintf("%v", pointerx.StringR(i.ClientId)),
+		fmt.Sprintf("%v", pointerx.StringR(i.ClientSecret)),
 		strings.Join(i.GrantTypes, ", "),
 		strings.Join(i.ResponseTypes, ", "),
-		fmt.Sprintf("%v", i.Scope),
+		fmt.Sprintf("%v", pointerx.StringR(i.Scope)),
 		strings.Join(i.Audience, ","),
 		strings.Join(i.RedirectUris, ", "),
 	}

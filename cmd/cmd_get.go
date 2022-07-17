@@ -11,7 +11,6 @@ func NewGetCmd(root *cobra.Command) *cobra.Command {
 		Use:   "get",
 		Short: "Get resources",
 	}
-	cmd.AddCommand(NewGetClientsCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

@@ -11,7 +11,6 @@ func NewUpdateCmd(root *cobra.Command) *cobra.Command {
 		Use:   "update",
 		Short: "Update resources",
 	}
-	cmd.AddCommand(NewUpdateClientCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

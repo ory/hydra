@@ -29,6 +29,7 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/ipx"
 
 	"github.com/ory/x/errorsx"
 
@@ -78,6 +79,21 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 
 	if len(c.JSONWebKeysURI) > 0 && c.JSONWebKeys != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Fields jwks and jwks_uri can not both be set, you must choose one."))
+	}
+
+	if v.r.Config().ClientHTTPNoPrivateIPRanges() {
+		values := map[string]string{
+			"jwks_uri":               c.JSONWebKeysURI,
+			"backchannel_logout_uri": c.BackChannelLogoutURI,
+		}
+
+		for k, v := range c.RequestURIs {
+			values[fmt.Sprintf("request_uris.%d", k)] = v
+		}
+
+		if err := ipx.AreAllAssociatedIPsAllowed(values); err != nil {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Client IP address is not allowed: %s", err))
+		}
 	}
 
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {

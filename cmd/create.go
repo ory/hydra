@@ -11,7 +11,6 @@ func NewCreateCmd(root *cobra.Command) *cobra.Command {
 		Use:   "create",
 		Short: "Create resources",
 	}
-	cmd.AddCommand(NewCreateClientsCommand(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

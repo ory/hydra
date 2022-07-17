@@ -11,7 +11,6 @@ func NewPerformCmd(root *cobra.Command) *cobra.Command {
 		Use:   "perform",
 		Short: "Perform OAuth 2.0 Flows",
 	}
-	cmd.AddCommand(NewPerformClientCredentialsCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

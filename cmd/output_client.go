@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/ory/x/pointerx"
 	"strings"
+
+	"github.com/ory/x/pointerx"
 
 	hydra "github.com/ory/hydra-client-go"
 )

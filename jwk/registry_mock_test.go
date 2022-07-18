@@ -80,20 +80,6 @@ func (mr *MockInternalRegistryMockRecorder) KeyCipher() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "KeyCipher", reflect.TypeOf((*MockInternalRegistry)(nil).KeyCipher))
 }
 
-// KeyGenerators mocks base method.
-func (m *MockInternalRegistry) KeyGenerators() map[string]jwk.KeyGenerator {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "KeyGenerators")
-	ret0, _ := ret[0].(map[string]jwk.KeyGenerator)
-	return ret0
-}
-
-// KeyGenerators indicates an expected call of KeyGenerators.
-func (mr *MockInternalRegistryMockRecorder) KeyGenerators() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "KeyGenerators", reflect.TypeOf((*MockInternalRegistry)(nil).KeyGenerators))
-}
-
 // KeyManager mocks base method.
 func (m *MockInternalRegistry) KeyManager() jwk.Manager {
 	m.ctrl.T.Helper()
@@ -199,20 +185,6 @@ func (m *MockRegistry) KeyCipher() *jwk.AEAD {
 func (mr *MockRegistryMockRecorder) KeyCipher() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "KeyCipher", reflect.TypeOf((*MockRegistry)(nil).KeyCipher))
-}
-
-// KeyGenerators mocks base method.
-func (m *MockRegistry) KeyGenerators() map[string]jwk.KeyGenerator {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "KeyGenerators")
-	ret0, _ := ret[0].(map[string]jwk.KeyGenerator)
-	return ret0
-}
-
-// KeyGenerators indicates an expected call of KeyGenerators.
-func (mr *MockRegistryMockRecorder) KeyGenerators() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "KeyGenerators", reflect.TypeOf((*MockRegistry)(nil).KeyGenerators))
 }
 
 // KeyManager mocks base method.

@@ -379,6 +379,22 @@ func TestInfinitRefreshTokenTTL(t *testing.T) {
 	assert.Equal(t, -1*time.Nanosecond, c.GetRefreshTokenLifespan(ctx))
 }
 
+func TestCookieSecure(t *testing.T) {
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	c := MustNew(context.Background(), l, configx.WithValue(KeyDevelopmentMode, true))
+
+	c.MustSet(ctx, KeyCookieSecure, true)
+	assert.True(t, c.CookieSecure(ctx))
+
+	c.MustSet(ctx, KeyCookieSecure, false)
+	assert.False(t, c.CookieSecure(ctx))
+
+	c.MustSet(ctx, KeyDevelopmentMode, false)
+	assert.True(t, c.CookieSecure(ctx))
+}
+
 func TestTokenRefreshHookURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)

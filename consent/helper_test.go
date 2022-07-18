@@ -259,6 +259,7 @@ func TestValidateCsrfSession(t *testing.T) {
 			config := mock.NewMockCookieConfigProvider(ctrl)
 			config.EXPECT().CookieSameSiteLegacyWorkaround(gomock.Any()).Return(tc.sameSiteLegacyWorkaround).AnyTimes()
 			config.EXPECT().IsDevelopmentMode(gomock.Any()).Return(false).AnyTimes()
+			config.EXPECT().CookieSecure(gomock.Any()).Return(false).AnyTimes()
 
 			sameSite := http.SameSiteDefaultMode
 			if tc.sameSite > 0 {
@@ -402,7 +403,7 @@ func TestCreateCsrfSession(t *testing.T) {
 			config := mock.NewMockCookieConfigProvider(ctrl)
 			config.EXPECT().CookieSameSiteMode(gomock.Any()).Return(tc.sameSite).AnyTimes()
 			config.EXPECT().CookieSameSiteLegacyWorkaround(gomock.Any()).Return(tc.sameSiteLegacyWorkaround).AnyTimes()
-			config.EXPECT().IsDevelopmentMode(gomock.Any()).Return(!tc.secure).AnyTimes()
+			config.EXPECT().CookieSecure(gomock.Any()).Return(tc.secure).AnyTimes()
 			config.EXPECT().CookieDomain(gomock.Any()).Return(tc.domain).AnyTimes()
 
 			err := createCsrfSession(rr, req, config, store, tc.name, "value")

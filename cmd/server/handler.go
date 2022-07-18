@@ -319,8 +319,9 @@ func serve(
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{
-		Handler:   handler,
-		TLSConfig: tlsConfig,
+		Handler:           handler,
+		TLSConfig:         tlsConfig,
+		ReadHeaderTimeout: time.Second * 5,
 	})
 
 	if err := graceful.Graceful(func() error {

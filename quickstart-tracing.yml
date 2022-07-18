@@ -20,6 +20,7 @@ services:
       # - zipkin
       # - datadog
     environment:
+      # - TRACING_SERVICE_NAME="Ory Hydra"
       - TRACING_PROVIDER=jaeger
       # - TRACING_PROVIDER=zipkin
       # - TRACING_PROVIDER=datadog
@@ -42,7 +43,6 @@ services:
       # - ELASTIC_APM_ENVIRONMENT="devel"
       ### Opentelemetry ###
       ### See env vars here: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md ###
-      # - OTEL_SERVICE_NAME="Ory Hydra"
   jaeger:
     image: jaegertracing/all-in-one:1.19.2
     ports:

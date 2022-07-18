@@ -52,6 +52,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		code         int
 		header       http.Header
 		expectHeader http.Header
+		method       string
 	}{
 		{
 			d:            "should ignore when disabled",
@@ -161,6 +162,17 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
+			d: "should succeed on pre-flight request when token introspection fails",
+			prep: func(t *testing.T, r driver.Registry) {
+				r.Config().MustSet("serve.public.cors.enabled", true)
+				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+			},
+			code:         http.StatusNotImplemented,
+			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Bearer 1234"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
+			method:       "OPTIONS",
+		},
+		{
 			d: "should fail when token introspection fails",
 			prep: func(t *testing.T, r driver.Registry) {
 				r.Config().MustSet("serve.public.cors.enabled", true)
@@ -237,7 +249,11 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				tc.prep(t, r)
 			}
 
-			req, err := http.NewRequest("GET", "http://foobar.com/", nil)
+			method := "GET"
+			if tc.method != "" {
+				method = tc.method
+			}
+			req, err := http.NewRequest(method, "http://foobar.com/", nil)
 			require.NoError(t, err)
 			for k := range tc.header {
 				req.Header.Set(k, tc.header.Get(k))

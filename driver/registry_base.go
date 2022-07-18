@@ -306,7 +306,7 @@ func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
 	}
 
 	cs := sessions.NewCookieStore(keys...)
-	cs.Options.Secure = !m.Config().IsDevelopmentMode(ctx)
+	cs.Options.Secure = m.Config().CookieSecure(ctx)
 	cs.Options.HttpOnly = true
 
 	// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.

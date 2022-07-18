@@ -2,8 +2,11 @@
 -- hydra:generate hydra migrate gen
 
 
-UPDATE hydra_oauth2_flow SET requested_scope = CONCAT('["', REPLACE(requested_scope,'|','","'), '"]') WHERE requested_scope <> '[]';
-UPDATE hydra_oauth2_flow SET requested_at_audience = CONCAT('["', REPLACE(requested_at_audience,'|','","'), '"]') WHERE requested_at_audience <> '[]';
-UPDATE hydra_oauth2_flow SET amr = CONCAT('["', REPLACE(amr,'|','","'), '"]') WHERE amr <> '[]';
-UPDATE hydra_oauth2_flow SET granted_scope = CONCAT('["', REPLACE(granted_scope,'|','","'), '"]') WHERE granted_scope <> '[]';
-UPDATE hydra_oauth2_flow SET granted_at_audience = CONCAT('["', REPLACE(granted_at_audience,'|','","'), '"]') WHERE granted_at_audience <> '[]';
+ALTER TABLE hydra_client DROP COLUMN redirect_uris;
+ALTER TABLE hydra_client DROP COLUMN grant_types;
+ALTER TABLE hydra_client DROP COLUMN response_types;
+ALTER TABLE hydra_client DROP COLUMN audience;
+ALTER TABLE hydra_client DROP COLUMN allowed_cors_origins;
+ALTER TABLE hydra_client DROP COLUMN contacts;
+ALTER TABLE hydra_client DROP COLUMN request_uris;
+ALTER TABLE hydra_client DROP COLUMN post_logout_redirect_uris;

@@ -188,7 +188,11 @@ and success, unless if the --no-shutdown flag is provided.`,
 				tlsc = &tls.Config{Certificates: []tls.Certificate{*cert}}
 			}
 
-			server := graceful.WithDefaults(&http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r, TLSConfig: tlsc})
+			server := graceful.WithDefaults(&http.Server{
+				Addr:    fmt.Sprintf(":%d", port),
+				Handler: r, TLSConfig: tlsc,
+				ReadHeaderTimeout: time.Second * 5,
+			})
 			var shutdown = func() {
 				time.Sleep(time.Second * 1)
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)

@@ -426,6 +426,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		for k, values := range []url.Values{
 			{"prompt": {"login"}},
 			{"max_age": {"1"}},
+			{"max_age": {"0"}},
 		} {
 			t.Run("values="+values.Encode(), func(t *testing.T) {
 				if k == 1 {

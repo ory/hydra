@@ -77,6 +77,20 @@ func (mr *MockCookieConfigProviderMockRecorder) CookieSameSiteMode(arg0 interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CookieSameSiteMode", reflect.TypeOf((*MockCookieConfigProvider)(nil).CookieSameSiteMode), arg0)
 }
 
+// CookieSecure mocks base method.
+func (m *MockCookieConfigProvider) CookieSecure(arg0 context.Context) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CookieSecure", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// CookieSecure indicates an expected call of CookieSecure.
+func (mr *MockCookieConfigProviderMockRecorder) CookieSecure(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CookieSecure", reflect.TypeOf((*MockCookieConfigProvider)(nil).CookieSecure), arg0)
+}
+
 // IsDevelopmentMode mocks base method.
 func (m *MockCookieConfigProvider) IsDevelopmentMode(arg0 context.Context) bool {
 	m.ctrl.T.Helper()

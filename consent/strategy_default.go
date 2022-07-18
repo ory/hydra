@@ -306,7 +306,7 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 	cookie.Options.HttpOnly = true
 	cookie.Options.Path = "/"
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
-	cookie.Options.Secure = !s.c.IsDevelopmentMode(ctx)
+	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	cookie.Options.Domain = s.c.CookieDomain(ctx)
 	cookie.Options.MaxAge = -1
 
@@ -440,7 +440,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	cookie.Options.HttpOnly = true
 	cookie.Options.Path = "/"
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
-	cookie.Options.Secure = !s.c.IsDevelopmentMode(ctx)
+	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	if err := cookie.Save(r, w); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -450,7 +450,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			"cookie_name":      s.c.SessionCookieName(ctx),
 			"cookie_http_only": true,
 			"cookie_same_site": s.c.CookieSameSiteMode(ctx),
-			"cookie_secure":    !s.c.IsDevelopmentMode(ctx),
+			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
 	return session, nil
 }

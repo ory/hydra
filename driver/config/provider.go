@@ -54,6 +54,7 @@ const (
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
 	KeyCookieDomain                              = "serve.cookies.domain"
+	KeyCookieSecure                              = "serve.cookies.secure"
 	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
@@ -257,6 +258,13 @@ func (p *DefaultProvider) EncryptSessionData(ctx context.Context) bool {
 
 func (p *DefaultProvider) ExcludeNotBeforeClaim(ctx context.Context) bool {
 	return p.getProvider(ctx).BoolF(KeyExcludeNotBeforeClaim, false)
+}
+
+func (p *DefaultProvider) CookieSecure(ctx context.Context) bool {
+	if !p.IsDevelopmentMode(ctx) {
+		return true
+	}
+	return p.getProvider(ctx).BoolF(KeyCookieSecure, false)
 }
 
 func (p *DefaultProvider) CookieSameSiteMode(ctx context.Context) http.SameSite {

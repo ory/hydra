@@ -78,7 +78,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConf
 
 	session.Values["csrf"] = csrfValue
 	session.Options.HttpOnly = true
-	session.Options.Secure = !conf.IsDevelopmentMode(r.Context())
+	session.Options.Secure = conf.CookieSecure(r.Context())
 	session.Options.SameSite = sameSite
 	session.Options.Domain = conf.CookieDomain(r.Context())
 	if err := session.Save(r, w); err != nil {

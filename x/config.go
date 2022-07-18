@@ -12,4 +12,5 @@ type CookieConfigProvider interface {
 	IsDevelopmentMode(ctx context.Context) bool
 	CookieSameSiteMode(ctx context.Context) http.SameSite
 	CookieSameSiteLegacyWorkaround(ctx context.Context) bool
+	CookieSecure(ctx context.Context) bool
 }

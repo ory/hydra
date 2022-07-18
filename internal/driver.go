@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 
-	"strings"
 	"sync"
 	"testing"
 
@@ -76,29 +75,15 @@ func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 }
 
 func ConnectToMySQL(t *testing.T) string {
-	c := dockertest.ConnectToTestMySQLPop(t)
-	url := c.URL()
-	if !strings.HasPrefix(url, "mysql://") {
-		url = "mysql://" + url
-	}
-	require.NoError(t, c.Close())
-	return url
+	return dockertest.RunTestMySQLWithVersion(t, "11.8")
 }
 
 func ConnectToPG(t *testing.T) string {
-	c := dockertest.ConnectToTestPostgreSQLPop(t)
-	require.NoError(t, c.Close())
-	return c.URL()
+	return dockertest.RunTestPostgreSQLWithVersion(t, "11.8")
 }
 
 func ConnectToCRDB(t *testing.T) string {
-	c := dockertest.ConnectToTestCockroachDBPop(t)
-	url := c.URL()
-	if !strings.HasPrefix(url, "cockroach") {
-		url = "cockroach://" + strings.Split(url, "://")[1]
-	}
-	require.NoError(t, c.Close())
-	return url
+	return dockertest.RunTestCockroachDBWithVersion(t, "v22.1.2")
 }
 
 func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {

@@ -3,7 +3,7 @@
 CREATE TABLE hydra_oauth2_flow
 (
     login_challenge           VARCHAR(40)  NOT NULL PRIMARY KEY,
-    requested_scope           TEXT         NOT NULL,
+    requested_scope           TEXT         NOT NULL DEFAULT '[]',
     login_verifier            VARCHAR(40)  NOT NULL,
     login_csrf                VARCHAR(40)  NOT NULL,
     subject                   VARCHAR(255) NOT NULL,
@@ -11,37 +11,37 @@ CREATE TABLE hydra_oauth2_flow
     login_skip                INTEGER      NOT NULL,
     client_id                 VARCHAR(255) NOT NULL REFERENCES hydra_client (id) ON DELETE CASCADE,
     requested_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    oidc_context              TEXT         NOT NULL,
+    login_initialized_at      TIMESTAMP    NULL DEFAULT NULL,
+    oidc_context              jsonb         NOT NULL DEFAULT '{}',
     login_session_id          VARCHAR(40)  NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE CASCADE DEFAULT '',
-    requested_at_audience     TEXT         NULL DEFAULT '',
-    login_initialized_at      TIMESTAMP    NULL,
+    requested_at_audience     text         NULL DEFAULT '[]',
 
     state                     INTEGER      NOT NULL,
 
-    login_remember            INTEGER      NULL,
-    login_remember_for        INTEGER      NULL,
+    login_remember            INTEGER      NOT NULL DEFAULT false,
+    login_remember_for        INTEGER      NOT NULL,
     login_error               TEXT         NULL,
-    acr                       TEXT         NULL,
-    login_authenticated_at    TIMESTAMP    NULL,
-    login_was_used            INTEGER      NULL,
-    forced_subject_identifier VARCHAR(255) NULL DEFAULT '',
-    context                   TEXT         NULL DEFAULT '{}',
-    amr                       TEXT         NULL DEFAULT '',
+    acr                       TEXT          NOT NULL DEFAULT '',
+    login_authenticated_at    TIMESTAMP    NULL DEFAULT NULL,
+    login_was_used            INTEGER      NOT NULL DEFAULT false,
+    forced_subject_identifier VARCHAR(255) NOT NULL DEFAULT '',
+    context                   jsonb         NOT NULL DEFAULT '{}',
+    amr                       text         NOT NULL DEFAULT '[]',
 
     consent_challenge_id      VARCHAR(40)  NULL,
-    consent_skip              INTEGER      NULL DEFAULT false,
+    consent_skip              INTEGER      NOT NULL DEFAULT false,
     consent_verifier          VARCHAR(40)  NULL,
     consent_csrf              VARCHAR(40)  NULL,
 
-    granted_scope             TEXT        NULL,
-    granted_at_audience       TEXT        NULL DEFAULT '',
-    consent_remember          INTEGER     NULL DEFAULT 0,
+    granted_scope             text        NOT NULL DEFAULT '[]',
+    granted_at_audience       text        NOT NULL DEFAULT '[]',
+    consent_remember          INTEGER     NOT NULL DEFAULT 0,
     consent_remember_for      INTEGER     NULL,
     consent_handled_at        TIMESTAMP   NULL,
     consent_was_used          INTEGER     NOT NULL DEFAULT false,
     consent_error             TEXT        NULL,
-    session_id_token          TEXT        NULL DEFAULT '{}',
-    session_access_token      TEXT        NULL DEFAULT '{}'
+    session_id_token          jsonb        NULL DEFAULT '{}',
+    session_access_token      jsonb        NULL DEFAULT '{}'
 
     CHECK (
         state = 128 OR

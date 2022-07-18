@@ -144,7 +144,7 @@ func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.Resp
 		return err
 	}
 
-	maxAge := int64(0)
+	maxAge := int64(-1)
 	if ma := ar.GetRequestForm().Get("max_age"); len(ma) > 0 {
 		var err error
 		maxAge, err = strconv.ParseInt(ma, 10, 64)
@@ -153,7 +153,7 @@ func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.Resp
 		}
 	}
 
-	if maxAge > 0 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > -1 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because prompt is set to 'none' and authentication time reached 'max_age'."))
 		}

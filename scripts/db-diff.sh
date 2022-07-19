@@ -72,7 +72,7 @@ function hydra::util::ensure-mysqldump {
 }
 
 function dump_pg {
-	if [[ ! -v TEST_DATABASE_POSTGRESQL ]]; then
+	if test -z $TEST_DATABASE_POSTGRESQL; then
 		echo 'Error: TEST_DATABASE_POSTGRESQL is not set; try running "source scripts/test-env.sh"' >&2
 		exit 1
 	fi
@@ -87,7 +87,7 @@ function dump_pg {
 }
 
 function dump_cockroach {
-	if [[ ! -v TEST_DATABASE_COCKROACHDB ]]; then
+	if test -z $TEST_DATABASE_COCKROACHDB; then
 		echo 'Error: TEST_DATABASE_COCKROACHDB is not set; try running "source scripts/test-env.sh"' >&2
 		exit 1
 	fi
@@ -100,7 +100,7 @@ function dump_cockroach {
 }
 
 function dump_sqlite {
-	if [[ ! -v SQLITE_PATH ]]; then
+	if test -z $SQLITE_PATH; then
 		SQLITE_PATH="$(mktemp -d)/temp.sqlite"
 	fi
 
@@ -112,7 +112,7 @@ function dump_sqlite {
 }
 
 function dump_mysql {
-	if [[ ! -v TEST_DATABASE_MYSQL ]]; then
+	if test -z $TEST_DATABASE_MYSQL; then
 		echo 'Error: TEST_DATABASE_MYSQL is not set; try running "source scripts/test-env.sh"' >&2
 		exit 1
 	fi

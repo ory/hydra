@@ -46,7 +46,7 @@ lint: .bin/golangci-lint
 .PHONY: test
 test: .bin/go-acc
 		make test-resetdb
-		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite
+		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite,json1
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -80,7 +80,7 @@ e2e: node_modules test-resetdb
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-		go test -failfast -short -tags sqlite ./...
+		go test -failfast -short -tags sqlite,json1 ./...
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
@@ -161,14 +161,14 @@ install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
 		GO111MODULE=on go install \
-				-tags sqlite \
+				-tags sqlite,json1 \
 				-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
 				.
 		git checkout master
 
 .PHONY: install
 install:
-		GO111MODULE=on go install -tags sqlite .
+		GO111MODULE=on go install -tags sqlite,json1 .
 
 .PHONY: contributors
 contributors:

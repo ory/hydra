@@ -99,7 +99,7 @@ jobs:
       - name: Run go-acc (tests)
         run: |
           make .bin/go-acc
-          .bin/go-acc -o coverage.out ./... -- -failfast -timeout=20m -tags sqlite
+          .bin/go-acc -o coverage.out ./... -- -failfast -timeout=20m -tags sqlite,json1
       - name: Submit to Codecov
         run: |
           bash <(curl -s https://codecov.io/bash)

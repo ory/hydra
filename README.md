@@ -205,7 +205,7 @@ that your company deserves a spot here, reach out to
             <td>DataDetect</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/datadetect.svg" alt="Datadetect"></td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Sainsbury's</td>
@@ -223,13 +223,13 @@ that your company deserves a spot here, reach out to
             <td>Reyah</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/reyah.svg" alt="Reyah"></td>
             <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Zero</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/commitzero.svg" alt="Project Zero by Commit"></td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Padis</td>
@@ -247,7 +247,7 @@ that your company deserves a spot here, reach out to
             <td>Security Onion Solutions</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Factly</td>
@@ -271,7 +271,7 @@ that your company deserves a spot here, reach out to
             <td>Spiri.bo</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/spiribo.svg" alt="Spiri.bo"></td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Sponsor</td>
             <td>Strivacity</td>
@@ -560,25 +560,25 @@ It is recommended to use the make file to run your tests using `make quicktest`
 
 **Please note**:
 
-All tests run against a sqlite in-memory database, thus it is required to use
-the `-tags sqlite` build tag.
+All tests run against a sqlite in-memory database,
+thus it is required to use the `-tags sqlite,json1` build tag.
 
 Short tests run fairly quickly. You can either test all of the code at once:
 
 ```shell script
-go test -v -failfast -short -tags sqlite ./...
+go test -v -failfast -short -tags sqlite,json1 ./...
 ```
 
 or test just a specific module:
 
 ```shell script
-go test -v -failfast -short -tags sqlite ./client
+go test -v -failfast -short -tags sqlite,json1 ./client
 ```
 
 or a specific test:
 
 ```shell script
-go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
+go test -v -failfast -short -tags sqlite,json1 -run ^TestName$ ./...
 ```
 
 ##### Regular Tests

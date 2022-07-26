@@ -26,6 +26,9 @@ type RefreshTokenHookRequest struct {
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
 	GrantedScopes []string `json:"granted_scopes"`
 
+	// IDTokenExtra is arbitrary data set by the session.
+	IDTokenExtra interface{} `json:"id_token_extra,omitempty"`
+
 	// Subject is the identifier of the authenticated end-user.
 	Subject string `json:"subject,omitempty"`
 }

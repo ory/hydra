@@ -993,6 +993,11 @@
             },
             "type": "array"
           },
+          "id_token_extra": {
+            "additionalProperties": true,
+            "description": "IDTokenExtra is arbitrary data set by the session.",
+            "type": "object"
+          },
           "subject": {
             "description": "Subject is the identifier of the authenticated end-user.",
             "type": "string"

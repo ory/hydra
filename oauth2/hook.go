@@ -23,6 +23,8 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 type RefreshTokenHookRequest struct {
 	// Subject is the identifier of the authenticated end-user.
 	Subject string `json:"subject"`
+	// IDTokenExtra is arbitrary data set by the session.
+	IDTokenExtra map[string]interface{} `json:"id_token_extra"`
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
@@ -60,6 +62,7 @@ func RefreshTokenHook(config *config.Provider) AccessRequestHook {
 
 		reqBody := RefreshTokenHookRequest{
 			Subject:         session.GetSubject(),
+			IDTokenExtra:    session.IDTokenClaims().Extra,
 			ClientID:        requester.GetClient().GetID(),
 			GrantedScopes:   requester.GetGrantedScopes(),
 			GrantedAudience: requester.GetGrantedAudience(),

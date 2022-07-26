@@ -106,6 +106,31 @@ SetGrantedScopes sets GrantedScopes field to given value.
 
 HasGrantedScopes returns a boolean if a field has been set.
 
+### GetIdTokenExtra
+
+`func (o *RefreshTokenHookRequest) GetIdTokenExtra() map[string]map[string]interface{}`
+
+GetIdTokenExtra returns the IdTokenExtra field if non-nil, zero value otherwise.
+
+### GetIdTokenExtraOk
+
+`func (o *RefreshTokenHookRequest) GetIdTokenExtraOk() (*map[string]map[string]interface{}, bool)`
+
+GetIdTokenExtraOk returns a tuple with the IdTokenExtra field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
+
+### SetIdTokenExtra
+
+`func (o *RefreshTokenHookRequest) SetIdTokenExtra(v map[string]map[string]interface{})`
+
+SetIdTokenExtra sets IdTokenExtra field to given value.
+
+### HasIdTokenExtra
+
+`func (o *RefreshTokenHookRequest) HasIdTokenExtra() bool`
+
+HasIdTokenExtra returns a boolean if a field has been set.
+
 ### GetSubject
 
 `func (o *RefreshTokenHookRequest) GetSubject() string`

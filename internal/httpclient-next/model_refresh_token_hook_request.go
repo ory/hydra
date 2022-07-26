@@ -23,6 +23,8 @@ type RefreshTokenHookRequest struct {
 	GrantedAudience []string `json:"granted_audience,omitempty"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
 	GrantedScopes []string `json:"granted_scopes,omitempty"`
+	// IDTokenExtra is arbitrary data set by the session.
+	IdTokenExtra map[string]map[string]interface{} `json:"id_token_extra,omitempty"`
 	// Subject is the identifier of the authenticated end-user.
 	Subject *string `json:"subject,omitempty"`
 }
@@ -140,6 +142,38 @@ func (o *RefreshTokenHookRequest) SetGrantedScopes(v []string) {
 	o.GrantedScopes = v
 }
 
+// GetIdTokenExtra returns the IdTokenExtra field value if set, zero value otherwise.
+func (o *RefreshTokenHookRequest) GetIdTokenExtra() map[string]map[string]interface{} {
+	if o == nil || o.IdTokenExtra == nil {
+		var ret map[string]map[string]interface{}
+		return ret
+	}
+	return o.IdTokenExtra
+}
+
+// GetIdTokenExtraOk returns a tuple with the IdTokenExtra field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RefreshTokenHookRequest) GetIdTokenExtraOk() (map[string]map[string]interface{}, bool) {
+	if o == nil || o.IdTokenExtra == nil {
+		return nil, false
+	}
+	return o.IdTokenExtra, true
+}
+
+// HasIdTokenExtra returns a boolean if a field has been set.
+func (o *RefreshTokenHookRequest) HasIdTokenExtra() bool {
+	if o != nil && o.IdTokenExtra != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetIdTokenExtra gets a reference to the given map[string]map[string]interface{} and assigns it to the IdTokenExtra field.
+func (o *RefreshTokenHookRequest) SetIdTokenExtra(v map[string]map[string]interface{}) {
+	o.IdTokenExtra = v
+}
+
 // GetSubject returns the Subject field value if set, zero value otherwise.
 func (o *RefreshTokenHookRequest) GetSubject() string {
 	if o == nil || o.Subject == nil {
@@ -182,6 +216,9 @@ func (o RefreshTokenHookRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.GrantedScopes != nil {
 		toSerialize["granted_scopes"] = o.GrantedScopes
+	}
+	if o.IdTokenExtra != nil {
+		toSerialize["id_token_extra"] = o.IdTokenExtra
 	}
 	if o.Subject != nil {
 		toSerialize["subject"] = o.Subject

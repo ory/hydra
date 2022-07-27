@@ -73,6 +73,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.refresh_token_rotation.grace_period" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -484,4 +485,13 @@ func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
 
 func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
 	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+}
+
+func (p *Provider) RefreshTokenRotationGracePeriod() time.Duration {
+	var duration = p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if duration > time.Hour {
+		return time.Hour
+	}
+
+	return p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
 }

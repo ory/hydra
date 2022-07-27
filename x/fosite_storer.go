@@ -34,13 +34,10 @@ import (
 type FositeStorer interface {
 	fosite.Storage
 	oauth2.CoreStorage
+	oauth2.TokenRevocationStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
 	rfc7523.RFC7523KeyStorage
-
-	RevokeRefreshToken(ctx context.Context, requestID string) error
-
-	RevokeAccessToken(ctx context.Context, requestID string) error
 
 	// flush the access token requests from the database.
 	// no data will be deleted after the 'notAfter' timeframe.

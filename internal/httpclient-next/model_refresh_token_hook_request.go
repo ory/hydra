@@ -22,9 +22,9 @@ type RefreshTokenHookRequest struct {
 	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
 	GrantedAudience []string `json:"granted_audience,omitempty"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-	GrantedScopes []string `json:"granted_scopes,omitempty"`
-	// IDTokenExtra is arbitrary data set by the session.
-	IdTokenExtra map[string]map[string]interface{} `json:"id_token_extra,omitempty"`
+	GrantedScopes []string   `json:"granted_scopes,omitempty"`
+	Requester     *Requester `json:"requester,omitempty"`
+	Session       *Session   `json:"session,omitempty"`
 	// Subject is the identifier of the authenticated end-user.
 	Subject *string `json:"subject,omitempty"`
 }
@@ -142,36 +142,68 @@ func (o *RefreshTokenHookRequest) SetGrantedScopes(v []string) {
 	o.GrantedScopes = v
 }
 
-// GetIdTokenExtra returns the IdTokenExtra field value if set, zero value otherwise.
-func (o *RefreshTokenHookRequest) GetIdTokenExtra() map[string]map[string]interface{} {
-	if o == nil || o.IdTokenExtra == nil {
-		var ret map[string]map[string]interface{}
+// GetRequester returns the Requester field value if set, zero value otherwise.
+func (o *RefreshTokenHookRequest) GetRequester() Requester {
+	if o == nil || o.Requester == nil {
+		var ret Requester
 		return ret
 	}
-	return o.IdTokenExtra
+	return *o.Requester
 }
 
-// GetIdTokenExtraOk returns a tuple with the IdTokenExtra field value if set, nil otherwise
+// GetRequesterOk returns a tuple with the Requester field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RefreshTokenHookRequest) GetIdTokenExtraOk() (map[string]map[string]interface{}, bool) {
-	if o == nil || o.IdTokenExtra == nil {
+func (o *RefreshTokenHookRequest) GetRequesterOk() (*Requester, bool) {
+	if o == nil || o.Requester == nil {
 		return nil, false
 	}
-	return o.IdTokenExtra, true
+	return o.Requester, true
 }
 
-// HasIdTokenExtra returns a boolean if a field has been set.
-func (o *RefreshTokenHookRequest) HasIdTokenExtra() bool {
-	if o != nil && o.IdTokenExtra != nil {
+// HasRequester returns a boolean if a field has been set.
+func (o *RefreshTokenHookRequest) HasRequester() bool {
+	if o != nil && o.Requester != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetIdTokenExtra gets a reference to the given map[string]map[string]interface{} and assigns it to the IdTokenExtra field.
-func (o *RefreshTokenHookRequest) SetIdTokenExtra(v map[string]map[string]interface{}) {
-	o.IdTokenExtra = v
+// SetRequester gets a reference to the given Requester and assigns it to the Requester field.
+func (o *RefreshTokenHookRequest) SetRequester(v Requester) {
+	o.Requester = &v
+}
+
+// GetSession returns the Session field value if set, zero value otherwise.
+func (o *RefreshTokenHookRequest) GetSession() Session {
+	if o == nil || o.Session == nil {
+		var ret Session
+		return ret
+	}
+	return *o.Session
+}
+
+// GetSessionOk returns a tuple with the Session field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RefreshTokenHookRequest) GetSessionOk() (*Session, bool) {
+	if o == nil || o.Session == nil {
+		return nil, false
+	}
+	return o.Session, true
+}
+
+// HasSession returns a boolean if a field has been set.
+func (o *RefreshTokenHookRequest) HasSession() bool {
+	if o != nil && o.Session != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSession gets a reference to the given Session and assigns it to the Session field.
+func (o *RefreshTokenHookRequest) SetSession(v Session) {
+	o.Session = &v
 }
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
@@ -217,8 +249,11 @@ func (o RefreshTokenHookRequest) MarshalJSON() ([]byte, error) {
 	if o.GrantedScopes != nil {
 		toSerialize["granted_scopes"] = o.GrantedScopes
 	}
-	if o.IdTokenExtra != nil {
-		toSerialize["id_token_extra"] = o.IdTokenExtra
+	if o.Requester != nil {
+		toSerialize["requester"] = o.Requester
+	}
+	if o.Session != nil {
+		toSerialize["session"] = o.Session
 	}
 	if o.Subject != nil {
 		toSerialize["subject"] = o.Subject

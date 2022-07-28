@@ -2300,6 +2300,100 @@
     }
   },
   "definitions": {
+    "DefaultSession": {
+      "description": "IDTokenSession is a session container for the id token",
+      "type": "object",
+      "properties": {
+        "Claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
+        "ExpiresAt": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "Headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        }
+      }
+    },
+    "Headers": {
+      "description": "Headers is the jwt headers",
+      "type": "object",
+      "properties": {
+        "Extra": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "IDTokenClaims": {
+      "description": "IDTokenClaims represent the claims used in open id connect requests",
+      "type": "object",
+      "properties": {
+        "AccessTokenHash": {
+          "type": "string"
+        },
+        "Audience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "AuthTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "AuthenticationContextClassReference": {
+          "type": "string"
+        },
+        "AuthenticationMethodsReferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "CodeHash": {
+          "type": "string"
+        },
+        "ExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Extra": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "IssuedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Issuer": {
+          "type": "string"
+        },
+        "JTI": {
+          "type": "string"
+        },
+        "Nonce": {
+          "type": "string"
+        },
+        "RequestedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Subject": {
+          "type": "string"
+        }
+      }
+    },
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -2439,6 +2533,52 @@
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
+        }
+      }
+    },
+    "Session": {
+      "type": "object",
+      "properties": {
+        "Claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
+        "ExpiresAt": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "Headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        },
+        "allowed_top_level_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "consent_challenge": {
+          "type": "string"
+        },
+        "exclude_not_before_claim": {
+          "type": "boolean"
+        },
+        "extra": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "kid": {
+          "type": "string"
         }
       }
     },
@@ -3256,10 +3396,11 @@
             "type": "string"
           }
         },
-        "id_token_extra": {
-          "description": "IDTokenExtra is arbitrary data set by the session.",
-          "type": "object",
-          "additionalProperties": true
+        "requester": {
+          "$ref": "#/definitions/requester"
+        },
+        "session": {
+          "$ref": "#/definitions/Session"
         },
         "subject": {
           "description": "Subject is the identifier of the authenticated end-user.",
@@ -3313,6 +3454,37 @@
         "redirect_to": {
           "description": "Original request URL to which you should redirect the user if request was already handled.",
           "type": "string"
+        }
+      }
+    },
+    "requester": {
+      "type": "object",
+      "title": "Requester is a token endpoint's request context.",
+      "properties": {
+        "client_id": {
+          "description": "ClientID is the identifier of the OAuth 2.0 client.",
+          "type": "string"
+        },
+        "grant_types": {
+          "description": "GrantTypes is the requests grant types.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "granted_audience": {
+          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "granted_scopes": {
+          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

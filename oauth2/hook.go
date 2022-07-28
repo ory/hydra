@@ -17,14 +17,30 @@ import (
 // AccessRequestHook is called when an access token is being refreshed.
 type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequester) error
 
+// Requester is a token endpoint's request context.
+//
+// swagger:model requester
+type Requester struct {
+	// ClientID is the identifier of the OAuth 2.0 client.
+	ClientID string `json:"client_id"`
+	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
+	GrantedScopes []string `json:"granted_scopes"`
+	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
+	GrantedAudience []string `json:"granted_audience"`
+	// GrantTypes is the requests grant types.
+	GrantTypes []string `json:"grant_types"`
+}
+
 // RefreshTokenHookRequest is the request body sent to the refresh token hook.
 //
 // swagger:model refreshTokenHookRequest
 type RefreshTokenHookRequest struct {
 	// Subject is the identifier of the authenticated end-user.
 	Subject string `json:"subject"`
-	// IDTokenExtra is arbitrary data set by the session.
-	IDTokenExtra map[string]interface{} `json:"id_token_extra"`
+	// Session is the request's session..
+	Session *Session `json:"session"`
+	// Requester is a token endpoint's request context.
+	Requester Requester `json:"requester"`
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
@@ -60,9 +76,17 @@ func RefreshTokenHook(config *config.Provider) AccessRequestHook {
 			return nil
 		}
 
+		requesterInfo := Requester{
+			ClientID:        requester.GetClient().GetID(),
+			GrantedScopes:   requester.GetGrantedScopes(),
+			GrantedAudience: requester.GetGrantedAudience(),
+			GrantTypes:      requester.GetGrantTypes(),
+		}
+
 		reqBody := RefreshTokenHookRequest{
+			Session:         session,
+			Requester:       requesterInfo,
 			Subject:         session.GetSubject(),
-			IDTokenExtra:    session.IDTokenClaims().Extra,
 			ClientID:        requester.GetClient().GetID(),
 			GrantedScopes:   requester.GetGrantedScopes(),
 			GrantedAudience: requester.GetGrantedAudience(),

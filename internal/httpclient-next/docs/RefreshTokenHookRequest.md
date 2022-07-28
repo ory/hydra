@@ -106,30 +106,60 @@ SetGrantedScopes sets GrantedScopes field to given value.
 
 HasGrantedScopes returns a boolean if a field has been set.
 
-### GetIdTokenExtra
+### GetRequester
 
-`func (o *RefreshTokenHookRequest) GetIdTokenExtra() map[string]map[string]interface{}`
+`func (o *RefreshTokenHookRequest) GetRequester() Requester`
 
-GetIdTokenExtra returns the IdTokenExtra field if non-nil, zero value otherwise.
+GetRequester returns the Requester field if non-nil, zero value otherwise.
 
-### GetIdTokenExtraOk
+### GetRequesterOk
 
-`func (o *RefreshTokenHookRequest) GetIdTokenExtraOk() (*map[string]map[string]interface{}, bool)`
+`func (o *RefreshTokenHookRequest) GetRequesterOk() (*Requester, bool)`
 
-GetIdTokenExtraOk returns a tuple with the IdTokenExtra field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+<<<<<<< HEAD GetIdTokenExtraOk returns a tuple with the IdTokenExtra field if
+it's non-nil, zero value otherwise and a boolean to check if the value has been
+set. ======= GetRequesterOk returns a tuple with the Requester field if it's
+non-nil, zero value otherwise and a boolean to check if the value has been set.
 
-### SetIdTokenExtra
+> > > > > > > c0e06932 (feat: use entire session and requester in the refresh
+> > > > > > > hook request body)
 
-`func (o *RefreshTokenHookRequest) SetIdTokenExtra(v map[string]map[string]interface{})`
+### SetRequester
 
-SetIdTokenExtra sets IdTokenExtra field to given value.
+`func (o *RefreshTokenHookRequest) SetRequester(v Requester)`
 
-### HasIdTokenExtra
+SetRequester sets Requester field to given value.
 
-`func (o *RefreshTokenHookRequest) HasIdTokenExtra() bool`
+### HasRequester
 
-HasIdTokenExtra returns a boolean if a field has been set.
+`func (o *RefreshTokenHookRequest) HasRequester() bool`
+
+HasRequester returns a boolean if a field has been set.
+
+### GetSession
+
+`func (o *RefreshTokenHookRequest) GetSession() Session`
+
+GetSession returns the Session field if non-nil, zero value otherwise.
+
+### GetSessionOk
+
+`func (o *RefreshTokenHookRequest) GetSessionOk() (*Session, bool)`
+
+GetSessionOk returns a tuple with the Session field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
+
+### SetSession
+
+`func (o *RefreshTokenHookRequest) SetSession(v Session)`
+
+SetSession sets Session field to given value.
+
+### HasSession
+
+`func (o *RefreshTokenHookRequest) HasSession() bool`
+
+HasSession returns a boolean if a field has been set.
 
 ### GetSubject
 

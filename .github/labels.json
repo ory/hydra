@@ -2,72 +2,51 @@
   {
     "name": "package/persistence/sql",
     "color": "0A28FD",
-    "aliases": [
-      "sql"
-    ]
+    "aliases": ["sql"]
   },
   {
     "name": "package/sdk",
     "color": "0A28FD",
-    "aliases": [
-      "sdk"
-    ]
+    "aliases": ["sdk"]
   },
   {
     "name": "package/telemetry",
     "color": "0A28FD",
-    "aliases": [
-      "telemetry"
-    ]
+    "aliases": ["telemetry"]
   },
   {
     "name": "package/oidc",
     "color": "0A28FD",
-    "aliases": [
-      "oidc"
-    ]
+    "aliases": ["oidc"]
   },
   {
     "name": "package/consent",
     "color": "0A28FD",
-    "aliases": [
-      "consent"
-    ]
+    "aliases": ["consent"]
   },
   {
     "name": "package/oauth2",
     "color": "0A28FD",
-    "aliases": [
-      "oauth2"
-    ]
+    "aliases": ["oauth2"]
   },
   {
     "name": "package/client",
     "color": "0A28FD",
-    "aliases": [
-      "client"
-    ]
+    "aliases": ["client"]
   },
   {
     "name": "package/jwk",
     "color": "0A28FD",
-    "aliases": [
-      "jwk"
-    ]
+    "aliases": ["jwk"]
   },
   {
     "name": "package/cli",
     "color": "0A28FD",
-    "aliases": [
-      "cmd",
-      "config"
-    ]
+    "aliases": ["cmd", "config"]
   },
   {
     "name": "package/config",
     "color": "0A28FD",
-    "aliases": [
-      "config"
-    ]
+    "aliases": ["config"]
   }
 ]

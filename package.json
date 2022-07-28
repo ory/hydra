@@ -4,7 +4,7 @@
   "private": true,
   "prettier": "ory-prettier-styles",
   "config": {
-    "prettierTarget": "**/*.{js,ts,md,mdx,yml,yaml}"
+    "prettierTarget": "**/*.{js,ts,md,mdx,yml,yaml,json}"
   },
   "scripts": {
     "format": "prettier --write ${npm_package_config_prettierTarget}",

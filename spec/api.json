@@ -115,12 +115,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "use",
-          "kty",
-          "kid",
-          "alg"
-        ],
+        "required": ["use", "kty", "kid", "alg"],
         "type": "object"
       },
       "JSONWebKeySet": {
@@ -286,9 +281,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "subject"
-        ],
+        "required": ["subject"],
         "title": "HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
@@ -299,9 +292,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "redirect_to"
-        ],
+        "required": ["redirect_to"],
         "title": "The response payload sent when accepting or rejecting a login or consent request.",
         "type": "object"
       },
@@ -354,9 +345,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "challenge"
-        ],
+        "required": ["challenge"],
         "title": "Contains information on an ongoing consent request.",
         "type": "object"
       },
@@ -435,9 +424,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object"
       },
       "healthNotReadyStatus": {
@@ -504,11 +491,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "alg",
-          "use",
-          "kid"
-        ],
+        "required": ["alg", "use", "kid"],
         "type": "object"
       },
       "loginRequest": {
@@ -841,9 +824,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "active"
-        ],
+        "required": ["active"],
         "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
         "type": "object"
       },
@@ -960,10 +941,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "op",
-          "path"
-        ],
+        "required": ["op", "path"],
         "type": "object"
       },
       "patchRequest": {
@@ -1044,9 +1022,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "redirect_to"
-        ],
+        "required": ["redirect_to"],
         "title": "The response payload sent when there is an attempt to access already handled request.",
         "type": "object"
       },
@@ -1071,10 +1047,7 @@
           },
           "scope": {
             "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-            "example": [
-              "openid",
-              "offline"
-            ],
+            "example": ["openid", "offline"],
             "items": {
               "type": "string"
             },
@@ -1086,12 +1059,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "issuer",
-          "scope",
-          "jwk",
-          "expires_at"
-        ],
+        "required": ["issuer", "scope", "jwk", "expires_at"],
         "type": "object"
       },
       "trustedJsonWebKey": {
@@ -1139,10 +1107,7 @@
           },
           "scope": {
             "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-            "example": [
-              "openid",
-              "offline"
-            ],
+            "example": ["openid", "offline"],
             "items": {
               "type": "string"
             },
@@ -1478,9 +1443,7 @@
           }
         },
         "summary": "JSON Web Keys Discovery",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/.well-known/openid-configuration": {
@@ -1520,9 +1483,7 @@
           }
         },
         "summary": "OpenID Connect Discovery",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/clients": {
@@ -1581,9 +1542,7 @@
           }
         },
         "summary": "List OAuth 2.0 Clients",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "post": {
         "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret\nwill be generated. The secret will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -1622,9 +1581,7 @@
           }
         },
         "summary": "Create an OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/clients/{id}": {
@@ -1658,9 +1615,7 @@
           }
         },
         "summary": "Deletes an OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "get": {
         "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -1699,9 +1654,7 @@
           }
         },
         "summary": "Get an OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "patch": {
         "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -1751,9 +1704,7 @@
           }
         },
         "summary": "Patch an OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "put": {
         "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -1803,9 +1754,7 @@
           }
         },
         "summary": "Update an OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/clients/{id}/lifespans": {
@@ -1855,9 +1804,7 @@
             "description": "jsonError"
           }
         },
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/health/alive": {
@@ -1887,9 +1834,7 @@
           }
         },
         "summary": "Check HTTP Server Status",
-        "tags": [
-          "metadata"
-        ]
+        "tags": ["metadata"]
       }
     },
     "/health/ready": {
@@ -1934,9 +1879,7 @@
           }
         },
         "summary": "Check HTTP Server and Database Status",
-        "tags": [
-          "metadata"
-        ]
+        "tags": ["metadata"]
       }
     },
     "/keys/{set}": {
@@ -1990,9 +1933,7 @@
           }
         },
         "summary": "Delete a JSON Web Key Set",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "get": {
         "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2051,9 +1992,7 @@
           }
         },
         "summary": "Retrieve a JSON Web Key Set",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "post": {
         "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2122,9 +2061,7 @@
           }
         },
         "summary": "Generate a New JSON Web Key",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2193,9 +2130,7 @@
           }
         },
         "summary": "Update a JSON Web Key Set",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/keys/{set}/{kid}": {
@@ -2258,9 +2193,7 @@
           }
         },
         "summary": "Delete a JSON Web Key",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "get": {
         "description": "This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).",
@@ -2318,9 +2251,7 @@
           }
         },
         "summary": "Fetch a JSON Web Key",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2398,9 +2329,7 @@
           }
         },
         "summary": "Update a JSON Web Key",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth": {
@@ -2433,9 +2362,7 @@
           }
         },
         "summary": "The OAuth 2.0 Authorize Endpoint",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/auth/requests/consent": {
@@ -2495,9 +2422,7 @@
           }
         },
         "summary": "Get Consent Request Information",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/consent/accept": {
@@ -2557,9 +2482,7 @@
           }
         },
         "summary": "Accept a Consent Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/consent/reject": {
@@ -2619,9 +2542,7 @@
           }
         },
         "summary": "Reject a Consent Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/login": {
@@ -2691,9 +2612,7 @@
           }
         },
         "summary": "Get a Login Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/login/accept": {
@@ -2773,9 +2692,7 @@
           }
         },
         "summary": "Accept a Login Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/login/reject": {
@@ -2855,9 +2772,7 @@
           }
         },
         "summary": "Reject a Login Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/logout": {
@@ -2917,9 +2832,7 @@
           }
         },
         "summary": "Get a Logout Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/logout/accept": {
@@ -2969,9 +2882,7 @@
           }
         },
         "summary": "Accept a Logout Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/requests/logout/reject": {
@@ -3029,9 +2940,7 @@
           }
         },
         "summary": "Reject a Logout Request",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/sessions/consent": {
@@ -3091,9 +3000,7 @@
           }
         },
         "summary": "Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "get": {
         "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
@@ -3152,9 +3059,7 @@
           }
         },
         "summary": "Lists All Consent Sessions of a Subject",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/auth/sessions/login": {
@@ -3197,9 +3102,7 @@
           }
         },
         "summary": "Invalidates All Login Sessions of a Certain User\nInvalidates a Subject's Authentication Session",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/flush": {
@@ -3242,9 +3145,7 @@
           }
         },
         "summary": "Flush Expired OAuth2 Access Tokens",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/introspect": {
@@ -3263,16 +3164,12 @@
                   },
                   "token": {
                     "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue returned.",
-                    "required": [
-                      "token"
-                    ],
+                    "required": ["token"],
                     "type": "string",
                     "x-formData-name": "token"
                   }
                 },
-                "required": [
-                  "token"
-                ],
+                "required": ["token"],
                 "type": "object"
               }
             }
@@ -3311,9 +3208,7 @@
           }
         },
         "summary": "Introspect OAuth2 Tokens",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/oauth2/register": {
@@ -3354,9 +3249,7 @@
           }
         },
         "summary": "Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/register/{id}": {
@@ -3390,9 +3283,7 @@
           }
         },
         "summary": "Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       },
       "get": {
         "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -3431,9 +3322,7 @@
           }
         },
         "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       },
       "put": {
         "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -3483,9 +3372,7 @@
           }
         },
         "summary": "Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/revoke": {
@@ -3498,16 +3385,12 @@
               "schema": {
                 "properties": {
                   "token": {
-                    "required": [
-                      "token"
-                    ],
+                    "required": ["token"],
                     "type": "string",
                     "x-formData-name": "token"
                   }
                 },
-                "required": [
-                  "token"
-                ],
+                "required": ["token"],
                 "type": "object"
               }
             }
@@ -3547,9 +3430,7 @@
           }
         ],
         "summary": "Revoke OAuth2 Tokens",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/sessions/logout": {
@@ -3562,9 +3443,7 @@
           }
         },
         "summary": "OpenID Connect Front-Backchannel Enabled Logout",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/token": {
@@ -3585,9 +3464,7 @@
                     "x-formData-name": "code"
                   },
                   "grant_type": {
-                    "required": [
-                      "grant_type"
-                    ],
+                    "required": ["grant_type"],
                     "type": "string",
                     "x-formData-name": "grant_type"
                   },
@@ -3600,9 +3477,7 @@
                     "x-formData-name": "refresh_token"
                   }
                 },
-                "required": [
-                  "grant_type"
-                ],
+                "required": ["grant_type"],
                 "type": "object"
               }
             }
@@ -3659,9 +3534,7 @@
           }
         ],
         "summary": "The OAuth 2.0 Token Endpoint",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/oauth2/tokens": {
@@ -3704,9 +3577,7 @@
           }
         },
         "summary": "Delete OAuth2 Access Tokens from a Client",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/trust/grants/jwt-bearer/issuers": {
@@ -3764,9 +3635,7 @@
           }
         },
         "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "post": {
         "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
@@ -3824,9 +3693,7 @@
           }
         },
         "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/trust/grants/jwt-bearer/issuers/{id}": {
@@ -3870,9 +3737,7 @@
           }
         },
         "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       },
       "get": {
         "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
@@ -3921,9 +3786,7 @@
           }
         },
         "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
-        "tags": [
-          "admin"
-        ]
+        "tags": ["admin"]
       }
     },
     "/userinfo": {
@@ -3968,9 +3831,7 @@
           }
         ],
         "summary": "OpenID Connect Userinfo",
-        "tags": [
-          "public"
-        ]
+        "tags": ["public"]
       }
     },
     "/version": {
@@ -3996,9 +3857,7 @@
           }
         },
         "summary": "Return Running Software Version.",
-        "tags": [
-          "metadata"
-        ]
+        "tags": ["metadata"]
       }
     }
   },

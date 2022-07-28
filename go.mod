@@ -10,6 +10,7 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+	github.com/ory/x => github.com/grantzvolsky/x v0.0.383-0.20220731104300-14bdfa6f47a5
 )
 
 replace github.com/ory/hydra-client-go => ./internal/httpclient
@@ -19,7 +20,6 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.0.0
-	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-swagger/go-swagger v0.26.1
@@ -40,11 +40,11 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/miekg/pkcs11 v1.0.3
-	github.com/mikefarah/yq/v4 v4.19.1
+	github.com/mikefarah/yq/v4 v4.16.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.3-0.20220623093045-89faad818c4c
+	github.com/ory/fosite v0.42.3-0.20220730230743-a37ad04f6a5c
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
@@ -60,6 +60,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
+	github.com/tidwall/gjson v1.14.1
 	github.com/tidwall/gjson v1.14.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/sjson v1.2.4
@@ -87,7 +88,6 @@ require (
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/a8m/envsubst v1.3.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/avast/retry-go/v4 v4.0.5 // indirect
@@ -98,6 +98,7 @@ require (
 	github.com/cockroachdb/cockroach-go/v2 v2.2.10 // indirect
 	github.com/containerd/containerd v1.5.7 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
+	github.com/cristalhq/jwt/v4 v4.0.2 // indirect
 	github.com/dave/jennifer v1.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
@@ -112,6 +113,7 @@ require (
 	github.com/elastic/go-sysinfo v1.1.1 // indirect
 	github.com/elastic/go-windows v1.0.0 // indirect
 	github.com/elliotchance/orderedmap v1.4.0 // indirect
+	github.com/evanphx/json-patch v4.11.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect

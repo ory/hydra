@@ -2,14 +2,14 @@
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**GrantAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
-**GrantScope** | Pointer to **[]string** |  | [optional] 
-**HandledAt** | Pointer to **time.Time** |  | [optional] 
-**Remember** | Pointer to **bool** | Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope. | [optional] 
-**RememberFor** | Pointer to **int64** | RememberFor sets how long the consent authorization should be remembered for in seconds. If set to &#x60;0&#x60;, the authorization will be remembered indefinitely. | [optional] 
-**Session** | Pointer to [**AcceptOAuth2ConsentRequestSession**](AcceptOAuth2ConsentRequestSession.md) |  | [optional] 
+| Name                         | Type                                                                                     | Description                                                                                                                                                              | Notes      |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| **GrantAccessTokenAudience** | Pointer to **[]string**                                                                  |                                                                                                                                                                          | [optional] |
+| **GrantScope**               | Pointer to **[]string**                                                                  |                                                                                                                                                                          | [optional] |
+| **HandledAt**                | Pointer to **time.Time**                                                                 |                                                                                                                                                                          | [optional] |
+| **Remember**                 | Pointer to **bool**                                                                      | Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope. | [optional] |
+| **RememberFor**              | Pointer to **int64**                                                                     | RememberFor sets how long the consent authorization should be remembered for in seconds. If set to &#x60;0&#x60;, the authorization will be remembered indefinitely.     | [optional] |
+| **Session**                  | Pointer to [**AcceptOAuth2ConsentRequestSession**](AcceptOAuth2ConsentRequestSession.md) |                                                                                                                                                                          | [optional] |
 
 ## Methods
 
@@ -17,31 +17,34 @@ Name | Type | Description | Notes
 
 `func NewAcceptOAuth2ConsentRequest() *AcceptOAuth2ConsentRequest`
 
-NewAcceptOAuth2ConsentRequest instantiates a new AcceptOAuth2ConsentRequest object
-This constructor will assign default values to properties that have it defined,
-and makes sure properties required by API are set, but the set of arguments
-will change when the set of required properties is changed
+NewAcceptOAuth2ConsentRequest instantiates a new AcceptOAuth2ConsentRequest
+object This constructor will assign default values to properties that have it
+defined, and makes sure properties required by API are set, but the set of
+arguments will change when the set of required properties is changed
 
 ### NewAcceptOAuth2ConsentRequestWithDefaults
 
 `func NewAcceptOAuth2ConsentRequestWithDefaults() *AcceptOAuth2ConsentRequest`
 
-NewAcceptOAuth2ConsentRequestWithDefaults instantiates a new AcceptOAuth2ConsentRequest object
-This constructor will only assign default values to properties that have it defined,
-but it doesn't guarantee that properties required by API are set
+NewAcceptOAuth2ConsentRequestWithDefaults instantiates a new
+AcceptOAuth2ConsentRequest object This constructor will only assign default
+values to properties that have it defined, but it doesn't guarantee that
+properties required by API are set
 
 ### GetGrantAccessTokenAudience
 
 `func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudience() []string`
 
-GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field if non-nil, zero value otherwise.
+GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field if
+non-nil, zero value otherwise.
 
 ### GetGrantAccessTokenAudienceOk
 
 `func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudienceOk() (*[]string, bool)`
 
-GetGrantAccessTokenAudienceOk returns a tuple with the GrantAccessTokenAudience field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetGrantAccessTokenAudienceOk returns a tuple with the GrantAccessTokenAudience
+field if it's non-nil, zero value otherwise and a boolean to check if the value
+has been set.
 
 ### SetGrantAccessTokenAudience
 
@@ -65,8 +68,8 @@ GetGrantScope returns the GrantScope field if non-nil, zero value otherwise.
 
 `func (o *AcceptOAuth2ConsentRequest) GetGrantScopeOk() (*[]string, bool)`
 
-GetGrantScopeOk returns a tuple with the GrantScope field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetGrantScopeOk returns a tuple with the GrantScope field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetGrantScope
 
@@ -90,8 +93,8 @@ GetHandledAt returns the HandledAt field if non-nil, zero value otherwise.
 
 `func (o *AcceptOAuth2ConsentRequest) GetHandledAtOk() (*time.Time, bool)`
 
-GetHandledAtOk returns a tuple with the HandledAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetHandledAtOk returns a tuple with the HandledAt field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetHandledAt
 
@@ -115,8 +118,8 @@ GetRemember returns the Remember field if non-nil, zero value otherwise.
 
 `func (o *AcceptOAuth2ConsentRequest) GetRememberOk() (*bool, bool)`
 
-GetRememberOk returns a tuple with the Remember field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetRememberOk returns a tuple with the Remember field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetRemember
 
@@ -140,8 +143,8 @@ GetRememberFor returns the RememberFor field if non-nil, zero value otherwise.
 
 `func (o *AcceptOAuth2ConsentRequest) GetRememberForOk() (*int64, bool)`
 
-GetRememberForOk returns a tuple with the RememberFor field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetRememberForOk returns a tuple with the RememberFor field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
 
 ### SetRememberFor
 
@@ -165,8 +168,8 @@ GetSession returns the Session field if non-nil, zero value otherwise.
 
 `func (o *AcceptOAuth2ConsentRequest) GetSessionOk() (*AcceptOAuth2ConsentRequestSession, bool)`
 
-GetSessionOk returns a tuple with the Session field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetSessionOk returns a tuple with the Session field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetSession
 
@@ -180,7 +183,6 @@ SetSession sets Session field to given value.
 
 HasSession returns a boolean if a field has been set.
 
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
-
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to README]](../README.md)

@@ -83,7 +83,7 @@ func TestJWTBearer(t *testing.T) {
 	}
 
 	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, grant trust.Grant) {
-		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token, admin)
+		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
 			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)

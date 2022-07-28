@@ -2,6 +2,7 @@
 .travis.yml
 README.md
 api/openapi.yaml
+api_admin.go
 api_metadata.go
 api_v1.go
 client.go
@@ -9,6 +10,7 @@ configuration.go
 docs/AcceptOAuth2ConsentRequest.md
 docs/AcceptOAuth2ConsentRequestSession.md
 docs/AcceptOAuth2LoginRequest.md
+docs/AdminApi.md
 docs/AdminCreateJsonWebKeySetBody.md
 docs/AdminTrustOAuth2JwtGrantIssuerBody.md
 docs/GenericError.md
@@ -41,8 +43,11 @@ docs/RefreshTokenHookRequest.md
 docs/RefreshTokenHookResponse.md
 docs/RejectOAuth2Request.md
 docs/SuccessfulOAuth2RequestResponse.md
+docs/TokenPagination.md
+docs/TokenPaginationHeaders.md
 docs/TrustedOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantJsonWebKey.md
+docs/UpdateOAuth2ClientLifespans.md
 docs/V1Api.md
 docs/Version.md
 git_push.sh
@@ -82,8 +87,11 @@ model_refresh_token_hook_request.go
 model_refresh_token_hook_response.go
 model_reject_o_auth2_request.go
 model_successful_o_auth2_request_response.go
+model_token_pagination.go
+model_token_pagination_headers.go
 model_trusted_o_auth2_jwt_grant_issuer.go
 model_trusted_o_auth2_jwt_grant_json_web_key.go
+model_update_o_auth2_client_lifespans.go
 model_version.go
 response.go
 utils.go

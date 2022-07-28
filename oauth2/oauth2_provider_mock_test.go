@@ -10,7 +10,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-
 	fosite "github.com/ory/fosite"
 )
 
@@ -133,6 +132,36 @@ func (mr *MockOAuth2ProviderMockRecorder) NewIntrospectionRequest(arg0, arg1, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewIntrospectionRequest", reflect.TypeOf((*MockOAuth2Provider)(nil).NewIntrospectionRequest), arg0, arg1, arg2)
 }
 
+// NewPushedAuthorizeRequest mocks base method.
+func (m *MockOAuth2Provider) NewPushedAuthorizeRequest(arg0 context.Context, arg1 *http.Request) (fosite.AuthorizeRequester, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewPushedAuthorizeRequest", arg0, arg1)
+	ret0, _ := ret[0].(fosite.AuthorizeRequester)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewPushedAuthorizeRequest indicates an expected call of NewPushedAuthorizeRequest.
+func (mr *MockOAuth2ProviderMockRecorder) NewPushedAuthorizeRequest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewPushedAuthorizeRequest", reflect.TypeOf((*MockOAuth2Provider)(nil).NewPushedAuthorizeRequest), arg0, arg1)
+}
+
+// NewPushedAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) NewPushedAuthorizeResponse(arg0 context.Context, arg1 fosite.AuthorizeRequester, arg2 fosite.Session) (fosite.PushedAuthorizeResponder, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewPushedAuthorizeResponse", arg0, arg1, arg2)
+	ret0, _ := ret[0].(fosite.PushedAuthorizeResponder)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewPushedAuthorizeResponse indicates an expected call of NewPushedAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) NewPushedAuthorizeResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewPushedAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewPushedAuthorizeResponse), arg0, arg1, arg2)
+}
+
 // NewRevocationRequest mocks base method.
 func (m *MockOAuth2Provider) NewRevocationRequest(arg0 context.Context, arg1 *http.Request) error {
 	m.ctrl.T.Helper()
@@ -217,6 +246,30 @@ func (m *MockOAuth2Provider) WriteIntrospectionResponse(arg0 context.Context, ar
 func (mr *MockOAuth2ProviderMockRecorder) WriteIntrospectionResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIntrospectionResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteIntrospectionResponse), arg0, arg1, arg2)
+}
+
+// WritePushedAuthorizeError mocks base method.
+func (m *MockOAuth2Provider) WritePushedAuthorizeError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 error) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WritePushedAuthorizeError", arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeError indicates an expected call of WritePushedAuthorizeError.
+func (mr *MockOAuth2ProviderMockRecorder) WritePushedAuthorizeError(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WritePushedAuthorizeError", reflect.TypeOf((*MockOAuth2Provider)(nil).WritePushedAuthorizeError), arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) WritePushedAuthorizeResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 fosite.PushedAuthorizeResponder) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WritePushedAuthorizeResponse", arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeResponse indicates an expected call of WritePushedAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) WritePushedAuthorizeResponse(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WritePushedAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WritePushedAuthorizeResponse), arg0, arg1, arg2, arg3)
 }
 
 // WriteRevocationResponse mocks base method.

@@ -1,4 +1,4 @@
-# PaginationHeaders
+# TokenPaginationHeaders
 
 ## Properties
 
@@ -9,70 +9,70 @@
 
 ## Methods
 
-### NewPaginationHeaders
+### NewTokenPaginationHeaders
 
-`func NewPaginationHeaders() *PaginationHeaders`
+`func NewTokenPaginationHeaders() *TokenPaginationHeaders`
 
-NewPaginationHeaders instantiates a new PaginationHeaders object This
+NewTokenPaginationHeaders instantiates a new TokenPaginationHeaders object This
 constructor will assign default values to properties that have it defined, and
 makes sure properties required by API are set, but the set of arguments will
 change when the set of required properties is changed
 
-### NewPaginationHeadersWithDefaults
+### NewTokenPaginationHeadersWithDefaults
 
-`func NewPaginationHeadersWithDefaults() *PaginationHeaders`
+`func NewTokenPaginationHeadersWithDefaults() *TokenPaginationHeaders`
 
-NewPaginationHeadersWithDefaults instantiates a new PaginationHeaders object
-This constructor will only assign default values to properties that have it
-defined, but it doesn't guarantee that properties required by API are set
+NewTokenPaginationHeadersWithDefaults instantiates a new TokenPaginationHeaders
+object This constructor will only assign default values to properties that have
+it defined, but it doesn't guarantee that properties required by API are set
 
 ### GetLink
 
-`func (o *PaginationHeaders) GetLink() string`
+`func (o *TokenPaginationHeaders) GetLink() string`
 
 GetLink returns the Link field if non-nil, zero value otherwise.
 
 ### GetLinkOk
 
-`func (o *PaginationHeaders) GetLinkOk() (*string, bool)`
+`func (o *TokenPaginationHeaders) GetLinkOk() (*string, bool)`
 
 GetLinkOk returns a tuple with the Link field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetLink
 
-`func (o *PaginationHeaders) SetLink(v string)`
+`func (o *TokenPaginationHeaders) SetLink(v string)`
 
 SetLink sets Link field to given value.
 
 ### HasLink
 
-`func (o *PaginationHeaders) HasLink() bool`
+`func (o *TokenPaginationHeaders) HasLink() bool`
 
 HasLink returns a boolean if a field has been set.
 
 ### GetXTotalCount
 
-`func (o *PaginationHeaders) GetXTotalCount() string`
+`func (o *TokenPaginationHeaders) GetXTotalCount() string`
 
 GetXTotalCount returns the XTotalCount field if non-nil, zero value otherwise.
 
 ### GetXTotalCountOk
 
-`func (o *PaginationHeaders) GetXTotalCountOk() (*string, bool)`
+`func (o *TokenPaginationHeaders) GetXTotalCountOk() (*string, bool)`
 
 GetXTotalCountOk returns a tuple with the XTotalCount field if it's non-nil,
 zero value otherwise and a boolean to check if the value has been set.
 
 ### SetXTotalCount
 
-`func (o *PaginationHeaders) SetXTotalCount(v string)`
+`func (o *TokenPaginationHeaders) SetXTotalCount(v string)`
 
 SetXTotalCount sets XTotalCount field to given value.
 
 ### HasXTotalCount
 
-`func (o *PaginationHeaders) HasXTotalCount() bool`
+`func (o *TokenPaginationHeaders) HasXTotalCount() bool`
 
 HasXTotalCount returns a boolean if a field has been set.
 

@@ -207,6 +207,42 @@ type Client struct {
 
 	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
 	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
+
+	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan" db:"authorization_code_grant_access_token_lifespan"`
+
+	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan" db:"authorization_code_grant_id_token_lifespan"`
+
+	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan" db:"authorization_code_grant_refresh_token_lifespan"`
+
+	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan" db:"client_credentials_grant_access_token_lifespan"`
+
+	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan" db:"implicit_grant_access_token_lifespan"`
+
+	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan" db:"implicit_grant_id_token_lifespan"`
+
+	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan" db:"jwt_bearer_grant_access_token_lifespan"`
+
+	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan" db:"password_grant_access_token_lifespan"`
+
+	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan" db:"password_grant_refresh_token_lifespan"`
+
+	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan" db:"refresh_token_grant_id_token_lifespan"`
+
+	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan" db:"refresh_token_grant_access_token_lifespan"`
+
+	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan" db:"refresh_token_grant_refresh_token_lifespan"`
 }
 
 func (Client) TableName() string {
@@ -335,4 +371,52 @@ func (c *Client) GetTokenEndpointAuthMethod() string {
 
 func (c *Client) GetRequestURIs() []string {
 	return c.RequestURIs
+}
+
+var _ fosite.ClientWithCustomTokenLifespans = &Client{}
+
+func (c *Client) GetEffectiveLifespan(gt fosite.GrantType, tt fosite.TokenType, fallback time.Duration) time.Duration {
+	var cl *time.Duration
+	if gt == fosite.GrantTypeAuthorizationCode {
+		if tt == fosite.AccessToken && c.AuthorizationCodeGrantAccessTokenLifespan.Valid {
+			cl = &c.AuthorizationCodeGrantAccessTokenLifespan.Duration
+		} else if tt == fosite.IDToken && c.AuthorizationCodeGrantIDTokenLifespan.Valid {
+			cl = &c.AuthorizationCodeGrantIDTokenLifespan.Duration
+		} else if tt == fosite.RefreshToken && c.AuthorizationCodeGrantRefreshTokenLifespan.Valid {
+			cl = &c.AuthorizationCodeGrantRefreshTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypeClientCredentials {
+		if tt == fosite.AccessToken && c.ClientCredentialsGrantAccessTokenLifespan.Valid {
+			cl = &c.ClientCredentialsGrantAccessTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypeImplicit {
+		if tt == fosite.AccessToken && c.ImplicitGrantAccessTokenLifespan.Valid {
+			cl = &c.ImplicitGrantAccessTokenLifespan.Duration
+		} else if tt == fosite.IDToken && c.ImplicitGrantIDTokenLifespan.Valid {
+			cl = &c.ImplicitGrantIDTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypeJwtBearer {
+		if tt == fosite.AccessToken && c.JwtBearerGrantAccessTokenLifespan.Valid {
+			cl = &c.JwtBearerGrantAccessTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypePassword {
+		if tt == fosite.AccessToken && c.PasswordGrantAccessTokenLifespan.Valid {
+			cl = &c.PasswordGrantAccessTokenLifespan.Duration
+		} else if tt == fosite.RefreshToken && c.PasswordGrantRefreshTokenLifespan.Valid {
+			cl = &c.PasswordGrantRefreshTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypeRefreshToken {
+		if tt == fosite.AccessToken && c.RefreshTokenGrantAccessTokenLifespan.Valid {
+			cl = &c.RefreshTokenGrantAccessTokenLifespan.Duration
+		} else if tt == fosite.IDToken && c.RefreshTokenGrantIDTokenLifespan.Valid {
+			cl = &c.RefreshTokenGrantIDTokenLifespan.Duration
+		} else if tt == fosite.RefreshToken && c.RefreshTokenGrantRefreshTokenLifespan.Valid {
+			cl = &c.RefreshTokenGrantRefreshTokenLifespan.Duration
+		}
+	}
+
+	if cl == nil {
+		return fallback
+	}
+	return *cl
 }

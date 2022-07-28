@@ -8,7 +8,7 @@ info:
     name: Apache 2.0
   title: Ory Hydra API
 servers:
-- url: /
+  - url: /
 paths:
   /.well-known/jwks.json:
     get:
@@ -22,17 +22,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKeySet'
+                $ref: "#/components/schemas/JSONWebKeySet"
           description: JSONWebKeySet
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: JSON Web Keys Discovery
       tags:
-      - public
+        - public
   /.well-known/openid-configuration:
     get:
       description: |-
@@ -48,23 +48,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wellKnown'
+                $ref: "#/components/schemas/wellKnown"
           description: wellKnown
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: OpenID Connect Discovery
       tags:
-      - public
+        - public
   /clients:
     get:
       description: |-
@@ -79,59 +79,60 @@ paths:
         Multiple links can be included in this header, and will be separated by a comma.
       operationId: listOAuth2Clients
       parameters:
-      - description: The maximum amount of clients to returned, upper bound is 500
-          clients.
-        explode: true
-        in: query
-        name: limit
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
-      - description: The offset from where to start looking.
-        explode: true
-        in: query
-        name: offset
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
-      - description: The name of the clients to filter by.
-        explode: true
-        in: query
-        name: client_name
-        required: false
-        schema:
-          type: string
-        style: form
-      - description: The owner of the clients to filter by.
-        explode: true
-        in: query
-        name: owner
-        required: false
-        schema:
-          type: string
-        style: form
+        - description:
+            The maximum amount of clients to returned, upper bound is 500
+            clients.
+          explode: true
+          in: query
+          name: limit
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
+        - description: The offset from where to start looking.
+          explode: true
+          in: query
+          name: offset
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
+        - description: The name of the clients to filter by.
+          explode: true
+          in: query
+          name: client_name
+          required: false
+          schema:
+            type: string
+          style: form
+        - description: The owner of the clients to filter by.
+          explode: true
+          in: query
+          name: owner
+          required: false
+          schema:
+            type: string
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/oAuth2Client'
+                  $ref: "#/components/schemas/oAuth2Client"
                 type: array
           description: A list of clients.
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: List OAuth 2.0 Clients
       tags:
-      - admin
+        - admin
     post:
       description: |-
         Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
@@ -145,7 +146,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         required: true
         x-originalParamName: Body
       responses:
@@ -153,17 +154,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Create an OAuth 2.0 Client
       tags:
-      - admin
+        - admin
   /clients/{id}:
     delete:
       description: |-
@@ -175,14 +176,14 @@ paths:
         Make sure that this endpoint is well protected and only callable by first-party components.
       operationId: deleteOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "204":
           description: |-
@@ -192,11 +193,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Deletes an OAuth 2.0 Client
       tags:
-      - admin
+        - admin
     get:
       description: |-
         Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
@@ -205,30 +206,30 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: getOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Get an OAuth 2.0 Client
       tags:
-      - admin
+        - admin
     patch:
       description: |-
         Patch an existing OAuth 2.0 Client. If you pass `client_secret`
@@ -239,19 +240,19 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: patchOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/patchRequest'
+              $ref: "#/components/schemas/patchRequest"
         required: true
         x-originalParamName: Body
       responses:
@@ -259,17 +260,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Patch an OAuth 2.0 Client
       tags:
-      - admin
+        - admin
     put:
       description: |-
         Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
@@ -279,19 +280,19 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: updateOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         required: true
         x-originalParamName: Body
       responses:
@@ -299,17 +300,54 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Update an OAuth 2.0 Client
       tags:
-      - admin
+        - admin
+  /clients/{id}/lifespans:
+    put:
+      description: |-
+        UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
+        client configuration takes precedence over the instance-wide token lifespan
+        configuration.
+      operationId: UpdateOAuth2ClientLifespans
+      parameters:
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOAuth2ClientLifespans"
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuth2Client"
+          description: oAuth2Client
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jsonError"
+          description: jsonError
+      tags:
+        - admin
   /health/alive:
     get:
       description: |-
@@ -327,17 +365,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/healthStatus'
+                $ref: "#/components/schemas/healthStatus"
           description: Ory Hydra is ready to accept connections.
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Check HTTP Server Status
       tags:
-      - metadata
+        - metadata
   /health/ready:
     get:
       description: |-
@@ -355,17 +393,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: "#/components/schemas/inline_response_200"
           description: Ory Hydra is ready to accept requests.
         "503":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_503'
+                $ref: "#/components/schemas/inline_response_503"
           description: Ory Kratos is not yet ready to accept requests.
       summary: Check HTTP Server and Database Status
       tags:
-      - metadata
+        - metadata
   /keys/{set}:
     delete:
       description: |-
@@ -374,14 +412,14 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: deleteJsonWebKeySet
       parameters:
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "204":
           description: |-
@@ -391,23 +429,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Delete a JSON Web Key Set
       tags:
-      - admin
+        - admin
     get:
       description: |-
         This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
@@ -415,42 +453,42 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: getJsonWebKeySet
       parameters:
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKeySet'
+                $ref: "#/components/schemas/JSONWebKeySet"
           description: JSONWebKeySet
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Retrieve a JSON Web Key Set
       tags:
-      - admin
+        - admin
     post:
       description: |-
         This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
@@ -458,48 +496,48 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: createJsonWebKeySet
       parameters:
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jsonWebKeySetGeneratorRequest'
+              $ref: "#/components/schemas/jsonWebKeySetGeneratorRequest"
         x-originalParamName: Body
       responses:
         "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKeySet'
+                $ref: "#/components/schemas/JSONWebKeySet"
           description: JSONWebKeySet
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Generate a New JSON Web Key
       tags:
-      - admin
+        - admin
     put:
       description: |-
         Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -507,48 +545,48 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: updateJsonWebKeySet
       parameters:
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JSONWebKeySet'
+              $ref: "#/components/schemas/JSONWebKeySet"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKeySet'
+                $ref: "#/components/schemas/JSONWebKeySet"
           description: JSONWebKeySet
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Update a JSON Web Key Set
       tags:
-      - admin
+        - admin
   /keys/{set}/{kid}:
     delete:
       description: |-
@@ -557,22 +595,22 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: deleteJsonWebKey
       parameters:
-      - description: The kid of the desired key
-        explode: false
-        in: path
-        name: kid
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The kid of the desired key
+          explode: false
+          in: path
+          name: kid
+          required: true
+          schema:
+            type: string
+          style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "204":
           description: |-
@@ -582,66 +620,67 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Delete a JSON Web Key
       tags:
-      - admin
+        - admin
     get:
-      description: This endpoint returns a singular JSON Web Key, identified by the
-        set and the specific key ID (kid).
+      description:
+        This endpoint returns a singular JSON Web Key, identified by the set and
+        the specific key ID (kid).
       operationId: getJsonWebKey
       parameters:
-      - description: The kid of the desired key
-        explode: false
-        in: path
-        name: kid
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The kid of the desired key
+          explode: false
+          in: path
+          name: kid
+          required: true
+          schema:
+            type: string
+          style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKeySet'
+                $ref: "#/components/schemas/JSONWebKeySet"
           description: JSONWebKeySet
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Fetch a JSON Web Key
       tags:
-      - admin
+        - admin
     put:
       description: |-
         Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -649,56 +688,56 @@ paths:
         A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: updateJsonWebKey
       parameters:
-      - description: The kid of the desired key
-        explode: false
-        in: path
-        name: kid
-        required: true
-        schema:
-          type: string
-        style: simple
-      - description: The set
-        explode: false
-        in: path
-        name: set
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The kid of the desired key
+          explode: false
+          in: path
+          name: kid
+          required: true
+          schema:
+            type: string
+          style: simple
+        - description: The set
+          explode: false
+          in: path
+          name: set
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JSONWebKey'
+              $ref: "#/components/schemas/JSONWebKey"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JSONWebKey'
+                $ref: "#/components/schemas/JSONWebKey"
           description: JSONWebKey
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "403":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Update a JSON Web Key
       tags:
-      - admin
+        - admin
   /oauth2/auth:
     get:
       description: |-
@@ -716,17 +755,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: The OAuth 2.0 Authorize Endpoint
       tags:
-      - public
+        - public
   /oauth2/auth/requests/consent:
     get:
       description: |-
@@ -742,41 +781,41 @@ paths:
         or rejected the request.
       operationId: getConsentRequest
       parameters:
-      - explode: true
-        in: query
-        name: consent_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: consent_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/consentRequest'
+                $ref: "#/components/schemas/consentRequest"
           description: consentRequest
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/requestWasHandledResponse'
+                $ref: "#/components/schemas/requestWasHandledResponse"
           description: requestWasHandledResponse
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Get Consent Request Information
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/consent/accept:
     put:
       description: |-
@@ -798,41 +837,41 @@ paths:
         The response contains a redirect URL which the consent provider should redirect the user-agent to.
       operationId: acceptConsentRequest
       parameters:
-      - explode: true
-        in: query
-        name: consent_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: consent_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/acceptConsentRequest'
+              $ref: "#/components/schemas/acceptConsentRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/completedRequest'
+                $ref: "#/components/schemas/completedRequest"
           description: completedRequest
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Accept a Consent Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/consent/reject:
     put:
       description: |-
@@ -853,41 +892,41 @@ paths:
         The response contains a redirect URL which the consent provider should redirect the user-agent to.
       operationId: rejectConsentRequest
       parameters:
-      - explode: true
-        in: query
-        name: consent_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: consent_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rejectRequest'
+              $ref: "#/components/schemas/rejectRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/completedRequest'
+                $ref: "#/components/schemas/completedRequest"
           description: completedRequest
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Reject a Consent Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/login:
     get:
       description: |-
@@ -900,47 +939,47 @@ paths:
         provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
       operationId: getLoginRequest
       parameters:
-      - explode: true
-        in: query
-        name: login_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: login_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/loginRequest'
+                $ref: "#/components/schemas/loginRequest"
           description: loginRequest
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/requestWasHandledResponse'
+                $ref: "#/components/schemas/requestWasHandledResponse"
           description: requestWasHandledResponse
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Get a Login Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/login/accept:
     put:
       description: |-
@@ -959,53 +998,53 @@ paths:
         The response contains a redirect URL which the login provider should redirect the user-agent to.
       operationId: acceptLoginRequest
       parameters:
-      - explode: true
-        in: query
-        name: login_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: login_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/acceptLoginRequest'
+              $ref: "#/components/schemas/acceptLoginRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/completedRequest'
+                $ref: "#/components/schemas/completedRequest"
           description: completedRequest
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Accept a Login Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/login/reject:
     put:
       description: |-
@@ -1023,93 +1062,93 @@ paths:
         The response contains a redirect URL which the login provider should redirect the user-agent to.
       operationId: rejectLoginRequest
       parameters:
-      - explode: true
-        in: query
-        name: login_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: login_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rejectRequest'
+              $ref: "#/components/schemas/rejectRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/completedRequest'
+                $ref: "#/components/schemas/completedRequest"
           description: completedRequest
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Reject a Login Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/logout:
     get:
       description: Use this endpoint to fetch a logout request.
       operationId: getLogoutRequest
       parameters:
-      - explode: true
-        in: query
-        name: logout_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: logout_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/logoutRequest'
+                $ref: "#/components/schemas/logoutRequest"
           description: logoutRequest
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/requestWasHandledResponse'
+                $ref: "#/components/schemas/requestWasHandledResponse"
           description: requestWasHandledResponse
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Get a Logout Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/logout/accept:
     put:
       description: |-
@@ -1119,35 +1158,35 @@ paths:
         The response contains a redirect URL which the consent provider should redirect the user-agent to.
       operationId: acceptLogoutRequest
       parameters:
-      - explode: true
-        in: query
-        name: logout_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: logout_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/completedRequest'
+                $ref: "#/components/schemas/completedRequest"
           description: completedRequest
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Accept a Logout Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/requests/logout/reject:
     put:
       description: |-
@@ -1157,21 +1196,21 @@ paths:
         The response is empty as the logout provider has to chose what action to perform next.
       operationId: rejectLogoutRequest
       parameters:
-      - explode: true
-        in: query
-        name: logout_challenge
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: logout_challenge
+          required: true
+          schema:
+            type: string
+          style: form
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rejectRequest'
+              $ref: "#/components/schemas/rejectRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/rejectRequest'
+              $ref: "#/components/schemas/rejectRequest"
         x-originalParamName: Body
       responses:
         "204":
@@ -1182,17 +1221,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Reject a Logout Request
       tags:
-      - admin
+        - admin
   /oauth2/auth/sessions/consent:
     delete:
       description: |-
@@ -1200,32 +1239,35 @@ paths:
         associated OAuth 2.0 Access Tokens.
       operationId: revokeConsentSessions
       parameters:
-      - description: The subject (Subject) who's consent sessions should be deleted.
-        explode: true
-        in: query
-        name: subject
-        required: true
-        schema:
-          type: string
-        style: form
-      - description: If set, deletes only those consent sessions by the Subject that
-          have been granted to the specified OAuth 2.0 Client ID
-        explode: true
-        in: query
-        name: client
-        required: false
-        schema:
-          type: string
-        style: form
-      - description: If set to `?all=true`, deletes all consent sessions by the Subject
-          that have been granted.
-        explode: true
-        in: query
-        name: all
-        required: false
-        schema:
-          type: boolean
-        style: form
+        - description:
+            The subject (Subject) who's consent sessions should be deleted.
+          explode: true
+          in: query
+          name: subject
+          required: true
+          schema:
+            type: string
+          style: form
+        - description:
+            If set, deletes only those consent sessions by the Subject that have
+            been granted to the specified OAuth 2.0 Client ID
+          explode: true
+          in: query
+          name: client
+          required: false
+          schema:
+            type: string
+          style: form
+        - description:
+            If set to `?all=true`, deletes all consent sessions by the Subject
+            that have been granted.
+          explode: true
+          in: query
+          name: all
+          required: false
+          schema:
+            type: boolean
+          style: form
       responses:
         "204":
           description: |-
@@ -1235,17 +1277,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+      summary:
+        Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
       tags:
-      - admin
+        - admin
     get:
       description: |-
         This endpoint lists all subject's granted consent sessions, including client and granted scope.
@@ -1257,56 +1300,57 @@ paths:
         Multiple links can be included in this header, and will be separated by a comma.
       operationId: listSubjectConsentSessions
       parameters:
-      - explode: true
-        in: query
-        name: subject
-        required: true
-        schema:
-          type: string
-        style: form
-      - description: The maximum amount of consent sessions to be returned, upper
-          bound is 500 sessions.
-        explode: true
-        in: query
-        name: limit
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
-      - description: The offset from where to start looking.
-        explode: true
-        in: query
-        name: offset
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
+        - explode: true
+          in: query
+          name: subject
+          required: true
+          schema:
+            type: string
+          style: form
+        - description:
+            The maximum amount of consent sessions to be returned, upper bound
+            is 500 sessions.
+          explode: true
+          in: query
+          name: limit
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
+        - description: The offset from where to start looking.
+          explode: true
+          in: query
+          name: offset
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/PreviousConsentSession'
+                  $ref: "#/components/schemas/PreviousConsentSession"
                 type: array
           description: A list of used consent requests.
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Lists All Consent Sessions of a Subject
       tags:
-      - admin
+        - admin
   /oauth2/auth/sessions/login:
     delete:
       description: |-
@@ -1315,13 +1359,13 @@ paths:
         Front- or Back-channel logout.
       operationId: revokeAuthenticationSession
       parameters:
-      - explode: true
-        in: query
-        name: subject
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: subject
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "204":
           description: |-
@@ -1331,19 +1375,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: |-
         Invalidates All Login Sessions of a Certain User
         Invalidates a Subject's Authentication Session
       tags:
-      - admin
+        - admin
   /oauth2/flush:
     post:
       description: |-
@@ -1355,7 +1399,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/flushInactiveOAuth2TokensRequest'
+              $ref: "#/components/schemas/flushInactiveOAuth2TokensRequest"
         x-originalParamName: Body
       responses:
         "204":
@@ -1366,17 +1410,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Flush Expired OAuth2 Access Tokens
       tags:
-      - admin
+        - admin
   /oauth2/introspect:
     post:
       description: |-
@@ -1387,7 +1431,7 @@ paths:
         For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
       operationId: introspectOAuth2Token
       requestBody:
-        $ref: '#/components/requestBodies/inline_object'
+        $ref: "#/components/requestBodies/inline_object"
         content:
           application/x-www-form-urlencoded:
             schema:
@@ -1405,34 +1449,34 @@ paths:
                     defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
                     value returned.
                   required:
-                  - token
+                    - token
                   type: string
                   x-formData-name: token
               required:
-              - token
+                - token
               type: object
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2TokenIntrospection'
+                $ref: "#/components/schemas/oAuth2TokenIntrospection"
           description: oAuth2TokenIntrospection
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Introspect OAuth2 Tokens
       tags:
-      - admin
+        - admin
   /oauth2/register:
     post:
       description: |-
@@ -1452,7 +1496,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         required: true
         x-originalParamName: Body
       responses:
@@ -1460,18 +1504,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+      summary:
+        Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
         Registration Management Protocol
       tags:
-      - public
+        - public
   /oauth2/register/{id}:
     delete:
       description: |-
@@ -1488,14 +1533,14 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: dynamicClientRegistrationDeleteOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "204":
           description: |-
@@ -1505,12 +1550,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+      summary:
+        Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
         Registration Management Protocol
       tags:
-      - public
+        - public
     get:
       description: |-
         This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
@@ -1526,31 +1572,32 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: dynamicClientRegistrationGetOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
-        Management Protocol
+      summary:
+        Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+        Registration Management Protocol
       tags:
-      - public
+        - public
     put:
       description: |-
         This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
@@ -1569,19 +1616,19 @@ paths:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: dynamicClientRegistrationUpdateOAuth2Client
       parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the OAuth 2.0 Client.
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         required: true
         x-originalParamName: Body
       responses:
@@ -1589,18 +1636,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+      summary:
+        Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
         Registration Management Protocol
       tags:
-      - public
+        - public
   /oauth2/revoke:
     post:
       description: |-
@@ -1610,18 +1658,18 @@ paths:
         the client the token was generated for.
       operationId: revokeOAuth2Token
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_1'
+        $ref: "#/components/requestBodies/inline_object_1"
         content:
           application/x-www-form-urlencoded:
             schema:
               properties:
                 token:
                   required:
-                  - token
+                    - token
                   type: string
                   x-formData-name: token
               required:
-              - token
+                - token
               type: object
       responses:
         "200":
@@ -1632,20 +1680,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       security:
-      - basic: []
-      - oauth2: []
+        - basic: []
+        - oauth2: []
       summary: Revoke OAuth2 Tokens
       tags:
-      - public
+        - public
   /oauth2/sessions/logout:
     get:
       description: |-
@@ -1663,7 +1711,7 @@ paths:
             typically 201.
       summary: OpenID Connect Front-Backchannel Enabled Logout
       tags:
-      - public
+        - public
   /oauth2/token:
     post:
       description: |-
@@ -1677,7 +1725,7 @@ paths:
         > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
       operationId: oauth2Token
       requestBody:
-        $ref: '#/components/requestBodies/inline_object_2'
+        $ref: "#/components/requestBodies/inline_object_2"
         content:
           application/x-www-form-urlencoded:
             schema:
@@ -1690,7 +1738,7 @@ paths:
                   x-formData-name: code
                 grant_type:
                   required:
-                  - grant_type
+                    - grant_type
                   type: string
                   x-formData-name: grant_type
                 redirect_uri:
@@ -1700,52 +1748,53 @@ paths:
                   type: string
                   x-formData-name: refresh_token
               required:
-              - grant_type
+                - grant_type
               type: object
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oauth2TokenResponse'
+                $ref: "#/components/schemas/oauth2TokenResponse"
           description: oauth2TokenResponse
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       security:
-      - basic: []
-      - oauth2: []
+        - basic: []
+        - oauth2: []
       summary: The OAuth 2.0 Token Endpoint
       tags:
-      - public
+        - public
   /oauth2/tokens:
     delete:
-      description: This endpoint deletes OAuth2 access tokens issued for a client
-        from the database
+      description:
+        This endpoint deletes OAuth2 access tokens issued for a client from the
+        database
       operationId: deleteOAuth2Token
       parameters:
-      - explode: true
-        in: query
-        name: client_id
-        required: true
-        schema:
-          type: string
-        style: form
+        - explode: true
+          in: query
+          name: client_id
+          required: true
+          schema:
+            type: string
+          style: form
       responses:
         "204":
           description: |-
@@ -1755,65 +1804,68 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary: Delete OAuth2 Access Tokens from a Client
       tags:
-      - admin
+        - admin
   /trust/grants/jwt-bearer/issuers:
     get:
-      description: Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+      description:
+        Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
       operationId: listTrustedJwtGrantIssuers
       parameters:
-      - description: If optional "issuer" is supplied, only jwt-bearer grants with
-          this issuer will be returned.
-        explode: true
-        in: query
-        name: issuer
-        required: false
-        schema:
-          type: string
-        style: form
-      - description: The maximum amount of policies returned, upper bound is 500 policies
-        explode: true
-        in: query
-        name: limit
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
-      - description: The offset from where to start looking.
-        explode: true
-        in: query
-        name: offset
-        required: false
-        schema:
-          format: int64
-          type: integer
-        style: form
+        - description:
+            If optional "issuer" is supplied, only jwt-bearer grants with this
+            issuer will be returned.
+          explode: true
+          in: query
+          name: issuer
+          required: false
+          schema:
+            type: string
+          style: form
+        - description:
+            The maximum amount of policies returned, upper bound is 500 policies
+          explode: true
+          in: query
+          name: limit
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
+        - description: The offset from where to start looking.
+          explode: true
+          in: query
+          name: offset
+          required: false
+          schema:
+            format: int64
+            type: integer
+          style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedJwtGrantIssuers'
+                $ref: "#/components/schemas/trustedJwtGrantIssuers"
           description: trustedJwtGrantIssuers
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: List Trusted OAuth2 JWT Bearer Grant Type Issuers
       tags:
-      - admin
+        - admin
     post:
       description: |-
         Use this endpoint to establish a trust relationship for a JWT issuer
@@ -1824,36 +1876,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/trustJwtGrantIssuerBody'
+              $ref: "#/components/schemas/trustJwtGrantIssuerBody"
         x-originalParamName: Body
       responses:
         "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedJwtGrantIssuer'
+                $ref: "#/components/schemas/trustedJwtGrantIssuer"
           description: trustedJwtGrantIssuer
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
         "409":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Trust an OAuth2 JWT Bearer Grant Type Issuer
       tags:
-      - admin
+        - admin
   /trust/grants/jwt-bearer/issuers/{id}:
     delete:
       description: |-
@@ -1864,14 +1916,14 @@ paths:
         for OAuth 2.0 Client Authentication and Authorization Grant.
       operationId: deleteTrustedJwtGrantIssuer
       parameters:
-      - description: The id of the desired grant
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the desired grant
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "204":
           description: |-
@@ -1881,53 +1933,53 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
-      - admin
+        - admin
     get:
       description: |-
         Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
         created the trust relationship.
       operationId: getTrustedJwtGrantIssuer
       parameters:
-      - description: The id of the desired grant
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
+        - description: The id of the desired grant
+          explode: false
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          style: simple
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedJwtGrantIssuer'
+                $ref: "#/components/schemas/trustedJwtGrantIssuer"
           description: trustedJwtGrantIssuer
         "404":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
-      - admin
+        - admin
   /userinfo:
     get:
       description: |-
@@ -1945,25 +1997,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/userinfoResponse'
+                $ref: "#/components/schemas/userinfoResponse"
           description: userinfoResponse
         "401":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonError'
+                $ref: "#/components/schemas/jsonError"
           description: jsonError
       security:
-      - oauth2: []
+        - oauth2: []
       summary: OpenID Connect Userinfo
       tags:
-      - public
+        - public
   /version:
     get:
       description: |-
@@ -1980,28 +2032,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200_1'
+                $ref: "#/components/schemas/inline_response_200_1"
           description: Returns the Ory Hydra version.
       summary: Return Running Software Version.
       tags:
-      - metadata
+        - metadata
 components:
   requestBodies:
     inline_object_1:
       content:
         application/x-www-form-urlencoded:
           schema:
-            $ref: '#/components/schemas/inline_object_1'
+            $ref: "#/components/schemas/inline_object_1"
     inline_object:
       content:
         application/x-www-form-urlencoded:
           schema:
-            $ref: '#/components/schemas/inline_object'
+            $ref: "#/components/schemas/inline_object"
     inline_object_2:
       content:
         application/x-www-form-urlencoded:
           schema:
-            $ref: '#/components/schemas/inline_object_2'
+            $ref: "#/components/schemas/inline_object_2"
   responses:
     emptyResponse:
       description: |-
@@ -2012,7 +2064,7 @@ components:
         application/json:
           schema:
             items:
-              $ref: '#/components/schemas/PreviousConsentSession'
+              $ref: "#/components/schemas/PreviousConsentSession"
             type: array
       description: A list of used consent requests.
     oAuth2ClientList:
@@ -2020,12 +2072,13 @@ components:
         application/json:
           schema:
             items:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
             type: array
       description: A list of clients.
   schemas:
     JSONRawMessage:
-      title: JSONRawMessage represents a json.RawMessage that works well with JSON,
+      title:
+        JSONRawMessage represents a json.RawMessage that works well with JSON,
         SQL, and Swagger.
       type: object
     JSONWebKey:
@@ -2040,8 +2093,8 @@ components:
         use: sig
         kid: 1603dfe0af8f4596
         x5c:
-        - x5c
-        - x5c
+          - x5c
+          - x5c
         k: GawgguFyGrWKav7AX4VKUg
         dp: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
         dq: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
@@ -2142,10 +2195,10 @@ components:
           example: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
           type: string
       required:
-      - alg
-      - kid
-      - kty
-      - use
+        - alg
+        - kid
+        - kty
+        - use
       type: object
     JSONWebKeySet:
       description: |-
@@ -2156,44 +2209,44 @@ components:
         effectively written in the swagger spec.
       example:
         keys:
-        - d: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
-          e: AQAB
-          crv: P-256
-          use: sig
-          kid: 1603dfe0af8f4596
-          x5c:
-          - x5c
-          - x5c
-          k: GawgguFyGrWKav7AX4VKUg
-          dp: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
-          dq: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
-          n: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
-          p: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
-          kty: RSA
-          q: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
-          qi: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
-          x: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
-          y: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
-          alg: RS256
-        - d: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
-          e: AQAB
-          crv: P-256
-          use: sig
-          kid: 1603dfe0af8f4596
-          x5c:
-          - x5c
-          - x5c
-          k: GawgguFyGrWKav7AX4VKUg
-          dp: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
-          dq: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
-          n: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
-          p: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
-          kty: RSA
-          q: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
-          qi: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
-          x: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
-          y: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
-          alg: RS256
+          - d: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
+            e: AQAB
+            crv: P-256
+            use: sig
+            kid: 1603dfe0af8f4596
+            x5c:
+              - x5c
+              - x5c
+            k: GawgguFyGrWKav7AX4VKUg
+            dp: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
+            dq: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
+            n: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
+            p: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
+            kty: RSA
+            q: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
+            qi: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
+            x: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
+            y: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
+            alg: RS256
+          - d: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
+            e: AQAB
+            crv: P-256
+            use: sig
+            kid: 1603dfe0af8f4596
+            x5c:
+              - x5c
+              - x5c
+            k: GawgguFyGrWKav7AX4VKUg
+            dp: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
+            dq: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
+            n: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
+            p: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
+            kty: RSA
+            q: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
+            qi: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
+            x: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
+            y: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
+            alg: RS256
       properties:
         keys:
           description: |-
@@ -2203,11 +2256,17 @@ components:
             can choose to assign a meaning to the order for their purposes, if
             desired.
           items:
-            $ref: '#/components/schemas/JSONWebKey'
+            $ref: "#/components/schemas/JSONWebKey"
           type: array
       type: object
     JoseJSONWebKeySet:
       type: object
+    NullDuration:
+      description:
+        Specify a time duration in milliseconds, seconds, minutes, hours.
+      pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+      title: Time duration
+      type: string
     PreviousConsentSession:
       description: |-
         The response used to return used consent requests
@@ -2216,49 +2275,54 @@ components:
         remember: true
         consent_request:
           requested_access_token_audience:
-          - requested_access_token_audience
-          - requested_access_token_audience
+            - requested_access_token_audience
+            - requested_access_token_audience
           login_challenge: login_challenge
           subject: subject
           amr:
-          - amr
-          - amr
+            - amr
+            - amr
           oidc_context:
             login_hint: login_hint
             ui_locales:
-            - ui_locales
-            - ui_locales
+              - ui_locales
+              - ui_locales
             id_token_hint_claims:
-              key: '{}'
+              key: "{}"
             acr_values:
-            - acr_values
-            - acr_values
+              - acr_values
+              - acr_values
             display: display
           skip: true
           request_url: request_url
           acr: acr
-          context: '{}'
+          context: "{}"
           challenge: challenge
           client:
-            metadata: '{}'
+            metadata: "{}"
             token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
             client_uri: client_uri
-            jwks: '{}'
+            jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+            jwks: "{}"
             logo_uri: logo_uri
             created_at: 2000-01-23T04:56:07.000+00:00
             registration_client_uri: registration_client_uri
             allowed_cors_origins:
-            - allowed_cors_origins
-            - allowed_cors_origins
+              - allowed_cors_origins
+              - allowed_cors_origins
+            refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
             registration_access_token: registration_access_token
             client_id: client_id
             token_endpoint_auth_method: token_endpoint_auth_method
             userinfo_signed_response_alg: userinfo_signed_response_alg
+            authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+            authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+            client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
             updated_at: 2000-01-23T04:56:07.000+00:00
             scope: scope
             request_uris:
-            - request_uris
-            - request_uris
+              - request_uris
+              - request_uris
             client_secret: client_secret
             backchannel_logout_session_required: true
             backchannel_logout_uri: backchannel_logout_uri
@@ -2266,59 +2330,68 @@ components:
             policy_uri: policy_uri
             owner: owner
             audience:
-            - audience
-            - audience
+              - audience
+              - audience
+            authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
             post_logout_redirect_uris:
-            - post_logout_redirect_uris
-            - post_logout_redirect_uris
+              - post_logout_redirect_uris
+              - post_logout_redirect_uris
             grant_types:
-            - grant_types
-            - grant_types
+              - grant_types
+              - grant_types
             subject_type: subject_type
+            refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
             redirect_uris:
-            - redirect_uris
-            - redirect_uris
+              - redirect_uris
+              - redirect_uris
             sector_identifier_uri: sector_identifier_uri
             frontchannel_logout_session_required: true
             frontchannel_logout_uri: frontchannel_logout_uri
+            refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+            implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+            password_grant_access_token_lifespan: password_grant_access_token_lifespan
             client_secret_expires_at: 0
+            implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
             jwks_uri: jwks_uri
+            password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
             request_object_signing_alg: request_object_signing_alg
             tos_uri: tos_uri
             contacts:
-            - contacts
-            - contacts
+              - contacts
+              - contacts
             response_types:
-            - response_types
-            - response_types
+              - response_types
+              - response_types
           login_session_id: login_session_id
           requested_scope:
-          - requested_scope
-          - requested_scope
+            - requested_scope
+            - requested_scope
         session:
           access_token: ""
           id_token: ""
         grant_access_token_audience:
-        - grant_access_token_audience
-        - grant_access_token_audience
+          - grant_access_token_audience
+          - grant_access_token_audience
         handled_at: 2000-01-23T04:56:07.000+00:00
         grant_scope:
-        - grant_scope
-        - grant_scope
+          - grant_scope
+          - grant_scope
         remember_for: 0
       properties:
         consent_request:
-          $ref: '#/components/schemas/consentRequest'
+          $ref: "#/components/schemas/consentRequest"
         grant_access_token_audience:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         grant_scope:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         handled_at:
@@ -2337,28 +2410,128 @@ components:
           format: int64
           type: integer
         session:
-          $ref: '#/components/schemas/consentRequestSession'
+          $ref: "#/components/schemas/consentRequestSession"
       type: object
     StringSlicePipeDelimiter:
       items:
         type: string
-      title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.
+      title:
+        StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+        string.
       type: array
     UUID:
       format: uuid4
       type: string
+    UpdateOAuth2ClientLifespans:
+      description:
+        The OIDC Hybrid grant type inherits token lifespan configuration from
+        the implicit grant.
+      example:
+        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+        authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+        refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+        client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
+        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+        password_grant_access_token_lifespan: password_grant_access_token_lifespan
+        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+        refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
+        password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
+        refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
+      properties:
+        authorization_code_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        client_credentials_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        jwt_bearer_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+      title: |-
+        UpdateOAuth2ClientLifespans holds default lifespan configuration for the different
+        token types that may be issued for the client. This configuration takes
+        precedence over fosite's instance-wide default lifespan, but it may be
+        overridden by a session's expires_at claim.
+      type: object
     acceptConsentRequest:
       properties:
         grant_access_token_audience:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         grant_scope:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         handled_at:
@@ -2377,7 +2550,7 @@ components:
           format: int64
           type: integer
         session:
-          $ref: '#/components/schemas/consentRequestSession'
+          $ref: "#/components/schemas/consentRequestSession"
       title: The request payload used to accept a consent request.
       type: object
     acceptLoginRequest:
@@ -2390,11 +2563,13 @@ components:
         amr:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         context:
-          title: JSONRawMessage represents a json.RawMessage that works well with
+          title:
+            JSONRawMessage represents a json.RawMessage that works well with
             JSON, SQL, and Swagger.
           type: object
         force_subject_identifier:
@@ -2430,71 +2605,81 @@ components:
           format: int64
           type: integer
         subject:
-          description: Subject is the user ID of the end-user that authenticated.
+          description:
+            Subject is the user ID of the end-user that authenticated.
           type: string
       required:
-      - subject
-      title: HandledLoginRequest is the request payload used to accept a login request.
+        - subject
+      title:
+        HandledLoginRequest is the request payload used to accept a login
+        request.
       type: object
     completedRequest:
       example:
         redirect_to: redirect_to
       properties:
         redirect_to:
-          description: RedirectURL is the URL which you should redirect the user to
-            once the authentication process is completed.
+          description:
+            RedirectURL is the URL which you should redirect the user to once
+            the authentication process is completed.
           type: string
       required:
-      - redirect_to
-      title: The response payload sent when accepting or rejecting a login or consent
+        - redirect_to
+      title:
+        The response payload sent when accepting or rejecting a login or consent
         request.
       type: object
     consentRequest:
       example:
         requested_access_token_audience:
-        - requested_access_token_audience
-        - requested_access_token_audience
+          - requested_access_token_audience
+          - requested_access_token_audience
         login_challenge: login_challenge
         subject: subject
         amr:
-        - amr
-        - amr
+          - amr
+          - amr
         oidc_context:
           login_hint: login_hint
           ui_locales:
-          - ui_locales
-          - ui_locales
+            - ui_locales
+            - ui_locales
           id_token_hint_claims:
-            key: '{}'
+            key: "{}"
           acr_values:
-          - acr_values
-          - acr_values
+            - acr_values
+            - acr_values
           display: display
         skip: true
         request_url: request_url
         acr: acr
-        context: '{}'
+        context: "{}"
         challenge: challenge
         client:
-          metadata: '{}'
+          metadata: "{}"
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
-          jwks: '{}'
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: "{}"
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
           allowed_cors_origins:
-          - allowed_cors_origins
-          - allowed_cors_origins
+            - allowed_cors_origins
+            - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
-          - request_uris
-          - request_uris
+            - request_uris
+            - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
@@ -2502,35 +2687,42 @@ components:
           policy_uri: policy_uri
           owner: owner
           audience:
-          - audience
-          - audience
+            - audience
+            - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
-          - post_logout_redirect_uris
-          - post_logout_redirect_uris
+            - post_logout_redirect_uris
+            - post_logout_redirect_uris
           grant_types:
-          - grant_types
-          - grant_types
+            - grant_types
+            - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
-          - redirect_uris
-          - redirect_uris
+            - redirect_uris
+            - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
-          - contacts
-          - contacts
+            - contacts
+            - contacts
           response_types:
-          - response_types
-          - response_types
+            - response_types
+            - response_types
         login_session_id: login_session_id
         requested_scope:
-        - requested_scope
-        - requested_scope
+          - requested_scope
+          - requested_scope
       properties:
         acr:
           description: |-
@@ -2540,7 +2732,8 @@ components:
         amr:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         challenge:
@@ -2549,9 +2742,10 @@ components:
             identify the session.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         context:
-          title: JSONRawMessage represents a json.RawMessage that works well with
+          title:
+            JSONRawMessage represents a json.RawMessage that works well with
             JSON, SQL, and Swagger.
           type: object
         login_challenge:
@@ -2567,7 +2761,7 @@ components:
             channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
           type: string
         oidc_context:
-          $ref: '#/components/schemas/openIDConnectContext'
+          $ref: "#/components/schemas/openIDConnectContext"
         request_url:
           description: |-
             RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -2577,13 +2771,15 @@ components:
         requested_access_token_audience:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         requested_scope:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         skip:
@@ -2598,7 +2794,7 @@ components:
             requested by the OAuth 2.0 client.
           type: string
       required:
-      - challenge
+        - challenge
       title: Contains information on an ongoing consent request.
       type: object
     consentRequestSession:
@@ -2685,15 +2881,15 @@ components:
           example: Not Found
           type: string
       required:
-      - message
+        - message
       type: object
     healthNotReadyStatus:
       properties:
         errors:
           additionalProperties:
             type: string
-          description: Errors contains a list of errors that caused the not ready
-            status.
+          description:
+            Errors contains a list of errors that caused the not ready status.
           type: object
       type: object
     healthStatus:
@@ -2705,25 +2901,28 @@ components:
           type: string
       type: object
     jsonError:
-      description: Error responses are sent when an error (e.g. unauthorized, bad
-        request, ...) occurred.
+      description:
+        Error responses are sent when an error (e.g. unauthorized, bad request,
+        ...) occurred.
       properties:
         error:
           description: Name is the error name.
           example: The requested resource could not be found
           type: string
         error_debug:
-          description: Debug contains debug information. This is usually not available
-            and has to be enabled.
+          description:
+            Debug contains debug information. This is usually not available and
+            has to be enabled.
           example: The database adapter was unable to find the element
           type: string
         error_description:
-          description: Description contains further information on the nature of the
-            error.
+          description:
+            Description contains further information on the nature of the error.
           example: Object with ID 12345 does not exist
           type: string
         status_code:
-          description: Code represents the error status code (404, 403, 401, ...).
+          description:
+            Code represents the error status code (404, 403, 401, ...).
           example: 404
           format: int64
           type: integer
@@ -2732,7 +2931,8 @@ components:
     jsonWebKeySetGeneratorRequest:
       properties:
         alg:
-          description: The algorithm to be used for creating the key. Supports "RS256",
+          description:
+            The algorithm to be used for creating the key. Supports "RS256",
             "ES256", "ES512", "HS512", and "HS256"
           type: string
         kid:
@@ -2746,48 +2946,53 @@ components:
             on data. Valid values are "enc" and "sig".
           type: string
       required:
-      - alg
-      - kid
-      - use
+        - alg
+        - kid
+        - use
       type: object
     loginRequest:
       example:
         requested_access_token_audience:
-        - requested_access_token_audience
-        - requested_access_token_audience
+          - requested_access_token_audience
+          - requested_access_token_audience
         subject: subject
         oidc_context:
           login_hint: login_hint
           ui_locales:
-          - ui_locales
-          - ui_locales
+            - ui_locales
+            - ui_locales
           id_token_hint_claims:
-            key: '{}'
+            key: "{}"
           acr_values:
-          - acr_values
-          - acr_values
+            - acr_values
+            - acr_values
           display: display
         challenge: challenge
         client:
-          metadata: '{}'
+          metadata: "{}"
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
-          jwks: '{}'
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: "{}"
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
           allowed_cors_origins:
-          - allowed_cors_origins
-          - allowed_cors_origins
+            - allowed_cors_origins
+            - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
-          - request_uris
-          - request_uris
+            - request_uris
+            - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
@@ -2795,37 +3000,44 @@ components:
           policy_uri: policy_uri
           owner: owner
           audience:
-          - audience
-          - audience
+            - audience
+            - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
-          - post_logout_redirect_uris
-          - post_logout_redirect_uris
+            - post_logout_redirect_uris
+            - post_logout_redirect_uris
           grant_types:
-          - grant_types
-          - grant_types
+            - grant_types
+            - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
-          - redirect_uris
-          - redirect_uris
+            - redirect_uris
+            - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
-          - contacts
-          - contacts
+            - contacts
+            - contacts
           response_types:
-          - response_types
-          - response_types
+            - response_types
+            - response_types
         session_id: session_id
         skip: true
         request_url: request_url
         requested_scope:
-        - requested_scope
-        - requested_scope
+          - requested_scope
+          - requested_scope
       properties:
         challenge:
           description: |-
@@ -2833,9 +3045,9 @@ components:
             identify the session.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         oidc_context:
-          $ref: '#/components/schemas/openIDConnectContext'
+          $ref: "#/components/schemas/openIDConnectContext"
         request_url:
           description: |-
             RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -2845,13 +3057,15 @@ components:
         requested_access_token_audience:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         requested_scope:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         session_id:
@@ -2875,13 +3089,13 @@ components:
             when accepting the login request, or the request will fail.
           type: string
       required:
-      - challenge
-      - client
-      - request_url
-      - requested_access_token_audience
-      - requested_scope
-      - skip
-      - subject
+        - challenge
+        - client
+        - request_url
+        - requested_access_token_audience
+        - requested_scope
+        - skip
+        - subject
       title: Contains information on an ongoing login request.
       type: object
     logoutRequest:
@@ -2889,25 +3103,30 @@ components:
         subject: subject
         challenge: challenge
         client:
-          metadata: '{}'
+          metadata: "{}"
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
-          jwks: '{}'
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: "{}"
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
           allowed_cors_origins:
-          - allowed_cors_origins
-          - allowed_cors_origins
+            - allowed_cors_origins
+            - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
-          - request_uris
-          - request_uris
+            - request_uris
+            - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
@@ -2915,31 +3134,38 @@ components:
           policy_uri: policy_uri
           owner: owner
           audience:
-          - audience
-          - audience
+            - audience
+            - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
-          - post_logout_redirect_uris
-          - post_logout_redirect_uris
+            - post_logout_redirect_uris
+            - post_logout_redirect_uris
           grant_types:
-          - grant_types
-          - grant_types
+            - grant_types
+            - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
-          - redirect_uris
-          - redirect_uris
+            - redirect_uris
+            - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
-          - contacts
-          - contacts
+            - contacts
+            - contacts
           response_types:
-          - response_types
-          - response_types
+            - response_types
+            - response_types
         rp_initiated: true
         request_url: request_url
         sid: sid
@@ -2950,48 +3176,60 @@ components:
             identify the session.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         request_url:
           description: RequestURL is the original Logout URL requested.
           type: string
         rp_initiated:
-          description: RPInitiated is set to true if the request was initiated by
-            a Relying Party (RP), also known as an OAuth 2.0 Client.
+          description:
+            RPInitiated is set to true if the request was initiated by a Relying
+            Party (RP), also known as an OAuth 2.0 Client.
           type: boolean
         sid:
-          description: SessionID is the login session ID that was requested to log
-            out.
+          description:
+            SessionID is the login session ID that was requested to log out.
           type: string
         subject:
           description: Subject is the user for whom the logout was request.
           type: string
       title: Contains information about an ongoing logout request.
       type: object
+    nullDuration:
+      description:
+        Specify a time duration in milliseconds, seconds, minutes, hours.
+      pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+      title: Time duration
+      type: string
     nullTime:
       format: date-time
       title: NullTime implements sql.NullTime functionality.
       type: string
     oAuth2Client:
       example:
-        metadata: '{}'
+        metadata: "{}"
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
         client_uri: client_uri
-        jwks: '{}'
+        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+        jwks: "{}"
         logo_uri: logo_uri
         created_at: 2000-01-23T04:56:07.000+00:00
         registration_client_uri: registration_client_uri
         allowed_cors_origins:
-        - allowed_cors_origins
-        - allowed_cors_origins
+          - allowed_cors_origins
+          - allowed_cors_origins
+        refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
         registration_access_token: registration_access_token
         client_id: client_id
         token_endpoint_auth_method: token_endpoint_auth_method
         userinfo_signed_response_alg: userinfo_signed_response_alg
+        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+        authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+        client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
         updated_at: 2000-01-23T04:56:07.000+00:00
         scope: scope
         request_uris:
-        - request_uris
-        - request_uris
+          - request_uris
+          - request_uris
         client_secret: client_secret
         backchannel_logout_session_required: true
         backchannel_logout_uri: backchannel_logout_uri
@@ -2999,44 +3237,71 @@ components:
         policy_uri: policy_uri
         owner: owner
         audience:
-        - audience
-        - audience
+          - audience
+          - audience
+        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
         post_logout_redirect_uris:
-        - post_logout_redirect_uris
-        - post_logout_redirect_uris
+          - post_logout_redirect_uris
+          - post_logout_redirect_uris
         grant_types:
-        - grant_types
-        - grant_types
+          - grant_types
+          - grant_types
         subject_type: subject_type
+        refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
         redirect_uris:
-        - redirect_uris
-        - redirect_uris
+          - redirect_uris
+          - redirect_uris
         sector_identifier_uri: sector_identifier_uri
         frontchannel_logout_session_required: true
         frontchannel_logout_uri: frontchannel_logout_uri
+        refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+        password_grant_access_token_lifespan: password_grant_access_token_lifespan
         client_secret_expires_at: 0
+        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
         jwks_uri: jwks_uri
+        password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
         request_object_signing_alg: request_object_signing_alg
         tos_uri: tos_uri
         contacts:
-        - contacts
-        - contacts
+          - contacts
+          - contacts
         response_types:
-        - response_types
-        - response_types
+          - response_types
+          - response_types
       properties:
         allowed_cors_origins:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         audience:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        authorization_code_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         backchannel_logout_session_required:
           description: |-
             Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
@@ -3044,8 +3309,15 @@ components:
             If omitted, the default value is false.
           type: boolean
         backchannel_logout_uri:
-          description: RP URL that will cause the RP to log itself out when sent a
-            Logout Token by the OP.
+          description:
+            RP URL that will cause the RP to log itself out when sent a Logout
+            Token by the OP.
+          type: string
+        client_credentials_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
           type: string
         client_id:
           description: ID  is the id for this client.
@@ -3081,7 +3353,8 @@ components:
         contacts:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         created_at:
@@ -3104,9 +3377,22 @@ components:
         grant_types:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        implicit_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         jwks:
           type: object
         jwks_uri:
@@ -3120,15 +3406,36 @@ components:
             to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST
             match those in the certificate.
           type: string
+        jwt_bearer_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         logo_uri:
-          description: LogoURI is an URL string that references a logo for the client.
+          description:
+            LogoURI is an URL string that references a logo for the client.
           type: string
         metadata:
-          title: JSONRawMessage represents a json.RawMessage that works well with
+          title:
+            JSONRawMessage represents a json.RawMessage that works well with
             JSON, SQL, and Swagger.
           type: object
         owner:
-          description: Owner is a string identifying the owner of the OAuth 2.0 Client.
+          description:
+            Owner is a string identifying the owner of the OAuth 2.0 Client.
+          type: string
+        password_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
           type: string
         policy_uri:
           description: |-
@@ -3139,22 +3446,44 @@ components:
         post_logout_redirect_uris:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         redirect_uris:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        refresh_token_grant_access_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_id_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_refresh_token_lifespan:
+          description:
+            Specify a time duration in milliseconds, seconds, minutes, hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         registration_access_token:
-          description: RegistrationAccessToken can be used to update, get, or delete
-            the OAuth2 Client.
+          description:
+            RegistrationAccessToken can be used to update, get, or delete the
+            OAuth2 Client.
           type: string
         registration_client_uri:
-          description: RegistrationClientURI is the URL used to update, get, or delete
-            the OAuth2 Client.
+          description:
+            RegistrationClientURI is the URL used to update, get, or delete the
+            OAuth2 Client.
           type: string
         request_object_signing_alg:
           description: |-
@@ -3164,13 +3493,15 @@ components:
         request_uris:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         response_types:
           items:
             type: string
-          title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
         scope:
@@ -3196,7 +3527,8 @@ components:
             client_secret_basic, private_key_jwt, and none.
           type: string
         token_endpoint_auth_signing_alg:
-          description: Requested Client Authentication signing algorithm for the Token
+          description:
+            Requested Client Authentication signing algorithm for the Token
             Endpoint.
           type: string
         tos_uri:
@@ -3222,7 +3554,7 @@ components:
       description: https://tools.ietf.org/html/rfc7662
       example:
         ext:
-          key: '{}'
+          key: "{}"
         sub: sub
         iss: iss
         active: true
@@ -3230,8 +3562,8 @@ components:
         token_type: token_type
         client_id: client_id
         aud:
-        - aud
-        - aud
+          - aud
+          - aud
         nbf: 1
         token_use: token_use
         scope: scope
@@ -3252,7 +3584,8 @@ components:
             before its expiration time).
           type: boolean
         aud:
-          description: Audience contains a list of the token's intended audiences.
+          description:
+            Audience contains a list of the token's intended audiences.
           items:
             type: string
           type: array
@@ -3279,7 +3612,8 @@ components:
           format: int64
           type: integer
         iss:
-          description: IssuerURL is a string representing the issuer of this token
+          description:
+            IssuerURL is a string representing the issuer of this token
           type: string
         nbf:
           description: |-
@@ -3305,10 +3639,12 @@ components:
             authorized this token.
           type: string
         token_type:
-          description: TokenType is the introspected token's type, typically `Bearer`.
+          description:
+            TokenType is the introspected token's type, typically `Bearer`.
           type: string
         token_use:
-          description: TokenUse is the introspected token's use, for example `access_token`
+          description:
+            TokenUse is the introspected token's use, for example `access_token`
             or `refresh_token`.
           type: string
         username:
@@ -3317,9 +3653,10 @@ components:
             authorized this token.
           type: string
       required:
-      - active
-      title: 'Introspection contains an access token''s session data as specified
-        by IETF RFC 7662, see:'
+        - active
+      title:
+        "Introspection contains an access token's session data as specified by
+        IETF RFC 7662, see:"
       type: object
     oauth2TokenResponse:
       description: The Access Token Response
@@ -3379,13 +3716,13 @@ components:
       example:
         login_hint: login_hint
         ui_locales:
-        - ui_locales
-        - ui_locales
+          - ui_locales
+          - ui_locales
         id_token_hint_claims:
-          key: '{}'
+          key: "{}"
         acr_values:
-        - acr_values
-        - acr_values
+          - acr_values
+          - acr_values
         display: display
       properties:
         acr_values:
@@ -3456,13 +3793,13 @@ components:
           description: The value to be used within the operations
           type: object
       required:
-      - op
-      - path
+        - op
+        - path
       type: object
     patchRequest:
       description: A JSONPatch request
       items:
-        $ref: '#/components/schemas/patchDocument'
+        $ref: "#/components/schemas/patchDocument"
       type: array
     refreshTokenHookRequest:
       properties:
@@ -3470,28 +3807,31 @@ components:
           description: ClientID is the identifier of the OAuth 2.0 client.
           type: string
         granted_audience:
-          description: GrantedAudience is the list of audiences granted to the OAuth
-            2.0 client.
+          description:
+            GrantedAudience is the list of audiences granted to the OAuth 2.0
+            client.
           items:
             type: string
           type: array
         granted_scopes:
-          description: GrantedScopes is the list of scopes granted to the OAuth 2.0
-            client.
+          description:
+            GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
           items:
             type: string
           type: array
         subject:
           description: Subject is the identifier of the authenticated end-user.
           type: string
-      title: RefreshTokenHookRequest is the request body sent to the refresh token
+      title:
+        RefreshTokenHookRequest is the request body sent to the refresh token
         hook.
       type: object
     refreshTokenHookResponse:
       properties:
         session:
-          $ref: '#/components/schemas/consentRequestSession'
-      title: RefreshTokenHookResponse is the response body received from the refresh
+          $ref: "#/components/schemas/consentRequestSession"
+      title:
+        RefreshTokenHookResponse is the response body received from the refresh
         token hook.
       type: object
     rejectRequest:
@@ -3525,51 +3865,58 @@ components:
     requestWasHandledResponse:
       properties:
         redirect_to:
-          description: Original request URL to which you should redirect the user
-            if request was already handled.
+          description:
+            Original request URL to which you should redirect the user if
+            request was already handled.
           type: string
       required:
-      - redirect_to
-      title: The response payload sent when there is an attempt to access already
+        - redirect_to
+      title:
+        The response payload sent when there is an attempt to access already
         handled request.
       type: object
     trustJwtGrantIssuerBody:
       properties:
         allow_any_subject:
-          description: The "allow_any_subject" indicates that the issuer is allowed
-            to have any principal as the subject of the JWT.
+          description:
+            The "allow_any_subject" indicates that the issuer is allowed to have
+            any principal as the subject of the JWT.
           type: boolean
         expires_at:
-          description: The "expires_at" indicates, when grant will expire, so we will
+          description:
+            The "expires_at" indicates, when grant will expire, so we will
             reject assertion from "issuer" targeting "subject".
           format: date-time
           type: string
         issuer:
-          description: The "issuer" identifies the principal that issued the JWT assertion
+          description:
+            The "issuer" identifies the principal that issued the JWT assertion
             (same as "iss" claim in JWT).
           example: https://jwt-idp.example.com
           type: string
         jwk:
-          $ref: '#/components/schemas/JSONWebKey'
+          $ref: "#/components/schemas/JSONWebKey"
         scope:
-          description: The "scope" contains list of scope values (as described in
-            Section 3.3 of OAuth 2.0 [RFC6749])
+          description:
+            The "scope" contains list of scope values (as described in Section
+            3.3 of OAuth 2.0 [RFC6749])
           example:
-          - openid
-          - offline
+            - openid
+            - offline
           items:
             type: string
           type: array
         subject:
-          description: The "subject" identifies the principal that is the subject
-            of the JWT.
+          description:
+            The "subject" identifies the principal that is the subject of the
+            JWT.
           example: mike@example.com
           type: string
       required:
-      - expires_at
-      - issuer
-      - jwk
-      - scope
+        - expires_at
+        - issuer
+        - jwk
+        - scope
       type: object
     trustedJsonWebKey:
       example:
@@ -3577,13 +3924,15 @@ components:
         kid: 123e4567-e89b-12d3-a456-426655440000
       properties:
         kid:
-          description: The "key_id" is key unique identifier (same as kid header in
+          description:
+            The "key_id" is key unique identifier (same as kid header in
             jws/jwt).
           example: 123e4567-e89b-12d3-a456-426655440000
           type: string
         set:
-          description: The "set" is basically a name for a group(set) of keys. Will
-            be the same as "issuer" in grant.
+          description:
+            The "set" is basically a name for a group(set) of keys. Will be the
+            same as "issuer" in grant.
           example: https://jwt-idp.example.com
           type: string
       type: object
@@ -3595,23 +3944,25 @@ components:
         expires_at: 2000-01-23T04:56:07.000+00:00
         subject: mike@example.com
         scope:
-        - openid
-        - offline
+          - openid
+          - offline
         created_at: 2000-01-23T04:56:07.000+00:00
         id: 9edc811f-4e28-453c-9b46-4de65f00217f
         allow_any_subject: true
         issuer: https://jwt-idp.example.com
       properties:
         allow_any_subject:
-          description: The "allow_any_subject" indicates that the issuer is allowed
-            to have any principal as the subject of the JWT.
+          description:
+            The "allow_any_subject" indicates that the issuer is allowed to have
+            any principal as the subject of the JWT.
           type: boolean
         created_at:
           description: The "created_at" indicates, when grant was created.
           format: date-time
           type: string
         expires_at:
-          description: The "expires_at" indicates, when grant will expire, so we will
+          description:
+            The "expires_at" indicates, when grant will expire, so we will
             reject assertion from "issuer" targeting "subject".
           format: date-time
           type: string
@@ -3619,30 +3970,33 @@ components:
           example: 9edc811f-4e28-453c-9b46-4de65f00217f
           type: string
         issuer:
-          description: The "issuer" identifies the principal that issued the JWT assertion
+          description:
+            The "issuer" identifies the principal that issued the JWT assertion
             (same as "iss" claim in JWT).
           example: https://jwt-idp.example.com
           type: string
         public_key:
-          $ref: '#/components/schemas/trustedJsonWebKey'
+          $ref: "#/components/schemas/trustedJsonWebKey"
         scope:
-          description: The "scope" contains list of scope values (as described in
-            Section 3.3 of OAuth 2.0 [RFC6749])
+          description:
+            The "scope" contains list of scope values (as described in Section
+            3.3 of OAuth 2.0 [RFC6749])
           example:
-          - openid
-          - offline
+            - openid
+            - offline
           items:
             type: string
           type: array
         subject:
-          description: The "subject" identifies the principal that is the subject
-            of the JWT.
+          description:
+            The "subject" identifies the principal that is the subject of the
+            JWT.
           example: mike@example.com
           type: string
       type: object
     trustedJwtGrantIssuers:
       items:
-        $ref: '#/components/schemas/trustedJwtGrantIssuer'
+        $ref: "#/components/schemas/trustedJwtGrantIssuer"
       type: array
     userinfoResponse:
       description: The userinfo response
@@ -3668,116 +4022,141 @@ components:
         email: email
       properties:
         birthdate:
-          description: End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004]
-            YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted.
-            To represent only the year, YYYY format is allowed. Note that depending
-            on the underlying platform's date related function, providing just year
-            can result in varying month and day, so the implementers need to take
-            this factor into account to correctly process the dates.
+          description:
+            End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004]
+            YYYY-MM-DD format. The year MAY be 0000, indicating that it is
+            omitted. To represent only the year, YYYY format is allowed. Note
+            that depending on the underlying platform's date related function,
+            providing just year can result in varying month and day, so the
+            implementers need to take this factor into account to correctly
+            process the dates.
           type: string
         email:
-          description: End-User's preferred e-mail address. Its value MUST conform
-            to the RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon
-            this value being unique, as discussed in Section 5.7.
+          description:
+            End-User's preferred e-mail address. Its value MUST conform to the
+            RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon this
+            value being unique, as discussed in Section 5.7.
           type: string
         email_verified:
-          description: True if the End-User's e-mail address has been verified; otherwise
-            false. When this Claim Value is true, this means that the OP took affirmative
-            steps to ensure that this e-mail address was controlled by the End-User
-            at the time the verification was performed. The means by which an e-mail
-            address is verified is context-specific, and dependent upon the trust
-            framework or contractual agreements within which the parties are operating.
+          description:
+            True if the End-User's e-mail address has been verified; otherwise
+            false. When this Claim Value is true, this means that the OP took
+            affirmative steps to ensure that this e-mail address was controlled
+            by the End-User at the time the verification was performed. The
+            means by which an e-mail address is verified is context-specific,
+            and dependent upon the trust framework or contractual agreements
+            within which the parties are operating.
           type: boolean
         family_name:
-          description: Surname(s) or last name(s) of the End-User. Note that in some
-            cultures, people can have multiple family names or no family name; all
-            can be present, with the names being separated by space characters.
+          description:
+            Surname(s) or last name(s) of the End-User. Note that in some
+            cultures, people can have multiple family names or no family name;
+            all can be present, with the names being separated by space
+            characters.
           type: string
         gender:
-          description: End-User's gender. Values defined by this specification are
-            female and male. Other values MAY be used when neither of the defined
+          description:
+            End-User's gender. Values defined by this specification are female
+            and male. Other values MAY be used when neither of the defined
             values are applicable.
           type: string
         given_name:
-          description: Given name(s) or first name(s) of the End-User. Note that in
-            some cultures, people can have multiple given names; all can be present,
+          description:
+            Given name(s) or first name(s) of the End-User. Note that in some
+            cultures, people can have multiple given names; all can be present,
             with the names being separated by space characters.
           type: string
         locale:
-          description: End-User's locale, represented as a BCP47 [RFC5646] language
-            tag. This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in
-            lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase,
-            separated by a dash. For example, en-US or fr-CA. As a compatibility note,
-            some implementations have used an underscore as the separator rather than
-            a dash, for example, en_US; Relying Parties MAY choose to accept this
-            locale syntax as well.
+          description:
+            End-User's locale, represented as a BCP47 [RFC5646] language tag.
+            This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in
+            lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in
+            uppercase, separated by a dash. For example, en-US or fr-CA. As a
+            compatibility note, some implementations have used an underscore as
+            the separator rather than a dash, for example, en_US; Relying
+            Parties MAY choose to accept this locale syntax as well.
           type: string
         middle_name:
-          description: Middle name(s) of the End-User. Note that in some cultures,
-            people can have multiple middle names; all can be present, with the names
-            being separated by space characters. Also note that in some cultures,
-            middle names are not used.
+          description:
+            Middle name(s) of the End-User. Note that in some cultures, people
+            can have multiple middle names; all can be present, with the names
+            being separated by space characters. Also note that in some
+            cultures, middle names are not used.
           type: string
         name:
-          description: End-User's full name in displayable form including all name
-            parts, possibly including titles and suffixes, ordered according to the
+          description:
+            End-User's full name in displayable form including all name parts,
+            possibly including titles and suffixes, ordered according to the
             End-User's locale and preferences.
           type: string
         nickname:
-          description: Casual name of the End-User that may or may not be the same
-            as the given_name. For instance, a nickname value of Mike might be returned
+          description:
+            Casual name of the End-User that may or may not be the same as the
+            given_name. For instance, a nickname value of Mike might be returned
             alongside a given_name value of Michael.
           type: string
         phone_number:
-          description: End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED
-            as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2)
-            687 2400. If the phone number contains an extension, it is RECOMMENDED
-            that the extension be represented using the RFC 3966 [RFC3966] extension
-            syntax, for example, +1 (604) 555-1234;ext=5678.
+          description:
+            End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED
+            as the format of this Claim, for example, +1 (425) 555-1212 or +56
+            (2) 687 2400. If the phone number contains an extension, it is
+            RECOMMENDED that the extension be represented using the RFC 3966
+            [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.
           type: string
         phone_number_verified:
-          description: True if the End-User's phone number has been verified; otherwise
-            false. When this Claim Value is true, this means that the OP took affirmative
-            steps to ensure that this phone number was controlled by the End-User
-            at the time the verification was performed. The means by which a phone
-            number is verified is context-specific, and dependent upon the trust framework
-            or contractual agreements within which the parties are operating. When
-            true, the phone_number Claim MUST be in E.164 format and any extensions
-            MUST be represented in RFC 3966 format.
+          description:
+            True if the End-User's phone number has been verified; otherwise
+            false. When this Claim Value is true, this means that the OP took
+            affirmative steps to ensure that this phone number was controlled by
+            the End-User at the time the verification was performed. The means
+            by which a phone number is verified is context-specific, and
+            dependent upon the trust framework or contractual agreements within
+            which the parties are operating. When true, the phone_number Claim
+            MUST be in E.164 format and any extensions MUST be represented in
+            RFC 3966 format.
           type: boolean
         picture:
-          description: URL of the End-User's profile picture. This URL MUST refer
-            to an image file (for example, a PNG, JPEG, or GIF image file), rather
-            than to a Web page containing an image. Note that this URL SHOULD specifically
-            reference a profile photo of the End-User suitable for displaying when
-            describing the End-User, rather than an arbitrary photo taken by the End-User.
+          description:
+            URL of the End-User's profile picture. This URL MUST refer to an
+            image file (for example, a PNG, JPEG, or GIF image file), rather
+            than to a Web page containing an image. Note that this URL SHOULD
+            specifically reference a profile photo of the End-User suitable for
+            displaying when describing the End-User, rather than an arbitrary
+            photo taken by the End-User.
           type: string
         preferred_username:
-          description: Non-unique shorthand name by which the End-User wishes to be
-            referred to at the RP, such as janedoe or j.doe. This value MAY be any
-            valid JSON string including special characters such as @, /, or whitespace.
+          description:
+            Non-unique shorthand name by which the End-User wishes to be
+            referred to at the RP, such as janedoe or j.doe. This value MAY be
+            any valid JSON string including special characters such as @, /, or
+            whitespace.
           type: string
         profile:
-          description: URL of the End-User's profile page. The contents of this Web
-            page SHOULD be about the End-User.
+          description:
+            URL of the End-User's profile page. The contents of this Web page
+            SHOULD be about the End-User.
           type: string
         sub:
           description: Subject - Identifier for the End-User at the IssuerURL.
           type: string
         updated_at:
-          description: Time the End-User's information was last updated. Its value
-            is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z
-            as measured in UTC until the date/time.
+          description:
+            Time the End-User's information was last updated. Its value is a
+            JSON number representing the number of seconds from
+            1970-01-01T0:0:0Z as measured in UTC until the date/time.
           format: int64
           type: integer
         website:
-          description: URL of the End-User's Web page or blog. This Web page SHOULD
-            contain information published by the End-User or an organization that
-            the End-User is affiliated with.
+          description:
+            URL of the End-User's Web page or blog. This Web page SHOULD contain
+            information published by the End-User or an organization that the
+            End-User is affiliated with.
           type: string
         zoneinfo:
-          description: String from zoneinfo [zoneinfo] time zone database representing
-            the End-User's time zone. For example, Europe/Paris or America/Los_Angeles.
+          description:
+            String from zoneinfo [zoneinfo] time zone database representing the
+            End-User's time zone. For example, Europe/Paris or
+            America/Los_Angeles.
           type: string
       type: object
     version:
@@ -3795,51 +4174,51 @@ components:
         claims_parameter_supported: true
         backchannel_logout_supported: true
         scopes_supported:
-        - scopes_supported
-        - scopes_supported
+          - scopes_supported
+          - scopes_supported
         issuer: https://playground.ory.sh/ory-hydra/public/
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
         claims_supported:
-        - claims_supported
-        - claims_supported
+          - claims_supported
+          - claims_supported
         userinfo_signing_alg_values_supported:
-        - userinfo_signing_alg_values_supported
-        - userinfo_signing_alg_values_supported
+          - userinfo_signing_alg_values_supported
+          - userinfo_signing_alg_values_supported
         token_endpoint_auth_methods_supported:
-        - token_endpoint_auth_methods_supported
-        - token_endpoint_auth_methods_supported
+          - token_endpoint_auth_methods_supported
+          - token_endpoint_auth_methods_supported
         backchannel_logout_session_supported: true
         response_modes_supported:
-        - response_modes_supported
-        - response_modes_supported
+          - response_modes_supported
+          - response_modes_supported
         token_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/token
         response_types_supported:
-        - response_types_supported
-        - response_types_supported
+          - response_types_supported
+          - response_types_supported
         request_uri_parameter_supported: true
         grant_types_supported:
-        - grant_types_supported
-        - grant_types_supported
+          - grant_types_supported
+          - grant_types_supported
         end_session_endpoint: end_session_endpoint
         revocation_endpoint: revocation_endpoint
         userinfo_endpoint: userinfo_endpoint
         frontchannel_logout_supported: true
         require_request_uri_registration: true
         code_challenge_methods_supported:
-        - code_challenge_methods_supported
-        - code_challenge_methods_supported
+          - code_challenge_methods_supported
+          - code_challenge_methods_supported
         frontchannel_logout_session_supported: true
         jwks_uri: https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json
         subject_types_supported:
-        - subject_types_supported
-        - subject_types_supported
+          - subject_types_supported
+          - subject_types_supported
         id_token_signing_alg_values_supported:
-        - id_token_signing_alg_values_supported
-        - id_token_signing_alg_values_supported
+          - id_token_signing_alg_values_supported
+          - id_token_signing_alg_values_supported
         registration_endpoint: https://playground.ory.sh/ory-hydra/admin/client
         request_object_signing_alg_values_supported:
-        - request_object_signing_alg_values_supported
-        - request_object_signing_alg_values_supported
+          - request_object_signing_alg_values_supported
+          - request_object_signing_alg_values_supported
       properties:
         authorization_endpoint:
           description: URL of the OP's OAuth 2.0 Authorization Endpoint.
@@ -3851,12 +4230,14 @@ components:
             session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
           type: boolean
         backchannel_logout_supported:
-          description: Boolean value specifying whether the OP supports back-channel
+          description:
+            Boolean value specifying whether the OP supports back-channel
             logout, with true indicating support.
           type: boolean
         claims_parameter_supported:
-          description: Boolean value specifying whether the OP supports use of the
-            claims parameter, with true indicating support.
+          description:
+            Boolean value specifying whether the OP supports use of the claims
+            parameter, with true indicating support.
           type: boolean
         claims_supported:
           description: |-
@@ -3873,8 +4254,9 @@ components:
             type: string
           type: array
         end_session_endpoint:
-          description: URL at the OP to which an RP can perform a redirect to request
-            that the End-User be logged out at the OP.
+          description:
+            URL at the OP to which an RP can perform a redirect to request that
+            the End-User be logged out at the OP.
           type: string
         frontchannel_logout_session_supported:
           description: |-
@@ -3883,12 +4265,14 @@ components:
             included in ID Tokens issued by the OP.
           type: boolean
         frontchannel_logout_supported:
-          description: Boolean value specifying whether the OP supports HTTP-based
-            logout, with true indicating support.
+          description:
+            Boolean value specifying whether the OP supports HTTP-based logout,
+            with true indicating support.
           type: boolean
         grant_types_supported:
-          description: JSON array containing a list of the OAuth 2.0 Grant Type values
-            that this OP supports.
+          description:
+            JSON array containing a list of the OAuth 2.0 Grant Type values that
+            this OP supports.
           items:
             type: string
           type: array
@@ -3931,11 +4315,13 @@ components:
             type: string
           type: array
         request_parameter_supported:
-          description: Boolean value specifying whether the OP supports use of the
-            request parameter, with true indicating support.
+          description:
+            Boolean value specifying whether the OP supports use of the request
+            parameter, with true indicating support.
           type: boolean
         request_uri_parameter_supported:
-          description: Boolean value specifying whether the OP supports use of the
+          description:
+            Boolean value specifying whether the OP supports use of the
             request_uri parameter, with true indicating support.
           type: boolean
         require_request_uri_registration:
@@ -3944,8 +4330,9 @@ components:
             using the request_uris registration parameter.
           type: boolean
         response_modes_supported:
-          description: JSON array containing a list of the OAuth 2.0 response_mode
-            values that this OP supports.
+          description:
+            JSON array containing a list of the OAuth 2.0 response_mode values
+            that this OP supports.
           items:
             type: string
           type: array
@@ -3957,7 +4344,8 @@ components:
             type: string
           type: array
         revocation_endpoint:
-          description: URL of the authorization server's OAuth 2.0 revocation endpoint.
+          description:
+            URL of the authorization server's OAuth 2.0 revocation endpoint.
           type: string
         scopes_supported:
           description: |-
@@ -3988,20 +4376,21 @@ components:
           description: URL of the OP's UserInfo Endpoint.
           type: string
         userinfo_signing_alg_values_supported:
-          description: JSON array containing a list of the JWS [JWS] signing algorithms
-            (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims
-            in a JWT [JWT].
+          description:
+            JSON array containing a list of the JWS [JWS] signing algorithms
+            (alg values) [JWA] supported by the UserInfo Endpoint to encode the
+            Claims in a JWT [JWT].
           items:
             type: string
           type: array
       required:
-      - authorization_endpoint
-      - id_token_signing_alg_values_supported
-      - issuer
-      - jwks_uri
-      - response_types_supported
-      - subject_types_supported
-      - token_endpoint
+        - authorization_endpoint
+        - id_token_signing_alg_values_supported
+        - issuer
+        - jwks_uri
+        - response_types_supported
+        - subject_types_supported
+        - token_endpoint
       title: WellKnown represents important OpenID Connect discovery metadata
       type: object
     inline_response_200:
@@ -4017,8 +4406,8 @@ components:
         errors:
           additionalProperties:
             type: string
-          description: Errors contains a list of errors that caused the not ready
-            status.
+          description:
+            Errors contains a list of errors that caused the not ready status.
           type: object
       type: object
     inline_object:
@@ -4036,21 +4425,21 @@ components:
             defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
             value returned.
           required:
-          - token
+            - token
           type: string
           x-formData-name: token
       required:
-      - token
+        - token
       type: object
     inline_object_1:
       properties:
         token:
           required:
-          - token
+            - token
           type: string
           x-formData-name: token
       required:
-      - token
+        - token
       type: object
     inline_object_2:
       properties:
@@ -4062,7 +4451,7 @@ components:
           x-formData-name: code
         grant_type:
           required:
-          - grant_type
+            - grant_type
           type: string
           x-formData-name: grant_type
         redirect_uri:
@@ -4072,7 +4461,7 @@ components:
           type: string
           x-formData-name: refresh_token
       required:
-      - grant_type
+        - grant_type
       type: object
     inline_response_200_1:
       example:
@@ -4091,7 +4480,9 @@ components:
         authorizationCode:
           authorizationUrl: https://hydra.demo.ory.sh/oauth2/auth
           scopes:
-            offline: A scope required when requesting refresh tokens (alias for `offline_access`)
+            offline:
+              A scope required when requesting refresh tokens (alias for
+              `offline_access`)
             offline_access: A scope required when requesting refresh tokens
             openid: Request an OpenID Connect ID Token
           tokenUrl: https://hydra.demo.ory.sh/oauth2/token

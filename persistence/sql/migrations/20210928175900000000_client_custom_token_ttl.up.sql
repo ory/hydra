@@ -1,0 +1,12 @@
+ALTER TABLE hydra_client ADD COLUMN authorization_code_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN authorization_code_grant_id_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN authorization_code_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN client_credentials_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN implicit_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN implicit_grant_id_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN jwt_bearer_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN password_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN password_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN refresh_token_grant_id_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN refresh_token_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
+ALTER TABLE hydra_client ADD COLUMN refresh_token_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL;

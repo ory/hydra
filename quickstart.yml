@@ -9,7 +9,7 @@
 # endpoint can only be used if you follow the steps in the tutorial.      #
 #                                                                         #
 ###########################################################################
-version: '3.7'
+version: "3.7"
 services:
   hydra:
     image: oryd/hydra:v1.11.8

@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   hydra-migrate:
@@ -14,11 +14,9 @@ services:
       dockerfile: ./test/conformance/hydra/Dockerfile
     environment:
       ISSUER_URL: https://hydra:4444/
-    command:
-      serve -c /etc/config/hydra/hydra.yml all
+    command: serve -c /etc/config/hydra/hydra.yml all
     volumes:
-      -
-        type: bind
+      - type: bind
         source: ./test/conformance/hydra/config
         target: /etc/config/hydra
 
@@ -35,26 +33,26 @@ services:
 
   httpd:
     image: oryd/hydra-oidc-httpd:latest
-#    build:
-#      # When running with `run.sh` the cwd is the project's root.
-#      context: ./test/conformance
-#      dockerfile: httpd/Dockerfile
+    #    build:
+    #      # When running with `run.sh` the cwd is the project's root.
+    #      context: ./test/conformance
+    #      dockerfile: httpd/Dockerfile
     ports:
-     - "8443:8443"
+      - "8443:8443"
     depends_on:
-     - server
+      - server
     networks:
       - intranet
     restart: unless-stopped
 
   server:
     image: oryd/hydra-oidc-server:latest
-#    build:
-#      # When running with `run.sh` the cwd is the project's root.
-#      context: ./test/conformance
-#      dockerfile: Dockerfile
+    #    build:
+    #      # When running with `run.sh` the cwd is the project's root.
+    #      context: ./test/conformance
+    #      dockerfile: Dockerfile
     depends_on:
-     - mongodb
+      - mongodb
     logging:
       # limit logs retained on host
       driver: "json-file"

@@ -11,6 +11,8 @@ import (
 
 	"github.com/tidwall/gjson"
 
+	"github.com/ory/hydra/internal/testhelpers"
+
 	"github.com/ory/hydra/driver/config"
 
 	"github.com/julienschmidt/httprouter"
@@ -475,6 +477,21 @@ func TestHandler(t *testing.T) {
 			})
 			require.Equal(t, http.StatusForbidden, res.StatusCode, body)
 			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+		})
+
+		t.Run("case=update the lifespans of an OAuth2 client", func(t *testing.T) {
+			expected := &client.Client{
+				OutfacingID:             "update-existing-client-lifespans",
+				Secret:                  "averylongsecret",
+				RedirectURIs:            []string{"http://localhost:3000/cb"},
+				TokenEndpointAuthMethod: "client_secret_basic",
+			}
+			body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
+			require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+			body, res = makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+gjson.Get(body, "client_id").String()+"/lifespans", testhelpers.TestLifespans)
+			require.Equal(t, http.StatusOK, res.StatusCode, body)
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

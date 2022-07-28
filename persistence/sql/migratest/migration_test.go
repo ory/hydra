@@ -67,8 +67,8 @@ func TestMigrations(t *testing.T) {
 			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), d.Logger())
 			require.NoError(t, tm.Up(context.Background()))
 
-			var lastClient *client.Client
-			for i := 1; i <= 14; i++ {
+			var client14 *client.Client
+			for i := 1; i <= 15; i++ {
 				// skip cockroach assertions until migration 13
 				if db == "cockroach" && i < 13 {
 					continue
@@ -78,7 +78,9 @@ func TestMigrations(t *testing.T) {
 					actual := &client.Client{}
 					require.NoError(t, c.Where("id = ?", expected.OutfacingID).First(actual))
 					assertEqualClients(t, expected, actual)
-					lastClient = actual
+					if i == 14 {
+						client14 = actual
+					}
 				})
 			}
 
@@ -124,7 +126,7 @@ func TestMigrations(t *testing.T) {
 					assertEqualHandledLoginRequests(t, ehlr, ahlr)
 
 					if efols != nil {
-						afols, err := d.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.OutfacingID, efols.SubjectObfuscated)
+						afols, err := d.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), client14.OutfacingID, efols.SubjectObfuscated)
 						require.NoError(t, err)
 						assertEqualForcedObfucscatedLoginSessions(t, efols, afols)
 					}

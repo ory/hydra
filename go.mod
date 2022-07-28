@@ -48,7 +48,7 @@ require (
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.2
+	github.com/ory/fosite v0.42.3-0.20220728130632-c3e0133cfed9
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
@@ -63,7 +63,7 @@ require (
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.14.0
+	github.com/tidwall/gjson v1.14.1
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0

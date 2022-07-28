@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   gitlab:
@@ -13,6 +13,6 @@ services:
       - "8000:8000" # http
       - "2222:22" # ssh
     volumes:
-    - './contrib/quickstart/gitlab/config:/etc/gitlab'
-    - './contrib/quickstart/gitlab/logs:/var/log/gitlab'
-    - './contrib/quickstart/gitlab/data:/var/opt/gitlab'
+      - "./contrib/quickstart/gitlab/config:/etc/gitlab"
+      - "./contrib/quickstart/gitlab/logs:/var/log/gitlab"
+      - "./contrib/quickstart/gitlab/data:/var/opt/gitlab"

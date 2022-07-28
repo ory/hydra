@@ -2,12 +2,12 @@
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**ClientId** | Pointer to **string** | ClientID is the identifier of the OAuth 2.0 client. | [optional] 
-**GrantedAudience** | Pointer to **[]string** | GrantedAudience is the list of audiences granted to the OAuth 2.0 client. | [optional] 
-**GrantedScopes** | Pointer to **[]string** | GrantedScopes is the list of scopes granted to the OAuth 2.0 client. | [optional] 
-**Subject** | Pointer to **string** | Subject is the identifier of the authenticated end-user. | [optional] 
+| Name                | Type                    | Description                                                               | Notes      |
+| ------------------- | ----------------------- | ------------------------------------------------------------------------- | ---------- |
+| **ClientId**        | Pointer to **string**   | ClientID is the identifier of the OAuth 2.0 client.                       | [optional] |
+| **GrantedAudience** | Pointer to **[]string** | GrantedAudience is the list of audiences granted to the OAuth 2.0 client. | [optional] |
+| **GrantedScopes**   | Pointer to **[]string** | GrantedScopes is the list of scopes granted to the OAuth 2.0 client.      | [optional] |
+| **Subject**         | Pointer to **string**   | Subject is the identifier of the authenticated end-user.                  | [optional] |
 
 ## Methods
 
@@ -17,16 +17,17 @@ Name | Type | Description | Notes
 
 NewRefreshTokenHookRequest instantiates a new RefreshTokenHookRequest object
 This constructor will assign default values to properties that have it defined,
-and makes sure properties required by API are set, but the set of arguments
-will change when the set of required properties is changed
+and makes sure properties required by API are set, but the set of arguments will
+change when the set of required properties is changed
 
 ### NewRefreshTokenHookRequestWithDefaults
 
 `func NewRefreshTokenHookRequestWithDefaults() *RefreshTokenHookRequest`
 
-NewRefreshTokenHookRequestWithDefaults instantiates a new RefreshTokenHookRequest object
-This constructor will only assign default values to properties that have it defined,
-but it doesn't guarantee that properties required by API are set
+NewRefreshTokenHookRequestWithDefaults instantiates a new
+RefreshTokenHookRequest object This constructor will only assign default values
+to properties that have it defined, but it doesn't guarantee that properties
+required by API are set
 
 ### GetClientId
 
@@ -38,8 +39,8 @@ GetClientId returns the ClientId field if non-nil, zero value otherwise.
 
 `func (o *RefreshTokenHookRequest) GetClientIdOk() (*string, bool)`
 
-GetClientIdOk returns a tuple with the ClientId field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetClientIdOk returns a tuple with the ClientId field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetClientId
 
@@ -57,14 +58,15 @@ HasClientId returns a boolean if a field has been set.
 
 `func (o *RefreshTokenHookRequest) GetGrantedAudience() []string`
 
-GetGrantedAudience returns the GrantedAudience field if non-nil, zero value otherwise.
+GetGrantedAudience returns the GrantedAudience field if non-nil, zero value
+otherwise.
 
 ### GetGrantedAudienceOk
 
 `func (o *RefreshTokenHookRequest) GetGrantedAudienceOk() (*[]string, bool)`
 
-GetGrantedAudienceOk returns a tuple with the GrantedAudience field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetGrantedAudienceOk returns a tuple with the GrantedAudience field if it's
+non-nil, zero value otherwise and a boolean to check if the value has been set.
 
 ### SetGrantedAudience
 
@@ -82,14 +84,15 @@ HasGrantedAudience returns a boolean if a field has been set.
 
 `func (o *RefreshTokenHookRequest) GetGrantedScopes() []string`
 
-GetGrantedScopes returns the GrantedScopes field if non-nil, zero value otherwise.
+GetGrantedScopes returns the GrantedScopes field if non-nil, zero value
+otherwise.
 
 ### GetGrantedScopesOk
 
 `func (o *RefreshTokenHookRequest) GetGrantedScopesOk() (*[]string, bool)`
 
-GetGrantedScopesOk returns a tuple with the GrantedScopes field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetGrantedScopesOk returns a tuple with the GrantedScopes field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
 
 ### SetGrantedScopes
 
@@ -113,8 +116,8 @@ GetSubject returns the Subject field if non-nil, zero value otherwise.
 
 `func (o *RefreshTokenHookRequest) GetSubjectOk() (*string, bool)`
 
-GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetSubject
 
@@ -128,7 +131,6 @@ SetSubject sets Subject field to given value.
 
 HasSubject returns a boolean if a field has been set.
 
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
-
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to README]](../README.md)

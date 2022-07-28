@@ -10,10 +10,9 @@
 #                                                                         #
 ###########################################################################
 
-version: '3.7'
+version: "3.7"
 
 services:
-
   hydra:
     depends_on:
       - jaeger
@@ -49,7 +48,6 @@ services:
       - "16686:16686" # The UI port
     networks:
       - intranet
-
 #  zipkin:
 #    image: openzipkin/zipkin:2
 #    environment:

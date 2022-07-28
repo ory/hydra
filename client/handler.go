@@ -68,6 +68,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
 	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
+	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.UpdateLifespans)
 
 	if h.r.Config().PublicAllowDynamicRegistration() {
 		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
@@ -565,6 +566,56 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route PUT /clients/{id}/lifespans admin UpdateOAuth2ClientLifespans
+//
+// UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
+// client configuration takes precedence over the instance-wide token lifespan
+// configuration.
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: oAuth2Client
+//       default: jsonError
+func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var id = ps.ByName("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	var ls UpdateOAuth2ClientLifespans
+	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		return
+	}
+
+	c.AuthorizationCodeGrantAccessTokenLifespan = ls.AuthorizationCodeGrantAccessTokenLifespan
+	c.AuthorizationCodeGrantIDTokenLifespan = ls.AuthorizationCodeGrantIDTokenLifespan
+	c.AuthorizationCodeGrantRefreshTokenLifespan = ls.AuthorizationCodeGrantRefreshTokenLifespan
+	c.ClientCredentialsGrantAccessTokenLifespan = ls.ClientCredentialsGrantAccessTokenLifespan
+	c.ImplicitGrantAccessTokenLifespan = ls.ImplicitGrantAccessTokenLifespan
+	c.ImplicitGrantIDTokenLifespan = ls.ImplicitGrantIDTokenLifespan
+	c.JwtBearerGrantAccessTokenLifespan = ls.JwtBearerGrantAccessTokenLifespan
+	c.PasswordGrantAccessTokenLifespan = ls.PasswordGrantAccessTokenLifespan
+	c.PasswordGrantRefreshTokenLifespan = ls.PasswordGrantRefreshTokenLifespan
+	c.RefreshTokenGrantAccessTokenLifespan = ls.RefreshTokenGrantAccessTokenLifespan
+	c.RefreshTokenGrantIDTokenLifespan = ls.RefreshTokenGrantIDTokenLifespan
+	c.RefreshTokenGrantRefreshTokenLifespan = ls.RefreshTokenGrantRefreshTokenLifespan
+	c.Secret = ""
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	h.r.Writer().Write(w, r, c)
 }
 
 // swagger:route DELETE /oauth2/register/{id} public dynamicClientRegistrationDeleteOAuth2Client

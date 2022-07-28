@@ -6,3 +6,17 @@
   path: /components/schemas/consentRequestSession/properties/id_token/additionalProperties
 - op: remove
   path: /components/schemas/consentRequestSession/properties/id_token/type
+- op: replace
+  path: /components/schemas/nullDuration
+  value:
+    title: "Time duration"
+    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
+    type: string
+    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+- op: replace
+  path: /components/schemas/NullDuration
+  value:
+    title: "Time duration"
+    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
+    type: string
+    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"

@@ -44,6 +44,7 @@ docs/RequestWasHandledResponse.md
 docs/TrustJwtGrantIssuerBody.md
 docs/TrustedJsonWebKey.md
 docs/TrustedJwtGrantIssuer.md
+docs/UpdateOAuth2ClientLifespans.md
 docs/UserinfoResponse.md
 docs/Version.md
 docs/WellKnown.md
@@ -83,6 +84,7 @@ model_request_was_handled_response.go
 model_trust_jwt_grant_issuer_body.go
 model_trusted_json_web_key.go
 model_trusted_jwt_grant_issuer.go
+model_update_o_auth2_client_lifespans.go
 model_userinfo_response.go
 model_version.go
 model_well_known.go

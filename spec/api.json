@@ -29,6 +29,12 @@
         "nullable": true,
         "type": "boolean"
       },
+      "NullDuration": {
+        "description": "Specify a time duration in milliseconds, seconds, minutes, hours.",
+        "pattern": "^([0-9]+(ns|us|ms|s|m|h))*$",
+        "title": "Time duration",
+        "type": "string"
+      },
       "NullInt": {
         "nullable": true,
         "type": "integer"
@@ -61,6 +67,49 @@
       "UUID": {
         "format": "uuid4",
         "type": "string"
+      },
+      "UpdateOAuth2ClientLifespans": {
+        "description": "The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.",
+        "properties": {
+          "authorization_code_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "client_credentials_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "implicit_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "implicit_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "jwt_bearer_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "password_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "password_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          }
+        },
+        "title": "UpdateOAuth2ClientLifespans holds default lifespan configuration for the different\ntoken types that may be issued for the client. This configuration takes\nprecedence over fosite's instance-wide default lifespan, but it may be\noverridden by a session's expires_at claim.",
+        "type": "object"
       },
       "acceptOAuth2ConsentRequest": {
         "properties": {
@@ -1337,6 +1386,38 @@
         "title": "The response payload sent when accepting or rejecting a login, consent, or logout request.",
         "type": "object"
       },
+      "tokenPagination": {
+        "properties": {
+          "page_size": {
+            "default": 250,
+            "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "format": "int64",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page_token": {
+            "default": "1",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "minimum": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "tokenPaginationHeaders": {
+        "properties": {
+          "link": {
+            "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+            "type": "string"
+          },
+          "x-total-count": {
+            "description": "The total number of clients.\n\nin: header",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "trustedOAuth2JwtGrantIssuer": {
         "properties": {
           "allow_any_subject": {
@@ -1801,6 +1882,58 @@
         "summary": "Update an OAuth 2.0 Client",
         "tags": [
           "v1"
+        ]
+      }
+    },
+    "/admin/clients/{id}/lifespans": {
+      "put": {
+        "description": "UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This\nclient configuration takes precedence over the instance-wide token lifespan\nconfiguration.",
+        "operationId": "UpdateOAuth2ClientLifespans",
+        "parameters": [
+          {
+            "description": "The id of the OAuth 2.0 Client.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOAuth2ClientLifespans"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2Client"
+                }
+              }
+            },
+            "description": "oAuth2Client"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/genericError"
+                }
+              }
+            },
+            "description": "genericError"
+          }
+        },
+        "tags": [
+          "admin"
         ]
       }
     },

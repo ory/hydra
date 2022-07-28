@@ -36,6 +36,7 @@ import (
 	"time"
 
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/requirex"
 
 	hydra "github.com/ory/hydra-client-go"
 
@@ -213,7 +214,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
 		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
 		require.NoError(t, err)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
 	}
 
 	assertIDToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
@@ -228,7 +229,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), time.Second)
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
 		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
@@ -275,7 +276,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
 		assert.EqualValues(t, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
 		return i
@@ -309,9 +310,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			introspectAccessToken(t, conf, token, subject)
-			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().AccessTokenLifespan()))
-			assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().IDTokenLifespan()))
-			assertRefreshToken(t, token, conf, iat.Add(reg.Config().RefreshTokenLifespan()))
+			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+			assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+			assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 
 			t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
 				require.NotEmpty(t, token.RefreshToken)
@@ -326,9 +327,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				introspectAccessToken(t, conf, refreshedToken, subject)
 
 				t.Run("followup=refreshed tokens contain valid tokens", func(t *testing.T) {
-					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().AccessTokenLifespan()))
-					assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().IDTokenLifespan()))
-					assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().RefreshTokenLifespan()))
+					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+					assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+					assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 				})
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
@@ -405,7 +406,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		require.Len(t, aud, 1)
 		assert.EqualValues(t, aud[0].String(), expectAud)
 
-		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().IDTokenLifespan()))
+		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 	})
 
 	t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
@@ -422,7 +423,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			body := introspectAccessToken(t, conf, token, subject)
-			testhelpers.RequireEqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+			requirex.EqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration))
 			assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.AuthorizationCodeGrantIDTokenLifespan.Duration))
@@ -443,7 +444,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
 
 				body := introspectAccessToken(t, conf, refreshedToken, subject)
-				testhelpers.RequireEqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+				requirex.EqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
 					i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
@@ -463,11 +464,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret},
-				c.OutfacingID,
+				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				c.GetID(),
 				ls, adminTS,
 			)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "jwt")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 			run(t, "jwt", c, conf, ls)
 		})
 
@@ -477,33 +478,33 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret},
-				c.OutfacingID,
+				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				c.GetID(),
 				ls, adminTS,
 			)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque", c, conf, ls)
 		})
 
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
 			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret}, c.OutfacingID, testhelpers.TestLifespans, adminTS)
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret}, c.OutfacingID, client.UpdateOAuth2ClientLifespans{}, adminTS)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.UpdateOAuth2ClientLifespans{}, adminTS)
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
 			expectedLifespans := client.UpdateOAuth2ClientLifespans{
-				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
-				ClientCredentialsGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				ImplicitGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				ImplicitGrantIDTokenLifespan:               x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				JwtBearerGrantAccessTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				PasswordGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				PasswordGrantRefreshTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
-				RefreshTokenGrantIDTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				RefreshTokenGrantAccessTokenLifespan:       x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				RefreshTokenGrantRefreshTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
+				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
+				ClientCredentialsGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				ImplicitGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				ImplicitGrantIDTokenLifespan:               x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				JwtBearerGrantAccessTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				PasswordGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				PasswordGrantRefreshTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
+				RefreshTokenGrantIDTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				RefreshTokenGrantAccessTokenLifespan:       x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				RefreshTokenGrantRefreshTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
 			}
 			run(t, "opaque", c, conf, expectedLifespans)
 		})
@@ -602,7 +603,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				token, err := conf.Exchange(context.Background(), code)
 				require.NoError(t, err)
 				introspectAccessToken(t, conf, token, subject)
-				assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().IDTokenLifespan()))
+				assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 			})
 		})
 	})
@@ -672,7 +673,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		token, err := conf.Exchange(context.Background(), code)
 		require.NoError(t, err)
 
-		idClaims := assertIDToken(t, token, conf, subject, "", time.Now().Add(reg.Config().IDTokenLifespan()))
+		idClaims := assertIDToken(t, token, conf, subject, "", time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 
 		time.Sleep(time.Second)
 		uiClaims := testhelpers.Userinfo(t, token, publicTS)
@@ -1116,7 +1117,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
 						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
-						origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
+						origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -1127,7 +1128,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
-						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
+						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
 						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
 					})
 

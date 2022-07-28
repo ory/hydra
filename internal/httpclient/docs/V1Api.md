@@ -1,61 +1,58 @@
 # \V1Api
 
-All URIs are relative to *http://localhost*
+All URIs are relative to _http://localhost_
 
-Method | HTTP request | Description
-------------- | ------------- | -------------
-[**AdminAcceptOAuth2ConsentRequest**](V1Api.md#AdminAcceptOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/accept | Accept an OAuth 2.0 Consent Request
-[**AdminAcceptOAuth2LoginRequest**](V1Api.md#AdminAcceptOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/accept | Accept an OAuth 2.0 Login Request
-[**AdminAcceptOAuth2LogoutRequest**](V1Api.md#AdminAcceptOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/accept | Accept an OAuth 2.0 Logout Request
-[**AdminCreateJsonWebKeySet**](V1Api.md#AdminCreateJsonWebKeySet) | **Post** /admin/keys/{set} | Generate a New JSON Web Key
-[**AdminCreateOAuth2Client**](V1Api.md#AdminCreateOAuth2Client) | **Post** /admin/clients | Create an OAuth 2.0 Client
-[**AdminDeleteJsonWebKey**](V1Api.md#AdminDeleteJsonWebKey) | **Delete** /admin/keys/{set}/{kid} | Delete a JSON Web Key
-[**AdminDeleteJsonWebKeySet**](V1Api.md#AdminDeleteJsonWebKeySet) | **Delete** /admin/keys/{set} | Delete a JSON Web Key Set
-[**AdminDeleteOAuth2Client**](V1Api.md#AdminDeleteOAuth2Client) | **Delete** /admin/clients/{id} | Deletes an OAuth 2.0 Client
-[**AdminDeleteOAuth2Token**](V1Api.md#AdminDeleteOAuth2Token) | **Delete** /admin/oauth2/tokens | Delete OAuth2 Access Tokens from a Client
-[**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
-[**AdminGetJsonWebKey**](V1Api.md#AdminGetJsonWebKey) | **Get** /admin/keys/{set}/{kid} | Fetch a JSON Web Key
-[**AdminGetJsonWebKeySet**](V1Api.md#AdminGetJsonWebKeySet) | **Get** /admin/keys/{set} | Retrieve a JSON Web Key Set
-[**AdminGetOAuth2Client**](V1Api.md#AdminGetOAuth2Client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
-[**AdminGetOAuth2ConsentRequest**](V1Api.md#AdminGetOAuth2ConsentRequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request Information
-[**AdminGetOAuth2LoginRequest**](V1Api.md#AdminGetOAuth2LoginRequest) | **Get** /admin/oauth2/auth/requests/login | Get an OAuth 2.0 Login Request
-[**AdminGetOAuth2LogoutRequest**](V1Api.md#AdminGetOAuth2LogoutRequest) | **Get** /admin/oauth2/auth/requests/logout | Get an OAuth 2.0 Logout Request
-[**AdminGetTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminGetTrustedOAuth2JwtGrantIssuer) | **Get** /admin/trust/grants/jwt-bearer/issuers/{id} | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
-[**AdminIntrospectOAuth2Token**](V1Api.md#AdminIntrospectOAuth2Token) | **Post** /admin/oauth2/introspect | Introspect OAuth2 Access or Refresh Tokens
-[**AdminListOAuth2Clients**](V1Api.md#AdminListOAuth2Clients) | **Get** /admin/clients | List OAuth 2.0 Clients
-[**AdminListOAuth2SubjectConsentSessions**](V1Api.md#AdminListOAuth2SubjectConsentSessions) | **Get** /admin/oauth2/auth/sessions/consent | List OAuth 2.0 Consent Sessions of a Subject
-[**AdminListTrustedOAuth2JwtGrantIssuers**](V1Api.md#AdminListTrustedOAuth2JwtGrantIssuers) | **Get** /admin/trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
-[**AdminPatchOAuth2Client**](V1Api.md#AdminPatchOAuth2Client) | **Patch** /admin/clients/{id} | Patch an OAuth 2.0 Client
-[**AdminRejectOAuth2ConsentRequest**](V1Api.md#AdminRejectOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/reject | Reject an OAuth 2.0 Consent Request
-[**AdminRejectOAuth2LoginRequest**](V1Api.md#AdminRejectOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject an OAuth 2.0 Login Request
-[**AdminRejectOAuth2LogoutRequest**](V1Api.md#AdminRejectOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject an OAuth 2.0 Logout Request
-[**AdminRevokeOAuth2ConsentSessions**](V1Api.md#AdminRevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
-[**AdminRevokeOAuth2LoginSessions**](V1Api.md#AdminRevokeOAuth2LoginSessions) | **Delete** /admin/oauth2/auth/sessions/login | Invalidates All OAuth 2.0 Login Sessions of a Certain User
-[**AdminTrustOAuth2JwtGrantIssuer**](V1Api.md#AdminTrustOAuth2JwtGrantIssuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust an OAuth2 JWT Bearer Grant Type Issuer
-[**AdminUpdateJsonWebKey**](V1Api.md#AdminUpdateJsonWebKey) | **Put** /admin/keys/{set}/{kid} | Update a JSON Web Key
-[**AdminUpdateJsonWebKeySet**](V1Api.md#AdminUpdateJsonWebKeySet) | **Put** /admin/keys/{set} | Update a JSON Web Key Set
-[**AdminUpdateOAuth2Client**](V1Api.md#AdminUpdateOAuth2Client) | **Put** /admin/clients/{id} | Update an OAuth 2.0 Client
-[**DiscoverJsonWebKeys**](V1Api.md#DiscoverJsonWebKeys) | **Get** /.well-known/jwks.json | Discover JSON Web Keys
-[**DiscoverOidcConfiguration**](V1Api.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-[**DynamicClientRegistrationCreateOAuth2Client**](V1Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationDeleteOAuth2Client**](V1Api.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationGetOAuth2Client**](V1Api.md#DynamicClientRegistrationGetOAuth2Client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationUpdateOAuth2Client**](V1Api.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**GetOidcUserInfo**](V1Api.md#GetOidcUserInfo) | **Get** /userinfo | OpenID Connect Userinfo
-[**PerformOAuth2AuthorizationFlow**](V1Api.md#PerformOAuth2AuthorizationFlow) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
-[**PerformOAuth2TokenFlow**](V1Api.md#PerformOAuth2TokenFlow) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
-[**PerformOidcFrontOrBackChannelLogout**](V1Api.md#PerformOidcFrontOrBackChannelLogout) | **Get** /oauth2/sessions/logout | OpenID Connect Front- or Back-channel Enabled Logout
-[**RevokeOAuth2Token**](V1Api.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke an OAuth2 Access or Refresh Token
-
-
+| Method                                                                                                  | HTTP request                                           | Description                                                                                            |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| [**AdminAcceptOAuth2ConsentRequest**](V1Api.md#AdminAcceptOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                                    |
+| [**AdminAcceptOAuth2LoginRequest**](V1Api.md#AdminAcceptOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                                      |
+| [**AdminAcceptOAuth2LogoutRequest**](V1Api.md#AdminAcceptOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                                     |
+| [**AdminCreateJsonWebKeySet**](V1Api.md#AdminCreateJsonWebKeySet)                                       | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                                            |
+| [**AdminCreateOAuth2Client**](V1Api.md#AdminCreateOAuth2Client)                                         | **Post** /admin/clients                                | Create an OAuth 2.0 Client                                                                             |
+| [**AdminDeleteJsonWebKey**](V1Api.md#AdminDeleteJsonWebKey)                                             | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                                  |
+| [**AdminDeleteJsonWebKeySet**](V1Api.md#AdminDeleteJsonWebKeySet)                                       | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                              |
+| [**AdminDeleteOAuth2Client**](V1Api.md#AdminDeleteOAuth2Client)                                         | **Delete** /admin/clients/{id}                         | Deletes an OAuth 2.0 Client                                                                            |
+| [**AdminDeleteOAuth2Token**](V1Api.md#AdminDeleteOAuth2Token)                                           | **Delete** /admin/oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                              |
+| [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer)           | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                   |
+| [**AdminGetJsonWebKey**](V1Api.md#AdminGetJsonWebKey)                                                   | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                                   |
+| [**AdminGetJsonWebKeySet**](V1Api.md#AdminGetJsonWebKeySet)                                             | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                                            |
+| [**AdminGetOAuth2Client**](V1Api.md#AdminGetOAuth2Client)                                               | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                                |
+| [**AdminGetOAuth2ConsentRequest**](V1Api.md#AdminGetOAuth2ConsentRequest)                               | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                              |
+| [**AdminGetOAuth2LoginRequest**](V1Api.md#AdminGetOAuth2LoginRequest)                                   | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                                         |
+| [**AdminGetOAuth2LogoutRequest**](V1Api.md#AdminGetOAuth2LogoutRequest)                                 | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                                        |
+| [**AdminGetTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminGetTrustedOAuth2JwtGrantIssuer)                 | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                      |
+| [**AdminIntrospectOAuth2Token**](V1Api.md#AdminIntrospectOAuth2Token)                                   | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                                             |
+| [**AdminListOAuth2Clients**](V1Api.md#AdminListOAuth2Clients)                                           | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                                 |
+| [**AdminListOAuth2SubjectConsentSessions**](V1Api.md#AdminListOAuth2SubjectConsentSessions)             | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                                           |
+| [**AdminListTrustedOAuth2JwtGrantIssuers**](V1Api.md#AdminListTrustedOAuth2JwtGrantIssuers)             | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                                      |
+| [**AdminPatchOAuth2Client**](V1Api.md#AdminPatchOAuth2Client)                                           | **Patch** /admin/clients/{id}                          | Patch an OAuth 2.0 Client                                                                              |
+| [**AdminRejectOAuth2ConsentRequest**](V1Api.md#AdminRejectOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                                    |
+| [**AdminRejectOAuth2LoginRequest**](V1Api.md#AdminRejectOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                                      |
+| [**AdminRejectOAuth2LogoutRequest**](V1Api.md#AdminRejectOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                                     |
+| [**AdminRevokeOAuth2ConsentSessions**](V1Api.md#AdminRevokeOAuth2ConsentSessions)                       | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client                        |
+| [**AdminRevokeOAuth2LoginSessions**](V1Api.md#AdminRevokeOAuth2LoginSessions)                           | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                                             |
+| [**AdminTrustOAuth2JwtGrantIssuer**](V1Api.md#AdminTrustOAuth2JwtGrantIssuer)                           | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                                           |
+| [**AdminUpdateJsonWebKey**](V1Api.md#AdminUpdateJsonWebKey)                                             | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                                  |
+| [**AdminUpdateJsonWebKeySet**](V1Api.md#AdminUpdateJsonWebKeySet)                                       | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                              |
+| [**AdminUpdateOAuth2Client**](V1Api.md#AdminUpdateOAuth2Client)                                         | **Put** /admin/clients/{id}                            | Update an OAuth 2.0 Client                                                                             |
+| [**DiscoverJsonWebKeys**](V1Api.md#DiscoverJsonWebKeys)                                                 | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                                 |
+| [**DiscoverOidcConfiguration**](V1Api.md#DiscoverOidcConfiguration)                                     | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                               |
+| [**DynamicClientRegistrationCreateOAuth2Client**](V1Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                              | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
+| [**DynamicClientRegistrationDeleteOAuth2Client**](V1Api.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}                       | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
+| [**DynamicClientRegistrationGetOAuth2Client**](V1Api.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}                          | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
+| [**DynamicClientRegistrationUpdateOAuth2Client**](V1Api.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}                          | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
+| [**GetOidcUserInfo**](V1Api.md#GetOidcUserInfo)                                                         | **Get** /userinfo                                      | OpenID Connect Userinfo                                                                                |
+| [**PerformOAuth2AuthorizationFlow**](V1Api.md#PerformOAuth2AuthorizationFlow)                           | **Get** /oauth2/auth                                   | The OAuth 2.0 Authorize Endpoint                                                                       |
+| [**PerformOAuth2TokenFlow**](V1Api.md#PerformOAuth2TokenFlow)                                           | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                                                           |
+| [**PerformOidcFrontOrBackChannelLogout**](V1Api.md#PerformOidcFrontOrBackChannelLogout)                 | **Get** /oauth2/sessions/logout                        | OpenID Connect Front- or Back-channel Enabled Logout                                                   |
+| [**RevokeOAuth2Token**](V1Api.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                                | Revoke an OAuth2 Access or Refresh Token                                                               |
 
 ## AdminAcceptOAuth2ConsentRequest
 
-> SuccessfulOAuth2RequestResponse AdminAcceptOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
+> SuccessfulOAuth2RequestResponse
+> AdminAcceptOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
 
 Accept an OAuth 2.0 Consent Request
-
-
 
 ### Example
 
@@ -70,7 +67,7 @@ import (
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | 
+    consentChallenge := "consentChallenge_example" // string |
     acceptOAuth2ConsentRequest := *openapiclient.NewAcceptOAuth2ConsentRequest() // AcceptOAuth2ConsentRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -87,17 +84,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminAcceptOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminAcceptOAuth2ConsentRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **consentChallenge** | **string** |  | 
- **acceptOAuth2ConsentRequest** | [**AcceptOAuth2ConsentRequest**](AcceptOAuth2ConsentRequest.md) |  | 
+| Name                           | Type                                                            | Description | Notes |
+| ------------------------------ | --------------------------------------------------------------- | ----------- | ----- |
+| **consentChallenge**           | **string**                                                      |             |
+| **acceptOAuth2ConsentRequest** | [**AcceptOAuth2ConsentRequest**](AcceptOAuth2ConsentRequest.md) |             |
 
 ### Return type
 
@@ -112,18 +107,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminAcceptOAuth2LoginRequest
 
-> SuccessfulOAuth2RequestResponse AdminAcceptOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
+> SuccessfulOAuth2RequestResponse
+> AdminAcceptOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
 
 Accept an OAuth 2.0 Login Request
-
-
 
 ### Example
 
@@ -138,7 +132,7 @@ import (
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | 
+    loginChallenge := "loginChallenge_example" // string |
     acceptOAuth2LoginRequest := *openapiclient.NewAcceptOAuth2LoginRequest("Subject_example") // AcceptOAuth2LoginRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -155,17 +149,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminAcceptOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminAcceptOAuth2LoginRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **loginChallenge** | **string** |  | 
- **acceptOAuth2LoginRequest** | [**AcceptOAuth2LoginRequest**](AcceptOAuth2LoginRequest.md) |  | 
+| Name                         | Type                                                        | Description | Notes |
+| ---------------------------- | ----------------------------------------------------------- | ----------- | ----- |
+| **loginChallenge**           | **string**                                                  |             |
+| **acceptOAuth2LoginRequest** | [**AcceptOAuth2LoginRequest**](AcceptOAuth2LoginRequest.md) |             |
 
 ### Return type
 
@@ -180,18 +172,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminAcceptOAuth2LogoutRequest
 
-> SuccessfulOAuth2RequestResponse AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
+> SuccessfulOAuth2RequestResponse
+> AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 
 Accept an OAuth 2.0 Logout Request
-
-
 
 ### Example
 
@@ -206,7 +197,7 @@ import (
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | 
+    logoutChallenge := "logoutChallenge_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -222,16 +213,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminAcceptOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminAcceptOAuth2LogoutRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **logoutChallenge** | **string** |  | 
+| Name                | Type       | Description | Notes |
+| ------------------- | ---------- | ----------- | ----- |
+| **logoutChallenge** | **string** |             |
 
 ### Return type
 
@@ -246,18 +235,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminCreateJsonWebKeySet
 
-> JsonWebKeySet AdminCreateJsonWebKeySet(ctx, set).AdminCreateJsonWebKeySetBody(adminCreateJsonWebKeySetBody).Execute()
+> JsonWebKeySet AdminCreateJsonWebKeySet(ctx,
+> set).AdminCreateJsonWebKeySetBody(adminCreateJsonWebKeySetBody).Execute()
 
 Generate a New JSON Web Key
-
-
 
 ### Example
 
@@ -273,7 +261,7 @@ import (
 
 func main() {
     set := "set_example" // string | The JSON Web Key Set
-    adminCreateJsonWebKeySetBody := *openapiclient.NewAdminCreateJsonWebKeySetBody("Alg_example", "Kid_example", "Use_example") // AdminCreateJsonWebKeySetBody | 
+    adminCreateJsonWebKeySetBody := *openapiclient.NewAdminCreateJsonWebKeySetBody("Alg_example", "Kid_example", "Use_example") // AdminCreateJsonWebKeySetBody |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -289,21 +277,21 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminCreateJsonWebKeySetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminCreateJsonWebKeySetRequest struct via the builder pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **adminCreateJsonWebKeySetBody** | [**AdminCreateJsonWebKeySetBody**](AdminCreateJsonWebKeySetBody.md) |  | 
+**adminCreateJsonWebKeySetBody** |
+[**AdminCreateJsonWebKeySetBody**](AdminCreateJsonWebKeySetBody.md) | |
 
 ### Return type
 
@@ -318,18 +306,16 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminCreateOAuth2Client
 
 > OAuth2Client AdminCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
 
 Create an OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -344,7 +330,7 @@ import (
 )
 
 func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -360,16 +346,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminCreateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminCreateOAuth2ClientRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+| Name             | Type                                | Description | Notes |
+| ---------------- | ----------------------------------- | ----------- | ----- |
+| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
 
 ### Return type
 
@@ -384,18 +368,16 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminDeleteJsonWebKey
 
 > AdminDeleteJsonWebKey(ctx, set, kid).Execute()
 
 Delete a JSON Web Key
-
-
 
 ### Example
 
@@ -425,26 +407,23 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
-**kid** | **string** | The JSON Web Key ID (kid) | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
+| **kid** | **string**          | The JSON Web Key ID (kid)                                                   |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminDeleteJsonWebKeyRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminDeleteJsonWebKeyRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -455,18 +434,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminDeleteJsonWebKeySet
 
 > AdminDeleteJsonWebKeySet(ctx, set).Execute()
 
 Delete a JSON Web Key Set
-
-
 
 ### Example
 
@@ -495,24 +472,22 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminDeleteJsonWebKeySetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminDeleteJsonWebKeySetRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -523,18 +498,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminDeleteOAuth2Client
 
 > AdminDeleteOAuth2Client(ctx, id).Execute()
 
 Deletes an OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -563,24 +536,22 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminDeleteOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminDeleteOAuth2ClientRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -591,18 +562,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminDeleteOAuth2Token
 
 > AdminDeleteOAuth2Token(ctx).ClientId(clientId).Execute()
 
 Delete OAuth2 Access Tokens from a Client
-
-
 
 ### Example
 
@@ -617,7 +586,7 @@ import (
 )
 
 func main() {
-    clientId := "clientId_example" // string | 
+    clientId := "clientId_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -631,20 +600,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminDeleteOAuth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminDeleteOAuth2TokenRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **clientId** | **string** |  | 
+| Name         | Type       | Description | Notes |
+| ------------ | ---------- | ----------- | ----- |
+| **clientId** | **string** |             |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -655,18 +622,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminDeleteTrustedOAuth2JwtGrantIssuer
 
 > AdminDeleteTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
 
 Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
-
-
 
 ### Example
 
@@ -695,24 +660,22 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the desired grant | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the desired grant                                                 |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -723,18 +686,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminGetJsonWebKey
 
 > JsonWebKeySet AdminGetJsonWebKey(ctx, set, kid).Execute()
 
 Fetch a JSON Web Key
-
-
 
 ### Example
 
@@ -766,22 +727,19 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
-**kid** | **string** | The JSON Web Key ID (kid) | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
+| **kid** | **string**          | The JSON Web Key ID (kid)                                                   |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetJsonWebKeyRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiAdminGetJsonWebKeyRequest
+struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -796,18 +754,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminGetJsonWebKeySet
 
 > JsonWebKeySet AdminGetJsonWebKeySet(ctx, set).Execute()
 
 Retrieve a JSON Web Key Set
-
-
 
 ### Example
 
@@ -838,20 +794,18 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetJsonWebKeySetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetJsonWebKeySetRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -866,18 +820,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminGetOAuth2Client
 
 > OAuth2Client AdminGetOAuth2Client(ctx, id).Execute()
 
 Get an OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -908,20 +860,18 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetOAuth2ClientRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -936,18 +886,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminGetOAuth2ConsentRequest
 
-> OAuth2ConsentRequest AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).Execute()
+> OAuth2ConsentRequest
+> AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).Execute()
 
 Get OAuth 2.0 Consent Request Information
-
-
 
 ### Example
 
@@ -962,7 +911,7 @@ import (
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | 
+    consentChallenge := "consentChallenge_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -978,16 +927,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetOAuth2ConsentRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **consentChallenge** | **string** |  | 
+| Name                 | Type       | Description | Notes |
+| -------------------- | ---------- | ----------- | ----- |
+| **consentChallenge** | **string** |             |
 
 ### Return type
 
@@ -1002,18 +949,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminGetOAuth2LoginRequest
 
-> OAuth2LoginRequest AdminGetOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).Execute()
+> OAuth2LoginRequest
+> AdminGetOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).Execute()
 
 Get an OAuth 2.0 Login Request
-
-
 
 ### Example
 
@@ -1028,7 +974,7 @@ import (
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | 
+    loginChallenge := "loginChallenge_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -1044,16 +990,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetOAuth2LoginRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **loginChallenge** | **string** |  | 
+| Name               | Type       | Description | Notes |
+| ------------------ | ---------- | ----------- | ----- |
+| **loginChallenge** | **string** |             |
 
 ### Return type
 
@@ -1068,18 +1012,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminGetOAuth2LogoutRequest
 
-> OAuth2LogoutRequest AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
+> OAuth2LogoutRequest
+> AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 
 Get an OAuth 2.0 Logout Request
-
-
 
 ### Example
 
@@ -1094,7 +1037,7 @@ import (
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | 
+    logoutChallenge := "logoutChallenge_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -1110,16 +1053,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetOAuth2LogoutRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **logoutChallenge** | **string** |  | 
+| Name                | Type       | Description | Notes |
+| ------------------- | ---------- | ----------- | ----- |
+| **logoutChallenge** | **string** |             |
 
 ### Return type
 
@@ -1134,18 +1075,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminGetTrustedOAuth2JwtGrantIssuer
 
-> TrustedOAuth2JwtGrantIssuer AdminGetTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
+> TrustedOAuth2JwtGrantIssuer AdminGetTrustedOAuth2JwtGrantIssuer(ctx,
+> id).Execute()
 
 Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
-
-
 
 ### Example
 
@@ -1176,20 +1116,18 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the desired grant | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the desired grant                                                 |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminGetTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminGetTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -1204,18 +1142,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminIntrospectOAuth2Token
 
-> IntrospectedOAuth2Token AdminIntrospectOAuth2Token(ctx).Token(token).Scope(scope).Execute()
+> IntrospectedOAuth2Token
+> AdminIntrospectOAuth2Token(ctx).Token(token).Scope(scope).Execute()
 
 Introspect OAuth2 Access or Refresh Tokens
-
-
 
 ### Example
 
@@ -1247,17 +1184,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminIntrospectOAuth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminIntrospectOAuth2TokenRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **token** | **string** | The string value of the token. For access tokens, this is the \\\&quot;access_token\\\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\&quot;refresh_token\\\&quot; value returned. | 
- **scope** | **string** | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. | 
+| Name      | Type       | Description                                                                                                                                                                                                                               | Notes |
+| --------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **token** | **string** | The string value of the token. For access tokens, this is the \\\&quot;access_token\\\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\&quot;refresh_token\\\&quot; value returned. |
+| **scope** | **string** | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.                                                                                          |
 
 ### Return type
 
@@ -1272,18 +1207,17 @@ No authorization required
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminListOAuth2Clients
 
-> []OAuth2Client AdminListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
+> []OAuth2Client
+> AdminListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
 
 List OAuth 2.0 Clients
-
-
 
 ### Example
 
@@ -1317,19 +1251,17 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminListOAuth2ClientsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminListOAuth2ClientsRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **pageSize** | **int64** | Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
- **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
- **clientName** | **string** | The name of the clients to filter by. | 
- **owner** | **string** | The owner of the clients to filter by. | 
+| Name           | Type       | Description                                                                                                                                                                                           | Notes                      |
+| -------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| **pageSize**   | **int64**  | Items per page This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]           |
+| **pageToken**  | **string** | Next Page Token The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).                           | [default to &quot;1&quot;] |
+| **clientName** | **string** | The name of the clients to filter by.                                                                                                                                                                 |
+| **owner**      | **string** | The owner of the clients to filter by.                                                                                                                                                                |
 
 ### Return type
 
@@ -1344,18 +1276,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminListOAuth2SubjectConsentSessions
 
-> []PreviousOAuth2ConsentSession AdminListOAuth2SubjectConsentSessions(ctx).Subject(subject).Link(link).XTotalCount(xTotalCount).Execute()
+> []PreviousOAuth2ConsentSession
+> AdminListOAuth2SubjectConsentSessions(ctx).Subject(subject).Link(link).XTotalCount(xTotalCount).Execute()
 
 List OAuth 2.0 Consent Sessions of a Subject
-
-
 
 ### Example
 
@@ -1388,18 +1319,16 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminListOAuth2SubjectConsentSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminListOAuth2SubjectConsentSessionsRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **subject** | **string** | The subject to list the consent sessions for. | 
- **link** | **string** | The link header contains pagination links.  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | 
- **xTotalCount** | **string** | The total number of clients. | 
+| Name            | Type       | Description                                                                                                                                                                       | Notes |
+| --------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| **subject**     | **string** | The subject to list the consent sessions for.                                                                                                                                     |
+| **link**        | **string** | The link header contains pagination links. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). |
+| **xTotalCount** | **string** | The total number of clients.                                                                                                                                                      |
 
 ### Return type
 
@@ -1414,18 +1343,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminListTrustedOAuth2JwtGrantIssuers
 
-> []TrustedOAuth2JwtGrantIssuer AdminListTrustedOAuth2JwtGrantIssuers(ctx).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Limit(limit).Offset(offset).Execute()
+> []TrustedOAuth2JwtGrantIssuer
+> AdminListTrustedOAuth2JwtGrantIssuers(ctx).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Limit(limit).Offset(offset).Execute()
 
 List Trusted OAuth2 JWT Bearer Grant Type Issuers
-
-
 
 ### Example
 
@@ -1460,20 +1388,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminListTrustedOAuth2JwtGrantIssuersRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminListTrustedOAuth2JwtGrantIssuersRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **maxItems** | **int64** |  | 
- **defaultItems** | **int64** |  | 
- **issuer** | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. | 
- **limit** | **int64** | The maximum amount of policies returned, upper bound is 500 policies | 
- **offset** | **int64** | The offset from where to start looking. | 
+| Name             | Type       | Description                                                                                             | Notes |
+| ---------------- | ---------- | ------------------------------------------------------------------------------------------------------- | ----- |
+| **maxItems**     | **int64**  |                                                                                                         |
+| **defaultItems** | **int64**  |                                                                                                         |
+| **issuer**       | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. |
+| **limit**        | **int64**  | The maximum amount of policies returned, upper bound is 500 policies                                    |
+| **offset**       | **int64**  | The offset from where to start looking.                                                                 |
 
 ### Return type
 
@@ -1488,18 +1414,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminPatchOAuth2Client
 
 > OAuth2Client AdminPatchOAuth2Client(ctx, id).JsonPatch(jsonPatch).Execute()
 
 Patch an OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -1515,7 +1439,7 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch | 
+    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -1531,21 +1455,20 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminPatchOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminPatchOAuth2ClientRequest struct via the builder pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **jsonPatch** | [**[]JsonPatch**](JsonPatch.md) |  | 
+**jsonPatch** | [**[]JsonPatch**](JsonPatch.md) | |
 
 ### Return type
 
@@ -1560,18 +1483,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminRejectOAuth2ConsentRequest
 
-> SuccessfulOAuth2RequestResponse AdminRejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+> SuccessfulOAuth2RequestResponse
+> AdminRejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject an OAuth 2.0 Consent Request
-
-
 
 ### Example
 
@@ -1586,7 +1508,7 @@ import (
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | 
+    consentChallenge := "consentChallenge_example" // string |
     rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -1603,17 +1525,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminRejectOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminRejectOAuth2ConsentRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **consentChallenge** | **string** |  | 
- **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |  | 
+| Name                    | Type                                              | Description | Notes |
+| ----------------------- | ------------------------------------------------- | ----------- | ----- |
+| **consentChallenge**    | **string**                                        |             |
+| **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |             |
 
 ### Return type
 
@@ -1628,18 +1548,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminRejectOAuth2LoginRequest
 
-> SuccessfulOAuth2RequestResponse AdminRejectOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+> SuccessfulOAuth2RequestResponse
+> AdminRejectOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject an OAuth 2.0 Login Request
-
-
 
 ### Example
 
@@ -1654,7 +1573,7 @@ import (
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | 
+    loginChallenge := "loginChallenge_example" // string |
     rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -1671,17 +1590,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminRejectOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminRejectOAuth2LoginRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **loginChallenge** | **string** |  | 
- **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |  | 
+| Name                    | Type                                              | Description | Notes |
+| ----------------------- | ------------------------------------------------- | ----------- | ----- |
+| **loginChallenge**      | **string**                                        |             |
+| **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |             |
 
 ### Return type
 
@@ -1696,18 +1613,16 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminRejectOAuth2LogoutRequest
 
 > AdminRejectOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject an OAuth 2.0 Logout Request
-
-
 
 ### Example
 
@@ -1722,7 +1637,7 @@ import (
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | 
+    logoutChallenge := "logoutChallenge_example" // string |
     rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -1737,21 +1652,19 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminRejectOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminRejectOAuth2LogoutRequestRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **logoutChallenge** | **string** |  | 
- **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |  | 
+| Name                    | Type                                              | Description | Notes |
+| ----------------------- | ------------------------------------------------- | ----------- | ----- |
+| **logoutChallenge**     | **string**                                        |             |
+| **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |             |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -1762,18 +1675,16 @@ No authorization required
 - **Content-Type**: application/json, application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminRevokeOAuth2ConsentSessions
 
 > AdminRevokeOAuth2ConsentSessions(ctx).Subject(subject).Client(client).All(all).Execute()
 
 Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -1804,22 +1715,20 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminRevokeOAuth2ConsentSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminRevokeOAuth2ConsentSessionsRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **subject** | **string** | The subject (Subject) whose consent sessions should be deleted. | 
- **client** | **string** | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID | 
- **all** | **bool** | If set to &#x60;true&#x60; deletes all consent sessions by the Subject that have been granted. | 
+| Name        | Type       | Description                                                                                                            | Notes |
+| ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------- | ----- |
+| **subject** | **string** | The subject (Subject) whose consent sessions should be deleted.                                                        |
+| **client**  | **string** | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID |
+| **all**     | **bool**   | If set to &#x60;true&#x60; deletes all consent sessions by the Subject that have been granted.                         |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -1830,18 +1739,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## AdminRevokeOAuth2LoginSessions
 
 > AdminRevokeOAuth2LoginSessions(ctx).Subject(subject).Execute()
 
 Invalidates All OAuth 2.0 Login Sessions of a Certain User
-
-
 
 ### Example
 
@@ -1870,20 +1777,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminRevokeOAuth2LoginSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminRevokeOAuth2LoginSessionsRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **subject** | **string** | The subject to revoke authentication sessions for. | 
+| Name        | Type       | Description                                        | Notes |
+| ----------- | ---------- | -------------------------------------------------- | ----- |
+| **subject** | **string** | The subject to revoke authentication sessions for. |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -1894,18 +1799,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminTrustOAuth2JwtGrantIssuer
 
-> TrustedOAuth2JwtGrantIssuer AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(adminTrustOAuth2JwtGrantIssuerBody).Execute()
+> TrustedOAuth2JwtGrantIssuer
+> AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(adminTrustOAuth2JwtGrantIssuerBody).Execute()
 
 Trust an OAuth2 JWT Bearer Grant Type Issuer
-
-
 
 ### Example
 
@@ -1937,16 +1841,14 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminTrustOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminTrustOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **adminTrustOAuth2JwtGrantIssuerBody** | [**AdminTrustOAuth2JwtGrantIssuerBody**](AdminTrustOAuth2JwtGrantIssuerBody.md) |  | 
+| Name                                   | Type                                                                            | Description | Notes |
+| -------------------------------------- | ------------------------------------------------------------------------------- | ----------- | ----- |
+| **adminTrustOAuth2JwtGrantIssuerBody** | [**AdminTrustOAuth2JwtGrantIssuerBody**](AdminTrustOAuth2JwtGrantIssuerBody.md) |             |
 
 ### Return type
 
@@ -1961,18 +1863,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminUpdateJsonWebKey
 
-> JsonWebKey AdminUpdateJsonWebKey(ctx, set, kid).JsonWebKey(jsonWebKey).Execute()
+> JsonWebKey AdminUpdateJsonWebKey(ctx, set,
+> kid).JsonWebKey(jsonWebKey).Execute()
 
 Update a JSON Web Key
-
-
 
 ### Example
 
@@ -2005,23 +1906,21 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
-**kid** | **string** | The JSON Web Key ID (kid) | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
+| **kid** | **string**          | The JSON Web Key ID (kid)                                                   |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminUpdateJsonWebKeyRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminUpdateJsonWebKeyRequest struct via the builder pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
- **jsonWebKey** | [**JsonWebKey**](JsonWebKey.md) |  | 
+**jsonWebKey** | [**JsonWebKey**](JsonWebKey.md) | |
 
 ### Return type
 
@@ -2036,18 +1935,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminUpdateJsonWebKeySet
 
-> JsonWebKeySet AdminUpdateJsonWebKeySet(ctx, set).JsonWebKeySet(jsonWebKeySet).Execute()
+> JsonWebKeySet AdminUpdateJsonWebKeySet(ctx,
+> set).JsonWebKeySet(jsonWebKeySet).Execute()
 
 Update a JSON Web Key Set
-
-
 
 ### Example
 
@@ -2079,21 +1977,20 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**set** | **string** | The JSON Web Key Set | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **set** | **string**          | The JSON Web Key Set                                                        |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminUpdateJsonWebKeySetRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminUpdateJsonWebKeySetRequest struct via the builder pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **jsonWebKeySet** | [**JsonWebKeySet**](JsonWebKeySet.md) |  | 
+**jsonWebKeySet** | [**JsonWebKeySet**](JsonWebKeySet.md) | |
 
 ### Return type
 
@@ -2108,18 +2005,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## AdminUpdateOAuth2Client
 
-> OAuth2Client AdminUpdateOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
+> OAuth2Client AdminUpdateOAuth2Client(ctx,
+> id).OAuth2Client(oAuth2Client).Execute()
 
 Update an OAuth 2.0 Client
-
-
 
 ### Example
 
@@ -2135,7 +2031,7 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -2151,21 +2047,20 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiAdminUpdateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiAdminUpdateOAuth2ClientRequest struct via the builder pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
 
 ### Return type
 
@@ -2180,18 +2075,16 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DiscoverJsonWebKeys
 
 > JsonWebKeySet DiscoverJsonWebKeys(ctx).Execute()
 
 Discover JSON Web Keys
-
-
 
 ### Example
 
@@ -2225,8 +2118,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiscoverJsonWebKeysRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiDiscoverJsonWebKeysRequest
+struct via the builder pattern
 
 ### Return type
 
@@ -2241,18 +2134,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DiscoverOidcConfiguration
 
 > OidcConfiguration DiscoverOidcConfiguration(ctx).Execute()
 
 OpenID Connect Discovery
-
-
 
 ### Example
 
@@ -2286,8 +2177,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiscoverOidcConfigurationRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a
+apiDiscoverOidcConfigurationRequest struct via the builder pattern
 
 ### Return type
 
@@ -2302,18 +2193,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## DynamicClientRegistrationCreateOAuth2Client
 
-> OAuth2Client DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
+> OAuth2Client
+> DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
 
-Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+Registration Management Protocol
 
 ### Example
 
@@ -2328,7 +2219,7 @@ import (
 )
 
 func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -2344,16 +2235,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+| Name             | Type                                | Description | Notes |
+| ---------------- | ----------------------------------- | ----------- | ----- |
+| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
 
 ### Return type
 
@@ -2368,18 +2258,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DynamicClientRegistrationDeleteOAuth2Client
 
 > DynamicClientRegistrationDeleteOAuth2Client(ctx, id).Execute()
 
-Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+Registration Management Protocol
 
 ### Example
 
@@ -2408,24 +2297,23 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -2436,18 +2324,17 @@ Name | Type | Description  | Notes
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DynamicClientRegistrationGetOAuth2Client
 
 > OAuth2Client DynamicClientRegistrationGetOAuth2Client(ctx, id).Execute()
 
-Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
+Management Protocol
 
 ### Example
 
@@ -2478,20 +2365,19 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -2506,18 +2392,18 @@ Name | Type | Description  | Notes
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## DynamicClientRegistrationUpdateOAuth2Client
 
-> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
+> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx,
+> id).OAuth2Client(oAuth2Client).Execute()
 
-Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
+Management Protocol
 
 ### Example
 
@@ -2533,7 +2419,7 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -2549,21 +2435,21 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder
+pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
 
 ### Return type
 
@@ -2578,18 +2464,16 @@ Name | Type | Description  | Notes
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## GetOidcUserInfo
 
 > OidcUserInfo GetOidcUserInfo(ctx).Execute()
 
 OpenID Connect Userinfo
-
-
 
 ### Example
 
@@ -2623,8 +2507,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiGetOidcUserInfoRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiGetOidcUserInfoRequest
+struct via the builder pattern
 
 ### Return type
 
@@ -2639,18 +2523,16 @@ Other parameters are passed through a pointer to a apiGetOidcUserInfoRequest str
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## PerformOAuth2AuthorizationFlow
 
 > OAuth2ApiError PerformOAuth2AuthorizationFlow(ctx).Execute()
 
 The OAuth 2.0 Authorize Endpoint
-
-
 
 ### Example
 
@@ -2684,8 +2566,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiPerformOAuth2AuthorizationFlowRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a
+apiPerformOAuth2AuthorizationFlowRequest struct via the builder pattern
 
 ### Return type
 
@@ -2700,18 +2582,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## PerformOAuth2TokenFlow
 
-> OAuth2TokenResponse PerformOAuth2TokenFlow(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+> OAuth2TokenResponse
+> PerformOAuth2TokenFlow(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 
 The OAuth 2.0 Token Endpoint
-
-
 
 ### Example
 
@@ -2726,7 +2607,7 @@ import (
 )
 
 func main() {
-    grantType := "grantType_example" // string | 
+    grantType := "grantType_example" // string |
     clientId := "clientId_example" // string |  (optional)
     code := "code_example" // string |  (optional)
     redirectUri := "redirectUri_example" // string |  (optional)
@@ -2746,20 +2627,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiPerformOAuth2TokenFlowRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiPerformOAuth2TokenFlowRequest struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **grantType** | **string** |  | 
- **clientId** | **string** |  | 
- **code** | **string** |  | 
- **redirectUri** | **string** |  | 
- **refreshToken** | **string** |  | 
+| Name             | Type       | Description | Notes |
+| ---------------- | ---------- | ----------- | ----- |
+| **grantType**    | **string** |             |
+| **clientId**     | **string** |             |
+| **code**         | **string** |             |
+| **redirectUri**  | **string** |             |
+| **refreshToken** | **string** |             |
 
 ### Return type
 
@@ -2774,18 +2653,16 @@ Name | Type | Description  | Notes
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## PerformOidcFrontOrBackChannelLogout
 
 > PerformOidcFrontOrBackChannelLogout(ctx).Execute()
 
 OpenID Connect Front- or Back-channel Enabled Logout
-
-
 
 ### Example
 
@@ -2817,12 +2694,12 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiPerformOidcFrontOrBackChannelLogoutRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a
+apiPerformOidcFrontOrBackChannelLogoutRequest struct via the builder pattern
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -2833,18 +2710,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: Not defined
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## RevokeOAuth2Token
 
 > RevokeOAuth2Token(ctx).Token(token).Execute()
 
 Revoke an OAuth2 Access or Refresh Token
-
-
 
 ### Example
 
@@ -2859,7 +2734,7 @@ import (
 )
 
 func main() {
-    token := "token_example" // string | 
+    token := "token_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -2873,20 +2748,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest
+struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **token** | **string** |  | 
+| Name      | Type       | Description | Notes |
+| --------- | ---------- | ----------- | ----- |
+| **token** | **string** |             |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -2897,7 +2770,7 @@ Name | Type | Description  | Notes
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-

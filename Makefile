@@ -17,7 +17,7 @@ define make-go-dependency
 endef
 
 .bin/golangci-lint: Makefile
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh  | sh -s -- -b .bin v1.46.2
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v1.46.2
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 

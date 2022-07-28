@@ -560,8 +560,8 @@ It is recommended to use the make file to run your tests using `make quicktest`
 
 **Please note**:
 
-All tests run against a sqlite in-memory database,
-thus it is required to use the `-tags sqlite,json1` build tag.
+All tests run against a sqlite in-memory database, thus it is required to use
+the `-tags sqlite,json1` build tag.
 
 Short tests run fairly quickly. You can either test all of the code at once:
 
@@ -696,10 +696,21 @@ docker compose -f quickstart.yml up # ....
 #### Add a new migration
 
 1. `mkdir persistence/sql/src/YYYYMMDD000001_migration_name/`
-2. Put the migration files into this directory, following the standard naming conventions. If you wish to execute different parts of a migration in separate transactions, add split marks (lines with the text `--split`) where desired. Why this might be necessary is explained in https://github.com/gobuffalo/fizz/issues/104.
-3. Run `make persistence/sql/migrations/<migration_id>` to generate migration fragments.
-4. If an update causes the migration to have fewer fragments than the number already generated, run `make persistence/sql/migrations/<migration_id>-clean`. This is equivalent to a `rm` command with the right parameters, but comes with better tab completion.
-5. Before committing generated migration fragments, run the above clean command and generate a fresh copy of migration fragments to make sure the `sql/src` and `sql/migrations` directories are consistent.
+2. Put the migration files into this directory, following the standard naming
+   conventions. If you wish to execute different parts of a migration in
+   separate transactions, add split marks (lines with the text `--split`) where
+   desired. Why this might be necessary is explained in
+   https://github.com/gobuffalo/fizz/issues/104.
+3. Run `make persistence/sql/migrations/<migration_id>` to generate migration
+   fragments.
+4. If an update causes the migration to have fewer fragments than the number
+   already generated, run
+   `make persistence/sql/migrations/<migration_id>-clean`. This is equivalent to
+   a `rm` command with the right parameters, but comes with better tab
+   completion.
+5. Before committing generated migration fragments, run the above clean command
+   and generate a fresh copy of migration fragments to make sure the `sql/src`
+   and `sql/migrations` directories are consistent.
 
 ## Libraries and third-party projects
 

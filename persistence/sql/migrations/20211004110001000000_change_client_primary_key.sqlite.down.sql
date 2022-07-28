@@ -33,7 +33,19 @@ CREATE TABLE "_hydra_client_tmp"
     backchannel_logout_uri               TEXT         NOT NULL DEFAULT '',
     backchannel_logout_session_required  INTEGER      NOT NULL DEFAULT false,
     metadata                             TEXT         NOT NULL DEFAULT '{}',
-    token_endpoint_auth_signing_alg      VARCHAR(10)  NOT NULL DEFAULT ''
+    token_endpoint_auth_signing_alg      VARCHAR(10)  NOT NULL DEFAULT '',
+    authorization_code_grant_access_token_lifespan  BIGINT NULL DEFAULT NULL,
+    authorization_code_grant_id_token_lifespan      BIGINT NULL DEFAULT NULL,
+    authorization_code_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL,
+    client_credentials_grant_access_token_lifespan  BIGINT NULL DEFAULT NULL,
+    implicit_grant_access_token_lifespan            BIGINT NULL DEFAULT NULL,
+    implicit_grant_id_token_lifespan                BIGINT NULL DEFAULT NULL,
+    jwt_bearer_grant_access_token_lifespan          BIGINT NULL DEFAULT NULL,
+    password_grant_access_token_lifespan            BIGINT NULL DEFAULT NULL,
+    password_grant_refresh_token_lifespan           BIGINT NULL DEFAULT NULL,
+    refresh_token_grant_id_token_lifespan           BIGINT NULL DEFAULT NULL,
+    refresh_token_grant_access_token_lifespan       BIGINT NULL DEFAULT NULL,
+    refresh_token_grant_refresh_token_lifespan      BIGINT NULL DEFAULT NULL
 );
 
 INSERT INTO "_hydra_client_tmp" (
@@ -70,7 +82,19 @@ INSERT INTO "_hydra_client_tmp" (
     backchannel_logout_uri,
     backchannel_logout_session_required,
     metadata,
-    token_endpoint_auth_signing_alg
+    token_endpoint_auth_signing_alg,
+    authorization_code_grant_access_token_lifespan,
+    authorization_code_grant_id_token_lifespan,
+    authorization_code_grant_refresh_token_lifespan,
+    client_credentials_grant_access_token_lifespan,
+    implicit_grant_access_token_lifespan,
+    implicit_grant_id_token_lifespan,
+    jwt_bearer_grant_access_token_lifespan,
+    password_grant_access_token_lifespan,
+    password_grant_refresh_token_lifespan,
+    refresh_token_grant_id_token_lifespan,
+    refresh_token_grant_access_token_lifespan,
+    refresh_token_grant_refresh_token_lifespan
 ) SELECT
     id,
     client_name,
@@ -105,7 +129,19 @@ INSERT INTO "_hydra_client_tmp" (
     backchannel_logout_uri,
     backchannel_logout_session_required,
     metadata,
-    token_endpoint_auth_signing_alg
+    token_endpoint_auth_signing_alg,
+    authorization_code_grant_access_token_lifespan,
+    authorization_code_grant_id_token_lifespan,
+    authorization_code_grant_refresh_token_lifespan,
+    client_credentials_grant_access_token_lifespan,
+    implicit_grant_access_token_lifespan,
+    implicit_grant_id_token_lifespan,
+    jwt_bearer_grant_access_token_lifespan,
+    password_grant_access_token_lifespan,
+    password_grant_refresh_token_lifespan,
+    refresh_token_grant_id_token_lifespan,
+    refresh_token_grant_access_token_lifespan,
+    refresh_token_grant_refresh_token_lifespan
 FROM "hydra_client";
 
 DROP INDEX hydra_client_id_idx;

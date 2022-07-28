@@ -2,14 +2,14 @@
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**AccessToken** | Pointer to **string** | The access token issued by the authorization server. | [optional] 
-**ExpiresIn** | Pointer to **int64** | The lifetime in seconds of the access token.  For example, the value \&quot;3600\&quot; denotes that the access token will expire in one hour from the time the response was generated. | [optional] 
-**IdToken** | Pointer to **int64** | To retrieve a refresh token request the id_token scope. | [optional] 
-**RefreshToken** | Pointer to **string** | The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \&quot;offline\&quot; to your access token request. | [optional] 
-**Scope** | Pointer to **int64** | The scope of the access token | [optional] 
-**TokenType** | Pointer to **string** | The type of the token issued | [optional] 
+| Name             | Type                  | Description                                                                                                                                                                            | Notes      |
+| ---------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **AccessToken**  | Pointer to **string** | The access token issued by the authorization server.                                                                                                                                   | [optional] |
+| **ExpiresIn**    | Pointer to **int64**  | The lifetime in seconds of the access token. For example, the value \&quot;3600\&quot; denotes that the access token will expire in one hour from the time the response was generated. | [optional] |
+| **IdToken**      | Pointer to **int64**  | To retrieve a refresh token request the id_token scope.                                                                                                                                | [optional] |
+| **RefreshToken** | Pointer to **string** | The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \&quot;offline\&quot; to your access token request.                                     | [optional] |
+| **Scope**        | Pointer to **int64**  | The scope of the access token                                                                                                                                                          | [optional] |
+| **TokenType**    | Pointer to **string** | The type of the token issued                                                                                                                                                           | [optional] |
 
 ## Methods
 
@@ -17,18 +17,18 @@ Name | Type | Description | Notes
 
 `func NewOAuth2TokenResponse() *OAuth2TokenResponse`
 
-NewOAuth2TokenResponse instantiates a new OAuth2TokenResponse object
-This constructor will assign default values to properties that have it defined,
-and makes sure properties required by API are set, but the set of arguments
-will change when the set of required properties is changed
+NewOAuth2TokenResponse instantiates a new OAuth2TokenResponse object This
+constructor will assign default values to properties that have it defined, and
+makes sure properties required by API are set, but the set of arguments will
+change when the set of required properties is changed
 
 ### NewOAuth2TokenResponseWithDefaults
 
 `func NewOAuth2TokenResponseWithDefaults() *OAuth2TokenResponse`
 
 NewOAuth2TokenResponseWithDefaults instantiates a new OAuth2TokenResponse object
-This constructor will only assign default values to properties that have it defined,
-but it doesn't guarantee that properties required by API are set
+This constructor will only assign default values to properties that have it
+defined, but it doesn't guarantee that properties required by API are set
 
 ### GetAccessToken
 
@@ -40,8 +40,8 @@ GetAccessToken returns the AccessToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetAccessTokenOk() (*string, bool)`
 
-GetAccessTokenOk returns a tuple with the AccessToken field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetAccessTokenOk returns a tuple with the AccessToken field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
 
 ### SetAccessToken
 
@@ -65,8 +65,8 @@ GetExpiresIn returns the ExpiresIn field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetExpiresInOk() (*int64, bool)`
 
-GetExpiresInOk returns a tuple with the ExpiresIn field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetExpiresInOk returns a tuple with the ExpiresIn field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetExpiresIn
 
@@ -90,8 +90,8 @@ GetIdToken returns the IdToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetIdTokenOk() (*int64, bool)`
 
-GetIdTokenOk returns a tuple with the IdToken field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetIdTokenOk returns a tuple with the IdToken field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetIdToken
 
@@ -115,8 +115,8 @@ GetRefreshToken returns the RefreshToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetRefreshTokenOk() (*string, bool)`
 
-GetRefreshTokenOk returns a tuple with the RefreshToken field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetRefreshTokenOk returns a tuple with the RefreshToken field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
 
 ### SetRefreshToken
 
@@ -140,8 +140,8 @@ GetScope returns the Scope field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetScopeOk() (*int64, bool)`
 
-GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetScope
 
@@ -165,8 +165,8 @@ GetTokenType returns the TokenType field if non-nil, zero value otherwise.
 
 `func (o *OAuth2TokenResponse) GetTokenTypeOk() (*string, bool)`
 
-GetTokenTypeOk returns a tuple with the TokenType field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetTokenTypeOk returns a tuple with the TokenType field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetTokenType
 
@@ -180,7 +180,6 @@ SetTokenType sets TokenType field to given value.
 
 HasTokenType returns a boolean if a field has been set.
 
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
-
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to README]](../README.md)

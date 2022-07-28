@@ -621,7 +621,7 @@ type AdminApi interface {
 
 	/*
 			 * UpdateOAuth2ClientLifespans Method for UpdateOAuth2ClientLifespans
-			 * Update an existing OAuth 2.0 client's token lifespan configuration. This
+			 * UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
 		client configuration takes precedence over the instance-wide token lifespan
 		configuration.
 			 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -632,8 +632,9 @@ type AdminApi interface {
 
 	/*
 	 * UpdateOAuth2ClientLifespansExecute executes the request
+	 * @return OAuth2Client
 	 */
-	UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdateOAuth2ClientLifespansRequest) (*http.Response, error)
+	UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdateOAuth2ClientLifespansRequest) (*OAuth2Client, *http.Response, error)
 }
 
 // AdminApiService AdminApi service
@@ -4996,18 +4997,24 @@ func (a *AdminApiService) UpdateOAuth2ClientExecute(r AdminApiApiUpdateOAuth2Cli
 }
 
 type AdminApiApiUpdateOAuth2ClientLifespansRequest struct {
-	ctx        context.Context
-	ApiService AdminApi
-	id         string
+	ctx                         context.Context
+	ApiService                  AdminApi
+	id                          string
+	updateOAuth2ClientLifespans *UpdateOAuth2ClientLifespans
 }
 
-func (r AdminApiApiUpdateOAuth2ClientLifespansRequest) Execute() (*http.Response, error) {
+func (r AdminApiApiUpdateOAuth2ClientLifespansRequest) UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans UpdateOAuth2ClientLifespans) AdminApiApiUpdateOAuth2ClientLifespansRequest {
+	r.updateOAuth2ClientLifespans = &updateOAuth2ClientLifespans
+	return r
+}
+
+func (r AdminApiApiUpdateOAuth2ClientLifespansRequest) Execute() (*OAuth2Client, *http.Response, error) {
 	return r.ApiService.UpdateOAuth2ClientLifespansExecute(r)
 }
 
 /*
  * UpdateOAuth2ClientLifespans Method for UpdateOAuth2ClientLifespans
- * Update an existing OAuth 2.0 client's token lifespan configuration. This
+ * UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
 client configuration takes precedence over the instance-wide token lifespan
 configuration.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -5024,19 +5031,21 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespans(ctx context.Context, id st
 
 /*
  * Execute executes the request
+ * @return OAuth2Client
  */
-func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdateOAuth2ClientLifespansRequest) (*http.Response, error) {
+func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdateOAuth2ClientLifespansRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
+		localVarReturnValue  *OAuth2Client
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.UpdateOAuth2ClientLifespans")
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/clients/{id}/lifespans"
@@ -5047,7 +5056,7 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdate
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
+	localVarHTTPContentTypes := []string{"application/json"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -5063,21 +5072,23 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdate
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	// body params
+	localVarPostBody = r.updateOAuth2ClientLifespans
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -5089,11 +5100,20 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdate
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }

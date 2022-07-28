@@ -82,6 +82,19 @@ func expectedClient(i int) *client.Client {
 		fallthrough
 	case 13:
 		c.Metadata = sqlxx.JSONRawMessage("{}")
+	case 15:
+		c.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Duration: 151000000000, Valid: true}
+		c.AuthorizationCodeGrantIDTokenLifespan = x.NullDuration{Duration: 152000000000, Valid: true}
+		c.AuthorizationCodeGrantRefreshTokenLifespan = x.NullDuration{Duration: 153000000000, Valid: true}
+		c.ClientCredentialsGrantAccessTokenLifespan = x.NullDuration{Duration: 154000000000, Valid: true}
+		c.ImplicitGrantAccessTokenLifespan = x.NullDuration{Duration: 155000000000, Valid: true}
+		c.ImplicitGrantIDTokenLifespan = x.NullDuration{Duration: 156000000000, Valid: true}
+		c.JwtBearerGrantAccessTokenLifespan = x.NullDuration{Duration: 157000000000, Valid: true}
+		c.PasswordGrantAccessTokenLifespan = x.NullDuration{Duration: 158000000000, Valid: true}
+		c.PasswordGrantRefreshTokenLifespan = x.NullDuration{Duration: 159000000000, Valid: true}
+		c.RefreshTokenGrantIDTokenLifespan = x.NullDuration{Duration: 160000000000, Valid: true}
+		c.RefreshTokenGrantAccessTokenLifespan = x.NullDuration{Duration: 161000000000, Valid: true}
+		c.RefreshTokenGrantRefreshTokenLifespan = x.NullDuration{Duration: 162000000000, Valid: true}
 	}
 	return c
 }

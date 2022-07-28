@@ -14,6 +14,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/internal/httpclient/models"
 )
 
 // NewUpdateOAuth2ClientLifespansParams creates a new UpdateOAuth2ClientLifespansParams object,
@@ -58,6 +60,9 @@ func NewUpdateOAuth2ClientLifespansParamsWithHTTPClient(client *http.Client) *Up
    Typically these are written to a http.Request.
 */
 type UpdateOAuth2ClientLifespansParams struct {
+
+	// Body.
+	Body *models.UpdateOAuth2ClientLifespans
 
 	/* ID.
 
@@ -118,6 +123,17 @@ func (o *UpdateOAuth2ClientLifespansParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithBody adds the body to the update o auth2 client lifespans params
+func (o *UpdateOAuth2ClientLifespansParams) WithBody(body *models.UpdateOAuth2ClientLifespans) *UpdateOAuth2ClientLifespansParams {
+	o.SetBody(body)
+	return o
+}
+
+// SetBody adds the body to the update o auth2 client lifespans params
+func (o *UpdateOAuth2ClientLifespansParams) SetBody(body *models.UpdateOAuth2ClientLifespans) {
+	o.Body = body
+}
+
 // WithID adds the id to the update o auth2 client lifespans params
 func (o *UpdateOAuth2ClientLifespansParams) WithID(id string) *UpdateOAuth2ClientLifespansParams {
 	o.SetID(id)
@@ -136,6 +152,11 @@ func (o *UpdateOAuth2ClientLifespansParams) WriteToRequest(r runtime.ClientReque
 		return err
 	}
 	var res []error
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
+		}
+	}
 
 	// path param id
 	if err := r.SetPathParam("id", o.ID); err != nil {

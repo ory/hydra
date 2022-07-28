@@ -2238,7 +2238,7 @@ No authorization required
 
 ## UpdateOAuth2ClientLifespans
 
-> UpdateOAuth2ClientLifespans(ctx, id).Execute()
+> OAuth2Client UpdateOAuth2ClientLifespans(ctx, id).UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans).Execute()
 
 
 
@@ -2258,14 +2258,17 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
+    updateOAuth2ClientLifespans := *openapiclient.NewUpdateOAuth2ClientLifespans() // UpdateOAuth2ClientLifespans |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.UpdateOAuth2ClientLifespans(context.Background(), id).Execute()
+    resp, r, err := apiClient.AdminApi.UpdateOAuth2ClientLifespans(context.Background(), id).UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.UpdateOAuth2ClientLifespans``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
+    // response from `UpdateOAuth2ClientLifespans`: OAuth2Client
+    fmt.Fprintf(os.Stdout, "Response from `AdminApi.UpdateOAuth2ClientLifespans`: %v\n", resp)
 }
 ```
 
@@ -2285,10 +2288,11 @@ Other parameters are passed through a pointer to a apiUpdateOAuth2ClientLifespan
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
+ **updateOAuth2ClientLifespans** | [**UpdateOAuth2ClientLifespans**](UpdateOAuth2ClientLifespans.md) |  | 
 
 ### Return type
 
- (empty response body)
+[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 
@@ -2296,7 +2300,7 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

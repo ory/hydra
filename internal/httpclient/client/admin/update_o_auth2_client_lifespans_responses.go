@@ -48,17 +48,27 @@ func NewUpdateOAuth2ClientLifespansOK() *UpdateOAuth2ClientLifespansOK {
 
 /* UpdateOAuth2ClientLifespansOK describes a response with status code 200, with default header values.
 
- Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-typically 201.
+oAuth2Client
 */
 type UpdateOAuth2ClientLifespansOK struct {
+	Payload *models.OAuth2Client
 }
 
 func (o *UpdateOAuth2ClientLifespansOK) Error() string {
-	return fmt.Sprintf("[PUT /clients/{id}/lifespans][%d] updateOAuth2ClientLifespansOK ", 200)
+	return fmt.Sprintf("[PUT /clients/{id}/lifespans][%d] updateOAuth2ClientLifespansOK  %+v", 200, o.Payload)
+}
+func (o *UpdateOAuth2ClientLifespansOK) GetPayload() *models.OAuth2Client {
+	return o.Payload
 }
 
 func (o *UpdateOAuth2ClientLifespansOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.OAuth2Client)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
@@ -86,7 +96,7 @@ func (o *UpdateOAuth2ClientLifespansDefault) Code() int {
 }
 
 func (o *UpdateOAuth2ClientLifespansDefault) Error() string {
-	return fmt.Sprintf("[PUT /clients/{id}/lifespans][%d] updateOAuth2ClientLifespans default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[PUT /clients/{id}/lifespans][%d] UpdateOAuth2ClientLifespans default  %+v", o._statusCode, o.Payload)
 }
 func (o *UpdateOAuth2ClientLifespansDefault) GetPayload() *models.JSONError {
 	return o.Payload

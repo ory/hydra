@@ -13,7 +13,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
 	djwt "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
@@ -105,20 +104,20 @@ func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *h
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
 }
 
-func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID string, lifespans fosite.ClientLifespanConfig, adminTS *httptest.Server) {
+func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID string, lifespans client.UpdateOAuth2ClientLifespans, adminTS *httptest.Server) {
 	b, err := json.Marshal(lifespans)
 	require.NoError(t, err)
 	req := httpx.MustNewRequest(
 		"PUT",
 		adminTS.URL+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
 		bytes.NewBuffer(b),
-		"application/x-www-form-urlencoded",
+		"application/json",
 	)
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
 	res, err := adminTS.Client().Do(req)
 	require.NoError(t, err)
 	defer res.Body.Close()
-	require.Equal(t, res.StatusCode, http.StatusNoContent)
+	require.Equal(t, res.StatusCode, http.StatusOK)
 }
 
 func Userinfo(t *testing.T, token *oauth2.Token, publicTS *httptest.Server) gjson.Result {

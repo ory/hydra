@@ -371,7 +371,7 @@
     },
     "/clients/{id}/lifespans": {
       "put": {
-        "description": "Update an existing OAuth 2.0 client's token lifespan configuration. This\nclient configuration takes precedence over the instance-wide token lifespan\nconfiguration.",
+        "description": "UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This\nclient configuration takes precedence over the instance-wide token lifespan\nconfiguration.",
         "consumes": [
           "application/json"
         ],
@@ -382,7 +382,7 @@
         "tags": [
           "admin"
         ],
-        "operationId": "updateOAuth2ClientLifespans",
+        "operationId": "UpdateOAuth2ClientLifespans",
         "parameters": [
           {
             "type": "string",
@@ -390,11 +390,21 @@
             "name": "id",
             "in": "path",
             "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateOAuth2ClientLifespans"
+            }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
           },
           "default": {
             "description": "jsonError",
@@ -2439,6 +2449,49 @@
         "type": "string"
       }
     },
+    "UpdateOAuth2ClientLifespans": {
+      "description": "The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.",
+      "type": "object",
+      "title": "UpdateOAuth2ClientLifespans holds default lifespan configuration for the different\ntoken types that may be issued for the client. This configuration takes\nprecedence over fosite's instance-wide default lifespan, but it may be\noverridden by a session's expires_at claim.",
+      "properties": {
+        "authorization_code_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "authorization_code_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "authorization_code_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "client_credentials_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "implicit_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "implicit_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "jwt_bearer_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "password_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "password_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "refresh_token_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "refresh_token_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "refresh_token_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        }
+      }
+    },
     "acceptConsentRequest": {
       "type": "object",
       "title": "The request payload used to accept a consent request.",
@@ -2829,6 +2882,15 @@
         "audience": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
+        "authorization_code_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "authorization_code_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "authorization_code_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
         "backchannel_logout_session_required": {
           "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
           "type": "boolean"
@@ -2836,6 +2898,9 @@
         "backchannel_logout_uri": {
           "description": "RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.",
           "type": "string"
+        },
+        "client_credentials_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
         },
         "client_id": {
           "description": "ID  is the id for this client.",
@@ -2877,12 +2942,21 @@
         "grant_types": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
+        "implicit_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "implicit_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
         "jwks": {
           "$ref": "#/definitions/JoseJSONWebKeySet"
         },
         "jwks_uri": {
           "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
           "type": "string"
+        },
+        "jwt_bearer_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
         },
         "logo_uri": {
           "description": "LogoURI is an URL string that references a logo for the client.",
@@ -2895,6 +2969,12 @@
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
           "type": "string"
         },
+        "password_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "password_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
         "policy_uri": {
           "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
           "type": "string"
@@ -2904,6 +2984,15 @@
         },
         "redirect_uris": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
+        "refresh_token_grant_access_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "refresh_token_grant_id_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
+        },
+        "refresh_token_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/nullDuration"
         },
         "registration_access_token": {
           "description": "RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.",

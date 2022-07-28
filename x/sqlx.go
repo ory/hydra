@@ -36,6 +36,37 @@ func (n *JoseJSONWebKeySet) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
+type Duration time.Duration
+
+// MarshalJSON returns m as the JSON encoding of m.
+func (ns Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(time.Duration(ns).String())
+}
+
+// UnmarshalJSON sets *m to a copy of data.
+func (ns *Duration) UnmarshalJSON(data []byte) error {
+	if ns == nil {
+		return errors.New("json.RawMessage: UnmarshalJSON on nil pointer")
+	}
+
+	if len(data) == 0 || string(data) == "null" {
+		return nil
+	}
+
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	p, err := time.ParseDuration(s)
+	if err != nil {
+		return err
+	}
+
+	*ns = Duration(p)
+	return nil
+}
+
 // NullDuration represents a nullable JSON and SQL compatible time.Duration.
 //
 // TODO delete this type and replace it with ory/x/sqlxx/NullDuration when applying the custom client token TTL patch to Hydra 2.x

@@ -313,10 +313,10 @@ paths:
   /clients/{id}/lifespans:
     put:
       description: |-
-        Update an existing OAuth 2.0 client's token lifespan configuration. This
+        UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
         client configuration takes precedence over the instance-wide token lifespan
         configuration.
-      operationId: updateOAuth2ClientLifespans
+      operationId: UpdateOAuth2ClientLifespans
       parameters:
       - description: The id of the OAuth 2.0 Client.
         explode: false
@@ -326,11 +326,19 @@ paths:
         schema:
           type: string
         style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOAuth2ClientLifespans'
+        x-originalParamName: Body
       responses:
         "200":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oAuth2Client'
+          description: oAuth2Client
         default:
           content:
             application/json:
@@ -2279,6 +2287,7 @@ components:
             metadata: '{}'
             token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
             client_uri: client_uri
+            jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
             jwks: '{}'
             logo_uri: logo_uri
             created_at: 2000-01-23T04:56:07.000+00:00
@@ -2286,10 +2295,14 @@ components:
             allowed_cors_origins:
             - allowed_cors_origins
             - allowed_cors_origins
+            refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
             registration_access_token: registration_access_token
             client_id: client_id
             token_endpoint_auth_method: token_endpoint_auth_method
             userinfo_signed_response_alg: userinfo_signed_response_alg
+            authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+            authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+            client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
             updated_at: 2000-01-23T04:56:07.000+00:00
             scope: scope
             request_uris:
@@ -2304,6 +2317,7 @@ components:
             audience:
             - audience
             - audience
+            authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
             post_logout_redirect_uris:
             - post_logout_redirect_uris
             - post_logout_redirect_uris
@@ -2311,14 +2325,20 @@ components:
             - grant_types
             - grant_types
             subject_type: subject_type
+            refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
             redirect_uris:
             - redirect_uris
             - redirect_uris
             sector_identifier_uri: sector_identifier_uri
             frontchannel_logout_session_required: true
             frontchannel_logout_uri: frontchannel_logout_uri
+            refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+            implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+            password_grant_access_token_lifespan: password_grant_access_token_lifespan
             client_secret_expires_at: 0
+            implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
             jwks_uri: jwks_uri
+            password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
             request_object_signing_alg: request_object_signing_alg
             tos_uri: tos_uri
             contacts:
@@ -2383,6 +2403,101 @@ components:
     UUID:
       format: uuid4
       type: string
+    UpdateOAuth2ClientLifespans:
+      description: The OIDC Hybrid grant type inherits token lifespan configuration
+        from the implicit grant.
+      example:
+        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+        authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+        refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+        client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
+        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+        password_grant_access_token_lifespan: password_grant_access_token_lifespan
+        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+        refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
+        password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
+        refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
+      properties:
+        authorization_code_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        client_credentials_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        jwt_bearer_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+      title: |-
+        UpdateOAuth2ClientLifespans holds default lifespan configuration for the different
+        token types that may be issued for the client. This configuration takes
+        precedence over fosite's instance-wide default lifespan, but it may be
+        overridden by a session's expires_at claim.
+      type: object
     acceptConsentRequest:
       properties:
         grant_access_token_audience:
@@ -2515,6 +2630,7 @@ components:
           metadata: '{}'
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
           jwks: '{}'
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
@@ -2522,10 +2638,14 @@ components:
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
@@ -2540,6 +2660,7 @@ components:
           audience:
           - audience
           - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
@@ -2547,14 +2668,20 @@ components:
           - grant_types
           - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
           - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
@@ -2808,6 +2935,7 @@ components:
           metadata: '{}'
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
           jwks: '{}'
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
@@ -2815,10 +2943,14 @@ components:
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
@@ -2833,6 +2965,7 @@ components:
           audience:
           - audience
           - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
@@ -2840,14 +2973,20 @@ components:
           - grant_types
           - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
           - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
@@ -2928,6 +3067,7 @@ components:
           metadata: '{}'
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
           jwks: '{}'
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
@@ -2935,10 +3075,14 @@ components:
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
+          refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
           token_endpoint_auth_method: token_endpoint_auth_method
           userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+          client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
           scope: scope
           request_uris:
@@ -2953,6 +3097,7 @@ components:
           audience:
           - audience
           - audience
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
@@ -2960,14 +3105,20 @@ components:
           - grant_types
           - grant_types
           subject_type: subject_type
+          refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
           - redirect_uris
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          password_grant_access_token_lifespan: password_grant_access_token_lifespan
           client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           jwks_uri: jwks_uri
+          password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
           contacts:
@@ -3004,20 +3155,10 @@ components:
       title: Contains information about an ongoing logout request.
       type: object
     nullDuration:
-      description: TODO delete this type and replace it with ory/x/sqlxx/NullDuration
-        when applying the custom client token TTL patch to Hydra 2.x
-      properties:
-        Duration:
-          description: |-
-            A Duration represents the elapsed time between two instants
-            as an int64 nanosecond count. The representation limits the
-            largest representable duration to approximately 290 years.
-          format: int64
-          type: integer
-        Valid:
-          type: boolean
-      title: NullDuration represents a nullable JSON and SQL compatible time.Duration.
-      type: object
+      description: Specify a time duration in milliseconds, seconds, minutes, hours.
+      pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+      title: Time duration
+      type: string
     nullTime:
       format: date-time
       title: NullTime implements sql.NullTime functionality.
@@ -3027,6 +3168,7 @@ components:
         metadata: '{}'
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
         client_uri: client_uri
+        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
         jwks: '{}'
         logo_uri: logo_uri
         created_at: 2000-01-23T04:56:07.000+00:00
@@ -3034,10 +3176,14 @@ components:
         allowed_cors_origins:
         - allowed_cors_origins
         - allowed_cors_origins
+        refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
         registration_access_token: registration_access_token
         client_id: client_id
         token_endpoint_auth_method: token_endpoint_auth_method
         userinfo_signed_response_alg: userinfo_signed_response_alg
+        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+        authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
+        client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
         updated_at: 2000-01-23T04:56:07.000+00:00
         scope: scope
         request_uris:
@@ -3052,6 +3198,7 @@ components:
         audience:
         - audience
         - audience
+        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
         post_logout_redirect_uris:
         - post_logout_redirect_uris
         - post_logout_redirect_uris
@@ -3059,14 +3206,20 @@ components:
         - grant_types
         - grant_types
         subject_type: subject_type
+        refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
         redirect_uris:
         - redirect_uris
         - redirect_uris
         sector_identifier_uri: sector_identifier_uri
         frontchannel_logout_session_required: true
         frontchannel_logout_uri: frontchannel_logout_uri
+        refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
+        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+        password_grant_access_token_lifespan: password_grant_access_token_lifespan
         client_secret_expires_at: 0
+        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
         jwks_uri: jwks_uri
+        password_grant_refresh_token_lifespan: password_grant_refresh_token_lifespan
         request_object_signing_alg: request_object_signing_alg
         tos_uri: tos_uri
         contacts:
@@ -3088,6 +3241,24 @@ components:
           title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        authorization_code_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        authorization_code_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         backchannel_logout_session_required:
           description: |-
             Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
@@ -3097,6 +3268,12 @@ components:
         backchannel_logout_uri:
           description: RP URL that will cause the RP to log itself out when sent a
             Logout Token by the OP.
+          type: string
+        client_credentials_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
           type: string
         client_id:
           description: ID  is the id for this client.
@@ -3158,6 +3335,18 @@ components:
           title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        implicit_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        implicit_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         jwks:
           type: object
         jwks_uri:
@@ -3171,6 +3360,12 @@ components:
             to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST
             match those in the certificate.
           type: string
+        jwt_bearer_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         logo_uri:
           description: LogoURI is an URL string that references a logo for the client.
           type: string
@@ -3180,6 +3375,18 @@ components:
           type: object
         owner:
           description: Owner is a string identifying the owner of the OAuth 2.0 Client.
+          type: string
+        password_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        password_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
           type: string
         policy_uri:
           description: |-
@@ -3199,6 +3406,24 @@ components:
           title: StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+        refresh_token_grant_access_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_id_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
+        refresh_token_grant_refresh_token_lifespan:
+          description: Specify a time duration in milliseconds, seconds, minutes,
+            hours.
+          pattern: ^([0-9]+(ns|us|ms|s|m|h))*$
+          title: Time duration
+          type: string
         registration_access_token:
           description: RegistrationAccessToken can be used to update, get, or delete
             the OAuth2 Client.

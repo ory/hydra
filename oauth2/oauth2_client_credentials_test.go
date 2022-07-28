@@ -225,8 +225,8 @@ func TestClientCredentials(t *testing.T) {
 					Scope:         "foobar",
 					Audience:      []string{"https://api.ory.sh/"},
 				})
-				testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: cl.OutfacingID, ClientSecret: conf.ClientSecret}, cl.OutfacingID, testLifespans, admin)
-				getAndInspectToken(t, cl, conf, strategy, time.Now().Add(*testLifespans.ClientCredentialsGrantAccessTokenLifespan))
+				testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: cl.OutfacingID, ClientSecret: conf.ClientSecret}, cl.OutfacingID, testhelpers.TestLifespans, admin)
+				getAndInspectToken(t, cl, conf, strategy, time.Now().Add(testhelpers.TestLifespans.ClientCredentialsGrantAccessTokenLifespan.Duration))
 			}
 		}
 

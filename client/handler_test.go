@@ -523,7 +523,7 @@ func TestHandler(t *testing.T) {
 
 		t.Run("case=update the lifespans of an OAuth2 client", func(t *testing.T) {
 			expected := &client.Client{
-				OutfacingID:             "update-existing-client-lifespans",
+				Name:                    "update-existing-client-lifespans",
 				Secret:                  "averylongsecret",
 				RedirectURIs:            []string{"http://localhost:3000/cb"},
 				TokenEndpointAuthMethod: "client_secret_basic",
@@ -533,7 +533,7 @@ func TestHandler(t *testing.T) {
 
 			body, res = makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+gjson.Get(body, "client_id").String()+"/lifespans", testhelpers.TestLifespans)
 			require.Equal(t, http.StatusOK, res.StatusCode, body)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

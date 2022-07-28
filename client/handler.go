@@ -675,6 +675,103 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:parameters UpdateOAuth2ClientLifespans
+type swaggerUpdateOAuth2ClientLifespans struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	Body UpdateOAuth2ClientLifespans
+}
+
+// UpdateOAuth2ClientLifespans holds default lifespan configuration for the different
+// token types that may be issued for the client. This configuration takes
+// precedence over fosite's instance-wide default lifespan, but it may be
+// overridden by a session's expires_at claim.
+//
+// The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.
+//
+// swagger:model UpdateOAuth2ClientLifespans
+type UpdateOAuth2ClientLifespans struct {
+	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan"`
+	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan"`
+	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan"`
+	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan"`
+	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan"`
+	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan"`
+	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan"`
+	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan"`
+	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan"`
+	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan"`
+	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan"`
+	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan"`
+}
+
+// swagger:route PUT /admin/clients/{id}/lifespans admin UpdateOAuth2ClientLifespans
+//
+// UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
+// client configuration takes precedence over the instance-wide token lifespan
+// configuration.
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: oAuth2Client
+//       default: genericError
+func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var id = ps.ByName("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	var ls UpdateOAuth2ClientLifespans
+	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		return
+	}
+
+	c.AuthorizationCodeGrantAccessTokenLifespan = ls.AuthorizationCodeGrantAccessTokenLifespan
+	c.AuthorizationCodeGrantIDTokenLifespan = ls.AuthorizationCodeGrantIDTokenLifespan
+	c.AuthorizationCodeGrantRefreshTokenLifespan = ls.AuthorizationCodeGrantRefreshTokenLifespan
+	c.ClientCredentialsGrantAccessTokenLifespan = ls.ClientCredentialsGrantAccessTokenLifespan
+	c.ImplicitGrantAccessTokenLifespan = ls.ImplicitGrantAccessTokenLifespan
+	c.ImplicitGrantIDTokenLifespan = ls.ImplicitGrantIDTokenLifespan
+	c.JwtBearerGrantAccessTokenLifespan = ls.JwtBearerGrantAccessTokenLifespan
+	c.PasswordGrantAccessTokenLifespan = ls.PasswordGrantAccessTokenLifespan
+	c.PasswordGrantRefreshTokenLifespan = ls.PasswordGrantRefreshTokenLifespan
+	c.RefreshTokenGrantAccessTokenLifespan = ls.RefreshTokenGrantAccessTokenLifespan
+	c.RefreshTokenGrantIDTokenLifespan = ls.RefreshTokenGrantIDTokenLifespan
+	c.RefreshTokenGrantRefreshTokenLifespan = ls.RefreshTokenGrantRefreshTokenLifespan
+	c.Secret = ""
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	h.r.Writer().Write(w, r, c)
+}
+
 // swagger:parameters dynamicClientRegistrationDeleteOAuth2Client
 type dynamicClientRegistrationDeleteOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.

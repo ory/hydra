@@ -367,6 +367,52 @@
         }
       }
     },
+    "/admin/clients/{id}/lifespans": {
+      "put": {
+        "description": "UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This\nclient configuration takes precedence over the instance-wide token lifespan\nconfiguration.",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "UpdateOAuth2ClientLifespans",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateOAuth2ClientLifespans"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/admin/keys/{set}": {
       "get": {
         "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2001,11 +2047,59 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
+    "NullDuration": {
+      "description": "TODO delete this type and replace it with ory/x/sqlxx/NullDuration when applying the custom client token TTL patch to Hydra 2.x",
+      "type": "string",
+      "title": "NullDuration represents a nullable JSON and SQL compatible time.Duration."
+    },
     "StringSliceJSONFormat": {
       "type": "array",
       "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
       "items": {
         "type": "string"
+      }
+    },
+    "UpdateOAuth2ClientLifespans": {
+      "description": "The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.",
+      "type": "object",
+      "title": "UpdateOAuth2ClientLifespans holds default lifespan configuration for the different\ntoken types that may be issued for the client. This configuration takes\nprecedence over fosite's instance-wide default lifespan, but it may be\noverridden by a session's expires_at claim.",
+      "properties": {
+        "authorization_code_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "authorization_code_grant_id_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "authorization_code_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "client_credentials_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "implicit_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "implicit_grant_id_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "jwt_bearer_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "password_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "password_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "refresh_token_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "refresh_token_grant_id_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "refresh_token_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        }
       }
     },
     "acceptOAuth2ConsentRequest": {
@@ -3277,6 +3371,38 @@
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
+          "type": "string"
+        }
+      }
+    },
+    "tokenPagination": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "integer",
+          "format": "int64",
+          "default": 250,
+          "maximum": 1000,
+          "minimum": 1
+        },
+        "page_token": {
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "string",
+          "default": "1",
+          "minimum": 1
+        }
+      }
+    },
+    "tokenPaginationHeaders": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+          "type": "string"
+        },
+        "x-total-count": {
+          "description": "The total number of clients.\n\nin: header",
           "type": "string"
         }
       }

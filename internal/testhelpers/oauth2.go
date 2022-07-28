@@ -96,7 +96,7 @@ func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *h
 	require.NotEmpty(t, token)
 
 	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",
-		strings.NewReader((url.Values{"token": {token.AccessToken}}).Encode()),
+		strings.NewReader((url.Values{"token": {token}}).Encode()),
 		"application/x-www-form-urlencoded")
 
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
@@ -111,7 +111,7 @@ func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID stri
 	require.NoError(t, err)
 	req := httpx.MustNewRequest(
 		"PUT",
-		adminTS.URL+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
+		adminTS.URL+"/admin"+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
 		bytes.NewBuffer(b),
 		"application/json",
 	)

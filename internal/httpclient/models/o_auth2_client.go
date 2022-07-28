@@ -25,15 +25,6 @@ type OAuth2Client struct {
 	// audience
 	Audience StringSlicePipeDelimiter `json:"audience,omitempty"`
 
-	// authorization code grant access token lifespan
-	AuthorizationCodeGrantAccessTokenLifespan *NullDuration `json:"authorization_code_grant_access_token_lifespan,omitempty"`
-
-	// authorization code grant id token lifespan
-	AuthorizationCodeGrantIDTokenLifespan *NullDuration `json:"authorization_code_grant_id_token_lifespan,omitempty"`
-
-	// authorization code grant refresh token lifespan
-	AuthorizationCodeGrantRefreshTokenLifespan *NullDuration `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
-
 	// Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
 	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
 	// If omitted, the default value is false.
@@ -41,9 +32,6 @@ type OAuth2Client struct {
 
 	// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
 	BackchannelLogoutURI string `json:"backchannel_logout_uri,omitempty"`
-
-	// client credentials grant access token lifespan
-	ClientCredentialsGrantAccessTokenLifespan *NullDuration `json:"client_credentials_grant_access_token_lifespan,omitempty"`
 
 	// ID  is the id for this client.
 	ClientID string `json:"client_id,omitempty"`
@@ -92,12 +80,6 @@ type OAuth2Client struct {
 	// grant types
 	GrantTypes StringSlicePipeDelimiter `json:"grant_types,omitempty"`
 
-	// implicit grant access token lifespan
-	ImplicitGrantAccessTokenLifespan *NullDuration `json:"implicit_grant_access_token_lifespan,omitempty"`
-
-	// implicit grant id token lifespan
-	ImplicitGrantIDTokenLifespan *NullDuration `json:"implicit_grant_id_token_lifespan,omitempty"`
-
 	// jwks
 	Jwks JoseJSONWebKeySet `json:"jwks,omitempty"`
 
@@ -111,9 +93,6 @@ type OAuth2Client struct {
 	// match those in the certificate.
 	JwksURI string `json:"jwks_uri,omitempty"`
 
-	// jwt bearer grant access token lifespan
-	JwtBearerGrantAccessTokenLifespan *NullDuration `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
-
 	// LogoURI is an URL string that references a logo for the client.
 	LogoURI string `json:"logo_uri,omitempty"`
 
@@ -122,12 +101,6 @@ type OAuth2Client struct {
 
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
 	Owner string `json:"owner,omitempty"`
-
-	// password grant access token lifespan
-	PasswordGrantAccessTokenLifespan *NullDuration `json:"password_grant_access_token_lifespan,omitempty"`
-
-	// password grant refresh token lifespan
-	PasswordGrantRefreshTokenLifespan *NullDuration `json:"password_grant_refresh_token_lifespan,omitempty"`
 
 	// PolicyURI is a URL string that points to a human-readable privacy policy document
 	// that describes how the deployment organization collects, uses,
@@ -139,15 +112,6 @@ type OAuth2Client struct {
 
 	// redirect uris
 	RedirectUris StringSlicePipeDelimiter `json:"redirect_uris,omitempty"`
-
-	// refresh token grant access token lifespan
-	RefreshTokenGrantAccessTokenLifespan *NullDuration `json:"refresh_token_grant_access_token_lifespan,omitempty"`
-
-	// refresh token grant id token lifespan
-	RefreshTokenGrantIDTokenLifespan *NullDuration `json:"refresh_token_grant_id_token_lifespan,omitempty"`
-
-	// refresh token grant refresh token lifespan
-	RefreshTokenGrantRefreshTokenLifespan *NullDuration `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
 
 	// RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.
 	RegistrationAccessToken string `json:"registration_access_token,omitempty"`
@@ -214,22 +178,6 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateAuthorizationCodeGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateAuthorizationCodeGrantIDTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateAuthorizationCodeGrantRefreshTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateClientCredentialsGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateContacts(formats); err != nil {
 		res = append(res, err)
 	}
@@ -242,43 +190,11 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateImplicitGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateImplicitGrantIDTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateJwtBearerGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePasswordGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePasswordGrantRefreshTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validatePostLogoutRedirectUris(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateRedirectUris(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateRefreshTokenGrantAccessTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateRefreshTokenGrantIDTokenLifespan(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateRefreshTokenGrantRefreshTokenLifespan(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -334,74 +250,6 @@ func (m *OAuth2Client) validateAudience(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OAuth2Client) validateAuthorizationCodeGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.AuthorizationCodeGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.AuthorizationCodeGrantAccessTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateAuthorizationCodeGrantIDTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.AuthorizationCodeGrantIDTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.AuthorizationCodeGrantIDTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateAuthorizationCodeGrantRefreshTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.AuthorizationCodeGrantRefreshTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.AuthorizationCodeGrantRefreshTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateClientCredentialsGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.ClientCredentialsGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.ClientCredentialsGrantAccessTokenLifespan != nil {
-		if err := m.ClientCredentialsGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("client_credentials_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *OAuth2Client) validateContacts(formats strfmt.Registry) error {
 	if swag.IsZero(m.Contacts) { // not required
 		return nil
@@ -444,91 +292,6 @@ func (m *OAuth2Client) validateGrantTypes(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OAuth2Client) validateImplicitGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.ImplicitGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.ImplicitGrantAccessTokenLifespan != nil {
-		if err := m.ImplicitGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateImplicitGrantIDTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.ImplicitGrantIDTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.ImplicitGrantIDTokenLifespan != nil {
-		if err := m.ImplicitGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateJwtBearerGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.JwtBearerGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.JwtBearerGrantAccessTokenLifespan != nil {
-		if err := m.JwtBearerGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validatePasswordGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.PasswordGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.PasswordGrantAccessTokenLifespan != nil {
-		if err := m.PasswordGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validatePasswordGrantRefreshTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.PasswordGrantRefreshTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.PasswordGrantRefreshTokenLifespan != nil {
-		if err := m.PasswordGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_refresh_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *OAuth2Client) validatePostLogoutRedirectUris(formats strfmt.Registry) error {
 	if swag.IsZero(m.PostLogoutRedirectUris) { // not required
 		return nil
@@ -554,57 +317,6 @@ func (m *OAuth2Client) validateRedirectUris(formats strfmt.Registry) error {
 			return ve.ValidateName("redirect_uris")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateRefreshTokenGrantAccessTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.RefreshTokenGrantAccessTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.RefreshTokenGrantAccessTokenLifespan != nil {
-		if err := m.RefreshTokenGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateRefreshTokenGrantIDTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.RefreshTokenGrantIDTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.RefreshTokenGrantIDTokenLifespan != nil {
-		if err := m.RefreshTokenGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateRefreshTokenGrantRefreshTokenLifespan(formats strfmt.Registry) error {
-	if swag.IsZero(m.RefreshTokenGrantRefreshTokenLifespan) { // not required
-		return nil
-	}
-
-	if m.RefreshTokenGrantRefreshTokenLifespan != nil {
-		if err := m.RefreshTokenGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
-			}
-			return err
-		}
 	}
 
 	return nil
@@ -676,22 +388,6 @@ func (m *OAuth2Client) ContextValidate(ctx context.Context, formats strfmt.Regis
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateAuthorizationCodeGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateAuthorizationCodeGrantIDTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateAuthorizationCodeGrantRefreshTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateClientCredentialsGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateContacts(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -700,43 +396,11 @@ func (m *OAuth2Client) ContextValidate(ctx context.Context, formats strfmt.Regis
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateImplicitGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateImplicitGrantIDTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateJwtBearerGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidatePasswordGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidatePasswordGrantRefreshTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidatePostLogoutRedirectUris(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.contextValidateRedirectUris(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateRefreshTokenGrantAccessTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateRefreshTokenGrantIDTokenLifespan(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateRefreshTokenGrantRefreshTokenLifespan(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -778,62 +442,6 @@ func (m *OAuth2Client) contextValidateAudience(ctx context.Context, formats strf
 	return nil
 }
 
-func (m *OAuth2Client) contextValidateAuthorizationCodeGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.AuthorizationCodeGrantAccessTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateAuthorizationCodeGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.AuthorizationCodeGrantIDTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateAuthorizationCodeGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.AuthorizationCodeGrantRefreshTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateClientCredentialsGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.ClientCredentialsGrantAccessTokenLifespan != nil {
-		if err := m.ClientCredentialsGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("client_credentials_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *OAuth2Client) contextValidateContacts(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := m.Contacts.ContextValidate(ctx, formats); err != nil {
@@ -858,76 +466,6 @@ func (m *OAuth2Client) contextValidateGrantTypes(ctx context.Context, formats st
 	return nil
 }
 
-func (m *OAuth2Client) contextValidateImplicitGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.ImplicitGrantAccessTokenLifespan != nil {
-		if err := m.ImplicitGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateImplicitGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.ImplicitGrantIDTokenLifespan != nil {
-		if err := m.ImplicitGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateJwtBearerGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.JwtBearerGrantAccessTokenLifespan != nil {
-		if err := m.JwtBearerGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidatePasswordGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.PasswordGrantAccessTokenLifespan != nil {
-		if err := m.PasswordGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidatePasswordGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.PasswordGrantRefreshTokenLifespan != nil {
-		if err := m.PasswordGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_refresh_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *OAuth2Client) contextValidatePostLogoutRedirectUris(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := m.PostLogoutRedirectUris.ContextValidate(ctx, formats); err != nil {
@@ -947,48 +485,6 @@ func (m *OAuth2Client) contextValidateRedirectUris(ctx context.Context, formats 
 			return ve.ValidateName("redirect_uris")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateRefreshTokenGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.RefreshTokenGrantAccessTokenLifespan != nil {
-		if err := m.RefreshTokenGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_access_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateRefreshTokenGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.RefreshTokenGrantIDTokenLifespan != nil {
-		if err := m.RefreshTokenGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_id_token_lifespan")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) contextValidateRefreshTokenGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.RefreshTokenGrantRefreshTokenLifespan != nil {
-		if err := m.RefreshTokenGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
-			}
-			return err
-		}
 	}
 
 	return nil

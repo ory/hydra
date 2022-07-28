@@ -209,39 +209,51 @@ type Client struct {
 	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
 
 	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan" db:"authorization_code_grant_access_token_lifespan"`
 
 	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan" db:"authorization_code_grant_id_token_lifespan"`
 
 	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan" db:"authorization_code_grant_refresh_token_lifespan"`
 
 	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan" db:"client_credentials_grant_access_token_lifespan"`
 
 	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan" db:"implicit_grant_access_token_lifespan"`
 
 	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan" db:"implicit_grant_id_token_lifespan"`
 
 	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan" db:"jwt_bearer_grant_access_token_lifespan"`
 
 	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan" db:"password_grant_access_token_lifespan"`
 
 	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan" db:"password_grant_refresh_token_lifespan"`
 
 	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan" db:"refresh_token_grant_id_token_lifespan"`
 
 	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan" db:"refresh_token_grant_access_token_lifespan"`
 
 	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
+	// swagger:ignore
 	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan" db:"refresh_token_grant_refresh_token_lifespan"`
 }
 
@@ -374,64 +386,6 @@ func (c *Client) GetRequestURIs() []string {
 }
 
 var _ fosite.ClientWithCustomTokenLifespans = &Client{}
-
-func (c *Client) GetTokenLifespans() *fosite.ClientLifespanConfig {
-	var r fosite.ClientLifespanConfig
-
-	if c.AuthorizationCodeGrantAccessTokenLifespan.Valid {
-		r.AuthorizationCodeGrantAccessTokenLifespan = &c.AuthorizationCodeGrantAccessTokenLifespan.Duration
-	}
-
-	if c.AuthorizationCodeGrantIDTokenLifespan.Valid {
-		r.AuthorizationCodeGrantIDTokenLifespan = &c.AuthorizationCodeGrantIDTokenLifespan.Duration
-	}
-
-	if c.AuthorizationCodeGrantRefreshTokenLifespan.Valid {
-		r.AuthorizationCodeGrantRefreshTokenLifespan = &c.AuthorizationCodeGrantRefreshTokenLifespan.Duration
-	}
-
-	if c.ClientCredentialsGrantAccessTokenLifespan.Valid {
-		r.ClientCredentialsGrantAccessTokenLifespan = &c.ClientCredentialsGrantAccessTokenLifespan.Duration
-	}
-
-	if c.ImplicitGrantAccessTokenLifespan.Valid {
-		r.ImplicitGrantAccessTokenLifespan = &c.ImplicitGrantAccessTokenLifespan.Duration
-	}
-
-	if c.ImplicitGrantIDTokenLifespan.Valid {
-		r.ImplicitGrantIDTokenLifespan = &c.ImplicitGrantIDTokenLifespan.Duration
-	}
-
-	if c.JwtBearerGrantAccessTokenLifespan.Valid {
-		r.JwtBearerGrantAccessTokenLifespan = &c.JwtBearerGrantAccessTokenLifespan.Duration
-	}
-
-	if c.PasswordGrantAccessTokenLifespan.Valid {
-		r.PasswordGrantAccessTokenLifespan = &c.PasswordGrantAccessTokenLifespan.Duration
-	}
-
-	if c.PasswordGrantRefreshTokenLifespan.Valid {
-		r.PasswordGrantRefreshTokenLifespan = &c.PasswordGrantRefreshTokenLifespan.Duration
-	}
-
-	if c.RefreshTokenGrantIDTokenLifespan.Valid {
-		r.RefreshTokenGrantIDTokenLifespan = &c.RefreshTokenGrantIDTokenLifespan.Duration
-	}
-
-	if c.RefreshTokenGrantAccessTokenLifespan.Valid {
-		r.RefreshTokenGrantAccessTokenLifespan = &c.RefreshTokenGrantAccessTokenLifespan.Duration
-	}
-
-	if c.RefreshTokenGrantRefreshTokenLifespan.Valid {
-		r.RefreshTokenGrantRefreshTokenLifespan = &c.RefreshTokenGrantRefreshTokenLifespan.Duration
-	}
-
-	return &r
-}
-
-func (c *Client) SetTokenLifespans(clc *fosite.ClientLifespanConfig) {
-	panic("not implemented")
-}
 
 func (c *Client) GetEffectiveLifespan(gt fosite.GrantType, tt fosite.TokenType, fallback time.Duration) time.Duration {
 	var cl *time.Duration

@@ -4,7 +4,7 @@ on:
     branches:
       - master
     tags:
-      - '*'
+      - "*"
   pull_request:
 
 # Cancel in-progress runs in current workflow.
@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.16.1'
+          go-version: "^1.16.1"
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
@@ -146,8 +146,8 @@ jobs:
       - sdk-generate
     strategy:
       matrix:
-        database: ['memory', 'postgres', 'mysql', 'cockroach']
-        args: ['', '--jwt']
+        database: ["memory", "postgres", "mysql", "cockroach"]
+        args: ["", "--jwt"]
     services:
       postgres:
         image: postgres:9.6
@@ -270,7 +270,7 @@ jobs:
           mailchimp_list_id: f605a41b53
           mailchmip_segment_id: 6479481
           mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
-          draft: 'true'
+          draft: "true"
           ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}
 
   slack-approval-notification:
@@ -297,5 +297,5 @@ jobs:
           mailchimp_list_id: f605a41b53
           mailchmip_segment_id: 6479481
           mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
-          draft: 'false'
+          draft: "false"
           ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}

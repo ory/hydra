@@ -38,13 +38,18 @@ If you're unsure about any of them, don't hesitate to ask. We're here to help!
 -->
 
 - [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md).
-- [ ] I have referenced an issue containing the design document if my change introduces a new feature.
-- [ ] I am following the [contributing code guidelines](../blob/master/CONTRIBUTING.md#contributing-code).
+- [ ] I have referenced an issue containing the design document if my change
+      introduces a new feature.
+- [ ] I am following the
+      [contributing code guidelines](../blob/master/CONTRIBUTING.md#contributing-code).
 - [ ] I have read the [security policy](../security/policy).
-- [ ] I confirm that this pull request does not address a security vulnerability. 
-      If this pull request addresses a security. vulnerability, 
-      I confirm that I got green light (please contact [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push the changes.
-- [ ] I have added tests that prove my fix is effective or that my feature works.
+- [ ] I confirm that this pull request does not address a security
+      vulnerability. If this pull request addresses a security. vulnerability, I
+      confirm that I got green light (please contact
+      [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push
+      the changes.
+- [ ] I have added tests that prove my fix is effective or that my feature
+      works.
 - [ ] I have added or changed [the documentation](https://github.com/ory/docs).
 
 ## Further Comments

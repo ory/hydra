@@ -24,40 +24,40 @@ import (
 type UpdateOAuth2ClientLifespans struct {
 
 	// authorization code grant access token lifespan
-	AuthorizationCodeGrantAccessTokenLifespan *NullDuration `json:"authorization_code_grant_access_token_lifespan,omitempty"`
+	AuthorizationCodeGrantAccessTokenLifespan NullDuration `json:"authorization_code_grant_access_token_lifespan,omitempty"`
 
 	// authorization code grant id token lifespan
-	AuthorizationCodeGrantIDTokenLifespan *NullDuration `json:"authorization_code_grant_id_token_lifespan,omitempty"`
+	AuthorizationCodeGrantIDTokenLifespan NullDuration `json:"authorization_code_grant_id_token_lifespan,omitempty"`
 
 	// authorization code grant refresh token lifespan
-	AuthorizationCodeGrantRefreshTokenLifespan *NullDuration `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
+	AuthorizationCodeGrantRefreshTokenLifespan NullDuration `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
 
 	// client credentials grant access token lifespan
-	ClientCredentialsGrantAccessTokenLifespan *NullDuration `json:"client_credentials_grant_access_token_lifespan,omitempty"`
+	ClientCredentialsGrantAccessTokenLifespan NullDuration `json:"client_credentials_grant_access_token_lifespan,omitempty"`
 
 	// implicit grant access token lifespan
-	ImplicitGrantAccessTokenLifespan *NullDuration `json:"implicit_grant_access_token_lifespan,omitempty"`
+	ImplicitGrantAccessTokenLifespan NullDuration `json:"implicit_grant_access_token_lifespan,omitempty"`
 
 	// implicit grant id token lifespan
-	ImplicitGrantIDTokenLifespan *NullDuration `json:"implicit_grant_id_token_lifespan,omitempty"`
+	ImplicitGrantIDTokenLifespan NullDuration `json:"implicit_grant_id_token_lifespan,omitempty"`
 
 	// jwt bearer grant access token lifespan
-	JwtBearerGrantAccessTokenLifespan *NullDuration `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
+	JwtBearerGrantAccessTokenLifespan NullDuration `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
 
 	// password grant access token lifespan
-	PasswordGrantAccessTokenLifespan *NullDuration `json:"password_grant_access_token_lifespan,omitempty"`
+	PasswordGrantAccessTokenLifespan NullDuration `json:"password_grant_access_token_lifespan,omitempty"`
 
 	// password grant refresh token lifespan
-	PasswordGrantRefreshTokenLifespan *NullDuration `json:"password_grant_refresh_token_lifespan,omitempty"`
+	PasswordGrantRefreshTokenLifespan NullDuration `json:"password_grant_refresh_token_lifespan,omitempty"`
 
 	// refresh token grant access token lifespan
-	RefreshTokenGrantAccessTokenLifespan *NullDuration `json:"refresh_token_grant_access_token_lifespan,omitempty"`
+	RefreshTokenGrantAccessTokenLifespan NullDuration `json:"refresh_token_grant_access_token_lifespan,omitempty"`
 
 	// refresh token grant id token lifespan
-	RefreshTokenGrantIDTokenLifespan *NullDuration `json:"refresh_token_grant_id_token_lifespan,omitempty"`
+	RefreshTokenGrantIDTokenLifespan NullDuration `json:"refresh_token_grant_id_token_lifespan,omitempty"`
 
 	// refresh token grant refresh token lifespan
-	RefreshTokenGrantRefreshTokenLifespan *NullDuration `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
+	RefreshTokenGrantRefreshTokenLifespan NullDuration `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
 }
 
 // Validate validates this update o auth2 client lifespans
@@ -123,13 +123,11 @@ func (m *UpdateOAuth2ClientLifespans) validateAuthorizationCodeGrantAccessTokenL
 		return nil
 	}
 
-	if m.AuthorizationCodeGrantAccessTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -140,13 +138,11 @@ func (m *UpdateOAuth2ClientLifespans) validateAuthorizationCodeGrantIDTokenLifes
 		return nil
 	}
 
-	if m.AuthorizationCodeGrantIDTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantIDTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -157,13 +153,11 @@ func (m *UpdateOAuth2ClientLifespans) validateAuthorizationCodeGrantRefreshToken
 		return nil
 	}
 
-	if m.AuthorizationCodeGrantRefreshTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantRefreshTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -174,13 +168,11 @@ func (m *UpdateOAuth2ClientLifespans) validateClientCredentialsGrantAccessTokenL
 		return nil
 	}
 
-	if m.ClientCredentialsGrantAccessTokenLifespan != nil {
-		if err := m.ClientCredentialsGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("client_credentials_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.ClientCredentialsGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("client_credentials_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -191,13 +183,11 @@ func (m *UpdateOAuth2ClientLifespans) validateImplicitGrantAccessTokenLifespan(f
 		return nil
 	}
 
-	if m.ImplicitGrantAccessTokenLifespan != nil {
-		if err := m.ImplicitGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.ImplicitGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("implicit_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -208,13 +198,11 @@ func (m *UpdateOAuth2ClientLifespans) validateImplicitGrantIDTokenLifespan(forma
 		return nil
 	}
 
-	if m.ImplicitGrantIDTokenLifespan != nil {
-		if err := m.ImplicitGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.ImplicitGrantIDTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("implicit_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -225,13 +213,11 @@ func (m *UpdateOAuth2ClientLifespans) validateJwtBearerGrantAccessTokenLifespan(
 		return nil
 	}
 
-	if m.JwtBearerGrantAccessTokenLifespan != nil {
-		if err := m.JwtBearerGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.JwtBearerGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -242,13 +228,11 @@ func (m *UpdateOAuth2ClientLifespans) validatePasswordGrantAccessTokenLifespan(f
 		return nil
 	}
 
-	if m.PasswordGrantAccessTokenLifespan != nil {
-		if err := m.PasswordGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.PasswordGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("password_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -259,13 +243,11 @@ func (m *UpdateOAuth2ClientLifespans) validatePasswordGrantRefreshTokenLifespan(
 		return nil
 	}
 
-	if m.PasswordGrantRefreshTokenLifespan != nil {
-		if err := m.PasswordGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.PasswordGrantRefreshTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("password_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -276,13 +258,11 @@ func (m *UpdateOAuth2ClientLifespans) validateRefreshTokenGrantAccessTokenLifesp
 		return nil
 	}
 
-	if m.RefreshTokenGrantAccessTokenLifespan != nil {
-		if err := m.RefreshTokenGrantAccessTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantAccessTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -293,13 +273,11 @@ func (m *UpdateOAuth2ClientLifespans) validateRefreshTokenGrantIDTokenLifespan(f
 		return nil
 	}
 
-	if m.RefreshTokenGrantIDTokenLifespan != nil {
-		if err := m.RefreshTokenGrantIDTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantIDTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -310,13 +288,11 @@ func (m *UpdateOAuth2ClientLifespans) validateRefreshTokenGrantRefreshTokenLifes
 		return nil
 	}
 
-	if m.RefreshTokenGrantRefreshTokenLifespan != nil {
-		if err := m.RefreshTokenGrantRefreshTokenLifespan.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantRefreshTokenLifespan.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -382,13 +358,11 @@ func (m *UpdateOAuth2ClientLifespans) ContextValidate(ctx context.Context, forma
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.AuthorizationCodeGrantAccessTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -396,13 +370,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantAcces
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.AuthorizationCodeGrantIDTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -410,13 +382,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantIDTok
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.AuthorizationCodeGrantRefreshTokenLifespan != nil {
-		if err := m.AuthorizationCodeGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.AuthorizationCodeGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("authorization_code_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -424,13 +394,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateAuthorizationCodeGrantRefre
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateClientCredentialsGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.ClientCredentialsGrantAccessTokenLifespan != nil {
-		if err := m.ClientCredentialsGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("client_credentials_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.ClientCredentialsGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("client_credentials_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -438,13 +406,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateClientCredentialsGrantAcces
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateImplicitGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.ImplicitGrantAccessTokenLifespan != nil {
-		if err := m.ImplicitGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.ImplicitGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("implicit_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -452,13 +418,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateImplicitGrantAccessTokenLif
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateImplicitGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.ImplicitGrantIDTokenLifespan != nil {
-		if err := m.ImplicitGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("implicit_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.ImplicitGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("implicit_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -466,13 +430,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateImplicitGrantIDTokenLifespa
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateJwtBearerGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.JwtBearerGrantAccessTokenLifespan != nil {
-		if err := m.JwtBearerGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.JwtBearerGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("jwt_bearer_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -480,13 +442,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateJwtBearerGrantAccessTokenLi
 
 func (m *UpdateOAuth2ClientLifespans) contextValidatePasswordGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.PasswordGrantAccessTokenLifespan != nil {
-		if err := m.PasswordGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.PasswordGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("password_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -494,13 +454,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidatePasswordGrantAccessTokenLif
 
 func (m *UpdateOAuth2ClientLifespans) contextValidatePasswordGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.PasswordGrantRefreshTokenLifespan != nil {
-		if err := m.PasswordGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("password_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.PasswordGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("password_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -508,13 +466,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidatePasswordGrantRefreshTokenLi
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateRefreshTokenGrantAccessTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.RefreshTokenGrantAccessTokenLifespan != nil {
-		if err := m.RefreshTokenGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_access_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantAccessTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_access_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -522,13 +478,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateRefreshTokenGrantAccessToke
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateRefreshTokenGrantIDTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.RefreshTokenGrantIDTokenLifespan != nil {
-		if err := m.RefreshTokenGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_id_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantIDTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_id_token_lifespan")
 		}
+		return err
 	}
 
 	return nil
@@ -536,13 +490,11 @@ func (m *UpdateOAuth2ClientLifespans) contextValidateRefreshTokenGrantIDTokenLif
 
 func (m *UpdateOAuth2ClientLifespans) contextValidateRefreshTokenGrantRefreshTokenLifespan(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.RefreshTokenGrantRefreshTokenLifespan != nil {
-		if err := m.RefreshTokenGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
-			}
-			return err
+	if err := m.RefreshTokenGrantRefreshTokenLifespan.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("refresh_token_grant_refresh_token_lifespan")
 		}
+		return err
 	}
 
 	return nil

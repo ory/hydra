@@ -6,8 +6,12 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AllowedCorsOrigins** | Pointer to **[]string** |  | [optional] 
 **Audience** | Pointer to **[]string** |  | [optional] 
+**AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**AuthorizationCodeGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **BackchannelLogoutSessionRequired** | Pointer to **bool** | Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false. | [optional] 
 **BackchannelLogoutUri** | Pointer to **string** | RP URL that will cause the RP to log itself out when sent a Logout Token by the OP. | [optional] 
+**ClientCredentialsGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **ClientId** | Pointer to **string** | ID  is the id for this client. | [optional] 
 **ClientName** | Pointer to **string** | Name is the human-readable string name of the client to be presented to the end-user during authorization. | [optional] 
 **ClientSecret** | Pointer to **string** | Secret is the client&#39;s secret. The secret will be included in the create request as cleartext, and then never again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users that they need to write the secret down as it will not be made available again. | [optional] 
@@ -18,14 +22,22 @@ Name | Type | Description | Notes
 **FrontchannelLogoutSessionRequired** | Pointer to **bool** | Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false. | [optional] 
 **FrontchannelLogoutUri** | Pointer to **string** | RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be. | [optional] 
 **GrantTypes** | Pointer to **[]string** |  | [optional] 
+**ImplicitGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**ImplicitGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **Jwks** | Pointer to **map[string]interface{}** |  | [optional] 
 **JwksUri** | Pointer to **string** | URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
+**JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **LogoUri** | Pointer to **string** | LogoURI is an URL string that references a logo for the client. | [optional] 
 **Metadata** | Pointer to **map[string]interface{}** |  | [optional] 
 **Owner** | Pointer to **string** | Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] 
+**PasswordGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**PasswordGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **PolicyUri** | Pointer to **string** | PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data. | [optional] 
 **PostLogoutRedirectUris** | Pointer to **[]string** |  | [optional] 
 **RedirectUris** | Pointer to **[]string** |  | [optional] 
+**RefreshTokenGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**RefreshTokenGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**RefreshTokenGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **RegistrationAccessToken** | Pointer to **string** | RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client. | [optional] 
 **RegistrationClientUri** | Pointer to **string** | RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client. | [optional] 
 **RequestObjectSigningAlg** | Pointer to **string** | JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm. | [optional] 
@@ -109,6 +121,81 @@ SetAudience sets Audience field to given value.
 
 HasAudience returns a boolean if a field has been set.
 
+### GetAuthorizationCodeGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespan() string`
+
+GetAuthorizationCodeGrantAccessTokenLifespan returns the AuthorizationCodeGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetAuthorizationCodeGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetAuthorizationCodeGrantAccessTokenLifespanOk returns a tuple with the AuthorizationCodeGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAuthorizationCodeGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetAuthorizationCodeGrantAccessTokenLifespan(v string)`
+
+SetAuthorizationCodeGrantAccessTokenLifespan sets AuthorizationCodeGrantAccessTokenLifespan field to given value.
+
+### HasAuthorizationCodeGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasAuthorizationCodeGrantAccessTokenLifespan() bool`
+
+HasAuthorizationCodeGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetAuthorizationCodeGrantIdTokenLifespan
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespan() string`
+
+GetAuthorizationCodeGrantIdTokenLifespan returns the AuthorizationCodeGrantIdTokenLifespan field if non-nil, zero value otherwise.
+
+### GetAuthorizationCodeGrantIdTokenLifespanOk
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bool)`
+
+GetAuthorizationCodeGrantIdTokenLifespanOk returns a tuple with the AuthorizationCodeGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAuthorizationCodeGrantIdTokenLifespan
+
+`func (o *OAuth2Client) SetAuthorizationCodeGrantIdTokenLifespan(v string)`
+
+SetAuthorizationCodeGrantIdTokenLifespan sets AuthorizationCodeGrantIdTokenLifespan field to given value.
+
+### HasAuthorizationCodeGrantIdTokenLifespan
+
+`func (o *OAuth2Client) HasAuthorizationCodeGrantIdTokenLifespan() bool`
+
+HasAuthorizationCodeGrantIdTokenLifespan returns a boolean if a field has been set.
+
+### GetAuthorizationCodeGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespan() string`
+
+GetAuthorizationCodeGrantRefreshTokenLifespan returns the AuthorizationCodeGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
+
+### GetAuthorizationCodeGrantRefreshTokenLifespanOk
+
+`func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*string, bool)`
+
+GetAuthorizationCodeGrantRefreshTokenLifespanOk returns a tuple with the AuthorizationCodeGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAuthorizationCodeGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) SetAuthorizationCodeGrantRefreshTokenLifespan(v string)`
+
+SetAuthorizationCodeGrantRefreshTokenLifespan sets AuthorizationCodeGrantRefreshTokenLifespan field to given value.
+
+### HasAuthorizationCodeGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) HasAuthorizationCodeGrantRefreshTokenLifespan() bool`
+
+HasAuthorizationCodeGrantRefreshTokenLifespan returns a boolean if a field has been set.
+
 ### GetBackchannelLogoutSessionRequired
 
 `func (o *OAuth2Client) GetBackchannelLogoutSessionRequired() bool`
@@ -158,6 +245,31 @@ SetBackchannelLogoutUri sets BackchannelLogoutUri field to given value.
 `func (o *OAuth2Client) HasBackchannelLogoutUri() bool`
 
 HasBackchannelLogoutUri returns a boolean if a field has been set.
+
+### GetClientCredentialsGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespan() string`
+
+GetClientCredentialsGrantAccessTokenLifespan returns the ClientCredentialsGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetClientCredentialsGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetClientCredentialsGrantAccessTokenLifespanOk returns a tuple with the ClientCredentialsGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetClientCredentialsGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetClientCredentialsGrantAccessTokenLifespan(v string)`
+
+SetClientCredentialsGrantAccessTokenLifespan sets ClientCredentialsGrantAccessTokenLifespan field to given value.
+
+### HasClientCredentialsGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasClientCredentialsGrantAccessTokenLifespan() bool`
+
+HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetClientId
 
@@ -409,6 +521,56 @@ SetGrantTypes sets GrantTypes field to given value.
 
 HasGrantTypes returns a boolean if a field has been set.
 
+### GetImplicitGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespan() string`
+
+GetImplicitGrantAccessTokenLifespan returns the ImplicitGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetImplicitGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetImplicitGrantAccessTokenLifespanOk returns a tuple with the ImplicitGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetImplicitGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetImplicitGrantAccessTokenLifespan(v string)`
+
+SetImplicitGrantAccessTokenLifespan sets ImplicitGrantAccessTokenLifespan field to given value.
+
+### HasImplicitGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasImplicitGrantAccessTokenLifespan() bool`
+
+HasImplicitGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetImplicitGrantIdTokenLifespan
+
+`func (o *OAuth2Client) GetImplicitGrantIdTokenLifespan() string`
+
+GetImplicitGrantIdTokenLifespan returns the ImplicitGrantIdTokenLifespan field if non-nil, zero value otherwise.
+
+### GetImplicitGrantIdTokenLifespanOk
+
+`func (o *OAuth2Client) GetImplicitGrantIdTokenLifespanOk() (*string, bool)`
+
+GetImplicitGrantIdTokenLifespanOk returns a tuple with the ImplicitGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetImplicitGrantIdTokenLifespan
+
+`func (o *OAuth2Client) SetImplicitGrantIdTokenLifespan(v string)`
+
+SetImplicitGrantIdTokenLifespan sets ImplicitGrantIdTokenLifespan field to given value.
+
+### HasImplicitGrantIdTokenLifespan
+
+`func (o *OAuth2Client) HasImplicitGrantIdTokenLifespan() bool`
+
+HasImplicitGrantIdTokenLifespan returns a boolean if a field has been set.
+
 ### GetJwks
 
 `func (o *OAuth2Client) GetJwks() map[string]interface{}`
@@ -458,6 +620,31 @@ SetJwksUri sets JwksUri field to given value.
 `func (o *OAuth2Client) HasJwksUri() bool`
 
 HasJwksUri returns a boolean if a field has been set.
+
+### GetJwtBearerGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespan() string`
+
+GetJwtBearerGrantAccessTokenLifespan returns the JwtBearerGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetJwtBearerGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetJwtBearerGrantAccessTokenLifespanOk returns a tuple with the JwtBearerGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetJwtBearerGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetJwtBearerGrantAccessTokenLifespan(v string)`
+
+SetJwtBearerGrantAccessTokenLifespan sets JwtBearerGrantAccessTokenLifespan field to given value.
+
+### HasJwtBearerGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasJwtBearerGrantAccessTokenLifespan() bool`
+
+HasJwtBearerGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetLogoUri
 
@@ -534,6 +721,56 @@ SetOwner sets Owner field to given value.
 
 HasOwner returns a boolean if a field has been set.
 
+### GetPasswordGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetPasswordGrantAccessTokenLifespan() string`
+
+GetPasswordGrantAccessTokenLifespan returns the PasswordGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetPasswordGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetPasswordGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetPasswordGrantAccessTokenLifespanOk returns a tuple with the PasswordGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPasswordGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetPasswordGrantAccessTokenLifespan(v string)`
+
+SetPasswordGrantAccessTokenLifespan sets PasswordGrantAccessTokenLifespan field to given value.
+
+### HasPasswordGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasPasswordGrantAccessTokenLifespan() bool`
+
+HasPasswordGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetPasswordGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) GetPasswordGrantRefreshTokenLifespan() string`
+
+GetPasswordGrantRefreshTokenLifespan returns the PasswordGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
+
+### GetPasswordGrantRefreshTokenLifespanOk
+
+`func (o *OAuth2Client) GetPasswordGrantRefreshTokenLifespanOk() (*string, bool)`
+
+GetPasswordGrantRefreshTokenLifespanOk returns a tuple with the PasswordGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPasswordGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) SetPasswordGrantRefreshTokenLifespan(v string)`
+
+SetPasswordGrantRefreshTokenLifespan sets PasswordGrantRefreshTokenLifespan field to given value.
+
+### HasPasswordGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) HasPasswordGrantRefreshTokenLifespan() bool`
+
+HasPasswordGrantRefreshTokenLifespan returns a boolean if a field has been set.
+
 ### GetPolicyUri
 
 `func (o *OAuth2Client) GetPolicyUri() string`
@@ -608,6 +845,81 @@ SetRedirectUris sets RedirectUris field to given value.
 `func (o *OAuth2Client) HasRedirectUris() bool`
 
 HasRedirectUris returns a boolean if a field has been set.
+
+### GetRefreshTokenGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespan() string`
+
+GetRefreshTokenGrantAccessTokenLifespan returns the RefreshTokenGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetRefreshTokenGrantAccessTokenLifespanOk
+
+`func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetRefreshTokenGrantAccessTokenLifespanOk returns a tuple with the RefreshTokenGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRefreshTokenGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) SetRefreshTokenGrantAccessTokenLifespan(v string)`
+
+SetRefreshTokenGrantAccessTokenLifespan sets RefreshTokenGrantAccessTokenLifespan field to given value.
+
+### HasRefreshTokenGrantAccessTokenLifespan
+
+`func (o *OAuth2Client) HasRefreshTokenGrantAccessTokenLifespan() bool`
+
+HasRefreshTokenGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetRefreshTokenGrantIdTokenLifespan
+
+`func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespan() string`
+
+GetRefreshTokenGrantIdTokenLifespan returns the RefreshTokenGrantIdTokenLifespan field if non-nil, zero value otherwise.
+
+### GetRefreshTokenGrantIdTokenLifespanOk
+
+`func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool)`
+
+GetRefreshTokenGrantIdTokenLifespanOk returns a tuple with the RefreshTokenGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRefreshTokenGrantIdTokenLifespan
+
+`func (o *OAuth2Client) SetRefreshTokenGrantIdTokenLifespan(v string)`
+
+SetRefreshTokenGrantIdTokenLifespan sets RefreshTokenGrantIdTokenLifespan field to given value.
+
+### HasRefreshTokenGrantIdTokenLifespan
+
+`func (o *OAuth2Client) HasRefreshTokenGrantIdTokenLifespan() bool`
+
+HasRefreshTokenGrantIdTokenLifespan returns a boolean if a field has been set.
+
+### GetRefreshTokenGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespan() string`
+
+GetRefreshTokenGrantRefreshTokenLifespan returns the RefreshTokenGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
+
+### GetRefreshTokenGrantRefreshTokenLifespanOk
+
+`func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bool)`
+
+GetRefreshTokenGrantRefreshTokenLifespanOk returns a tuple with the RefreshTokenGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRefreshTokenGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) SetRefreshTokenGrantRefreshTokenLifespan(v string)`
+
+SetRefreshTokenGrantRefreshTokenLifespan sets RefreshTokenGrantRefreshTokenLifespan field to given value.
+
+### HasRefreshTokenGrantRefreshTokenLifespan
+
+`func (o *OAuth2Client) HasRefreshTokenGrantRefreshTokenLifespan() bool`
+
+HasRefreshTokenGrantRefreshTokenLifespan returns a boolean if a field has been set.
 
 ### GetRegistrationAccessToken
 

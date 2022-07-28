@@ -13,3 +13,10 @@
     description: "Specify a time duration in milliseconds, seconds, minutes, hours."
     type: string
     pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+- op: replace
+  path: /components/schemas/NullDuration
+  value:
+    title: "Time duration"
+    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
+    type: string
+    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"

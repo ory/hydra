@@ -17,5 +17,17 @@
   "subject_type": "",
   "jwks": {},
   "metadata": {},
-  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-1"
+  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-1",
+  "authorization_code_grant_access_token_lifespan": null,
+  "authorization_code_grant_id_token_lifespan": null,
+  "authorization_code_grant_refresh_token_lifespan": null,
+  "client_credentials_grant_access_token_lifespan": null,
+  "implicit_grant_access_token_lifespan": null,
+  "implicit_grant_id_token_lifespan": null,
+  "jwt_bearer_grant_access_token_lifespan": null,
+  "password_grant_access_token_lifespan": null,
+  "password_grant_refresh_token_lifespan": null,
+  "refresh_token_grant_id_token_lifespan": null,
+  "refresh_token_grant_access_token_lifespan": null,
+  "refresh_token_grant_refresh_token_lifespan": null
 }

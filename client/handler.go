@@ -68,6 +68,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
 	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
+	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.UpdateLifespans)
 
 	if h.r.Config().PublicAllowDynamicRegistration() {
 		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
@@ -560,6 +561,47 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route PUT /clients/{id}/lifespans admin updateOAuth2ClientLifespans
+//
+// Update an existing OAuth 2.0 client's token lifespan configuration. This
+// client configuration takes precedence over the instance-wide token lifespan
+// configuration.
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: emptyResponse
+//       default: jsonError
+func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var id = ps.ByName("id")
+
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	var ls fosite.ClientLifespanConfig
+
+	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		return
+	}
+
+	c.SetTokenLifespans(&ls)
+	c.Secret = ""
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

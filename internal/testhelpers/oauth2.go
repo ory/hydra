@@ -1,7 +1,9 @@
 package testhelpers
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ory/fosite"
 	djwt "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
@@ -25,6 +28,7 @@ import (
 
 	"net/http/httptest"
 
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
@@ -87,11 +91,11 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 	return gjson.ParseBytes(body)
 }
 
-func IntrospectToken(t *testing.T, conf *oauth2.Config, token *oauth2.Token, adminTS *httptest.Server) gjson.Result {
-	require.NotEmpty(t, token.AccessToken)
+func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
+	require.NotEmpty(t, token)
 
 	req := httpx.MustNewRequest("POST", adminTS.URL+"/oauth2/introspect",
-		strings.NewReader((url.Values{"token": {token.AccessToken}}).Encode()),
+		strings.NewReader((url.Values{"token": {token}}).Encode()),
 		"application/x-www-form-urlencoded")
 
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
@@ -99,6 +103,22 @@ func IntrospectToken(t *testing.T, conf *oauth2.Config, token *oauth2.Token, adm
 	require.NoError(t, err)
 	defer res.Body.Close()
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
+}
+
+func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID string, lifespans fosite.ClientLifespanConfig, adminTS *httptest.Server) {
+	b, err := json.Marshal(lifespans)
+	require.NoError(t, err)
+	req := httpx.MustNewRequest(
+		"PUT",
+		adminTS.URL+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
+		bytes.NewBuffer(b),
+		"application/x-www-form-urlencoded",
+	)
+	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
+	res, err := adminTS.Client().Do(req)
+	require.NoError(t, err)
+	defer res.Body.Close()
+	require.Equal(t, res.StatusCode, http.StatusNoContent)
 }
 
 func Userinfo(t *testing.T, token *oauth2.Token, publicTS *httptest.Server) gjson.Result {

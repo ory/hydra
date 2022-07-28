@@ -310,6 +310,35 @@ paths:
       summary: Update an OAuth 2.0 Client
       tags:
       - admin
+  /clients/{id}/lifespans:
+    put:
+      description: |-
+        Update an existing OAuth 2.0 client's token lifespan configuration. This
+        client configuration takes precedence over the instance-wide token lifespan
+        configuration.
+      operationId: updateOAuth2ClientLifespans
+      parameters:
+      - description: The id of the OAuth 2.0 Client.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jsonError'
+          description: jsonError
+      tags:
+      - admin
   /health/alive:
     get:
       description: |-
@@ -2024,6 +2053,13 @@ components:
             type: array
       description: A list of clients.
   schemas:
+    Duration:
+      description: |-
+        A Duration represents the elapsed time between two instants
+        as an int64 nanosecond count. The representation limits the
+        largest representable duration to approximately 290 years.
+      format: int64
+      type: integer
     JSONRawMessage:
       title: JSONRawMessage represents a json.RawMessage that works well with JSON,
         SQL, and Swagger.
@@ -2966,6 +3002,21 @@ components:
           description: Subject is the user for whom the logout was request.
           type: string
       title: Contains information about an ongoing logout request.
+      type: object
+    nullDuration:
+      description: TODO delete this type and replace it with ory/x/sqlxx/NullDuration
+        when applying the custom client token TTL patch to Hydra 2.x
+      properties:
+        Duration:
+          description: |-
+            A Duration represents the elapsed time between two instants
+            as an int64 nanosecond count. The representation limits the
+            largest representable duration to approximately 290 years.
+          format: int64
+          type: integer
+        Valid:
+          type: boolean
+      title: NullDuration represents a nullable JSON and SQL compatible time.Duration.
       type: object
     nullTime:
       format: date-time

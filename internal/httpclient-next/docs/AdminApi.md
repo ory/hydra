@@ -36,6 +36,7 @@ Method | HTTP request | Description
 [**UpdateJsonWebKey**](AdminApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 [**UpdateJsonWebKeySet**](AdminApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Update a JSON Web Key Set
 [**UpdateOAuth2Client**](AdminApi.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
+[**UpdateOAuth2ClientLifespans**](AdminApi.md#UpdateOAuth2ClientLifespans) | **Put** /clients/{id}/lifespans | 
 
 
 
@@ -2228,6 +2229,74 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateOAuth2ClientLifespans
+
+> UpdateOAuth2ClientLifespans(ctx, id).Execute()
+
+
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    id := "id_example" // string | The id of the OAuth 2.0 Client.
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.AdminApi.UpdateOAuth2ClientLifespans(context.Background(), id).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.UpdateOAuth2ClientLifespans``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the OAuth 2.0 Client. | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiUpdateOAuth2ClientLifespansRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

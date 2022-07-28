@@ -225,7 +225,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			token, err := conf.Exchange(context.Background(), code)
 			require.NoError(t, err)
 
-			claims := testhelpers.IntrospectToken(t, conf, token, adminTS)
+			claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
 			assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
 
 			idClaims := testhelpers.DecodeIDToken(t, token)
@@ -598,7 +598,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				assert.EqualValues(t, hash, uiClaims.Get("sub").String())
 
 				// Access token data must not be obfuscated
-				atClaims := testhelpers.IntrospectToken(t, conf, token, adminTS)
+				atClaims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
 				assert.EqualValues(t, subject, atClaims.Get("sub").String())
 			})
 		}
@@ -634,7 +634,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		assert.EqualValues(t, obfuscated, uiClaims.Get("sub").String())
 
 		// Access token data must not be obfuscated
-		atClaims := testhelpers.IntrospectToken(t, conf, token, adminTS)
+		atClaims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
 		assert.EqualValues(t, subject, atClaims.Get("sub").String())
 	})
 

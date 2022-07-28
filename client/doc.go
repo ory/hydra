@@ -138,6 +138,15 @@ type swaggerDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
+// swagger:parameters updateOAuth2ClientLifespans
+type swaggerUpdateOAuth2ClientLifespans struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
 // swagger:parameters dynamicClientRegistrationDeleteOAuth2Client
 type dynamicClientRegistrationDeleteOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.

@@ -29,6 +29,7 @@ docs/JsonWebKeySetGeneratorRequest.md
 docs/LoginRequest.md
 docs/LogoutRequest.md
 docs/MetadataApi.md
+docs/NullDuration.md
 docs/OAuth2Client.md
 docs/OAuth2TokenIntrospection.md
 docs/Oauth2TokenResponse.md
@@ -69,6 +70,7 @@ model_json_web_key_set.go
 model_json_web_key_set_generator_request.go
 model_login_request.go
 model_logout_request.go
+model_null_duration.go
 model_o_auth2_client.go
 model_o_auth2_token_introspection.go
 model_oauth2_token_response.go

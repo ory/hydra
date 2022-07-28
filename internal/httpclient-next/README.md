@@ -111,6 +111,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**UpdateJsonWebKey**](docs/AdminApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**UpdateJsonWebKeySet**](docs/AdminApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**UpdateOAuth2Client**](docs/AdminApi.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
+*AdminApi* | [**UpdateOAuth2ClientLifespans**](docs/AdminApi.md#updateoauth2clientlifespans) | **Put** /clients/{id}/lifespans | 
 *MetadataApi* | [**GetVersion**](docs/MetadataApi.md#getversion) | **Get** /version | Return Running Software Version.
 *MetadataApi* | [**IsAlive**](docs/MetadataApi.md#isalive) | **Get** /health/alive | Check HTTP Server Status
 *MetadataApi* | [**IsReady**](docs/MetadataApi.md#isready) | **Get** /health/ready | Check HTTP Server and Database Status
@@ -148,6 +149,7 @@ Class | Method | HTTP request | Description
  - [JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [LogoutRequest](docs/LogoutRequest.md)
+ - [NullDuration](docs/NullDuration.md)
  - [OAuth2Client](docs/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)

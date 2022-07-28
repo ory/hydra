@@ -304,6 +304,7 @@ func serve(
 ) {
 	defer wg.Done()
 
+	// #nosec G112 false positive
 	var srv = graceful.WithDefaults(&http.Server{
 		Handler: handler,
 		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.

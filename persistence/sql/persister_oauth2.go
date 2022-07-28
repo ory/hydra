@@ -20,9 +20,10 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
+
+	"github.com/ory/hydra/oauth2"
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}
@@ -252,10 +253,20 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 	signature = p.hashSignature(signature, table)
 
 	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
-			Exec())
+	if err := p.Connection(ctx).
+		RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
+		Exec(); errors.Is(err, sql.ErrNoRows) {
+		return errorsx.WithStack(fosite.ErrNotFound)
+	} else if err := sqlcon.HandleError(err); err != nil {
+		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		} else if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
+			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		}
+		return err
+	}
+	return nil
+
 }
 
 func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) error {

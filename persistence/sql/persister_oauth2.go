@@ -253,16 +253,15 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 	signature = p.hashSignature(signature, table)
 
 	/* #nosec G201 table is static */
-	if err := p.Connection(ctx).
-		RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
-		Exec(); errors.Is(err, sql.ErrNoRows) {
+	err := sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
+			Exec())
+	if errors.Is(err, sqlcon.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
-	} else if err := sqlcon.HandleError(err); err != nil {
-		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-		} else if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
-			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-		}
+	} else if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if err != nil {
 		return err
 	}
 	return nil

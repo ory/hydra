@@ -272,11 +272,19 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 
 	signature = p.hashSignature(ctx, signature, table)
 
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
+	err := sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
 			Where("signature=?", signature).
 			Delete(&OAuth2RequestSQL{Table: table}))
+
+	if errors.Is(err, sqlcon.ErrNoRows) {
+		return errorsx.WithStack(fosite.ErrNotFound)
+	} else if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) error {

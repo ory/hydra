@@ -2,14 +2,14 @@
 
 ## Properties
 
-| Name                | Type                                     | Description                                                               | Notes      |
-| ------------------- | ---------------------------------------- | ------------------------------------------------------------------------- | ---------- |
-| **ClientId**        | Pointer to **string**                    | ClientID is the identifier of the OAuth 2.0 client.                       | [optional] |
-| **GrantedAudience** | Pointer to **[]string**                  | GrantedAudience is the list of audiences granted to the OAuth 2.0 client. | [optional] |
-| **GrantedScopes**   | Pointer to **[]string**                  | GrantedScopes is the list of scopes granted to the OAuth 2.0 client.      | [optional] |
-| **Requester**       | Pointer to [**Requester**](Requester.md) |                                                                           | [optional] |
-| **Session**         | Pointer to [**Session**](Session.md)     |                                                                           | [optional] |
-| **Subject**         | Pointer to **string**                    | Subject is the identifier of the authenticated end-user.                  | [optional] |
+| Name                | Type                                                         | Description                                                               | Notes      |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | ---------- |
+| **ClientId**        | Pointer to **string**                                        | ClientID is the identifier of the OAuth 2.0 client.                       | [optional] |
+| **GrantedAudience** | Pointer to **[]string**                                      | GrantedAudience is the list of audiences granted to the OAuth 2.0 client. | [optional] |
+| **GrantedScopes**   | Pointer to **[]string**                                      | GrantedScopes is the list of scopes granted to the OAuth 2.0 client.      | [optional] |
+| **Requester**       | Pointer to [**OAuth2AccessRequest**](OAuth2AccessRequest.md) |                                                                           | [optional] |
+| **Session**         | Pointer to [**Session**](Session.md)                         |                                                                           | [optional] |
+| **Subject**         | Pointer to **string**                                        | Subject is the identifier of the authenticated end-user.                  | [optional] |
 
 ## Methods
 
@@ -110,20 +110,20 @@ HasGrantedScopes returns a boolean if a field has been set.
 
 ### GetRequester
 
-`func (o *RefreshTokenHookRequest) GetRequester() Requester`
+`func (o *RefreshTokenHookRequest) GetRequester() OAuth2AccessRequest`
 
 GetRequester returns the Requester field if non-nil, zero value otherwise.
 
 ### GetRequesterOk
 
-`func (o *RefreshTokenHookRequest) GetRequesterOk() (*Requester, bool)`
+`func (o *RefreshTokenHookRequest) GetRequesterOk() (*OAuth2AccessRequest, bool)`
 
 GetRequesterOk returns a tuple with the Requester field if it's non-nil, zero
 value otherwise and a boolean to check if the value has been set.
 
 ### SetRequester
 
-`func (o *RefreshTokenHookRequest) SetRequester(v Requester)`
+`func (o *RefreshTokenHookRequest) SetRequester(v OAuth2AccessRequest)`
 
 SetRequester sets Requester field to given value.
 

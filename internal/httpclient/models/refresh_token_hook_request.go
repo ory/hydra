@@ -28,7 +28,7 @@ type RefreshTokenHookRequest struct {
 	GrantedScopes []string `json:"granted_scopes"`
 
 	// requester
-	Requester *Requester `json:"requester,omitempty"`
+	Requester *OAuth2AccessRequest `json:"requester,omitempty"`
 
 	// session
 	Session *Session `json:"session,omitempty"`

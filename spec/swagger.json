@@ -2999,6 +2999,37 @@
       "format": "date-time",
       "title": "NullTime implements sql.NullTime functionality."
     },
+    "oAuth2AccessRequest": {
+      "type": "object",
+      "title": "Requester is a token endpoint's request context.",
+      "properties": {
+        "client_id": {
+          "description": "ClientID is the identifier of the OAuth 2.0 client.",
+          "type": "string"
+        },
+        "grant_types": {
+          "description": "GrantTypes is the requests grant types.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "granted_audience": {
+          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "granted_scopes": {
+          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "oAuth2Client": {
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
@@ -3397,7 +3428,7 @@
           }
         },
         "requester": {
-          "$ref": "#/definitions/requester"
+          "$ref": "#/definitions/oAuth2AccessRequest"
         },
         "session": {
           "$ref": "#/definitions/Session"
@@ -3454,37 +3485,6 @@
         "redirect_to": {
           "description": "Original request URL to which you should redirect the user if request was already handled.",
           "type": "string"
-        }
-      }
-    },
-    "requester": {
-      "type": "object",
-      "title": "Requester is a token endpoint's request context.",
-      "properties": {
-        "client_id": {
-          "description": "ClientID is the identifier of the OAuth 2.0 client.",
-          "type": "string"
-        },
-        "grant_types": {
-          "description": "GrantTypes is the requests grant types.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_audience": {
-          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_scopes": {
-          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },

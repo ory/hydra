@@ -19,7 +19,7 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 
 // Requester is a token endpoint's request context.
 //
-// swagger:model requester
+// swagger:model oAuth2AccessRequest
 type Requester struct {
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id"`

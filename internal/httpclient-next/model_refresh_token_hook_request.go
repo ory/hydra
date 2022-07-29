@@ -22,9 +22,9 @@ type RefreshTokenHookRequest struct {
 	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
 	GrantedAudience []string `json:"granted_audience,omitempty"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-	GrantedScopes []string   `json:"granted_scopes,omitempty"`
-	Requester     *Requester `json:"requester,omitempty"`
-	Session       *Session   `json:"session,omitempty"`
+	GrantedScopes []string             `json:"granted_scopes,omitempty"`
+	Requester     *OAuth2AccessRequest `json:"requester,omitempty"`
+	Session       *Session             `json:"session,omitempty"`
 	// Subject is the identifier of the authenticated end-user.
 	Subject *string `json:"subject,omitempty"`
 }
@@ -143,9 +143,9 @@ func (o *RefreshTokenHookRequest) SetGrantedScopes(v []string) {
 }
 
 // GetRequester returns the Requester field value if set, zero value otherwise.
-func (o *RefreshTokenHookRequest) GetRequester() Requester {
+func (o *RefreshTokenHookRequest) GetRequester() OAuth2AccessRequest {
 	if o == nil || o.Requester == nil {
-		var ret Requester
+		var ret OAuth2AccessRequest
 		return ret
 	}
 	return *o.Requester
@@ -153,7 +153,7 @@ func (o *RefreshTokenHookRequest) GetRequester() Requester {
 
 // GetRequesterOk returns a tuple with the Requester field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RefreshTokenHookRequest) GetRequesterOk() (*Requester, bool) {
+func (o *RefreshTokenHookRequest) GetRequesterOk() (*OAuth2AccessRequest, bool) {
 	if o == nil || o.Requester == nil {
 		return nil, false
 	}
@@ -169,8 +169,8 @@ func (o *RefreshTokenHookRequest) HasRequester() bool {
 	return false
 }
 
-// SetRequester gets a reference to the given Requester and assigns it to the Requester field.
-func (o *RefreshTokenHookRequest) SetRequester(v Requester) {
+// SetRequester gets a reference to the given OAuth2AccessRequest and assigns it to the Requester field.
+func (o *RefreshTokenHookRequest) SetRequester(v OAuth2AccessRequest) {
 	o.Requester = &v
 }
 

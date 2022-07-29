@@ -58,8 +58,8 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 	hydraoauth2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/assertx"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/urlx"
 )
 
@@ -1051,46 +1051,16 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
 							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
 
-							assertx.EqualAsJSONExcept(t, hookReq.Session, json.RawMessage(`{
-								"allowed_top_level_claims": [],
-								"client_id": "app-client",
-								"consent_challenge": "",
-								"exclude_not_before_claim": false,
-								"extra": {},
-								"id_token": {
-									"headers": {
-										"extra": {"kid":"public:hydra.openid.id-token"}
-									},
-									"id_token_claims": {
-										"acr": "1",
-										"amr": null,
-										"at_hash": "",
-										"c_hash": "",
-										"aud": ["app-client"],
-										"ext": {"sid":""},
-										"iss": "http://localhost:4444/",
-										"jti": "",
-										"nonce": "",
-										"sub": "foo"
-									},
-									"subject": "foo",
-									"username": ""
-								}
-							}`), []string{
-								"kid",
-								"id_token.expires_at",
-								"id_token.id_token_claims.iat",
-								"id_token.id_token_claims.exp",
-								"id_token.id_token_claims.rat",
-								"id_token.id_token_claims.auth_time",
-							})
-
-							assertx.EqualAsJSON(t, hookReq.Requester, json.RawMessage(`{
-								"client_id": "app-client",
-								"granted_scopes": ["offline", "openid", "hydra.*"],
-								"granted_audience": [],
-								"grant_types": ["refresh_token"]
-							}`))
+							except := []string{
+								"session.kid",
+								"session.id_token.expires_at",
+								"session.id_token.headers.extra.kid",
+								"session.id_token.id_token_claims.iat",
+								"session.id_token.id_token_claims.exp",
+								"session.id_token.id_token_claims.rat",
+								"session.id_token.id_token_claims.auth_time",
+							}
+							snapshotx.SnapshotTExcept(t, hookReq, except)
 
 							claims := map[string]interface{}{
 								"hooked": true,

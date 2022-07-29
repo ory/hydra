@@ -12,10 +12,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Requester Requester is a token endpoint's request context.
+// OAuth2AccessRequest Requester is a token endpoint's request context.
 //
-// swagger:model requester
-type Requester struct {
+// swagger:model oAuth2AccessRequest
+type OAuth2AccessRequest struct {
 
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id,omitempty"`
@@ -30,18 +30,18 @@ type Requester struct {
 	GrantedScopes []string `json:"granted_scopes"`
 }
 
-// Validate validates this requester
-func (m *Requester) Validate(formats strfmt.Registry) error {
+// Validate validates this o auth2 access request
+func (m *OAuth2AccessRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this requester based on context it is used
-func (m *Requester) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this o auth2 access request based on context it is used
+func (m *OAuth2AccessRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Requester) MarshalBinary() ([]byte, error) {
+func (m *OAuth2AccessRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -49,8 +49,8 @@ func (m *Requester) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Requester) UnmarshalBinary(b []byte) error {
-	var res Requester
+func (m *OAuth2AccessRequest) UnmarshalBinary(b []byte) error {
+	var res OAuth2AccessRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

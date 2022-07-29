@@ -32,6 +32,7 @@ docs/JsonWebKeySetGeneratorRequest.md
 docs/LoginRequest.md
 docs/LogoutRequest.md
 docs/MetadataApi.md
+docs/OAuth2AccessRequest.md
 docs/OAuth2Client.md
 docs/OAuth2TokenIntrospection.md
 docs/Oauth2TokenResponse.md
@@ -44,7 +45,6 @@ docs/RefreshTokenHookRequest.md
 docs/RefreshTokenHookResponse.md
 docs/RejectRequest.md
 docs/RequestWasHandledResponse.md
-docs/Requester.md
 docs/Session.md
 docs/TrustJwtGrantIssuerBody.md
 docs/TrustedJsonWebKey.md
@@ -78,6 +78,7 @@ model_json_web_key_set.go
 model_json_web_key_set_generator_request.go
 model_login_request.go
 model_logout_request.go
+model_o_auth2_access_request.go
 model_o_auth2_client.go
 model_o_auth2_token_introspection.go
 model_oauth2_token_response.go
@@ -89,7 +90,6 @@ model_refresh_token_hook_request.go
 model_refresh_token_hook_response.go
 model_reject_request.go
 model_request_was_handled_response.go
-model_requester.go
 model_session.go
 model_trust_jwt_grant_issuer_body.go
 model_trusted_json_web_key.go

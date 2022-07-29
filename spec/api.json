@@ -738,6 +738,37 @@
         "title": "NullTime implements sql.NullTime functionality.",
         "type": "string"
       },
+      "oAuth2AccessRequest": {
+        "properties": {
+          "client_id": {
+            "description": "ClientID is the identifier of the OAuth 2.0 client.",
+            "type": "string"
+          },
+          "grant_types": {
+            "description": "GrantTypes is the requests grant types.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_audience": {
+            "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_scopes": {
+            "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "Requester is a token endpoint's request context.",
+        "type": "object"
+      },
       "oAuth2Client": {
         "properties": {
           "allowed_cors_origins": {
@@ -1134,7 +1165,7 @@
             "type": "array"
           },
           "requester": {
-            "$ref": "#/components/schemas/requester"
+            "$ref": "#/components/schemas/oAuth2AccessRequest"
           },
           "session": {
             "$ref": "#/components/schemas/Session"
@@ -1194,37 +1225,6 @@
           "redirect_to"
         ],
         "title": "The response payload sent when there is an attempt to access already handled request.",
-        "type": "object"
-      },
-      "requester": {
-        "properties": {
-          "client_id": {
-            "description": "ClientID is the identifier of the OAuth 2.0 client.",
-            "type": "string"
-          },
-          "grant_types": {
-            "description": "GrantTypes is the requests grant types.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "granted_audience": {
-            "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "granted_scopes": {
-            "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "title": "Requester is a token endpoint's request context.",
         "type": "object"
       },
       "trustJwtGrantIssuerBody": {

@@ -17,7 +17,7 @@ import (
 
 // Headers Headers is the jwt headers
 type Headers struct {
-	Extra map[string]map[string]interface{} `json:"Extra,omitempty"`
+	Extra map[string]map[string]interface{} `json:"extra,omitempty"`
 }
 
 // NewHeaders instantiates a new Headers object
@@ -72,7 +72,7 @@ func (o *Headers) SetExtra(v map[string]map[string]interface{}) {
 func (o Headers) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Extra != nil {
-		toSerialize["Extra"] = o.Extra
+		toSerialize["extra"] = o.Extra
 	}
 	return json.Marshal(toSerialize)
 }

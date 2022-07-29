@@ -35,23 +35,23 @@
       "DefaultSession": {
         "description": "IDTokenSession is a session container for the id token",
         "properties": {
-          "Claims": {
-            "$ref": "#/components/schemas/IDTokenClaims"
-          },
-          "ExpiresAt": {
+          "expires_at": {
             "additionalProperties": {
               "format": "date-time",
               "type": "string"
             },
             "type": "object"
           },
-          "Headers": {
+          "headers": {
             "$ref": "#/components/schemas/Headers"
           },
-          "Subject": {
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "subject": {
             "type": "string"
           },
-          "Username": {
+          "username": {
             "type": "string"
           }
         },
@@ -60,7 +60,7 @@
       "Headers": {
         "description": "Headers is the jwt headers",
         "properties": {
-          "Extra": {
+          "extra": {
             "additionalProperties": true,
             "type": "object"
           }
@@ -70,57 +70,57 @@
       "IDTokenClaims": {
         "description": "IDTokenClaims represent the claims used in open id connect requests",
         "properties": {
-          "AccessTokenHash": {
+          "acr": {
             "type": "string"
           },
-          "Audience": {
+          "amr": {
             "items": {
               "type": "string"
             },
             "type": "array"
           },
-          "AuthTime": {
-            "format": "date-time",
+          "at_hash": {
             "type": "string"
           },
-          "AuthenticationContextClassReference": {
-            "type": "string"
-          },
-          "AuthenticationMethodsReferences": {
+          "aud": {
             "items": {
               "type": "string"
             },
             "type": "array"
           },
-          "CodeHash": {
-            "type": "string"
-          },
-          "ExpiresAt": {
+          "auth_time": {
             "format": "date-time",
             "type": "string"
           },
-          "Extra": {
+          "c_hash": {
+            "type": "string"
+          },
+          "exp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "ext": {
             "additionalProperties": true,
             "type": "object"
           },
-          "IssuedAt": {
+          "iat": {
             "format": "date-time",
             "type": "string"
           },
-          "Issuer": {
+          "iss": {
             "type": "string"
           },
-          "JTI": {
+          "jti": {
             "type": "string"
           },
-          "Nonce": {
+          "nonce": {
             "type": "string"
           },
-          "RequestedAt": {
+          "rat": {
             "format": "date-time",
             "type": "string"
           },
-          "Subject": {
+          "sub": {
             "type": "string"
           }
         },
@@ -271,25 +271,6 @@
       },
       "Session": {
         "properties": {
-          "Claims": {
-            "$ref": "#/components/schemas/IDTokenClaims"
-          },
-          "ExpiresAt": {
-            "additionalProperties": {
-              "format": "date-time",
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "Headers": {
-            "$ref": "#/components/schemas/Headers"
-          },
-          "Subject": {
-            "type": "string"
-          },
-          "Username": {
-            "type": "string"
-          },
           "allowed_top_level_claims": {
             "items": {
               "type": "string"
@@ -305,11 +286,30 @@
           "exclude_not_before_claim": {
             "type": "boolean"
           },
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
           "extra": {
             "additionalProperties": true,
             "type": "object"
           },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
           "kid": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
             "type": "string"
           }
         },

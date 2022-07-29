@@ -2,22 +2,22 @@
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**AccessTokenHash** | Pointer to **string** |  | [optional] 
-**Audience** | Pointer to **[]string** |  | [optional] 
-**AuthTime** | Pointer to **time.Time** |  | [optional] 
-**AuthenticationContextClassReference** | Pointer to **string** |  | [optional] 
-**AuthenticationMethodsReferences** | Pointer to **[]string** |  | [optional] 
-**CodeHash** | Pointer to **string** |  | [optional] 
-**ExpiresAt** | Pointer to **time.Time** |  | [optional] 
-**Extra** | Pointer to **map[string]map[string]interface{}** |  | [optional] 
-**IssuedAt** | Pointer to **time.Time** |  | [optional] 
-**Issuer** | Pointer to **string** |  | [optional] 
-**JTI** | Pointer to **string** |  | [optional] 
-**Nonce** | Pointer to **string** |  | [optional] 
-**RequestedAt** | Pointer to **time.Time** |  | [optional] 
-**Subject** | Pointer to **string** |  | [optional] 
+| Name         | Type                                             | Description | Notes      |
+| ------------ | ------------------------------------------------ | ----------- | ---------- |
+| **Acr**      | Pointer to **string**                            |             | [optional] |
+| **Amr**      | Pointer to **[]string**                          |             | [optional] |
+| **AtHash**   | Pointer to **string**                            |             | [optional] |
+| **Aud**      | Pointer to **[]string**                          |             | [optional] |
+| **AuthTime** | Pointer to **time.Time**                         |             | [optional] |
+| **CHash**    | Pointer to **string**                            |             | [optional] |
+| **Exp**      | Pointer to **time.Time**                         |             | [optional] |
+| **Ext**      | Pointer to **map[string]map[string]interface{}** |             | [optional] |
+| **Iat**      | Pointer to **time.Time**                         |             | [optional] |
+| **Iss**      | Pointer to **string**                            |             | [optional] |
+| **Jti**      | Pointer to **string**                            |             | [optional] |
+| **Nonce**    | Pointer to **string**                            |             | [optional] |
+| **Rat**      | Pointer to **time.Time**                         |             | [optional] |
+| **Sub**      | Pointer to **string**                            |             | [optional] |
 
 ## Methods
 
@@ -25,68 +25,118 @@ Name | Type | Description | Notes
 
 `func NewIDTokenClaims() *IDTokenClaims`
 
-NewIDTokenClaims instantiates a new IDTokenClaims object
-This constructor will assign default values to properties that have it defined,
-and makes sure properties required by API are set, but the set of arguments
-will change when the set of required properties is changed
+NewIDTokenClaims instantiates a new IDTokenClaims object This constructor will
+assign default values to properties that have it defined, and makes sure
+properties required by API are set, but the set of arguments will change when
+the set of required properties is changed
 
 ### NewIDTokenClaimsWithDefaults
 
 `func NewIDTokenClaimsWithDefaults() *IDTokenClaims`
 
-NewIDTokenClaimsWithDefaults instantiates a new IDTokenClaims object
-This constructor will only assign default values to properties that have it defined,
+NewIDTokenClaimsWithDefaults instantiates a new IDTokenClaims object This
+constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetAccessTokenHash
+### GetAcr
 
-`func (o *IDTokenClaims) GetAccessTokenHash() string`
+`func (o *IDTokenClaims) GetAcr() string`
 
-GetAccessTokenHash returns the AccessTokenHash field if non-nil, zero value otherwise.
+GetAcr returns the Acr field if non-nil, zero value otherwise.
 
-### GetAccessTokenHashOk
+### GetAcrOk
 
-`func (o *IDTokenClaims) GetAccessTokenHashOk() (*string, bool)`
+`func (o *IDTokenClaims) GetAcrOk() (*string, bool)`
 
-GetAccessTokenHashOk returns a tuple with the AccessTokenHash field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetAcrOk returns a tuple with the Acr field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetAccessTokenHash
+### SetAcr
 
-`func (o *IDTokenClaims) SetAccessTokenHash(v string)`
+`func (o *IDTokenClaims) SetAcr(v string)`
 
-SetAccessTokenHash sets AccessTokenHash field to given value.
+SetAcr sets Acr field to given value.
 
-### HasAccessTokenHash
+### HasAcr
 
-`func (o *IDTokenClaims) HasAccessTokenHash() bool`
+`func (o *IDTokenClaims) HasAcr() bool`
 
-HasAccessTokenHash returns a boolean if a field has been set.
+HasAcr returns a boolean if a field has been set.
 
-### GetAudience
+### GetAmr
 
-`func (o *IDTokenClaims) GetAudience() []string`
+`func (o *IDTokenClaims) GetAmr() []string`
 
-GetAudience returns the Audience field if non-nil, zero value otherwise.
+GetAmr returns the Amr field if non-nil, zero value otherwise.
 
-### GetAudienceOk
+### GetAmrOk
 
-`func (o *IDTokenClaims) GetAudienceOk() (*[]string, bool)`
+`func (o *IDTokenClaims) GetAmrOk() (*[]string, bool)`
 
-GetAudienceOk returns a tuple with the Audience field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetAmrOk returns a tuple with the Amr field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetAudience
+### SetAmr
 
-`func (o *IDTokenClaims) SetAudience(v []string)`
+`func (o *IDTokenClaims) SetAmr(v []string)`
 
-SetAudience sets Audience field to given value.
+SetAmr sets Amr field to given value.
 
-### HasAudience
+### HasAmr
 
-`func (o *IDTokenClaims) HasAudience() bool`
+`func (o *IDTokenClaims) HasAmr() bool`
 
-HasAudience returns a boolean if a field has been set.
+HasAmr returns a boolean if a field has been set.
+
+### GetAtHash
+
+`func (o *IDTokenClaims) GetAtHash() string`
+
+GetAtHash returns the AtHash field if non-nil, zero value otherwise.
+
+### GetAtHashOk
+
+`func (o *IDTokenClaims) GetAtHashOk() (*string, bool)`
+
+GetAtHashOk returns a tuple with the AtHash field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
+
+### SetAtHash
+
+`func (o *IDTokenClaims) SetAtHash(v string)`
+
+SetAtHash sets AtHash field to given value.
+
+### HasAtHash
+
+`func (o *IDTokenClaims) HasAtHash() bool`
+
+HasAtHash returns a boolean if a field has been set.
+
+### GetAud
+
+`func (o *IDTokenClaims) GetAud() []string`
+
+GetAud returns the Aud field if non-nil, zero value otherwise.
+
+### GetAudOk
+
+`func (o *IDTokenClaims) GetAudOk() (*[]string, bool)`
+
+GetAudOk returns a tuple with the Aud field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
+
+### SetAud
+
+`func (o *IDTokenClaims) SetAud(v []string)`
+
+SetAud sets Aud field to given value.
+
+### HasAud
+
+`func (o *IDTokenClaims) HasAud() bool`
+
+HasAud returns a boolean if a field has been set.
 
 ### GetAuthTime
 
@@ -98,8 +148,8 @@ GetAuthTime returns the AuthTime field if non-nil, zero value otherwise.
 
 `func (o *IDTokenClaims) GetAuthTimeOk() (*time.Time, bool)`
 
-GetAuthTimeOk returns a tuple with the AuthTime field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetAuthTimeOk returns a tuple with the AuthTime field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetAuthTime
 
@@ -113,205 +163,155 @@ SetAuthTime sets AuthTime field to given value.
 
 HasAuthTime returns a boolean if a field has been set.
 
-### GetAuthenticationContextClassReference
+### GetCHash
 
-`func (o *IDTokenClaims) GetAuthenticationContextClassReference() string`
+`func (o *IDTokenClaims) GetCHash() string`
 
-GetAuthenticationContextClassReference returns the AuthenticationContextClassReference field if non-nil, zero value otherwise.
+GetCHash returns the CHash field if non-nil, zero value otherwise.
 
-### GetAuthenticationContextClassReferenceOk
+### GetCHashOk
 
-`func (o *IDTokenClaims) GetAuthenticationContextClassReferenceOk() (*string, bool)`
+`func (o *IDTokenClaims) GetCHashOk() (*string, bool)`
 
-GetAuthenticationContextClassReferenceOk returns a tuple with the AuthenticationContextClassReference field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetCHashOk returns a tuple with the CHash field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetAuthenticationContextClassReference
+### SetCHash
 
-`func (o *IDTokenClaims) SetAuthenticationContextClassReference(v string)`
+`func (o *IDTokenClaims) SetCHash(v string)`
 
-SetAuthenticationContextClassReference sets AuthenticationContextClassReference field to given value.
+SetCHash sets CHash field to given value.
 
-### HasAuthenticationContextClassReference
+### HasCHash
 
-`func (o *IDTokenClaims) HasAuthenticationContextClassReference() bool`
+`func (o *IDTokenClaims) HasCHash() bool`
 
-HasAuthenticationContextClassReference returns a boolean if a field has been set.
+HasCHash returns a boolean if a field has been set.
 
-### GetAuthenticationMethodsReferences
+### GetExp
 
-`func (o *IDTokenClaims) GetAuthenticationMethodsReferences() []string`
+`func (o *IDTokenClaims) GetExp() time.Time`
 
-GetAuthenticationMethodsReferences returns the AuthenticationMethodsReferences field if non-nil, zero value otherwise.
+GetExp returns the Exp field if non-nil, zero value otherwise.
 
-### GetAuthenticationMethodsReferencesOk
+### GetExpOk
 
-`func (o *IDTokenClaims) GetAuthenticationMethodsReferencesOk() (*[]string, bool)`
+`func (o *IDTokenClaims) GetExpOk() (*time.Time, bool)`
 
-GetAuthenticationMethodsReferencesOk returns a tuple with the AuthenticationMethodsReferences field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetExpOk returns a tuple with the Exp field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetAuthenticationMethodsReferences
+### SetExp
 
-`func (o *IDTokenClaims) SetAuthenticationMethodsReferences(v []string)`
+`func (o *IDTokenClaims) SetExp(v time.Time)`
 
-SetAuthenticationMethodsReferences sets AuthenticationMethodsReferences field to given value.
+SetExp sets Exp field to given value.
 
-### HasAuthenticationMethodsReferences
+### HasExp
 
-`func (o *IDTokenClaims) HasAuthenticationMethodsReferences() bool`
+`func (o *IDTokenClaims) HasExp() bool`
 
-HasAuthenticationMethodsReferences returns a boolean if a field has been set.
+HasExp returns a boolean if a field has been set.
 
-### GetCodeHash
+### GetExt
 
-`func (o *IDTokenClaims) GetCodeHash() string`
+`func (o *IDTokenClaims) GetExt() map[string]map[string]interface{}`
 
-GetCodeHash returns the CodeHash field if non-nil, zero value otherwise.
+GetExt returns the Ext field if non-nil, zero value otherwise.
 
-### GetCodeHashOk
+### GetExtOk
 
-`func (o *IDTokenClaims) GetCodeHashOk() (*string, bool)`
+`func (o *IDTokenClaims) GetExtOk() (*map[string]map[string]interface{}, bool)`
 
-GetCodeHashOk returns a tuple with the CodeHash field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetExtOk returns a tuple with the Ext field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetCodeHash
+### SetExt
 
-`func (o *IDTokenClaims) SetCodeHash(v string)`
+`func (o *IDTokenClaims) SetExt(v map[string]map[string]interface{})`
 
-SetCodeHash sets CodeHash field to given value.
+SetExt sets Ext field to given value.
 
-### HasCodeHash
+### HasExt
 
-`func (o *IDTokenClaims) HasCodeHash() bool`
+`func (o *IDTokenClaims) HasExt() bool`
 
-HasCodeHash returns a boolean if a field has been set.
+HasExt returns a boolean if a field has been set.
 
-### GetExpiresAt
+### GetIat
 
-`func (o *IDTokenClaims) GetExpiresAt() time.Time`
+`func (o *IDTokenClaims) GetIat() time.Time`
 
-GetExpiresAt returns the ExpiresAt field if non-nil, zero value otherwise.
+GetIat returns the Iat field if non-nil, zero value otherwise.
 
-### GetExpiresAtOk
+### GetIatOk
 
-`func (o *IDTokenClaims) GetExpiresAtOk() (*time.Time, bool)`
+`func (o *IDTokenClaims) GetIatOk() (*time.Time, bool)`
 
-GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetIatOk returns a tuple with the Iat field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetExpiresAt
+### SetIat
 
-`func (o *IDTokenClaims) SetExpiresAt(v time.Time)`
+`func (o *IDTokenClaims) SetIat(v time.Time)`
 
-SetExpiresAt sets ExpiresAt field to given value.
+SetIat sets Iat field to given value.
 
-### HasExpiresAt
+### HasIat
 
-`func (o *IDTokenClaims) HasExpiresAt() bool`
+`func (o *IDTokenClaims) HasIat() bool`
 
-HasExpiresAt returns a boolean if a field has been set.
+HasIat returns a boolean if a field has been set.
 
-### GetExtra
+### GetIss
 
-`func (o *IDTokenClaims) GetExtra() map[string]map[string]interface{}`
+`func (o *IDTokenClaims) GetIss() string`
 
-GetExtra returns the Extra field if non-nil, zero value otherwise.
+GetIss returns the Iss field if non-nil, zero value otherwise.
 
-### GetExtraOk
+### GetIssOk
 
-`func (o *IDTokenClaims) GetExtraOk() (*map[string]map[string]interface{}, bool)`
+`func (o *IDTokenClaims) GetIssOk() (*string, bool)`
 
-GetExtraOk returns a tuple with the Extra field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetIssOk returns a tuple with the Iss field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetExtra
+### SetIss
 
-`func (o *IDTokenClaims) SetExtra(v map[string]map[string]interface{})`
+`func (o *IDTokenClaims) SetIss(v string)`
 
-SetExtra sets Extra field to given value.
+SetIss sets Iss field to given value.
 
-### HasExtra
+### HasIss
 
-`func (o *IDTokenClaims) HasExtra() bool`
+`func (o *IDTokenClaims) HasIss() bool`
 
-HasExtra returns a boolean if a field has been set.
+HasIss returns a boolean if a field has been set.
 
-### GetIssuedAt
+### GetJti
 
-`func (o *IDTokenClaims) GetIssuedAt() time.Time`
+`func (o *IDTokenClaims) GetJti() string`
 
-GetIssuedAt returns the IssuedAt field if non-nil, zero value otherwise.
+GetJti returns the Jti field if non-nil, zero value otherwise.
 
-### GetIssuedAtOk
+### GetJtiOk
 
-`func (o *IDTokenClaims) GetIssuedAtOk() (*time.Time, bool)`
+`func (o *IDTokenClaims) GetJtiOk() (*string, bool)`
 
-GetIssuedAtOk returns a tuple with the IssuedAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetJtiOk returns a tuple with the Jti field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetIssuedAt
+### SetJti
 
-`func (o *IDTokenClaims) SetIssuedAt(v time.Time)`
+`func (o *IDTokenClaims) SetJti(v string)`
 
-SetIssuedAt sets IssuedAt field to given value.
+SetJti sets Jti field to given value.
 
-### HasIssuedAt
+### HasJti
 
-`func (o *IDTokenClaims) HasIssuedAt() bool`
+`func (o *IDTokenClaims) HasJti() bool`
 
-HasIssuedAt returns a boolean if a field has been set.
-
-### GetIssuer
-
-`func (o *IDTokenClaims) GetIssuer() string`
-
-GetIssuer returns the Issuer field if non-nil, zero value otherwise.
-
-### GetIssuerOk
-
-`func (o *IDTokenClaims) GetIssuerOk() (*string, bool)`
-
-GetIssuerOk returns a tuple with the Issuer field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetIssuer
-
-`func (o *IDTokenClaims) SetIssuer(v string)`
-
-SetIssuer sets Issuer field to given value.
-
-### HasIssuer
-
-`func (o *IDTokenClaims) HasIssuer() bool`
-
-HasIssuer returns a boolean if a field has been set.
-
-### GetJTI
-
-`func (o *IDTokenClaims) GetJTI() string`
-
-GetJTI returns the JTI field if non-nil, zero value otherwise.
-
-### GetJTIOk
-
-`func (o *IDTokenClaims) GetJTIOk() (*string, bool)`
-
-GetJTIOk returns a tuple with the JTI field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetJTI
-
-`func (o *IDTokenClaims) SetJTI(v string)`
-
-SetJTI sets JTI field to given value.
-
-### HasJTI
-
-`func (o *IDTokenClaims) HasJTI() bool`
-
-HasJTI returns a boolean if a field has been set.
+HasJti returns a boolean if a field has been set.
 
 ### GetNonce
 
@@ -323,8 +323,8 @@ GetNonce returns the Nonce field if non-nil, zero value otherwise.
 
 `func (o *IDTokenClaims) GetNonceOk() (*string, bool)`
 
-GetNonceOk returns a tuple with the Nonce field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetNonceOk returns a tuple with the Nonce field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetNonce
 
@@ -338,57 +338,56 @@ SetNonce sets Nonce field to given value.
 
 HasNonce returns a boolean if a field has been set.
 
-### GetRequestedAt
+### GetRat
 
-`func (o *IDTokenClaims) GetRequestedAt() time.Time`
+`func (o *IDTokenClaims) GetRat() time.Time`
 
-GetRequestedAt returns the RequestedAt field if non-nil, zero value otherwise.
+GetRat returns the Rat field if non-nil, zero value otherwise.
 
-### GetRequestedAtOk
+### GetRatOk
 
-`func (o *IDTokenClaims) GetRequestedAtOk() (*time.Time, bool)`
+`func (o *IDTokenClaims) GetRatOk() (*time.Time, bool)`
 
-GetRequestedAtOk returns a tuple with the RequestedAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetRatOk returns a tuple with the Rat field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetRequestedAt
+### SetRat
 
-`func (o *IDTokenClaims) SetRequestedAt(v time.Time)`
+`func (o *IDTokenClaims) SetRat(v time.Time)`
 
-SetRequestedAt sets RequestedAt field to given value.
+SetRat sets Rat field to given value.
 
-### HasRequestedAt
+### HasRat
 
-`func (o *IDTokenClaims) HasRequestedAt() bool`
+`func (o *IDTokenClaims) HasRat() bool`
 
-HasRequestedAt returns a boolean if a field has been set.
+HasRat returns a boolean if a field has been set.
 
-### GetSubject
+### GetSub
 
-`func (o *IDTokenClaims) GetSubject() string`
+`func (o *IDTokenClaims) GetSub() string`
 
-GetSubject returns the Subject field if non-nil, zero value otherwise.
+GetSub returns the Sub field if non-nil, zero value otherwise.
 
-### GetSubjectOk
+### GetSubOk
 
-`func (o *IDTokenClaims) GetSubjectOk() (*string, bool)`
+`func (o *IDTokenClaims) GetSubOk() (*string, bool)`
 
-GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetSubOk returns a tuple with the Sub field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
-### SetSubject
+### SetSub
 
-`func (o *IDTokenClaims) SetSubject(v string)`
+`func (o *IDTokenClaims) SetSub(v string)`
 
-SetSubject sets Subject field to given value.
+SetSub sets Sub field to given value.
 
-### HasSubject
+### HasSub
 
-`func (o *IDTokenClaims) HasSubject() bool`
+`func (o *IDTokenClaims) HasSub() bool`
 
-HasSubject returns a boolean if a field has been set.
+HasSub returns a boolean if a field has been set.
 
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
-
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to README]](../README.md)

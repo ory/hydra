@@ -19,21 +19,6 @@ import (
 // swagger:model Session
 type Session struct {
 
-	// claims
-	Claims *IDTokenClaims `json:"Claims,omitempty"`
-
-	// expires at
-	ExpiresAt map[string]strfmt.DateTime `json:"ExpiresAt,omitempty"`
-
-	// headers
-	Headers *Headers `json:"Headers,omitempty"`
-
-	// subject
-	Subject string `json:"Subject,omitempty"`
-
-	// username
-	Username string `json:"Username,omitempty"`
-
 	// allowed top level claims
 	AllowedTopLevelClaims []string `json:"allowed_top_level_claims"`
 
@@ -46,20 +31,31 @@ type Session struct {
 	// exclude not before claim
 	ExcludeNotBeforeClaim bool `json:"exclude_not_before_claim,omitempty"`
 
+	// expires at
+	ExpiresAt map[string]strfmt.DateTime `json:"expires_at,omitempty"`
+
 	// extra
 	Extra interface{} `json:"extra,omitempty"`
 
+	// headers
+	Headers *Headers `json:"headers,omitempty"`
+
+	// id token claims
+	IDTokenClaims *IDTokenClaims `json:"id_token_claims,omitempty"`
+
 	// kid
 	Kid string `json:"kid,omitempty"`
+
+	// subject
+	Subject string `json:"subject,omitempty"`
+
+	// username
+	Username string `json:"username,omitempty"`
 }
 
 // Validate validates this session
 func (m *Session) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateClaims(formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.validateExpiresAt(formats); err != nil {
 		res = append(res, err)
@@ -69,26 +65,13 @@ func (m *Session) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateIDTokenClaims(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *Session) validateClaims(formats strfmt.Registry) error {
-	if swag.IsZero(m.Claims) { // not required
-		return nil
-	}
-
-	if m.Claims != nil {
-		if err := m.Claims.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("Claims")
-			}
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -99,7 +82,7 @@ func (m *Session) validateExpiresAt(formats strfmt.Registry) error {
 
 	for k := range m.ExpiresAt {
 
-		if err := validate.FormatOf("ExpiresAt"+"."+k, "body", "date-time", m.ExpiresAt[k].String(), formats); err != nil {
+		if err := validate.FormatOf("expires_at"+"."+k, "body", "date-time", m.ExpiresAt[k].String(), formats); err != nil {
 			return err
 		}
 
@@ -116,7 +99,24 @@ func (m *Session) validateHeaders(formats strfmt.Registry) error {
 	if m.Headers != nil {
 		if err := m.Headers.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("Headers")
+				return ve.ValidateName("headers")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Session) validateIDTokenClaims(formats strfmt.Registry) error {
+	if swag.IsZero(m.IDTokenClaims) { // not required
+		return nil
+	}
+
+	if m.IDTokenClaims != nil {
+		if err := m.IDTokenClaims.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("id_token_claims")
 			}
 			return err
 		}
@@ -129,11 +129,11 @@ func (m *Session) validateHeaders(formats strfmt.Registry) error {
 func (m *Session) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateClaims(ctx, formats); err != nil {
+	if err := m.contextValidateHeaders(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.contextValidateHeaders(ctx, formats); err != nil {
+	if err := m.contextValidateIDTokenClaims(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -143,12 +143,12 @@ func (m *Session) ContextValidate(ctx context.Context, formats strfmt.Registry) 
 	return nil
 }
 
-func (m *Session) contextValidateClaims(ctx context.Context, formats strfmt.Registry) error {
+func (m *Session) contextValidateHeaders(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.Claims != nil {
-		if err := m.Claims.ContextValidate(ctx, formats); err != nil {
+	if m.Headers != nil {
+		if err := m.Headers.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("Claims")
+				return ve.ValidateName("headers")
 			}
 			return err
 		}
@@ -157,12 +157,12 @@ func (m *Session) contextValidateClaims(ctx context.Context, formats strfmt.Regi
 	return nil
 }
 
-func (m *Session) contextValidateHeaders(ctx context.Context, formats strfmt.Registry) error {
+func (m *Session) contextValidateIDTokenClaims(ctx context.Context, formats strfmt.Registry) error {
 
-	if m.Headers != nil {
-		if err := m.Headers.ContextValidate(ctx, formats); err != nil {
+	if m.IDTokenClaims != nil {
+		if err := m.IDTokenClaims.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("Headers")
+				return ve.ValidateName("id_token_claims")
 			}
 			return err
 		}

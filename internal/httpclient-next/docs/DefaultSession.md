@@ -2,13 +2,13 @@
 
 ## Properties
 
-Name | Type | Description | Notes
------------- | ------------- | ------------- | -------------
-**Claims** | Pointer to [**IDTokenClaims**](IDTokenClaims.md) |  | [optional] 
-**ExpiresAt** | Pointer to [**map[string]time.Time**](time.Time.md) |  | [optional] 
-**Headers** | Pointer to [**Headers**](Headers.md) |  | [optional] 
-**Subject** | Pointer to **string** |  | [optional] 
-**Username** | Pointer to **string** |  | [optional] 
+| Name              | Type                                                | Description | Notes      |
+| ----------------- | --------------------------------------------------- | ----------- | ---------- |
+| **ExpiresAt**     | Pointer to [**map[string]time.Time**](time.Time.md) |             | [optional] |
+| **Headers**       | Pointer to [**Headers**](Headers.md)                |             | [optional] |
+| **IdTokenClaims** | Pointer to [**IDTokenClaims**](IDTokenClaims.md)    |             | [optional] |
+| **Subject**       | Pointer to **string**                               |             | [optional] |
+| **Username**      | Pointer to **string**                               |             | [optional] |
 
 ## Methods
 
@@ -16,43 +16,18 @@ Name | Type | Description | Notes
 
 `func NewDefaultSession() *DefaultSession`
 
-NewDefaultSession instantiates a new DefaultSession object
-This constructor will assign default values to properties that have it defined,
-and makes sure properties required by API are set, but the set of arguments
-will change when the set of required properties is changed
+NewDefaultSession instantiates a new DefaultSession object This constructor will
+assign default values to properties that have it defined, and makes sure
+properties required by API are set, but the set of arguments will change when
+the set of required properties is changed
 
 ### NewDefaultSessionWithDefaults
 
 `func NewDefaultSessionWithDefaults() *DefaultSession`
 
-NewDefaultSessionWithDefaults instantiates a new DefaultSession object
-This constructor will only assign default values to properties that have it defined,
+NewDefaultSessionWithDefaults instantiates a new DefaultSession object This
+constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetClaims
-
-`func (o *DefaultSession) GetClaims() IDTokenClaims`
-
-GetClaims returns the Claims field if non-nil, zero value otherwise.
-
-### GetClaimsOk
-
-`func (o *DefaultSession) GetClaimsOk() (*IDTokenClaims, bool)`
-
-GetClaimsOk returns a tuple with the Claims field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetClaims
-
-`func (o *DefaultSession) SetClaims(v IDTokenClaims)`
-
-SetClaims sets Claims field to given value.
-
-### HasClaims
-
-`func (o *DefaultSession) HasClaims() bool`
-
-HasClaims returns a boolean if a field has been set.
 
 ### GetExpiresAt
 
@@ -64,8 +39,8 @@ GetExpiresAt returns the ExpiresAt field if non-nil, zero value otherwise.
 
 `func (o *DefaultSession) GetExpiresAtOk() (*map[string]time.Time, bool)`
 
-GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetExpiresAt
 
@@ -89,8 +64,8 @@ GetHeaders returns the Headers field if non-nil, zero value otherwise.
 
 `func (o *DefaultSession) GetHeadersOk() (*Headers, bool)`
 
-GetHeadersOk returns a tuple with the Headers field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetHeadersOk returns a tuple with the Headers field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetHeaders
 
@@ -104,6 +79,32 @@ SetHeaders sets Headers field to given value.
 
 HasHeaders returns a boolean if a field has been set.
 
+### GetIdTokenClaims
+
+`func (o *DefaultSession) GetIdTokenClaims() IDTokenClaims`
+
+GetIdTokenClaims returns the IdTokenClaims field if non-nil, zero value
+otherwise.
+
+### GetIdTokenClaimsOk
+
+`func (o *DefaultSession) GetIdTokenClaimsOk() (*IDTokenClaims, bool)`
+
+GetIdTokenClaimsOk returns a tuple with the IdTokenClaims field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
+
+### SetIdTokenClaims
+
+`func (o *DefaultSession) SetIdTokenClaims(v IDTokenClaims)`
+
+SetIdTokenClaims sets IdTokenClaims field to given value.
+
+### HasIdTokenClaims
+
+`func (o *DefaultSession) HasIdTokenClaims() bool`
+
+HasIdTokenClaims returns a boolean if a field has been set.
+
 ### GetSubject
 
 `func (o *DefaultSession) GetSubject() string`
@@ -114,8 +115,8 @@ GetSubject returns the Subject field if non-nil, zero value otherwise.
 
 `func (o *DefaultSession) GetSubjectOk() (*string, bool)`
 
-GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
 
 ### SetSubject
 
@@ -139,8 +140,8 @@ GetUsername returns the Username field if non-nil, zero value otherwise.
 
 `func (o *DefaultSession) GetUsernameOk() (*string, bool)`
 
-GetUsernameOk returns a tuple with the Username field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
+GetUsernameOk returns a tuple with the Username field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
 
 ### SetUsername
 
@@ -154,7 +155,6 @@ SetUsername sets Username field to given value.
 
 HasUsername returns a boolean if a field has been set.
 
-
-[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
-
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to README]](../README.md)

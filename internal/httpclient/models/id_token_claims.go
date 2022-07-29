@@ -19,51 +19,51 @@ import (
 // swagger:model IDTokenClaims
 type IDTokenClaims struct {
 
-	// access token hash
-	AccessTokenHash string `json:"AccessTokenHash,omitempty"`
+	// acr
+	Acr string `json:"acr,omitempty"`
 
-	// audience
-	Audience []string `json:"Audience"`
+	// amr
+	Amr []string `json:"amr"`
+
+	// at hash
+	AtHash string `json:"at_hash,omitempty"`
+
+	// aud
+	Aud []string `json:"aud"`
 
 	// auth time
 	// Format: date-time
-	AuthTime strfmt.DateTime `json:"AuthTime,omitempty"`
+	AuthTime strfmt.DateTime `json:"auth_time,omitempty"`
 
-	// authentication context class reference
-	AuthenticationContextClassReference string `json:"AuthenticationContextClassReference,omitempty"`
+	// c hash
+	CHash string `json:"c_hash,omitempty"`
 
-	// authentication methods references
-	AuthenticationMethodsReferences []string `json:"AuthenticationMethodsReferences"`
-
-	// code hash
-	CodeHash string `json:"CodeHash,omitempty"`
-
-	// expires at
+	// exp
 	// Format: date-time
-	ExpiresAt strfmt.DateTime `json:"ExpiresAt,omitempty"`
+	Exp strfmt.DateTime `json:"exp,omitempty"`
 
-	// extra
-	Extra interface{} `json:"Extra,omitempty"`
+	// ext
+	Ext interface{} `json:"ext,omitempty"`
 
-	// issued at
+	// iat
 	// Format: date-time
-	IssuedAt strfmt.DateTime `json:"IssuedAt,omitempty"`
+	Iat strfmt.DateTime `json:"iat,omitempty"`
 
-	// issuer
-	Issuer string `json:"Issuer,omitempty"`
+	// iss
+	Iss string `json:"iss,omitempty"`
 
-	// j t i
-	JTI string `json:"JTI,omitempty"`
+	// jti
+	Jti string `json:"jti,omitempty"`
 
 	// nonce
-	Nonce string `json:"Nonce,omitempty"`
+	Nonce string `json:"nonce,omitempty"`
 
-	// requested at
+	// rat
 	// Format: date-time
-	RequestedAt strfmt.DateTime `json:"RequestedAt,omitempty"`
+	Rat strfmt.DateTime `json:"rat,omitempty"`
 
-	// subject
-	Subject string `json:"Subject,omitempty"`
+	// sub
+	Sub string `json:"sub,omitempty"`
 }
 
 // Validate validates this ID token claims
@@ -74,15 +74,15 @@ func (m *IDTokenClaims) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateExpiresAt(formats); err != nil {
+	if err := m.validateExp(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateIssuedAt(formats); err != nil {
+	if err := m.validateIat(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateRequestedAt(formats); err != nil {
+	if err := m.validateRat(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -97,43 +97,43 @@ func (m *IDTokenClaims) validateAuthTime(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.FormatOf("AuthTime", "body", "date-time", m.AuthTime.String(), formats); err != nil {
+	if err := validate.FormatOf("auth_time", "body", "date-time", m.AuthTime.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *IDTokenClaims) validateExpiresAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.ExpiresAt) { // not required
+func (m *IDTokenClaims) validateExp(formats strfmt.Registry) error {
+	if swag.IsZero(m.Exp) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("ExpiresAt", "body", "date-time", m.ExpiresAt.String(), formats); err != nil {
+	if err := validate.FormatOf("exp", "body", "date-time", m.Exp.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *IDTokenClaims) validateIssuedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.IssuedAt) { // not required
+func (m *IDTokenClaims) validateIat(formats strfmt.Registry) error {
+	if swag.IsZero(m.Iat) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("IssuedAt", "body", "date-time", m.IssuedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("iat", "body", "date-time", m.Iat.String(), formats); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *IDTokenClaims) validateRequestedAt(formats strfmt.Registry) error {
-	if swag.IsZero(m.RequestedAt) { // not required
+func (m *IDTokenClaims) validateRat(formats strfmt.Registry) error {
+	if swag.IsZero(m.Rat) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("RequestedAt", "body", "date-time", m.RequestedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("rat", "body", "date-time", m.Rat.String(), formats); err != nil {
 		return err
 	}
 

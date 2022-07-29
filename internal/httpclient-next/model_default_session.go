@@ -18,11 +18,11 @@ import (
 
 // DefaultSession IDTokenSession is a session container for the id token
 type DefaultSession struct {
-	Claims    *IDTokenClaims        `json:"Claims,omitempty"`
-	ExpiresAt *map[string]time.Time `json:"ExpiresAt,omitempty"`
-	Headers   *Headers              `json:"Headers,omitempty"`
-	Subject   *string               `json:"Subject,omitempty"`
-	Username  *string               `json:"Username,omitempty"`
+	ExpiresAt     *map[string]time.Time `json:"expires_at,omitempty"`
+	Headers       *Headers              `json:"headers,omitempty"`
+	IdTokenClaims *IDTokenClaims        `json:"id_token_claims,omitempty"`
+	Subject       *string               `json:"subject,omitempty"`
+	Username      *string               `json:"username,omitempty"`
 }
 
 // NewDefaultSession instantiates a new DefaultSession object
@@ -40,38 +40,6 @@ func NewDefaultSession() *DefaultSession {
 func NewDefaultSessionWithDefaults() *DefaultSession {
 	this := DefaultSession{}
 	return &this
-}
-
-// GetClaims returns the Claims field value if set, zero value otherwise.
-func (o *DefaultSession) GetClaims() IDTokenClaims {
-	if o == nil || o.Claims == nil {
-		var ret IDTokenClaims
-		return ret
-	}
-	return *o.Claims
-}
-
-// GetClaimsOk returns a tuple with the Claims field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DefaultSession) GetClaimsOk() (*IDTokenClaims, bool) {
-	if o == nil || o.Claims == nil {
-		return nil, false
-	}
-	return o.Claims, true
-}
-
-// HasClaims returns a boolean if a field has been set.
-func (o *DefaultSession) HasClaims() bool {
-	if o != nil && o.Claims != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetClaims gets a reference to the given IDTokenClaims and assigns it to the Claims field.
-func (o *DefaultSession) SetClaims(v IDTokenClaims) {
-	o.Claims = &v
 }
 
 // GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
@@ -136,6 +104,38 @@ func (o *DefaultSession) HasHeaders() bool {
 // SetHeaders gets a reference to the given Headers and assigns it to the Headers field.
 func (o *DefaultSession) SetHeaders(v Headers) {
 	o.Headers = &v
+}
+
+// GetIdTokenClaims returns the IdTokenClaims field value if set, zero value otherwise.
+func (o *DefaultSession) GetIdTokenClaims() IDTokenClaims {
+	if o == nil || o.IdTokenClaims == nil {
+		var ret IDTokenClaims
+		return ret
+	}
+	return *o.IdTokenClaims
+}
+
+// GetIdTokenClaimsOk returns a tuple with the IdTokenClaims field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DefaultSession) GetIdTokenClaimsOk() (*IDTokenClaims, bool) {
+	if o == nil || o.IdTokenClaims == nil {
+		return nil, false
+	}
+	return o.IdTokenClaims, true
+}
+
+// HasIdTokenClaims returns a boolean if a field has been set.
+func (o *DefaultSession) HasIdTokenClaims() bool {
+	if o != nil && o.IdTokenClaims != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetIdTokenClaims gets a reference to the given IDTokenClaims and assigns it to the IdTokenClaims field.
+func (o *DefaultSession) SetIdTokenClaims(v IDTokenClaims) {
+	o.IdTokenClaims = &v
 }
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
@@ -204,20 +204,20 @@ func (o *DefaultSession) SetUsername(v string) {
 
 func (o DefaultSession) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Claims != nil {
-		toSerialize["Claims"] = o.Claims
-	}
 	if o.ExpiresAt != nil {
-		toSerialize["ExpiresAt"] = o.ExpiresAt
+		toSerialize["expires_at"] = o.ExpiresAt
 	}
 	if o.Headers != nil {
-		toSerialize["Headers"] = o.Headers
+		toSerialize["headers"] = o.Headers
+	}
+	if o.IdTokenClaims != nil {
+		toSerialize["id_token_claims"] = o.IdTokenClaims
 	}
 	if o.Subject != nil {
-		toSerialize["Subject"] = o.Subject
+		toSerialize["subject"] = o.Subject
 	}
 	if o.Username != nil {
-		toSerialize["Username"] = o.Username
+		toSerialize["username"] = o.Username
 	}
 	return json.Marshal(toSerialize)
 }

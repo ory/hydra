@@ -18,7 +18,7 @@ import (
 type Headers struct {
 
 	// extra
-	Extra interface{} `json:"Extra,omitempty"`
+	Extra interface{} `json:"extra,omitempty"`
 }
 
 // Validate validates this headers

@@ -33,7 +33,7 @@ import (
 )
 
 type Session struct {
-	*openid.DefaultSession `json:"idToken"`
+	*openid.DefaultSession `json:"id_token"`
 	Extra                  map[string]interface{} `json:"extra"`
 	KID                    string                 `json:"kid"`
 	ClientID               string                 `json:"client_id"`

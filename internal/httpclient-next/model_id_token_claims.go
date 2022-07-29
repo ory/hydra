@@ -18,20 +18,20 @@ import (
 
 // IDTokenClaims IDTokenClaims represent the claims used in open id connect requests
 type IDTokenClaims struct {
-	AccessTokenHash                     *string                           `json:"AccessTokenHash,omitempty"`
-	Audience                            []string                          `json:"Audience,omitempty"`
-	AuthTime                            *time.Time                        `json:"AuthTime,omitempty"`
-	AuthenticationContextClassReference *string                           `json:"AuthenticationContextClassReference,omitempty"`
-	AuthenticationMethodsReferences     []string                          `json:"AuthenticationMethodsReferences,omitempty"`
-	CodeHash                            *string                           `json:"CodeHash,omitempty"`
-	ExpiresAt                           *time.Time                        `json:"ExpiresAt,omitempty"`
-	Extra                               map[string]map[string]interface{} `json:"Extra,omitempty"`
-	IssuedAt                            *time.Time                        `json:"IssuedAt,omitempty"`
-	Issuer                              *string                           `json:"Issuer,omitempty"`
-	JTI                                 *string                           `json:"JTI,omitempty"`
-	Nonce                               *string                           `json:"Nonce,omitempty"`
-	RequestedAt                         *time.Time                        `json:"RequestedAt,omitempty"`
-	Subject                             *string                           `json:"Subject,omitempty"`
+	Acr      *string                           `json:"acr,omitempty"`
+	Amr      []string                          `json:"amr,omitempty"`
+	AtHash   *string                           `json:"at_hash,omitempty"`
+	Aud      []string                          `json:"aud,omitempty"`
+	AuthTime *time.Time                        `json:"auth_time,omitempty"`
+	CHash    *string                           `json:"c_hash,omitempty"`
+	Exp      *time.Time                        `json:"exp,omitempty"`
+	Ext      map[string]map[string]interface{} `json:"ext,omitempty"`
+	Iat      *time.Time                        `json:"iat,omitempty"`
+	Iss      *string                           `json:"iss,omitempty"`
+	Jti      *string                           `json:"jti,omitempty"`
+	Nonce    *string                           `json:"nonce,omitempty"`
+	Rat      *time.Time                        `json:"rat,omitempty"`
+	Sub      *string                           `json:"sub,omitempty"`
 }
 
 // NewIDTokenClaims instantiates a new IDTokenClaims object
@@ -51,68 +51,132 @@ func NewIDTokenClaimsWithDefaults() *IDTokenClaims {
 	return &this
 }
 
-// GetAccessTokenHash returns the AccessTokenHash field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetAccessTokenHash() string {
-	if o == nil || o.AccessTokenHash == nil {
+// GetAcr returns the Acr field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetAcr() string {
+	if o == nil || o.Acr == nil {
 		var ret string
 		return ret
 	}
-	return *o.AccessTokenHash
+	return *o.Acr
 }
 
-// GetAccessTokenHashOk returns a tuple with the AccessTokenHash field value if set, nil otherwise
+// GetAcrOk returns a tuple with the Acr field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetAccessTokenHashOk() (*string, bool) {
-	if o == nil || o.AccessTokenHash == nil {
+func (o *IDTokenClaims) GetAcrOk() (*string, bool) {
+	if o == nil || o.Acr == nil {
 		return nil, false
 	}
-	return o.AccessTokenHash, true
+	return o.Acr, true
 }
 
-// HasAccessTokenHash returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasAccessTokenHash() bool {
-	if o != nil && o.AccessTokenHash != nil {
+// HasAcr returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasAcr() bool {
+	if o != nil && o.Acr != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetAccessTokenHash gets a reference to the given string and assigns it to the AccessTokenHash field.
-func (o *IDTokenClaims) SetAccessTokenHash(v string) {
-	o.AccessTokenHash = &v
+// SetAcr gets a reference to the given string and assigns it to the Acr field.
+func (o *IDTokenClaims) SetAcr(v string) {
+	o.Acr = &v
 }
 
-// GetAudience returns the Audience field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetAudience() []string {
-	if o == nil || o.Audience == nil {
+// GetAmr returns the Amr field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetAmr() []string {
+	if o == nil || o.Amr == nil {
 		var ret []string
 		return ret
 	}
-	return o.Audience
+	return o.Amr
 }
 
-// GetAudienceOk returns a tuple with the Audience field value if set, nil otherwise
+// GetAmrOk returns a tuple with the Amr field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetAudienceOk() ([]string, bool) {
-	if o == nil || o.Audience == nil {
+func (o *IDTokenClaims) GetAmrOk() ([]string, bool) {
+	if o == nil || o.Amr == nil {
 		return nil, false
 	}
-	return o.Audience, true
+	return o.Amr, true
 }
 
-// HasAudience returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasAudience() bool {
-	if o != nil && o.Audience != nil {
+// HasAmr returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasAmr() bool {
+	if o != nil && o.Amr != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetAudience gets a reference to the given []string and assigns it to the Audience field.
-func (o *IDTokenClaims) SetAudience(v []string) {
-	o.Audience = v
+// SetAmr gets a reference to the given []string and assigns it to the Amr field.
+func (o *IDTokenClaims) SetAmr(v []string) {
+	o.Amr = v
+}
+
+// GetAtHash returns the AtHash field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetAtHash() string {
+	if o == nil || o.AtHash == nil {
+		var ret string
+		return ret
+	}
+	return *o.AtHash
+}
+
+// GetAtHashOk returns a tuple with the AtHash field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *IDTokenClaims) GetAtHashOk() (*string, bool) {
+	if o == nil || o.AtHash == nil {
+		return nil, false
+	}
+	return o.AtHash, true
+}
+
+// HasAtHash returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasAtHash() bool {
+	if o != nil && o.AtHash != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAtHash gets a reference to the given string and assigns it to the AtHash field.
+func (o *IDTokenClaims) SetAtHash(v string) {
+	o.AtHash = &v
+}
+
+// GetAud returns the Aud field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetAud() []string {
+	if o == nil || o.Aud == nil {
+		var ret []string
+		return ret
+	}
+	return o.Aud
+}
+
+// GetAudOk returns a tuple with the Aud field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *IDTokenClaims) GetAudOk() ([]string, bool) {
+	if o == nil || o.Aud == nil {
+		return nil, false
+	}
+	return o.Aud, true
+}
+
+// HasAud returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasAud() bool {
+	if o != nil && o.Aud != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAud gets a reference to the given []string and assigns it to the Aud field.
+func (o *IDTokenClaims) SetAud(v []string) {
+	o.Aud = v
 }
 
 // GetAuthTime returns the AuthTime field value if set, zero value otherwise.
@@ -147,260 +211,196 @@ func (o *IDTokenClaims) SetAuthTime(v time.Time) {
 	o.AuthTime = &v
 }
 
-// GetAuthenticationContextClassReference returns the AuthenticationContextClassReference field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetAuthenticationContextClassReference() string {
-	if o == nil || o.AuthenticationContextClassReference == nil {
+// GetCHash returns the CHash field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetCHash() string {
+	if o == nil || o.CHash == nil {
 		var ret string
 		return ret
 	}
-	return *o.AuthenticationContextClassReference
+	return *o.CHash
 }
 
-// GetAuthenticationContextClassReferenceOk returns a tuple with the AuthenticationContextClassReference field value if set, nil otherwise
+// GetCHashOk returns a tuple with the CHash field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetAuthenticationContextClassReferenceOk() (*string, bool) {
-	if o == nil || o.AuthenticationContextClassReference == nil {
+func (o *IDTokenClaims) GetCHashOk() (*string, bool) {
+	if o == nil || o.CHash == nil {
 		return nil, false
 	}
-	return o.AuthenticationContextClassReference, true
+	return o.CHash, true
 }
 
-// HasAuthenticationContextClassReference returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasAuthenticationContextClassReference() bool {
-	if o != nil && o.AuthenticationContextClassReference != nil {
+// HasCHash returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasCHash() bool {
+	if o != nil && o.CHash != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetAuthenticationContextClassReference gets a reference to the given string and assigns it to the AuthenticationContextClassReference field.
-func (o *IDTokenClaims) SetAuthenticationContextClassReference(v string) {
-	o.AuthenticationContextClassReference = &v
+// SetCHash gets a reference to the given string and assigns it to the CHash field.
+func (o *IDTokenClaims) SetCHash(v string) {
+	o.CHash = &v
 }
 
-// GetAuthenticationMethodsReferences returns the AuthenticationMethodsReferences field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetAuthenticationMethodsReferences() []string {
-	if o == nil || o.AuthenticationMethodsReferences == nil {
-		var ret []string
-		return ret
-	}
-	return o.AuthenticationMethodsReferences
-}
-
-// GetAuthenticationMethodsReferencesOk returns a tuple with the AuthenticationMethodsReferences field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetAuthenticationMethodsReferencesOk() ([]string, bool) {
-	if o == nil || o.AuthenticationMethodsReferences == nil {
-		return nil, false
-	}
-	return o.AuthenticationMethodsReferences, true
-}
-
-// HasAuthenticationMethodsReferences returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasAuthenticationMethodsReferences() bool {
-	if o != nil && o.AuthenticationMethodsReferences != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetAuthenticationMethodsReferences gets a reference to the given []string and assigns it to the AuthenticationMethodsReferences field.
-func (o *IDTokenClaims) SetAuthenticationMethodsReferences(v []string) {
-	o.AuthenticationMethodsReferences = v
-}
-
-// GetCodeHash returns the CodeHash field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetCodeHash() string {
-	if o == nil || o.CodeHash == nil {
-		var ret string
-		return ret
-	}
-	return *o.CodeHash
-}
-
-// GetCodeHashOk returns a tuple with the CodeHash field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetCodeHashOk() (*string, bool) {
-	if o == nil || o.CodeHash == nil {
-		return nil, false
-	}
-	return o.CodeHash, true
-}
-
-// HasCodeHash returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasCodeHash() bool {
-	if o != nil && o.CodeHash != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetCodeHash gets a reference to the given string and assigns it to the CodeHash field.
-func (o *IDTokenClaims) SetCodeHash(v string) {
-	o.CodeHash = &v
-}
-
-// GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetExpiresAt() time.Time {
-	if o == nil || o.ExpiresAt == nil {
+// GetExp returns the Exp field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetExp() time.Time {
+	if o == nil || o.Exp == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.ExpiresAt
+	return *o.Exp
 }
 
-// GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
+// GetExpOk returns a tuple with the Exp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetExpiresAtOk() (*time.Time, bool) {
-	if o == nil || o.ExpiresAt == nil {
+func (o *IDTokenClaims) GetExpOk() (*time.Time, bool) {
+	if o == nil || o.Exp == nil {
 		return nil, false
 	}
-	return o.ExpiresAt, true
+	return o.Exp, true
 }
 
-// HasExpiresAt returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasExpiresAt() bool {
-	if o != nil && o.ExpiresAt != nil {
+// HasExp returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasExp() bool {
+	if o != nil && o.Exp != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetExpiresAt gets a reference to the given time.Time and assigns it to the ExpiresAt field.
-func (o *IDTokenClaims) SetExpiresAt(v time.Time) {
-	o.ExpiresAt = &v
+// SetExp gets a reference to the given time.Time and assigns it to the Exp field.
+func (o *IDTokenClaims) SetExp(v time.Time) {
+	o.Exp = &v
 }
 
-// GetExtra returns the Extra field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetExtra() map[string]map[string]interface{} {
-	if o == nil || o.Extra == nil {
+// GetExt returns the Ext field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetExt() map[string]map[string]interface{} {
+	if o == nil || o.Ext == nil {
 		var ret map[string]map[string]interface{}
 		return ret
 	}
-	return o.Extra
+	return o.Ext
 }
 
-// GetExtraOk returns a tuple with the Extra field value if set, nil otherwise
+// GetExtOk returns a tuple with the Ext field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetExtraOk() (map[string]map[string]interface{}, bool) {
-	if o == nil || o.Extra == nil {
+func (o *IDTokenClaims) GetExtOk() (map[string]map[string]interface{}, bool) {
+	if o == nil || o.Ext == nil {
 		return nil, false
 	}
-	return o.Extra, true
+	return o.Ext, true
 }
 
-// HasExtra returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasExtra() bool {
-	if o != nil && o.Extra != nil {
+// HasExt returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasExt() bool {
+	if o != nil && o.Ext != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetExtra gets a reference to the given map[string]map[string]interface{} and assigns it to the Extra field.
-func (o *IDTokenClaims) SetExtra(v map[string]map[string]interface{}) {
-	o.Extra = v
+// SetExt gets a reference to the given map[string]map[string]interface{} and assigns it to the Ext field.
+func (o *IDTokenClaims) SetExt(v map[string]map[string]interface{}) {
+	o.Ext = v
 }
 
-// GetIssuedAt returns the IssuedAt field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetIssuedAt() time.Time {
-	if o == nil || o.IssuedAt == nil {
+// GetIat returns the Iat field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetIat() time.Time {
+	if o == nil || o.Iat == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.IssuedAt
+	return *o.Iat
 }
 
-// GetIssuedAtOk returns a tuple with the IssuedAt field value if set, nil otherwise
+// GetIatOk returns a tuple with the Iat field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetIssuedAtOk() (*time.Time, bool) {
-	if o == nil || o.IssuedAt == nil {
+func (o *IDTokenClaims) GetIatOk() (*time.Time, bool) {
+	if o == nil || o.Iat == nil {
 		return nil, false
 	}
-	return o.IssuedAt, true
+	return o.Iat, true
 }
 
-// HasIssuedAt returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasIssuedAt() bool {
-	if o != nil && o.IssuedAt != nil {
+// HasIat returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasIat() bool {
+	if o != nil && o.Iat != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetIssuedAt gets a reference to the given time.Time and assigns it to the IssuedAt field.
-func (o *IDTokenClaims) SetIssuedAt(v time.Time) {
-	o.IssuedAt = &v
+// SetIat gets a reference to the given time.Time and assigns it to the Iat field.
+func (o *IDTokenClaims) SetIat(v time.Time) {
+	o.Iat = &v
 }
 
-// GetIssuer returns the Issuer field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetIssuer() string {
-	if o == nil || o.Issuer == nil {
+// GetIss returns the Iss field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetIss() string {
+	if o == nil || o.Iss == nil {
 		var ret string
 		return ret
 	}
-	return *o.Issuer
+	return *o.Iss
 }
 
-// GetIssuerOk returns a tuple with the Issuer field value if set, nil otherwise
+// GetIssOk returns a tuple with the Iss field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetIssuerOk() (*string, bool) {
-	if o == nil || o.Issuer == nil {
+func (o *IDTokenClaims) GetIssOk() (*string, bool) {
+	if o == nil || o.Iss == nil {
 		return nil, false
 	}
-	return o.Issuer, true
+	return o.Iss, true
 }
 
-// HasIssuer returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasIssuer() bool {
-	if o != nil && o.Issuer != nil {
+// HasIss returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasIss() bool {
+	if o != nil && o.Iss != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetIssuer gets a reference to the given string and assigns it to the Issuer field.
-func (o *IDTokenClaims) SetIssuer(v string) {
-	o.Issuer = &v
+// SetIss gets a reference to the given string and assigns it to the Iss field.
+func (o *IDTokenClaims) SetIss(v string) {
+	o.Iss = &v
 }
 
-// GetJTI returns the JTI field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetJTI() string {
-	if o == nil || o.JTI == nil {
+// GetJti returns the Jti field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetJti() string {
+	if o == nil || o.Jti == nil {
 		var ret string
 		return ret
 	}
-	return *o.JTI
+	return *o.Jti
 }
 
-// GetJTIOk returns a tuple with the JTI field value if set, nil otherwise
+// GetJtiOk returns a tuple with the Jti field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetJTIOk() (*string, bool) {
-	if o == nil || o.JTI == nil {
+func (o *IDTokenClaims) GetJtiOk() (*string, bool) {
+	if o == nil || o.Jti == nil {
 		return nil, false
 	}
-	return o.JTI, true
+	return o.Jti, true
 }
 
-// HasJTI returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasJTI() bool {
-	if o != nil && o.JTI != nil {
+// HasJti returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasJti() bool {
+	if o != nil && o.Jti != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetJTI gets a reference to the given string and assigns it to the JTI field.
-func (o *IDTokenClaims) SetJTI(v string) {
-	o.JTI = &v
+// SetJti gets a reference to the given string and assigns it to the Jti field.
+func (o *IDTokenClaims) SetJti(v string) {
+	o.Jti = &v
 }
 
 // GetNonce returns the Nonce field value if set, zero value otherwise.
@@ -435,113 +435,113 @@ func (o *IDTokenClaims) SetNonce(v string) {
 	o.Nonce = &v
 }
 
-// GetRequestedAt returns the RequestedAt field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetRequestedAt() time.Time {
-	if o == nil || o.RequestedAt == nil {
+// GetRat returns the Rat field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetRat() time.Time {
+	if o == nil || o.Rat == nil {
 		var ret time.Time
 		return ret
 	}
-	return *o.RequestedAt
+	return *o.Rat
 }
 
-// GetRequestedAtOk returns a tuple with the RequestedAt field value if set, nil otherwise
+// GetRatOk returns a tuple with the Rat field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetRequestedAtOk() (*time.Time, bool) {
-	if o == nil || o.RequestedAt == nil {
+func (o *IDTokenClaims) GetRatOk() (*time.Time, bool) {
+	if o == nil || o.Rat == nil {
 		return nil, false
 	}
-	return o.RequestedAt, true
+	return o.Rat, true
 }
 
-// HasRequestedAt returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasRequestedAt() bool {
-	if o != nil && o.RequestedAt != nil {
+// HasRat returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasRat() bool {
+	if o != nil && o.Rat != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetRequestedAt gets a reference to the given time.Time and assigns it to the RequestedAt field.
-func (o *IDTokenClaims) SetRequestedAt(v time.Time) {
-	o.RequestedAt = &v
+// SetRat gets a reference to the given time.Time and assigns it to the Rat field.
+func (o *IDTokenClaims) SetRat(v time.Time) {
+	o.Rat = &v
 }
 
-// GetSubject returns the Subject field value if set, zero value otherwise.
-func (o *IDTokenClaims) GetSubject() string {
-	if o == nil || o.Subject == nil {
+// GetSub returns the Sub field value if set, zero value otherwise.
+func (o *IDTokenClaims) GetSub() string {
+	if o == nil || o.Sub == nil {
 		var ret string
 		return ret
 	}
-	return *o.Subject
+	return *o.Sub
 }
 
-// GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
+// GetSubOk returns a tuple with the Sub field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *IDTokenClaims) GetSubjectOk() (*string, bool) {
-	if o == nil || o.Subject == nil {
+func (o *IDTokenClaims) GetSubOk() (*string, bool) {
+	if o == nil || o.Sub == nil {
 		return nil, false
 	}
-	return o.Subject, true
+	return o.Sub, true
 }
 
-// HasSubject returns a boolean if a field has been set.
-func (o *IDTokenClaims) HasSubject() bool {
-	if o != nil && o.Subject != nil {
+// HasSub returns a boolean if a field has been set.
+func (o *IDTokenClaims) HasSub() bool {
+	if o != nil && o.Sub != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetSubject gets a reference to the given string and assigns it to the Subject field.
-func (o *IDTokenClaims) SetSubject(v string) {
-	o.Subject = &v
+// SetSub gets a reference to the given string and assigns it to the Sub field.
+func (o *IDTokenClaims) SetSub(v string) {
+	o.Sub = &v
 }
 
 func (o IDTokenClaims) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.AccessTokenHash != nil {
-		toSerialize["AccessTokenHash"] = o.AccessTokenHash
+	if o.Acr != nil {
+		toSerialize["acr"] = o.Acr
 	}
-	if o.Audience != nil {
-		toSerialize["Audience"] = o.Audience
+	if o.Amr != nil {
+		toSerialize["amr"] = o.Amr
+	}
+	if o.AtHash != nil {
+		toSerialize["at_hash"] = o.AtHash
+	}
+	if o.Aud != nil {
+		toSerialize["aud"] = o.Aud
 	}
 	if o.AuthTime != nil {
-		toSerialize["AuthTime"] = o.AuthTime
+		toSerialize["auth_time"] = o.AuthTime
 	}
-	if o.AuthenticationContextClassReference != nil {
-		toSerialize["AuthenticationContextClassReference"] = o.AuthenticationContextClassReference
+	if o.CHash != nil {
+		toSerialize["c_hash"] = o.CHash
 	}
-	if o.AuthenticationMethodsReferences != nil {
-		toSerialize["AuthenticationMethodsReferences"] = o.AuthenticationMethodsReferences
+	if o.Exp != nil {
+		toSerialize["exp"] = o.Exp
 	}
-	if o.CodeHash != nil {
-		toSerialize["CodeHash"] = o.CodeHash
+	if o.Ext != nil {
+		toSerialize["ext"] = o.Ext
 	}
-	if o.ExpiresAt != nil {
-		toSerialize["ExpiresAt"] = o.ExpiresAt
+	if o.Iat != nil {
+		toSerialize["iat"] = o.Iat
 	}
-	if o.Extra != nil {
-		toSerialize["Extra"] = o.Extra
+	if o.Iss != nil {
+		toSerialize["iss"] = o.Iss
 	}
-	if o.IssuedAt != nil {
-		toSerialize["IssuedAt"] = o.IssuedAt
-	}
-	if o.Issuer != nil {
-		toSerialize["Issuer"] = o.Issuer
-	}
-	if o.JTI != nil {
-		toSerialize["JTI"] = o.JTI
+	if o.Jti != nil {
+		toSerialize["jti"] = o.Jti
 	}
 	if o.Nonce != nil {
-		toSerialize["Nonce"] = o.Nonce
+		toSerialize["nonce"] = o.Nonce
 	}
-	if o.RequestedAt != nil {
-		toSerialize["RequestedAt"] = o.RequestedAt
+	if o.Rat != nil {
+		toSerialize["rat"] = o.Rat
 	}
-	if o.Subject != nil {
-		toSerialize["Subject"] = o.Subject
+	if o.Sub != nil {
+		toSerialize["sub"] = o.Sub
 	}
 	return json.Marshal(toSerialize)
 }

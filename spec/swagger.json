@@ -2304,23 +2304,23 @@
       "description": "IDTokenSession is a session container for the id token",
       "type": "object",
       "properties": {
-        "Claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "ExpiresAt": {
+        "expires_at": {
           "type": "object",
           "additionalProperties": {
             "type": "string",
             "format": "date-time"
           }
         },
-        "Headers": {
+        "headers": {
           "$ref": "#/definitions/Headers"
         },
-        "Subject": {
+        "id_token_claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
+        "subject": {
           "type": "string"
         },
-        "Username": {
+        "username": {
           "type": "string"
         }
       }
@@ -2329,7 +2329,7 @@
       "description": "Headers is the jwt headers",
       "type": "object",
       "properties": {
-        "Extra": {
+        "extra": {
           "type": "object",
           "additionalProperties": true
         }
@@ -2339,57 +2339,57 @@
       "description": "IDTokenClaims represent the claims used in open id connect requests",
       "type": "object",
       "properties": {
-        "AccessTokenHash": {
+        "acr": {
           "type": "string"
         },
-        "Audience": {
+        "amr": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "AuthTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "AuthenticationContextClassReference": {
+        "at_hash": {
           "type": "string"
         },
-        "AuthenticationMethodsReferences": {
+        "aud": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "CodeHash": {
-          "type": "string"
-        },
-        "ExpiresAt": {
+        "auth_time": {
           "type": "string",
           "format": "date-time"
         },
-        "Extra": {
+        "c_hash": {
+          "type": "string"
+        },
+        "exp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ext": {
           "type": "object",
           "additionalProperties": true
         },
-        "IssuedAt": {
+        "iat": {
           "type": "string",
           "format": "date-time"
         },
-        "Issuer": {
+        "iss": {
           "type": "string"
         },
-        "JTI": {
+        "jti": {
           "type": "string"
         },
-        "Nonce": {
+        "nonce": {
           "type": "string"
         },
-        "RequestedAt": {
+        "rat": {
           "type": "string",
           "format": "date-time"
         },
-        "Subject": {
+        "sub": {
           "type": "string"
         }
       }
@@ -2539,25 +2539,6 @@
     "Session": {
       "type": "object",
       "properties": {
-        "Claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "ExpiresAt": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "Headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "Subject": {
-          "type": "string"
-        },
-        "Username": {
-          "type": "string"
-        },
         "allowed_top_level_claims": {
           "type": "array",
           "items": {
@@ -2573,11 +2554,30 @@
         "exclude_not_before_claim": {
           "type": "boolean"
         },
+        "expires_at": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
         "extra": {
           "type": "object",
           "additionalProperties": true
         },
+        "headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "id_token_claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
         "kid": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "username": {
           "type": "string"
         }
       }

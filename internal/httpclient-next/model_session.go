@@ -18,17 +18,17 @@ import (
 
 // Session struct for Session
 type Session struct {
-	Claims                *IDTokenClaims                    `json:"Claims,omitempty"`
-	ExpiresAt             *map[string]time.Time             `json:"ExpiresAt,omitempty"`
-	Headers               *Headers                          `json:"Headers,omitempty"`
-	Subject               *string                           `json:"Subject,omitempty"`
-	Username              *string                           `json:"Username,omitempty"`
 	AllowedTopLevelClaims []string                          `json:"allowed_top_level_claims,omitempty"`
 	ClientId              *string                           `json:"client_id,omitempty"`
 	ConsentChallenge      *string                           `json:"consent_challenge,omitempty"`
 	ExcludeNotBeforeClaim *bool                             `json:"exclude_not_before_claim,omitempty"`
+	ExpiresAt             *map[string]time.Time             `json:"expires_at,omitempty"`
 	Extra                 map[string]map[string]interface{} `json:"extra,omitempty"`
+	Headers               *Headers                          `json:"headers,omitempty"`
+	IdTokenClaims         *IDTokenClaims                    `json:"id_token_claims,omitempty"`
 	Kid                   *string                           `json:"kid,omitempty"`
+	Subject               *string                           `json:"subject,omitempty"`
+	Username              *string                           `json:"username,omitempty"`
 }
 
 // NewSession instantiates a new Session object
@@ -46,166 +46,6 @@ func NewSession() *Session {
 func NewSessionWithDefaults() *Session {
 	this := Session{}
 	return &this
-}
-
-// GetClaims returns the Claims field value if set, zero value otherwise.
-func (o *Session) GetClaims() IDTokenClaims {
-	if o == nil || o.Claims == nil {
-		var ret IDTokenClaims
-		return ret
-	}
-	return *o.Claims
-}
-
-// GetClaimsOk returns a tuple with the Claims field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Session) GetClaimsOk() (*IDTokenClaims, bool) {
-	if o == nil || o.Claims == nil {
-		return nil, false
-	}
-	return o.Claims, true
-}
-
-// HasClaims returns a boolean if a field has been set.
-func (o *Session) HasClaims() bool {
-	if o != nil && o.Claims != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetClaims gets a reference to the given IDTokenClaims and assigns it to the Claims field.
-func (o *Session) SetClaims(v IDTokenClaims) {
-	o.Claims = &v
-}
-
-// GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
-func (o *Session) GetExpiresAt() map[string]time.Time {
-	if o == nil || o.ExpiresAt == nil {
-		var ret map[string]time.Time
-		return ret
-	}
-	return *o.ExpiresAt
-}
-
-// GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Session) GetExpiresAtOk() (*map[string]time.Time, bool) {
-	if o == nil || o.ExpiresAt == nil {
-		return nil, false
-	}
-	return o.ExpiresAt, true
-}
-
-// HasExpiresAt returns a boolean if a field has been set.
-func (o *Session) HasExpiresAt() bool {
-	if o != nil && o.ExpiresAt != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetExpiresAt gets a reference to the given map[string]time.Time and assigns it to the ExpiresAt field.
-func (o *Session) SetExpiresAt(v map[string]time.Time) {
-	o.ExpiresAt = &v
-}
-
-// GetHeaders returns the Headers field value if set, zero value otherwise.
-func (o *Session) GetHeaders() Headers {
-	if o == nil || o.Headers == nil {
-		var ret Headers
-		return ret
-	}
-	return *o.Headers
-}
-
-// GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Session) GetHeadersOk() (*Headers, bool) {
-	if o == nil || o.Headers == nil {
-		return nil, false
-	}
-	return o.Headers, true
-}
-
-// HasHeaders returns a boolean if a field has been set.
-func (o *Session) HasHeaders() bool {
-	if o != nil && o.Headers != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetHeaders gets a reference to the given Headers and assigns it to the Headers field.
-func (o *Session) SetHeaders(v Headers) {
-	o.Headers = &v
-}
-
-// GetSubject returns the Subject field value if set, zero value otherwise.
-func (o *Session) GetSubject() string {
-	if o == nil || o.Subject == nil {
-		var ret string
-		return ret
-	}
-	return *o.Subject
-}
-
-// GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Session) GetSubjectOk() (*string, bool) {
-	if o == nil || o.Subject == nil {
-		return nil, false
-	}
-	return o.Subject, true
-}
-
-// HasSubject returns a boolean if a field has been set.
-func (o *Session) HasSubject() bool {
-	if o != nil && o.Subject != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetSubject gets a reference to the given string and assigns it to the Subject field.
-func (o *Session) SetSubject(v string) {
-	o.Subject = &v
-}
-
-// GetUsername returns the Username field value if set, zero value otherwise.
-func (o *Session) GetUsername() string {
-	if o == nil || o.Username == nil {
-		var ret string
-		return ret
-	}
-	return *o.Username
-}
-
-// GetUsernameOk returns a tuple with the Username field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *Session) GetUsernameOk() (*string, bool) {
-	if o == nil || o.Username == nil {
-		return nil, false
-	}
-	return o.Username, true
-}
-
-// HasUsername returns a boolean if a field has been set.
-func (o *Session) HasUsername() bool {
-	if o != nil && o.Username != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetUsername gets a reference to the given string and assigns it to the Username field.
-func (o *Session) SetUsername(v string) {
-	o.Username = &v
 }
 
 // GetAllowedTopLevelClaims returns the AllowedTopLevelClaims field value if set, zero value otherwise.
@@ -336,6 +176,38 @@ func (o *Session) SetExcludeNotBeforeClaim(v bool) {
 	o.ExcludeNotBeforeClaim = &v
 }
 
+// GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
+func (o *Session) GetExpiresAt() map[string]time.Time {
+	if o == nil || o.ExpiresAt == nil {
+		var ret map[string]time.Time
+		return ret
+	}
+	return *o.ExpiresAt
+}
+
+// GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Session) GetExpiresAtOk() (*map[string]time.Time, bool) {
+	if o == nil || o.ExpiresAt == nil {
+		return nil, false
+	}
+	return o.ExpiresAt, true
+}
+
+// HasExpiresAt returns a boolean if a field has been set.
+func (o *Session) HasExpiresAt() bool {
+	if o != nil && o.ExpiresAt != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetExpiresAt gets a reference to the given map[string]time.Time and assigns it to the ExpiresAt field.
+func (o *Session) SetExpiresAt(v map[string]time.Time) {
+	o.ExpiresAt = &v
+}
+
 // GetExtra returns the Extra field value if set, zero value otherwise.
 func (o *Session) GetExtra() map[string]map[string]interface{} {
 	if o == nil || o.Extra == nil {
@@ -366,6 +238,70 @@ func (o *Session) HasExtra() bool {
 // SetExtra gets a reference to the given map[string]map[string]interface{} and assigns it to the Extra field.
 func (o *Session) SetExtra(v map[string]map[string]interface{}) {
 	o.Extra = v
+}
+
+// GetHeaders returns the Headers field value if set, zero value otherwise.
+func (o *Session) GetHeaders() Headers {
+	if o == nil || o.Headers == nil {
+		var ret Headers
+		return ret
+	}
+	return *o.Headers
+}
+
+// GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Session) GetHeadersOk() (*Headers, bool) {
+	if o == nil || o.Headers == nil {
+		return nil, false
+	}
+	return o.Headers, true
+}
+
+// HasHeaders returns a boolean if a field has been set.
+func (o *Session) HasHeaders() bool {
+	if o != nil && o.Headers != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetHeaders gets a reference to the given Headers and assigns it to the Headers field.
+func (o *Session) SetHeaders(v Headers) {
+	o.Headers = &v
+}
+
+// GetIdTokenClaims returns the IdTokenClaims field value if set, zero value otherwise.
+func (o *Session) GetIdTokenClaims() IDTokenClaims {
+	if o == nil || o.IdTokenClaims == nil {
+		var ret IDTokenClaims
+		return ret
+	}
+	return *o.IdTokenClaims
+}
+
+// GetIdTokenClaimsOk returns a tuple with the IdTokenClaims field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Session) GetIdTokenClaimsOk() (*IDTokenClaims, bool) {
+	if o == nil || o.IdTokenClaims == nil {
+		return nil, false
+	}
+	return o.IdTokenClaims, true
+}
+
+// HasIdTokenClaims returns a boolean if a field has been set.
+func (o *Session) HasIdTokenClaims() bool {
+	if o != nil && o.IdTokenClaims != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetIdTokenClaims gets a reference to the given IDTokenClaims and assigns it to the IdTokenClaims field.
+func (o *Session) SetIdTokenClaims(v IDTokenClaims) {
+	o.IdTokenClaims = &v
 }
 
 // GetKid returns the Kid field value if set, zero value otherwise.
@@ -400,23 +336,72 @@ func (o *Session) SetKid(v string) {
 	o.Kid = &v
 }
 
+// GetSubject returns the Subject field value if set, zero value otherwise.
+func (o *Session) GetSubject() string {
+	if o == nil || o.Subject == nil {
+		var ret string
+		return ret
+	}
+	return *o.Subject
+}
+
+// GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Session) GetSubjectOk() (*string, bool) {
+	if o == nil || o.Subject == nil {
+		return nil, false
+	}
+	return o.Subject, true
+}
+
+// HasSubject returns a boolean if a field has been set.
+func (o *Session) HasSubject() bool {
+	if o != nil && o.Subject != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSubject gets a reference to the given string and assigns it to the Subject field.
+func (o *Session) SetSubject(v string) {
+	o.Subject = &v
+}
+
+// GetUsername returns the Username field value if set, zero value otherwise.
+func (o *Session) GetUsername() string {
+	if o == nil || o.Username == nil {
+		var ret string
+		return ret
+	}
+	return *o.Username
+}
+
+// GetUsernameOk returns a tuple with the Username field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Session) GetUsernameOk() (*string, bool) {
+	if o == nil || o.Username == nil {
+		return nil, false
+	}
+	return o.Username, true
+}
+
+// HasUsername returns a boolean if a field has been set.
+func (o *Session) HasUsername() bool {
+	if o != nil && o.Username != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetUsername gets a reference to the given string and assigns it to the Username field.
+func (o *Session) SetUsername(v string) {
+	o.Username = &v
+}
+
 func (o Session) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Claims != nil {
-		toSerialize["Claims"] = o.Claims
-	}
-	if o.ExpiresAt != nil {
-		toSerialize["ExpiresAt"] = o.ExpiresAt
-	}
-	if o.Headers != nil {
-		toSerialize["Headers"] = o.Headers
-	}
-	if o.Subject != nil {
-		toSerialize["Subject"] = o.Subject
-	}
-	if o.Username != nil {
-		toSerialize["Username"] = o.Username
-	}
 	if o.AllowedTopLevelClaims != nil {
 		toSerialize["allowed_top_level_claims"] = o.AllowedTopLevelClaims
 	}
@@ -429,11 +414,26 @@ func (o Session) MarshalJSON() ([]byte, error) {
 	if o.ExcludeNotBeforeClaim != nil {
 		toSerialize["exclude_not_before_claim"] = o.ExcludeNotBeforeClaim
 	}
+	if o.ExpiresAt != nil {
+		toSerialize["expires_at"] = o.ExpiresAt
+	}
 	if o.Extra != nil {
 		toSerialize["extra"] = o.Extra
 	}
+	if o.Headers != nil {
+		toSerialize["headers"] = o.Headers
+	}
+	if o.IdTokenClaims != nil {
+		toSerialize["id_token_claims"] = o.IdTokenClaims
+	}
 	if o.Kid != nil {
 		toSerialize["kid"] = o.Kid
+	}
+	if o.Subject != nil {
+		toSerialize["subject"] = o.Subject
+	}
+	if o.Username != nil {
+		toSerialize["username"] = o.Username
 	}
 	return json.Marshal(toSerialize)
 }

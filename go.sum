@@ -1368,8 +1368,8 @@ github.com/ory/dockertest/v3 v3.6.3/go.mod h1:EFLcVUOl8qCwp9NyDAcCDtq/QviLtYswW/
 github.com/ory/dockertest/v3 v3.8.1 h1:vU/8d1We4qIad2YM0kOwRVtnyue7ExvacPiw1yDm17g=
 github.com/ory/dockertest/v3 v3.8.1/go.mod h1:wSRQ3wmkz+uSARYMk7kVJFDBGm8x5gSxIhI7NDc+BAQ=
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
-github.com/ory/fosite v0.42.3-0.20220728130632-c3e0133cfed9 h1:zynOHfotugrZchcWxs8R7fV2a/19X76Z56zB7Ll5SMw=
-github.com/ory/fosite v0.42.3-0.20220728130632-c3e0133cfed9/go.mod h1:CR0cBDLr2rNDTNWmu5x9TeB7qt8KA668N/yZbej3FtE=
+github.com/ory/fosite v0.42.3-0.20220729111320-05d71b23559c h1:PdO8dsl7FiQG+D+8wNQgr8uM3zGlKLMCvBh10LrlKKU=
+github.com/ory/fosite v0.42.3-0.20220729111320-05d71b23559c/go.mod h1:CR0cBDLr2rNDTNWmu5x9TeB7qt8KA668N/yZbej3FtE=
 github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90/go.mod h1:sxnvPCxChFuSmTJGj8FdMupeq1BezCiEpDjTUXQ4hf4=
 github.com/ory/go-acc v0.2.6/go.mod h1:4Kb/UnPcT8qRAk3IAxta+hvVapdxTLWtrr7bFLlEgpw=
 github.com/ory/go-acc v0.2.8 h1:rOHHAPQjf0u7eHFGWpiXK+gIu/e0GRSJNr9pDukdNC4=

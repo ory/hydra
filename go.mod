@@ -10,7 +10,6 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
-	github.com/ory/x => github.com/grantzvolsky/x v0.0.383-0.20220731104300-14bdfa6f47a5
 )
 
 replace github.com/ory/hydra-client-go => ./internal/httpclient
@@ -50,7 +49,7 @@ require (
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
 	github.com/ory/jsonschema/v3 v3.0.7
-	github.com/ory/x v0.0.443
+	github.com/ory/x v0.0.451
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0

@@ -155,7 +155,7 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
 		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
 
-		for i, _ := range got.Keys {
+		for i := range got.Keys {
 			got.Keys[i].Use = "enc"
 		}
 		err = m.UpdateKeySet(context.TODO(), algo+set, got)

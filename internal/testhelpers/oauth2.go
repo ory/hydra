@@ -95,8 +95,8 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
 	require.NotEmpty(t, token)
 
-	req := httpx.MustNewRequest("POST", adminTS.URL+"/oauth2/introspect",
-		strings.NewReader((url.Values{"token": {token}}).Encode()),
+	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",
+		strings.NewReader((url.Values{"token": {token.AccessToken}}).Encode()),
 		"application/x-www-form-urlencoded")
 
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)

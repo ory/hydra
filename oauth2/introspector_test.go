@@ -52,7 +52,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "wildcard")
 	conf.MustSet(config.KeyIssuerURL, "https://foobariss")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, nil)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

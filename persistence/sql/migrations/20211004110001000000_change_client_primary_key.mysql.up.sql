@@ -8,7 +8,6 @@ UPDATE hydra_client SET pk = (SELECT LOWER(CONCAT(
     '-', CONCAT(HEX(FLOOR(ASCII(RANDOM_BYTES(1)) / 64)+8),SUBSTR(HEX(RANDOM_BYTES(2)), 2, 3)),
     '-', HEX(RANDOM_BYTES(6))
 )));
-ALTER TABLE hydra_client ALTER pk DROP DEFAULT;
 ALTER TABLE hydra_client DROP PRIMARY KEY, ADD PRIMARY KEY (pk);
 ALTER TABLE hydra_client ADD KEY (pk_deprecated);
-ALTER TABLE hydra_client CHANGE COLUMN pk_deprecated pk_deprecated INT UNSIGNED AUTO_INCREMENT;
+ALTER TABLE hydra_client CHANGE COLUMN pk_deprecated pk_deprecated INT UNSIGNED;

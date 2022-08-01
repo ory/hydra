@@ -6,11 +6,13 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 
@@ -37,11 +39,12 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 		t.Errorf("Failed to create registry: %s", err)
 		return
 	}
+	registry.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Must(uuid.NewV4())})
 
 	r := registry.(*RegistrySQL)
 	r.initialPing = failedPing(errors.New("snizzles"))
 
-	_ = r.Init(context.Background())
+	_ = r.Init(context.Background(), nil, true, false)
 
 	registryBase := RegistryBase{r: r, l: l}
 	registryBase.WithConfig(c)

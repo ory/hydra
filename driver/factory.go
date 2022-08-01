@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 
+	"github.com/gofrs/uuid"
 	"github.com/ory/x/configx"
 
 	"github.com/ory/x/logrusx"
@@ -15,6 +16,9 @@ type options struct {
 	preload      bool
 	validate     bool
 	opts         []configx.OptionModifier
+	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
+	defaultDefaultNID *uuid.UUID
+	skipNetworkInit   bool
 }
 
 func newOptions() *options {
@@ -51,6 +55,18 @@ func DisablePreloading() OptionsModifier {
 	}
 }
 
+func WithNID(defaultDefaultNID *uuid.UUID) OptionsModifier {
+	return func(o *options) {
+		o.defaultDefaultNID = defaultDefaultNID
+	}
+}
+
+func SkipNetworkInit() OptionsModifier {
+	return func(o *options) {
+		o.skipNetworkInit = true
+	}
+}
+
 func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	o := newOptions()
 	for _, f := range opts {
@@ -67,12 +83,12 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		config.MustValidate(l, c)
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l)
+	r, err := NewRegistryFromDSN(ctx, c, l, o.defaultDefaultNID, o.skipNetworkInit, false)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
-	if err = r.Init(ctx); err != nil {
+	if err = r.Init(ctx, o.defaultDefaultNID, o.skipNetworkInit, false); err != nil {
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 

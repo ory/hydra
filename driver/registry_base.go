@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/x/popx"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/rs/cors"
@@ -56,48 +58,49 @@ var (
 )
 
 type RegistryBase struct {
-	l            *logrusx.Logger
-	al           *logrusx.Logger
-	conf         *config.DefaultProvider
-	ch           *client.Handler
-	fh           fosite.Hasher
-	jwtGrantH    *trust.Handler
-	jwtGrantV    *trust.GrantValidator
-	kh           *jwk.Handler
-	cv           *client.Validator
-	ctxer        contextx.Contextualizer
-	hh           *healthx.Handler
-	kc           *jwk.AEAD
-	cos          consent.Strategy
-	writer       herodot.Writer
-	fsc          fosite.ScopeStrategy
-	atjs         jwk.JWTSigner
-	idtjs        jwk.JWTSigner
-	hsm          hsm.Context
-	fscPrev      string
-	forv         *openid.OpenIDConnectRequestValidator
-	fop          fosite.OAuth2Provider
-	coh          *consent.Handler
-	oah          *oauth2.Handler
-	sia          map[string]consent.SubjectIdentifierAlgorithm
-	trc          *otelx.Tracer
-	pmm          *prometheus.MetricsManager
-	oa2mw        func(h http.Handler) http.Handler
-	o2mc         *foauth2.HMACSHAStrategy
-	o2jwt        *foauth2.DefaultJWTStrategy
-	arhs         []oauth2.AccessRequestHook
-	buildVersion string
-	buildHash    string
-	buildDate    string
-	r            Registry
-	persister    persistence.Persister
-	jfs          fosite.JWKSFetcherStrategy
-	oc           fosite.Configurator
-	oidcs        jwk.JWTSigner
-	ats          jwk.JWTSigner
-	hmacs        *foauth2.HMACSHAStrategy
-	fc           *fositex.Config
-	publicCORS   *cors.Cors
+	l               *logrusx.Logger
+	al              *logrusx.Logger
+	conf            *config.DefaultProvider
+	ch              *client.Handler
+	fh              fosite.Hasher
+	jwtGrantH       *trust.Handler
+	jwtGrantV       *trust.GrantValidator
+	kh              *jwk.Handler
+	cv              *client.Validator
+	ctxer           contextx.Contextualizer
+	hh              *healthx.Handler
+	migrationStatus *popx.MigrationStatuses
+	kc              *jwk.AEAD
+	cos             consent.Strategy
+	writer          herodot.Writer
+	fsc             fosite.ScopeStrategy
+	atjs            jwk.JWTSigner
+	idtjs           jwk.JWTSigner
+	hsm             hsm.Context
+	fscPrev         string
+	forv            *openid.OpenIDConnectRequestValidator
+	fop             fosite.OAuth2Provider
+	coh             *consent.Handler
+	oah             *oauth2.Handler
+	sia             map[string]consent.SubjectIdentifierAlgorithm
+	trc             *otelx.Tracer
+	pmm             *prometheus.MetricsManager
+	oa2mw           func(h http.Handler) http.Handler
+	o2mc            *foauth2.HMACSHAStrategy
+	o2jwt           *foauth2.DefaultJWTStrategy
+	arhs            []oauth2.AccessRequestHook
+	buildVersion    string
+	buildHash       string
+	buildDate       string
+	r               Registry
+	persister       persistence.Persister
+	jfs             fosite.JWKSFetcherStrategy
+	oc              fosite.Configurator
+	oidcs           jwk.JWTSigner
+	ats             jwk.JWTSigner
+	hmacs           *foauth2.HMACSHAStrategy
+	fc              *fositex.Config
+	publicCORS      *cors.Cors
 }
 
 func (m *RegistryBase) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
@@ -265,6 +268,10 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 				return m.r.Ping()
 			},
 			"migrations": func(r *http.Request) error {
+				if m.migrationStatus != nil && !m.migrationStatus.HasPending() {
+					return nil
+				}
+
 				status, err := m.r.Persister().MigrationStatus(r.Context())
 				if err != nil {
 					return err
@@ -276,6 +283,7 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 					return err
 				}
 
+				m.migrationStatus = &status
 				return nil
 			},
 		})

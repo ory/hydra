@@ -17,7 +17,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 // PublicApiService PublicApi service
@@ -206,7 +205,7 @@ func (a *PublicApiService) DiscoverOpenIDConfigurationExecute(r ApiDiscoverOpenI
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -215,497 +214,7 @@ func (a *PublicApiService) DiscoverOpenIDConfigurationExecute(r ApiDiscoverOpenI
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v JsonError
-		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr.error = err.Error()
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiDynamicClientRegistrationCreateOAuth2ClientRequest struct {
-	ctx          context.Context
-	ApiService   *PublicApiService
-	oAuth2Client *OAuth2Client
-}
-
-func (r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) OAuth2Client(oAuth2Client OAuth2Client) ApiDynamicClientRegistrationCreateOAuth2ClientRequest {
-	r.oAuth2Client = &oAuth2Client
-	return r
-}
-
-func (r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Response, error) {
-	return r.ApiService.DynamicClientRegistrationCreateOAuth2ClientExecute(r)
-}
-
-/*
-DynamicClientRegistrationCreateOAuth2Client Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-Please note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those
-values will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or
-`client_secret_post`.
-
-The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
-Write the secret down and keep it somewhere safe.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiDynamicClientRegistrationCreateOAuth2ClientRequest
-*/
-func (a *PublicApiService) DynamicClientRegistrationCreateOAuth2Client(ctx context.Context) ApiDynamicClientRegistrationCreateOAuth2ClientRequest {
-	return ApiDynamicClientRegistrationCreateOAuth2ClientRequest{
-		ApiService: a,
-		ctx:        ctx,
-	}
-}
-
-// Execute executes the request
-//  @return OAuth2Client
-func (a *PublicApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *OAuth2Client
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PublicApiService.DynamicClientRegistrationCreateOAuth2Client")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/oauth2/register"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-	if r.oAuth2Client == nil {
-		return localVarReturnValue, nil, reportError("oAuth2Client is required and must be specified")
-	}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.oAuth2Client
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		var v JsonError
-		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr.error = err.Error()
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiDynamicClientRegistrationDeleteOAuth2ClientRequest struct {
-	ctx        context.Context
-	ApiService *PublicApiService
-	id         string
-}
-
-func (r ApiDynamicClientRegistrationDeleteOAuth2ClientRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DynamicClientRegistrationDeleteOAuth2ClientExecute(r)
-}
-
-/*
-DynamicClientRegistrationDeleteOAuth2Client Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest
-*/
-func (a *PublicApiService) DynamicClientRegistrationDeleteOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationDeleteOAuth2ClientRequest {
-	return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest{
-		ApiService: a,
-		ctx:        ctx,
-		id:         id,
-	}
-}
-
-// Execute executes the request
-func (a *PublicApiService) DynamicClientRegistrationDeleteOAuth2ClientExecute(r ApiDynamicClientRegistrationDeleteOAuth2ClientRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod = http.MethodDelete
-		localVarPostBody   interface{}
-		formFiles          []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PublicApiService.DynamicClientRegistrationDeleteOAuth2Client")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		var v JsonError
-		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr.error = err.Error()
-			return localVarHTTPResponse, newErr
-		}
-		newErr.model = v
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-type ApiDynamicClientRegistrationGetOAuth2ClientRequest struct {
-	ctx        context.Context
-	ApiService *PublicApiService
-	id         string
-}
-
-func (r ApiDynamicClientRegistrationGetOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Response, error) {
-	return r.ApiService.DynamicClientRegistrationGetOAuth2ClientExecute(r)
-}
-
-/*
-DynamicClientRegistrationGetOAuth2Client Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationGetOAuth2ClientRequest
-*/
-func (a *PublicApiService) DynamicClientRegistrationGetOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationGetOAuth2ClientRequest {
-	return ApiDynamicClientRegistrationGetOAuth2ClientRequest{
-		ApiService: a,
-		ctx:        ctx,
-		id:         id,
-	}
-}
-
-// Execute executes the request
-//  @return OAuth2Client
-func (a *PublicApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDynamicClientRegistrationGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *OAuth2Client
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PublicApiService.DynamicClientRegistrationGetOAuth2Client")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		var v JsonError
-		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr.error = err.Error()
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiDynamicClientRegistrationUpdateOAuth2ClientRequest struct {
-	ctx          context.Context
-	ApiService   *PublicApiService
-	id           string
-	oAuth2Client *OAuth2Client
-}
-
-func (r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) OAuth2Client(oAuth2Client OAuth2Client) ApiDynamicClientRegistrationUpdateOAuth2ClientRequest {
-	r.oAuth2Client = &oAuth2Client
-	return r
-}
-
-func (r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Response, error) {
-	return r.ApiService.DynamicClientRegistrationUpdateOAuth2ClientExecute(r)
-}
-
-/*
-DynamicClientRegistrationUpdateOAuth2Client Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-If you pass `client_secret` the secret will be updated and returned via the API.
-This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest
-*/
-func (a *PublicApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationUpdateOAuth2ClientRequest {
-	return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest{
-		ApiService: a,
-		ctx:        ctx,
-		id:         id,
-	}
-}
-
-// Execute executes the request
-//  @return OAuth2Client
-func (a *PublicApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
-	var (
-		localVarHTTPMethod  = http.MethodPut
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *OAuth2Client
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PublicApiService.DynamicClientRegistrationUpdateOAuth2Client")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-	if r.oAuth2Client == nil {
-		return localVarReturnValue, nil, reportError("oAuth2Client is required and must be specified")
-	}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.oAuth2Client
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		var v JsonError
+		var v OAuth2ApiError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -865,7 +374,7 @@ func (a *PublicApiService) Oauth2TokenExecute(r ApiOauth2TokenRequest) (*Oauth2T
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -875,7 +384,7 @@ func (a *PublicApiService) Oauth2TokenExecute(r ApiOauth2TokenRequest) (*Oauth2T
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -884,7 +393,7 @@ func (a *PublicApiService) Oauth2TokenExecute(r ApiOauth2TokenRequest) (*Oauth2T
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v JsonError
+		var v OAuth2ApiError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -911,7 +420,7 @@ type ApiOauthAuthRequest struct {
 	ApiService *PublicApiService
 }
 
-func (r ApiOauthAuthRequest) Execute() (*JsonError, *http.Response, error) {
+func (r ApiOauthAuthRequest) Execute() (*OAuth2ApiError, *http.Response, error) {
 	return r.ApiService.OauthAuthExecute(r)
 }
 
@@ -934,13 +443,13 @@ func (a *PublicApiService) OauthAuth(ctx context.Context) ApiOauthAuthRequest {
 }
 
 // Execute executes the request
-//  @return JsonError
-func (a *PublicApiService) OauthAuthExecute(r ApiOauthAuthRequest) (*JsonError, *http.Response, error) {
+//  @return OAuth2ApiError
+func (a *PublicApiService) OauthAuthExecute(r ApiOauthAuthRequest) (*OAuth2ApiError, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *JsonError
+		localVarReturnValue *OAuth2ApiError
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PublicApiService.OauthAuth")
@@ -994,7 +503,7 @@ func (a *PublicApiService) OauthAuthExecute(r ApiOauthAuthRequest) (*JsonError, 
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1003,7 +512,7 @@ func (a *PublicApiService) OauthAuthExecute(r ApiOauthAuthRequest) (*JsonError, 
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v JsonError
+		var v OAuth2ApiError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1121,7 +630,7 @@ func (a *PublicApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1130,7 +639,7 @@ func (a *PublicApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
-		var v JsonError
+		var v OAuth2ApiError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1235,7 +744,7 @@ func (a *PublicApiService) UserinfoExecute(r ApiUserinfoRequest) (*UserinfoRespo
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -1244,7 +753,7 @@ func (a *PublicApiService) UserinfoExecute(r ApiUserinfoRequest) (*UserinfoRespo
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v JsonError
+		var v OAuth2ApiError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1353,7 +862,7 @@ func (a *PublicApiService) WellKnownExecute(r ApiWellKnownRequest) (*JSONWebKeyS
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
-			var v JsonError
+			var v OAuth2ApiError
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

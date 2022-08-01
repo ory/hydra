@@ -75,22 +75,22 @@ func NewRevokeAuthenticationSessionBadRequest() *RevokeAuthenticationSessionBadR
 
 /* RevokeAuthenticationSessionBadRequest describes a response with status code 400, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type RevokeAuthenticationSessionBadRequest struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *RevokeAuthenticationSessionBadRequest) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionBadRequest  %+v", 400, o.Payload)
 }
-func (o *RevokeAuthenticationSessionBadRequest) GetPayload() *models.JSONError {
+func (o *RevokeAuthenticationSessionBadRequest) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *RevokeAuthenticationSessionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,22 +107,22 @@ func NewRevokeAuthenticationSessionInternalServerError() *RevokeAuthenticationSe
 
 /* RevokeAuthenticationSessionInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type RevokeAuthenticationSessionInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *RevokeAuthenticationSessionInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RevokeAuthenticationSessionInternalServerError) GetPayload() *models.JSONError {
+func (o *RevokeAuthenticationSessionInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *RevokeAuthenticationSessionInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

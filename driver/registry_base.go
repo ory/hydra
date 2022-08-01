@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/rs/cors"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -153,7 +155,7 @@ func (m *RegistryBase) addPublicCORSOnHandler(ctx context.Context) func(http.Han
 	}
 }
 
-func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
+func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 

@@ -76,22 +76,22 @@ func NewOauthAuthUnauthorized() *OauthAuthUnauthorized {
 
 /* OauthAuthUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type OauthAuthUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *OauthAuthUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthUnauthorized  %+v", 401, o.Payload)
 }
-func (o *OauthAuthUnauthorized) GetPayload() *models.JSONError {
+func (o *OauthAuthUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *OauthAuthUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -110,12 +110,12 @@ func NewOauthAuthDefault(code int) *OauthAuthDefault {
 
 /* OauthAuthDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type OauthAuthDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the oauth auth default response
@@ -126,13 +126,13 @@ func (o *OauthAuthDefault) Code() int {
 func (o *OauthAuthDefault) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuth default  %+v", o._statusCode, o.Payload)
 }
-func (o *OauthAuthDefault) GetPayload() *models.JSONError {
+func (o *OauthAuthDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *OauthAuthDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

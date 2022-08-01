@@ -8,10 +8,8 @@ Method | HTTP request | Description
 [**AcceptLoginRequest**](AdminApi.md#AcceptLoginRequest) | **Put** /oauth2/auth/requests/login/accept | Accept a Login Request
 [**AcceptLogoutRequest**](AdminApi.md#AcceptLogoutRequest) | **Put** /oauth2/auth/requests/logout/accept | Accept a Logout Request
 [**CreateJsonWebKeySet**](AdminApi.md#CreateJsonWebKeySet) | **Post** /keys/{set} | Generate a New JSON Web Key
-[**CreateOAuth2Client**](AdminApi.md#CreateOAuth2Client) | **Post** /clients | Create an OAuth 2.0 Client
 [**DeleteJsonWebKey**](AdminApi.md#DeleteJsonWebKey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 [**DeleteJsonWebKeySet**](AdminApi.md#DeleteJsonWebKeySet) | **Delete** /keys/{set} | Delete a JSON Web Key Set
-[**DeleteOAuth2Client**](AdminApi.md#DeleteOAuth2Client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 [**DeleteOAuth2Token**](AdminApi.md#DeleteOAuth2Token) | **Delete** /oauth2/tokens | Delete OAuth2 Access Tokens from a Client
 [**DeleteTrustedJwtGrantIssuer**](AdminApi.md#DeleteTrustedJwtGrantIssuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 [**GetConsentRequest**](AdminApi.md#GetConsentRequest) | **Get** /oauth2/auth/requests/consent | Get Consent Request Information
@@ -19,13 +17,10 @@ Method | HTTP request | Description
 [**GetJsonWebKeySet**](AdminApi.md#GetJsonWebKeySet) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
 [**GetLoginRequest**](AdminApi.md#GetLoginRequest) | **Get** /oauth2/auth/requests/login | Get a Login Request
 [**GetLogoutRequest**](AdminApi.md#GetLogoutRequest) | **Get** /oauth2/auth/requests/logout | Get a Logout Request
-[**GetOAuth2Client**](AdminApi.md#GetOAuth2Client) | **Get** /clients/{id} | Get an OAuth 2.0 Client
 [**GetTrustedJwtGrantIssuer**](AdminApi.md#GetTrustedJwtGrantIssuer) | **Get** /trust/grants/jwt-bearer/issuers/{id} | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 [**IntrospectOAuth2Token**](AdminApi.md#IntrospectOAuth2Token) | **Post** /oauth2/introspect | Introspect OAuth2 Tokens
-[**ListOAuth2Clients**](AdminApi.md#ListOAuth2Clients) | **Get** /clients | List OAuth 2.0 Clients
 [**ListSubjectConsentSessions**](AdminApi.md#ListSubjectConsentSessions) | **Get** /oauth2/auth/sessions/consent | Lists All Consent Sessions of a Subject
 [**ListTrustedJwtGrantIssuers**](AdminApi.md#ListTrustedJwtGrantIssuers) | **Get** /trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
-[**PatchOAuth2Client**](AdminApi.md#PatchOAuth2Client) | **Patch** /clients/{id} | Patch an OAuth 2.0 Client
 [**RejectConsentRequest**](AdminApi.md#RejectConsentRequest) | **Put** /oauth2/auth/requests/consent/reject | Reject a Consent Request
 [**RejectLoginRequest**](AdminApi.md#RejectLoginRequest) | **Put** /oauth2/auth/requests/login/reject | Reject a Login Request
 [**RejectLogoutRequest**](AdminApi.md#RejectLogoutRequest) | **Put** /oauth2/auth/requests/logout/reject | Reject a Logout Request
@@ -34,7 +29,6 @@ Method | HTTP request | Description
 [**TrustJwtGrantIssuer**](AdminApi.md#TrustJwtGrantIssuer) | **Post** /trust/grants/jwt-bearer/issuers | Trust an OAuth2 JWT Bearer Grant Type Issuer
 [**UpdateJsonWebKey**](AdminApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 [**UpdateJsonWebKeySet**](AdminApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Update a JSON Web Key Set
-[**UpdateOAuth2Client**](AdminApi.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 
 
 
@@ -302,67 +296,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## CreateOAuth2Client
-
-> OAuth2Client CreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
-
-Create an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.CreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.CreateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `CreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.CreateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiCreateOAuth2ClientRequest
-struct via the builder pattern
-
-| Name             | Type                                | Description | Notes |
-| ---------------- | ----------------------------------- | ----------- | ----- |
-| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## DeleteJsonWebKey
 
@@ -494,69 +427,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## DeleteOAuth2Client
-
-> DeleteOAuth2Client(ctx, id).Execute()
-
-Deletes an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.DeleteOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.DeleteOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDeleteOAuth2ClientRequest
-struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-(empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## DeleteOAuth2Token
 
@@ -1004,71 +874,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## GetOAuth2Client
-
-> OAuth2Client GetOAuth2Client(ctx, id).Execute()
-
-Get an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.GetOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.GetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.GetOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiGetOAuth2ClientRequest
-struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## GetTrustedJwtGrantIssuer
 
@@ -1201,73 +1006,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## ListOAuth2Clients
-
-> []OAuth2Client ListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
-
-List OAuth 2.0 Clients
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    pageSize := int64(789) // int64 | Items per PageToken  This is the number of items per page. (optional) (default to 250)
-    pageToken := "pageToken_example" // string | Pagination PageToken Token  The page token. (optional) (default to "1")
-    clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
-    owner := "owner_example" // string | The owner of the clients to filter by. (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.ListOAuth2Clients``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `ListOAuth2Clients`: []OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.ListOAuth2Clients`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiListOAuth2ClientsRequest
-struct via the builder pattern
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **pageSize** | **int64** | Items per PageToken  This is the number of items per page. | [default to 250]
- **pageToken** | **string** | Pagination PageToken Token  The page token. | [default to &quot;1&quot;]
- **clientName** | **string** | The name of the clients to filter by. | 
- **owner** | **string** | The owner of the clients to filter by. | 
-
-### Return type
-
-[**[]OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## ListSubjectConsentSessions
 
@@ -1403,74 +1141,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## PatchOAuth2Client
-
-> OAuth2Client PatchOAuth2Client(ctx, id).JsonPatch(jsonPatch).Execute()
-
-Patch an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch | 
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.PatchOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `PatchOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.PatchOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiPatchOAuth2ClientRequest
-struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
- **jsonPatch** | [**[]JsonPatch**](JsonPatch.md) |  | 
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## RejectConsentRequest
 
@@ -1994,140 +1664,3 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## UpdateOAuth2Client
-
-> OAuth2Client UpdateOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
-
-Update an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.UpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.UpdateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `UpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.UpdateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiUpdateOAuth2ClientRequest
-struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## UpdateOAuth2ClientLifespans
-
-> OAuth2Client UpdateOAuth2ClientLifespans(ctx,
-> id).UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans).Execute()
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    updateOAuth2ClientLifespans := *openapiclient.NewUpdateOAuth2ClientLifespans() // UpdateOAuth2ClientLifespans |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.UpdateOAuth2ClientLifespans(context.Background(), id).UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.UpdateOAuth2ClientLifespans``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `UpdateOAuth2ClientLifespans`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `AdminApi.UpdateOAuth2ClientLifespans`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiUpdateOAuth2ClientLifespansRequest struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-**updateOAuth2ClientLifespans** |
-[**UpdateOAuth2ClientLifespans**](UpdateOAuth2ClientLifespans.md) | |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)

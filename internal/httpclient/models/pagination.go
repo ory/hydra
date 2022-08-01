@@ -19,16 +19,18 @@ import (
 // swagger:model pagination
 type Pagination struct {
 
-	// Items per PageToken
+	// Items per page
 	//
-	// This is the number of items per page.
+	// This is the number of items per page to return.
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	// Maximum: 1000
 	// Minimum: 1
 	PageSize int64 `json:"page_size,omitempty"`
 
-	// Pagination PageToken Token
+	// Next Page Token
 	//
-	// The page token.
+	// The next page token.
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageToken *string `json:"page_token,omitempty"`
 }
 

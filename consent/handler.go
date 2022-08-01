@@ -26,6 +26,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
@@ -61,7 +63,7 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
+func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(LoginPath, h.GetLoginRequest)
 	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
 	admin.PUT(LoginPath+"/reject", h.RejectLoginRequest)
@@ -97,8 +99,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //
 //     Responses:
 //       204: emptyResponse
-//       400: jsonError
-//       500: jsonError
+//       400: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -149,8 +151,8 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: handledConsentRequestList
-//       400: jsonError
-//       500: jsonError
+//       400: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -209,8 +211,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       204: emptyResponse
-//       400: jsonError
-//       500: jsonError
+//       400: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -249,10 +251,10 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
-//       400: jsonError
-//       404: jsonError
+//       400: oAuth2ApiError
+//       404: oAuth2ApiError
 //       410: requestWasHandledResponse
-//       500: jsonError
+//       500: oAuth2ApiError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -308,10 +310,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //
 //     Responses:
 //       200: completedRequest
-//       400: jsonError
-//       404: jsonError
-//       401: jsonError
-//       500: jsonError
+//       400: oAuth2ApiError
+//       404: oAuth2ApiError
+//       401: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -400,10 +402,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: completedRequest
-//       400: jsonError
-//       401: jsonError
-//       404: jsonError
-//       500: jsonError
+//       400: oAuth2ApiError
+//       401: oAuth2ApiError
+//       404: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -476,9 +478,9 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: consentRequest
-//       404: jsonError
+//       404: oAuth2ApiError
 //       410: requestWasHandledResponse
-//       500: jsonError
+//       500: oAuth2ApiError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -544,8 +546,8 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //
 //     Responses:
 //       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//       404: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -623,8 +625,8 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//       404: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -689,8 +691,8 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//       404: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -724,8 +726,8 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //
 //     Responses:
 //       204: emptyResponse
-//       404: jsonError
-//       500: jsonError
+//       404: oAuth2ApiError
+//       500: oAuth2ApiError
 func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -753,9 +755,9 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //
 //     Responses:
 //       200: logoutRequest
-//       404: jsonError
+//       404: oAuth2ApiError
 //       410: requestWasHandledResponse
-//       500: jsonError
+//       500: oAuth2ApiError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),

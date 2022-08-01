@@ -90,10 +90,8 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**AcceptLoginRequest**](docs/AdminApi.md#acceptloginrequest) | **Put** /oauth2/auth/requests/login/accept | Accept a Login Request
 *AdminApi* | [**AcceptLogoutRequest**](docs/AdminApi.md#acceptlogoutrequest) | **Put** /oauth2/auth/requests/logout/accept | Accept a Logout Request
 *AdminApi* | [**CreateJsonWebKeySet**](docs/AdminApi.md#createjsonwebkeyset) | **Post** /keys/{set} | Generate a New JSON Web Key
-*AdminApi* | [**CreateOAuth2Client**](docs/AdminApi.md#createoauth2client) | **Post** /clients | Create an OAuth 2.0 Client
 *AdminApi* | [**DeleteJsonWebKey**](docs/AdminApi.md#deletejsonwebkey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
 *AdminApi* | [**DeleteJsonWebKeySet**](docs/AdminApi.md#deletejsonwebkeyset) | **Delete** /keys/{set} | Delete a JSON Web Key Set
-*AdminApi* | [**DeleteOAuth2Client**](docs/AdminApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 *AdminApi* | [**DeleteOAuth2Token**](docs/AdminApi.md#deleteoauth2token) | **Delete** /oauth2/tokens | Delete OAuth2 Access Tokens from a Client
 *AdminApi* | [**DeleteTrustedJwtGrantIssuer**](docs/AdminApi.md#deletetrustedjwtgrantissuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 *AdminApi* | [**GetConsentRequest**](docs/AdminApi.md#getconsentrequest) | **Get** /oauth2/auth/requests/consent | Get Consent Request Information
@@ -101,13 +99,10 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetJsonWebKeySet**](docs/AdminApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
 *AdminApi* | [**GetLoginRequest**](docs/AdminApi.md#getloginrequest) | **Get** /oauth2/auth/requests/login | Get a Login Request
 *AdminApi* | [**GetLogoutRequest**](docs/AdminApi.md#getlogoutrequest) | **Get** /oauth2/auth/requests/logout | Get a Logout Request
-*AdminApi* | [**GetOAuth2Client**](docs/AdminApi.md#getoauth2client) | **Get** /clients/{id} | Get an OAuth 2.0 Client
 *AdminApi* | [**GetTrustedJwtGrantIssuer**](docs/AdminApi.md#gettrustedjwtgrantissuer) | **Get** /trust/grants/jwt-bearer/issuers/{id} | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 *AdminApi* | [**IntrospectOAuth2Token**](docs/AdminApi.md#introspectoauth2token) | **Post** /oauth2/introspect | Introspect OAuth2 Tokens
-*AdminApi* | [**ListOAuth2Clients**](docs/AdminApi.md#listoauth2clients) | **Get** /clients | List OAuth 2.0 Clients
 *AdminApi* | [**ListSubjectConsentSessions**](docs/AdminApi.md#listsubjectconsentsessions) | **Get** /oauth2/auth/sessions/consent | Lists All Consent Sessions of a Subject
 *AdminApi* | [**ListTrustedJwtGrantIssuers**](docs/AdminApi.md#listtrustedjwtgrantissuers) | **Get** /trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
-*AdminApi* | [**PatchOAuth2Client**](docs/AdminApi.md#patchoauth2client) | **Patch** /clients/{id} | Patch an OAuth 2.0 Client
 *AdminApi* | [**RejectConsentRequest**](docs/AdminApi.md#rejectconsentrequest) | **Put** /oauth2/auth/requests/consent/reject | Reject a Consent Request
 *AdminApi* | [**RejectLoginRequest**](docs/AdminApi.md#rejectloginrequest) | **Put** /oauth2/auth/requests/login/reject | Reject a Login Request
 *AdminApi* | [**RejectLogoutRequest**](docs/AdminApi.md#rejectlogoutrequest) | **Put** /oauth2/auth/requests/logout/reject | Reject a Logout Request
@@ -116,21 +111,26 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**TrustJwtGrantIssuer**](docs/AdminApi.md#trustjwtgrantissuer) | **Post** /trust/grants/jwt-bearer/issuers | Trust an OAuth2 JWT Bearer Grant Type Issuer
 *AdminApi* | [**UpdateJsonWebKey**](docs/AdminApi.md#updatejsonwebkey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**UpdateJsonWebKeySet**](docs/AdminApi.md#updatejsonwebkeyset) | **Put** /keys/{set} | Update a JSON Web Key Set
-*AdminApi* | [**UpdateOAuth2Client**](docs/AdminApi.md#updateoauth2client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
 *MetadataApi* | [**GetVersion**](docs/MetadataApi.md#getversion) | **Get** /version | Return Running Software Version.
 *MetadataApi* | [**IsAlive**](docs/MetadataApi.md#isalive) | **Get** /health/alive | Check HTTP Server Status
 *MetadataApi* | [**IsReady**](docs/MetadataApi.md#isready) | **Get** /health/ready | Check HTTP Server and Database Status
 *PublicApi* | [**DisconnectUser**](docs/PublicApi.md#disconnectuser) | **Get** /oauth2/sessions/logout | OpenID Connect Front-Backchannel Enabled Logout
 *PublicApi* | [**DiscoverOpenIDConfiguration**](docs/PublicApi.md#discoveropenidconfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-*PublicApi* | [**DynamicClientRegistrationCreateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationcreateoauth2client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationDeleteOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationdeleteoauth2client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationGetOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationgetoauth2client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationUpdateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationupdateoauth2client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 *PublicApi* | [**Oauth2Token**](docs/PublicApi.md#oauth2token) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
 *PublicApi* | [**OauthAuth**](docs/PublicApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
 *PublicApi* | [**RevokeOAuth2Token**](docs/PublicApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 Tokens
 *PublicApi* | [**Userinfo**](docs/PublicApi.md#userinfo) | **Get** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**WellKnown**](docs/PublicApi.md#wellknown) | **Get** /.well-known/jwks.json | JSON Web Keys Discovery
+*V1Api* | [**AdminCreateOAuth2Client**](docs/V1Api.md#admincreateoauth2client) | **Post** /admin/clients | Create an OAuth 2.0 Client
+*V1Api* | [**AdminDeleteOAuth2Client**](docs/V1Api.md#admindeleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+*V1Api* | [**AdminGetOAuth2Client**](docs/V1Api.md#admingetoauth2client) | **Get** /clients/{id} | Get an OAuth 2.0 Client
+*V1Api* | [**AdminListOAuth2Clients**](docs/V1Api.md#adminlistoauth2clients) | **Get** /clients | List OAuth 2.0 Clients
+*V1Api* | [**AdminPatchOAuth2Client**](docs/V1Api.md#adminpatchoauth2client) | **Patch** /clients/{id} | Patch an OAuth 2.0 Client
+*V1Api* | [**AdminUpdateOAuth2Client**](docs/V1Api.md#adminupdateoauth2client) | **Put** /admin/clients/{id} | Update an OAuth 2.0 Client
+*V1Api* | [**DynamicClientRegistrationCreateOAuth2Client**](docs/V1Api.md#dynamicclientregistrationcreateoauth2client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*V1Api* | [**DynamicClientRegistrationDeleteOAuth2Client**](docs/V1Api.md#dynamicclientregistrationdeleteoauth2client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*V1Api* | [**DynamicClientRegistrationGetOAuth2Client**](docs/V1Api.md#dynamicclientregistrationgetoauth2client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*V1Api* | [**DynamicClientRegistrationUpdateOAuth2Client**](docs/V1Api.md#dynamicclientregistrationupdateoauth2client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 
 
 ## Documentation For Models
@@ -150,17 +150,18 @@ Class | Method | HTTP request | Description
  - [IsReady503Response](docs/IsReady503Response.md)
  - [JSONWebKey](docs/JSONWebKey.md)
  - [JSONWebKeySet](docs/JSONWebKeySet.md)
- - [JsonError](docs/JsonError.md)
  - [JsonPatch](docs/JsonPatch.md)
  - [JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [LogoutRequest](docs/LogoutRequest.md)
+ - [OAuth2ApiError](docs/OAuth2ApiError.md)
  - [OAuth2Client](docs/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
  - [OauthTokenResponse](docs/OauthTokenResponse.md)
  - [OpenIDConnectContext](docs/OpenIDConnectContext.md)
  - [Pagination](docs/Pagination.md)
+ - [PaginationHeaders](docs/PaginationHeaders.md)
  - [PreviousConsentSession](docs/PreviousConsentSession.md)
  - [RefreshTokenHookRequest](docs/RefreshTokenHookRequest.md)
  - [RefreshTokenHookResponse](docs/RefreshTokenHookResponse.md)

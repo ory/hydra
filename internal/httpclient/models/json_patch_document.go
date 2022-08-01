@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONPatchDocument A JSONPatch request
+// JSONPatchDocument A JSONPatchDocument request
 //
 // swagger:model jsonPatchDocument
 type JSONPatchDocument []*JSONPatch

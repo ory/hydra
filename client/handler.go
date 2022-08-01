@@ -29,6 +29,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
+	"github.com/ory/x/openapix"
+
 	"github.com/ory/x/uuidx"
 
 	"github.com/ory/x/jsonx"
@@ -60,28 +64,34 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
-	admin.GET(ClientsHandlerPath, h.List)
-	admin.POST(ClientsHandlerPath, h.Create)
+func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
+	admin.GET(ClientsHandlerPath, h.adminListOAuth2Clients)
+	admin.POST(ClientsHandlerPath, h.adminCreateOAuth2Client)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)
-	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
-	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
+	admin.PUT(ClientsHandlerPath+"/:id", h.adminUpdateOAuth2Client)
+	admin.PATCH(ClientsHandlerPath+"/:id", h.adminPatchOAuth2Client)
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.UpdateLifespans)
 
-	public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
+	public.POST(DynClientsHandlerPath, h.dynamicClientRegistrationCreateOAuth2Client)
 	public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
-	public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
+	public.PUT(DynClientsHandlerPath+"/:id", h.dynamicClientRegistrationUpdateOAuth2Client)
 	public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
 }
 
-// swagger:route POST /clients admin createOAuth2Client
+// swagger:parameters adminCreateOAuth2Client
+type adminCreateOAuth2Client struct {
+	// in: body
+	// required: true
+	Body Client
+}
+
+// swagger:route POST /admin/clients v1 adminCreateOAuth2Client
 //
 // Create an OAuth 2.0 Client
 //
-// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
-// will be generated. The secret will be returned in the response and you will not be able to retrieve it later on.
-// Write the secret down and keep it somwhere safe.
+// Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret
+// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -96,8 +106,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 //
 //     Responses:
 //       201: oAuth2Client
-//       default: jsonError
-func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminCreateOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -107,7 +117,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /oauth2/register public dynamicClientRegistrationCreateOAuth2Client
+// swagger:parameters dynamicClientRegistrationCreateOAuth2Client
+type dynamicClientRegistrationCreateOAuth2Client struct {
+	// in: body
+	// required: true
+	Body Client
+}
+
+// swagger:route POST /oauth2/register v1 dynamicClientRegistrationCreateOAuth2Client
 //
 // Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -134,8 +151,8 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 //     Responses:
 //       201: oAuth2Client
-//       default: jsonError
-func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) dynamicClientRegistrationCreateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -203,12 +220,25 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 	return &c, nil
 }
 
-// swagger:route PUT /clients/{id} admin updateOAuth2Client
+// swagger:parameters adminUpdateOAuth2Client
+type adminUpdateOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body Client
+}
+
+// swagger:route PUT /admin/clients/{id} v1 adminUpdateOAuth2Client
 //
 // Update an OAuth 2.0 Client
 //
-// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
-// This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret
+// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
@@ -223,8 +253,8 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: jsonError
-func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
@@ -258,7 +288,20 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 	return nil
 }
 
-// swagger:route PUT /oauth2/register/{id} public dynamicClientRegistrationUpdateOAuth2Client
+// swagger:parameters dynamicClientRegistrationUpdateOAuth2Client
+type dynamicClientRegistrationUpdateOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body Client
+}
+
+// swagger:route PUT /oauth2/register/{id} v1 dynamicClientRegistrationUpdateOAuth2Client
 //
 // Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -267,8 +310,8 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 // Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
 // is disabled by default. It can be enabled by an administrator.
 //
-// If you pass `client_secret` the secret will be updated and returned via the API.
-// This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// If you pass `client_secret` the secret is used, otherwise a random secret
+// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
 //
 // To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
 // uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
@@ -290,9 +333,9 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: jsonError
+//       default: oAuth2ApiError
 //
-func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) dynamicClientRegistrationUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -333,7 +376,20 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	h.r.Writer().Write(w, r, &c)
 }
 
-// swagger:route PATCH /clients/{id} admin patchOAuth2Client
+// swagger:parameters adminPatchOAuth2Client
+type adminPatchOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body openapix.JSONPatchDocument
+}
+
+// swagger:route PATCH /clients/{id} v1 adminPatchOAuth2Client
 //
 // Patch an OAuth 2.0 Client
 //
@@ -354,8 +410,8 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: jsonError
-func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminPatchOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -392,8 +448,18 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:parameters listOAuth2Clients
-type listOAuth2Clients struct {
+// The list of clients and pagination information.
+//
+// swagger:response adminListOAuth2ClientsResponse
+type adminListOAuth2ClientsResponse struct {
+	x.PaginationHeaders
+
+	// in:body
+	Body []Client
+}
+
+// swagger:parameters adminListOAuth2Clients
+type adminListOAuth2Clients struct {
 	x.PaginationParams
 
 	// The name of the clients to filter by.
@@ -405,7 +471,7 @@ type listOAuth2Clients struct {
 	Owner string `json:"owner"`
 }
 
-// swagger:route GET /clients admin listOAuth2Clients
+// swagger:route GET /clients v1 adminListOAuth2Clients
 //
 // List OAuth 2.0 Clients
 //
@@ -428,9 +494,9 @@ type listOAuth2Clients struct {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: oAuth2ClientList
-//       default: jsonError
-func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: adminListOAuth2ClientsResponse
+//       default: oAuth2ApiError
+func (h *Handler) adminListOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	page, itemsPerPage := x.ParsePagination(r)
 	filters := Filter{
 		Limit:  itemsPerPage,
@@ -463,7 +529,16 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /clients/{id} admin getOAuth2Client
+// swagger:parameters adminGetOAuth2Client
+type adminGetOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route GET /clients/{id} v1 adminGetOAuth2Client
 //
 // Get an OAuth 2.0 Client
 //
@@ -482,7 +557,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: jsonError
+//       default: oAuth2ApiError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -495,7 +570,16 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /oauth2/register/{id} public dynamicClientRegistrationGetOAuth2Client
+// swagger:parameters dynamicClientRegistrationGetOAuth2Client
+type dynamicClientRegistrationGetOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route GET /oauth2/register/{id} v1 dynamicClientRegistrationGetOAuth2Client
 //
 // Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -524,7 +608,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //
 //     Responses:
 //       200: oAuth2Client
-//       default: jsonError
+//       default: oAuth2ApiError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -549,7 +633,16 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route DELETE /clients/{id} admin deleteOAuth2Client
+// swagger:parameters adminDeleteOAuth2Client
+type adminDeleteOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route DELETE /clients/{id} v1 adminDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //
@@ -570,7 +663,7 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 //
 //     Responses:
 //       204: emptyResponse
-//       default: jsonError
+//       default: oAuth2ApiError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -581,57 +674,16 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route PUT /clients/{id}/lifespans admin UpdateOAuth2ClientLifespans
-//
-// UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
-// client configuration takes precedence over the instance-wide token lifespan
-// configuration.
-//
-//     Consumes:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
-func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
-	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	var ls UpdateOAuth2ClientLifespans
-	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
-		return
-	}
-
-	c.AuthorizationCodeGrantAccessTokenLifespan = ls.AuthorizationCodeGrantAccessTokenLifespan
-	c.AuthorizationCodeGrantIDTokenLifespan = ls.AuthorizationCodeGrantIDTokenLifespan
-	c.AuthorizationCodeGrantRefreshTokenLifespan = ls.AuthorizationCodeGrantRefreshTokenLifespan
-	c.ClientCredentialsGrantAccessTokenLifespan = ls.ClientCredentialsGrantAccessTokenLifespan
-	c.ImplicitGrantAccessTokenLifespan = ls.ImplicitGrantAccessTokenLifespan
-	c.ImplicitGrantIDTokenLifespan = ls.ImplicitGrantIDTokenLifespan
-	c.JwtBearerGrantAccessTokenLifespan = ls.JwtBearerGrantAccessTokenLifespan
-	c.PasswordGrantAccessTokenLifespan = ls.PasswordGrantAccessTokenLifespan
-	c.PasswordGrantRefreshTokenLifespan = ls.PasswordGrantRefreshTokenLifespan
-	c.RefreshTokenGrantAccessTokenLifespan = ls.RefreshTokenGrantAccessTokenLifespan
-	c.RefreshTokenGrantIDTokenLifespan = ls.RefreshTokenGrantIDTokenLifespan
-	c.RefreshTokenGrantRefreshTokenLifespan = ls.RefreshTokenGrantRefreshTokenLifespan
-	c.Secret = ""
-
-	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	h.r.Writer().Write(w, r, c)
+// swagger:parameters dynamicClientRegistrationDeleteOAuth2Client
+type dynamicClientRegistrationDeleteOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
 }
 
-// swagger:route DELETE /oauth2/register/{id} public dynamicClientRegistrationDeleteOAuth2Client
+// swagger:route DELETE /oauth2/register/{id} v1 dynamicClientRegistrationDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -657,7 +709,7 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 //
 //     Responses:
 //       204: emptyResponse
-//       default: jsonError
+//       default: oAuth2ApiError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)

@@ -85,22 +85,22 @@ func NewAcceptLogoutRequestNotFound() *AcceptLogoutRequestNotFound {
 
 /* AcceptLogoutRequestNotFound describes a response with status code 404, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type AcceptLogoutRequestNotFound struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *AcceptLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *AcceptLogoutRequestNotFound) GetPayload() *models.JSONError {
+func (o *AcceptLogoutRequestNotFound) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -117,22 +117,22 @@ func NewAcceptLogoutRequestInternalServerError() *AcceptLogoutRequestInternalSer
 
 /* AcceptLogoutRequestInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type AcceptLogoutRequestInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *AcceptLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.JSONError {
+func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -27,6 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/contextx"
 
@@ -43,8 +45,8 @@ func TestHandlerConsent(t *testing.T) {
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	h := reg.OAuth2Handler()
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)

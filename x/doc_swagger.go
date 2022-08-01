@@ -20,12 +20,12 @@
 
 package x
 
-// Generic Error Response
+// OAuth2 API Error
 //
-// Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
+// An API error caused by Ory's OAuth 2.0 APIs.
 //
-// swagger:model jsonError
-type jsonError struct {
+// swagger:model oAuth2ApiError
+type oAuth2ApiError struct {
 	// Name is the error name.
 	//
 	// example: The requested resource could not be found

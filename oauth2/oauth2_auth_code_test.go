@@ -35,6 +35,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/x/assertx"
 
 	"github.com/pborman/uuid"
@@ -363,7 +365,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(""), Remember: true}))
 			require.Error(t, err) // expects 400
-			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload)
+			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.Error.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload)
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
@@ -722,7 +724,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 			reg.WithConsentStrategy(consentStrategy)
 			handler := reg.OAuth2Handler()
-			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+			handler.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL), router, func(h http.Handler) http.Handler {
 				return h
 			})
 

@@ -1,9 +1,23 @@
 {
     "$id": "https://github.com/ory/kratos/.schema/versions.config.schema.json",
-    "$schema": "https://raw.githubusercontent.com/ory/cli/v0.0.21/.schema/version_meta.schema.json#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "All Versions of the ORY Hydra Configuration",
     "type": "object",
     "oneOf": [
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
+                            "const": "v1.11.7"
+                        }
+                    }
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.11.7/spec/config.json"
+                }
+            ]
+        },
         {
             "allOf": [
                 {
@@ -257,16 +271,35 @@
             ]
         },
         {
+            "description": "This is the fallback to the latest version (the first one in this schema) in case no version is specified.",
             "allOf": [
                 {
-                    "properties": {
-                        "version": {
-                            "const": "v1.11.7"
+                    "oneOf": [
+                        {
+                            "properties": {
+                                "version": {
+                                    "type": "string",
+                                    "maxLength": 0
+                                }
+                            },
+                            "required": [
+                                "version"
+                            ]
+                        },
+                        {
+                            "not": {
+                                "properties": {
+                                    "version": {}
+                                },
+                                "required": [
+                                    "version"
+                                ]
+                            }
                         }
-                    }
+                    ]
                 },
                 {
-                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.11.7/spec/config.json"
+                    "$ref": "#/oneOf/0/allOf/1"
                 }
             ]
         }

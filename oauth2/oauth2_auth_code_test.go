@@ -824,7 +824,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					expectOAuthAuthError: true,
 				},
 				{
-					d:                         "should pass because prompt=none and max_age < auth_time",
+					d:                         "should pass because prompt=none and max_age is less than auth_time",
 					authURL:                   oauthConfig.AuthCodeURL("some-foo-state") + "&prompt=none&max_age=3600",
 					authTime:                  time.Now().UTC().Add(-time.Minute),
 					requestTime:               time.Now().UTC(),

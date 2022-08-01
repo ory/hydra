@@ -4,8 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**PageSize** | Pointer to **int64** | Items per PageToken  This is the number of items per page. | [optional] [default to 250]
-**PageToken** | Pointer to **string** | Pagination PageToken Token  The page token. | [optional] [default to "1"]
+**PageSize** | Pointer to **int64** | Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [optional] [default to 250]
+**PageToken** | Pointer to **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [optional] [default to "1"]
 
 ## Methods
 

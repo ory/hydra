@@ -10,6 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/tidwall/sjson"
 
 	"github.com/gofrs/uuid"
@@ -23,7 +25,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/snapshotx"
 
 	"github.com/stretchr/testify/require"
@@ -129,9 +130,10 @@ func TestHandler(t *testing.T) {
 	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
 		require.NoError(t, reg.Config().Set(ctx, config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
 		router := httprouter.New()
-		h.SetRoutes(&x.RouterAdmin{Router: router}, &x.RouterPublic{Router: router})
+		h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router, "/admin", reg.Config().AdminURL), &httprouterx.RouterPublic{Router: router})
 		ts := httptest.NewServer(router)
 		t.Cleanup(ts.Close)
+		reg.Config().MustSet(ctx, config.KeyAdminURL, ts.URL)
 		return ts, ts.Client()
 	}
 

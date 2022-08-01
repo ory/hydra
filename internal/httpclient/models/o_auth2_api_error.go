@@ -12,12 +12,12 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONError Generic Error Response
+// OAuth2APIError OAuth2 API Error
 //
-// Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
+// An API error caused by Ory's OAuth 2.0 APIs.
 //
-// swagger:model jsonError
-type JSONError struct {
+// swagger:model oAuth2ApiError
+type OAuth2APIError struct {
 
 	// Name is the error name.
 	// Example: The requested resource could not be found
@@ -36,18 +36,18 @@ type JSONError struct {
 	StatusCode int64 `json:"status_code,omitempty"`
 }
 
-// Validate validates this json error
-func (m *JSONError) Validate(formats strfmt.Registry) error {
+// Validate validates this o auth2 Api error
+func (m *OAuth2APIError) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this json error based on context it is used
-func (m *JSONError) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this o auth2 Api error based on context it is used
+func (m *OAuth2APIError) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *JSONError) MarshalBinary() ([]byte, error) {
+func (m *OAuth2APIError) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -55,8 +55,8 @@ func (m *JSONError) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *JSONError) UnmarshalBinary(b []byte) error {
-	var res JSONError
+func (m *OAuth2APIError) UnmarshalBinary(b []byte) error {
+	var res OAuth2APIError
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

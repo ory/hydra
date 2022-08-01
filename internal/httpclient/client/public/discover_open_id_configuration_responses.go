@@ -86,22 +86,22 @@ func NewDiscoverOpenIDConfigurationUnauthorized() *DiscoverOpenIDConfigurationUn
 
 /* DiscoverOpenIDConfigurationUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DiscoverOpenIDConfigurationUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationUnauthorized  %+v", 401, o.Payload)
 }
-func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.JSONError {
+func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,12 +120,12 @@ func NewDiscoverOpenIDConfigurationDefault(code int) *DiscoverOpenIDConfiguratio
 
 /* DiscoverOpenIDConfigurationDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DiscoverOpenIDConfigurationDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the discover open ID configuration default response
@@ -136,13 +136,13 @@ func (o *DiscoverOpenIDConfigurationDefault) Code() int {
 func (o *DiscoverOpenIDConfigurationDefault) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIDConfiguration default  %+v", o._statusCode, o.Payload)
 }
-func (o *DiscoverOpenIDConfigurationDefault) GetPayload() *models.JSONError {
+func (o *DiscoverOpenIDConfigurationDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

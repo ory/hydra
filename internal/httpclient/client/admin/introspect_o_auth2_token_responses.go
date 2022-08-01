@@ -86,22 +86,22 @@ func NewIntrospectOAuth2TokenUnauthorized() *IntrospectOAuth2TokenUnauthorized {
 
 /* IntrospectOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type IntrospectOAuth2TokenUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
+func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,12 +120,12 @@ func NewIntrospectOAuth2TokenDefault(code int) *IntrospectOAuth2TokenDefault {
 
 /* IntrospectOAuth2TokenDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type IntrospectOAuth2TokenDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the introspect o auth2 token default response
@@ -136,13 +136,13 @@ func (o *IntrospectOAuth2TokenDefault) Code() int {
 func (o *IntrospectOAuth2TokenDefault) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2Token default  %+v", o._statusCode, o.Payload)
 }
-func (o *IntrospectOAuth2TokenDefault) GetPayload() *models.JSONError {
+func (o *IntrospectOAuth2TokenDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

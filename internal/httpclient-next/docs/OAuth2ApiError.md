@@ -1,4 +1,4 @@
-# JsonError
+# OAuth2ApiError
 
 ## Properties
 
@@ -11,121 +11,121 @@
 
 ## Methods
 
-### NewJsonError
+### NewOAuth2ApiError
 
-`func NewJsonError() *JsonError`
+`func NewOAuth2ApiError() *OAuth2ApiError`
 
-NewJsonError instantiates a new JsonError object This constructor will assign
-default values to properties that have it defined, and makes sure properties
-required by API are set, but the set of arguments will change when the set of
-required properties is changed
+NewOAuth2ApiError instantiates a new OAuth2ApiError object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
-### NewJsonErrorWithDefaults
+### NewOAuth2ApiErrorWithDefaults
 
-`func NewJsonErrorWithDefaults() *JsonError`
+`func NewOAuth2ApiErrorWithDefaults() *OAuth2ApiError`
 
-NewJsonErrorWithDefaults instantiates a new JsonError object This constructor
-will only assign default values to properties that have it defined, but it
-doesn't guarantee that properties required by API are set
+NewOAuth2ApiErrorWithDefaults instantiates a new OAuth2ApiError object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetError
 
-`func (o *JsonError) GetError() string`
+`func (o *OAuth2ApiError) GetError() string`
 
 GetError returns the Error field if non-nil, zero value otherwise.
 
 ### GetErrorOk
 
-`func (o *JsonError) GetErrorOk() (*string, bool)`
+`func (o *OAuth2ApiError) GetErrorOk() (*string, bool)`
 
 GetErrorOk returns a tuple with the Error field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetError
 
-`func (o *JsonError) SetError(v string)`
+`func (o *OAuth2ApiError) SetError(v string)`
 
 SetError sets Error field to given value.
 
 ### HasError
 
-`func (o *JsonError) HasError() bool`
+`func (o *OAuth2ApiError) HasError() bool`
 
 HasError returns a boolean if a field has been set.
 
 ### GetErrorDebug
 
-`func (o *JsonError) GetErrorDebug() string`
+`func (o *OAuth2ApiError) GetErrorDebug() string`
 
 GetErrorDebug returns the ErrorDebug field if non-nil, zero value otherwise.
 
 ### GetErrorDebugOk
 
-`func (o *JsonError) GetErrorDebugOk() (*string, bool)`
+`func (o *OAuth2ApiError) GetErrorDebugOk() (*string, bool)`
 
 GetErrorDebugOk returns a tuple with the ErrorDebug field if it's non-nil, zero
 value otherwise and a boolean to check if the value has been set.
 
 ### SetErrorDebug
 
-`func (o *JsonError) SetErrorDebug(v string)`
+`func (o *OAuth2ApiError) SetErrorDebug(v string)`
 
 SetErrorDebug sets ErrorDebug field to given value.
 
 ### HasErrorDebug
 
-`func (o *JsonError) HasErrorDebug() bool`
+`func (o *OAuth2ApiError) HasErrorDebug() bool`
 
 HasErrorDebug returns a boolean if a field has been set.
 
 ### GetErrorDescription
 
-`func (o *JsonError) GetErrorDescription() string`
+`func (o *OAuth2ApiError) GetErrorDescription() string`
 
 GetErrorDescription returns the ErrorDescription field if non-nil, zero value
 otherwise.
 
 ### GetErrorDescriptionOk
 
-`func (o *JsonError) GetErrorDescriptionOk() (*string, bool)`
+`func (o *OAuth2ApiError) GetErrorDescriptionOk() (*string, bool)`
 
 GetErrorDescriptionOk returns a tuple with the ErrorDescription field if it's
 non-nil, zero value otherwise and a boolean to check if the value has been set.
 
 ### SetErrorDescription
 
-`func (o *JsonError) SetErrorDescription(v string)`
+`func (o *OAuth2ApiError) SetErrorDescription(v string)`
 
 SetErrorDescription sets ErrorDescription field to given value.
 
 ### HasErrorDescription
 
-`func (o *JsonError) HasErrorDescription() bool`
+`func (o *OAuth2ApiError) HasErrorDescription() bool`
 
 HasErrorDescription returns a boolean if a field has been set.
 
 ### GetStatusCode
 
-`func (o *JsonError) GetStatusCode() int64`
+`func (o *OAuth2ApiError) GetStatusCode() int64`
 
 GetStatusCode returns the StatusCode field if non-nil, zero value otherwise.
 
 ### GetStatusCodeOk
 
-`func (o *JsonError) GetStatusCodeOk() (*int64, bool)`
+`func (o *OAuth2ApiError) GetStatusCodeOk() (*int64, bool)`
 
 GetStatusCodeOk returns a tuple with the StatusCode field if it's non-nil, zero
 value otherwise and a boolean to check if the value has been set.
 
 ### SetStatusCode
 
-`func (o *JsonError) SetStatusCode(v int64)`
+`func (o *OAuth2ApiError) SetStatusCode(v int64)`
 
 SetStatusCode sets StatusCode field to given value.
 
 ### HasStatusCode
 
-`func (o *JsonError) HasStatusCode() bool`
+`func (o *OAuth2ApiError) HasStatusCode() bool`
 
 HasStatusCode returns a boolean if a field has been set.
 

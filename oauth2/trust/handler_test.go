@@ -49,7 +49,7 @@ func (s *HandlerTestSuite) SetupSuite() {
 	conf.MustSet(context.Background(), config.KeyDefaultClientScope, []string{"foo", "bar"})
 	s.registry = internal.NewRegistryMemory(s.T(), conf, &contextx.Default{})
 
-	router := x.NewRouterAdmin()
+	router := x.NewRouterAdmin(conf.AdminURL)
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)

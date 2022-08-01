@@ -15,8 +15,8 @@ import (
 	"encoding/json"
 )
 
-// JsonError Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
-type JsonError struct {
+// OAuth2ApiError An API error caused by Ory's OAuth 2.0 APIs.
+type OAuth2ApiError struct {
 	// Name is the error name.
 	Error *string `json:"error,omitempty"`
 	// Debug contains debug information. This is usually not available and has to be enabled.
@@ -27,25 +27,25 @@ type JsonError struct {
 	StatusCode *int64 `json:"status_code,omitempty"`
 }
 
-// NewJsonError instantiates a new JsonError object
+// NewOAuth2ApiError instantiates a new OAuth2ApiError object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewJsonError() *JsonError {
-	this := JsonError{}
+func NewOAuth2ApiError() *OAuth2ApiError {
+	this := OAuth2ApiError{}
 	return &this
 }
 
-// NewJsonErrorWithDefaults instantiates a new JsonError object
+// NewOAuth2ApiErrorWithDefaults instantiates a new OAuth2ApiError object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewJsonErrorWithDefaults() *JsonError {
-	this := JsonError{}
+func NewOAuth2ApiErrorWithDefaults() *OAuth2ApiError {
+	this := OAuth2ApiError{}
 	return &this
 }
 
 // GetError returns the Error field value if set, zero value otherwise.
-func (o *JsonError) GetError() string {
+func (o *OAuth2ApiError) GetError() string {
 	if o == nil || o.Error == nil {
 		var ret string
 		return ret
@@ -55,7 +55,7 @@ func (o *JsonError) GetError() string {
 
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JsonError) GetErrorOk() (*string, bool) {
+func (o *OAuth2ApiError) GetErrorOk() (*string, bool) {
 	if o == nil || o.Error == nil {
 		return nil, false
 	}
@@ -63,7 +63,7 @@ func (o *JsonError) GetErrorOk() (*string, bool) {
 }
 
 // HasError returns a boolean if a field has been set.
-func (o *JsonError) HasError() bool {
+func (o *OAuth2ApiError) HasError() bool {
 	if o != nil && o.Error != nil {
 		return true
 	}
@@ -72,12 +72,12 @@ func (o *JsonError) HasError() bool {
 }
 
 // SetError gets a reference to the given string and assigns it to the Error field.
-func (o *JsonError) SetError(v string) {
+func (o *OAuth2ApiError) SetError(v string) {
 	o.Error = &v
 }
 
 // GetErrorDebug returns the ErrorDebug field value if set, zero value otherwise.
-func (o *JsonError) GetErrorDebug() string {
+func (o *OAuth2ApiError) GetErrorDebug() string {
 	if o == nil || o.ErrorDebug == nil {
 		var ret string
 		return ret
@@ -87,7 +87,7 @@ func (o *JsonError) GetErrorDebug() string {
 
 // GetErrorDebugOk returns a tuple with the ErrorDebug field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JsonError) GetErrorDebugOk() (*string, bool) {
+func (o *OAuth2ApiError) GetErrorDebugOk() (*string, bool) {
 	if o == nil || o.ErrorDebug == nil {
 		return nil, false
 	}
@@ -95,7 +95,7 @@ func (o *JsonError) GetErrorDebugOk() (*string, bool) {
 }
 
 // HasErrorDebug returns a boolean if a field has been set.
-func (o *JsonError) HasErrorDebug() bool {
+func (o *OAuth2ApiError) HasErrorDebug() bool {
 	if o != nil && o.ErrorDebug != nil {
 		return true
 	}
@@ -104,12 +104,12 @@ func (o *JsonError) HasErrorDebug() bool {
 }
 
 // SetErrorDebug gets a reference to the given string and assigns it to the ErrorDebug field.
-func (o *JsonError) SetErrorDebug(v string) {
+func (o *OAuth2ApiError) SetErrorDebug(v string) {
 	o.ErrorDebug = &v
 }
 
 // GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
-func (o *JsonError) GetErrorDescription() string {
+func (o *OAuth2ApiError) GetErrorDescription() string {
 	if o == nil || o.ErrorDescription == nil {
 		var ret string
 		return ret
@@ -119,7 +119,7 @@ func (o *JsonError) GetErrorDescription() string {
 
 // GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JsonError) GetErrorDescriptionOk() (*string, bool) {
+func (o *OAuth2ApiError) GetErrorDescriptionOk() (*string, bool) {
 	if o == nil || o.ErrorDescription == nil {
 		return nil, false
 	}
@@ -127,7 +127,7 @@ func (o *JsonError) GetErrorDescriptionOk() (*string, bool) {
 }
 
 // HasErrorDescription returns a boolean if a field has been set.
-func (o *JsonError) HasErrorDescription() bool {
+func (o *OAuth2ApiError) HasErrorDescription() bool {
 	if o != nil && o.ErrorDescription != nil {
 		return true
 	}
@@ -136,12 +136,12 @@ func (o *JsonError) HasErrorDescription() bool {
 }
 
 // SetErrorDescription gets a reference to the given string and assigns it to the ErrorDescription field.
-func (o *JsonError) SetErrorDescription(v string) {
+func (o *OAuth2ApiError) SetErrorDescription(v string) {
 	o.ErrorDescription = &v
 }
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
-func (o *JsonError) GetStatusCode() int64 {
+func (o *OAuth2ApiError) GetStatusCode() int64 {
 	if o == nil || o.StatusCode == nil {
 		var ret int64
 		return ret
@@ -151,7 +151,7 @@ func (o *JsonError) GetStatusCode() int64 {
 
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JsonError) GetStatusCodeOk() (*int64, bool) {
+func (o *OAuth2ApiError) GetStatusCodeOk() (*int64, bool) {
 	if o == nil || o.StatusCode == nil {
 		return nil, false
 	}
@@ -159,7 +159,7 @@ func (o *JsonError) GetStatusCodeOk() (*int64, bool) {
 }
 
 // HasStatusCode returns a boolean if a field has been set.
-func (o *JsonError) HasStatusCode() bool {
+func (o *OAuth2ApiError) HasStatusCode() bool {
 	if o != nil && o.StatusCode != nil {
 		return true
 	}
@@ -168,11 +168,11 @@ func (o *JsonError) HasStatusCode() bool {
 }
 
 // SetStatusCode gets a reference to the given int64 and assigns it to the StatusCode field.
-func (o *JsonError) SetStatusCode(v int64) {
+func (o *OAuth2ApiError) SetStatusCode(v int64) {
 	o.StatusCode = &v
 }
 
-func (o JsonError) MarshalJSON() ([]byte, error) {
+func (o OAuth2ApiError) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Error != nil {
 		toSerialize["error"] = o.Error
@@ -189,38 +189,38 @@ func (o JsonError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableJsonError struct {
-	value *JsonError
+type NullableOAuth2ApiError struct {
+	value *OAuth2ApiError
 	isSet bool
 }
 
-func (v NullableJsonError) Get() *JsonError {
+func (v NullableOAuth2ApiError) Get() *OAuth2ApiError {
 	return v.value
 }
 
-func (v *NullableJsonError) Set(val *JsonError) {
+func (v *NullableOAuth2ApiError) Set(val *OAuth2ApiError) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableJsonError) IsSet() bool {
+func (v NullableOAuth2ApiError) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableJsonError) Unset() {
+func (v *NullableOAuth2ApiError) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableJsonError(val *JsonError) *NullableJsonError {
-	return &NullableJsonError{value: val, isSet: true}
+func NewNullableOAuth2ApiError(val *OAuth2ApiError) *NullableOAuth2ApiError {
+	return &NullableOAuth2ApiError{value: val, isSet: true}
 }
 
-func (v NullableJsonError) MarshalJSON() ([]byte, error) {
+func (v NullableOAuth2ApiError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableJsonError) UnmarshalJSON(src []byte) error {
+func (v *NullableOAuth2ApiError) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -29,6 +29,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
@@ -66,9 +68,9 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	router := x.NewRouterAdmin()
+	router := x.NewRouterAdmin(conf.AdminURL)
 	handler := reg.OAuth2Handler()
-	handler.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+	handler.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)

@@ -193,7 +193,7 @@ func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.Log
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }
 
-func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models.ConsentRequest) {
+func compareSDKConsentRequest(t *testing.T, expected *OAuth2ConsentRequest, got models.ConsentRequest) {
 	assert.EqualValues(t, expected.ID, *got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)

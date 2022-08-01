@@ -155,7 +155,7 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 // CreateConsentRequest configures fields that are introduced or changed in the
 // consent request. It doesn't touch fields that would be copied from the login
 // request.
-func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.ConsentRequest) error {
+func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.OAuth2ConsentRequest) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentRequest")
 	defer span.End()
 
@@ -199,7 +199,7 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	return f, nil
 }
 
-func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*consent.ConsentRequest, error) {
+func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*consent.OAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConsentRequest")
 	defer span.End()
 
@@ -258,7 +258,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, login_challenge string)
 	})
 }
 
-func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.HandledConsentRequest) (*consent.ConsentRequest, error) {
+func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptOAuth2ConsentRequest) (*consent.OAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer span.End()
 
@@ -280,11 +280,11 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.Handled
 	return p.GetConsentRequest(ctx, r.ID)
 }
 
-func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.HandledConsentRequest, error) {
+func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()
 
-	var r consent.HandledConsentRequest
+	var r consent.AcceptOAuth2ConsentRequest
 	return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		var f flow.Flow
 		if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).First(&f); err != nil {
@@ -392,11 +392,11 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
 	}
 }
 
-func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.HandledConsentRequest, error) {
+func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequests")
 	defer span.End()
 
-	rs := make([]consent.HandledConsentRequest, 0)
+	rs := make([]consent.AcceptOAuth2ConsentRequest, 0)
 
 	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		f := &flow.Flow{}
@@ -423,12 +423,12 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 		}
 
 		var err error
-		rs, err = p.filterExpiredConsentRequests(ctx, []consent.HandledConsentRequest{*f.GetHandledConsentRequest()})
+		rs, err = p.filterExpiredConsentRequests(ctx, []consent.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
 		return err
 	})
 }
 
-func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.HandledConsentRequest, error) {
+func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer span.End()
 
@@ -454,7 +454,7 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 		return nil, sqlcon.HandleError(err)
 	}
 
-	var rs []consent.HandledConsentRequest
+	var rs []consent.AcceptOAuth2ConsentRequest
 	for _, f := range fs {
 		rs = append(rs, *f.GetHandledConsentRequest())
 	}
@@ -480,11 +480,11 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 	return n, sqlcon.HandleError(err)
 }
 
-func (p *Persister) filterExpiredConsentRequests(ctx context.Context, requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {
+func (p *Persister) filterExpiredConsentRequests(ctx context.Context, requests []consent.AcceptOAuth2ConsentRequest) ([]consent.AcceptOAuth2ConsentRequest, error) {
 	_, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.filterExpiredConsentRequests")
 	defer span.End()
 
-	var result []consent.HandledConsentRequest
+	var result []consent.AcceptOAuth2ConsentRequest
 	for _, v := range requests {
 		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue

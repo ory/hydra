@@ -15,6 +15,8 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/ory/hydra/internal/httpclient/client/v1"
 )
 
 // NewListTrustedJwtGrantIssuersParams creates a new ListTrustedJwtGrantIssuersParams object,

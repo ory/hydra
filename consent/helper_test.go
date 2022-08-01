@@ -54,22 +54,22 @@ func TestSanitizeClient(t *testing.T) {
 
 func TestMatchScopes(t *testing.T) {
 	for k, tc := range []struct {
-		granted         []HandledConsentRequest
+		granted         []AcceptOAuth2ConsentRequest
 		requested       []string
 		expectChallenge string
 	}{
 		{
-			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
-			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "",
 		},
 		{
-			granted: []HandledConsentRequest{
+			granted: []AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar"}},
 			},
@@ -77,7 +77,7 @@ func TestMatchScopes(t *testing.T) {
 			expectChallenge: "1",
 		},
 		{
-			granted: []HandledConsentRequest{
+			granted: []AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
@@ -85,7 +85,7 @@ func TestMatchScopes(t *testing.T) {
 			expectChallenge: "2",
 		},
 		{
-			granted: []HandledConsentRequest{
+			granted: []AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},

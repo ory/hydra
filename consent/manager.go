@@ -41,15 +41,15 @@ func (_ ForcedObfuscatedLoginSession) TableName() string {
 }
 
 type Manager interface {
-	CreateConsentRequest(ctx context.Context, req *ConsentRequest) error
-	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
-	HandleConsentRequest(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error)
+	CreateConsentRequest(ctx context.Context, req *OAuth2ConsentRequest) error
+	GetConsentRequest(ctx context.Context, challenge string) (*OAuth2ConsentRequest, error)
+	HandleConsentRequest(ctx context.Context, r *AcceptOAuth2ConsentRequest) (*OAuth2ConsentRequest, error)
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 
-	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error)
-	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]HandledConsentRequest, error)
-	FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]HandledConsentRequest, error)
+	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*AcceptOAuth2ConsentRequest, error)
+	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]AcceptOAuth2ConsentRequest, error)
+	FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]AcceptOAuth2ConsentRequest, error)
 	CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 	// Cookie management

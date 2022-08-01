@@ -14,6 +14,8 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/internal/httpclient/client/v1"
 )
 
 // NewIsInstanceReadyParams creates a new IsInstanceReadyParams object,

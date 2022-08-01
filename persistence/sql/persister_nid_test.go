@@ -360,7 +360,7 @@ func (s *PersisterTestSuite) TestCreateConsentRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &consent.ConsentRequest{
+			req := &consent.OAuth2ConsentRequest{
 				ID:             "consent-request-id",
 				LoginChallenge: sqlxx.NullString(f.ID),
 				Skip:           false,
@@ -735,7 +735,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &consent.ConsentRequest{
+			req := &consent.OAuth2ConsentRequest{
 				ID:             "consent-request-id",
 				LoginChallenge: sqlxx.NullString(f.ID),
 				Skip:           false,
@@ -743,7 +743,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 				CSRF:           "csrf",
 			}
 
-			hcr := &consent.HandledConsentRequest{
+			hcr := &consent.AcceptOAuth2ConsentRequest{
 				ID:        req.ID,
 				HandledAt: sqlxx.NullTime(time.Now()),
 				Remember:  true,
@@ -774,7 +774,7 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &consent.ConsentRequest{
+			req := &consent.OAuth2ConsentRequest{
 				ID:             "consent-request-id",
 				LoginChallenge: sqlxx.NullString(f.ID),
 				Skip:           false,
@@ -782,7 +782,7 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 				CSRF:           "csrf",
 			}
 
-			hcr := &consent.HandledConsentRequest{
+			hcr := &consent.AcceptOAuth2ConsentRequest{
 				ID:        req.ID,
 				HandledAt: sqlxx.NullTime(time.Now()),
 				Remember:  true,
@@ -1057,7 +1057,7 @@ func (s *PersisterTestSuite) TestGetConsentRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &consent.ConsentRequest{
+			req := &consent.OAuth2ConsentRequest{
 				ID:             "consent-request-id",
 				LoginChallenge: sqlxx.NullString(f.ID),
 				Skip:           false,
@@ -1392,7 +1392,7 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &consent.ConsentRequest{
+			req := &consent.OAuth2ConsentRequest{
 				ID:             "consent-request-id",
 				LoginChallenge: sqlxx.NullString(f.ID),
 				Skip:           false,
@@ -1400,7 +1400,7 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 				CSRF:           "csrf",
 			}
 
-			hcr := &consent.HandledConsentRequest{
+			hcr := &consent.AcceptOAuth2ConsentRequest{
 				ID:        req.ID,
 				HandledAt: sqlxx.NullTime(time.Now()),
 				Remember:  true,
@@ -1500,15 +1500,15 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
 
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.OAuth2ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.OAuth2ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.OAuth2ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
 
-			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.HandledConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.AcceptOAuth2ConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
 
 			cs, err := r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
@@ -1554,15 +1554,15 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
 
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
-			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.OAuth2ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.OAuth2ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.OAuth2ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
 
-			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.HandledConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.AcceptOAuth2ConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
 
 			cs, err := r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())

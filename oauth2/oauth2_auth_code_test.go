@@ -67,7 +67,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/urlx"
 )
 
 func noopHandler(t *testing.T) httprouter.Handle {

@@ -13,7 +13,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 # By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
 # is required for read/write of SQLite.
 RUN mkdir -p /var/lib/sqlite && \
-    chown ory:ory /var/lib/sqlite \
+    chown ory:ory /var/lib/sqlite
 
 USER ory
 

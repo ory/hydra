@@ -230,7 +230,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
-		requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
 		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)

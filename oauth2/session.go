@@ -33,13 +33,13 @@ import (
 )
 
 type Session struct {
-	*openid.DefaultSession `json:"idToken"`
+	*openid.DefaultSession `json:"id_token"`
 	Extra                  map[string]interface{} `json:"extra"`
-	KID                    string
-	ClientID               string
-	ConsentChallenge       string
-	ExcludeNotBeforeClaim  bool
-	AllowedTopLevelClaims  []string
+	KID                    string                 `json:"kid"`
+	ClientID               string                 `json:"client_id"`
+	ConsentChallenge       string                 `json:"consent_challenge"`
+	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
+	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
 }
 
 func NewSession(subject string) *Session {

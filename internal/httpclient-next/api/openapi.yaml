@@ -2076,6 +2076,72 @@ components:
             type: array
       description: A list of clients.
   schemas:
+    DefaultSession:
+      description: IDTokenSession is a session container for the id token
+      properties:
+        expires_at:
+          additionalProperties:
+            format: date-time
+            type: string
+          type: object
+        headers:
+          $ref: "#/components/schemas/Headers"
+        id_token_claims:
+          $ref: "#/components/schemas/IDTokenClaims"
+        subject:
+          type: string
+        username:
+          type: string
+      type: object
+    Headers:
+      description: Headers is the jwt headers
+      properties:
+        extra:
+          additionalProperties: true
+          type: object
+      type: object
+    IDTokenClaims:
+      description:
+        IDTokenClaims represent the claims used in open id connect requests
+      properties:
+        acr:
+          type: string
+        amr:
+          items:
+            type: string
+          type: array
+        at_hash:
+          type: string
+        aud:
+          items:
+            type: string
+          type: array
+        auth_time:
+          format: date-time
+          type: string
+        c_hash:
+          type: string
+        exp:
+          format: date-time
+          type: string
+        ext:
+          additionalProperties: true
+          type: object
+        iat:
+          format: date-time
+          type: string
+        iss:
+          type: string
+        jti:
+          type: string
+        nonce:
+          type: string
+        rat:
+          format: date-time
+          type: string
+        sub:
+          type: string
+      type: object
     JSONRawMessage:
       title:
         JSONRawMessage represents a json.RawMessage that works well with JSON,
@@ -2411,6 +2477,37 @@ components:
           type: integer
         session:
           $ref: "#/components/schemas/consentRequestSession"
+      type: object
+    Session:
+      properties:
+        allowed_top_level_claims:
+          items:
+            type: string
+          type: array
+        client_id:
+          type: string
+        consent_challenge:
+          type: string
+        exclude_not_before_claim:
+          type: boolean
+        expires_at:
+          additionalProperties:
+            format: date-time
+            type: string
+          type: object
+        extra:
+          additionalProperties: true
+          type: object
+        headers:
+          $ref: "#/components/schemas/Headers"
+        id_token_claims:
+          $ref: "#/components/schemas/IDTokenClaims"
+        kid:
+          type: string
+        subject:
+          type: string
+        username:
+          type: string
       type: object
     StringSlicePipeDelimiter:
       items:
@@ -3204,6 +3301,31 @@ components:
       format: date-time
       title: NullTime implements sql.NullTime functionality.
       type: string
+    oAuth2AccessRequest:
+      properties:
+        client_id:
+          description: ClientID is the identifier of the OAuth 2.0 client.
+          type: string
+        grant_types:
+          description: GrantTypes is the requests grant types.
+          items:
+            type: string
+          type: array
+        granted_audience:
+          description:
+            GrantedAudience is the list of audiences granted to the OAuth 2.0
+            client.
+          items:
+            type: string
+          type: array
+        granted_scopes:
+          description:
+            GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
+          items:
+            type: string
+          type: array
+      title: Requester is a token endpoint's request context.
+      type: object
     oAuth2Client:
       example:
         metadata: "{}"
@@ -3819,6 +3941,10 @@ components:
           items:
             type: string
           type: array
+        requester:
+          $ref: "#/components/schemas/oAuth2AccessRequest"
+        session:
+          $ref: "#/components/schemas/Session"
         subject:
           description: Subject is the identifier of the authenticated end-user.
           type: string

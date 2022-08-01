@@ -17,7 +17,6 @@ require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
-	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-openapi/errors v0.20.1
 	github.com/go-openapi/runtime v0.20.0
@@ -48,7 +47,7 @@ require (
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.3-0.20220728130632-c3e0133cfed9
+	github.com/ory/fosite v0.42.3-0.20220729111320-05d71b23559c
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13

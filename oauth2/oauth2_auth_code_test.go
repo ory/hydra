@@ -59,6 +59,7 @@ import (
 	hydraoauth2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/urlx"
 )
 
@@ -1033,12 +1034,33 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 							assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
 
+							expectedGrantedScopes := []string{"openid", "offline", "hydra.*"}
+							expectedSubject := "foo"
+
 							var hookReq hydraoauth2.RefreshTokenHookRequest
 							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
-							require.Equal(t, hookReq.Subject, "foo")
-							require.ElementsMatch(t, hookReq.GrantedScopes, []string{"openid", "offline", "hydra.*"})
+							require.Equal(t, hookReq.Subject, expectedSubject)
+							require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
 							require.ElementsMatch(t, hookReq.GrantedAudience, []string{})
 							require.Equal(t, hookReq.ClientID, oauthConfig.ClientID)
+							require.NotEmpty(t, hookReq.Session)
+							require.Equal(t, hookReq.Session.Subject, expectedSubject)
+							require.Equal(t, hookReq.Session.ClientID, oauthConfig.ClientID)
+							require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
+							require.NotEmpty(t, hookReq.Requester)
+							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
+							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
+
+							except := []string{
+								"session.kid",
+								"session.id_token.expires_at",
+								"session.id_token.headers.extra.kid",
+								"session.id_token.id_token_claims.iat",
+								"session.id_token.id_token_claims.exp",
+								"session.id_token.id_token_claims.rat",
+								"session.id_token.id_token_claims.auth_time",
+							}
+							snapshotx.SnapshotTExcept(t, hookReq, except)
 
 							claims := map[string]interface{}{
 								"hooked": true,

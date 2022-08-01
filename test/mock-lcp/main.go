@@ -41,7 +41,8 @@ func init() {
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")
-	lr, _, err := client.V1Api.AdminGetOAuth2LoginRequest(r.Context()).LoginChallenge(challenge).Execute()
+	lr, resp, err := client.V1Api.AdminGetOAuth2LoginRequest(r.Context()).LoginChallenge(challenge).Execute()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch clogin request: %s", err)
 	}
@@ -53,22 +54,24 @@ func login(rw http.ResponseWriter, r *http.Request) {
 			remember = true
 		}
 
-		vr, _, err := client.V1Api.AdminAcceptOAuth2LoginRequest(r.Context()).
+		vr, resp, err := client.V1Api.AdminAcceptOAuth2LoginRequest(r.Context()).
 			LoginChallenge(challenge).
 			AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
 				Subject:  "the-subject",
 				Remember: pointerx.Bool(remember),
 			}).Execute()
+		defer resp.Body.Close()
 		if err != nil {
 			log.Fatalf("Unable to execute request: %s", err)
 		}
 		redirectTo = vr.RedirectTo
 	} else {
-		vr, _, err := client.V1Api.AdminRejectOAuth2LoginRequest(r.Context()).
+		vr, resp, err := client.V1Api.AdminRejectOAuth2LoginRequest(r.Context()).
 			LoginChallenge(challenge).
 			RejectOAuth2Request(hydra.RejectOAuth2Request{
 				Error: pointerx.String("invalid_request"),
 			}).Execute()
+		defer resp.Body.Close()
 		if err != nil {
 			log.Fatalf("Unable to execute request: %s", err)
 		}
@@ -83,7 +86,8 @@ func login(rw http.ResponseWriter, r *http.Request) {
 func consent(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("consent_challenge")
 
-	o, _, err := client.V1Api.AdminGetOAuth2ConsentRequest(r.Context()).ConsentChallenge(challenge).Execute()
+	o, resp, err := client.V1Api.AdminGetOAuth2ConsentRequest(r.Context()).ConsentChallenge(challenge).Execute()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch consent request: %s", err)
 	}
@@ -99,7 +103,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 			value = "rab"
 		}
 
-		v, _, err := client.V1Api.AdminAcceptOAuth2ConsentRequest(r.Context()).
+		v, resp, err := client.V1Api.AdminAcceptOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(challenge).
 			AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 				GrantScope: o.RequestedScope,
@@ -109,14 +113,16 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 					IdToken:     map[string]interface{}{"baz": value},
 				},
 			}).Execute()
+		defer resp.Body.Close()
 		if err != nil {
 			log.Fatalf("Unable to execute request: %s", err)
 		}
 		redirectTo = v.RedirectTo
 	} else {
-		v, _, err := client.V1Api.AdminRejectOAuth2ConsentRequest(r.Context()).
+		v, resp, err := client.V1Api.AdminRejectOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(challenge).
 			RejectOAuth2Request(hydra.RejectOAuth2Request{Error: pointerx.String("invalid_request")}).Execute()
+		defer resp.Body.Close()
 		if err != nil {
 			log.Fatalf("Unable to execute request: %s", err)
 		}

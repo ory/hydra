@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/pborman/uuid"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/handler/rfc7523"
@@ -40,7 +41,7 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/pborman/uuid"
+	gofrsuuid "github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -58,9 +59,10 @@ func signatureFromJTI(jti string) string {
 }
 
 type BlacklistedJTI struct {
-	JTI    string    `db:"-"`
-	ID     string    `db:"signature"`
-	Expiry time.Time `db:"expires_at"`
+	JTI    string         `db:"-"`
+	ID     string         `db:"signature"`
+	Expiry time.Time      `db:"expires_at"`
+	NID    gofrsuuid.UUID `db:"nid"`
 }
 
 func (j *BlacklistedJTI) AfterFind(_ *pop.Connection) error {
@@ -479,6 +481,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		require.Error(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
+		require.NoError(t, m.DeleteAccessTokens(ctx, "foobar"))
 	}
 }
 
@@ -661,6 +664,8 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 
 			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
+			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
+			cmp.NID = gofrsuuid.Nil
 			require.NoError(t, err)
 			assert.Equal(t, jti, cmp)
 		})
@@ -687,6 +692,8 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 			cmp, err := store.GetClientAssertionJWT(context.Background(), newJTI.JTI)
 			require.NoError(t, err)
+			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
+			cmp.NID = gofrsuuid.Nil
 			assert.Equal(t, newJTI, cmp)
 		})
 

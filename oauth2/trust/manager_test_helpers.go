@@ -34,13 +34,16 @@ import (
 	"github.com/ory/hydra/jwk"
 )
 
-func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.T) {
+func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) func(t *testing.T) {
 	testGenerator := &jwk.RS256Generator{}
 	tokenServicePubKey1 := jose.JSONWebKey{}
 	tokenServicePubKey2 := jose.JSONWebKey{}
 	mikePubKey := jose.JSONWebKey{}
 
 	return func(t *testing.T) {
+		if parallel {
+			t.Parallel()
+		}
 		keySet, err := testGenerator.Generate("tokenServicePubKey1", "sig")
 		require.NoError(t, err)
 		tokenServicePubKey1 = keySet.Keys[1]
@@ -53,11 +56,11 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 		require.NoError(t, err)
 		mikePubKey = keySet.Keys[1]
 
-		storedGrants, err := m.GetGrants(context.TODO(), 100, 0, "")
+		storedGrants, err := t1.GetGrants(context.TODO(), 100, 0, "")
 		require.NoError(t, err)
 		assert.Len(t, storedGrants, 0)
 
-		count, err := m.CountGrants(context.TODO())
+		count, err := t1.CountGrants(context.TODO())
 		require.NoError(t, err)
 		assert.Equal(t, 0, count)
 
@@ -75,10 +78,10 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 			CreatedAt: createdAt,
 			ExpiresAt: expiresAt,
 		}
-		err = m.CreateGrant(context.TODO(), grant, tokenServicePubKey1)
+		err = t1.CreateGrant(context.TODO(), grant, tokenServicePubKey1)
 		require.NoError(t, err)
 
-		storedGrant, err := m.GetConcreteGrant(context.TODO(), grant.ID)
+		storedGrant, err := t1.GetConcreteGrant(context.TODO(), grant.ID)
 		require.NoError(t, err)
 		assert.Equal(t, grant.ID, storedGrant.ID)
 		assert.Equal(t, grant.Issuer, storedGrant.Issuer)
@@ -100,7 +103,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 			CreatedAt: createdAt.Add(time.Minute * 5),
 			ExpiresAt: createdAt.Add(-time.Minute * 5),
 		}
-		err = m.CreateGrant(context.TODO(), grant2, tokenServicePubKey2)
+		err = t1.CreateGrant(context.TODO(), grant2, tokenServicePubKey2)
 		require.NoError(t, err)
 
 		grant3 := Grant{
@@ -115,14 +118,14 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 			CreatedAt: createdAt.Add(time.Hour),
 			ExpiresAt: createdAt.Add(-time.Hour * 24),
 		}
-		err = m.CreateGrant(context.TODO(), grant3, mikePubKey)
+		err = t1.CreateGrant(context.TODO(), grant3, mikePubKey)
 		require.NoError(t, err)
 
-		count, err = m.CountGrants(context.TODO())
+		count, err = t1.CountGrants(context.TODO())
 		require.NoError(t, err)
 		assert.Equal(t, 3, count)
 
-		storedGrants, err = m.GetGrants(context.TODO(), 100, 0, "")
+		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, "")
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -132,7 +135,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 		assert.Equal(t, grant3.ID, storedGrants[2].ID)
 
-		storedGrants, err = m.GetGrants(context.TODO(), 100, 0, "token-service")
+		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, "token-service")
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -141,34 +144,35 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 		assert.Equal(t, grant.ID, storedGrants[0].ID)
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 
-		err = m.DeleteGrant(context.TODO(), grant.ID)
+		err = t1.DeleteGrant(context.TODO(), grant.ID)
 		require.NoError(t, err)
 
-		_, err = m.GetConcreteGrant(context.TODO(), grant.ID)
+		_, err = t1.GetConcreteGrant(context.TODO(), grant.ID)
 		require.Error(t, err)
 
-		count, err = m.CountGrants(context.TODO())
+		count, err = t1.CountGrants(context.TODO())
 		require.NoError(t, err)
 		assert.Equal(t, 2, count)
 
-		err = m.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt, 1000, 100)
+		err = t1.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt, 1000, 100)
 		require.NoError(t, err)
 
-		count, err = m.CountGrants(context.TODO())
+		count, err = t1.CountGrants(context.TODO())
 		require.NoError(t, err)
 		assert.Equal(t, 1, count)
 
-		_, err = m.GetConcreteGrant(context.TODO(), grant2.ID)
+		_, err = t1.GetConcreteGrant(context.TODO(), grant2.ID)
 		assert.NoError(t, err)
 	}
 }
 
-func TestHelperGrantManagerErrors(m GrantManager) func(t *testing.T) {
+func TestHelperGrantManagerErrors(m GrantManager, parallel bool) func(t *testing.T) {
 	testGenerator := &jwk.RS256Generator{}
 	pubKey1 := jose.JSONWebKey{}
 	pubKey2 := jose.JSONWebKey{}
 
 	return func(t *testing.T) {
+		t.Parallel()
 		keySet, err := testGenerator.Generate("pubKey1", "sig")
 		require.NoError(t, err)
 		pubKey1 = keySet.Keys[1]

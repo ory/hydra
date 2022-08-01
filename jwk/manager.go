@@ -65,7 +65,8 @@ type (
 	}
 
 	SQLData struct {
-		ID uuid.UUID `db:"pk"`
+		ID  uuid.UUID `db:"pk"`
+		NID uuid.UUID `db:"nid"`
 		// This field is deprecated and will be removed
 		PKDeprecated int64     `json:"-" db:"pk_deprecated"`
 		Set          string    `db:"sid"`

@@ -26,13 +26,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 
-	"github.com/ory/hydra/internal/testhelpers/uuid"
+	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/x"
 )
 
@@ -50,7 +51,7 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 		assert.NoError(t, err)
 		dbClientConcrete, ok := dbClient.(*Client)
 		assert.True(t, ok)
-		uuid.AssertUUID(t, &dbClientConcrete.ID)
+		testhelpersuuid.AssertUUID(t, &dbClientConcrete.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }
@@ -87,13 +88,39 @@ func TestHelperUpdateTwoClients(_ string, m Manager) func(t *testing.T) {
 	}
 }
 
-func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.T) {
+func testHelperUpdateClient(t *testing.T, ctx context.Context, tenant Storage, k string) {
+	d, err := tenant.GetClient(ctx, "1234")
+	assert.NoError(t, err)
+	err = tenant.UpdateClient(ctx, &Client{
+		OutfacingID:       "2-1234",
+		Name:              "name-new",
+		Secret:            "secret-new",
+		RedirectURIs:      []string{"http://redirect/new"},
+		TermsOfServiceURI: "bar",
+		JSONWebKeys:       new(x.JoseJSONWebKeySet),
+	})
+	require.NoError(t, err)
+
+	nc, err := tenant.GetConcreteClient(ctx, "2-1234")
+	require.NoError(t, err)
+
+	if k != "http" {
+		// http always returns an empty secret
+		assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret())
+	}
+	assert.Equal(t, "bar", nc.TermsOfServiceURI)
+	assert.Equal(t, "name-new", nc.Name)
+	assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs())
+	assert.Zero(t, len(nc.Contacts))
+}
+
+func TestHelperCreateGetUpdateDeleteClient(k string, t1 Storage, t2 Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		_, err := m.GetClient(ctx, "1234")
+		_, err := t1.GetClient(ctx, "1234")
 		require.Error(t, err)
 
-		c := &Client{
+		t1c1 := &Client{
 			OutfacingID:                       "1234",
 			Name:                              "name",
 			Secret:                            "secret",
@@ -126,27 +153,48 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			BackChannelLogoutSessionRequired:  true,
 		}
 
-		require.NoError(t, m.CreateClient(ctx, c))
-		assert.Equal(t, c.GetID(), "1234")
-		if k != "http" {
-			assert.NotEmpty(t, c.GetHashedSecret())
+		require.NoError(t, t1.CreateClient(ctx, t1c1))
+		{
+			t2c1 := *t1c1
+			require.Error(t, t2.CreateClient(ctx, &t2c1), "should not be able to create the same client in other manager/tenant; are they backed by the same database?")
+			t2c1.ID = uuid.Nil
+			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same OutfacingID but different ID in other tenant")
 		}
 
-		assert.NoError(t, m.CreateClient(ctx, &Client{
+		t2c3 := *t1c1
+		{
+			pk, _ := uuid.NewV4()
+			t2c3.ID = pk
+			t2c3.OutfacingID = "t2c2-1234"
+			require.NoError(t, t2.CreateClient(ctx, &t2c3))
+			require.Error(t, t2.CreateClient(ctx, &t2c3))
+		}
+		assert.Equal(t, t1c1.GetID(), "1234")
+		if k != "http" {
+			assert.NotEmpty(t, t1c1.GetHashedSecret())
+		}
+
+		c2Template := &Client{
 			OutfacingID:       "2-1234",
 			Name:              "name2",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 			SecretExpiresAt:   1,
-		}))
+		}
+		assert.NoError(t, t1.CreateClient(ctx, c2Template))
+		c2Template.ID = uuid.Nil
+		assert.NoError(t, t2.CreateClient(ctx, c2Template))
 
-		d, err := m.GetClient(ctx, "1234")
+		d, err := t1.GetClient(ctx, "1234")
 		require.NoError(t, err)
 
-		compare(t, c, d, k)
+		cc := d.(*Client)
+		testhelpersuuid.AssertUUID(t, &cc.NID)
 
-		ds, err := m.GetClients(ctx, Filter{Limit: 100, Offset: 0})
+		compare(t, t1c1, d, k)
+
+		ds, err := t1.GetClients(ctx, Filter{Limit: 100, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
@@ -155,59 +203,42 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
 
-		ds, err = m.GetClients(ctx, Filter{Limit: 1, Offset: 0})
+		ds, err = t1.GetClients(ctx, Filter{Limit: 1, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 
-		ds, err = m.GetClients(ctx, Filter{Limit: 100, Offset: 100})
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 100})
 		assert.NoError(t, err)
 
 		// get by name
-		ds, err = m.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "name"})
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "name"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Name, "name")
 
 		// get by name not exist
-		ds, err = m.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "bad name"})
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "bad name"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 0)
 
 		// get by owner
-		ds, err = m.GetClients(ctx, Filter{Limit: 100, Offset: 0, Owner: "aeneas"})
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Owner: "aeneas"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Owner, "aeneas")
 
-		err = m.UpdateClient(ctx, &Client{
-			OutfacingID:       "2-1234",
-			Name:              "name-new",
-			Secret:            "secret-new",
-			RedirectURIs:      []string{"http://redirect/new"},
-			TermsOfServiceURI: "bar",
-			JSONWebKeys:       new(x.JoseJSONWebKeySet),
-		})
-		require.NoError(t, err)
+		testHelperUpdateClient(t, ctx, t1, k)
+		testHelperUpdateClient(t, ctx, t2, k)
 
-		nc, err := m.GetConcreteClient(ctx, "2-1234")
-		require.NoError(t, err)
-
-		if k != "http" {
-			// http always returns an empty secret
-			assert.NotEqual(t, d.GetHashedSecret(), nc.GetHashedSecret())
-		}
-		assert.Equal(t, "bar", nc.TermsOfServiceURI)
-		assert.Equal(t, "name-new", nc.Name)
-		assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs())
-		assert.Zero(t, len(nc.Contacts))
-
-		err = m.DeleteClient(ctx, "1234")
+		err = t1.DeleteClient(ctx, "1234")
 		assert.NoError(t, err)
+		err = t1.DeleteClient(ctx, t2c3.OutfacingID)
+		assert.Error(t, err, "tenant 1 should not be able to delete tenant 2's client")
 
-		_, err = m.GetClient(ctx, "1234")
+		_, err = t1.GetClient(ctx, "1234")
 		assert.NotNil(t, err)
 
-		n, err := m.CountClients(ctx)
+		n, err := t1.CountClients(ctx)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, n)
 	}

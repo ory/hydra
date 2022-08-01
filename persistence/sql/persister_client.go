@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/x/errorsx"
 
@@ -12,9 +13,13 @@ import (
 	"github.com/ory/x/sqlcon"
 )
 
+func (p *Persister) NetworkID(ctx context.Context) uuid.UUID {
+	return p.r.Contextualizer().Network(ctx, p.nid)
+}
+
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
-	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ?", id).First(&cl))
+	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).First(&cl))
 }
 
 func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -39,6 +44,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		}
 		// set the internal primary key
 		cl.ID = o.ID
+		cl.NID = o.NID
 
 		return sqlcon.HandleError(c.Update(cl))
 	})
@@ -64,6 +70,7 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 	}
 
 	c.Secret = string(h)
+	c.NID = p.NetworkID(ctx)
 	return sqlcon.HandleError(p.Connection(ctx).Create(c, "pk"))
 }
 
@@ -73,7 +80,7 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) error {
 		return err
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
+	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID, NID: p.NetworkID(ctx)}))
 }
 
 func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]client.Client, error) {
@@ -81,7 +88,8 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]cl
 
 	query := p.Connection(ctx).
 		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
-		Order("id")
+		Order("id").
+		Where("nid = ?", p.NetworkID(ctx))
 
 	if filters.Name != "" {
 		query.Where("client_name = ?", filters.Name)
@@ -94,6 +102,6 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]cl
 }
 
 func (p *Persister) CountClients(ctx context.Context) (int, error) {
-	n, err := p.Connection(ctx).Count(&client.Client{})
+	n, err := p.Connection(ctx).Where("nid = ?", p.NetworkID(ctx)).Count(&client.Client{})
 	return n, sqlcon.HandleError(err)
 }

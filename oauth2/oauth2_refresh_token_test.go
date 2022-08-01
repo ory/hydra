@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	gofrsuuid "github.com/gofrs/uuid"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,7 +73,8 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		},
 	}
 
-	setupRegistries(t)
+	t1NID := gofrsuuid.Must(gofrsuuid.FromString(uuid.New()))
+	setupRegistries(t, t1NID)
 
 	for dbName, dbRegistry := range registries {
 		if dbName == "memory" {

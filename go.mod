@@ -21,7 +21,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-swagger/go-swagger v0.26.1
-	github.com/gobuffalo/pop/v6 v6.0.4-0.20220707121509-feb0eed33d86
+	github.com/gobuffalo/pop/v6 v6.0.6
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.2.0+incompatible
@@ -47,7 +47,7 @@ require (
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
 	github.com/ory/jsonschema/v3 v3.0.7
-	github.com/ory/x v0.0.451
+	github.com/ory/x v0.0.453
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
@@ -66,7 +66,7 @@ require (
 	go.step.sm/crypto v0.16.2
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
-	golang.org/x/tools v0.1.10
+	golang.org/x/tools v0.1.11
 	gopkg.in/DataDog/dd-trace-go.v1 v1.39.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
@@ -128,14 +128,14 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/envy v1.10.1 // indirect
-	github.com/gobuffalo/fizz v1.14.0 // indirect
+	github.com/gobuffalo/fizz v1.14.2 // indirect
 	github.com/gobuffalo/flect v0.2.5 // indirect
 	github.com/gobuffalo/github_flavored_markdown v1.1.1 // indirect
-	github.com/gobuffalo/helpers v0.6.4 // indirect
+	github.com/gobuffalo/helpers v0.6.5 // indirect
 	github.com/gobuffalo/nulls v0.4.1 // indirect
-	github.com/gobuffalo/plush/v4 v4.1.12 // indirect
-	github.com/gobuffalo/tags/v3 v3.1.2 // indirect
-	github.com/gobuffalo/validate/v3 v3.3.1 // indirect
+	github.com/gobuffalo/plush/v4 v4.1.13 // indirect
+	github.com/gobuffalo/tags/v3 v3.1.3 // indirect
+	github.com/gobuffalo/validate/v3 v3.3.2 // indirect
 	github.com/goccy/go-yaml v1.9.5 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -250,7 +250,7 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220524220425-1d687d428aca // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect

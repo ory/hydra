@@ -76,22 +76,22 @@ func NewDeleteOAuth2TokenUnauthorized() *DeleteOAuth2TokenUnauthorized {
 
 /* DeleteOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DeleteOAuth2TokenUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
+func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -110,12 +110,12 @@ func NewDeleteOAuth2TokenDefault(code int) *DeleteOAuth2TokenDefault {
 
 /* DeleteOAuth2TokenDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DeleteOAuth2TokenDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the delete o auth2 token default response
@@ -126,13 +126,13 @@ func (o *DeleteOAuth2TokenDefault) Code() int {
 func (o *DeleteOAuth2TokenDefault) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2Token default  %+v", o._statusCode, o.Payload)
 }
-func (o *DeleteOAuth2TokenDefault) GetPayload() *models.JSONError {
+func (o *DeleteOAuth2TokenDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

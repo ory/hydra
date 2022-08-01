@@ -27,6 +27,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -57,7 +59,7 @@ func TestSDK(t *testing.T) {
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
 
-	h.SetRoutes(router.RouterAdmin())
+	h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL))
 	ts := httptest.NewServer(router)
 
 	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})

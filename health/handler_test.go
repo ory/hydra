@@ -76,7 +76,7 @@ func TestPublicHealthHandler(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			public := x.NewRouterPublic()
-			reg.RegisterRoutes(ctx, x.NewRouterAdmin(), public)
+			reg.RegisterRoutes(ctx, x.NewRouterAdmin(conf.AdminURL), public)
 
 			ts := httptest.NewServer(public)
 

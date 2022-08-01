@@ -83,22 +83,22 @@ func NewListSubjectConsentSessionsBadRequest() *ListSubjectConsentSessionsBadReq
 
 /* ListSubjectConsentSessionsBadRequest describes a response with status code 400, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type ListSubjectConsentSessionsBadRequest struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *ListSubjectConsentSessionsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsBadRequest  %+v", 400, o.Payload)
 }
-func (o *ListSubjectConsentSessionsBadRequest) GetPayload() *models.JSONError {
+func (o *ListSubjectConsentSessionsBadRequest) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *ListSubjectConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -115,22 +115,22 @@ func NewListSubjectConsentSessionsInternalServerError() *ListSubjectConsentSessi
 
 /* ListSubjectConsentSessionsInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type ListSubjectConsentSessionsInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *ListSubjectConsentSessionsInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsInternalServerError  %+v", 500, o.Payload)
 }
-func (o *ListSubjectConsentSessionsInternalServerError) GetPayload() *models.JSONError {
+func (o *ListSubjectConsentSessionsInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *ListSubjectConsentSessionsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

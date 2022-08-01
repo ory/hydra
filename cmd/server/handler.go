@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/ory/x/corsx"
+	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/x/servicelocator"
 
@@ -184,7 +185,7 @@ func RunServeAll(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
+func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(config.Version))
 
 	if d.Config().CGroupsV1AutoMaxProcsEnabled() {
@@ -198,7 +199,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 	adminmw = negroni.New()
 	publicmw = negroni.New()
 
-	admin = x.NewRouterAdmin()
+	admin = x.NewRouterAdmin(d.Config().AdminURL)
 	public = x.NewRouterPublic()
 
 	adminLogger := reqlog.

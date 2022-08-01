@@ -29,6 +29,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/pborman/uuid"
@@ -80,7 +82,7 @@ func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
 	return &Handler{r: r, c: c}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
+func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
 
@@ -226,8 +228,8 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //
 //     Responses:
 //       200: wellKnown
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -289,8 +291,8 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: userinfoResponse
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -390,8 +392,8 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: emptyResponse
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -423,8 +425,8 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: oAuth2TokenIntrospection
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -542,9 +544,9 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Responses:
 //       200: oauth2TokenResponse
-//       401: jsonError
-//       400: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       400: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -644,8 +646,8 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 //
 //     Responses:
 //       302: emptyResponse
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -781,8 +783,8 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //
 //     Responses:
 //       204: emptyResponse
-//       401: jsonError
-//       default: jsonError
+//       401: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

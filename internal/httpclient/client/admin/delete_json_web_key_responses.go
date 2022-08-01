@@ -81,22 +81,22 @@ func NewDeleteJSONWebKeyUnauthorized() *DeleteJSONWebKeyUnauthorized {
 
 /* DeleteJSONWebKeyUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DeleteJSONWebKeyUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *DeleteJSONWebKeyUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyUnauthorized  %+v", 401, o.Payload)
 }
-func (o *DeleteJSONWebKeyUnauthorized) GetPayload() *models.JSONError {
+func (o *DeleteJSONWebKeyUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeyUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -113,22 +113,22 @@ func NewDeleteJSONWebKeyForbidden() *DeleteJSONWebKeyForbidden {
 
 /* DeleteJSONWebKeyForbidden describes a response with status code 403, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DeleteJSONWebKeyForbidden struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *DeleteJSONWebKeyForbidden) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyForbidden  %+v", 403, o.Payload)
 }
-func (o *DeleteJSONWebKeyForbidden) GetPayload() *models.JSONError {
+func (o *DeleteJSONWebKeyForbidden) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeyForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -145,22 +145,22 @@ func NewDeleteJSONWebKeyInternalServerError() *DeleteJSONWebKeyInternalServerErr
 
 /* DeleteJSONWebKeyInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type DeleteJSONWebKeyInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *DeleteJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyInternalServerError  %+v", 500, o.Payload)
 }
-func (o *DeleteJSONWebKeyInternalServerError) GetPayload() *models.JSONError {
+func (o *DeleteJSONWebKeyInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

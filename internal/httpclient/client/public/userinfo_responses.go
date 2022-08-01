@@ -86,22 +86,22 @@ func NewUserinfoUnauthorized() *UserinfoUnauthorized {
 
 /* UserinfoUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type UserinfoUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *UserinfoUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoUnauthorized  %+v", 401, o.Payload)
 }
-func (o *UserinfoUnauthorized) GetPayload() *models.JSONError {
+func (o *UserinfoUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *UserinfoUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,12 +120,12 @@ func NewUserinfoDefault(code int) *UserinfoDefault {
 
 /* UserinfoDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type UserinfoDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the userinfo default response
@@ -136,13 +136,13 @@ func (o *UserinfoDefault) Code() int {
 func (o *UserinfoDefault) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfo default  %+v", o._statusCode, o.Payload)
 }
-func (o *UserinfoDefault) GetPayload() *models.JSONError {
+func (o *UserinfoDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *UserinfoDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

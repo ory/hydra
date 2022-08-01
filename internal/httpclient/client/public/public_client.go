@@ -10,6 +10,8 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+
+	"github.com/ory/hydra/internal/httpclient/client/v1"
 )
 
 // New creates a new public API client.

@@ -65,7 +65,7 @@ const (
 )
 
 // Flow is an abstraction used in the persistence layer to unify LoginRequest,
-// HandledLoginRequest, ConsentRequest, and HandledConsentRequest.
+// HandledLoginRequest, ConsentRequest, and AcceptOAuth2ConsentRequest.
 //
 // TODO: Deprecate the structs that are made obsolete by the Flow concept.
 // Context: Before Flow was introduced, the API and the database used the same
@@ -110,7 +110,7 @@ type Flow struct {
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *consent.OpenIDConnectContext `db:"oidc_context"`
+	OpenIDConnectContext *consent.OAuth2ConsentRequestOpenIDConnectContext `db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
@@ -346,7 +346,7 @@ func (f *Flow) InvalidateLoginRequest() error {
 	return nil
 }
 
-func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
+func (f *Flow) HandleConsentRequest(r *consent.AcceptOAuth2ConsentRequest) error {
 	if time.Time(r.HandledAt).IsZero() {
 		return errors.New("refusing to handle a consent request with null HandledAt")
 	}
@@ -360,7 +360,7 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 	}
 
 	if f.ConsentChallengeID.String() != r.ID {
-		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
+		return errors.Errorf("flow.ConsentChallengeID %s doesn't match AcceptOAuth2ConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
 	}
 
 	if r.Error != nil {
@@ -399,8 +399,8 @@ func (f *Flow) InvalidateConsentRequest() error {
 	return nil
 }
 
-func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
-	return &consent.ConsentRequest{
+func (f *Flow) GetConsentRequest() *consent.OAuth2ConsentRequest {
+	return &consent.OAuth2ConsentRequest{
 		ID:                     f.ConsentChallengeID.String(),
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
@@ -424,16 +424,16 @@ func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
 	}
 }
 
-func (f *Flow) GetHandledConsentRequest() *consent.HandledConsentRequest {
+func (f *Flow) GetHandledConsentRequest() *consent.AcceptOAuth2ConsentRequest {
 	crf := 0
 	if f.ConsentRememberFor != nil {
 		crf = *f.ConsentRememberFor
 	}
-	return &consent.HandledConsentRequest{
+	return &consent.AcceptOAuth2ConsentRequest{
 		ID:                 f.ConsentChallengeID.String(),
 		GrantedScope:       f.GrantedScope,
 		GrantedAudience:    f.GrantedAudience,
-		Session:            &consent.ConsentRequestSessionData{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
+		Session:            &consent.AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
 		Remember:           f.ConsentRemember,
 		RememberFor:        crf,
 		HandledAt:          f.ConsentHandledAt,

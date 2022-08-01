@@ -19,7 +19,7 @@ import (
 type RefreshTokenHookResponse struct {
 
 	// session
-	Session *ConsentRequestSession `json:"session,omitempty"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session,omitempty"`
 }
 
 // Validate validates this refresh token hook response

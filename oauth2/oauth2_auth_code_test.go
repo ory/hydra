@@ -1067,7 +1067,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							}
 
 							hookResp := hydraoauth2.RefreshTokenHookResponse{
-								Session: consent.ConsentRequestSessionData{
+								Session: consent.AcceptOAuth2ConsentRequestSession{
 									AccessToken: claims,
 									IDToken:     claims,
 								},

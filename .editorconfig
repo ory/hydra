@@ -10,3 +10,7 @@ indent_size = 2
 [{Makefile,go.mod,go.sum,*.go}]
 indent_style = tab
 indent_size = 4
+
+[.schema/version.schema.json]
+indent_style = space
+indent_size = 4

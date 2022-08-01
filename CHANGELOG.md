@@ -5,97 +5,99 @@
 
 **Table of Contents**
 
-- [0.0.0 (2022-06-14)](#000-2022-06-14)
+- [0.0.0 (2022-08-01)](#000-2022-08-01)
+- [1.11.9-pre.0 (2022-07-29)](#1119-pre0-2022-07-29)
   - [Bug Fixes](#bug-fixes)
+  - [Code Generation](#code-generation)
   - [Documentation](#documentation)
   - [Features](#features)
 - [1.11.8 (2022-05-04)](#1118-2022-05-04)
   - [Bug Fixes](#bug-fixes-1)
-  - [Code Generation](#code-generation)
+  - [Code Generation](#code-generation-1)
   - [Documentation](#documentation-1)
   - [Features](#features-1)
   - [Tests](#tests)
 - [1.11.7 (2022-02-23)](#1117-2022-02-23)
-  - [Code Generation](#code-generation-1)
+  - [Code Generation](#code-generation-2)
 - [1.11.6 (2022-02-23)](#1116-2022-02-23)
   - [Bug Fixes](#bug-fixes-2)
-  - [Code Generation](#code-generation-2)
+  - [Code Generation](#code-generation-3)
 - [1.11.5 (2022-02-21)](#1115-2022-02-21)
   - [Bug Fixes](#bug-fixes-3)
-  - [Code Generation](#code-generation-3)
+  - [Code Generation](#code-generation-4)
 - [1.11.4 (2022-02-16)](#1114-2022-02-16)
   - [Bug Fixes](#bug-fixes-4)
-  - [Code Generation](#code-generation-4)
+  - [Code Generation](#code-generation-5)
 - [1.11.3 (2022-02-15)](#1113-2022-02-15)
   - [Bug Fixes](#bug-fixes-5)
-  - [Code Generation](#code-generation-5)
-- [1.11.2 (2022-02-11)](#1112-2022-02-11)
   - [Code Generation](#code-generation-6)
+- [1.11.2 (2022-02-11)](#1112-2022-02-11)
+  - [Code Generation](#code-generation-7)
 - [1.11.1 (2022-02-11)](#1111-2022-02-11)
   - [Bug Fixes](#bug-fixes-6)
-  - [Code Generation](#code-generation-7)
+  - [Code Generation](#code-generation-8)
   - [Code Refactoring](#code-refactoring)
   - [Documentation](#documentation-2)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes-7)
-    - [Code Generation](#code-generation-8)
+    - [Code Generation](#code-generation-9)
     - [Documentation](#documentation-3)
     - [Features](#features-2)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes-8)
-    - [Code Generation](#code-generation-9)
+    - [Code Generation](#code-generation-10)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-4)
     - [Features](#features-3)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
   - [Bug Fixes](#bug-fixes-9)
-  - [Code Generation](#code-generation-10)
+  - [Code Generation](#code-generation-11)
   - [Documentation](#documentation-5)
 - [1.10.5 (2021-08-13)](#1105-2021-08-13)
   - [Bug Fixes](#bug-fixes-10)
-  - [Code Generation](#code-generation-11)
+  - [Code Generation](#code-generation-12)
   - [Documentation](#documentation-6)
   - [Features](#features-4)
 - [1.10.3 (2021-07-14)](#1103-2021-07-14)
   - [Bug Fixes](#bug-fixes-11)
-  - [Code Generation](#code-generation-12)
+  - [Code Generation](#code-generation-13)
   - [Code Refactoring](#code-refactoring-2)
   - [Documentation](#documentation-7)
   - [Features](#features-5)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-2)
     - [Bug Fixes](#bug-fixes-12)
-    - [Code Generation](#code-generation-13)
+    - [Code Generation](#code-generation-14)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-8)
     - [Features](#features-6)
 - [1.10.1 (2021-03-25)](#1101-2021-03-25)
   - [Bug Fixes](#bug-fixes-13)
-  - [Code Generation](#code-generation-14)
+  - [Code Generation](#code-generation-15)
   - [Documentation](#documentation-9)
   - [Features](#features-7)
   - [Tests](#tests-1)
   - [Unclassified](#unclassified)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
-  - [Code Generation](#code-generation-15)
+  - [Code Generation](#code-generation-16)
   - [Features](#features-8)
 - [1.9.1 (2021-01-27)](#191-2021-01-27)
-  - [Code Generation](#code-generation-16)
+  - [Code Generation](#code-generation-17)
   - [Documentation](#documentation-10)
 - [1.9.0 (2021-01-12)](#190-2021-01-12)
-  - [Code Generation](#code-generation-17)
-- [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
   - [Code Generation](#code-generation-18)
+- [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
+  - [Code Generation](#code-generation-19)
 - [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
   - [Bug Fixes](#bug-fixes-14)
-  - [Code Generation](#code-generation-19)
+  - [Code Generation](#code-generation-20)
   - [Documentation](#documentation-11)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
   - [Breaking Changes](#breaking-changes-3)
     - [Bug Fixes](#bug-fixes-15)
-    - [Code Generation](#code-generation-20)
+    - [Code Generation](#code-generation-21)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-12)
     - [Features](#features-9)
@@ -103,38 +105,38 @@
     - [Unclassified](#unclassified-1)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
   - [Bug Fixes](#bug-fixes-16)
-  - [Code Generation](#code-generation-21)
+  - [Code Generation](#code-generation-22)
   - [Documentation](#documentation-13)
   - [Features](#features-10)
   - [Tests](#tests-3)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
   - [Bug Fixes](#bug-fixes-17)
-  - [Code Generation](#code-generation-22)
+  - [Code Generation](#code-generation-23)
   - [Code Refactoring](#code-refactoring-5)
   - [Documentation](#documentation-14)
   - [Features](#features-11)
   - [Tests](#tests-4)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
-  - [Code Generation](#code-generation-23)
+  - [Code Generation](#code-generation-24)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
   - [Bug Fixes](#bug-fixes-18)
-  - [Code Generation](#code-generation-24)
+  - [Code Generation](#code-generation-25)
   - [Features](#features-12)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-4)
     - [Bug Fixes](#bug-fixes-19)
-    - [Code Generation](#code-generation-25)
+    - [Code Generation](#code-generation-26)
     - [Documentation](#documentation-15)
     - [Features](#features-13)
 - [1.7.4 (2020-08-31)](#174-2020-08-31)
   - [Bug Fixes](#bug-fixes-20)
-  - [Code Generation](#code-generation-26)
-- [1.7.3 (2020-08-31)](#173-2020-08-31)
   - [Code Generation](#code-generation-27)
+- [1.7.3 (2020-08-31)](#173-2020-08-31)
+  - [Code Generation](#code-generation-28)
 - [1.7.1 (2020-08-31)](#171-2020-08-31)
   - [Breaking Changes](#breaking-changes-5)
     - [Bug Fixes](#bug-fixes-21)
-    - [Code Generation](#code-generation-28)
+    - [Code Generation](#code-generation-29)
     - [Code Refactoring](#code-refactoring-6)
     - [Documentation](#documentation-16)
     - [Features](#features-14)
@@ -142,22 +144,22 @@
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-6)
     - [Bug Fixes](#bug-fixes-22)
-    - [Code Generation](#code-generation-29)
+    - [Code Generation](#code-generation-30)
     - [Code Refactoring](#code-refactoring-7)
     - [Documentation](#documentation-17)
     - [Features](#features-15)
     - [Unclassified](#unclassified-3)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
   - [Bug Fixes](#bug-fixes-23)
-  - [Code Generation](#code-generation-30)
+  - [Code Generation](#code-generation-31)
   - [Documentation](#documentation-18)
   - [Unclassified](#unclassified-4)
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
   - [Bug Fixes](#bug-fixes-24)
-  - [Code Generation](#code-generation-31)
+  - [Code Generation](#code-generation-32)
   - [Features](#features-16)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
-  - [Code Generation](#code-generation-32)
+  - [Code Generation](#code-generation-33)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
   - [Bug Fixes](#bug-fixes-25)
   - [Chores](#chores)
@@ -636,9 +638,23 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.8...v0.0.0) (2022-06-14)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.9-pre.0...v0.0.0) (2022-08-01)
+
+# [1.11.9-pre.0](https://github.com/ory/hydra/compare/v1.11.8...v1.11.9-pre.0) (2022-07-29)
+
+autogen: pin v1.11.9-pre.0 release commit
 
 ### Bug Fixes
+
+- Backport fix for client specific CORS
+  ([#1754](https://github.com/ory/hydra/issues/1754))
+  ([#3163](https://github.com/ory/hydra/issues/3163))
+  ([996258d](https://github.com/ory/hydra/commit/996258d50ec620c89a8f55a98436320ab99db62b))
+- **docs:** Correct the tracing service name environment variable
+  ([6e2343c](https://github.com/ory/hydra/commit/6e2343c68fb662b4af3839f56acff4f85c428f79)):
+
+  While I believe this used to be specific to OTEL, it now appears to be
+  configurable "globally", according to `spec/config.json`.
 
 - Fixed configuration editor for the documentation page
   ([#3105](https://github.com/ory/hydra/issues/3105))
@@ -646,6 +662,9 @@
 
   Closes https://github.com/ory/docs/issues/722
 
+- Handle server error when refresh token requests come same time
+  ([#3207](https://github.com/ory/hydra/issues/3207))
+  ([e66ba3c](https://github.com/ory/hydra/commit/e66ba3c6b3277e5be772f786df26509f939840e7))
 - Link OIDC Certification image
   ([#3124](https://github.com/ory/hydra/issues/3124))
   ([17b517f](https://github.com/ory/hydra/commit/17b517f355f63788b237b2964984df02b56b8c63))
@@ -656,6 +675,16 @@
 - Swagger for dynamic client registration
   ([#3141](https://github.com/ory/hydra/issues/3141))
   ([9902ec7](https://github.com/ory/hydra/commit/9902ec7333c6e2d271f47f8fc93c43176282d180))
+- Updated process ending instructions
+  ([#3176](https://github.com/ory/hydra/issues/3176))
+  ([b72491e](https://github.com/ory/hydra/commit/b72491ec81dc61ebf5d52ec0f30ae4561f37f9df)):
+
+  cmd + c doesn't end the process on macOS but ctrl + c does.
+
+### Code Generation
+
+- Pin v1.11.9-pre.0 release commit
+  ([5127bb7](https://github.com/ory/hydra/commit/5127bb7703968cb1f72f12c097bccaed488629da))
 
 ### Documentation
 
@@ -667,6 +696,13 @@
 - Add token_endpoint_auth_signing_alg to cli
   ([#3148](https://github.com/ory/hydra/issues/3148))
   ([ed6eb30](https://github.com/ory/hydra/commit/ed6eb3017dfb82f1c1fa97f1d88d023211f1e034))
+- Custom client token ttl ([#3206](https://github.com/ory/hydra/issues/3206))
+  ([9544c03](https://github.com/ory/hydra/commit/9544c03a3bc62de88f5348db30db2f6651c69597)),
+  closes [#3157](https://github.com/ory/hydra/issues/3157):
+
+  This change introduces a new endpoint that allows you to control how long
+  client tokens last. Now you can configure the lifespan for each valid
+  combination of Client, GrantType, and TokenType.
 
 # [1.11.8](https://github.com/ory/hydra/compare/v1.11.7...v1.11.8) (2022-05-04)
 

@@ -49,6 +49,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 	}
 
 	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
+		NID:     p.NetworkID(ctx),
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -70,6 +71,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 			}
 
 			if err := c.Create(&jwk.SQLData{
+				NID:     p.NetworkID(ctx),
 				Set:     set,
 				KID:     key.KeyID,
 				Version: 0,
@@ -109,7 +111,7 @@ func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.J
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	var j jwk.SQLData
 	if err := p.Connection(ctx).
-		Where("sid = ? AND kid = ?", set, kid).
+		Where("sid = ? AND kid = ? AND nid = ?", set, kid, p.NetworkID(ctx)).
 		Order("created_at DESC").
 		First(&j); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -133,7 +135,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	var js []jwk.SQLData
 	if err := p.Connection(ctx).
-		Where("sid = ?", set).
+		Where("sid = ? AND nid = ?", set, p.NetworkID(ctx)).
 		Order("created_at DESC").
 		All(&js); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -165,9 +167,9 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=?", set, kid).Exec())
+	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=? AND nid = ?", set, kid, p.NetworkID(ctx)).Exec())
 }
 
 func (p *Persister) DeleteKeySet(ctx context.Context, set string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=?", set).Exec())
+	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND nid = ?", set, p.NetworkID(ctx)).Exec())
 }

@@ -57,7 +57,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf)
+			reg := internal.NewRegistryMemory(t, conf, nil)
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
@@ -111,7 +111,7 @@ func TestGetLoginRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf)
+			reg := internal.NewRegistryMemory(t, conf, nil)
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
@@ -170,7 +170,7 @@ func TestGetConsentRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf)
+			reg := internal.NewRegistryMemory(t, conf, nil)
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}

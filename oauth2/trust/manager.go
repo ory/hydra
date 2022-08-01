@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -18,6 +19,7 @@ type GrantManager interface {
 
 type SQLData struct {
 	ID              string    `db:"id"`
+	NID             uuid.UUID `db:"nid"`
 	Issuer          string    `db:"issuer"`
 	Subject         string    `db:"subject"`
 	AllowAnySubject bool      `db:"allow_any_subject"`

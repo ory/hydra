@@ -66,7 +66,7 @@ var lifespan = time.Hour
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, nil)
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -155,7 +155,7 @@ func TestUserinfo(t *testing.T) {
 	conf.MustSet(config.KeyScopeStrategy, "")
 	conf.MustSet(config.KeyAuthCodeLifespan, lifespan)
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, nil)
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
@@ -409,7 +409,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	conf.MustSet(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
 	conf.MustSet(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 	conf.MustSet(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, nil)
 
 	h := oauth2.NewHandler(reg, conf)
 

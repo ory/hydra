@@ -3,7 +3,9 @@ package driver
 import (
 	"context"
 
+	"github.com/gofrs/uuid"
 	"github.com/ory/hydra/hsm"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/oauth2/trust"
 
@@ -34,14 +36,15 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context) error
+	Init(ctx context.Context, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.Provider) Registry
+	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
 	WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry
 
-	Config() *config.Provider
+	Config(ctx context.Context) *config.Provider
 	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
@@ -54,7 +57,7 @@ type Registry interface {
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
 
-	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
+	RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler
@@ -67,12 +70,12 @@ type Registry interface {
 	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) (Registry, error) {
 	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		return nil, err
 	}
-	if err := registry.Init(ctx); err != nil {
+	if err := registry.Init(ctx, defaultDefaultNID, skipNetworkInit, migrate); err != nil {
 		return nil, err
 	}
 	return registry, nil
@@ -88,11 +91,12 @@ func NewRegistryWithoutInit(c *config.Provider, l *logrusx.Logger) (Registry, er
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
+
 	return registry, nil
 }
 
 func CallRegistry(ctx context.Context, r Registry) {
-	r.ClientValidator()
+	r.ClientValidator(ctx)
 	r.ClientManager()
 	r.ClientHasher()
 	r.ConsentManager()

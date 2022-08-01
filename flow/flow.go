@@ -3,6 +3,7 @@ package flow
 import (
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v6"
@@ -63,8 +64,8 @@ const (
 	FlowStateConsentError = int16(129)
 )
 
-// Flow is an abstraction used in the persistence layer to unify LoginRequest
-// and HandledLoginRequest.
+// Flow is an abstraction used in the persistence layer to unify LoginRequest,
+// HandledLoginRequest, ConsentRequest, and HandledConsentRequest.
 //
 // TODO: Deprecate the structs that are made obsolete by the Flow concept.
 // Context: Before Flow was introduced, the API and the database used the same
@@ -79,7 +80,8 @@ type Flow struct {
 	// identify the session.
 	//
 	// required: true
-	ID string `db:"login_challenge"`
+	ID  string    `db:"login_challenge"`
+	NID uuid.UUID `db:"nid"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
@@ -127,7 +129,7 @@ type Flow struct {
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
-	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
+	// channel logout. Its value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `db:"login_session_id"`
 
 	LoginVerifier string `db:"login_verifier"`
@@ -441,8 +443,8 @@ func (_ Flow) TableName() string {
 }
 
 // FindByConsentChallengeID retrieves a flow given its consent challenge ID.
-func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string) error {
-	return c.Where("consent_challenge_id = ?", id).First(f)
+func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string, nid uuid.UUID) error {
+	return c.Where("consent_challenge_id = ? AND nid = ?", id, nid).First(f)
 }
 
 func (f *Flow) BeforeSave(_ *pop.Connection) error {

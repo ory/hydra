@@ -43,7 +43,8 @@ import (
 )
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
-	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
+	ctx := context.TODO()
+	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), nil)
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
 	for k, tc := range []struct {
 		prep         func(*testing.T, driver.Registry)
@@ -64,8 +65,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should reject when basic auth but client does not exist and cors enabled",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo", "bar"))}},
@@ -74,8 +75,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should reject when basic auth client exists but origin not allowed",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
@@ -87,7 +88,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin allowed",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
@@ -99,8 +100,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin allowed",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
@@ -112,8 +113,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed per client",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
@@ -125,8 +126,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"*"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"*"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
@@ -138,8 +139,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed globally",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://*.foobar.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://*.foobar.com"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
@@ -151,8 +152,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) allowed per client",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
@@ -175,8 +176,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should fail when token introspection fails",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Bearer 1234"}},
@@ -185,8 +186,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should work when token introspection returns a session",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 				sess := oauth2.NewSession("foo-9")
 				sess.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour))
 				ar := fosite.NewAccessRequest(sess)
@@ -204,12 +205,12 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept any allowed specified origin protocol",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-11", "bar"))}},
@@ -218,8 +219,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept client origin when basic auth client exists and origin is set at the client as well as the server",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://**.example.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://**.example.com"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-12", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
@@ -231,8 +232,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept server origin when basic auth client exists and origin is set at the client as well as the server",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://**.example.com"})
+				r.Config(ctx).MustSet("serve.public.cors.enabled", true)
+				r.Config(ctx).MustSet("serve.public.cors.allowed_origins", []string{"http://**.example.com"})
 
 				// Ignore unique violations
 				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-13", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
@@ -260,7 +261,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			}
 
 			res := httptest.NewRecorder()
-			oauth2cors.Middleware(r)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			oauth2cors.Middleware(ctx, r)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNotImplemented)
 			})).ServeHTTP(res, req)
 			require.NoError(t, err)

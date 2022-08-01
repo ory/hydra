@@ -10,16 +10,19 @@ import (
 	"time"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
+	"github.com/fatih/structs"
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/assert"
+	"github.com/sirupsen/logrus"
 
 	"github.com/gobuffalo/pop/v6"
 
-	"github.com/ory/x/configx"
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/flow"
+	"github.com/ory/hydra/internal"
 	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
 
@@ -27,13 +30,10 @@ import (
 
 	"github.com/ory/x/sqlcon/dockertest"
 
-	"github.com/ory/hydra/driver/config"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
@@ -55,24 +55,29 @@ func CompareWithFixture(t *testing.T, actual interface{}, prefix string, id stri
 	assert.NoError(t, s.SnapshotWithName(id, actualJSON))
 }
 
-func TestMigrations2(t *testing.T) {
+func TestMigrations(t *testing.T) {
+	connections := make(map[string]*pop.Connection, 1)
+
 	if testing.Short() {
-		t.SkipNow()
-		return
+		reg := internal.NewMockedRegistry(t, nil)
+		reg.Persister().MigrateUp(context.Background())
+		c := reg.Persister().Connection(context.Background())
+		connections["sqlite"] = c
 	}
 
-	connections := make(map[string]*pop.Connection, 3)
-	dockertest.Parallel([]func(){
-		func() {
-			connections["postgres"] = dockertest.ConnectToTestPostgreSQLPop(t)
-		},
-		func() {
-			connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
-		},
-		func() {
-			connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
-		},
-	})
+	if !testing.Short() {
+		dockertest.Parallel([]func(){
+			func() {
+				connections["postgres"] = dockertest.ConnectToTestPostgreSQLPop(t)
+			},
+			func() {
+				connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
+			},
+			func() {
+				connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
+			},
+		})
+	}
 
 	var test = func(db string, c *pop.Connection) func(t *testing.T) {
 		return func(t *testing.T) {
@@ -87,43 +92,30 @@ func TestMigrations2(t *testing.T) {
 				url = "sqlite://" + url
 			}
 
-			d := driver.New(
-				ctx,
-				driver.WithOptions(configx.WithValue(config.KeyDSN, url)),
-				driver.DisablePreloading(),
-				driver.DisableValidation(),
-			)
-
-			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), d.Logger())
+			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
+			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), l)
 			require.NoError(t, tm.Up(ctx))
 
 			t.Run("suite=fixtures", func(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
 					cs := []client.Client{}
 					require.NoError(t, c.All(&cs))
-					if db == "cockroach" {
-						require.Equal(t, 4, len(cs))
-					} else {
-						require.Equal(t, 16, len(cs))
-					}
+					require.Equal(t, 16, len(cs))
 					for _, c := range cs {
 						require.False(t, c.CreatedAt.IsZero())
 						require.False(t, c.UpdatedAt.IsZero())
 						c.CreatedAt = time.Time{} // Some CreatedAt and UpdatedAt values are generated during migrations so we zero them in the fixtures
 						c.UpdatedAt = time.Time{}
-						CompareWithFixture(t, c, "hydra_client", c.OutfacingID)
 						testhelpersuuid.AssertUUID(t, &c.ID)
+						c.ID = uuid.Nil
+						CompareWithFixture(t, structs.Map(c), "hydra_client", c.OutfacingID)
 					}
 				})
 
 				t.Run("case=hydra_jwk", func(t *testing.T) {
 					js := []jwk.SQLData{}
 					require.NoError(t, c.All(&js))
-					if db == "cockroach" {
-						require.Equal(t, 3, len(js))
-					} else {
-						require.Equal(t, 6, len(js))
-					}
+					require.Equal(t, 7, len(js))
 					for _, j := range js {
 						testhelpersuuid.AssertUUID(t, &j.ID)
 						j.ID = uuid.Nil // Some IDs are generated at migration time so we zero them in the fixtures
@@ -135,11 +127,7 @@ func TestMigrations2(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				if db == "cockroach" {
-					require.Equal(t, 3, len(flows))
-				} else {
-					require.Equal(t, 14, len(flows))
-				}
+				require.Equal(t, 14, len(flows))
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
@@ -151,11 +139,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_authentication_session", func(t *testing.T) {
 					ss := []consent.LoginSession{}
 					c.All(&ss)
-					if db == "cockroach" {
-						require.Equal(t, 3, len(ss))
-					} else {
-						require.Equal(t, 14, len(ss))
-					}
+					require.Equal(t, 14, len(ss))
 
 					for _, s := range ss {
 						s.AuthenticatedAt = sqlxx.NullTime(time.Time{})
@@ -166,11 +150,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_obfuscated_authentication_session", func(t *testing.T) {
 					ss := []consent.ForcedObfuscatedLoginSession{}
 					c.All(&ss)
-					if db == "cockroach" {
-						require.Equal(t, 3, len(ss))
-					} else {
-						require.Equal(t, 13, len(ss))
-					}
+					require.Equal(t, 13, len(ss))
 
 					for _, s := range ss {
 						CompareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
@@ -180,11 +160,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
 					lrs := []consent.LogoutRequest{}
 					c.All(&lrs)
-					if db == "cockroach" {
-						require.Equal(t, 3, len(lrs))
-					} else {
-						require.Equal(t, 6, len(lrs))
-					}
+					require.Equal(t, 6, len(lrs))
 
 					for _, s := range lrs {
 						s.Client = nil
@@ -205,11 +181,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_access", func(t *testing.T) {
 					as := []sql.OAuth2RequestSQL{}
 					c.RawQuery("SELECT * FROM hydra_oauth2_access").All(&as)
-					if db == "cockroach" {
-						require.Equal(t, 5, len(as))
-					} else {
-						require.Equal(t, 13, len(as))
-					}
+					require.Equal(t, 13, len(as))
 
 					for _, a := range as {
 						require.False(t, a.RequestedAt.IsZero())
@@ -223,11 +195,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_refresh", func(t *testing.T) {
 					rs := []sql.OAuth2RequestSQL{}
 					c.RawQuery("SELECT * FROM hydra_oauth2_refresh").All(&rs)
-					if db == "cockroach" {
-						require.Equal(t, 5, len(rs))
-					} else {
-						require.Equal(t, 13, len(rs))
-					}
+					require.Equal(t, 13, len(rs))
 
 					for _, a := range rs {
 						require.False(t, a.RequestedAt.IsZero())
@@ -241,11 +209,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_code", func(t *testing.T) {
 					cs := []sql.OAuth2RequestSQL{}
 					c.RawQuery("SELECT * FROM hydra_oauth2_code").All(&cs)
-					if db == "cockroach" {
-						require.Equal(t, 5, len(cs))
-					} else {
-						require.Equal(t, 13, len(cs))
-					}
+					require.Equal(t, 13, len(cs))
 
 					for _, a := range cs {
 						require.False(t, a.RequestedAt.IsZero())
@@ -259,11 +223,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_oidc", func(t *testing.T) {
 					os := []sql.OAuth2RequestSQL{}
 					c.RawQuery("SELECT * FROM hydra_oauth2_oidc").All(&os)
-					if db == "cockroach" {
-						require.Equal(t, 5, len(os))
-					} else {
-						require.Equal(t, 13, len(os))
-					}
+					require.Equal(t, 13, len(os))
 
 					for _, a := range os {
 						require.False(t, a.RequestedAt.IsZero())
@@ -277,11 +237,7 @@ func TestMigrations2(t *testing.T) {
 				t.Run("case=hydra_oauth2_pkce", func(t *testing.T) {
 					ps := []sql.OAuth2RequestSQL{}
 					c.RawQuery("SELECT * FROM hydra_oauth2_pkce").All(&ps)
-					if db == "cockroach" {
-						require.Equal(t, 5, len(ps))
-					} else {
-						require.Equal(t, 11, len(ps))
-					}
+					require.Equal(t, 11, len(ps))
 
 					for _, a := range ps {
 						require.False(t, a.RequestedAt.IsZero())

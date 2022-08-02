@@ -209,40 +209,40 @@ type Client struct {
 	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
 
 	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan" db:"authorization_code_grant_access_token_lifespan"`
+	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan,omitempty" db:"authorization_code_grant_access_token_lifespan"`
 
 	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan" db:"authorization_code_grant_id_token_lifespan"`
+	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan,omitempty" db:"authorization_code_grant_id_token_lifespan"`
 
 	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan" db:"authorization_code_grant_refresh_token_lifespan"`
+	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan,omitempty" db:"authorization_code_grant_refresh_token_lifespan"`
 
 	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan" db:"client_credentials_grant_access_token_lifespan"`
+	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan,omitempty" db:"client_credentials_grant_access_token_lifespan"`
 
 	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan" db:"implicit_grant_access_token_lifespan"`
+	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan,omitempty" db:"implicit_grant_access_token_lifespan"`
 
 	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan" db:"implicit_grant_id_token_lifespan"`
+	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan,omitempty" db:"implicit_grant_id_token_lifespan"`
 
 	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan" db:"jwt_bearer_grant_access_token_lifespan"`
+	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan,omitempty" db:"jwt_bearer_grant_access_token_lifespan"`
 
 	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan" db:"password_grant_access_token_lifespan"`
+	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan,omitempty" db:"password_grant_access_token_lifespan"`
 
 	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan" db:"password_grant_refresh_token_lifespan"`
+	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan,omitempty" db:"password_grant_refresh_token_lifespan"`
 
 	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan" db:"refresh_token_grant_id_token_lifespan"`
+	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan,omitempty" db:"refresh_token_grant_id_token_lifespan"`
 
 	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan" db:"refresh_token_grant_access_token_lifespan"`
+	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan,omitempty" db:"refresh_token_grant_access_token_lifespan"`
 
 	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration.
-	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan" db:"refresh_token_grant_refresh_token_lifespan"`
+	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan,omitempty" db:"refresh_token_grant_refresh_token_lifespan"`
 }
 
 func (Client) TableName() string {

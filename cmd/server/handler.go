@@ -206,7 +206,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		NewMiddlewareFromLogger(d.Logger(),
 			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL(ctx).String()))
 	if d.Config().DisableHealthAccessLog(config.AdminInterface) {
-		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
+		adminLogger = adminLogger.ExcludePaths("/admin"+healthx.AliveCheckPath, "/admin"+healthx.ReadyCheckPath)
 	}
 
 	adminmw.Use(adminLogger)
@@ -238,10 +238,11 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 				strings.Contains(d.Config().IssuerURL(ctx).String(), "localhost"),
 			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			WhitelistedPaths: []string{
-				jwk.KeyHandlerPath,
+				"/admin" + jwk.KeyHandlerPath,
 				jwk.WellKnownKeysPath,
 
-				client.ClientsHandlerPath,
+				"/admin" + client.ClientsHandlerPath,
+				client.DynClientsHandlerPath,
 
 				oauth2.DefaultConsentPath,
 				oauth2.DefaultLoginPath,
@@ -254,25 +255,30 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 				oauth2.UserinfoPath,
 				oauth2.WellKnownPath,
 				oauth2.JWKPath,
-				oauth2.IntrospectPath,
+				"/admin" + oauth2.IntrospectPath,
+				"/admin" + oauth2.DeleteTokensPath,
 				oauth2.RevocationPath,
 
-				consent.ConsentPath,
-				consent.ConsentPath + "/accept",
-				consent.ConsentPath + "/reject",
-				consent.LoginPath,
-				consent.LoginPath + "/accept",
-				consent.LoginPath + "/reject",
-				consent.LogoutPath,
-				consent.LogoutPath + "/accept",
-				consent.LogoutPath + "/reject",
-				consent.SessionsPath + "/login",
-				consent.SessionsPath + "/consent",
+				"/admin" + consent.ConsentPath,
+				"/admin" + consent.ConsentPath + "/accept",
+				"/admin" + consent.ConsentPath + "/reject",
+				"/admin" + consent.LoginPath,
+				"/admin" + consent.LoginPath + "/accept",
+				"/admin" + consent.LoginPath + "/reject",
+				"/admin" + consent.LogoutPath,
+				"/admin" + consent.LogoutPath + "/accept",
+				"/admin" + consent.LogoutPath + "/reject",
+				"/admin" + consent.SessionsPath + "/login",
+				"/admin" + consent.SessionsPath + "/consent",
 
 				healthx.AliveCheckPath,
 				healthx.ReadyCheckPath,
+				"/admin" + healthx.AliveCheckPath,
+				"/admin" + healthx.ReadyCheckPath,
 				healthx.VersionPath,
+				"/admin" + healthx.VersionPath,
 				prometheus.MetricsPrometheusPath,
+				"/admin" + prometheus.MetricsPrometheusPath,
 				"/",
 			},
 			BuildVersion: config.Version,

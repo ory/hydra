@@ -57,7 +57,7 @@ func NewDefaultJWTSigner(c *config.DefaultProvider, r InternalRegistry, setID st
 }
 
 func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKey, err error) {
-	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, uuid.Must(uuid.NewV4()).String(), "RS256")
+	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, uuid.Must(uuid.NewV4()).String(), string(jose.RS256))
 	if err == nil {
 		return private, nil
 	}

@@ -113,7 +113,7 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 		keys, err := h.r.KeyManager().GetKeySet(ctx, set)
 		if errors.Is(err, x.ErrNotFound) {
 			h.r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
-			keys, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.ES256), "sig")
+			keys, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
 			if err != nil {
 				h.r.Writer().WriteError(w, r, err)
 				return

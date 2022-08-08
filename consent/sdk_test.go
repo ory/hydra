@@ -118,69 +118,69 @@ func TestSDK(t *testing.T) {
 	lur2 := MockLogoutRequest("testsdk-2", false, network)
 	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
 
-	crGot, _, err := sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
+	crGot, _, err := sdk.V0alpha2Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr1, *crGot)
 
-	crGot, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
+	crGot, _, err = sdk.V0alpha2Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot)
 
-	arGot, _, err := sdk.V1Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-1")).Execute()
+	arGot, _, err := sdk.V0alpha2Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-1")).Execute()
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar1, *arGot)
 
-	arGot, _, err = sdk.V1Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-2")).Execute()
+	arGot, _, err = sdk.V0alpha2Api.AdminGetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-2")).Execute()
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar2, *arGot)
 
-	_, err = sdk.V1Api.AdminRevokeOAuth2LoginSessions(ctx).Subject("subject1").Execute()
+	_, err = sdk.V0alpha2Api.AdminRevokeOAuth2LoginSessions(ctx).Subject("subject1").Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").Execute()
+	_, err = sdk.V0alpha2Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").Execute()
 	require.Error(t, err)
 
-	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject(cr4.Subject).Client(cr4.Client.GetID()).Execute()
+	_, err = sdk.V0alpha2Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject(cr4.Subject).Client(cr4.Client.GetID()).Execute()
 	require.NoError(t, err)
 
-	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").All(true).Execute()
+	_, err = sdk.V0alpha2Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject1").All(true).Execute()
 	require.NoError(t, err)
 
-	_, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
+	_, _, err = sdk.V0alpha2Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
 	require.Error(t, err)
 
-	crGot, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
+	crGot, _, err = sdk.V0alpha2Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot)
 
-	_, err = sdk.V1Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject2").Client("fk-client-2").Execute()
+	_, err = sdk.V0alpha2Api.AdminRevokeOAuth2ConsentSessions(ctx).Subject("subject2").Client("fk-client-2").Execute()
 	require.NoError(t, err)
 
-	_, _, err = sdk.V1Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
+	_, _, err = sdk.V0alpha2Api.AdminGetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
 	require.Error(t, err)
 
-	csGot, _, err := sdk.V1Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject3").Execute()
+	csGot, _, err := sdk.V0alpha2Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject3").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot))
 	cs := csGot[0]
 	assert.Equal(t, makeID("challenge", network, "3"), cs.ConsentRequest.Challenge)
 
-	csGot, _, err = sdk.V1Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject2").Execute()
+	csGot, _, err = sdk.V0alpha2Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject2").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot))
 
-	luGot, _, err := sdk.V1Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
+	luGot, _, err := sdk.V0alpha2Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
 	require.NoError(t, err)
 	compareSDKLogoutRequest(t, lur1, luGot)
 
-	luaGot, _, err := sdk.V1Api.AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
+	luaGot, _, err := sdk.V0alpha2Api.AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
 	require.NoError(t, err)
 	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier="+makeID("verifier", network, "testsdk-1"), luaGot.RedirectTo)
 
-	_, err = sdk.V1Api.AdminRejectOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
+	_, err = sdk.V0alpha2Api.AdminRejectOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
 	require.NoError(t, err)
 
-	_, _, err = sdk.V1Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
+	_, _, err = sdk.V0alpha2Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
 	require.Error(t, err)
 }
 

@@ -126,6 +126,7 @@ sdk: .bin/swagger .bin/ory node_modules
 					-p file://.schema/openapi/patches/security.yaml \
 					spec/swagger.json spec/api.json
 
+		rm -rf "internal/httpclient"
 		npm run openapi-generator-cli -- generate -i "spec/api.json" \
 				-g go \
 				-o "internal/httpclient" \

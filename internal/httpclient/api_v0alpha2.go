@@ -20,12 +20,12 @@ import (
 	"strings"
 )
 
-// V1ApiService V1Api service
-type V1ApiService service
+// V0alpha2ApiService V0alpha2Api service
+type V0alpha2ApiService service
 
 type ApiAdminAcceptOAuth2ConsentRequestRequest struct {
 	ctx                        context.Context
-	ApiService                 *V1ApiService
+	ApiService                 *V0alpha2ApiService
 	consentChallenge           *string
 	acceptOAuth2ConsentRequest *AcceptOAuth2ConsentRequest
 }
@@ -67,7 +67,7 @@ The response contains a redirect URL which the consent provider should redirect 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminAcceptOAuth2ConsentRequestRequest
 */
-func (a *V1ApiService) AdminAcceptOAuth2ConsentRequest(ctx context.Context) ApiAdminAcceptOAuth2ConsentRequestRequest {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequest(ctx context.Context) ApiAdminAcceptOAuth2ConsentRequestRequest {
 	return ApiAdminAcceptOAuth2ConsentRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -76,7 +76,7 @@ func (a *V1ApiService) AdminAcceptOAuth2ConsentRequest(ctx context.Context) ApiA
 
 // Execute executes the request
 //  @return SuccessfulOAuth2RequestResponse
-func (a *V1ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAcceptOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAcceptOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -84,7 +84,7 @@ func (a *V1ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAcceptOA
 		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminAcceptOAuth2ConsentRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminAcceptOAuth2ConsentRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -164,7 +164,7 @@ func (a *V1ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAcceptOA
 
 type ApiAdminAcceptOAuth2LoginRequestRequest struct {
 	ctx                      context.Context
-	ApiService               *V1ApiService
+	ApiService               *V0alpha2ApiService
 	loginChallenge           *string
 	acceptOAuth2LoginRequest *AcceptOAuth2LoginRequest
 }
@@ -203,7 +203,7 @@ The response contains a redirect URL which the login provider should redirect th
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminAcceptOAuth2LoginRequestRequest
 */
-func (a *V1ApiService) AdminAcceptOAuth2LoginRequest(ctx context.Context) ApiAdminAcceptOAuth2LoginRequestRequest {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequest(ctx context.Context) ApiAdminAcceptOAuth2LoginRequestRequest {
 	return ApiAdminAcceptOAuth2LoginRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -212,7 +212,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LoginRequest(ctx context.Context) ApiAdm
 
 // Execute executes the request
 //  @return SuccessfulOAuth2RequestResponse
-func (a *V1ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcceptOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcceptOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -220,7 +220,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcceptOAut
 		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminAcceptOAuth2LoginRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminAcceptOAuth2LoginRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -300,7 +300,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcceptOAut
 
 type ApiAdminAcceptOAuth2LogoutRequestRequest struct {
 	ctx             context.Context
-	ApiService      *V1ApiService
+	ApiService      *V0alpha2ApiService
 	logoutChallenge *string
 }
 
@@ -323,7 +323,7 @@ The response contains a redirect URL which the consent provider should redirect 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminAcceptOAuth2LogoutRequestRequest
 */
-func (a *V1ApiService) AdminAcceptOAuth2LogoutRequest(ctx context.Context) ApiAdminAcceptOAuth2LogoutRequestRequest {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequest(ctx context.Context) ApiAdminAcceptOAuth2LogoutRequestRequest {
 	return ApiAdminAcceptOAuth2LogoutRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -332,7 +332,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LogoutRequest(ctx context.Context) ApiAd
 
 // Execute executes the request
 //  @return SuccessfulOAuth2RequestResponse
-func (a *V1ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcceptOAuth2LogoutRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcceptOAuth2LogoutRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -340,7 +340,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcceptOAu
 		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminAcceptOAuth2LogoutRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminAcceptOAuth2LogoutRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -418,7 +418,7 @@ func (a *V1ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcceptOAu
 
 type ApiAdminCreateJsonWebKeySetRequest struct {
 	ctx                          context.Context
-	ApiService                   *V1ApiService
+	ApiService                   *V0alpha2ApiService
 	set                          string
 	adminCreateJsonWebKeySetBody *AdminCreateJsonWebKeySetBody
 }
@@ -443,7 +443,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param set The JSON Web Key Set
  @return ApiAdminCreateJsonWebKeySetRequest
 */
-func (a *V1ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set string) ApiAdminCreateJsonWebKeySetRequest {
+func (a *V0alpha2ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set string) ApiAdminCreateJsonWebKeySetRequest {
 	return ApiAdminCreateJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -453,7 +453,7 @@ func (a *V1ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set string)
 
 // Execute executes the request
 //  @return JsonWebKeySet
-func (a *V1ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -461,7 +461,7 @@ func (a *V1ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKe
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminCreateJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminCreateJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -541,7 +541,7 @@ func (a *V1ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKe
 
 type ApiAdminCreateOAuth2ClientRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	oAuth2Client *OAuth2Client
 }
 
@@ -566,7 +566,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminCreateOAuth2ClientRequest
 */
-func (a *V1ApiService) AdminCreateOAuth2Client(ctx context.Context) ApiAdminCreateOAuth2ClientRequest {
+func (a *V0alpha2ApiService) AdminCreateOAuth2Client(ctx context.Context) ApiAdminCreateOAuth2ClientRequest {
 	return ApiAdminCreateOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -575,7 +575,7 @@ func (a *V1ApiService) AdminCreateOAuth2Client(ctx context.Context) ApiAdminCrea
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -583,7 +583,7 @@ func (a *V1ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2Clie
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminCreateOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminCreateOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -662,7 +662,7 @@ func (a *V1ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2Clie
 
 type ApiAdminDeleteJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	set        string
 	kid        string
 }
@@ -683,7 +683,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param kid The JSON Web Key ID (kid)
  @return ApiAdminDeleteJsonWebKeyRequest
 */
-func (a *V1ApiService) AdminDeleteJsonWebKey(ctx context.Context, set string, kid string) ApiAdminDeleteJsonWebKeyRequest {
+func (a *V0alpha2ApiService) AdminDeleteJsonWebKey(ctx context.Context, set string, kid string) ApiAdminDeleteJsonWebKeyRequest {
 	return ApiAdminDeleteJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -693,14 +693,14 @@ func (a *V1ApiService) AdminDeleteJsonWebKey(ctx context.Context, set string, ki
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminDeleteJsonWebKeyExecute(r ApiAdminDeleteJsonWebKeyRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminDeleteJsonWebKeyExecute(r ApiAdminDeleteJsonWebKeyRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminDeleteJsonWebKey")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -767,7 +767,7 @@ func (a *V1ApiService) AdminDeleteJsonWebKeyExecute(r ApiAdminDeleteJsonWebKeyRe
 
 type ApiAdminDeleteJsonWebKeySetRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	set        string
 }
 
@@ -786,7 +786,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param set The JSON Web Key Set
  @return ApiAdminDeleteJsonWebKeySetRequest
 */
-func (a *V1ApiService) AdminDeleteJsonWebKeySet(ctx context.Context, set string) ApiAdminDeleteJsonWebKeySetRequest {
+func (a *V0alpha2ApiService) AdminDeleteJsonWebKeySet(ctx context.Context, set string) ApiAdminDeleteJsonWebKeySetRequest {
 	return ApiAdminDeleteJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -795,14 +795,14 @@ func (a *V1ApiService) AdminDeleteJsonWebKeySet(ctx context.Context, set string)
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminDeleteJsonWebKeySetExecute(r ApiAdminDeleteJsonWebKeySetRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminDeleteJsonWebKeySetExecute(r ApiAdminDeleteJsonWebKeySetRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminDeleteJsonWebKeySet")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -868,7 +868,7 @@ func (a *V1ApiService) AdminDeleteJsonWebKeySetExecute(r ApiAdminDeleteJsonWebKe
 
 type ApiAdminDeleteOAuth2ClientRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -890,7 +890,7 @@ Make sure that this endpoint is well protected and only callable by first-party 
  @param id The id of the OAuth 2.0 Client.
  @return ApiAdminDeleteOAuth2ClientRequest
 */
-func (a *V1ApiService) AdminDeleteOAuth2Client(ctx context.Context, id string) ApiAdminDeleteOAuth2ClientRequest {
+func (a *V0alpha2ApiService) AdminDeleteOAuth2Client(ctx context.Context, id string) ApiAdminDeleteOAuth2ClientRequest {
 	return ApiAdminDeleteOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -899,14 +899,14 @@ func (a *V1ApiService) AdminDeleteOAuth2Client(ctx context.Context, id string) A
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminDeleteOAuth2ClientExecute(r ApiAdminDeleteOAuth2ClientRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminDeleteOAuth2ClientExecute(r ApiAdminDeleteOAuth2ClientRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminDeleteOAuth2Client")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -972,7 +972,7 @@ func (a *V1ApiService) AdminDeleteOAuth2ClientExecute(r ApiAdminDeleteOAuth2Clie
 
 type ApiAdminDeleteOAuth2TokenRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	clientId   *string
 }
 
@@ -993,7 +993,7 @@ This endpoint deletes OAuth2 access tokens issued for a client from the database
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminDeleteOAuth2TokenRequest
 */
-func (a *V1ApiService) AdminDeleteOAuth2Token(ctx context.Context) ApiAdminDeleteOAuth2TokenRequest {
+func (a *V0alpha2ApiService) AdminDeleteOAuth2Token(ctx context.Context) ApiAdminDeleteOAuth2TokenRequest {
 	return ApiAdminDeleteOAuth2TokenRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1001,14 +1001,14 @@ func (a *V1ApiService) AdminDeleteOAuth2Token(ctx context.Context) ApiAdminDelet
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminDeleteOAuth2TokenExecute(r ApiAdminDeleteOAuth2TokenRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminDeleteOAuth2TokenExecute(r ApiAdminDeleteOAuth2TokenRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteOAuth2Token")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminDeleteOAuth2Token")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1077,7 +1077,7 @@ func (a *V1ApiService) AdminDeleteOAuth2TokenExecute(r ApiAdminDeleteOAuth2Token
 
 type ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -1098,7 +1098,7 @@ for OAuth 2.0 Client Authentication and Authorization Grant.
  @param id The id of the desired grant
  @return ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest
 */
-func (a *V1ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest {
+func (a *V0alpha2ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest {
 	return ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1107,14 +1107,14 @@ func (a *V1ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuer(ctx context.Contex
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteTrustedOAuth2JwtGrantIssuer")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminDeleteTrustedOAuth2JwtGrantIssuer")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1180,7 +1180,7 @@ func (a *V1ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminD
 
 type ApiAdminGetJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	set        string
 	kid        string
 }
@@ -1199,7 +1199,7 @@ This endpoint returns a singular JSON Web Key. It is identified by the set and t
  @param kid The JSON Web Key ID (kid)
  @return ApiAdminGetJsonWebKeyRequest
 */
-func (a *V1ApiService) AdminGetJsonWebKey(ctx context.Context, set string, kid string) ApiAdminGetJsonWebKeyRequest {
+func (a *V0alpha2ApiService) AdminGetJsonWebKey(ctx context.Context, set string, kid string) ApiAdminGetJsonWebKeyRequest {
 	return ApiAdminGetJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1210,7 +1210,7 @@ func (a *V1ApiService) AdminGetJsonWebKey(ctx context.Context, set string, kid s
 
 // Execute executes the request
 //  @return JsonWebKeySet
-func (a *V1ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1218,7 +1218,7 @@ func (a *V1ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest)
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetJsonWebKey")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1294,7 +1294,7 @@ func (a *V1ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest)
 
 type ApiAdminGetJsonWebKeySetRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	set        string
 }
 
@@ -1313,7 +1313,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param set The JSON Web Key Set
  @return ApiAdminGetJsonWebKeySetRequest
 */
-func (a *V1ApiService) AdminGetJsonWebKeySet(ctx context.Context, set string) ApiAdminGetJsonWebKeySetRequest {
+func (a *V0alpha2ApiService) AdminGetJsonWebKeySet(ctx context.Context, set string) ApiAdminGetJsonWebKeySetRequest {
 	return ApiAdminGetJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1323,7 +1323,7 @@ func (a *V1ApiService) AdminGetJsonWebKeySet(ctx context.Context, set string) Ap
 
 // Execute executes the request
 //  @return JsonWebKeySet
-func (a *V1ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1331,7 +1331,7 @@ func (a *V1ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRe
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1406,7 +1406,7 @@ func (a *V1ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRe
 
 type ApiAdminGetOAuth2ClientRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -1426,7 +1426,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiAdminGetOAuth2ClientRequest
 */
-func (a *V1ApiService) AdminGetOAuth2Client(ctx context.Context, id string) ApiAdminGetOAuth2ClientRequest {
+func (a *V0alpha2ApiService) AdminGetOAuth2Client(ctx context.Context, id string) ApiAdminGetOAuth2ClientRequest {
 	return ApiAdminGetOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1436,7 +1436,7 @@ func (a *V1ApiService) AdminGetOAuth2Client(ctx context.Context, id string) ApiA
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) AdminGetOAuth2ClientExecute(r ApiAdminGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetOAuth2ClientExecute(r ApiAdminGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1444,7 +1444,7 @@ func (a *V1ApiService) AdminGetOAuth2ClientExecute(r ApiAdminGetOAuth2ClientRequ
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1519,7 +1519,7 @@ func (a *V1ApiService) AdminGetOAuth2ClientExecute(r ApiAdminGetOAuth2ClientRequ
 
 type ApiAdminGetOAuth2ConsentRequestRequest struct {
 	ctx              context.Context
-	ApiService       *V1ApiService
+	ApiService       *V0alpha2ApiService
 	consentChallenge *string
 }
 
@@ -1549,7 +1549,7 @@ or rejected the request.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminGetOAuth2ConsentRequestRequest
 */
-func (a *V1ApiService) AdminGetOAuth2ConsentRequest(ctx context.Context) ApiAdminGetOAuth2ConsentRequestRequest {
+func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequest(ctx context.Context) ApiAdminGetOAuth2ConsentRequestRequest {
 	return ApiAdminGetOAuth2ConsentRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1558,7 +1558,7 @@ func (a *V1ApiService) AdminGetOAuth2ConsentRequest(ctx context.Context) ApiAdmi
 
 // Execute executes the request
 //  @return OAuth2ConsentRequest
-func (a *V1ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOAuth2ConsentRequestRequest) (*OAuth2ConsentRequest, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOAuth2ConsentRequestRequest) (*OAuth2ConsentRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1566,7 +1566,7 @@ func (a *V1ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOAuth2Co
 		localVarReturnValue *OAuth2ConsentRequest
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetOAuth2ConsentRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetOAuth2ConsentRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1654,7 +1654,7 @@ func (a *V1ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOAuth2Co
 
 type ApiAdminGetOAuth2LoginRequestRequest struct {
 	ctx            context.Context
-	ApiService     *V1ApiService
+	ApiService     *V0alpha2ApiService
 	loginChallenge *string
 }
 
@@ -1681,7 +1681,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminGetOAuth2LoginRequestRequest
 */
-func (a *V1ApiService) AdminGetOAuth2LoginRequest(ctx context.Context) ApiAdminGetOAuth2LoginRequestRequest {
+func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequest(ctx context.Context) ApiAdminGetOAuth2LoginRequestRequest {
 	return ApiAdminGetOAuth2LoginRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1690,7 +1690,7 @@ func (a *V1ApiService) AdminGetOAuth2LoginRequest(ctx context.Context) ApiAdminG
 
 // Execute executes the request
 //  @return OAuth2LoginRequest
-func (a *V1ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAuth2LoginRequestRequest) (*OAuth2LoginRequest, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAuth2LoginRequestRequest) (*OAuth2LoginRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1698,7 +1698,7 @@ func (a *V1ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAuth2Logi
 		localVarReturnValue *OAuth2LoginRequest
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetOAuth2LoginRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetOAuth2LoginRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1786,7 +1786,7 @@ func (a *V1ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAuth2Logi
 
 type ApiAdminGetOAuth2LogoutRequestRequest struct {
 	ctx             context.Context
-	ApiService      *V1ApiService
+	ApiService      *V0alpha2ApiService
 	logoutChallenge *string
 }
 
@@ -1807,7 +1807,7 @@ Use this endpoint to fetch a logout request.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminGetOAuth2LogoutRequestRequest
 */
-func (a *V1ApiService) AdminGetOAuth2LogoutRequest(ctx context.Context) ApiAdminGetOAuth2LogoutRequestRequest {
+func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequest(ctx context.Context) ApiAdminGetOAuth2LogoutRequestRequest {
 	return ApiAdminGetOAuth2LogoutRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1816,7 +1816,7 @@ func (a *V1ApiService) AdminGetOAuth2LogoutRequest(ctx context.Context) ApiAdmin
 
 // Execute executes the request
 //  @return OAuth2LogoutRequest
-func (a *V1ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAuth2LogoutRequestRequest) (*OAuth2LogoutRequest, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAuth2LogoutRequestRequest) (*OAuth2LogoutRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1824,7 +1824,7 @@ func (a *V1ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAuth2Log
 		localVarReturnValue *OAuth2LogoutRequest
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetOAuth2LogoutRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetOAuth2LogoutRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1912,7 +1912,7 @@ func (a *V1ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAuth2Log
 
 type ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -1930,7 +1930,7 @@ created the trust relationship.
  @param id The id of the desired grant
  @return ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest
 */
-func (a *V1ApiService) AdminGetTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest {
+func (a *V0alpha2ApiService) AdminGetTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest {
 	return ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -1940,7 +1940,7 @@ func (a *V1ApiService) AdminGetTrustedOAuth2JwtGrantIssuer(ctx context.Context, 
 
 // Execute executes the request
 //  @return TrustedOAuth2JwtGrantIssuer
-func (a *V1ApiService) AdminGetTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminGetTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -1948,7 +1948,7 @@ func (a *V1ApiService) AdminGetTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminGetT
 		localVarReturnValue *TrustedOAuth2JwtGrantIssuer
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetTrustedOAuth2JwtGrantIssuer")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminGetTrustedOAuth2JwtGrantIssuer")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2023,7 +2023,7 @@ func (a *V1ApiService) AdminGetTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminGetT
 
 type ApiAdminIntrospectOAuth2TokenRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	token      *string
 	scope      *string
 }
@@ -2056,7 +2056,7 @@ For more information [read this blog post](https://www.oauth.com/oauth2-servers/
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminIntrospectOAuth2TokenRequest
 */
-func (a *V1ApiService) AdminIntrospectOAuth2Token(ctx context.Context) ApiAdminIntrospectOAuth2TokenRequest {
+func (a *V0alpha2ApiService) AdminIntrospectOAuth2Token(ctx context.Context) ApiAdminIntrospectOAuth2TokenRequest {
 	return ApiAdminIntrospectOAuth2TokenRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2065,7 +2065,7 @@ func (a *V1ApiService) AdminIntrospectOAuth2Token(ctx context.Context) ApiAdminI
 
 // Execute executes the request
 //  @return IntrospectedOAuth2Token
-func (a *V1ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrospectOAuth2TokenRequest) (*IntrospectedOAuth2Token, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrospectOAuth2TokenRequest) (*IntrospectedOAuth2Token, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -2073,7 +2073,7 @@ func (a *V1ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrospectOAu
 		localVarReturnValue *IntrospectedOAuth2Token
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminIntrospectOAuth2Token")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminIntrospectOAuth2Token")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2154,7 +2154,7 @@ func (a *V1ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrospectOAu
 
 type ApiAdminListOAuth2ClientsRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	pageSize   *int64
 	pageToken  *string
 	clientName *string
@@ -2207,7 +2207,7 @@ be included in this header, and will be separated by a comma.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminListOAuth2ClientsRequest
 */
-func (a *V1ApiService) AdminListOAuth2Clients(ctx context.Context) ApiAdminListOAuth2ClientsRequest {
+func (a *V0alpha2ApiService) AdminListOAuth2Clients(ctx context.Context) ApiAdminListOAuth2ClientsRequest {
 	return ApiAdminListOAuth2ClientsRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2216,7 +2216,7 @@ func (a *V1ApiService) AdminListOAuth2Clients(ctx context.Context) ApiAdminListO
 
 // Execute executes the request
 //  @return []OAuth2Client
-func (a *V1ApiService) AdminListOAuth2ClientsExecute(r ApiAdminListOAuth2ClientsRequest) ([]OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminListOAuth2ClientsExecute(r ApiAdminListOAuth2ClientsRequest) ([]OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -2224,7 +2224,7 @@ func (a *V1ApiService) AdminListOAuth2ClientsExecute(r ApiAdminListOAuth2Clients
 		localVarReturnValue []OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminListOAuth2Clients")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminListOAuth2Clients")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2310,7 +2310,7 @@ func (a *V1ApiService) AdminListOAuth2ClientsExecute(r ApiAdminListOAuth2Clients
 
 type ApiAdminListOAuth2SubjectConsentSessionsRequest struct {
 	ctx         context.Context
-	ApiService  *V1ApiService
+	ApiService  *V0alpha2ApiService
 	subject     *string
 	link        *string
 	xTotalCount *string
@@ -2351,7 +2351,7 @@ Multiple links can be included in this header, and will be separated by a comma.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminListOAuth2SubjectConsentSessionsRequest
 */
-func (a *V1ApiService) AdminListOAuth2SubjectConsentSessions(ctx context.Context) ApiAdminListOAuth2SubjectConsentSessionsRequest {
+func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessions(ctx context.Context) ApiAdminListOAuth2SubjectConsentSessionsRequest {
 	return ApiAdminListOAuth2SubjectConsentSessionsRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2360,7 +2360,7 @@ func (a *V1ApiService) AdminListOAuth2SubjectConsentSessions(ctx context.Context
 
 // Execute executes the request
 //  @return []PreviousOAuth2ConsentSession
-func (a *V1ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiAdminListOAuth2SubjectConsentSessionsRequest) ([]PreviousOAuth2ConsentSession, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiAdminListOAuth2SubjectConsentSessionsRequest) ([]PreviousOAuth2ConsentSession, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -2368,7 +2368,7 @@ func (a *V1ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiAdminLi
 		localVarReturnValue []PreviousOAuth2ConsentSession
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminListOAuth2SubjectConsentSessions")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminListOAuth2SubjectConsentSessions")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2452,7 +2452,7 @@ func (a *V1ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiAdminLi
 
 type ApiAdminListTrustedOAuth2JwtGrantIssuersRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	maxItems     *int64
 	defaultItems *int64
 	issuer       *string
@@ -2500,7 +2500,7 @@ Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminListTrustedOAuth2JwtGrantIssuersRequest
 */
-func (a *V1ApiService) AdminListTrustedOAuth2JwtGrantIssuers(ctx context.Context) ApiAdminListTrustedOAuth2JwtGrantIssuersRequest {
+func (a *V0alpha2ApiService) AdminListTrustedOAuth2JwtGrantIssuers(ctx context.Context) ApiAdminListTrustedOAuth2JwtGrantIssuersRequest {
 	return ApiAdminListTrustedOAuth2JwtGrantIssuersRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2509,7 +2509,7 @@ func (a *V1ApiService) AdminListTrustedOAuth2JwtGrantIssuers(ctx context.Context
 
 // Execute executes the request
 //  @return []TrustedOAuth2JwtGrantIssuer
-func (a *V1ApiService) AdminListTrustedOAuth2JwtGrantIssuersExecute(r ApiAdminListTrustedOAuth2JwtGrantIssuersRequest) ([]TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminListTrustedOAuth2JwtGrantIssuersExecute(r ApiAdminListTrustedOAuth2JwtGrantIssuersRequest) ([]TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -2517,7 +2517,7 @@ func (a *V1ApiService) AdminListTrustedOAuth2JwtGrantIssuersExecute(r ApiAdminLi
 		localVarReturnValue []TrustedOAuth2JwtGrantIssuer
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminListTrustedOAuth2JwtGrantIssuers")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminListTrustedOAuth2JwtGrantIssuers")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2606,7 +2606,7 @@ func (a *V1ApiService) AdminListTrustedOAuth2JwtGrantIssuersExecute(r ApiAdminLi
 
 type ApiAdminPatchOAuth2ClientRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 	jsonPatch  *[]JsonPatch
 }
@@ -2634,7 +2634,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiAdminPatchOAuth2ClientRequest
 */
-func (a *V1ApiService) AdminPatchOAuth2Client(ctx context.Context, id string) ApiAdminPatchOAuth2ClientRequest {
+func (a *V0alpha2ApiService) AdminPatchOAuth2Client(ctx context.Context, id string) ApiAdminPatchOAuth2ClientRequest {
 	return ApiAdminPatchOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2644,7 +2644,7 @@ func (a *V1ApiService) AdminPatchOAuth2Client(ctx context.Context, id string) Ap
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch
 		localVarPostBody    interface{}
@@ -2652,7 +2652,7 @@ func (a *V1ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2Client
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminPatchOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminPatchOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2732,7 +2732,7 @@ func (a *V1ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2Client
 
 type ApiAdminRejectOAuth2ConsentRequestRequest struct {
 	ctx                 context.Context
-	ApiService          *V1ApiService
+	ApiService          *V0alpha2ApiService
 	consentChallenge    *string
 	rejectOAuth2Request *RejectOAuth2Request
 }
@@ -2773,7 +2773,7 @@ The response contains a redirect URL which the consent provider should redirect 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminRejectOAuth2ConsentRequestRequest
 */
-func (a *V1ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context) ApiAdminRejectOAuth2ConsentRequestRequest {
+func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context) ApiAdminRejectOAuth2ConsentRequestRequest {
 	return ApiAdminRejectOAuth2ConsentRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2782,7 +2782,7 @@ func (a *V1ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context) ApiA
 
 // Execute executes the request
 //  @return SuccessfulOAuth2RequestResponse
-func (a *V1ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -2790,7 +2790,7 @@ func (a *V1ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOA
 		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRejectOAuth2ConsentRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminRejectOAuth2ConsentRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -2870,7 +2870,7 @@ func (a *V1ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOA
 
 type ApiAdminRejectOAuth2LoginRequestRequest struct {
 	ctx                 context.Context
-	ApiService          *V1ApiService
+	ApiService          *V0alpha2ApiService
 	loginChallenge      *string
 	rejectOAuth2Request *RejectOAuth2Request
 }
@@ -2908,7 +2908,7 @@ The response contains a redirect URL which the login provider should redirect th
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminRejectOAuth2LoginRequestRequest
 */
-func (a *V1ApiService) AdminRejectOAuth2LoginRequest(ctx context.Context) ApiAdminRejectOAuth2LoginRequestRequest {
+func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequest(ctx context.Context) ApiAdminRejectOAuth2LoginRequestRequest {
 	return ApiAdminRejectOAuth2LoginRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -2917,7 +2917,7 @@ func (a *V1ApiService) AdminRejectOAuth2LoginRequest(ctx context.Context) ApiAdm
 
 // Execute executes the request
 //  @return SuccessfulOAuth2RequestResponse
-func (a *V1ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminRejectOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminRejectOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -2925,7 +2925,7 @@ func (a *V1ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminRejectOAut
 		localVarReturnValue *SuccessfulOAuth2RequestResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRejectOAuth2LoginRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminRejectOAuth2LoginRequest")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3005,7 +3005,7 @@ func (a *V1ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminRejectOAut
 
 type ApiAdminRejectOAuth2LogoutRequestRequest struct {
 	ctx                 context.Context
-	ApiService          *V1ApiService
+	ApiService          *V0alpha2ApiService
 	logoutChallenge     *string
 	rejectOAuth2Request *RejectOAuth2Request
 }
@@ -3035,7 +3035,7 @@ The response is empty as the logout provider has to chose what action to perform
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminRejectOAuth2LogoutRequestRequest
 */
-func (a *V1ApiService) AdminRejectOAuth2LogoutRequest(ctx context.Context) ApiAdminRejectOAuth2LogoutRequestRequest {
+func (a *V0alpha2ApiService) AdminRejectOAuth2LogoutRequest(ctx context.Context) ApiAdminRejectOAuth2LogoutRequestRequest {
 	return ApiAdminRejectOAuth2LogoutRequestRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3043,14 +3043,14 @@ func (a *V1ApiService) AdminRejectOAuth2LogoutRequest(ctx context.Context) ApiAd
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminRejectOAuth2LogoutRequestExecute(r ApiAdminRejectOAuth2LogoutRequestRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminRejectOAuth2LogoutRequestExecute(r ApiAdminRejectOAuth2LogoutRequestRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodPut
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRejectOAuth2LogoutRequest")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminRejectOAuth2LogoutRequest")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3121,7 +3121,7 @@ func (a *V1ApiService) AdminRejectOAuth2LogoutRequestExecute(r ApiAdminRejectOAu
 
 type ApiAdminRevokeOAuth2ConsentSessionsRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	subject    *string
 	client     *string
 	all        *bool
@@ -3158,7 +3158,7 @@ associated OAuth 2.0 Access Tokens.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminRevokeOAuth2ConsentSessionsRequest
 */
-func (a *V1ApiService) AdminRevokeOAuth2ConsentSessions(ctx context.Context) ApiAdminRevokeOAuth2ConsentSessionsRequest {
+func (a *V0alpha2ApiService) AdminRevokeOAuth2ConsentSessions(ctx context.Context) ApiAdminRevokeOAuth2ConsentSessionsRequest {
 	return ApiAdminRevokeOAuth2ConsentSessionsRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3166,14 +3166,14 @@ func (a *V1ApiService) AdminRevokeOAuth2ConsentSessions(ctx context.Context) Api
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminRevokeOAuth2ConsentSessionsExecute(r ApiAdminRevokeOAuth2ConsentSessionsRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminRevokeOAuth2ConsentSessionsExecute(r ApiAdminRevokeOAuth2ConsentSessionsRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRevokeOAuth2ConsentSessions")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminRevokeOAuth2ConsentSessions")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3248,7 +3248,7 @@ func (a *V1ApiService) AdminRevokeOAuth2ConsentSessionsExecute(r ApiAdminRevokeO
 
 type ApiAdminRevokeOAuth2LoginSessionsRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	subject    *string
 }
 
@@ -3272,7 +3272,7 @@ Front- or Back-channel logout.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminRevokeOAuth2LoginSessionsRequest
 */
-func (a *V1ApiService) AdminRevokeOAuth2LoginSessions(ctx context.Context) ApiAdminRevokeOAuth2LoginSessionsRequest {
+func (a *V0alpha2ApiService) AdminRevokeOAuth2LoginSessions(ctx context.Context) ApiAdminRevokeOAuth2LoginSessionsRequest {
 	return ApiAdminRevokeOAuth2LoginSessionsRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3280,14 +3280,14 @@ func (a *V1ApiService) AdminRevokeOAuth2LoginSessions(ctx context.Context) ApiAd
 }
 
 // Execute executes the request
-func (a *V1ApiService) AdminRevokeOAuth2LoginSessionsExecute(r ApiAdminRevokeOAuth2LoginSessionsRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) AdminRevokeOAuth2LoginSessionsExecute(r ApiAdminRevokeOAuth2LoginSessionsRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminRevokeOAuth2LoginSessions")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminRevokeOAuth2LoginSessions")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3356,7 +3356,7 @@ func (a *V1ApiService) AdminRevokeOAuth2LoginSessionsExecute(r ApiAdminRevokeOAu
 
 type ApiAdminTrustOAuth2JwtGrantIssuerRequest struct {
 	ctx                                context.Context
-	ApiService                         *V1ApiService
+	ApiService                         *V0alpha2ApiService
 	adminTrustOAuth2JwtGrantIssuerBody *AdminTrustOAuth2JwtGrantIssuerBody
 }
 
@@ -3379,7 +3379,7 @@ and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiAdminTrustOAuth2JwtGrantIssuerRequest
 */
-func (a *V1ApiService) AdminTrustOAuth2JwtGrantIssuer(ctx context.Context) ApiAdminTrustOAuth2JwtGrantIssuerRequest {
+func (a *V0alpha2ApiService) AdminTrustOAuth2JwtGrantIssuer(ctx context.Context) ApiAdminTrustOAuth2JwtGrantIssuerRequest {
 	return ApiAdminTrustOAuth2JwtGrantIssuerRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3388,7 +3388,7 @@ func (a *V1ApiService) AdminTrustOAuth2JwtGrantIssuer(ctx context.Context) ApiAd
 
 // Execute executes the request
 //  @return TrustedOAuth2JwtGrantIssuer
-func (a *V1ApiService) AdminTrustOAuth2JwtGrantIssuerExecute(r ApiAdminTrustOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminTrustOAuth2JwtGrantIssuerExecute(r ApiAdminTrustOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -3396,7 +3396,7 @@ func (a *V1ApiService) AdminTrustOAuth2JwtGrantIssuerExecute(r ApiAdminTrustOAut
 		localVarReturnValue *TrustedOAuth2JwtGrantIssuer
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminTrustOAuth2JwtGrantIssuer")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminTrustOAuth2JwtGrantIssuer")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3472,7 +3472,7 @@ func (a *V1ApiService) AdminTrustOAuth2JwtGrantIssuerExecute(r ApiAdminTrustOAut
 
 type ApiAdminUpdateJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	set        string
 	kid        string
 	jsonWebKey *JsonWebKey
@@ -3499,7 +3499,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param kid The JSON Web Key ID (kid)
  @return ApiAdminUpdateJsonWebKeyRequest
 */
-func (a *V1ApiService) AdminUpdateJsonWebKey(ctx context.Context, set string, kid string) ApiAdminUpdateJsonWebKeyRequest {
+func (a *V0alpha2ApiService) AdminUpdateJsonWebKey(ctx context.Context, set string, kid string) ApiAdminUpdateJsonWebKeyRequest {
 	return ApiAdminUpdateJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3510,7 +3510,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKey(ctx context.Context, set string, ki
 
 // Execute executes the request
 //  @return JsonWebKey
-func (a *V1ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -3518,7 +3518,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRe
 		localVarReturnValue *JsonWebKey
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminUpdateJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminUpdateJsonWebKey")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3596,7 +3596,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRe
 
 type ApiAdminUpdateJsonWebKeySetRequest struct {
 	ctx           context.Context
-	ApiService    *V1ApiService
+	ApiService    *V0alpha2ApiService
 	set           string
 	jsonWebKeySet *JsonWebKeySet
 }
@@ -3621,7 +3621,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
  @param set The JSON Web Key Set
  @return ApiAdminUpdateJsonWebKeySetRequest
 */
-func (a *V1ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set string) ApiAdminUpdateJsonWebKeySetRequest {
+func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set string) ApiAdminUpdateJsonWebKeySetRequest {
 	return ApiAdminUpdateJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3631,7 +3631,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set string)
 
 // Execute executes the request
 //  @return JsonWebKeySet
-func (a *V1ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -3639,7 +3639,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKe
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminUpdateJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminUpdateJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3716,7 +3716,7 @@ func (a *V1ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKe
 
 type ApiAdminUpdateOAuth2ClientRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	id           string
 	oAuth2Client *OAuth2Client
 }
@@ -3743,7 +3743,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiAdminUpdateOAuth2ClientRequest
 */
-func (a *V1ApiService) AdminUpdateOAuth2Client(ctx context.Context, id string) ApiAdminUpdateOAuth2ClientRequest {
+func (a *V0alpha2ApiService) AdminUpdateOAuth2Client(ctx context.Context, id string) ApiAdminUpdateOAuth2ClientRequest {
 	return ApiAdminUpdateOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3753,7 +3753,7 @@ func (a *V1ApiService) AdminUpdateOAuth2Client(ctx context.Context, id string) A
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -3761,7 +3761,7 @@ func (a *V1ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2Clie
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminUpdateOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminUpdateOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3841,7 +3841,7 @@ func (a *V1ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2Clie
 
 type ApiDiscoverJsonWebKeysRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 }
 
 func (r ApiDiscoverJsonWebKeysRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
@@ -3858,7 +3858,7 @@ if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client l
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDiscoverJsonWebKeysRequest
 */
-func (a *V1ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonWebKeysRequest {
+func (a *V0alpha2ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonWebKeysRequest {
 	return ApiDiscoverJsonWebKeysRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3867,7 +3867,7 @@ func (a *V1ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonW
 
 // Execute executes the request
 //  @return JsonWebKeySet
-func (a *V1ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *V0alpha2ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -3875,7 +3875,7 @@ func (a *V1ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysReques
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DiscoverJsonWebKeys")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DiscoverJsonWebKeys")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -3949,7 +3949,7 @@ func (a *V1ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysReques
 
 type ApiDiscoverOidcConfigurationRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 }
 
 func (r ApiDiscoverOidcConfigurationRequest) Execute() (*OidcConfiguration, *http.Response, error) {
@@ -3969,7 +3969,7 @@ For a full list of clients go here: https://openid.net/developers/certified/
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDiscoverOidcConfigurationRequest
 */
-func (a *V1ApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscoverOidcConfigurationRequest {
+func (a *V0alpha2ApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscoverOidcConfigurationRequest {
 	return ApiDiscoverOidcConfigurationRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -3978,7 +3978,7 @@ func (a *V1ApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscove
 
 // Execute executes the request
 //  @return OidcConfiguration
-func (a *V1ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigurationRequest) (*OidcConfiguration, *http.Response, error) {
+func (a *V0alpha2ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigurationRequest) (*OidcConfiguration, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -3986,7 +3986,7 @@ func (a *V1ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigu
 		localVarReturnValue *OidcConfiguration
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DiscoverOidcConfiguration")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DiscoverOidcConfiguration")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4060,7 +4060,7 @@ func (a *V1ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigu
 
 type ApiDynamicClientRegistrationCreateOAuth2ClientRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	oAuth2Client *OAuth2Client
 }
 
@@ -4091,7 +4091,7 @@ Write the secret down and keep it somewhere safe.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDynamicClientRegistrationCreateOAuth2ClientRequest
 */
-func (a *V1ApiService) DynamicClientRegistrationCreateOAuth2Client(ctx context.Context) ApiDynamicClientRegistrationCreateOAuth2ClientRequest {
+func (a *V0alpha2ApiService) DynamicClientRegistrationCreateOAuth2Client(ctx context.Context) ApiDynamicClientRegistrationCreateOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationCreateOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4100,7 +4100,7 @@ func (a *V1ApiService) DynamicClientRegistrationCreateOAuth2Client(ctx context.C
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -4108,7 +4108,7 @@ func (a *V1ApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiD
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DynamicClientRegistrationCreateOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DynamicClientRegistrationCreateOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4187,7 +4187,7 @@ func (a *V1ApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiD
 
 type ApiDynamicClientRegistrationDeleteOAuth2ClientRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -4214,7 +4214,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest
 */
-func (a *V1ApiService) DynamicClientRegistrationDeleteOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationDeleteOAuth2ClientRequest {
+func (a *V0alpha2ApiService) DynamicClientRegistrationDeleteOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationDeleteOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4223,14 +4223,14 @@ func (a *V1ApiService) DynamicClientRegistrationDeleteOAuth2Client(ctx context.C
 }
 
 // Execute executes the request
-func (a *V1ApiService) DynamicClientRegistrationDeleteOAuth2ClientExecute(r ApiDynamicClientRegistrationDeleteOAuth2ClientRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) DynamicClientRegistrationDeleteOAuth2ClientExecute(r ApiDynamicClientRegistrationDeleteOAuth2ClientRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DynamicClientRegistrationDeleteOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DynamicClientRegistrationDeleteOAuth2Client")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4296,7 +4296,7 @@ func (a *V1ApiService) DynamicClientRegistrationDeleteOAuth2ClientExecute(r ApiD
 
 type ApiDynamicClientRegistrationGetOAuth2ClientRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	id         string
 }
 
@@ -4323,7 +4323,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiDynamicClientRegistrationGetOAuth2ClientRequest
 */
-func (a *V1ApiService) DynamicClientRegistrationGetOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationGetOAuth2ClientRequest {
+func (a *V0alpha2ApiService) DynamicClientRegistrationGetOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationGetOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationGetOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4333,7 +4333,7 @@ func (a *V1ApiService) DynamicClientRegistrationGetOAuth2Client(ctx context.Cont
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDynamicClientRegistrationGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDynamicClientRegistrationGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -4341,7 +4341,7 @@ func (a *V1ApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDyna
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DynamicClientRegistrationGetOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DynamicClientRegistrationGetOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4416,7 +4416,7 @@ func (a *V1ApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDyna
 
 type ApiDynamicClientRegistrationUpdateOAuth2ClientRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	id           string
 	oAuth2Client *OAuth2Client
 }
@@ -4452,7 +4452,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
  @param id The id of the OAuth 2.0 Client.
  @return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest
 */
-func (a *V1ApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationUpdateOAuth2ClientRequest {
+func (a *V0alpha2ApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationUpdateOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4462,7 +4462,7 @@ func (a *V1ApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx context.C
 
 // Execute executes the request
 //  @return OAuth2Client
-func (a *V1ApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *V0alpha2ApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -4470,7 +4470,7 @@ func (a *V1ApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiD
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DynamicClientRegistrationUpdateOAuth2Client")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.DynamicClientRegistrationUpdateOAuth2Client")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4550,7 +4550,7 @@ func (a *V1ApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiD
 
 type ApiGetOidcUserInfoRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 }
 
 func (r ApiGetOidcUserInfoRequest) Execute() (*OidcUserInfo, *http.Response, error) {
@@ -4572,7 +4572,7 @@ for more details about header format.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetOidcUserInfoRequest
 */
-func (a *V1ApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRequest {
+func (a *V0alpha2ApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRequest {
 	return ApiGetOidcUserInfoRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4581,7 +4581,7 @@ func (a *V1ApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRe
 
 // Execute executes the request
 //  @return OidcUserInfo
-func (a *V1ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*OidcUserInfo, *http.Response, error) {
+func (a *V0alpha2ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*OidcUserInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -4589,7 +4589,7 @@ func (a *V1ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*Oid
 		localVarReturnValue *OidcUserInfo
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.GetOidcUserInfo")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.GetOidcUserInfo")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4663,7 +4663,7 @@ func (a *V1ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*Oid
 
 type ApiPerformOAuth2AuthorizationFlowRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 }
 
 func (r ApiPerformOAuth2AuthorizationFlowRequest) Execute() (*OAuth2ApiError, *http.Response, error) {
@@ -4681,7 +4681,7 @@ To learn more about this flow please refer to the specification: https://tools.i
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiPerformOAuth2AuthorizationFlowRequest
 */
-func (a *V1ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context) ApiPerformOAuth2AuthorizationFlowRequest {
+func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context) ApiPerformOAuth2AuthorizationFlowRequest {
 	return ApiPerformOAuth2AuthorizationFlowRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4690,7 +4690,7 @@ func (a *V1ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context) ApiPe
 
 // Execute executes the request
 //  @return OAuth2ApiError
-func (a *V1ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2AuthorizationFlowRequest) (*OAuth2ApiError, *http.Response, error) {
+func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2AuthorizationFlowRequest) (*OAuth2ApiError, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -4698,7 +4698,7 @@ func (a *V1ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2A
 		localVarReturnValue *OAuth2ApiError
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.PerformOAuth2AuthorizationFlow")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.PerformOAuth2AuthorizationFlow")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4772,7 +4772,7 @@ func (a *V1ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2A
 
 type ApiPerformOAuth2TokenFlowRequest struct {
 	ctx          context.Context
-	ApiService   *V1ApiService
+	ApiService   *V0alpha2ApiService
 	grantType    *string
 	clientId     *string
 	code         *string
@@ -4824,7 +4824,7 @@ request entity-body.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiPerformOAuth2TokenFlowRequest
 */
-func (a *V1ApiService) PerformOAuth2TokenFlow(ctx context.Context) ApiPerformOAuth2TokenFlowRequest {
+func (a *V0alpha2ApiService) PerformOAuth2TokenFlow(ctx context.Context) ApiPerformOAuth2TokenFlowRequest {
 	return ApiPerformOAuth2TokenFlowRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4833,7 +4833,7 @@ func (a *V1ApiService) PerformOAuth2TokenFlow(ctx context.Context) ApiPerformOAu
 
 // Execute executes the request
 //  @return OAuth2TokenResponse
-func (a *V1ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2TokenFlowRequest) (*OAuth2TokenResponse, *http.Response, error) {
+func (a *V0alpha2ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2TokenFlowRequest) (*OAuth2TokenResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -4841,7 +4841,7 @@ func (a *V1ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2TokenFlow
 		localVarReturnValue *OAuth2TokenResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.PerformOAuth2TokenFlow")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.PerformOAuth2TokenFlow")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -4931,7 +4931,7 @@ func (a *V1ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2TokenFlow
 
 type ApiPerformOidcFrontOrBackChannelLogoutRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 }
 
 func (r ApiPerformOidcFrontOrBackChannelLogoutRequest) Execute() (*http.Response, error) {
@@ -4951,7 +4951,7 @@ Back-channel logout is performed asynchronously and does not affect logout flow.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiPerformOidcFrontOrBackChannelLogoutRequest
 */
-func (a *V1ApiService) PerformOidcFrontOrBackChannelLogout(ctx context.Context) ApiPerformOidcFrontOrBackChannelLogoutRequest {
+func (a *V0alpha2ApiService) PerformOidcFrontOrBackChannelLogout(ctx context.Context) ApiPerformOidcFrontOrBackChannelLogoutRequest {
 	return ApiPerformOidcFrontOrBackChannelLogoutRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -4959,14 +4959,14 @@ func (a *V1ApiService) PerformOidcFrontOrBackChannelLogout(ctx context.Context) 
 }
 
 // Execute executes the request
-func (a *V1ApiService) PerformOidcFrontOrBackChannelLogoutExecute(r ApiPerformOidcFrontOrBackChannelLogoutRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) PerformOidcFrontOrBackChannelLogoutExecute(r ApiPerformOidcFrontOrBackChannelLogoutRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodGet
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.PerformOidcFrontOrBackChannelLogout")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.PerformOidcFrontOrBackChannelLogout")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -5024,7 +5024,7 @@ func (a *V1ApiService) PerformOidcFrontOrBackChannelLogoutExecute(r ApiPerformOi
 
 type ApiRevokeOAuth2TokenRequest struct {
 	ctx        context.Context
-	ApiService *V1ApiService
+	ApiService *V0alpha2ApiService
 	token      *string
 }
 
@@ -5048,7 +5048,7 @@ the client the token was generated for.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiRevokeOAuth2TokenRequest
 */
-func (a *V1ApiService) RevokeOAuth2Token(ctx context.Context) ApiRevokeOAuth2TokenRequest {
+func (a *V0alpha2ApiService) RevokeOAuth2Token(ctx context.Context) ApiRevokeOAuth2TokenRequest {
 	return ApiRevokeOAuth2TokenRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -5056,14 +5056,14 @@ func (a *V1ApiService) RevokeOAuth2Token(ctx context.Context) ApiRevokeOAuth2Tok
 }
 
 // Execute executes the request
-func (a *V1ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenRequest) (*http.Response, error) {
+func (a *V0alpha2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodPost
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.RevokeOAuth2Token")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.RevokeOAuth2Token")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}

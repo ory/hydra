@@ -2,9 +2,9 @@
 
 ## Properties
 
-| Name      | Type                                             | Description | Notes      |
-| --------- | ------------------------------------------------ | ----------- | ---------- |
-| **Extra** | Pointer to **map[string]map[string]interface{}** |             | [optional] |
+| Name      | Type                                  | Description | Notes      |
+| --------- | ------------------------------------- | ----------- | ---------- |
+| **Extra** | Pointer to **map[string]interface{}** |             | [optional] |
 
 ## Methods
 
@@ -27,20 +27,20 @@ guarantee that properties required by API are set
 
 ### GetExtra
 
-`func (o *Headers) GetExtra() map[string]map[string]interface{}`
+`func (o *Headers) GetExtra() map[string]interface{}`
 
 GetExtra returns the Extra field if non-nil, zero value otherwise.
 
 ### GetExtraOk
 
-`func (o *Headers) GetExtraOk() (*map[string]map[string]interface{}, bool)`
+`func (o *Headers) GetExtraOk() (*map[string]interface{}, bool)`
 
 GetExtraOk returns a tuple with the Extra field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetExtra
 
-`func (o *Headers) SetExtra(v map[string]map[string]interface{})`
+`func (o *Headers) SetExtra(v map[string]interface{})`
 
 SetExtra sets Extra field to given value.
 

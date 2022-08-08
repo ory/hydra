@@ -86,7 +86,7 @@ type adminCreateOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route POST /admin/clients v1 adminCreateOAuth2Client
+// swagger:route POST /admin/clients v0alpha2 adminCreateOAuth2Client
 //
 // Create an OAuth 2.0 Client
 //
@@ -124,7 +124,7 @@ type dynamicClientRegistrationCreateOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route POST /oauth2/register v1 dynamicClientRegistrationCreateOAuth2Client
+// swagger:route POST /oauth2/register v0alpha2 dynamicClientRegistrationCreateOAuth2Client
 //
 // Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -233,7 +233,7 @@ type adminUpdateOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route PUT /admin/clients/{id} v1 adminUpdateOAuth2Client
+// swagger:route PUT /admin/clients/{id} v0alpha2 adminUpdateOAuth2Client
 //
 // Update an OAuth 2.0 Client
 //
@@ -301,7 +301,7 @@ type dynamicClientRegistrationUpdateOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route PUT /oauth2/register/{id} v1 dynamicClientRegistrationUpdateOAuth2Client
+// swagger:route PUT /oauth2/register/{id} v0alpha2 dynamicClientRegistrationUpdateOAuth2Client
 //
 // Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -388,7 +388,7 @@ type adminPatchOAuth2Client struct {
 	Body openapix.JSONPatchDocument
 }
 
-// swagger:route PATCH /admin/clients/{id} v1 adminPatchOAuth2Client
+// swagger:route PATCH /admin/clients/{id} v0alpha2 adminPatchOAuth2Client
 //
 // Patch an OAuth 2.0 Client
 //
@@ -470,7 +470,7 @@ type adminListOAuth2Clients struct {
 	Owner string `json:"owner"`
 }
 
-// swagger:route GET /admin/clients v1 adminListOAuth2Clients
+// swagger:route GET /admin/clients v0alpha2 adminListOAuth2Clients
 //
 // List OAuth 2.0 Clients
 //
@@ -539,7 +539,7 @@ type adminGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /admin/clients/{id} v1 adminGetOAuth2Client
+// swagger:route GET /admin/clients/{id} v0alpha2 adminGetOAuth2Client
 //
 // Get an OAuth 2.0 Client
 //
@@ -580,7 +580,7 @@ type dynamicClientRegistrationGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /oauth2/register/{id} v1 dynamicClientRegistrationGetOAuth2Client
+// swagger:route GET /oauth2/register/{id} v0alpha2 dynamicClientRegistrationGetOAuth2Client
 //
 // Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -643,7 +643,7 @@ type adminDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /admin/clients/{id} v1 adminDeleteOAuth2Client
+// swagger:route DELETE /admin/clients/{id} v0alpha2 adminDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //
@@ -781,7 +781,7 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /oauth2/register/{id} v1 dynamicClientRegistrationDeleteOAuth2Client
+// swagger:route DELETE /oauth2/register/{id} v0alpha2 dynamicClientRegistrationDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //

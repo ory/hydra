@@ -117,7 +117,7 @@ Please be aware that this command does not update existing clients. If the clien
 
 			for src, cc := range clients {
 				for _, c := range cc {
-					result, _, err := m.V1Api.AdminCreateOAuth2Client(cmd.Context()).OAuth2Client(c).Execute() //nolint:bodyclose
+					result, _, err := m.V0alpha2Api.AdminCreateOAuth2Client(cmd.Context()).OAuth2Client(c).Execute() //nolint:bodyclose
 					if err != nil {
 						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
 						continue

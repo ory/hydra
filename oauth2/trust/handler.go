@@ -76,7 +76,7 @@ type adminTrustOAuth2JwtGrantIssuer struct {
 	Body adminTrustOAuth2JwtGrantIssuerBody
 }
 
-// swagger:route POST /admin/trust/grants/jwt-bearer/issuers v1 adminTrustOAuth2JwtGrantIssuer
+// swagger:route POST /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminTrustOAuth2JwtGrantIssuer
 //
 // Trust an OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -139,7 +139,7 @@ type adminGetTrustedOAuth2JwtGrantIssuer struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} v1 adminGetTrustedOAuth2JwtGrantIssuer
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminGetTrustedOAuth2JwtGrantIssuer
 //
 // Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -177,7 +177,7 @@ type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} v1 adminDeleteTrustedOAuth2JwtGrantIssuer
+// swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminDeleteTrustedOAuth2JwtGrantIssuer
 //
 // Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -228,7 +228,7 @@ type adminListTrustedOAuth2JwtGrantIssuers struct {
 	Offset int `json:"offset"`
 }
 
-// swagger:route GET /admin/trust/grants/jwt-bearer/issuers v1 adminListTrustedOAuth2JwtGrantIssuers
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminListTrustedOAuth2JwtGrantIssuers
 //
 // List Trusted OAuth2 JWT Bearer Grant Type Issuers
 //

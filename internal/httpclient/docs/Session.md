@@ -9,7 +9,7 @@
 | **ConsentChallenge**      | Pointer to **string**                               |             | [optional] |
 | **ExcludeNotBeforeClaim** | Pointer to **bool**                                 |             | [optional] |
 | **ExpiresAt**             | Pointer to [**map[string]time.Time**](time.Time.md) |             | [optional] |
-| **Extra**                 | Pointer to **map[string]map[string]interface{}**    |             | [optional] |
+| **Extra**                 | Pointer to **map[string]interface{}**               |             | [optional] |
 | **Headers**               | Pointer to [**Headers**](Headers.md)                |             | [optional] |
 | **IdTokenClaims**         | Pointer to [**IDTokenClaims**](IDTokenClaims.md)    |             | [optional] |
 | **Kid**                   | Pointer to **string**                               |             | [optional] |
@@ -167,20 +167,20 @@ HasExpiresAt returns a boolean if a field has been set.
 
 ### GetExtra
 
-`func (o *Session) GetExtra() map[string]map[string]interface{}`
+`func (o *Session) GetExtra() map[string]interface{}`
 
 GetExtra returns the Extra field if non-nil, zero value otherwise.
 
 ### GetExtraOk
 
-`func (o *Session) GetExtraOk() (*map[string]map[string]interface{}, bool)`
+`func (o *Session) GetExtraOk() (*map[string]interface{}, bool)`
 
 GetExtraOk returns a tuple with the Extra field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetExtra
 
-`func (o *Session) SetExtra(v map[string]map[string]interface{})`
+`func (o *Session) SetExtra(v map[string]interface{})`
 
 SetExtra sets Extra field to given value.
 

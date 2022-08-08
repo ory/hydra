@@ -101,7 +101,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, 
 
 			secret := flagx.MustGetString(cmd, flagClientSecret)
 			//nolint:bodyclose
-			client, _, err := m.V1Api.AdminCreateOAuth2Client(cmd.Context()).OAuth2Client(clientFromFlags(cmd)).Execute()
+			client, _, err := m.V0alpha2Api.AdminCreateOAuth2Client(cmd.Context()).OAuth2Client(clientFromFlags(cmd)).Execute()
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}

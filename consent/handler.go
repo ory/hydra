@@ -99,7 +99,7 @@ type adminRevokeOAuth2ConsentSessions struct {
 	All bool `json:"all"`
 }
 
-// swagger:route DELETE /admin/oauth2/auth/sessions/consent v1 adminRevokeOAuth2ConsentSessions
+// swagger:route DELETE /admin/oauth2/auth/sessions/consent v0alpha2 adminRevokeOAuth2ConsentSessions
 //
 // Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
@@ -156,7 +156,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 	Subject string `json:"subject"`
 }
 
-// swagger:route GET /admin/oauth2/auth/sessions/consent v1 adminListOAuth2SubjectConsentSessions
+// swagger:route GET /admin/oauth2/auth/sessions/consent v0alpha2 adminListOAuth2SubjectConsentSessions
 //
 // List OAuth 2.0 Consent Sessions of a Subject
 //
@@ -224,7 +224,7 @@ type adminRevokeOAuth2LoginSessions struct {
 	Subject string `json:"subject"`
 }
 
-// swagger:route DELETE /admin/oauth2/auth/sessions/login v1 adminRevokeOAuth2LoginSessions
+// swagger:route DELETE /admin/oauth2/auth/sessions/login v0alpha2 adminRevokeOAuth2LoginSessions
 //
 // Invalidates All OAuth 2.0 Login Sessions of a Certain User
 //
@@ -265,7 +265,7 @@ type adminGetOAuth2LoginRequest struct {
 	Challenge string `json:"login_challenge"`
 }
 
-// swagger:route GET /admin/oauth2/auth/requests/login v1 adminGetOAuth2LoginRequest
+// swagger:route GET /admin/oauth2/auth/requests/login v0alpha2 adminGetOAuth2LoginRequest
 //
 // Get an OAuth 2.0 Login Request
 //
@@ -327,7 +327,7 @@ type adminAcceptOAuth2LoginRequest struct {
 	Body HandledLoginRequest
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/login/accept v1 adminAcceptOAuth2LoginRequest
+// swagger:route PUT /admin/oauth2/auth/requests/login/accept v0alpha2 adminAcceptOAuth2LoginRequest
 //
 // Accept an OAuth 2.0 Login Request
 //
@@ -427,7 +427,7 @@ type adminRejectOAuth2LoginRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/login/reject v1 adminRejectOAuth2LoginRequest
+// swagger:route PUT /admin/oauth2/auth/requests/login/reject v0alpha2 adminRejectOAuth2LoginRequest
 //
 // Reject an OAuth 2.0 Login Request
 //
@@ -509,7 +509,7 @@ type adminGetOAuth2ConsentRequest struct {
 	Challenge string `json:"consent_challenge"`
 }
 
-// swagger:route GET /admin/oauth2/auth/requests/consent v1 adminGetOAuth2ConsentRequest
+// swagger:route GET /admin/oauth2/auth/requests/consent v0alpha2 adminGetOAuth2ConsentRequest
 //
 // Get OAuth 2.0 Consent Request Information
 //
@@ -580,7 +580,7 @@ type adminAcceptOAuth2ConsentRequest struct {
 	Body AcceptOAuth2ConsentRequest
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/consent/accept v1 adminAcceptOAuth2ConsentRequest
+// swagger:route PUT /admin/oauth2/auth/requests/consent/accept v0alpha2 adminAcceptOAuth2ConsentRequest
 //
 // Accept an OAuth 2.0 Consent Request
 //
@@ -669,7 +669,7 @@ type adminRejectOAuth2ConsentRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/consent/reject v1 adminRejectOAuth2ConsentRequest
+// swagger:route PUT /admin/oauth2/auth/requests/consent/reject v0alpha2 adminRejectOAuth2ConsentRequest
 //
 // Reject an OAuth 2.0 Consent Request
 //
@@ -755,7 +755,7 @@ type adminAcceptOAuth2LogoutRequest struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/logout/accept v1 adminAcceptOAuth2LogoutRequest
+// swagger:route PUT /admin/oauth2/auth/requests/logout/accept v0alpha2 adminAcceptOAuth2LogoutRequest
 //
 // Accept an OAuth 2.0 Logout Request
 //
@@ -798,7 +798,7 @@ type adminRejectOAuth2LogoutRequest struct {
 	Body RequestDeniedError
 }
 
-// swagger:route PUT /admin/oauth2/auth/requests/logout/reject v1 adminRejectOAuth2LogoutRequest
+// swagger:route PUT /admin/oauth2/auth/requests/logout/reject v0alpha2 adminRejectOAuth2LogoutRequest
 //
 // Reject an OAuth 2.0 Logout Request
 //
@@ -836,7 +836,7 @@ type adminGetOAuth2LogoutRequest struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:route GET /admin/oauth2/auth/requests/logout v1 adminGetOAuth2LogoutRequest
+// swagger:route GET /admin/oauth2/auth/requests/logout v0alpha2 adminGetOAuth2LogoutRequest
 //
 // Get an OAuth 2.0 Logout Request
 //

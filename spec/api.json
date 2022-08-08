@@ -19,6 +19,100 @@
       }
     },
     "schemas": {
+      "DefaultSession": {
+        "description": "IDTokenSession is a session container for the id token",
+        "properties": {
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Headers": {
+        "description": "Headers is the jwt headers",
+        "properties": {
+          "extra": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "IDTokenClaims": {
+        "description": "IDTokenClaims represent the claims used in open id connect requests",
+        "properties": {
+          "acr": {
+            "type": "string"
+          },
+          "amr": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "at_hash": {
+            "type": "string"
+          },
+          "aud": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "auth_time": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "c_hash": {
+            "type": "string"
+          },
+          "exp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "ext": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "iat": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "iss": {
+            "type": "string"
+          },
+          "jti": {
+            "type": "string"
+          },
+          "nonce": {
+            "type": "string"
+          },
+          "rat": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "sub": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
       },
@@ -52,6 +146,52 @@
         "format": "uuid4",
         "nullable": true,
         "type": "string"
+      },
+      "Session": {
+        "properties": {
+          "allowed_top_level_claims": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "consent_challenge": {
+            "type": "string"
+          },
+          "exclude_not_before_claim": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "kid": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
       },
       "StringSliceJSONFormat": {
         "items": {
@@ -578,6 +718,37 @@
         "format": "date-time",
         "title": "NullTime implements sql.NullTime functionality.",
         "type": "string"
+      },
+      "oAuth2AccessRequest": {
+        "properties": {
+          "client_id": {
+            "description": "ClientID is the identifier of the OAuth 2.0 client.",
+            "type": "string"
+          },
+          "grant_types": {
+            "description": "GrantTypes is the requests grant types.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_audience": {
+            "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_scopes": {
+            "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "Requester is a token endpoint's request context.",
+        "type": "object"
       },
       "oAuth2ApiError": {
         "description": "An API error caused by Ory's OAuth 2.0 APIs.",
@@ -1329,6 +1500,12 @@
             },
             "type": "array"
           },
+          "requester": {
+            "$ref": "#/components/schemas/oAuth2AccessRequest"
+          },
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          },
           "subject": {
             "description": "Subject is the identifier of the authenticated end-user.",
             "type": "string"
@@ -1562,7 +1739,7 @@
         },
         "summary": "Discover JSON Web Keys",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -1594,7 +1771,7 @@
         },
         "summary": "OpenID Connect Discovery",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -1659,7 +1836,7 @@
         },
         "summary": "List OAuth 2.0 Clients",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "post": {
@@ -1700,7 +1877,7 @@
         },
         "summary": "Create an OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -1736,7 +1913,7 @@
         },
         "summary": "Deletes an OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -1777,7 +1954,7 @@
         },
         "summary": "Get an OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "patch": {
@@ -1829,7 +2006,7 @@
         },
         "summary": "Patch an OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "put": {
@@ -1881,7 +2058,7 @@
         },
         "summary": "Update an OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -1969,7 +2146,7 @@
         },
         "summary": "Delete a JSON Web Key Set",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -2010,7 +2187,7 @@
         },
         "summary": "Retrieve a JSON Web Key Set",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "post": {
@@ -2062,7 +2239,7 @@
         },
         "summary": "Generate a New JSON Web Key",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "put": {
@@ -2113,7 +2290,7 @@
         },
         "summary": "Update a JSON Web Key Set",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2158,7 +2335,7 @@
         },
         "summary": "Delete a JSON Web Key",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -2208,7 +2385,7 @@
         },
         "summary": "Fetch a JSON Web Key",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "put": {
@@ -2268,7 +2445,7 @@
         },
         "summary": "Update a JSON Web Key",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2320,7 +2497,7 @@
         },
         "summary": "Get OAuth 2.0 Consent Request Information",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2372,7 +2549,7 @@
         },
         "summary": "Accept an OAuth 2.0 Consent Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2424,7 +2601,7 @@
         },
         "summary": "Reject an OAuth 2.0 Consent Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2476,7 +2653,7 @@
         },
         "summary": "Get an OAuth 2.0 Login Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2528,7 +2705,7 @@
         },
         "summary": "Accept an OAuth 2.0 Login Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2580,7 +2757,7 @@
         },
         "summary": "Reject an OAuth 2.0 Login Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2632,7 +2809,7 @@
         },
         "summary": "Get an OAuth 2.0 Logout Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2674,7 +2851,7 @@
         },
         "summary": "Accept an OAuth 2.0 Logout Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2724,7 +2901,7 @@
         },
         "summary": "Reject an OAuth 2.0 Logout Request",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2776,7 +2953,7 @@
         },
         "summary": "Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -2833,7 +3010,7 @@
         },
         "summary": "List OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2869,7 +3046,7 @@
         },
         "summary": "Invalidates All OAuth 2.0 Login Sessions of a Certain User",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2928,7 +3105,7 @@
         },
         "summary": "Introspect OAuth2 Access or Refresh Tokens",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -2963,7 +3140,7 @@
         },
         "summary": "Delete OAuth2 Access Tokens from a Client",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3039,7 +3216,7 @@
         },
         "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "post": {
@@ -3079,7 +3256,7 @@
         },
         "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3115,7 +3292,7 @@
         },
         "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -3156,7 +3333,7 @@
         },
         "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3260,7 +3437,7 @@
         },
         "summary": "The OAuth 2.0 Authorize Endpoint",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3303,7 +3480,7 @@
         },
         "summary": "Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3344,7 +3521,7 @@
         ],
         "summary": "Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "get": {
@@ -3390,7 +3567,7 @@
         ],
         "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       },
       "put": {
@@ -3447,7 +3624,7 @@
         ],
         "summary": "Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3501,7 +3678,7 @@
         ],
         "summary": "Revoke an OAuth2 Access or Refresh Token",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3516,7 +3693,7 @@
         },
         "summary": "OpenID Connect Front- or Back-channel Enabled Logout",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3593,7 +3770,7 @@
         ],
         "summary": "The OAuth 2.0 Token Endpoint",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },
@@ -3630,7 +3807,7 @@
         ],
         "summary": "OpenID Connect Userinfo",
         "tags": [
-          "v1"
+          "v0alpha2"
         ]
       }
     },

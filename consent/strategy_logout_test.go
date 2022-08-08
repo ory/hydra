@@ -134,12 +134,12 @@ func TestLogoutFlows(t *testing.T) {
 				defer wg.Done()
 			}
 
-			res, _, err := adminApi.V1Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			res, _, err := adminApi.V0alpha2Api.AdminGetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
 			if cb != nil {
 				cb(t, res, err)
 			}
 
-			v, _, err := adminApi.V1Api.AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			v, _, err := adminApi.V0alpha2Api.AdminAcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
 			require.NoError(t, err)
 			require.NotEmpty(t, v.RedirectTo)
 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)

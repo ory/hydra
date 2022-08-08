@@ -47,7 +47,7 @@ func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
 
 			clients := make([]hydra.OAuth2Client, 0, len(args))
 			for _, id := range args {
-				client, _, err := m.V1Api.AdminGetOAuth2Client(cmd.Context(), id).Execute() //nolint:bodyclose
+				client, _, err := m.V0alpha2Api.AdminGetOAuth2Client(cmd.Context(), id).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}

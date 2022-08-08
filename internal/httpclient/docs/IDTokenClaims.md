@@ -2,22 +2,22 @@
 
 ## Properties
 
-| Name         | Type                                             | Description | Notes      |
-| ------------ | ------------------------------------------------ | ----------- | ---------- |
-| **Acr**      | Pointer to **string**                            |             | [optional] |
-| **Amr**      | Pointer to **[]string**                          |             | [optional] |
-| **AtHash**   | Pointer to **string**                            |             | [optional] |
-| **Aud**      | Pointer to **[]string**                          |             | [optional] |
-| **AuthTime** | Pointer to **time.Time**                         |             | [optional] |
-| **CHash**    | Pointer to **string**                            |             | [optional] |
-| **Exp**      | Pointer to **time.Time**                         |             | [optional] |
-| **Ext**      | Pointer to **map[string]map[string]interface{}** |             | [optional] |
-| **Iat**      | Pointer to **time.Time**                         |             | [optional] |
-| **Iss**      | Pointer to **string**                            |             | [optional] |
-| **Jti**      | Pointer to **string**                            |             | [optional] |
-| **Nonce**    | Pointer to **string**                            |             | [optional] |
-| **Rat**      | Pointer to **time.Time**                         |             | [optional] |
-| **Sub**      | Pointer to **string**                            |             | [optional] |
+| Name         | Type                                  | Description | Notes      |
+| ------------ | ------------------------------------- | ----------- | ---------- |
+| **Acr**      | Pointer to **string**                 |             | [optional] |
+| **Amr**      | Pointer to **[]string**               |             | [optional] |
+| **AtHash**   | Pointer to **string**                 |             | [optional] |
+| **Aud**      | Pointer to **[]string**               |             | [optional] |
+| **AuthTime** | Pointer to **time.Time**              |             | [optional] |
+| **CHash**    | Pointer to **string**                 |             | [optional] |
+| **Exp**      | Pointer to **time.Time**              |             | [optional] |
+| **Ext**      | Pointer to **map[string]interface{}** |             | [optional] |
+| **Iat**      | Pointer to **time.Time**              |             | [optional] |
+| **Iss**      | Pointer to **string**                 |             | [optional] |
+| **Jti**      | Pointer to **string**                 |             | [optional] |
+| **Nonce**    | Pointer to **string**                 |             | [optional] |
+| **Rat**      | Pointer to **time.Time**              |             | [optional] |
+| **Sub**      | Pointer to **string**                 |             | [optional] |
 
 ## Methods
 
@@ -215,20 +215,20 @@ HasExp returns a boolean if a field has been set.
 
 ### GetExt
 
-`func (o *IDTokenClaims) GetExt() map[string]map[string]interface{}`
+`func (o *IDTokenClaims) GetExt() map[string]interface{}`
 
 GetExt returns the Ext field if non-nil, zero value otherwise.
 
 ### GetExtOk
 
-`func (o *IDTokenClaims) GetExtOk() (*map[string]map[string]interface{}, bool)`
+`func (o *IDTokenClaims) GetExtOk() (*map[string]interface{}, bool)`
 
 GetExtOk returns a tuple with the Ext field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetExt
 
-`func (o *IDTokenClaims) SetExt(v map[string]map[string]interface{})`
+`func (o *IDTokenClaims) SetExt(v map[string]interface{})`
 
 SetExt sets Ext field to given value.
 

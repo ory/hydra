@@ -1,51 +1,51 @@
-# \V1Api
+# \V0alpha2Api
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                  | HTTP request                                           | Description                                                                                            |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| [**AdminAcceptOAuth2ConsentRequest**](V1Api.md#AdminAcceptOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                                    |
-| [**AdminAcceptOAuth2LoginRequest**](V1Api.md#AdminAcceptOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                                      |
-| [**AdminAcceptOAuth2LogoutRequest**](V1Api.md#AdminAcceptOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                                     |
-| [**AdminCreateJsonWebKeySet**](V1Api.md#AdminCreateJsonWebKeySet)                                       | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                                            |
-| [**AdminCreateOAuth2Client**](V1Api.md#AdminCreateOAuth2Client)                                         | **Post** /admin/clients                                | Create an OAuth 2.0 Client                                                                             |
-| [**AdminDeleteJsonWebKey**](V1Api.md#AdminDeleteJsonWebKey)                                             | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                                  |
-| [**AdminDeleteJsonWebKeySet**](V1Api.md#AdminDeleteJsonWebKeySet)                                       | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                              |
-| [**AdminDeleteOAuth2Client**](V1Api.md#AdminDeleteOAuth2Client)                                         | **Delete** /admin/clients/{id}                         | Deletes an OAuth 2.0 Client                                                                            |
-| [**AdminDeleteOAuth2Token**](V1Api.md#AdminDeleteOAuth2Token)                                           | **Delete** /admin/oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                              |
-| [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer)           | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                   |
-| [**AdminGetJsonWebKey**](V1Api.md#AdminGetJsonWebKey)                                                   | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                                   |
-| [**AdminGetJsonWebKeySet**](V1Api.md#AdminGetJsonWebKeySet)                                             | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                                            |
-| [**AdminGetOAuth2Client**](V1Api.md#AdminGetOAuth2Client)                                               | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                                |
-| [**AdminGetOAuth2ConsentRequest**](V1Api.md#AdminGetOAuth2ConsentRequest)                               | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                              |
-| [**AdminGetOAuth2LoginRequest**](V1Api.md#AdminGetOAuth2LoginRequest)                                   | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                                         |
-| [**AdminGetOAuth2LogoutRequest**](V1Api.md#AdminGetOAuth2LogoutRequest)                                 | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                                        |
-| [**AdminGetTrustedOAuth2JwtGrantIssuer**](V1Api.md#AdminGetTrustedOAuth2JwtGrantIssuer)                 | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                      |
-| [**AdminIntrospectOAuth2Token**](V1Api.md#AdminIntrospectOAuth2Token)                                   | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                                             |
-| [**AdminListOAuth2Clients**](V1Api.md#AdminListOAuth2Clients)                                           | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                                 |
-| [**AdminListOAuth2SubjectConsentSessions**](V1Api.md#AdminListOAuth2SubjectConsentSessions)             | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                                           |
-| [**AdminListTrustedOAuth2JwtGrantIssuers**](V1Api.md#AdminListTrustedOAuth2JwtGrantIssuers)             | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                                      |
-| [**AdminPatchOAuth2Client**](V1Api.md#AdminPatchOAuth2Client)                                           | **Patch** /admin/clients/{id}                          | Patch an OAuth 2.0 Client                                                                              |
-| [**AdminRejectOAuth2ConsentRequest**](V1Api.md#AdminRejectOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                                    |
-| [**AdminRejectOAuth2LoginRequest**](V1Api.md#AdminRejectOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                                      |
-| [**AdminRejectOAuth2LogoutRequest**](V1Api.md#AdminRejectOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                                     |
-| [**AdminRevokeOAuth2ConsentSessions**](V1Api.md#AdminRevokeOAuth2ConsentSessions)                       | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client                        |
-| [**AdminRevokeOAuth2LoginSessions**](V1Api.md#AdminRevokeOAuth2LoginSessions)                           | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                                             |
-| [**AdminTrustOAuth2JwtGrantIssuer**](V1Api.md#AdminTrustOAuth2JwtGrantIssuer)                           | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                                           |
-| [**AdminUpdateJsonWebKey**](V1Api.md#AdminUpdateJsonWebKey)                                             | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                                  |
-| [**AdminUpdateJsonWebKeySet**](V1Api.md#AdminUpdateJsonWebKeySet)                                       | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                              |
-| [**AdminUpdateOAuth2Client**](V1Api.md#AdminUpdateOAuth2Client)                                         | **Put** /admin/clients/{id}                            | Update an OAuth 2.0 Client                                                                             |
-| [**DiscoverJsonWebKeys**](V1Api.md#DiscoverJsonWebKeys)                                                 | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                                 |
-| [**DiscoverOidcConfiguration**](V1Api.md#DiscoverOidcConfiguration)                                     | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                               |
-| [**DynamicClientRegistrationCreateOAuth2Client**](V1Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                              | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
-| [**DynamicClientRegistrationDeleteOAuth2Client**](V1Api.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}                       | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
-| [**DynamicClientRegistrationGetOAuth2Client**](V1Api.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}                          | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
-| [**DynamicClientRegistrationUpdateOAuth2Client**](V1Api.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}                          | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
-| [**GetOidcUserInfo**](V1Api.md#GetOidcUserInfo)                                                         | **Get** /userinfo                                      | OpenID Connect Userinfo                                                                                |
-| [**PerformOAuth2AuthorizationFlow**](V1Api.md#PerformOAuth2AuthorizationFlow)                           | **Get** /oauth2/auth                                   | The OAuth 2.0 Authorize Endpoint                                                                       |
-| [**PerformOAuth2TokenFlow**](V1Api.md#PerformOAuth2TokenFlow)                                           | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                                                           |
-| [**PerformOidcFrontOrBackChannelLogout**](V1Api.md#PerformOidcFrontOrBackChannelLogout)                 | **Get** /oauth2/sessions/logout                        | OpenID Connect Front- or Back-channel Enabled Logout                                                   |
-| [**RevokeOAuth2Token**](V1Api.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                                | Revoke an OAuth2 Access or Refresh Token                                                               |
+| Method                                                                                                        | HTTP request                                           | Description                                                                                            |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| [**AdminAcceptOAuth2ConsentRequest**](V0alpha2Api.md#AdminAcceptOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                                    |
+| [**AdminAcceptOAuth2LoginRequest**](V0alpha2Api.md#AdminAcceptOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                                      |
+| [**AdminAcceptOAuth2LogoutRequest**](V0alpha2Api.md#AdminAcceptOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                                     |
+| [**AdminCreateJsonWebKeySet**](V0alpha2Api.md#AdminCreateJsonWebKeySet)                                       | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                                            |
+| [**AdminCreateOAuth2Client**](V0alpha2Api.md#AdminCreateOAuth2Client)                                         | **Post** /admin/clients                                | Create an OAuth 2.0 Client                                                                             |
+| [**AdminDeleteJsonWebKey**](V0alpha2Api.md#AdminDeleteJsonWebKey)                                             | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                                  |
+| [**AdminDeleteJsonWebKeySet**](V0alpha2Api.md#AdminDeleteJsonWebKeySet)                                       | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                              |
+| [**AdminDeleteOAuth2Client**](V0alpha2Api.md#AdminDeleteOAuth2Client)                                         | **Delete** /admin/clients/{id}                         | Deletes an OAuth 2.0 Client                                                                            |
+| [**AdminDeleteOAuth2Token**](V0alpha2Api.md#AdminDeleteOAuth2Token)                                           | **Delete** /admin/oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                              |
+| [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer)           | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                   |
+| [**AdminGetJsonWebKey**](V0alpha2Api.md#AdminGetJsonWebKey)                                                   | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                                   |
+| [**AdminGetJsonWebKeySet**](V0alpha2Api.md#AdminGetJsonWebKeySet)                                             | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                                            |
+| [**AdminGetOAuth2Client**](V0alpha2Api.md#AdminGetOAuth2Client)                                               | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                                |
+| [**AdminGetOAuth2ConsentRequest**](V0alpha2Api.md#AdminGetOAuth2ConsentRequest)                               | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                              |
+| [**AdminGetOAuth2LoginRequest**](V0alpha2Api.md#AdminGetOAuth2LoginRequest)                                   | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                                         |
+| [**AdminGetOAuth2LogoutRequest**](V0alpha2Api.md#AdminGetOAuth2LogoutRequest)                                 | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                                        |
+| [**AdminGetTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminGetTrustedOAuth2JwtGrantIssuer)                 | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                      |
+| [**AdminIntrospectOAuth2Token**](V0alpha2Api.md#AdminIntrospectOAuth2Token)                                   | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                                             |
+| [**AdminListOAuth2Clients**](V0alpha2Api.md#AdminListOAuth2Clients)                                           | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                                 |
+| [**AdminListOAuth2SubjectConsentSessions**](V0alpha2Api.md#AdminListOAuth2SubjectConsentSessions)             | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                                           |
+| [**AdminListTrustedOAuth2JwtGrantIssuers**](V0alpha2Api.md#AdminListTrustedOAuth2JwtGrantIssuers)             | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                                      |
+| [**AdminPatchOAuth2Client**](V0alpha2Api.md#AdminPatchOAuth2Client)                                           | **Patch** /admin/clients/{id}                          | Patch an OAuth 2.0 Client                                                                              |
+| [**AdminRejectOAuth2ConsentRequest**](V0alpha2Api.md#AdminRejectOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                                    |
+| [**AdminRejectOAuth2LoginRequest**](V0alpha2Api.md#AdminRejectOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                                      |
+| [**AdminRejectOAuth2LogoutRequest**](V0alpha2Api.md#AdminRejectOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                                     |
+| [**AdminRevokeOAuth2ConsentSessions**](V0alpha2Api.md#AdminRevokeOAuth2ConsentSessions)                       | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client                        |
+| [**AdminRevokeOAuth2LoginSessions**](V0alpha2Api.md#AdminRevokeOAuth2LoginSessions)                           | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                                             |
+| [**AdminTrustOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminTrustOAuth2JwtGrantIssuer)                           | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                                           |
+| [**AdminUpdateJsonWebKey**](V0alpha2Api.md#AdminUpdateJsonWebKey)                                             | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                                  |
+| [**AdminUpdateJsonWebKeySet**](V0alpha2Api.md#AdminUpdateJsonWebKeySet)                                       | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                              |
+| [**AdminUpdateOAuth2Client**](V0alpha2Api.md#AdminUpdateOAuth2Client)                                         | **Put** /admin/clients/{id}                            | Update an OAuth 2.0 Client                                                                             |
+| [**DiscoverJsonWebKeys**](V0alpha2Api.md#DiscoverJsonWebKeys)                                                 | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                                 |
+| [**DiscoverOidcConfiguration**](V0alpha2Api.md#DiscoverOidcConfiguration)                                     | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                               |
+| [**DynamicClientRegistrationCreateOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                              | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
+| [**DynamicClientRegistrationDeleteOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}                       | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
+| [**DynamicClientRegistrationGetOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}                          | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
+| [**DynamicClientRegistrationUpdateOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}                          | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
+| [**GetOidcUserInfo**](V0alpha2Api.md#GetOidcUserInfo)                                                         | **Get** /userinfo                                      | OpenID Connect Userinfo                                                                                |
+| [**PerformOAuth2AuthorizationFlow**](V0alpha2Api.md#PerformOAuth2AuthorizationFlow)                           | **Get** /oauth2/auth                                   | The OAuth 2.0 Authorize Endpoint                                                                       |
+| [**PerformOAuth2TokenFlow**](V0alpha2Api.md#PerformOAuth2TokenFlow)                                           | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                                                           |
+| [**PerformOidcFrontOrBackChannelLogout**](V0alpha2Api.md#PerformOidcFrontOrBackChannelLogout)                 | **Get** /oauth2/sessions/logout                        | OpenID Connect Front- or Back-channel Enabled Logout                                                   |
+| [**RevokeOAuth2Token**](V0alpha2Api.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                                | Revoke an OAuth2 Access or Refresh Token                                                               |
 
 ## AdminAcceptOAuth2ConsentRequest
 
@@ -72,13 +72,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminAcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminAcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminAcceptOAuth2ConsentRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminAcceptOAuth2ConsentRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminAcceptOAuth2ConsentRequest`: SuccessfulOAuth2RequestResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminAcceptOAuth2ConsentRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminAcceptOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -137,13 +137,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminAcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminAcceptOAuth2LoginRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminAcceptOAuth2LoginRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminAcceptOAuth2LoginRequest`: SuccessfulOAuth2RequestResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminAcceptOAuth2LoginRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminAcceptOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -201,13 +201,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminAcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminAcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminAcceptOAuth2LogoutRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminAcceptOAuth2LogoutRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminAcceptOAuth2LogoutRequest`: SuccessfulOAuth2RequestResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminAcceptOAuth2LogoutRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminAcceptOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -265,13 +265,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminCreateJsonWebKeySet(context.Background(), set).AdminCreateJsonWebKeySetBody(adminCreateJsonWebKeySetBody).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminCreateJsonWebKeySet(context.Background(), set).AdminCreateJsonWebKeySetBody(adminCreateJsonWebKeySetBody).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminCreateJsonWebKeySet``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminCreateJsonWebKeySet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminCreateJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminCreateJsonWebKeySet`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminCreateJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -334,13 +334,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminCreateOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminCreateOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminCreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminCreateOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminCreateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -397,9 +397,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminDeleteJsonWebKey(context.Background(), set, kid).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminDeleteJsonWebKey(context.Background(), set, kid).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminDeleteJsonWebKey``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteJsonWebKey``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -462,9 +462,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminDeleteJsonWebKeySet(context.Background(), set).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminDeleteJsonWebKeySet(context.Background(), set).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminDeleteJsonWebKeySet``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteJsonWebKeySet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -526,9 +526,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminDeleteOAuth2Client(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminDeleteOAuth2Client(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminDeleteOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -590,9 +590,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminDeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminDeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminDeleteOAuth2Token``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteOAuth2Token``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -650,9 +650,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminDeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminDeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminDeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -715,13 +715,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetJsonWebKey(context.Background(), set, kid).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetJsonWebKey(context.Background(), set, kid).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetJsonWebKey``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetJsonWebKey``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetJsonWebKey`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetJsonWebKey`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -782,13 +782,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetJsonWebKeySet(context.Background(), set).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetJsonWebKeySet(context.Background(), set).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetJsonWebKeySet``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetJsonWebKeySet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetJsonWebKeySet`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -848,13 +848,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetOAuth2Client(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetOAuth2Client(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -915,13 +915,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetOAuth2ConsentRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetOAuth2ConsentRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetOAuth2ConsentRequest`: OAuth2ConsentRequest
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetOAuth2ConsentRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -978,13 +978,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetOAuth2LoginRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetOAuth2LoginRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetOAuth2LoginRequest`: OAuth2LoginRequest
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetOAuth2LoginRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -1041,13 +1041,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetOAuth2LogoutRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetOAuth2LogoutRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetOAuth2LogoutRequest`: OAuth2LogoutRequest
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetOAuth2LogoutRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -1104,13 +1104,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminGetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminGetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminGetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminGetTrustedOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminGetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 
@@ -1172,13 +1172,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminIntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminIntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminIntrospectOAuth2Token``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminIntrospectOAuth2Token``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminIntrospectOAuth2Token`: IntrospectedOAuth2Token
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminIntrospectOAuth2Token`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminIntrospectOAuth2Token`: %v\n", resp)
 }
 ```
 
@@ -1239,13 +1239,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminListOAuth2Clients``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminListOAuth2Clients``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminListOAuth2Clients`: []OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminListOAuth2Clients`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminListOAuth2Clients`: %v\n", resp)
 }
 ```
 
@@ -1307,13 +1307,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminListOAuth2SubjectConsentSessions(context.Background()).Subject(subject).Link(link).XTotalCount(xTotalCount).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminListOAuth2SubjectConsentSessions(context.Background()).Subject(subject).Link(link).XTotalCount(xTotalCount).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminListOAuth2SubjectConsentSessions``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminListOAuth2SubjectConsentSessions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminListOAuth2SubjectConsentSessions`: []PreviousOAuth2ConsentSession
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminListOAuth2SubjectConsentSessions`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminListOAuth2SubjectConsentSessions`: %v\n", resp)
 }
 ```
 
@@ -1376,13 +1376,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Limit(limit).Offset(offset).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Limit(limit).Offset(offset).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminListTrustedOAuth2JwtGrantIssuers`: []TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
 }
 ```
 
@@ -1443,13 +1443,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminPatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminPatchOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminPatchOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminPatchOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminPatchOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminPatchOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -1513,13 +1513,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminRejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminRejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRejectOAuth2ConsentRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminRejectOAuth2ConsentRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminRejectOAuth2ConsentRequest`: SuccessfulOAuth2RequestResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminRejectOAuth2ConsentRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminRejectOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -1578,13 +1578,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminRejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminRejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRejectOAuth2LoginRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminRejectOAuth2LoginRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminRejectOAuth2LoginRequest`: SuccessfulOAuth2RequestResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminRejectOAuth2LoginRequest`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminRejectOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -1642,9 +1642,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminRejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminRejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRejectOAuth2LogoutRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminRejectOAuth2LogoutRequest``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -1705,9 +1705,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminRevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminRevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRevokeOAuth2ConsentSessions``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminRevokeOAuth2ConsentSessions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -1767,9 +1767,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminRevokeOAuth2LoginSessions(context.Background()).Subject(subject).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminRevokeOAuth2LoginSessions(context.Background()).Subject(subject).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminRevokeOAuth2LoginSessions``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminRevokeOAuth2LoginSessions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -1829,13 +1829,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(adminTrustOAuth2JwtGrantIssuerBody).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(adminTrustOAuth2JwtGrantIssuerBody).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminTrustOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminTrustOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminTrustOAuth2JwtGrantIssuer`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 
@@ -1894,13 +1894,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminUpdateJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminUpdateJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminUpdateJsonWebKey``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminUpdateJsonWebKey``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminUpdateJsonWebKey`: JsonWebKey
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminUpdateJsonWebKey`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminUpdateJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -1965,13 +1965,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminUpdateJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminUpdateJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminUpdateJsonWebKeySet``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminUpdateJsonWebKeySet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminUpdateJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminUpdateJsonWebKeySet`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminUpdateJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -2035,13 +2035,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.AdminUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+    resp, r, err := apiClient.V0alpha2Api.AdminUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.AdminUpdateOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminUpdateOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `AdminUpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.AdminUpdateOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminUpdateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -2102,13 +2102,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DiscoverJsonWebKeys(context.Background()).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DiscoverJsonWebKeys(context.Background()).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DiscoverJsonWebKeys``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DiscoverJsonWebKeys``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `DiscoverJsonWebKeys`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.DiscoverJsonWebKeys`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DiscoverJsonWebKeys`: %v\n", resp)
 }
 ```
 
@@ -2161,13 +2161,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DiscoverOidcConfiguration(context.Background()).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DiscoverOidcConfiguration(context.Background()).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DiscoverOidcConfiguration``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DiscoverOidcConfiguration``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `DiscoverOidcConfiguration`: OidcConfiguration
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.DiscoverOidcConfiguration`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DiscoverOidcConfiguration`: %v\n", resp)
 }
 ```
 
@@ -2223,13 +2223,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DynamicClientRegistrationCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DynamicClientRegistrationCreateOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `DynamicClientRegistrationCreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.DynamicClientRegistrationCreateOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -2287,9 +2287,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DynamicClientRegistrationDeleteOAuth2Client(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationDeleteOAuth2Client(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DynamicClientRegistrationDeleteOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationDeleteOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -2353,13 +2353,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DynamicClientRegistrationGetOAuth2Client(context.Background(), id).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationGetOAuth2Client(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DynamicClientRegistrationGetOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationGetOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `DynamicClientRegistrationGetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.DynamicClientRegistrationGetOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationGetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -2423,13 +2423,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.DynamicClientRegistrationUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.DynamicClientRegistrationUpdateOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `DynamicClientRegistrationUpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.DynamicClientRegistrationUpdateOAuth2Client`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -2491,13 +2491,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.GetOidcUserInfo(context.Background()).Execute()
+    resp, r, err := apiClient.V0alpha2Api.GetOidcUserInfo(context.Background()).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.GetOidcUserInfo``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.GetOidcUserInfo``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `GetOidcUserInfo`: OidcUserInfo
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.GetOidcUserInfo`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.GetOidcUserInfo`: %v\n", resp)
 }
 ```
 
@@ -2550,13 +2550,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.PerformOAuth2AuthorizationFlow(context.Background()).Execute()
+    resp, r, err := apiClient.V0alpha2Api.PerformOAuth2AuthorizationFlow(context.Background()).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.PerformOAuth2AuthorizationFlow``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.PerformOAuth2AuthorizationFlow``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `PerformOAuth2AuthorizationFlow`: OAuth2ApiError
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.PerformOAuth2AuthorizationFlow`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.PerformOAuth2AuthorizationFlow`: %v\n", resp)
 }
 ```
 
@@ -2615,13 +2615,13 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.PerformOAuth2TokenFlow(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+    resp, r, err := apiClient.V0alpha2Api.PerformOAuth2TokenFlow(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.PerformOAuth2TokenFlow``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.PerformOAuth2TokenFlow``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
     // response from `PerformOAuth2TokenFlow`: OAuth2TokenResponse
-    fmt.Fprintf(os.Stdout, "Response from `V1Api.PerformOAuth2TokenFlow`: %v\n", resp)
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.PerformOAuth2TokenFlow`: %v\n", resp)
 }
 ```
 
@@ -2680,9 +2680,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.PerformOidcFrontOrBackChannelLogout(context.Background()).Execute()
+    resp, r, err := apiClient.V0alpha2Api.PerformOidcFrontOrBackChannelLogout(context.Background()).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.PerformOidcFrontOrBackChannelLogout``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.PerformOidcFrontOrBackChannelLogout``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }
@@ -2738,9 +2738,9 @@ func main() {
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V1Api.RevokeOAuth2Token(context.Background()).Token(token).Execute()
+    resp, r, err := apiClient.V0alpha2Api.RevokeOAuth2Token(context.Background()).Token(token).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V1Api.RevokeOAuth2Token``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.RevokeOAuth2Token``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
 }

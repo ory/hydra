@@ -114,7 +114,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	admin.DELETE(DeleteTokensPath, h.adminDeleteOAuth2Token)
 }
 
-// swagger:route GET /oauth2/sessions/logout v1 performOidcFrontOrBackChannelLogout
+// swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout
 //
 // OpenID Connect Front- or Back-channel Enabled Logout
 //
@@ -353,7 +353,7 @@ type OIDCConfiguration struct {
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
 }
 
-// swagger:route GET /.well-known/openid-configuration v1 discoverOidcConfiguration
+// swagger:route GET /.well-known/openid-configuration v0alpha2 discoverOidcConfiguration
 //
 // OpenID Connect Discovery
 //
@@ -471,7 +471,7 @@ type oidcUserInfo struct {
 	UpdatedAt int `json:"updated_at,omitempty"`
 }
 
-// swagger:route GET /userinfo v1 getOidcUserInfo
+// swagger:route GET /userinfo v0alpha2 getOidcUserInfo
 //
 // OpenID Connect Userinfo
 //
@@ -581,7 +581,7 @@ type revokeOAuth2Token struct {
 	Token string `json:"token"`
 }
 
-// swagger:route POST /oauth2/revoke v1 revokeOAuth2Token
+// swagger:route POST /oauth2/revoke v0alpha2 revokeOAuth2Token
 //
 // Revoke an OAuth2 Access or Refresh Token
 //
@@ -631,7 +631,7 @@ type adminIntrospectOAuth2Token struct {
 	Scope string `json:"scope"`
 }
 
-// swagger:route POST /admin/oauth2/introspect v1 adminIntrospectOAuth2Token
+// swagger:route POST /admin/oauth2/introspect v0alpha2 adminIntrospectOAuth2Token
 //
 // Introspect OAuth2 Access or Refresh Tokens
 //
@@ -785,7 +785,7 @@ type oAuth2TokenResponse struct {
 	TokenType string `json:"token_type"`
 }
 
-// swagger:route POST /oauth2/token v1 performOAuth2TokenFlow
+// swagger:route POST /oauth2/token v0alpha2 performOAuth2TokenFlow
 //
 // The OAuth 2.0 Token Endpoint
 //
@@ -884,7 +884,7 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 	h.r.OAuth2Provider().WriteAccessResponse(ctx, w, accessRequest, accessResponse)
 }
 
-// swagger:route GET /oauth2/auth v1 performOAuth2AuthorizationFlow
+// swagger:route GET /oauth2/auth v0alpha2 performOAuth2AuthorizationFlow
 //
 // The OAuth 2.0 Authorize Endpoint
 //
@@ -1015,7 +1015,7 @@ type adminDeleteOAuth2Token struct {
 	ClientID string `json:"client_id"`
 }
 
-// swagger:route DELETE /admin/oauth2/tokens v1 adminDeleteOAuth2Token
+// swagger:route DELETE /admin/oauth2/tokens v0alpha2 adminDeleteOAuth2Token
 //
 // Delete OAuth2 Access Tokens from a Client
 //

@@ -165,7 +165,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					client.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
 				}
 
-				ctx, _, err := client.V1Api.AdminIntrospectOAuth2Token(context.Background()).
+				ctx, _, err := client.V0alpha2Api.AdminIntrospectOAuth2Token(context.Background()).
 					Token(c.token).
 					Scope(strings.Join(c.scopes, " ")).
 					Execute()

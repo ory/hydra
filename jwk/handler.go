@@ -86,7 +86,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	admin.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
 }
 
-// swagger:route GET /.well-known/jwks.json v1 discoverJsonWebKeys
+// swagger:route GET /.well-known/jwks.json v0alpha2 discoverJsonWebKeys
 //
 // Discover JSON Web Keys
 //
@@ -144,7 +144,7 @@ type adminGetJsonWebKey struct {
 	KID string `json:"kid"`
 }
 
-// swagger:route GET /admin/keys/{set}/{kid} v1 adminGetJsonWebKey
+// swagger:route GET /admin/keys/{set}/{kid} v0alpha2 adminGetJsonWebKey
 //
 // Fetch a JSON Web Key
 //
@@ -183,7 +183,7 @@ type adminGetJsonWebKeySet struct {
 	Set string `json:"set"`
 }
 
-// swagger:route GET /admin/keys/{set} v1 adminGetJsonWebKeySet
+// swagger:route GET /admin/keys/{set} v0alpha2 adminGetJsonWebKeySet
 //
 // Retrieve a JSON Web Key Set
 //
@@ -247,7 +247,7 @@ type adminCreateJsonWebKeySetBody struct {
 	KeyID string `json:"kid"`
 }
 
-// swagger:route POST /admin/keys/{set} v1 adminCreateJsonWebKeySet
+// swagger:route POST /admin/keys/{set} v0alpha2 adminCreateJsonWebKeySet
 //
 // Generate a New JSON Web Key
 //
@@ -293,7 +293,7 @@ type adminUpdateJsonWebKeySet struct {
 	Body jsonWebKeySet
 }
 
-// swagger:route PUT /admin/keys/{set} v1 adminUpdateJsonWebKeySet
+// swagger:route PUT /admin/keys/{set} v0alpha2 adminUpdateJsonWebKeySet
 //
 // Update a JSON Web Key Set
 //
@@ -346,7 +346,7 @@ type adminUpdateJsonWebKey struct {
 	Body x.JSONWebKey
 }
 
-// swagger:route PUT /admin/keys/{set}/{kid} v1 adminUpdateJsonWebKey
+// swagger:route PUT /admin/keys/{set}/{kid} v0alpha2 adminUpdateJsonWebKey
 //
 // Update a JSON Web Key
 //
@@ -390,7 +390,7 @@ type adminDeleteJsonWebKeySet struct {
 	Set string `json:"set"`
 }
 
-// swagger:route DELETE /admin/keys/{set} v1 adminDeleteJsonWebKeySet
+// swagger:route DELETE /admin/keys/{set} v0alpha2 adminDeleteJsonWebKeySet
 //
 // Delete a JSON Web Key Set
 //
@@ -434,7 +434,7 @@ type adminDeleteJsonWebKey struct {
 	KID string `json:"kid"`
 }
 
-// swagger:route DELETE /admin/keys/{set}/{kid} v1 adminDeleteJsonWebKey
+// swagger:route DELETE /admin/keys/{set}/{kid} v0alpha2 adminDeleteJsonWebKey
 //
 // Delete a JSON Web Key
 //

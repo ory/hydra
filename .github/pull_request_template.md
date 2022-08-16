@@ -17,8 +17,8 @@ If this pull request
 
 1. is a fix for a known bug, link the issue where the bug was reported in the format of `#1234`;
 2. is a fix for a previously unknown bug, explain the bug and how to reproduce it in this pull request;
-2. implements a new feature, link the issue containing the design document in the format of `#1234`;
-3. improves the documentation, no issue reference is required.
+3. implements a new feature, link the issue containing the design document in the format of `#1234`;
+4. improves the documentation, no issue reference is required.
 
 Pull requests introducing new features, which do not have a design document linked are more likely to be rejected and take on average 2-8 weeks longer to
 get merged.

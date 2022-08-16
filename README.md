@@ -308,6 +308,12 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/connctd.svg" alt="Connctd"></td>
             <td><a href="https://connctd.com/">connctd.com</a></td>
         </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Paralus</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/paralus.svg" alt="Paralus"></td>
+            <td><a href="https://www.paralus.io/">paralus.io</a></td>
+        </tr>
     </tbody>
 </table>
 

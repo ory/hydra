@@ -17,23 +17,9 @@
           "optional": true,
           "match": "http://consent:3000/login*",
           "commands": [
-            [
-              "text",
-              "id",
-              "email",
-              "foo@bar.com"
-            ],
-            [
-              "text",
-              "id",
-              "password",
-              "foobar"
-            ],
-            [
-              "click",
-              "id",
-              "accept"
-            ]
+            ["text", "id", "email", "foo@bar.com"],
+            ["text", "id", "password", "foobar"],
+            ["click", "id", "accept"]
           ]
         },
         {
@@ -41,16 +27,8 @@
           "optional": true,
           "match": "http://consent:3000/consent*",
           "commands": [
-            [
-              "click",
-              "id",
-              "openid"
-            ],
-            [
-              "click",
-              "id",
-              "accept"
-            ]
+            ["click", "id", "openid"],
+            ["click", "id", "accept"]
           ]
         },
         {
@@ -71,23 +49,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -95,21 +59,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "profile"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "profile"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -130,23 +82,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -154,21 +92,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "email"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "email"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -189,23 +115,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -213,21 +125,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "address"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "address"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -248,23 +148,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -272,21 +158,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "phone"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "phone"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -307,23 +181,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -331,36 +191,12 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "phone"
-                ],
-                [
-                  "click",
-                  "id",
-                  "address"
-                ],
-                [
-                  "click",
-                  "id",
-                  "email"
-                ],
-                [
-                  "click",
-                  "id",
-                  "profile"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "phone"],
+                ["click", "id", "address"],
+                ["click", "id", "email"],
+                ["click", "id", "profile"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -381,23 +217,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -405,21 +227,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "email"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "email"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -516,39 +326,17 @@
                   ".*",
                   "update-image-placeholder-optional"
                 ],
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
               "task": "Authorize Client",
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -569,28 +357,10 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -598,21 +368,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -641,23 +399,9 @@
                   ".*",
                   "update-image-placeholder-optional"
                 ],
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -665,16 +409,8 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -695,28 +431,10 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -724,21 +442,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -759,28 +465,10 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -788,21 +476,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "remember"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "remember"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -847,23 +523,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -871,21 +533,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "offline_access"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "offline_access"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -906,23 +556,9 @@
               "optional": true,
               "match": "http://consent:3000/login*",
               "commands": [
-                [
-                  "text",
-                  "id",
-                  "email",
-                  "foo@bar.com"
-                ],
-                [
-                  "text",
-                  "id",
-                  "password",
-                  "foobar"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["text", "id", "email", "foo@bar.com"],
+                ["text", "id", "password", "foobar"],
+                ["click", "id", "accept"]
               ]
             },
             {
@@ -930,21 +566,9 @@
               "optional": true,
               "match": "http://consent:3000/consent*",
               "commands": [
-                [
-                  "click",
-                  "id",
-                  "openid"
-                ],
-                [
-                  "click",
-                  "id",
-                  "offline_access"
-                ],
-                [
-                  "click",
-                  "id",
-                  "accept"
-                ]
+                ["click", "id", "openid"],
+                ["click", "id", "offline_access"],
+                ["click", "id", "accept"]
               ]
             },
             {

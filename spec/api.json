@@ -32,6 +32,100 @@
       }
     },
     "schemas": {
+      "DefaultSession": {
+        "description": "IDTokenSession is a session container for the id token",
+        "properties": {
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Headers": {
+        "description": "Headers is the jwt headers",
+        "properties": {
+          "extra": {
+            "additionalProperties": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "IDTokenClaims": {
+        "description": "IDTokenClaims represent the claims used in open id connect requests",
+        "properties": {
+          "acr": {
+            "type": "string"
+          },
+          "amr": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "at_hash": {
+            "type": "string"
+          },
+          "aud": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "auth_time": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "c_hash": {
+            "type": "string"
+          },
+          "exp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "ext": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "iat": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "iss": {
+            "type": "string"
+          },
+          "jti": {
+            "type": "string"
+          },
+          "nonce": {
+            "type": "string"
+          },
+          "rat": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "sub": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger.",
         "type": "object"
@@ -139,6 +233,12 @@
       "JoseJSONWebKeySet": {
         "type": "object"
       },
+      "NullDuration": {
+        "description": "Specify a time duration in milliseconds, seconds, minutes, hours.",
+        "pattern": "^([0-9]+(ns|us|ms|s|m|h))*$",
+        "title": "Time duration",
+        "type": "string"
+      },
       "PreviousConsentSession": {
         "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
         "properties": {
@@ -169,6 +269,52 @@
         },
         "type": "object"
       },
+      "Session": {
+        "properties": {
+          "allowed_top_level_claims": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "consent_challenge": {
+            "type": "string"
+          },
+          "exclude_not_before_claim": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "extra": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "kid": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "StringSlicePipeDelimiter": {
         "items": {
           "type": "string"
@@ -179,6 +325,49 @@
       "UUID": {
         "format": "uuid4",
         "type": "string"
+      },
+      "UpdateOAuth2ClientLifespans": {
+        "description": "The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.",
+        "properties": {
+          "authorization_code_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "client_credentials_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "implicit_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "implicit_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "jwt_bearer_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "password_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "password_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          }
+        },
+        "title": "UpdateOAuth2ClientLifespans holds default lifespan configuration for the different\ntoken types that may be issued for the client. This configuration takes\nprecedence over fosite's instance-wide default lifespan, but it may be\noverridden by a session's expires_at claim.",
+        "type": "object"
       },
       "acceptConsentRequest": {
         "properties": {
@@ -538,10 +727,47 @@
         "title": "Contains information about an ongoing logout request.",
         "type": "object"
       },
+      "nullDuration": {
+        "description": "Specify a time duration in milliseconds, seconds, minutes, hours.",
+        "pattern": "^([0-9]+(ns|us|ms|s|m|h))*$",
+        "title": "Time duration",
+        "type": "string"
+      },
       "nullTime": {
         "format": "date-time",
         "title": "NullTime implements sql.NullTime functionality.",
         "type": "string"
+      },
+      "oAuth2AccessRequest": {
+        "properties": {
+          "client_id": {
+            "description": "ClientID is the identifier of the OAuth 2.0 client.",
+            "type": "string"
+          },
+          "grant_types": {
+            "description": "GrantTypes is the requests grant types.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_audience": {
+            "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "granted_scopes": {
+            "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "Requester is a token endpoint's request context.",
+        "type": "object"
       },
       "oAuth2Client": {
         "properties": {
@@ -551,6 +777,15 @@
           "audience": {
             "$ref": "#/components/schemas/StringSlicePipeDelimiter"
           },
+          "authorization_code_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "authorization_code_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
           "backchannel_logout_session_required": {
             "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
             "type": "boolean"
@@ -558,6 +793,9 @@
           "backchannel_logout_uri": {
             "description": "RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.",
             "type": "string"
+          },
+          "client_credentials_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
           },
           "client_id": {
             "description": "ID  is the id for this client.",
@@ -599,12 +837,21 @@
           "grant_types": {
             "$ref": "#/components/schemas/StringSlicePipeDelimiter"
           },
+          "implicit_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "implicit_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
           "jwks": {
             "$ref": "#/components/schemas/JoseJSONWebKeySet"
           },
           "jwks_uri": {
             "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
             "type": "string"
+          },
+          "jwt_bearer_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
           },
           "logo_uri": {
             "description": "LogoURI is an URL string that references a logo for the client.",
@@ -617,6 +864,12 @@
             "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
             "type": "string"
           },
+          "password_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "password_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
           "policy_uri": {
             "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
             "type": "string"
@@ -626,6 +879,15 @@
           },
           "redirect_uris": {
             "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+          },
+          "refresh_token_grant_access_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_id_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
+          },
+          "refresh_token_grant_refresh_token_lifespan": {
+            "$ref": "#/components/schemas/NullDuration"
           },
           "registration_access_token": {
             "description": "RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.",
@@ -901,6 +1163,12 @@
               "type": "string"
             },
             "type": "array"
+          },
+          "requester": {
+            "$ref": "#/components/schemas/oAuth2AccessRequest"
+          },
+          "session": {
+            "$ref": "#/components/schemas/Session"
           },
           "subject": {
             "description": "Subject is the identifier of the authenticated end-user.",
@@ -1712,6 +1980,58 @@
           }
         },
         "summary": "Update an OAuth 2.0 Client",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/clients/{id}/lifespans": {
+      "put": {
+        "description": "UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This\nclient configuration takes precedence over the instance-wide token lifespan\nconfiguration.",
+        "operationId": "UpdateOAuth2ClientLifespans",
+        "parameters": [
+          {
+            "description": "The id of the OAuth 2.0 Client.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOAuth2ClientLifespans"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2Client"
+                }
+              }
+            },
+            "description": "oAuth2Client"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
         "tags": [
           "admin"
         ]

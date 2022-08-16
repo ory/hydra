@@ -29,9 +29,9 @@ https://github.com/ory/meta/blob/master/templates/repository/common/CONTRIBUTING
 
 ## Introduction
 
-_Please note_: We take Ory Hydra's security and our users' trust very
-seriously. If you believe you have found a security issue in Ory Hydra,
-please disclose by contacting us at security@ory.sh.
+_Please note_: We take Ory Hydra's security and our users' trust very seriously.
+If you believe you have found a security issue in Ory Hydra, please disclose by
+contacting us at security@ory.sh.
 
 There are many ways in which you can contribute. The goal of this document is to
 provide a high-level overview of how you can get involved in Ory.
@@ -47,11 +47,9 @@ contributions, and don't want a wall of rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
-won't clash with Ory
-Hydra's direction. A great way to
-do this is via
-[Ory Hydra Discussions](https://github.com/ory/hydra/discussions)
-or the [Ory Chat](https://www.ory.sh/chat).
+won't clash with Ory Hydra's direction. A great way to do this is via
+[Ory Hydra Discussions](https://github.com/ory/hydra/discussions) or the
+[Ory Chat](https://www.ory.sh/chat).
 
 ## FAQ
 
@@ -68,8 +66,7 @@ or the [Ory Chat](https://www.ory.sh/chat).
 - I want to talk to other Ory Hydra users.
   [How can I become a part of the community?](#communication)
 
-- I would like to know what I am agreeing to when I contribute to Ory
-  Hydra.
+- I would like to know what I am agreeing to when I contribute to Ory Hydra.
   Does Ory have
   [a Contributors License Agreement?](https://cla-assistant.io/ory/hydra)
 
@@ -100,10 +97,10 @@ to help out:
   help, please share it! Bonus: You get GitHub achievements for answered
   discussions.
 
-- **Help with open issues.** We have a lot of open issues for Ory Hydra and
-  some of them may lack necessary information, some are duplicates of older
-  issues. You can help out by guiding people through the process of filling out
-  the issue template, asking for clarifying information, or pointing them to
+- **Help with open issues.** We have a lot of open issues for Ory Hydra and some
+  of them may lack necessary information, some are duplicates of older issues.
+  You can help out by guiding people through the process of filling out the
+  issue template, asking for clarifying information, or pointing them to
   existing issues that match their description of the problem.
 
 - **Review documentation changes.** Most documentation just needs a review for
@@ -119,8 +116,9 @@ to help out:
 We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of Ory, etc.
 
-Check out [Ory Hydra Discussions](https://github.com/ory/hydra/discussions). This is a great place for
-in-depth discussions and lots of code examples, logs and similar data.
+Check out [Ory Hydra Discussions](https://github.com/ory/hydra/discussions).
+This is a great place for in-depth discussions and lots of code examples, logs
+and similar data.
 
 You can also join our community calls, if you want to speak to the Ory team
 directly or ask some questions. You can find more info and participate in

@@ -1,30 +1,26 @@
 # \PublicApi
 
-All URIs are relative to *http://localhost*
+All URIs are relative to _http://localhost_
 
-Method | HTTP request | Description
-------------- | ------------- | -------------
-[**DisconnectUser**](PublicApi.md#DisconnectUser) | **Get** /oauth2/sessions/logout | OpenID Connect Front-Backchannel Enabled Logout
-[**DiscoverOpenIDConfiguration**](PublicApi.md#DiscoverOpenIDConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-[**DynamicClientRegistrationCreateOAuth2Client**](PublicApi.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationDeleteOAuth2Client**](PublicApi.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationGetOAuth2Client**](PublicApi.md#DynamicClientRegistrationGetOAuth2Client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationUpdateOAuth2Client**](PublicApi.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**Oauth2Token**](PublicApi.md#Oauth2Token) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
-[**OauthAuth**](PublicApi.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
-[**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth2 Tokens
-[**Userinfo**](PublicApi.md#Userinfo) | **Get** /userinfo | OpenID Connect Userinfo
-[**WellKnown**](PublicApi.md#WellKnown) | **Get** /.well-known/jwks.json | JSON Web Keys Discovery
-
-
+| Method                                                                                                      | HTTP request                              | Description                                                                                            |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [**DisconnectUser**](PublicApi.md#DisconnectUser)                                                           | **Get** /oauth2/sessions/logout           | OpenID Connect Front-Backchannel Enabled Logout                                                        |
+| [**DiscoverOpenIDConfiguration**](PublicApi.md#DiscoverOpenIDConfiguration)                                 | **Get** /.well-known/openid-configuration | OpenID Connect Discovery                                                                               |
+| [**DynamicClientRegistrationCreateOAuth2Client**](PublicApi.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                 | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
+| [**DynamicClientRegistrationDeleteOAuth2Client**](PublicApi.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}          | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
+| [**DynamicClientRegistrationGetOAuth2Client**](PublicApi.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}             | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
+| [**DynamicClientRegistrationUpdateOAuth2Client**](PublicApi.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}             | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
+| [**Oauth2Token**](PublicApi.md#Oauth2Token)                                                                 | **Post** /oauth2/token                    | The OAuth 2.0 Token Endpoint                                                                           |
+| [**OauthAuth**](PublicApi.md#OauthAuth)                                                                     | **Get** /oauth2/auth                      | The OAuth 2.0 Authorize Endpoint                                                                       |
+| [**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                   | Revoke OAuth2 Tokens                                                                                   |
+| [**Userinfo**](PublicApi.md#Userinfo)                                                                       | **Get** /userinfo                         | OpenID Connect Userinfo                                                                                |
+| [**WellKnown**](PublicApi.md#WellKnown)                                                                     | **Get** /.well-known/jwks.json            | JSON Web Keys Discovery                                                                                |
 
 ## DisconnectUser
 
 > DisconnectUser(ctx).Execute()
 
 OpenID Connect Front-Backchannel Enabled Logout
-
-
 
 ### Example
 
@@ -56,12 +52,12 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDisconnectUserRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiDisconnectUserRequest
+struct via the builder pattern
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -72,18 +68,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: Not defined
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DiscoverOpenIDConfiguration
 
 > WellKnown DiscoverOpenIDConfiguration(ctx).Execute()
 
 OpenID Connect Discovery
-
-
 
 ### Example
 
@@ -117,8 +111,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiscoverOpenIDConfigurationRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a
+apiDiscoverOpenIDConfigurationRequest struct via the builder pattern
 
 ### Return type
 
@@ -133,18 +127,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## DynamicClientRegistrationCreateOAuth2Client
 
-> OAuth2Client DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
+> OAuth2Client
+> DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
 
-Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+Registration Management Protocol
 
 ### Example
 
@@ -159,7 +153,7 @@ import (
 )
 
 func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -175,16 +169,15 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+| Name             | Type                                | Description | Notes |
+| ---------------- | ----------------------------------- | ----------- | ----- |
+| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
 
 ### Return type
 
@@ -199,18 +192,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DynamicClientRegistrationDeleteOAuth2Client
 
 > DynamicClientRegistrationDeleteOAuth2Client(ctx, id).Execute()
 
-Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+Registration Management Protocol
 
 ### Example
 
@@ -239,24 +231,23 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -267,18 +258,17 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## DynamicClientRegistrationGetOAuth2Client
 
 > OAuth2Client DynamicClientRegistrationGetOAuth2Client(ctx, id).Execute()
 
-Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
+Management Protocol
 
 ### Example
 
@@ -309,20 +299,19 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder
+pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
 ### Return type
 
@@ -337,18 +326,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## DynamicClientRegistrationUpdateOAuth2Client
 
-> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
+> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx,
+> id).OAuth2Client(oAuth2Client).Execute()
 
-Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
+Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
+Management Protocol
 
 ### Example
 
@@ -364,7 +353,7 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
+    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -380,21 +369,21 @@ func main() {
 
 ### Path Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder pattern
+Other parameters are passed through a pointer to a
+apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder
+pattern
 
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
 
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
+**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
 
 ### Return type
 
@@ -409,18 +398,17 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-
 ## Oauth2Token
 
-> Oauth2TokenResponse Oauth2Token(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+> Oauth2TokenResponse
+> Oauth2Token(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 
 The OAuth 2.0 Token Endpoint
-
-
 
 ### Example
 
@@ -435,7 +423,7 @@ import (
 )
 
 func main() {
-    grantType := "grantType_example" // string | 
+    grantType := "grantType_example" // string |
     clientId := "clientId_example" // string |  (optional)
     code := "code_example" // string |  (optional)
     redirectUri := "redirectUri_example" // string |  (optional)
@@ -455,20 +443,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiOauth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiOauth2TokenRequest struct
+via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **grantType** | **string** |  | 
- **clientId** | **string** |  | 
- **code** | **string** |  | 
- **redirectUri** | **string** |  | 
- **refreshToken** | **string** |  | 
+| Name             | Type       | Description | Notes |
+| ---------------- | ---------- | ----------- | ----- |
+| **grantType**    | **string** |             |
+| **clientId**     | **string** |             |
+| **code**         | **string** |             |
+| **redirectUri**  | **string** |             |
+| **refreshToken** | **string** |             |
 
 ### Return type
 
@@ -483,18 +469,16 @@ Name | Type | Description  | Notes
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## OauthAuth
 
 > OauthAuth(ctx).Execute()
 
 The OAuth 2.0 Authorize Endpoint
-
-
 
 ### Example
 
@@ -526,12 +510,12 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiOauthAuthRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiOauthAuthRequest struct
+via the builder pattern
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -542,18 +526,16 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## RevokeOAuth2Token
 
 > RevokeOAuth2Token(ctx).Token(token).Execute()
 
 Revoke OAuth2 Tokens
-
-
 
 ### Example
 
@@ -568,7 +550,7 @@ import (
 )
 
 func main() {
-    token := "token_example" // string | 
+    token := "token_example" // string |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -582,20 +564,18 @@ func main() {
 
 ### Path Parameters
 
-
-
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest
+struct via the builder pattern
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **token** | **string** |  | 
+| Name      | Type       | Description | Notes |
+| --------- | ---------- | ----------- | ----- |
+| **token** | **string** |             |
 
 ### Return type
 
- (empty response body)
+(empty response body)
 
 ### Authorization
 
@@ -606,18 +586,16 @@ Name | Type | Description  | Notes
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## Userinfo
 
 > UserinfoResponse Userinfo(ctx).Execute()
 
 OpenID Connect Userinfo
-
-
 
 ### Example
 
@@ -651,8 +629,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiUserinfoRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiUserinfoRequest struct via
+the builder pattern
 
 ### Return type
 
@@ -667,18 +645,16 @@ Other parameters are passed through a pointer to a apiUserinfoRequest struct via
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-
 
 ## WellKnown
 
 > JSONWebKeySet WellKnown(ctx).Execute()
 
 JSON Web Keys Discovery
-
-
 
 ### Example
 
@@ -712,8 +688,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiWellKnownRequest struct via the builder pattern
-
+Other parameters are passed through a pointer to a apiWellKnownRequest struct
+via the builder pattern
 
 ### Return type
 
@@ -728,7 +704,7 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
-

@@ -11,5 +11,5 @@ ratings:
     - "**.go"
 
 exclude_paths:
-- vendor/
-- sdk/
+  - vendor/
+  - sdk/

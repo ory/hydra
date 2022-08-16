@@ -318,7 +318,6 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 		fc := m.oAuth2Config()
 		oidcStrategy := &openid.DefaultStrategy{
 			JWTStrategy: m.OpenIDJWTStrategy(),
-			Expiry:      m.C.IDTokenLifespan(),
 			Issuer:      m.C.IssuerURL().String(),
 		}
 

@@ -10,10 +10,9 @@
 #                                                                         #
 ###########################################################################
 
-version: '3.7'
+version: "3.7"
 
 services:
-
   hydra:
     environment:
       - SERVE_PUBLIC_CORS_ENABLED=true

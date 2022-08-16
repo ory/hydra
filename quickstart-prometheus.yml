@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '3.7'
+version: "3.7"
 
 services:
   prometheus:
@@ -19,8 +19,7 @@ services:
       - "9090:9090"
     depends_on:
       - hydra
-    command:
-      --config.file=/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./quickstart-prometheus-config.yml:/etc/prometheus/prometheus.yml
     networks:

@@ -29,6 +29,10 @@
 
 package client
 
+import (
+	"github.com/ory/hydra/x"
+)
+
 // swagger:parameters createOAuth2Client dynamicClientRegistrationCreateOAuth2Client
 type dynamicClientRegistrationCreateOAuth2Client struct {
 	// in: body
@@ -136,6 +140,53 @@ type swaggerDeleteOAuth2Client struct {
 	// in: path
 	// required: true
 	ID string `json:"id"`
+}
+
+// swagger:parameters UpdateOAuth2ClientLifespans
+type swaggerUpdateOAuth2ClientLifespans struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	Body UpdateOAuth2ClientLifespans
+}
+
+// UpdateOAuth2ClientLifespans holds default lifespan configuration for the different
+// token types that may be issued for the client. This configuration takes
+// precedence over fosite's instance-wide default lifespan, but it may be
+// overridden by a session's expires_at claim.
+//
+// The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.
+//
+// swagger:model UpdateOAuth2ClientLifespans
+type UpdateOAuth2ClientLifespans struct {
+	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan"`
+	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan"`
+	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan"`
+	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan"`
+	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan"`
+	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan"`
+	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan"`
+	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan"`
+	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan"`
+	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan"`
+	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan"`
+	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
+	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan"`
 }
 
 // swagger:parameters dynamicClientRegistrationDeleteOAuth2Client

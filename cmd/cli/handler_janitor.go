@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/hydra/persistence"
 
 	"github.com/pkg/errors"
@@ -33,10 +35,18 @@ const (
 	Config                 = "config"
 )
 
-type JanitorHandler struct{}
+type JanitorHandler struct {
+	slOpts []servicelocatorx.Option
+	dOpts  []driver.OptionsModifier
+	cOpts  []configx.OptionModifier
+}
 
-func NewJanitorHandler() *JanitorHandler {
-	return &JanitorHandler{}
+func NewJanitorHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *JanitorHandler {
+	return &JanitorHandler{
+		slOpts: slOpts,
+		dOpts:  dOpts,
+		cOpts:  cOpts,
+	}
 }
 
 func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
@@ -70,11 +80,11 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
-	return purge(cmd, args)
+func (j *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
+	return purge(cmd, args, servicelocatorx.NewOptions(j.slOpts...), j.dOpts)
 }
 
-func purge(cmd *cobra.Command, args []string) error {
+func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts []driver.OptionsModifier) error {
 	ctx := cmd.Context()
 	var d driver.Registry
 
@@ -105,13 +115,13 @@ func purge(cmd *cobra.Command, args []string) error {
 		co = append(co, configx.WithValue(config.KeyDSN, args[0]))
 	}
 
-	do := []driver.OptionsModifier{
+	do := append(dOpts,
 		driver.DisableValidation(),
 		driver.DisablePreloading(),
 		driver.WithOptions(co...),
-	}
+	)
 
-	d, err := driver.New(ctx, do...)
+	d, err := driver.New(ctx, sl, do)
 	if err != nil {
 		return errors.Wrap(err, "Could not create driver")
 	}

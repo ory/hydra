@@ -80,18 +80,18 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(introspectCmd)
 	introspectCmd.AddCommand(NewIntrospectTokenCmd(parent))
 
-	parent.AddCommand(NewJanitorCmd())
+	parent.AddCommand(NewJanitorCmd(nil, nil, nil))
 
 	migrateCmd := NewMigrateCmd()
 	parent.AddCommand(migrateCmd)
 	migrateCmd.AddCommand(NewMigrateGenCmd())
-	migrateCmd.AddCommand(NewMigrateSqlCmd())
+	migrateCmd.AddCommand(NewMigrateSqlCmd(nil, nil, nil))
 
 	serveCmd := NewServeCmd()
 	parent.AddCommand(serveCmd)
-	serveCmd.AddCommand(NewServeAdminCmd())
-	serveCmd.AddCommand(NewServePublicCmd())
-	serveCmd.AddCommand(NewServeAllCmd())
+	serveCmd.AddCommand(NewServeAdminCmd(nil, nil, nil))
+	serveCmd.AddCommand(NewServePublicCmd(nil, nil, nil))
+	serveCmd.AddCommand(NewServeAllCmd(nil, nil, nil))
 
 	parent.AddCommand(NewVersionCmd())
 }

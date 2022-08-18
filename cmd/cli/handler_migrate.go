@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/configx"
@@ -260,12 +262,15 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 	if flagx.MustGetBool(cmd, "read-from-env") {
 		d, err = driver.New(
 			cmd.Context(),
-			driver.WithOptions(
-				configx.SkipValidation(),
-				configx.WithFlags(cmd.Flags())),
-			driver.DisableValidation(),
-			driver.DisablePreloading(),
-			driver.SkipNetworkInit())
+			servicelocatorx.NewOptions(),
+			[]driver.OptionsModifier{
+				driver.WithOptions(
+					configx.SkipValidation(),
+					configx.WithFlags(cmd.Flags())),
+				driver.DisableValidation(),
+				driver.DisablePreloading(),
+				driver.SkipNetworkInit(),
+			})
 		if err != nil {
 			return err
 		}
@@ -280,14 +285,17 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 		}
 		d, err = driver.New(
 			cmd.Context(),
-			driver.WithOptions(
-				configx.WithFlags(cmd.Flags()),
-				configx.SkipValidation(),
-				configx.WithValue(config.KeyDSN, args[0]),
-			),
-			driver.DisableValidation(),
-			driver.DisablePreloading(),
-			driver.SkipNetworkInit())
+			servicelocatorx.NewOptions(),
+			[]driver.OptionsModifier{
+				driver.WithOptions(
+					configx.WithFlags(cmd.Flags()),
+					configx.SkipValidation(),
+					configx.WithValue(config.KeyDSN, args[0]),
+				),
+				driver.DisableValidation(),
+				driver.DisablePreloading(),
+				driver.SkipNetworkInit(),
+			})
 		if err != nil {
 			return err
 		}

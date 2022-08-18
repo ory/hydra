@@ -3,8 +3,7 @@ package driver
 import (
 	"context"
 
-	"github.com/ory/hydra/x/servicelocatorx"
-	"github.com/ory/x/servicelocator"
+	"github.com/ory/x/servicelocatorx"
 
 	"github.com/ory/x/configx"
 
@@ -19,6 +18,7 @@ type options struct {
 	preload      bool
 	validate     bool
 	opts         []configx.OptionModifier
+	config       *config.DefaultProvider
 	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
 	skipNetworkInit bool
 }
@@ -28,6 +28,12 @@ func newOptions() *options {
 		validate: true,
 		preload:  true,
 		opts:     []configx.OptionModifier{},
+	}
+}
+
+func WithConfig(config *config.DefaultProvider) func(o *options) {
+	return func(o *options) {
+		o.config = config
 	}
 }
 
@@ -61,16 +67,19 @@ func SkipNetworkInit() OptionsModifier {
 	}
 }
 
-func New(ctx context.Context, opts ...OptionsModifier) (Registry, error) {
+func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
 		f(o)
 	}
 
-	l := servicelocator.Logger(ctx, logrusx.New("Ory Hydra", config.Version))
-	ctxter := servicelocator.Contextualizer(ctx, &contextx.Default{})
+	l := sl.Logger()
+	if l == nil {
+		l = logrusx.New("Ory Hydra", config.Version)
+	}
 
-	c := servicelocatorx.ConfigFromContext(ctx, nil)
+	ctxter := sl.Contextualizer()
+	c := o.config
 	if c == nil {
 		var err error
 		c, err = config.New(ctx, l, o.opts...)

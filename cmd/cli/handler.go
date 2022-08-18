@@ -25,6 +25,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/spf13/cobra"
 
 	"github.com/ory/x/cmdx"
@@ -53,9 +57,9 @@ func RemoteURI(cmd *cobra.Command) *url.URL {
 	return endpoint
 }
 
-func NewHandler() *Handler {
+func NewHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *Handler {
 	return &Handler{
 		Migration: newMigrateHandler(),
-		Janitor:   NewJanitorHandler(),
+		Janitor:   NewJanitorHandler(slOpts, dOpts, cOpts),
 	}
 }

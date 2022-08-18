@@ -29,10 +29,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/x/servicelocator"
 
 	analytics "github.com/ory/analytics-go/v4"
 	"github.com/ory/x/configx"
@@ -63,13 +63,13 @@ import (
 
 var _ = &consent.Handler{}
 
-func EnhanceMiddleware(ctx context.Context, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
+func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
 	if !networkx.AddressIsUnixSocket(address) {
 		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(ctx, iface)))
 	}
 
-	for _, mw := range servicelocator.HTTPMiddlewares(ctx) {
-		n.Use(mw)
+	for _, mw := range sl.HTTPMiddlewares() {
+		n.UseFunc(mw)
 	}
 
 	n.UseHandler(router)
@@ -86,103 +86,115 @@ func isDSNAllowed(ctx context.Context, r driver.Registry) {
 	}
 }
 
-func RunServeAdmin(cmd *cobra.Command, args []string) error {
-	ctx := cmd.Context()
-	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
-	if err != nil {
-		return err
+func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
+
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
+		isDSNAllowed(ctx, d)
+
+		admin, _, adminmw, _ := setup(ctx, d, cmd)
+		d.PrometheusManager().RegisterRouter(admin.Router)
+
+		var wg sync.WaitGroup
+		wg.Add(1)
+
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.AdminInterface,
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			d.Config().ListenOn(config.AdminInterface),
+			d.Config().SocketPermission(config.AdminInterface),
+		)
+
+		wg.Wait()
+		return nil
 	}
-	isDSNAllowed(ctx, d)
-
-	admin, _, adminmw, _ := setup(ctx, d, cmd)
-	d.PrometheusManager().RegisterRouter(admin.Router)
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go serve(
-		ctx,
-		d,
-		cmd,
-		&wg,
-		config.AdminInterface,
-		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(config.AdminInterface),
-		d.Config().SocketPermission(config.AdminInterface),
-	)
-
-	wg.Wait()
-	return nil
 }
 
-func RunServePublic(cmd *cobra.Command, args []string) error {
-	ctx := cmd.Context()
-	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
-	if err != nil {
-		return err
+func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
+
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
+		isDSNAllowed(ctx, d)
+
+		_, public, _, publicmw := setup(ctx, d, cmd)
+		d.PrometheusManager().RegisterRouter(public.Router)
+
+		var wg sync.WaitGroup
+		wg.Add(1)
+
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.PublicInterface,
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			d.Config().ListenOn(config.PublicInterface),
+			d.Config().SocketPermission(config.PublicInterface),
+		)
+
+		wg.Wait()
+		return nil
 	}
-	isDSNAllowed(ctx, d)
-
-	_, public, _, publicmw := setup(ctx, d, cmd)
-	d.PrometheusManager().RegisterRouter(public.Router)
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go serve(
-		ctx,
-		d,
-		cmd,
-		&wg,
-		config.PublicInterface,
-		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(config.PublicInterface),
-		d.Config().SocketPermission(config.PublicInterface),
-	)
-
-	wg.Wait()
-	return nil
 }
 
-func RunServeAll(cmd *cobra.Command, args []string) error {
-	ctx := cmd.Context()
-	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
-	if err != nil {
-		return err
+func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
+
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
+
+		admin, public, adminmw, publicmw := setup(ctx, d, cmd)
+
+		d.PrometheusManager().RegisterRouter(admin.Router)
+		d.PrometheusManager().RegisterRouter(public.Router)
+
+		var wg sync.WaitGroup
+		wg.Add(2)
+
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.PublicInterface,
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			d.Config().ListenOn(config.PublicInterface),
+			d.Config().SocketPermission(config.PublicInterface),
+		)
+
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.AdminInterface,
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			d.Config().ListenOn(config.AdminInterface),
+			d.Config().SocketPermission(config.AdminInterface),
+		)
+
+		wg.Wait()
+		return nil
 	}
-
-	admin, public, adminmw, publicmw := setup(ctx, d, cmd)
-
-	d.PrometheusManager().RegisterRouter(admin.Router)
-	d.PrometheusManager().RegisterRouter(public.Router)
-
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	go serve(
-		ctx,
-		d,
-		cmd,
-		&wg,
-		config.PublicInterface,
-		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(config.PublicInterface),
-		d.Config().SocketPermission(config.PublicInterface),
-	)
-
-	go serve(
-		ctx,
-		d,
-		cmd,
-		&wg,
-		config.AdminInterface,
-		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(config.AdminInterface),
-		d.Config().SocketPermission(config.AdminInterface),
-	)
-
-	wg.Wait()
-	return nil
 }
 
 func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, adminmw, publicmw *negroni.Negroni) {

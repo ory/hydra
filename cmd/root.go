@@ -24,20 +24,24 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/spf13/cobra"
 )
 
 // This represents the base command when called without any subcommands
-func NewRootCmd() *cobra.Command {
+func NewRootCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "hydra",
 		Short: "Run and manage Ory Hydra",
 	}
-	RegisterCommandRecursive(cmd)
+	RegisterCommandRecursive(cmd, slOpts, dOpts, cOpts)
 	return cmd
 }
 
-func RegisterCommandRecursive(parent *cobra.Command) {
+func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) {
 	createCmd := NewCreateCmd(parent)
 	parent.AddCommand(createCmd)
 	createCmd.AddCommand(NewCreateClientsCommand(parent))
@@ -80,25 +84,25 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(introspectCmd)
 	introspectCmd.AddCommand(NewIntrospectTokenCmd(parent))
 
-	parent.AddCommand(NewJanitorCmd(nil, nil, nil))
+	parent.AddCommand(NewJanitorCmd(slOpts, dOpts, cOpts))
 
 	migrateCmd := NewMigrateCmd()
 	parent.AddCommand(migrateCmd)
 	migrateCmd.AddCommand(NewMigrateGenCmd())
-	migrateCmd.AddCommand(NewMigrateSqlCmd(nil, nil, nil))
+	migrateCmd.AddCommand(NewMigrateSqlCmd(slOpts, dOpts, cOpts))
 
 	serveCmd := NewServeCmd()
 	parent.AddCommand(serveCmd)
-	serveCmd.AddCommand(NewServeAdminCmd(nil, nil, nil))
-	serveCmd.AddCommand(NewServePublicCmd(nil, nil, nil))
-	serveCmd.AddCommand(NewServeAllCmd(nil, nil, nil))
+	serveCmd.AddCommand(NewServeAdminCmd(slOpts, dOpts, cOpts))
+	serveCmd.AddCommand(NewServePublicCmd(slOpts, dOpts, cOpts))
+	serveCmd.AddCommand(NewServeAllCmd(slOpts, dOpts, cOpts))
 
 	parent.AddCommand(NewVersionCmd())
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
 func Execute() {
-	if err := NewRootCmd().Execute(); err != nil {
+	if err := NewRootCmd(nil, nil, nil).Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}

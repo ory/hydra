@@ -479,7 +479,7 @@ func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 
 func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager("hydra", m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManagerWithPrefix("hydra", prometheus.HTTPMetrics, m.buildVersion, m.buildHash, m.buildDate)
 	}
 	return m.pmm
 }

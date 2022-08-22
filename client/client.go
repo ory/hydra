@@ -395,7 +395,7 @@ func (c *Client) GetEffectiveLifespan(gt fosite.GrantType, tt fosite.TokenType, 
 		} else if tt == fosite.IDToken && c.ImplicitGrantIDTokenLifespan.Valid {
 			cl = &c.ImplicitGrantIDTokenLifespan.Duration
 		}
-	} else if gt == fosite.GrantTypeJwtBearer {
+	} else if gt == fosite.GrantTypeJWTBearer {
 		if tt == fosite.AccessToken && c.JwtBearerGrantAccessTokenLifespan.Valid {
 			cl = &c.JwtBearerGrantAccessTokenLifespan.Duration
 		}

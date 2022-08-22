@@ -40,13 +40,13 @@ import (
 type JWTStrategy interface {
 	GetPublicKeyID(ctx context.Context) (string, error)
 
-	jwt.JWTStrategy
+	jwt.Signer
 }
 
 type RS256JWTStrategy struct {
 	sync.RWMutex
 
-	RS256JWTStrategy *jwt.RS256JWTStrategy
+	RS256JWTStrategy *jwt.DefaultSigner
 	r                InternalRegistry
 	c                *config.Provider
 	rs               func() string
@@ -58,7 +58,7 @@ type RS256JWTStrategy struct {
 }
 
 func NewRS256JWTStrategy(c config.Provider, r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
-	j := &RS256JWTStrategy{c: &c, r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
+	j := &RS256JWTStrategy{c: &c, r: r, rs: rs, RS256JWTStrategy: new(jwt.DefaultSigner)}
 	if err := j.refresh(context.TODO()); err != nil {
 		return nil, err
 	}
@@ -70,8 +70,8 @@ func (j *RS256JWTStrategy) Hash(ctx context.Context, in []byte) ([]byte, error) 
 }
 
 // GetSigningMethodLength will return the length of the signing method
-func (j *RS256JWTStrategy) GetSigningMethodLength() int {
-	return j.RS256JWTStrategy.GetSigningMethodLength()
+func (j *RS256JWTStrategy) GetSigningMethodLength(ctx context.Context) int {
+	return j.RS256JWTStrategy.GetSigningMethodLength(nil)
 }
 
 func (j *RS256JWTStrategy) GetSignature(ctx context.Context, token string) (string, error) {
@@ -142,7 +142,9 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 	if k, ok := private.Key.(*rsa.PrivateKey); ok {
 		j.Lock()
 		j.privateKey = k
-		j.RS256JWTStrategy.PrivateKey = k
+		j.RS256JWTStrategy.GetPrivateKey = func(ctx context.Context) (interface{}, error) {
+			return k, nil
+		}
 		j.Unlock()
 
 		j.RLock()
@@ -154,7 +156,9 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 	} else if k, ok := private.Key.(jose.OpaqueSigner); ok {
 		j.Lock()
 		j.privateKey = k
-		j.RS256JWTStrategy.PrivateKey = k
+		j.RS256JWTStrategy.GetPrivateKey = func(ctx context.Context) (interface{}, error) {
+			return k, nil
+		}
 		j.Unlock()
 	} else {
 		return errors.New("unknown private key type")

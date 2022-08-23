@@ -18,8 +18,8 @@ import (
 
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/stringslice"
-	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 )
 
@@ -265,7 +265,7 @@ func (p *Provider) ScopeStrategy() string {
 	return p.p.String(KeyScopeStrategy)
 }
 
-func (p *Provider) Tracing() *tracing.Config {
+func (p *Provider) Tracing() *otelx.Config {
 	return p.p.TracingConfig("Ory Hydra")
 }
 

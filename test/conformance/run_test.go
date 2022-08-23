@@ -9,7 +9,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -103,7 +102,7 @@ var (
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
-	config, _  = ioutil.ReadFile("./config.json")
+	config, _  = io.ReadFile("./config.json")
 	httpClient = httpx.NewResilientClient(
 		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
 		httpx.ResilientClientWithClient(&http.Client{
@@ -184,7 +183,7 @@ func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
 	res, err := httpClient.Post(href, "application/json", payload)
 	require.NoError(t, err)
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, esc, res.StatusCode, "%s\n%s", href, body)
 	return body
@@ -300,7 +299,7 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 	res, err := httpClient.Get(urlx.AppendPaths(server, "/api/info", testID).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, 200, res.StatusCode, "%s", body)
 

@@ -25,7 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -86,8 +86,10 @@ type clientCreator interface {
 // - [x] If `authenticatedAt` is properly managed across the lifecycle
 //   - [x] The value `authenticatedAt` should be an old time if no user interaction wrt login was required
 //   - [x] The value `authenticatedAt` should be a recent time if user interaction wrt login was required
+//
 // - [x] If `requestedAt` is properly managed across the lifecycle
 //   - [x] The value of `requestedAt` must be the initial request time, not some other time (e.g. when accepting login)
+//
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
@@ -977,7 +979,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					require.NoError(t, err)
 					assert.Equal(t, http.StatusOK, res.StatusCode)
 
-					body, err := ioutil.ReadAll(res.Body)
+					body, err := io.ReadAll(res.Body)
 					require.NoError(t, err)
 
 					var refreshedToken oauth2.Token
@@ -1029,7 +1031,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err := ioutil.ReadAll(res.Body)
+						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 					})
@@ -1089,7 +1091,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err := ioutil.ReadAll(res.Body)
+						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
@@ -1122,7 +1124,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err = ioutil.ReadAll(res.Body)
+						body, err = io.ReadAll(res.Body)
 						require.NoError(t, err)
 
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))

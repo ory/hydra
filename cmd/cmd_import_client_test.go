@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -23,7 +23,7 @@ func writeTempFile(t *testing.T, contents interface{}) string {
 	t.Helper()
 	ij, err := json.Marshal(contents)
 	require.NoError(t, err)
-	f, err := ioutil.TempFile(t.TempDir(), "")
+	f, err := os.CreateTemp(t.TempDir(), "")
 	require.NoError(t, err)
 	_, err = f.Write(ij)
 	require.NoError(t, err)

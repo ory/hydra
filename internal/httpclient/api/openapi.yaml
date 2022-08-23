@@ -2030,6 +2030,23 @@ components:
         deleted.\
         \ The HTTP status code for empty responses is\ntypically 201."
   schemas:
+    DefaultSession:
+      description: IDTokenSession is a session container for the id token
+      properties:
+        expires_at:
+          additionalProperties:
+            format: date-time
+            type: string
+          type: object
+        headers:
+          $ref: "#/components/schemas/Headers"
+        id_token_claims:
+          $ref: "#/components/schemas/IDTokenClaims"
+        subject:
+          type: string
+        username:
+          type: string
+      type: object
     Headers:
       description: Headers is the jwt headers
       properties:
@@ -3666,10 +3683,7 @@ components:
         exclude_not_before_claim:
           type: boolean
         expires_at:
-          additionalProperties:
-            format: date-time
-            type: string
-          type: object
+          $ref: "#/components/schemas/oAuth2ConsentSession_expires_at"
         extra:
           additionalProperties: true
           type: object
@@ -4939,6 +4953,24 @@ components:
       properties:
         version:
           description: The version of Ory Hydra.
+          type: string
+      type: object
+    oAuth2ConsentSession_expires_at:
+      properties:
+        access_token:
+          format: date-time
+          type: string
+        authorize_code:
+          format: date-time
+          type: string
+        id_token:
+          format: date-time
+          type: string
+        par_context:
+          format: date-time
+          type: string
+        refresh_token:
+          format: date-time
           type: string
       type: object
   securitySchemes:

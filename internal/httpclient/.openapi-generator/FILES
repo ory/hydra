@@ -14,6 +14,7 @@ docs/AcceptOAuth2LoginRequest.md
 docs/AdminApi.md
 docs/AdminCreateJsonWebKeySetBody.md
 docs/AdminTrustOAuth2JwtGrantIssuerBody.md
+docs/DefaultSession.md
 docs/GenericError.md
 docs/GetVersion200Response.md
 docs/HandledOAuth2ConsentRequest.md
@@ -36,6 +37,7 @@ docs/OAuth2Client.md
 docs/OAuth2ConsentRequest.md
 docs/OAuth2ConsentRequestOpenIDConnectContext.md
 docs/OAuth2ConsentSession.md
+docs/OAuth2ConsentSessionExpiresAt.md
 docs/OAuth2LoginRequest.md
 docs/OAuth2LogoutRequest.md
 docs/OAuth2TokenResponse.md
@@ -63,6 +65,7 @@ model_accept_o_auth2_consent_request_session.go
 model_accept_o_auth2_login_request.go
 model_admin_create_json_web_key_set_body.go
 model_admin_trust_o_auth2_jwt_grant_issuer_body.go
+model_default_session.go
 model_generic_error.go
 model_get_version_200_response.go
 model_handled_o_auth2_consent_request.go
@@ -84,6 +87,7 @@ model_o_auth2_client.go
 model_o_auth2_consent_request.go
 model_o_auth2_consent_request_open_id_connect_context.go
 model_o_auth2_consent_session.go
+model_o_auth2_consent_session_expires_at.go
 model_o_auth2_login_request.go
 model_o_auth2_logout_request.go
 model_o_auth2_token_response.go

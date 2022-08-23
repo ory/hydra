@@ -19,6 +19,31 @@
       }
     },
     "schemas": {
+      "DefaultSession": {
+        "description": "IDTokenSession is a session container for the id token",
+        "properties": {
+          "expires_at": {
+            "additionalProperties": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "headers": {
+            "$ref": "#/components/schemas/Headers"
+          },
+          "id_token_claims": {
+            "$ref": "#/components/schemas/IDTokenClaims"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "Headers": {
         "description": "Headers is the jwt headers",
         "properties": {
@@ -989,9 +1014,27 @@
             "type": "boolean"
           },
           "expires_at": {
-            "additionalProperties": {
-              "format": "date-time",
-              "type": "string"
+            "properties": {
+              "access_token": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "authorize_code": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id_token": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "par_context": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "refresh_token": {
+                "format": "date-time",
+                "type": "string"
+              }
             },
             "type": "object"
           },

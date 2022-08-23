@@ -3,7 +3,7 @@ package driver
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -45,7 +45,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	ctx := context.Background()
 
 	l := logrusx.New("", "", logrusx.WithHook(&hook))
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN

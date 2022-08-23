@@ -3,8 +3,8 @@ package cmd_test
 import (
 	"context"
 	"encoding/base64"
-	"io/ioutil"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -25,7 +25,7 @@ import (
 
 func base64EncodedPGPPublicKey(t *testing.T) string {
 	t.Helper()
-	gpgPublicKey, err := ioutil.ReadFile("../test/stub/pgp.pub")
+	gpgPublicKey, err := os.ReadFile("../test/stub/pgp.pub")
 	if err != nil {
 		t.Fatal(err)
 	}

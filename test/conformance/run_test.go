@@ -12,6 +12,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -102,7 +103,7 @@ var (
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
-	config, _  = io.ReadFile("./config.json")
+	config, _  = os.ReadFile("./config.json")
 	httpClient = httpx.NewResilientClient(
 		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
 		httpx.ResilientClientWithClient(&http.Client{

@@ -2030,23 +2030,6 @@ components:
         deleted.\
         \ The HTTP status code for empty responses is\ntypically 201."
   schemas:
-    DefaultSession:
-      description: IDTokenSession is a session container for the id token
-      properties:
-        expires_at:
-          additionalProperties:
-            format: date-time
-            type: string
-          type: object
-        headers:
-          $ref: "#/components/schemas/Headers"
-        id_token_claims:
-          $ref: "#/components/schemas/IDTokenClaims"
-        subject:
-          type: string
-        username:
-          type: string
-      type: object
     Headers:
       description: Headers is the jwt headers
       properties:

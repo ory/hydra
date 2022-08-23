@@ -143,7 +143,6 @@ All URIs are relative to _http://localhost_
 - [AcceptOAuth2LoginRequest](docs/AcceptOAuth2LoginRequest.md)
 - [AdminCreateJsonWebKeySetBody](docs/AdminCreateJsonWebKeySetBody.md)
 - [AdminTrustOAuth2JwtGrantIssuerBody](docs/AdminTrustOAuth2JwtGrantIssuerBody.md)
-- [DefaultSession](docs/DefaultSession.md)
 - [GenericError](docs/GenericError.md)
 - [GetVersion200Response](docs/GetVersion200Response.md)
 - [HandledOAuth2ConsentRequest](docs/HandledOAuth2ConsentRequest.md)

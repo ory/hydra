@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/sessions"
 
-	"github.com/ory/x/tracing"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/herodot"
 	"github.com/ory/x/logrusx"
@@ -25,5 +25,5 @@ type RegistryCookieStore interface {
 }
 
 type TracingProvider interface {
-	Tracer(ctx context.Context) *tracing.Tracer
+	Tracer(ctx context.Context) *otelx.Tracer
 }

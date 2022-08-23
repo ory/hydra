@@ -283,13 +283,14 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 	return m.cs
 }
 
-func (m *RegistryBase) oAuth2Config() *compose.Config {
-	return &compose.Config{
+func (m *RegistryBase) oAuth2Config() *fosite.Config {
+	return &fosite.Config{
 		AccessTokenLifespan:                  m.C.AccessTokenLifespan(),
 		RefreshTokenLifespan:                 m.C.RefreshTokenLifespan(),
 		AuthorizeCodeLifespan:                m.C.AuthCodeLifespan(),
 		IDTokenLifespan:                      m.C.IDTokenLifespan(),
 		IDTokenIssuer:                        m.C.IssuerURL().String(),
+		ClientSecretsHasher:                  m.ClientHasher(),
 		HashCost:                             m.C.BCryptCost(),
 		ScopeStrategy:                        m.ScopeStrategy(),
 		SendDebugMessagesToClients:           m.C.ShareOAuth2Debug(),
@@ -308,7 +309,7 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 
 func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
 	if m.o2mc == nil {
-		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.C.GetSystemSecret(), m.C.GetRotatedSystemSecrets())
+		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config())
 	}
 	return m.o2mc
 }
@@ -317,8 +318,10 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 	if m.fop == nil {
 		fc := m.oAuth2Config()
 		oidcStrategy := &openid.DefaultStrategy{
-			JWTStrategy: m.OpenIDJWTStrategy(),
-			Issuer:      m.C.IssuerURL().String(),
+			Signer: m.OpenIDJWTStrategy(),
+			Config: &fosite.Config{
+				IDTokenIssuer: m.C.IssuerURL().String(),
+			},
 		}
 
 		var coreStrategy foauth2.CoreStrategy
@@ -327,7 +330,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 		switch ats := strings.ToLower(m.C.AccessTokenStrategy()); ats {
 		case "jwt":
 			coreStrategy = &foauth2.DefaultJWTStrategy{
-				JWTStrategy:     m.AccessTokenJWTStrategy(),
+				Signer:          m.AccessTokenJWTStrategy(),
 				HMACSHAStrategy: hmacStrategy,
 			}
 		case "opaque":
@@ -342,9 +345,8 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			&compose.CommonStrategy{
 				CoreStrategy:               coreStrategy,
 				OpenIDConnectTokenStrategy: oidcStrategy,
-				JWTStrategy:                m.OpenIDJWTStrategy(),
+				Signer:                     m.OpenIDJWTStrategy(),
 			},
-			m.ClientHasher(),
 			compose.OAuth2AuthorizeExplicitFactory,
 			compose.OAuth2AuthorizeImplicitFactory,
 			compose.OAuth2ClientCredentialsGrantFactory,
@@ -418,15 +420,18 @@ func (m *RegistryBase) OpenIDJWTStrategy() jwk.JWTStrategy {
 func (m *RegistryBase) FositeOpenIDDefaultStrategy() *openid.DefaultStrategy {
 	if m.fos == nil {
 		m.fos = &openid.DefaultStrategy{
-			JWTStrategy: m.OpenIDJWTStrategy(),
+			Signer: m.OpenIDJWTStrategy(),
 		}
 	}
 	return m.fos
 }
 
 func (m *RegistryBase) OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator {
+	config := &fosite.Config{
+		AllowedPromptValues: []string{"login", "none", "consent"},
+	}
 	if m.forv == nil {
-		m.forv = openid.NewOpenIDConnectRequestValidator([]string{"login", "none", "consent"}, m.FositeOpenIDDefaultStrategy())
+		m.forv = openid.NewOpenIDConnectRequestValidator(m.FositeOpenIDDefaultStrategy(), config)
 	}
 	return m.forv
 }
@@ -479,7 +484,7 @@ func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 
 func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager("hydra", m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManagerWithPrefix("hydra", prometheus.HTTPMetrics, m.buildVersion, m.buildHash, m.buildDate)
 	}
 	return m.pmm
 }

@@ -80,7 +80,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 
 // swagger:route POST /clients admin createOAuth2Client
 //
-// Create an OAuth 2.0 Client
+// # Create an OAuth 2.0 Client
 //
 // Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
 // will be generated. The secret will be returned in the response and you will not be able to retrieve it later on.
@@ -89,17 +89,17 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       201: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  201: oAuth2Client
+//	  default: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -126,18 +126,17 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 // The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
 // Write the secret down and keep it somewhere safe.
 //
+//	Consumes:
+//	- application/json
 //
-//     Consumes:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Schemes: http, https
 //
-//     Schemes: http, https
-//
-//     Responses:
-//       201: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  201: oAuth2Client
+//	  default: jsonError
 func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().ValidateDynamicRegistration, true)
 	if err != nil {
@@ -199,7 +198,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 
 // swagger:route PUT /clients/{id} admin updateOAuth2Client
 //
-// Update an OAuth 2.0 Client
+// # Update an OAuth 2.0 Client
 //
 // Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
 // This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
@@ -207,17 +206,17 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 
@@ -272,18 +271,17 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*C
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
-//
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
@@ -322,7 +320,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 
 // swagger:route PATCH /clients/{id} admin patchOAuth2Client
 //
-// Patch an OAuth 2.0 Client
+// # Patch an OAuth 2.0 Client
 //
 // Patch an existing OAuth 2.0 Client. If you pass `client_secret`
 // the secret will be updated and returned via the API. This is the
@@ -331,17 +329,17 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -400,7 +398,7 @@ type Filter struct {
 
 // swagger:route GET /clients admin listOAuth2Clients
 //
-// List OAuth 2.0 Clients
+// # List OAuth 2.0 Clients
 //
 // This endpoint lists all clients in the database, and never returns client secrets.
 // As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
@@ -412,17 +410,17 @@ type Filter struct {
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2ClientList
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2ClientList
+//	  default: jsonError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 	filters := Filter{
@@ -459,24 +457,24 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 // swagger:route GET /clients/{id} admin getOAuth2Client
 //
-// Get an OAuth 2.0 Client
+// # Get an OAuth 2.0 Client
 //
 // Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -506,17 +504,17 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
@@ -538,7 +536,7 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 
 // swagger:route DELETE /clients/{id} admin deleteOAuth2Client
 //
-// Deletes an OAuth 2.0 Client
+// # Deletes an OAuth 2.0 Client
 //
 // Delete an existing OAuth 2.0 Client by its ID.
 //
@@ -547,17 +545,17 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 //
 // Make sure that this endpoint is well protected and only callable by first-party components.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  default: jsonError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -574,14 +572,14 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 // client configuration takes precedence over the instance-wide token lifespan
 // configuration.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2Client
-//       default: jsonError
+//	Responses:
+//	  200: oAuth2Client
+//	  default: jsonError
 func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -634,14 +632,14 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  default: jsonError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
@@ -671,7 +669,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 	}
 
 	token := fosite.AccessTokenFromRequest(r)
-	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(token); err != nil {
+	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(nil, token); err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())

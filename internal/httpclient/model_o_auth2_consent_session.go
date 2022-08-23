@@ -13,22 +13,21 @@ package openapi
 
 import (
 	"encoding/json"
-	"time"
 )
 
 // OAuth2ConsentSession struct for OAuth2ConsentSession
 type OAuth2ConsentSession struct {
-	AllowedTopLevelClaims []string               `json:"allowed_top_level_claims,omitempty"`
-	ClientId              *string                `json:"client_id,omitempty"`
-	ConsentChallenge      *string                `json:"consent_challenge,omitempty"`
-	ExcludeNotBeforeClaim *bool                  `json:"exclude_not_before_claim,omitempty"`
-	ExpiresAt             *map[string]time.Time  `json:"expires_at,omitempty"`
-	Extra                 map[string]interface{} `json:"extra,omitempty"`
-	Headers               *Headers               `json:"headers,omitempty"`
-	IdTokenClaims         *IDTokenClaims         `json:"id_token_claims,omitempty"`
-	Kid                   *string                `json:"kid,omitempty"`
-	Subject               *string                `json:"subject,omitempty"`
-	Username              *string                `json:"username,omitempty"`
+	AllowedTopLevelClaims []string                       `json:"allowed_top_level_claims,omitempty"`
+	ClientId              *string                        `json:"client_id,omitempty"`
+	ConsentChallenge      *string                        `json:"consent_challenge,omitempty"`
+	ExcludeNotBeforeClaim *bool                          `json:"exclude_not_before_claim,omitempty"`
+	ExpiresAt             *OAuth2ConsentSessionExpiresAt `json:"expires_at,omitempty"`
+	Extra                 map[string]interface{}         `json:"extra,omitempty"`
+	Headers               *Headers                       `json:"headers,omitempty"`
+	IdTokenClaims         *IDTokenClaims                 `json:"id_token_claims,omitempty"`
+	Kid                   *string                        `json:"kid,omitempty"`
+	Subject               *string                        `json:"subject,omitempty"`
+	Username              *string                        `json:"username,omitempty"`
 }
 
 // NewOAuth2ConsentSession instantiates a new OAuth2ConsentSession object
@@ -177,9 +176,9 @@ func (o *OAuth2ConsentSession) SetExcludeNotBeforeClaim(v bool) {
 }
 
 // GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
-func (o *OAuth2ConsentSession) GetExpiresAt() map[string]time.Time {
+func (o *OAuth2ConsentSession) GetExpiresAt() OAuth2ConsentSessionExpiresAt {
 	if o == nil || o.ExpiresAt == nil {
-		var ret map[string]time.Time
+		var ret OAuth2ConsentSessionExpiresAt
 		return ret
 	}
 	return *o.ExpiresAt
@@ -187,7 +186,7 @@ func (o *OAuth2ConsentSession) GetExpiresAt() map[string]time.Time {
 
 // GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2ConsentSession) GetExpiresAtOk() (*map[string]time.Time, bool) {
+func (o *OAuth2ConsentSession) GetExpiresAtOk() (*OAuth2ConsentSessionExpiresAt, bool) {
 	if o == nil || o.ExpiresAt == nil {
 		return nil, false
 	}
@@ -203,8 +202,8 @@ func (o *OAuth2ConsentSession) HasExpiresAt() bool {
 	return false
 }
 
-// SetExpiresAt gets a reference to the given map[string]time.Time and assigns it to the ExpiresAt field.
-func (o *OAuth2ConsentSession) SetExpiresAt(v map[string]time.Time) {
+// SetExpiresAt gets a reference to the given OAuth2ConsentSessionExpiresAt and assigns it to the ExpiresAt field.
+func (o *OAuth2ConsentSession) SetExpiresAt(v OAuth2ConsentSessionExpiresAt) {
 	o.ExpiresAt = &v
 }
 

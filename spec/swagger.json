@@ -2146,52 +2146,6 @@
       "type": "string",
       "title": "NullDuration represents a nullable JSON and SQL compatible time.Duration."
     },
-    "Session": {
-      "type": "object",
-      "properties": {
-        "allowed_top_level_claims": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "client_id": {
-          "type": "string"
-        },
-        "consent_challenge": {
-          "type": "string"
-        },
-        "exclude_not_before_claim": {
-          "type": "boolean"
-        },
-        "expires_at": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "extra": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "id_token_claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "kid": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
     "StringSliceJSONFormat": {
       "type": "array",
       "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
@@ -3031,6 +2985,52 @@
         }
       }
     },
+    "oAuth2ConsentSession": {
+      "type": "object",
+      "properties": {
+        "allowed_top_level_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "consent_challenge": {
+          "type": "string"
+        },
+        "exclude_not_before_claim": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "extra": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "id_token_claims": {
+          "$ref": "#/definitions/IDTokenClaims"
+        },
+        "kid": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      }
+    },
     "oAuth2LoginRequest": {
       "type": "object",
       "title": "Contains information on an ongoing login request.",
@@ -3495,7 +3495,7 @@
           "$ref": "#/definitions/oAuth2AccessRequest"
         },
         "session": {
-          "$ref": "#/definitions/Session"
+          "$ref": "#/definitions/oAuth2ConsentSession"
         },
         "subject": {
           "description": "Subject is the identifier of the authenticated end-user.",

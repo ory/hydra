@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-// Session struct for Session
-type Session struct {
+// OAuth2ConsentSession struct for OAuth2ConsentSession
+type OAuth2ConsentSession struct {
 	AllowedTopLevelClaims []string               `json:"allowed_top_level_claims,omitempty"`
 	ClientId              *string                `json:"client_id,omitempty"`
 	ConsentChallenge      *string                `json:"consent_challenge,omitempty"`
@@ -31,25 +31,25 @@ type Session struct {
 	Username              *string                `json:"username,omitempty"`
 }
 
-// NewSession instantiates a new Session object
+// NewOAuth2ConsentSession instantiates a new OAuth2ConsentSession object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSession() *Session {
-	this := Session{}
+func NewOAuth2ConsentSession() *OAuth2ConsentSession {
+	this := OAuth2ConsentSession{}
 	return &this
 }
 
-// NewSessionWithDefaults instantiates a new Session object
+// NewOAuth2ConsentSessionWithDefaults instantiates a new OAuth2ConsentSession object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewSessionWithDefaults() *Session {
-	this := Session{}
+func NewOAuth2ConsentSessionWithDefaults() *OAuth2ConsentSession {
+	this := OAuth2ConsentSession{}
 	return &this
 }
 
 // GetAllowedTopLevelClaims returns the AllowedTopLevelClaims field value if set, zero value otherwise.
-func (o *Session) GetAllowedTopLevelClaims() []string {
+func (o *OAuth2ConsentSession) GetAllowedTopLevelClaims() []string {
 	if o == nil || o.AllowedTopLevelClaims == nil {
 		var ret []string
 		return ret
@@ -59,7 +59,7 @@ func (o *Session) GetAllowedTopLevelClaims() []string {
 
 // GetAllowedTopLevelClaimsOk returns a tuple with the AllowedTopLevelClaims field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetAllowedTopLevelClaimsOk() ([]string, bool) {
+func (o *OAuth2ConsentSession) GetAllowedTopLevelClaimsOk() ([]string, bool) {
 	if o == nil || o.AllowedTopLevelClaims == nil {
 		return nil, false
 	}
@@ -67,7 +67,7 @@ func (o *Session) GetAllowedTopLevelClaimsOk() ([]string, bool) {
 }
 
 // HasAllowedTopLevelClaims returns a boolean if a field has been set.
-func (o *Session) HasAllowedTopLevelClaims() bool {
+func (o *OAuth2ConsentSession) HasAllowedTopLevelClaims() bool {
 	if o != nil && o.AllowedTopLevelClaims != nil {
 		return true
 	}
@@ -76,12 +76,12 @@ func (o *Session) HasAllowedTopLevelClaims() bool {
 }
 
 // SetAllowedTopLevelClaims gets a reference to the given []string and assigns it to the AllowedTopLevelClaims field.
-func (o *Session) SetAllowedTopLevelClaims(v []string) {
+func (o *OAuth2ConsentSession) SetAllowedTopLevelClaims(v []string) {
 	o.AllowedTopLevelClaims = v
 }
 
 // GetClientId returns the ClientId field value if set, zero value otherwise.
-func (o *Session) GetClientId() string {
+func (o *OAuth2ConsentSession) GetClientId() string {
 	if o == nil || o.ClientId == nil {
 		var ret string
 		return ret
@@ -91,7 +91,7 @@ func (o *Session) GetClientId() string {
 
 // GetClientIdOk returns a tuple with the ClientId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetClientIdOk() (*string, bool) {
+func (o *OAuth2ConsentSession) GetClientIdOk() (*string, bool) {
 	if o == nil || o.ClientId == nil {
 		return nil, false
 	}
@@ -99,7 +99,7 @@ func (o *Session) GetClientIdOk() (*string, bool) {
 }
 
 // HasClientId returns a boolean if a field has been set.
-func (o *Session) HasClientId() bool {
+func (o *OAuth2ConsentSession) HasClientId() bool {
 	if o != nil && o.ClientId != nil {
 		return true
 	}
@@ -108,12 +108,12 @@ func (o *Session) HasClientId() bool {
 }
 
 // SetClientId gets a reference to the given string and assigns it to the ClientId field.
-func (o *Session) SetClientId(v string) {
+func (o *OAuth2ConsentSession) SetClientId(v string) {
 	o.ClientId = &v
 }
 
 // GetConsentChallenge returns the ConsentChallenge field value if set, zero value otherwise.
-func (o *Session) GetConsentChallenge() string {
+func (o *OAuth2ConsentSession) GetConsentChallenge() string {
 	if o == nil || o.ConsentChallenge == nil {
 		var ret string
 		return ret
@@ -123,7 +123,7 @@ func (o *Session) GetConsentChallenge() string {
 
 // GetConsentChallengeOk returns a tuple with the ConsentChallenge field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetConsentChallengeOk() (*string, bool) {
+func (o *OAuth2ConsentSession) GetConsentChallengeOk() (*string, bool) {
 	if o == nil || o.ConsentChallenge == nil {
 		return nil, false
 	}
@@ -131,7 +131,7 @@ func (o *Session) GetConsentChallengeOk() (*string, bool) {
 }
 
 // HasConsentChallenge returns a boolean if a field has been set.
-func (o *Session) HasConsentChallenge() bool {
+func (o *OAuth2ConsentSession) HasConsentChallenge() bool {
 	if o != nil && o.ConsentChallenge != nil {
 		return true
 	}
@@ -140,12 +140,12 @@ func (o *Session) HasConsentChallenge() bool {
 }
 
 // SetConsentChallenge gets a reference to the given string and assigns it to the ConsentChallenge field.
-func (o *Session) SetConsentChallenge(v string) {
+func (o *OAuth2ConsentSession) SetConsentChallenge(v string) {
 	o.ConsentChallenge = &v
 }
 
 // GetExcludeNotBeforeClaim returns the ExcludeNotBeforeClaim field value if set, zero value otherwise.
-func (o *Session) GetExcludeNotBeforeClaim() bool {
+func (o *OAuth2ConsentSession) GetExcludeNotBeforeClaim() bool {
 	if o == nil || o.ExcludeNotBeforeClaim == nil {
 		var ret bool
 		return ret
@@ -155,7 +155,7 @@ func (o *Session) GetExcludeNotBeforeClaim() bool {
 
 // GetExcludeNotBeforeClaimOk returns a tuple with the ExcludeNotBeforeClaim field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetExcludeNotBeforeClaimOk() (*bool, bool) {
+func (o *OAuth2ConsentSession) GetExcludeNotBeforeClaimOk() (*bool, bool) {
 	if o == nil || o.ExcludeNotBeforeClaim == nil {
 		return nil, false
 	}
@@ -163,7 +163,7 @@ func (o *Session) GetExcludeNotBeforeClaimOk() (*bool, bool) {
 }
 
 // HasExcludeNotBeforeClaim returns a boolean if a field has been set.
-func (o *Session) HasExcludeNotBeforeClaim() bool {
+func (o *OAuth2ConsentSession) HasExcludeNotBeforeClaim() bool {
 	if o != nil && o.ExcludeNotBeforeClaim != nil {
 		return true
 	}
@@ -172,12 +172,12 @@ func (o *Session) HasExcludeNotBeforeClaim() bool {
 }
 
 // SetExcludeNotBeforeClaim gets a reference to the given bool and assigns it to the ExcludeNotBeforeClaim field.
-func (o *Session) SetExcludeNotBeforeClaim(v bool) {
+func (o *OAuth2ConsentSession) SetExcludeNotBeforeClaim(v bool) {
 	o.ExcludeNotBeforeClaim = &v
 }
 
 // GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
-func (o *Session) GetExpiresAt() map[string]time.Time {
+func (o *OAuth2ConsentSession) GetExpiresAt() map[string]time.Time {
 	if o == nil || o.ExpiresAt == nil {
 		var ret map[string]time.Time
 		return ret
@@ -187,7 +187,7 @@ func (o *Session) GetExpiresAt() map[string]time.Time {
 
 // GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetExpiresAtOk() (*map[string]time.Time, bool) {
+func (o *OAuth2ConsentSession) GetExpiresAtOk() (*map[string]time.Time, bool) {
 	if o == nil || o.ExpiresAt == nil {
 		return nil, false
 	}
@@ -195,7 +195,7 @@ func (o *Session) GetExpiresAtOk() (*map[string]time.Time, bool) {
 }
 
 // HasExpiresAt returns a boolean if a field has been set.
-func (o *Session) HasExpiresAt() bool {
+func (o *OAuth2ConsentSession) HasExpiresAt() bool {
 	if o != nil && o.ExpiresAt != nil {
 		return true
 	}
@@ -204,12 +204,12 @@ func (o *Session) HasExpiresAt() bool {
 }
 
 // SetExpiresAt gets a reference to the given map[string]time.Time and assigns it to the ExpiresAt field.
-func (o *Session) SetExpiresAt(v map[string]time.Time) {
+func (o *OAuth2ConsentSession) SetExpiresAt(v map[string]time.Time) {
 	o.ExpiresAt = &v
 }
 
 // GetExtra returns the Extra field value if set, zero value otherwise.
-func (o *Session) GetExtra() map[string]interface{} {
+func (o *OAuth2ConsentSession) GetExtra() map[string]interface{} {
 	if o == nil || o.Extra == nil {
 		var ret map[string]interface{}
 		return ret
@@ -219,7 +219,7 @@ func (o *Session) GetExtra() map[string]interface{} {
 
 // GetExtraOk returns a tuple with the Extra field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetExtraOk() (map[string]interface{}, bool) {
+func (o *OAuth2ConsentSession) GetExtraOk() (map[string]interface{}, bool) {
 	if o == nil || o.Extra == nil {
 		return nil, false
 	}
@@ -227,7 +227,7 @@ func (o *Session) GetExtraOk() (map[string]interface{}, bool) {
 }
 
 // HasExtra returns a boolean if a field has been set.
-func (o *Session) HasExtra() bool {
+func (o *OAuth2ConsentSession) HasExtra() bool {
 	if o != nil && o.Extra != nil {
 		return true
 	}
@@ -236,12 +236,12 @@ func (o *Session) HasExtra() bool {
 }
 
 // SetExtra gets a reference to the given map[string]interface{} and assigns it to the Extra field.
-func (o *Session) SetExtra(v map[string]interface{}) {
+func (o *OAuth2ConsentSession) SetExtra(v map[string]interface{}) {
 	o.Extra = v
 }
 
 // GetHeaders returns the Headers field value if set, zero value otherwise.
-func (o *Session) GetHeaders() Headers {
+func (o *OAuth2ConsentSession) GetHeaders() Headers {
 	if o == nil || o.Headers == nil {
 		var ret Headers
 		return ret
@@ -251,7 +251,7 @@ func (o *Session) GetHeaders() Headers {
 
 // GetHeadersOk returns a tuple with the Headers field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetHeadersOk() (*Headers, bool) {
+func (o *OAuth2ConsentSession) GetHeadersOk() (*Headers, bool) {
 	if o == nil || o.Headers == nil {
 		return nil, false
 	}
@@ -259,7 +259,7 @@ func (o *Session) GetHeadersOk() (*Headers, bool) {
 }
 
 // HasHeaders returns a boolean if a field has been set.
-func (o *Session) HasHeaders() bool {
+func (o *OAuth2ConsentSession) HasHeaders() bool {
 	if o != nil && o.Headers != nil {
 		return true
 	}
@@ -268,12 +268,12 @@ func (o *Session) HasHeaders() bool {
 }
 
 // SetHeaders gets a reference to the given Headers and assigns it to the Headers field.
-func (o *Session) SetHeaders(v Headers) {
+func (o *OAuth2ConsentSession) SetHeaders(v Headers) {
 	o.Headers = &v
 }
 
 // GetIdTokenClaims returns the IdTokenClaims field value if set, zero value otherwise.
-func (o *Session) GetIdTokenClaims() IDTokenClaims {
+func (o *OAuth2ConsentSession) GetIdTokenClaims() IDTokenClaims {
 	if o == nil || o.IdTokenClaims == nil {
 		var ret IDTokenClaims
 		return ret
@@ -283,7 +283,7 @@ func (o *Session) GetIdTokenClaims() IDTokenClaims {
 
 // GetIdTokenClaimsOk returns a tuple with the IdTokenClaims field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetIdTokenClaimsOk() (*IDTokenClaims, bool) {
+func (o *OAuth2ConsentSession) GetIdTokenClaimsOk() (*IDTokenClaims, bool) {
 	if o == nil || o.IdTokenClaims == nil {
 		return nil, false
 	}
@@ -291,7 +291,7 @@ func (o *Session) GetIdTokenClaimsOk() (*IDTokenClaims, bool) {
 }
 
 // HasIdTokenClaims returns a boolean if a field has been set.
-func (o *Session) HasIdTokenClaims() bool {
+func (o *OAuth2ConsentSession) HasIdTokenClaims() bool {
 	if o != nil && o.IdTokenClaims != nil {
 		return true
 	}
@@ -300,12 +300,12 @@ func (o *Session) HasIdTokenClaims() bool {
 }
 
 // SetIdTokenClaims gets a reference to the given IDTokenClaims and assigns it to the IdTokenClaims field.
-func (o *Session) SetIdTokenClaims(v IDTokenClaims) {
+func (o *OAuth2ConsentSession) SetIdTokenClaims(v IDTokenClaims) {
 	o.IdTokenClaims = &v
 }
 
 // GetKid returns the Kid field value if set, zero value otherwise.
-func (o *Session) GetKid() string {
+func (o *OAuth2ConsentSession) GetKid() string {
 	if o == nil || o.Kid == nil {
 		var ret string
 		return ret
@@ -315,7 +315,7 @@ func (o *Session) GetKid() string {
 
 // GetKidOk returns a tuple with the Kid field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetKidOk() (*string, bool) {
+func (o *OAuth2ConsentSession) GetKidOk() (*string, bool) {
 	if o == nil || o.Kid == nil {
 		return nil, false
 	}
@@ -323,7 +323,7 @@ func (o *Session) GetKidOk() (*string, bool) {
 }
 
 // HasKid returns a boolean if a field has been set.
-func (o *Session) HasKid() bool {
+func (o *OAuth2ConsentSession) HasKid() bool {
 	if o != nil && o.Kid != nil {
 		return true
 	}
@@ -332,12 +332,12 @@ func (o *Session) HasKid() bool {
 }
 
 // SetKid gets a reference to the given string and assigns it to the Kid field.
-func (o *Session) SetKid(v string) {
+func (o *OAuth2ConsentSession) SetKid(v string) {
 	o.Kid = &v
 }
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
-func (o *Session) GetSubject() string {
+func (o *OAuth2ConsentSession) GetSubject() string {
 	if o == nil || o.Subject == nil {
 		var ret string
 		return ret
@@ -347,7 +347,7 @@ func (o *Session) GetSubject() string {
 
 // GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetSubjectOk() (*string, bool) {
+func (o *OAuth2ConsentSession) GetSubjectOk() (*string, bool) {
 	if o == nil || o.Subject == nil {
 		return nil, false
 	}
@@ -355,7 +355,7 @@ func (o *Session) GetSubjectOk() (*string, bool) {
 }
 
 // HasSubject returns a boolean if a field has been set.
-func (o *Session) HasSubject() bool {
+func (o *OAuth2ConsentSession) HasSubject() bool {
 	if o != nil && o.Subject != nil {
 		return true
 	}
@@ -364,12 +364,12 @@ func (o *Session) HasSubject() bool {
 }
 
 // SetSubject gets a reference to the given string and assigns it to the Subject field.
-func (o *Session) SetSubject(v string) {
+func (o *OAuth2ConsentSession) SetSubject(v string) {
 	o.Subject = &v
 }
 
 // GetUsername returns the Username field value if set, zero value otherwise.
-func (o *Session) GetUsername() string {
+func (o *OAuth2ConsentSession) GetUsername() string {
 	if o == nil || o.Username == nil {
 		var ret string
 		return ret
@@ -379,7 +379,7 @@ func (o *Session) GetUsername() string {
 
 // GetUsernameOk returns a tuple with the Username field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Session) GetUsernameOk() (*string, bool) {
+func (o *OAuth2ConsentSession) GetUsernameOk() (*string, bool) {
 	if o == nil || o.Username == nil {
 		return nil, false
 	}
@@ -387,7 +387,7 @@ func (o *Session) GetUsernameOk() (*string, bool) {
 }
 
 // HasUsername returns a boolean if a field has been set.
-func (o *Session) HasUsername() bool {
+func (o *OAuth2ConsentSession) HasUsername() bool {
 	if o != nil && o.Username != nil {
 		return true
 	}
@@ -396,11 +396,11 @@ func (o *Session) HasUsername() bool {
 }
 
 // SetUsername gets a reference to the given string and assigns it to the Username field.
-func (o *Session) SetUsername(v string) {
+func (o *OAuth2ConsentSession) SetUsername(v string) {
 	o.Username = &v
 }
 
-func (o Session) MarshalJSON() ([]byte, error) {
+func (o OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AllowedTopLevelClaims != nil {
 		toSerialize["allowed_top_level_claims"] = o.AllowedTopLevelClaims
@@ -438,38 +438,38 @@ func (o Session) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableSession struct {
-	value *Session
+type NullableOAuth2ConsentSession struct {
+	value *OAuth2ConsentSession
 	isSet bool
 }
 
-func (v NullableSession) Get() *Session {
+func (v NullableOAuth2ConsentSession) Get() *OAuth2ConsentSession {
 	return v.value
 }
 
-func (v *NullableSession) Set(val *Session) {
+func (v *NullableOAuth2ConsentSession) Set(val *OAuth2ConsentSession) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableSession) IsSet() bool {
+func (v NullableOAuth2ConsentSession) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableSession) Unset() {
+func (v *NullableOAuth2ConsentSession) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableSession(val *Session) *NullableSession {
-	return &NullableSession{value: val, isSet: true}
+func NewNullableOAuth2ConsentSession(val *OAuth2ConsentSession) *NullableOAuth2ConsentSession {
+	return &NullableOAuth2ConsentSession{value: val, isSet: true}
 }
 
-func (v NullableSession) MarshalJSON() ([]byte, error) {
+func (v NullableOAuth2ConsentSession) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableSession) UnmarshalJSON(src []byte) error {
+func (v *NullableOAuth2ConsentSession) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -2108,37 +2108,6 @@ components:
       format: uuid4
       nullable: true
       type: string
-    Session:
-      properties:
-        allowed_top_level_claims:
-          items:
-            type: string
-          type: array
-        client_id:
-          type: string
-        consent_challenge:
-          type: string
-        exclude_not_before_claim:
-          type: boolean
-        expires_at:
-          additionalProperties:
-            format: date-time
-            type: string
-          type: object
-        extra:
-          additionalProperties: true
-          type: object
-        headers:
-          $ref: "#/components/schemas/Headers"
-        id_token_claims:
-          $ref: "#/components/schemas/IDTokenClaims"
-        kid:
-          type: string
-        subject:
-          type: string
-        username:
-          type: string
-      type: object
     StringSliceJSONFormat:
       items:
         type: string
@@ -3684,6 +3653,37 @@ components:
           type: array
       title: Contains optional information about the OpenID Connect request.
       type: object
+    oAuth2ConsentSession:
+      properties:
+        allowed_top_level_claims:
+          items:
+            type: string
+          type: array
+        client_id:
+          type: string
+        consent_challenge:
+          type: string
+        exclude_not_before_claim:
+          type: boolean
+        expires_at:
+          additionalProperties:
+            format: date-time
+            type: string
+          type: object
+        extra:
+          additionalProperties: true
+          type: object
+        headers:
+          $ref: "#/components/schemas/Headers"
+        id_token_claims:
+          $ref: "#/components/schemas/IDTokenClaims"
+        kid:
+          type: string
+        subject:
+          type: string
+        username:
+          type: string
+      type: object
     oAuth2LoginRequest:
       example:
         requested_access_token_audience:
@@ -4679,7 +4679,7 @@ components:
         requester:
           $ref: "#/components/schemas/oAuth2AccessRequest"
         session:
-          $ref: "#/components/schemas/Session"
+          $ref: "#/components/schemas/oAuth2ConsentSession"
         subject:
           description: Subject is the identifier of the authenticated end-user.
           type: string

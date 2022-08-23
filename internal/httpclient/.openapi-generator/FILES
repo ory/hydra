@@ -35,6 +35,7 @@ docs/OAuth2ApiError.md
 docs/OAuth2Client.md
 docs/OAuth2ConsentRequest.md
 docs/OAuth2ConsentRequestOpenIDConnectContext.md
+docs/OAuth2ConsentSession.md
 docs/OAuth2LoginRequest.md
 docs/OAuth2LogoutRequest.md
 docs/OAuth2TokenResponse.md
@@ -46,7 +47,6 @@ docs/PreviousOAuth2ConsentSession.md
 docs/RefreshTokenHookRequest.md
 docs/RefreshTokenHookResponse.md
 docs/RejectOAuth2Request.md
-docs/Session.md
 docs/SuccessfulOAuth2RequestResponse.md
 docs/TokenPagination.md
 docs/TokenPaginationHeaders.md
@@ -83,6 +83,7 @@ model_o_auth2_api_error.go
 model_o_auth2_client.go
 model_o_auth2_consent_request.go
 model_o_auth2_consent_request_open_id_connect_context.go
+model_o_auth2_consent_session.go
 model_o_auth2_login_request.go
 model_o_auth2_logout_request.go
 model_o_auth2_token_response.go
@@ -94,7 +95,6 @@ model_previous_o_auth2_consent_session.go
 model_refresh_token_hook_request.go
 model_refresh_token_hook_response.go
 model_reject_o_auth2_request.go
-model_session.go
 model_successful_o_auth2_request_response.go
 model_token_pagination.go
 model_token_pagination_headers.go

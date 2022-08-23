@@ -24,7 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -344,7 +344,7 @@ func TestUserinfo(t *testing.T) {
 			require.NoError(t, err)
 			defer resp.Body.Close()
 			require.EqualValues(t, tc.expectStatusCode, resp.StatusCode)
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 			if tc.expectStatusCode == http.StatusOK {
 				tc.checkForSuccess(t, body)

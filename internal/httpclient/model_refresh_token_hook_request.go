@@ -22,9 +22,9 @@ type RefreshTokenHookRequest struct {
 	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
 	GrantedAudience []string `json:"granted_audience,omitempty"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-	GrantedScopes []string             `json:"granted_scopes,omitempty"`
-	Requester     *OAuth2AccessRequest `json:"requester,omitempty"`
-	Session       *Session             `json:"session,omitempty"`
+	GrantedScopes []string              `json:"granted_scopes,omitempty"`
+	Requester     *OAuth2AccessRequest  `json:"requester,omitempty"`
+	Session       *OAuth2ConsentSession `json:"session,omitempty"`
 	// Subject is the identifier of the authenticated end-user.
 	Subject *string `json:"subject,omitempty"`
 }
@@ -175,9 +175,9 @@ func (o *RefreshTokenHookRequest) SetRequester(v OAuth2AccessRequest) {
 }
 
 // GetSession returns the Session field value if set, zero value otherwise.
-func (o *RefreshTokenHookRequest) GetSession() Session {
+func (o *RefreshTokenHookRequest) GetSession() OAuth2ConsentSession {
 	if o == nil || o.Session == nil {
-		var ret Session
+		var ret OAuth2ConsentSession
 		return ret
 	}
 	return *o.Session
@@ -185,7 +185,7 @@ func (o *RefreshTokenHookRequest) GetSession() Session {
 
 // GetSessionOk returns a tuple with the Session field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RefreshTokenHookRequest) GetSessionOk() (*Session, bool) {
+func (o *RefreshTokenHookRequest) GetSessionOk() (*OAuth2ConsentSession, bool) {
 	if o == nil || o.Session == nil {
 		return nil, false
 	}
@@ -201,8 +201,8 @@ func (o *RefreshTokenHookRequest) HasSession() bool {
 	return false
 }
 
-// SetSession gets a reference to the given Session and assigns it to the Session field.
-func (o *RefreshTokenHookRequest) SetSession(v Session) {
+// SetSession gets a reference to the given OAuth2ConsentSession and assigns it to the Session field.
+func (o *RefreshTokenHookRequest) SetSession(v OAuth2ConsentSession) {
 	o.Session = &v
 }
 

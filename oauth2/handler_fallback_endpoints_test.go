@@ -22,7 +22,7 @@ package oauth2_test
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -56,7 +56,7 @@ func TestHandlerConsent(t *testing.T) {
 	assert.Nil(t, err)
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)
 
 	assert.NotEmpty(t, body)

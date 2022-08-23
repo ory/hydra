@@ -23,7 +23,7 @@ package client_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -191,7 +191,7 @@ func TestClientSDK(t *testing.T) {
 	t.Run("case=id can not be set", func(t *testing.T) {
 		_, res, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: x.ToPointer(uuidx.NewV4().String())}).Execute()
 		require.Error(t, err)
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		snapshotx.SnapshotT(t, json.RawMessage(body))
 	})

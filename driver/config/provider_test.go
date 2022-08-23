@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -100,7 +100,7 @@ func TestCORSOptions(t *testing.T) {
 func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 
 	p := MustNew(context.Background(), l)
 
@@ -116,7 +116,7 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 
 	p := MustNew(context.Background(), l)
 
@@ -132,7 +132,7 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 func TestPublicAllowDynamicRegistration(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 
 	p := MustNew(context.Background(), l)
 
@@ -148,7 +148,7 @@ func TestPublicAllowDynamicRegistration(t *testing.T) {
 func TestProviderIssuerURL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	p := MustNew(context.Background(), l)
 	p.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost", p.IssuerURL(ctx).String())
@@ -161,7 +161,7 @@ func TestProviderIssuerURL(t *testing.T) {
 func TestProviderIssuerPublicURL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	p := MustNew(context.Background(), l)
 	p.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost")
 	p.MustSet(ctx, KeyPublicURL, "http://hydra.example")
@@ -192,7 +192,7 @@ func TestProviderIssuerPublicURL(t *testing.T) {
 func TestProviderCookieSameSiteMode(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 
 	p := MustNew(context.Background(), l, configx.SkipValidation())
 	p.MustSet(ctx, KeyTLSEnabled, true)
@@ -330,7 +330,7 @@ func TestViperProviderValidates(t *testing.T) {
 }
 
 func TestSetPerm(t *testing.T) {
-	f, e := ioutil.TempFile("", "test")
+	f, e := os.CreateTemp("", "test")
 	require.NoError(t, e)
 	path := f.Name()
 
@@ -354,7 +354,7 @@ func TestSetPerm(t *testing.T) {
 func TestLoginConsentURL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	p := MustNew(context.Background(), l)
 	p.MustSet(ctx, KeyLoginURL, "http://localhost:8080/oauth/login")
 	p.MustSet(ctx, KeyConsentURL, "http://localhost:8080/oauth/consent")
@@ -373,7 +373,7 @@ func TestLoginConsentURL(t *testing.T) {
 func TestInfinitRefreshTokenTTL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	c := MustNew(context.Background(), l, configx.WithValue("ttl.refresh_token", -1))
 
 	assert.Equal(t, -1*time.Nanosecond, c.GetRefreshTokenLifespan(ctx))
@@ -382,7 +382,7 @@ func TestInfinitRefreshTokenTTL(t *testing.T) {
 func TestCookieSecure(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	c := MustNew(context.Background(), l, configx.WithValue(KeyDevelopmentMode, true))
 
 	c.MustSet(ctx, KeyCookieSecure, true)
@@ -409,7 +409,7 @@ func TestTokenRefreshHookURL(t *testing.T) {
 
 func TestJWTBearer(t *testing.T) {
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	p := MustNew(context.Background(), l)
 
 	ctx := context.Background()

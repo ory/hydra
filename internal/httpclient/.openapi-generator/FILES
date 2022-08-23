@@ -14,7 +14,6 @@ docs/AcceptOAuth2LoginRequest.md
 docs/AdminApi.md
 docs/AdminCreateJsonWebKeySetBody.md
 docs/AdminTrustOAuth2JwtGrantIssuerBody.md
-docs/DefaultSession.md
 docs/GenericError.md
 docs/GetVersion200Response.md
 docs/HandledOAuth2ConsentRequest.md
@@ -64,7 +63,6 @@ model_accept_o_auth2_consent_request_session.go
 model_accept_o_auth2_login_request.go
 model_admin_create_json_web_key_set_body.go
 model_admin_trust_o_auth2_jwt_grant_issuer_body.go
-model_default_session.go
 model_generic_error.go
 model_get_version_200_response.go
 model_handled_o_auth2_consent_request.go

@@ -22,8 +22,10 @@ package consent
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/julienschmidt/httprouter"
@@ -49,6 +51,7 @@ const (
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
 	SessionsPath = "/oauth2/auth/sessions"
+	DevicePath   = "/oauth2/auth/device"
 )
 
 func NewHandler(
@@ -77,28 +80,29 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(LogoutPath, h.GetLogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
+
+	admin.GET(DevicePath, h.GetDeviceLoginRequest)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
 //
-// Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+// # Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
 //
+//	Consumes:
+//	- application/json
 //
-//     Consumes:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Schemes: http, https
 //
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       400: jsonError
-//       500: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  400: jsonError
+//	  500: jsonError
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -129,28 +133,27 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route GET /oauth2/auth/sessions/consent admin listSubjectConsentSessions
 //
-// Lists All Consent Sessions of a Subject
+// # Lists All Consent Sessions of a Subject
 //
 // This endpoint lists all subject's granted consent sessions, including client and granted scope.
 // If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
 // empty JSON array with status code 200 OK.
 //
-//
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: handledConsentRequestList
-//       400: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: handledConsentRequestList
+//	  400: jsonError
+//	  500: jsonError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -198,19 +201,18 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 // Front- or Back-channel logout.
 //
+//	Consumes:
+//	- application/json
 //
-//     Consumes:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Schemes: http, https
 //
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       400: jsonError
-//       500: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  400: jsonError
+//	  500: jsonError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -226,9 +228,46 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	user_code := r.URL.Query().Get("user_code")
+	state := r.URL.Query().Get("state")
+
+	if user_code == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'user_code' is not defined but should have been.`)))
+		return
+	}
+
+	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), user_code, &fosite.DefaultSession{})
+
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
+	}
+
+	client_id := req.GetClient().GetID()
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	var scopes []string = req.GetRequestedScopes()
+	scope_string := strings.Join(scopes, " ")
+	auth_url := h.c.OAuth2AuthURL()
+	auth_param := url.Values{"state": {state}, "user_code": {user_code}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}
+	q := auth_url.Query()
+
+	for k := range auth_param {
+		q.Set(k, auth_param.Get(k))
+	}
+	auth_url.RawQuery = q.Encode()
+	fmt.Println(auth_url.String())
+
+	http.Redirect(w, r, urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {state}, "user_code": {user_code}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(), http.StatusFound)
+	return
+}
+
 // swagger:route GET /oauth2/auth/requests/login admin getLoginRequest
 //
-// Get a Login Request
+// # Get a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -238,21 +277,20 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 // The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
+//	Consumes:
+//	- application/json
 //
-//     Consumes:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Schemes: http, https
 //
-//     Schemes: http, https
-//
-//     Responses:
-//       200: loginRequest
-//       400: jsonError
-//       404: jsonError
-//       410: requestWasHandledResponse
-//       500: jsonError
+//	Responses:
+//	  200: loginRequest
+//	  400: jsonError
+//	  404: jsonError
+//	  410: requestWasHandledResponse
+//	  500: jsonError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -282,7 +320,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 
 // swagger:route PUT /oauth2/auth/requests/login/accept admin acceptLoginRequest
 //
-// Accept a Login Request
+// # Accept a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -298,20 +336,20 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: completedRequest
-//       400: jsonError
-//       404: jsonError
-//       401: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: completedRequest
+//	  400: jsonError
+//	  404: jsonError
+//	  401: jsonError
+//	  500: jsonError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -375,7 +413,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route PUT /oauth2/auth/requests/login/reject admin rejectLoginRequest
 //
-// Reject a Login Request
+// # Reject a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -390,20 +428,20 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: completedRequest
-//       400: jsonError
-//       401: jsonError
-//       404: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: completedRequest
+//	  400: jsonError
+//	  401: jsonError
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -453,7 +491,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route GET /oauth2/auth/requests/consent admin getConsentRequest
 //
-// Get Consent Request Information
+// # Get Consent Request Information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -466,19 +504,19 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 // provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: consentRequest
-//       404: jsonError
-//       410: requestWasHandledResponse
-//       500: jsonError
+//	Responses:
+//	  200: consentRequest
+//	  404: jsonError
+//	  410: requestWasHandledResponse
+//	  500: jsonError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -515,7 +553,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 
 // swagger:route PUT /oauth2/auth/requests/consent/accept admin acceptConsentRequest
 //
-// Accept a Consent Request
+// # Accept a Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -534,18 +572,18 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: completedRequest
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -595,7 +633,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route PUT /oauth2/auth/requests/consent/reject admin rejectConsentRequest
 //
-// Reject a Consent Request
+// # Reject a Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -613,18 +651,18 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: completedRequest
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -675,22 +713,22 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route PUT /oauth2/auth/requests/logout/accept admin acceptLogoutRequest
 //
-// Accept a Logout Request
+// # Accept a Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 // No body is required.
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: completedRequest
-//       404: jsonError
-//       500: jsonError
+//	Responses:
+//	  200: completedRequest
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -710,22 +748,22 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 
 // swagger:route PUT /oauth2/auth/requests/logout/reject admin rejectLogoutRequest
 //
-// Reject a Logout Request
+// # Reject a Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 // No body is required.
 //
 // The response is empty as the logout provider has to chose what action to perform next.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       404: jsonError
-//       500: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -742,20 +780,20 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 
 // swagger:route GET /oauth2/auth/requests/logout admin getLogoutRequest
 //
-// Get a Logout Request
+// # Get a Logout Request
 //
 // Use this endpoint to fetch a logout request.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: logoutRequest
-//       404: jsonError
-//       410: requestWasHandledResponse
-//       500: jsonError
+//	Responses:
+//	  200: logoutRequest
+//	  404: jsonError
+//	  410: requestWasHandledResponse
+//	  500: jsonError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),

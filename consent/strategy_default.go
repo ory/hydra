@@ -22,6 +22,7 @@ package consent
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -1011,6 +1012,17 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 	consentSession, err := s.verifyConsent(w, r, req, consentVerifier)
 	if err != nil {
 		return nil, err
+	}
+
+	// check if this a device request and that the client supports the needed grant
+	deviceUserCode := strings.TrimSpace(req.GetRequestForm().Get("user_code"))
+	if deviceUserCode != "" {
+		fmt.Println("Device user code found : " + deviceUserCode)
+		if consentSession.ConsentRequest.Client.GetGrantTypes().Has("urn:ietf:params:oauth:grant-type:device_code") {
+			fmt.Println("Client ID : " + consentSession.ConsentRequest.Client.GetID() + " can process device requests")
+		} else {
+			return nil, client.ErrInvalidClientMetadata
+		}
 	}
 
 	return consentSession, nil

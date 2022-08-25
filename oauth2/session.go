@@ -21,7 +21,12 @@
 package oauth2
 
 import (
+	"encoding/json"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 
 	"github.com/mohae/deepcopy"
 
@@ -123,4 +128,69 @@ func (s *Session) Clone() fosite.Session {
 	}
 
 	return deepcopy.Copy(s).(fosite.Session)
+}
+
+var keyRewrites = map[string]string{
+	"Extra":                          "extra",
+	"KID":                            "kid",
+	"ClientID":                       "client_id",
+	"ConsentChallenge":               "consent_challenge",
+	"ExcludeNotBeforeClaim":          "exclude_not_before_claim",
+	"AllowedTopLevelClaims":          "allowed_top_level_claims",
+	"idToken.Headers.Extra":          "id_token.headers.extra",
+	"idToken.ExpiresAt":              "id_token.expires_at",
+	"idToken.Username":               "id_token.username",
+	"idToken.Subject":                "id_token.subject",
+	"idToken.Claims.JTI":             "id_token.id_token_claims.jti",
+	"idToken.Claims.Issuer":          "id_token.id_token_claims.iss",
+	"idToken.Claims.Subject":         "id_token.id_token_claims.sub",
+	"idToken.Claims.Audience":        "id_token.id_token_claims.aud",
+	"idToken.Claims.Nonce":           "id_token.id_token_claims.nonce",
+	"idToken.Claims.ExpiresAt":       "id_token.id_token_claims.exp",
+	"idToken.Claims.IssuedAt":        "id_token.id_token_claims.iat",
+	"idToken.Claims.RequestedAt":     "id_token.id_token_claims.rat",
+	"idToken.Claims.AuthTime":        "id_token.id_token_claims.auth_time",
+	"idToken.Claims.AccessTokenHash": "id_token.id_token_claims.at_hash",
+	"idToken.Claims.AuthenticationContextClassReference": "id_token.id_token_claims.acr",
+	"idToken.Claims.AuthenticationMethodsReferences":     "id_token.id_token_claims.amr",
+	"idToken.Claims.CodeHash":                            "id_token.id_token_claims.c_hash",
+	"idToken.Claims.Extra":                               "id_token.id_token_claims.ext",
+}
+
+func (s *Session) UnmarshalJSON(in []byte) (err error) {
+	type t Session
+	interpret := in
+	parsed := gjson.ParseBytes(in)
+
+	for orig, update := range keyRewrites {
+		if !parsed.Get(orig).Exists() {
+			continue
+		}
+		interpret, err = sjson.SetRawBytes(interpret, update, []byte(parsed.Get(orig).Raw))
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	for orig := range keyRewrites {
+		interpret, err = sjson.DeleteBytes(interpret, orig)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	if parsed.Get("idToken").Exists() {
+		interpret, err = sjson.DeleteBytes(interpret, "idToken")
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
+	var tt t
+	if err := json.Unmarshal(interpret, &tt); err != nil {
+		return errors.WithStack(err)
+	}
+
+	*s = Session(tt)
+	return nil
 }

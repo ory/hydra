@@ -643,6 +643,8 @@
 
 ### Bug Fixes
 
+- Improve refresh webhook getter
+  ([d40b1da](https://github.com/ory/hydra/commit/d40b1daf2b62cd9868032fa1c376e1301936c0e1))
 - Omit null lifespans ([#3212](https://github.com/ory/hydra/issues/3212))
   ([2d080a0](https://github.com/ory/hydra/commit/2d080a01dc39a3f7155cf05938501d59bc5f21bb))
 - Regression in session store

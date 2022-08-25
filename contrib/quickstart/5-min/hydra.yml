@@ -1,28 +1,6 @@
-version: v1.10.7
 serve:
   cookies:
     same_site_mode: Lax
-  public:
-    cors:
-      enabled: false # CORS is managed by CloudFront
-
-webfinger:
-  oidc_discovery:
-    supported_claims:
-      - sub
-      - persona_id
-      - persona_krn
-      - grantType
-      - market
-      - zone
-    supported_scope:
-      - offline
-      - offline_access
-      - openid
-      - default
-  jwks:
-    broadcast_keys:
-      - hydra.openid.id-token
 
 urls:
   self:
@@ -38,44 +16,7 @@ secrets:
 oidc:
   subject_identifiers:
     supported_types:
+      - pairwise
       - public
-
-strategies:
-  access_token: jwt
-  scope: wildcard
-
-oauth2:
-  session:
-    encrypt_at_rest: false
-  exclude_not_before_claim: false
-  allowed_top_level_claims:
-    - persona_id
-    - persona_krn
-    - grantType
-    - market
-    - zone
-    - login_session_id
-  hashers:
-    bcrypt:
-      cost: 10
-  pkce:
-    enforced_for_public_clients: true
-    enforced: false
-  client_credentials:
-    default_grant_allowed_scope: false
-  expose_internal_errors: false
-
-ttl:
-  auth_code: 2m
-  access_token: 5m
-  id_token: 1h
-  refresh_token: 24h
-  login_consent_request: 30m
-
-log:
-  leak_sensitive_values: true
-  format: json
-  level: trace
-
-sqa:
-  opt_out: true
+    pairwise:
+      salt: youReallyNeedToChangeThis

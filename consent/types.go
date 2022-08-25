@@ -704,3 +704,81 @@ func NewConsentRequestSessionData() *ConsentRequestSessionData {
 		IDToken:     map[string]interface{}{},
 	}
 }
+
+
+// Contains information on an ongoing device link request.
+//
+// swagger:model deviceLinkRequest
+type DeviceLinkRequest struct {
+	// ID is the identifier ("link challenge") of the device link request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ID string `json:"challenge" db:"challenge"`
+
+	DeviceCode string `json:"device_code" db:"device_code"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
+
+	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
+	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
+	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	//
+	// required: true
+	Client *client.Client `json:"client" db:"-"`
+
+	ClientID string `json:"-" db:"client_id"`
+
+	// RequestURL is the original OAuth 2.0 Device Authorization URL requested by the OAuth 2.0 client. It is the URL which
+	// initiates the OAuth 2.0 Device Authorization Grant.
+	//
+	// required: true
+	RequestURL string `json:"request_url" db:"request_url"`
+
+	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
+	// a login and consent request in the login & consent app.
+	LoginChallenge sqlxx.NullString `json:"login_challenge" db:"login_challenge"`
+
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_handled,r"`
+
+	Verifier string `json:"-" db:"verifier"`
+
+	// AuthenticatedAt sqlxx.NullTime `json:"-" db:"authenticated_at"`
+	RequestedAt time.Time `json:"-" db:"requested_at"`
+}
+
+func (DeviceLinkRequest) TableName() string {
+	return "hydra_oauth2_device_link_request"
+}
+
+func (r *DeviceLinkRequest) FindInDB(c *pop.Connection, id string) error {
+	return c.Select("hydra_oauth2_device_link_request.*").
+		// LeftJoin("hydra_oauth2_device_link_request_handled as hr", "hydra_oauth2_device_link_request.challenge = hr.challenge").
+		Find(r, id)
+}
+
+func (r *DeviceLinkRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = r.Client.OutfacingID
+	}
+	return nil
+}
+
+func (r *DeviceLinkRequest) AfterFind(c *pop.Connection) error {
+	r.Client = &client.Client{}
+	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
+}

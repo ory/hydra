@@ -207,7 +207,7 @@ func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idToken
 	return sub, nil
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.Requester, subject string, authenticatedAt time.Time, session *LoginSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errorsx.WithStack(fosite.ErrServerError.WithHint("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date."))
 	}
@@ -231,6 +231,13 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	// Generate the request URL
 	iu := s.c.OAuth2AuthURL()
 	iu.RawQuery = r.URL.RawQuery
+
+	// Identify requester type
+	if _, ok := ar.(fosite.AuthorizeRequester); ok {
+		iu = s.c.OAuth2AuthURL()
+	} else if _, ok := ar.(*fosite.DeviceAuthorizeRequest); ok {
+		iu = s.c.OAuth2DeviceAuthURL()
+	}
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
@@ -527,7 +534,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 }
 
-func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *HandledConsentRequest) error {
+func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.Request, ar fosite.Requester, as *HandledLoginRequest, cs *HandledConsentRequest) error {
 	skip := false
 	if cs != nil {
 		skip = true
@@ -583,7 +590,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
+func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.Requester, verifier string) (*HandledConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
@@ -1014,4 +1021,205 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 	}
 
 	return consentSession, nil
+}
+
+func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*HandledConsentRequest, error) {
+
+	// 1 - Get the link_verifier value from the request
+	linkVerifier := strings.TrimSpace(req.GetRequestForm().Get("link_verifier"))
+	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
+	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
+
+	// Final stage of the device auth flow
+	if len(consentVerifier) > 0 {
+		handledConsent, err := s.verifyConsent(w, r, req, consentVerifier)
+		if err != nil {
+			return nil, err
+		}
+
+		return handledConsent, nil
+	}
+
+	// Authentication has been accepted
+	if len(authenticationVerifier) > 0 {
+		authSession, err := s.verifyDeviceGrantAuthentication(w, r, req, authenticationVerifier)
+		if err != nil {
+			return nil, err
+		}
+
+		// Update Link Request with reference to Login Challenge
+
+		// ok, we need to process this request and redirect to auth endpoint
+		return nil, s.forwardConsentRequest(w, r, req, authSession, nil)
+	}
+
+	// User Code linking has been accepted
+	if len(linkVerifier) > 0 {
+		// handledLinkRequest, err := s.verifyUserCodeLink(w, r, req, linkVerifier)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		return nil, s.forwardAuthenticationRequest(w, r, req, "", time.Time{}, nil)
+		// return nil, s.requestAuthentication(w, r, req)
+	}
+
+	// Generate the request URL
+	// reqURL := s.c.OAuth2DeviceAuthURL()
+	// reqURL.RawQuery = r.URL.RawQuery
+
+	// linkRequest := &DeviceLinkRequest{
+	// 	ID:                   req.GetID(),
+	// 	Verifier:             strings.Replace(uuid.New(), "-", "", -1),
+	// 	RequestedScope:       []string(req.GetRequestedScopes()),
+	// 	RequestedAudience:    []string(req.GetRequestedAudience()),
+	// 	Client:               sanitizeClient(req.GetClient().(*client.Client)),
+	// 	RequestedAt:          time.Now().Truncate(time.Second).UTC(),
+	// 	OpenIDConnectContext: nil,
+	// 	RequestURL:           reqURL.String(),
+	// }
+
+	// // Persist the Device Link Request
+	// if err := s.r.ConsentManager().CreateDeviceLinkRequest(r.Context(), linkRequest); err != nil {
+	// 	return nil, errorsx.WithStack(err)
+	// }
+
+	return nil, nil
+}
+
+func (s *DefaultStrategy) verifyDeviceGrantAuthentication(w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
+	ctx := r.Context()
+	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
+	if errors.Is(err, sqlcon.ErrNoRows) {
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
+	} else if err != nil {
+		return nil, err
+	}
+
+	if session.HasError() {
+		session.Error.SetDefaults(loginRequestDeniedErrorName)
+		return nil, errorsx.WithStack(session.Error.toRFCError())
+	}
+
+	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
+	}
+
+	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
+		return nil, err
+	}
+
+	if session.LoginRequest.Skip && !session.Remember {
+		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request was previously remembered and can only be forgotten using the reject feature."))
+	}
+
+	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
+		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
+		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
+	}
+
+	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	sessionID := session.LoginRequest.SessionID.String()
+
+	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
+		// ResponseTypes: req.GetResponseTypes(),
+		// RedirectURI:   req.GetRedirectURI(),
+		// State:         req.GetState(),
+		// HandledResponseTypes, this can be safely ignored because it's not being used by validation
+		Request: fosite.Request{
+			ID:                req.GetID(),
+			RequestedAt:       req.GetRequestedAt(),
+			Client:            req.GetClient(),
+			RequestedAudience: req.GetRequestedAudience(),
+			GrantedAudience:   req.GetGrantedAudience(),
+			RequestedScope:    req.GetRequestedScopes(),
+			GrantedScope:      req.GetGrantedScopes(),
+			Form:              req.GetRequestForm(),
+			Session: &openid.DefaultSession{
+				Claims: &jwt.IDTokenClaims{
+					Subject:     subjectIdentifier,
+					IssuedAt:    time.Now().UTC(),                // doesn't matter
+					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
+					AuthTime:    time.Time(session.AuthenticatedAt),
+					RequestedAt: session.RequestedAt,
+				},
+				Headers: &jwt.Headers{},
+				Subject: session.Subject,
+			},
+		},
+	}); errors.Is(err, fosite.ErrLoginRequired) {
+		// This indicates that something went wrong with checking the subject id - let's destroy the session to be safe
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
+		return nil, err
+	} else if err != nil {
+		return nil, err
+	}
+
+	if session.ForceSubjectIdentifier != "" {
+		if err := s.r.ConsentManager().CreateForcedObfuscatedLoginSession(r.Context(), &ForcedObfuscatedLoginSession{
+			Subject:           session.Subject,
+			ClientID:          req.GetClient().GetID(),
+			SubjectObfuscated: session.ForceSubjectIdentifier,
+		}); err != nil {
+			return nil, err
+		}
+	}
+
+	if !session.LoginRequest.Skip {
+		if time.Time(session.AuthenticatedAt).IsZero() {
+			return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
+		}
+
+		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+			return nil, err
+		}
+	}
+
+	if !session.Remember && !session.LoginRequest.Skip {
+		// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
+		// wants us to store a cookie. So let's bust the authentication session (if one exists).
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+	}
+
+	if !session.Remember || session.LoginRequest.Skip {
+		// If the user doesn't want to remember the session, we do not store a cookie.
+		// If login was skipped, it means an authentication cookie was present and
+		// we don't want to touch it (in order to preserve its original expiry date)
+		return session, nil
+	}
+
+	// Not a skipped login and the user asked to remember its session, store a cookie
+	cookie, _ := s.r.CookieStore().Get(r, CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie.Values[CookieAuthenticationSIDName] = sessionID
+	if session.RememberFor >= 0 {
+		cookie.Options.MaxAge = session.RememberFor
+	}
+	cookie.Options.HttpOnly = true
+	cookie.Options.SameSite = s.c.CookieSameSiteMode()
+	cookie.Options.Secure = s.c.TLS(config.PublicInterface).Enabled()
+	if err := cookie.Save(r, w); err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
+	s.r.Logger().WithRequest(r).
+		WithFields(logrus.Fields{
+			"cookie_name":      CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName),
+			"cookie_http_only": true,
+			"cookie_same_site": s.c.CookieSameSiteMode(),
+			"cookie_secure":    s.c.TLS(config.PublicInterface).Enabled(),
+		}).Debug("Authentication session cookie was set.")
+	return session, nil
 }

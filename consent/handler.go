@@ -48,6 +48,7 @@ const (
 	LoginPath    = "/oauth2/auth/requests/login"
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
+	DevicePath   = "/oauth2/auth/requests/device/usercode"
 	SessionsPath = "/oauth2/auth/sessions"
 )
 
@@ -77,6 +78,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(LogoutPath, h.GetLogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
+	admin.POST(DevicePath+"/verify", h.VerifyDeviceAuthUserCode)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
@@ -781,4 +783,89 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	h.r.Writer().Write(w, r, request)
+}
+
+func (h *Handler) VerifyDeviceAuthUserCode(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	type payload struct {
+		UserCode string `json:"userCode"`
+	}
+
+	var body payload
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	if body.UserCode == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Request body parameter 'userCode' is not defined but should have been.`)))
+		return
+	}
+
+	// Find the User Code in the DB if it exists
+	userCodeSession, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), body.UserCode, nil)
+	if err != nil {
+		if errors.Is(err, fosite.ErrNotFound) {
+			h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		}
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	// Check expiry of User Code
+	// ...
+
+	// Check that it hasn't already been used
+	// ...
+
+	// Find the Device Link Request using the Request ID of the User Code Session
+	deviceLinkReq, err := h.r.ConsentManager().GetDeviceLinkRequest(r.Context(), userCodeSession.GetID())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	// Invalidate the User Code to ensure it can't be used again.
+	// if err := h.r.OAuth2Storage().InvalidateUserCodeSession(r.Context(), body.UserCode); err != nil {
+	// 	h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+	// 	return
+	// }
+
+	// Should we create a HandledDeviceLinkRequest?
+
+	// p.ID = challenge
+	// ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	// if err != nil {
+	// 	h.r.Writer().WriteError(w, r, err)
+	// 	return
+	// } else if ar.Subject != "" && p.Subject != ar.Subject {
+	// 	h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' does not match subject from previous authentication.")))
+	// 	return
+	// }
+
+	// if ar.Skip {
+	// 	p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
+	// 	p.AuthenticatedAt = ar.AuthenticatedAt
+	// } else {
+	// 	p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+	// 		// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
+	// 		Truncate(time.Second))
+	// 	ar.AuthenticatedAt = p.AuthenticatedAt
+	// }
+	// p.RequestedAt = ar.RequestedAt
+
+	// request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &p)
+	// if err != nil {
+	// 	h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+	// 	return
+	// }
+
+	ru, err := url.Parse(deviceLinkReq.RequestURL)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"link_verifier": {deviceLinkReq.Verifier}}).String(),
+	})
 }

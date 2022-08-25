@@ -532,3 +532,35 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 
 	return nil
 }
+
+func (p *Persister) CreateDeviceLinkRequest(ctx context.Context, req *consent.DeviceLinkRequest) error {
+	return errorsx.WithStack(p.Connection(ctx).Create(req))
+}
+
+func (p *Persister) GetDeviceLinkRequest(ctx context.Context, challenge string) (*consent.DeviceLinkRequest, error) {
+	var lr consent.DeviceLinkRequest
+	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := (&lr).FindInDB(c, challenge); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errorsx.WithStack(x.ErrNotFound)
+			}
+			return sqlcon.HandleError(err)
+		}
+
+		return nil
+	})
+}
+
+func (p *Persister) GetDeviceLinkRequestByVerifier(ctx context.Context, verifier string) (*consent.DeviceLinkRequest, error) {
+	var lr consent.DeviceLinkRequest
+	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.Select(lr.TableName()+".*").Where("verifier = ?", verifier).First(&lr); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errorsx.WithStack(x.ErrNotFound)
+			}
+			return sqlcon.HandleError(err)
+		}
+
+		return nil
+	})
+}

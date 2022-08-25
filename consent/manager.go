@@ -64,6 +64,15 @@ type Manager interface {
 	CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error
 	GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error)
 
+	// Functions for the management of DeviceLink requests
+	CreateDeviceLinkRequest(ctx context.Context, req *DeviceLinkRequest) error
+	GetDeviceLinkRequest(ctx context.Context, challenge string) (*DeviceLinkRequest, error)
+	GetDeviceLinkRequestByVerifier(ctx context.Context, verifier string) (*DeviceLinkRequest, error)
+	// GetDeviceLinkRequestByUserCode(ctx context.Context, userCode string) (*DeviceLinkRequest, error)
+	// GetDeviceLinkRequestByDeviceCode(ctx context.Context, deviceCode string) (*DeviceLinkRequest, error)
+	// VerifyAndInvalidateDeviceLinkRequest(ctx context.Context, verifier string) (*HandledDeviceLinkRequest, error)
+
+
 	ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
 	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
 

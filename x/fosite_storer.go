@@ -34,6 +34,8 @@ import (
 type FositeStorer interface {
 	fosite.Storage
 	oauth2.CoreStorage
+	oauth2.DeviceCodeStorage
+	oauth2.UserCodeStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
 	rfc7523.RFC7523KeyStorage

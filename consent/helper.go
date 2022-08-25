@@ -33,7 +33,7 @@ import (
 	"github.com/ory/hydra/client"
 )
 
-func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {
+func sanitizeClientFromRequest(ar fosite.Requester) *client.Client {
 	return sanitizeClient(ar.GetClient().(*client.Client))
 }
 

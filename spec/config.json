@@ -623,6 +623,14 @@
           "format": "uri",
           "examples": ["https://my-consent.app/consent"]
         },
+        "device_link": {
+          "type": "string",
+          "description": "Sets the device link endpoint of the  User Login & Consent flow when supporting the Device Authorisation Grant. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": [
+            "https://my-device-link.app/link"
+          ]
+        },
         "logout": {
           "type": "string",
           "description": "Sets the logout endpoint. Defaults to an internal fallback URL showing an error.",
@@ -724,6 +732,17 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "device_authorization": {
+          "type": "object",
+          "properties": {
+            "token_polling_interval": {
+              "type": "integer",
+              "default": 2,
+              "title": "Device Authorisation Token Polling Interval",
+              "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint."
+            }
+          }
+        },
         "expose_internal_errors": {
           "type": "boolean",
           "description": "Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.",

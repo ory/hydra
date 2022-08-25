@@ -50,11 +50,13 @@ type (
 )
 
 const (
-	sqlTableOpenID  tableName = "oidc"
-	sqlTableAccess  tableName = "access"
-	sqlTableRefresh tableName = "refresh"
-	sqlTableCode    tableName = "code"
-	sqlTablePKCE    tableName = "pkce"
+	sqlTableOpenID     tableName = "oidc"
+	sqlTableAccess     tableName = "access"
+	sqlTableRefresh    tableName = "refresh"
+	sqlTableCode       tableName = "code"
+	sqlTableDeviceCode tableName = "device_code"
+	sqlTableUserCode   tableName = "user_code"
+	sqlTablePKCE       tableName = "pkce"
 )
 
 func (r OAuth2RequestSQL) TableName() string {
@@ -148,6 +150,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 		GrantedAudience:   stringsx.Splitx(r.GrantedAudience, "|"),
 		Form:              val,
 		Session:           session,
+		ConsentGranted:    r.ConsentChallenge.Valid,
 	}, nil
 }
 
@@ -221,6 +224,21 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
+func (p *Persister) updateSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
+	req, err := p.sqlSchemaFromRequest(signature, requester, table)
+	if err != nil {
+		return err
+	}
+
+	if err := sqlcon.HandleError(p.Connection(ctx).Update(req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	rawSignature = p.hashSignature(rawSignature, table)
 
@@ -237,13 +255,50 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 			fr, err = r.toRequest(ctx, session, p)
 			if err != nil {
 				return err
-			} else if table == sqlTableCode {
+			} 
+			switch table {
+			case sqlTableCode:
 				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			case sqlTableDeviceCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedDeviceCode)
+			case sqlTableUserCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedUserCode)
 			}
 
 			return errorsx.WithStack(fosite.ErrInactiveToken)
 		}
 
+		fr, err = r.toRequest(ctx, session, p)
+		return err
+	})
+}
+
+func (p *Persister) findSessionByRequestID(ctx context.Context, requestID string, session fosite.Session, table tableName) (fosite.Requester, error) {
+	r := OAuth2RequestSQL{Table: table}
+	var fr fosite.Requester
+
+	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := p.Connection(ctx).Where("request_id = ?", requestID).First(&r)
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		} else if !r.Active {
+			fr, err = r.toRequest(ctx, session, p)
+			if err != nil {
+				return err
+			}
+			switch table {
+			case sqlTableCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			case sqlTableDeviceCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedDeviceCode)
+			case sqlTableUserCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedUserCode)
+			}
+
+			return errorsx.WithStack(fosite.ErrInactiveToken)
+		}
 		fr, err = r.toRequest(ctx, session, p)
 		return err
 	})
@@ -316,6 +371,92 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 			Exec())
 }
 
+//func (p *Persister) CreateDeviceAuthorizeSession(ctx context.Context, deviceSignature string, userSignature string, request fosite.Requester) (err error) {
+// 	req, err := p.sqlSchemaFromRequest(deviceSignature, request, sqlTableDevice)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	deviceAuthRequest := &OAuth2DeviceRequestSQL{
+// 		ID:                req.ID,
+// 		UserCode:          userSignature,
+// 		Request:           req.Request,
+// 		ConsentChallenge:  req.ConsentChallenge,
+// 		RequestedAt:       req.RequestedAt,
+// 		Client:            req.Client,
+// 		Scopes:            req.Scopes,
+// 		GrantedScope:      req.GrantedScope,
+// 		GrantedAudience:   req.GrantedAudience,
+// 		RequestedAudience: req.RequestedAudience,
+// 		Form:              req.Form,
+// 		Session:           req.Session,
+// 		Subject:           req.Subject,
+// 		Active:            req.Active,
+// 		Table:             req.Table,
+// 	}
+
+// 	if err := sqlcon.HandleError(p.Connection(ctx).Create(deviceAuthRequest)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+// 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+// 	} else if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+
+// func (p *Persister) GetDeviceAuthorizeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+// 	return p.findSessionBySignature(ctx, signature, session, sqlTableDevice)
+// }
+
+func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	return p.createSession(ctx, signature, requester, sqlTableDeviceCode)
+}
+
+func (p *Persister) UpdateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	return p.updateSession(ctx, signature, requester, sqlTableDeviceCode)
+}
+
+func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.DeviceAuthorizeRequester, err error) {
+	requester, err := p.findSessionBySignature(ctx, signature, session, sqlTableDeviceCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fosite.DeviceAuthorizeRequest{
+		AuthorizationPending: requester.GetSession().(*oauth2.Session).ConsentChallenge == "",
+		Request:              *requester.(*fosite.Request),
+	}, nil
+}
+
+func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, requestID string, session fosite.Session) (request fosite.DeviceAuthorizeRequester, err error) {
+	requester, err := p.findSessionByRequestID(ctx, requestID, session, sqlTableDeviceCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &fosite.DeviceAuthorizeRequest{
+		AuthorizationPending: requester.GetSession().(*oauth2.Session).ConsentChallenge == "",
+		Request:              *requester.(*fosite.Request),
+	}, nil
+}
+
+func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	return p.createSession(ctx, signature, requester, sqlTableUserCode)
+}
+
+func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+	return p.findSessionBySignature(ctx, signature, session, sqlTableUserCode)
+}
+
+func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature string) (err error) {
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=?", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+				signature).
+			Exec())
+}
+	
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	return p.createSession(ctx, signature, requester, sqlTableAccess)
 }

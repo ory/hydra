@@ -68,6 +68,8 @@ const (
 	RevocationPath   = "/oauth2/revoke"
 	FlushPath        = "/oauth2/flush"
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
+
+	DeviceAuthPath = "/oauth2/device/auth"
 )
 
 type Handler struct {
@@ -106,6 +108,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
+
+	public.GET(DeviceAuthPath, h.DeviceAuthHandler)
+	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
@@ -819,3 +824,114 @@ func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httpro
 // This function will not be called, OPTIONS request will be handled by cors
 // this is just a placeholder.
 func (h *Handler) handleOptions(w http.ResponseWriter, r *http.Request) {}
+
+func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = r.Context()
+
+	oauthProvider := h.r.OAuth2Provider()
+
+	deviceAuthorizeRequest, err := oauthProvider.NewDeviceAuthorizeRequest(ctx, r)
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+		return
+	}
+
+	deviceAuthorizeRequest.SetSession(NewSession(""))
+
+	if len(strings.TrimSpace(deviceAuthorizeRequest.GetRequestForm().Get("link_verifier"))) == 0 {
+		// Initial Device Authorisation Request.
+		response, err := oauthProvider.NewDeviceAuthorizeResponse(ctx, deviceAuthorizeRequest)
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+			return
+		}
+
+		// Generate the request URL
+		reqURL := h.c.OAuth2DeviceAuthURL()
+		reqURL.RawQuery = r.URL.RawQuery
+
+		// Create a Device Link Request, referencing the Device Code generated
+		linkRequest := &consent.DeviceLinkRequest{
+			ID:                   deviceAuthorizeRequest.GetID(),
+			DeviceCode:           response.GetDeviceCode(),
+			Verifier:             strings.Replace(uuid.New(), "-", "", -1),
+			RequestedScope:       []string(deviceAuthorizeRequest.GetRequestedScopes()),
+			RequestedAudience:    []string(deviceAuthorizeRequest.GetRequestedAudience()),
+			Client:               deviceAuthorizeRequest.GetClient().(*client.Client),
+			RequestedAt:          time.Now().Truncate(time.Second).UTC(),
+			OpenIDConnectContext: nil,
+			RequestURL:           reqURL.String(),
+		}
+
+		// Persist the Device Link Request
+		if err := h.r.ConsentManager().CreateDeviceLinkRequest(r.Context(), linkRequest); err != nil {
+			x.LogError(r, err, h.r.Logger())
+			oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+			return
+		}
+
+		oauthProvider.WriteDeviceAuthorizeResponse(w, deviceAuthorizeRequest, response)
+		return
+	}
+
+	// This must be a follow up request, as part of the usercode/auth/consent redirection journey
+
+	consentSession, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(w, r, deviceAuthorizeRequest)
+	if err != nil {
+		if errors.Is(err, consent.ErrAbortOAuth2Request) {
+			x.LogAudit(r, nil, h.r.AuditLogger())
+			return // do nothing
+		}
+
+		x.LogError(r, err, h.r.Logger())
+		oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+		return
+	}
+
+	if consentSession != nil {
+		// User has completed consent, time to update the device code entity
+		// Update Link Request with Consent
+		linkReq, err := h.r.ConsentManager().GetDeviceLinkRequestByVerifier(r.Context(), strings.TrimSpace(deviceAuthorizeRequest.GetRequestForm().Get("link_verifier")))
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+			return
+		}
+
+		deviceCodeSession, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(r.Context(), linkReq.ID, deviceAuthorizeRequest.GetSession())
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+			return
+		}
+
+		rr, ok := deviceCodeSession.GetSession().(*Session)
+		if !ok {
+			// do something with the error
+		}
+
+		rr.ConsentChallenge = consentSession.ID
+		deviceCodeSession.SetSession(rr)
+
+		for _, scope := range consentSession.GrantedScope {
+			deviceCodeSession.GrantScope(scope)
+		}
+
+		for _, audience := range consentSession.GrantedAudience {
+			deviceCodeSession.GrantAudience(audience)
+		}
+
+		err = h.r.OAuth2Provider().AuthorizeDeviceCode(r.Context(), linkReq.DeviceCode, deviceCodeSession)
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			oauthProvider.WriteDeviceAuthorizeError(w, deviceAuthorizeRequest, err)
+			return
+		}
+
+	}
+
+	http.Redirect(w, r, "https://www.google.com", http.StatusFound)
+}
+

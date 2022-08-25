@@ -449,9 +449,13 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 
 		// "hydra_oauth2_authentication_session"
 		var ls consent.LoginSession
-		query := fmt.Sprintf(`
-			DELETE FROM %[1]s WHERE id in
-			(SELECT id
+
+		ids := []string{}
+
+		// Select tokens' signatures with limit
+		q := p.Connection(ctx).RawQuery(
+			fmt.Sprintf(`
+			SELECT id
 			FROM %[1]s
 			WHERE NOT EXISTS
 			    (
@@ -465,15 +469,34 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 			    FROM %[3]s
 			    WHERE %[3]s.login_session_id = %[1]s.id
 			    )
-			LIMIT %[4]d)
+			LIMIT %[4]d
 			`,
-			(&ls).TableName(),
-			(&lr).TableName(),
-			(&cr).TableName(),
-			limit,
+				(&ls).TableName(),
+				(&lr).TableName(),
+				(&cr).TableName(),
+				limit,
+			),
 		)
+		if err := q.All(&ids); err == sql.ErrNoRows {
+			return errors.Wrap(fosite.ErrNotFound, "")
+		}
 
-		return p.Connection(ctx).RawQuery(query).Exec()
+		var err error
+		for i := 0; i < len(ids); i += batchSize {
+			j := i + batchSize
+			if j > len(ids) {
+				j = len(ids)
+			}
+
+			if i != j {
+				err = p.Connection(ctx).RawQuery(
+					fmt.Sprintf("DELETE FROM %[1]s WHERE id in (?)", (&ls).TableName()),
+					ids[i:j],
+				).Exec()
+			}
+		}
+
+		return sqlcon.HandleError(err)
 	})
 }
 

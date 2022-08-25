@@ -649,6 +649,8 @@
   ([2d080a0](https://github.com/ory/hydra/commit/2d080a01dc39a3f7155cf05938501d59bc5f21bb))
 - Regression in session store
   ([5c4321d](https://github.com/ory/hydra/commit/5c4321d8d605c5c09537e345f56b447ac5856f95))
+- Remove special char from snapshot symbols
+  ([7128ad2](https://github.com/ory/hydra/commit/7128ad2a066674c4c1252f2cb1619055e5fbbbd9))
 - Revert config changes
   ([4da64de](https://github.com/ory/hydra/commit/4da64de7502a4de8cca4db6cfa35bdcf485ba7ef))
 - Session unmarshalling

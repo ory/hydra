@@ -75,12 +75,17 @@ func TestUnmarshalSession(t *testing.T) {
 		},
 	}
 
-	var actual Session
-	require.NoError(t, json.Unmarshal(v1118Session, &actual))
-	assertx.EqualAsJSON(t, expect, &actual)
-	snapshotx.SnapshotTExcept(t, &actual, nil)
+	t.Run("v1.11.8", func(t *testing.T) {
+		var actual Session
+		require.NoError(t, json.Unmarshal(v1118Session, &actual))
+		assertx.EqualAsJSON(t, expect, &actual)
+		snapshotx.SnapshotTExcept(t, &actual, nil)
+	})
 
-	require.NoError(t, json.Unmarshal(v1119Session, &actual))
-	assertx.EqualAsJSON(t, expect, &actual)
-	snapshotx.SnapshotTExcept(t, &actual, nil)
+	t.Run("v1.11.9", func(t *testing.T) {
+		var actual Session
+		require.NoError(t, json.Unmarshal(v1119Session, &actual))
+		assertx.EqualAsJSON(t, expect, &actual)
+		snapshotx.SnapshotTExcept(t, &actual, nil)
+	})
 }

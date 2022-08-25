@@ -87,6 +87,7 @@ type clientCreator interface {
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
 	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(config.KeyRefreshTokenHookURL, "")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {

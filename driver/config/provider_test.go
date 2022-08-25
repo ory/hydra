@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -381,4 +382,16 @@ func TestInfinitRefreshTokenTTL(t *testing.T) {
 	c := MustNew(context.Background(), l, configx.WithValue("ttl.refresh_token", -1))
 
 	assert.Equal(t, -1*time.Nanosecond, c.RefreshTokenLifespan())
+}
+
+func TestTokenRefreshHookURL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	c := MustNew(context.Background(), l, configx.SkipValidation())
+
+	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL())
+	c.MustSet(KeyRefreshTokenHookURL, "")
+	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL())
+	c.MustSet(KeyRefreshTokenHookURL, "http://localhost:8080/oauth/token_refresh")
+	assert.EqualValues(t, "http://localhost:8080/oauth/token_refresh", c.TokenRefreshHookURL().String())
 }

@@ -392,7 +392,11 @@ func (p *Provider) JWKSURL() *url.URL {
 }
 
 func (p *Provider) TokenRefreshHookURL() *url.URL {
-	return p.p.URIF(KeyRefreshTokenHookURL, nil)
+	if len(p.p.String(KeyRefreshTokenHookURL)) == 0 {
+		return nil
+	}
+
+	return p.p.RequestURIF(KeyRefreshTokenHookURL, nil)
 }
 
 func (p *Provider) AccessTokenStrategy() string {

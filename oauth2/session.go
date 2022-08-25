@@ -157,40 +157,38 @@ var keyRewrites = map[string]string{
 	"idToken.Claims.Extra":                               "id_token.id_token_claims.ext",
 }
 
-func (s *Session) UnmarshalJSON(in []byte) (err error) {
-	type t Session
-	interpret := in
-	parsed := gjson.ParseBytes(in)
+func (s *Session) UnmarshalJSON(original []byte) (err error) {
+	transformed := original
+	originalParsed := gjson.ParseBytes(original)
 
-	for orig, update := range keyRewrites {
-		if !parsed.Get(orig).Exists() {
+	for oldKey, newKey := range keyRewrites {
+		if !originalParsed.Get(oldKey).Exists() {
 			continue
 		}
-		interpret, err = sjson.SetRawBytes(interpret, update, []byte(parsed.Get(orig).Raw))
+		transformed, err = sjson.SetRawBytes(transformed, newKey, []byte(originalParsed.Get(oldKey).Raw))
 		if err != nil {
 			return errors.WithStack(err)
 		}
 	}
 
 	for orig := range keyRewrites {
-		interpret, err = sjson.DeleteBytes(interpret, orig)
+		transformed, err = sjson.DeleteBytes(transformed, orig)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 	}
 
-	if parsed.Get("idToken").Exists() {
-		interpret, err = sjson.DeleteBytes(interpret, "idToken")
+	if originalParsed.Get("idToken").Exists() {
+		transformed, err = sjson.DeleteBytes(transformed, "idToken")
 		if err != nil {
 			return errors.WithStack(err)
 		}
 	}
 
-	var tt t
-	if err := json.Unmarshal(interpret, &tt); err != nil {
+	type t Session
+	if err := json.Unmarshal(transformed, (*t)(s)); err != nil {
 		return errors.WithStack(err)
 	}
 
-	*s = Session(tt)
 	return nil
 }

@@ -1,0 +1,47 @@
+{
+  "idToken": {
+    "Claims": {
+      "JTI": "",
+      "Issuer": "http://127.0.0.1:4444/",
+      "Subject": "foo@bar.com",
+      "Audience": ["auth-code-client"],
+      "Nonce": "mbxojlzlkefzmlecvrzfkmpm",
+      "ExpiresAt": "0001-01-01T00:00:00Z",
+      "IssuedAt": "2022-08-25T09:21:04Z",
+      "RequestedAt": "2022-08-25T09:20:54Z",
+      "AuthTime": "2022-08-25T09:21:01Z",
+      "AccessTokenHash": "",
+      "AuthenticationContextClassReference": "0",
+      "AuthenticationMethodsReferences": [],
+      "CodeHash": "",
+      "Extra": {
+        "sid": "177e1f44-a1e9-415c-bfa3-8b62280b182d"
+      }
+    },
+    "Headers": {
+      "Extra": {
+        "kid": "public:hydra.openid.id-token"
+      }
+    },
+    "ExpiresAt": {
+      "access_token": "2022-08-25T09:26:05Z",
+      "authorize_code": "2022-08-25T09:23:04.432089764Z",
+      "refresh_token": "2022-08-26T09:21:05Z"
+    },
+    "Username": "",
+    "Subject": "foo@bar.com"
+  },
+  "extra": {},
+  "KID": "public:hydra.jwt.access-token",
+  "ClientID": "auth-code-client",
+  "ConsentChallenge": "2261efbd447044a1b2f76b05c6aca164",
+  "ExcludeNotBeforeClaim": false,
+  "AllowedTopLevelClaims": [
+    "persona_id",
+    "persona_krn",
+    "grantType",
+    "market",
+    "zone",
+    "login_session_id"
+  ]
+}

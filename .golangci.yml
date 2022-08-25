@@ -5,7 +5,9 @@ linters:
     - gosimple
     - bodyclose
     - staticcheck
-    - goimports
+    # Disabled due to Go 1.19 changes and Go-Swagger incompatibility
+    # https://github.com/ory/hydra/issues/3227
+    # - goimports
   disable:
     - ineffassign
     - deadcode

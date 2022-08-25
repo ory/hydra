@@ -5,7 +5,7 @@
 
 **Table of Contents**
 
-- [0.0.0 (2022-08-02)](#000-2022-08-02)
+- [0.0.0 (2022-08-25)](#000-2022-08-25)
   - [Bug Fixes](#bug-fixes)
 - [1.11.9 (2022-08-01)](#1119-2022-08-01)
   - [Bug Fixes](#bug-fixes-1)
@@ -639,12 +639,18 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.9...v0.0.0) (2022-08-02)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.9...v0.0.0) (2022-08-25)
 
 ### Bug Fixes
 
 - Omit null lifespans ([#3212](https://github.com/ory/hydra/issues/3212))
   ([2d080a0](https://github.com/ory/hydra/commit/2d080a01dc39a3f7155cf05938501d59bc5f21bb))
+- Regression in session store
+  ([5c4321d](https://github.com/ory/hydra/commit/5c4321d8d605c5c09537e345f56b447ac5856f95))
+- Revert config changes
+  ([4da64de](https://github.com/ory/hydra/commit/4da64de7502a4de8cca4db6cfa35bdcf485ba7ef))
+- Session unmarshalling
+  ([3bb943a](https://github.com/ory/hydra/commit/3bb943a9ac2d4309b43d1cb9bf27bac7cabb86f9))
 
 # [1.11.9](https://github.com/ory/hydra/compare/v1.11.8...v1.11.9) (2022-08-01)
 

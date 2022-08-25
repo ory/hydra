@@ -1,0 +1,49 @@
+{
+  "id_token": {
+    "id_token_claims": {
+      "jti": "",
+      "iss": "http://127.0.0.1:4444/",
+      "sub": "foo@bar.com",
+      "aud": [
+        "auth-code-client"
+      ],
+      "nonce": "mbxojlzlkefzmlecvrzfkmpm",
+      "exp": "0001-01-01T00:00:00Z",
+      "iat": "2022-08-25T09:21:04Z",
+      "rat": "2022-08-25T09:20:54Z",
+      "auth_time": "2022-08-25T09:21:01Z",
+      "at_hash": "",
+      "acr": "0",
+      "amr": [],
+      "c_hash": "",
+      "ext": {
+        "sid": "177e1f44-a1e9-415c-bfa3-8b62280b182d"
+      }
+    },
+    "headers": {
+      "extra": {
+        "kid": "public:hydra.openid.id-token"
+      }
+    },
+    "expires_at": {
+      "access_token": "2022-08-25T09:26:05Z",
+      "authorize_code": "2022-08-25T09:23:04.432089764Z",
+      "refresh_token": "2022-08-26T09:21:05Z"
+    },
+    "username": "",
+    "subject": "foo@bar.com"
+  },
+  "extra": {},
+  "kid": "public:hydra.jwt.access-token",
+  "client_id": "auth-code-client",
+  "consent_challenge": "2261efbd447044a1b2f76b05c6aca164",
+  "exclude_not_before_claim": false,
+  "allowed_top_level_claims": [
+    "persona_id",
+    "persona_krn",
+    "grantType",
+    "market",
+    "zone",
+    "login_session_id"
+  ]
+}

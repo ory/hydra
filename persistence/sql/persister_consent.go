@@ -477,11 +477,14 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 				limit,
 			),
 		)
-		if err := q.All(&ids); err == sql.ErrNoRows {
-			return errors.Wrap(fosite.ErrNotFound, "")
+		if err := q.All(&ids); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errors.Wrap(fosite.ErrNotFound, "")
+			}
+
+			return sqlcon.HandleError(err)
 		}
 
-		var err error
 		for i := 0; i < len(ids); i += batchSize {
 			j := i + batchSize
 			if j > len(ids) {
@@ -489,14 +492,16 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 			}
 
 			if i != j {
-				err = p.Connection(ctx).RawQuery(
+				if err := p.Connection(ctx).RawQuery(
 					fmt.Sprintf("DELETE FROM %[1]s WHERE id in (?)", (&ls).TableName()),
 					ids[i:j],
-				).Exec()
+				).Exec(); err != nil {
+					return sqlcon.HandleError(err)
+				}
 			}
 		}
 
-		return sqlcon.HandleError(err)
+		return nil
 	})
 }
 

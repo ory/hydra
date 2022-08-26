@@ -32,6 +32,7 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/sqlxx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -135,6 +136,22 @@ func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	request.SetSession(session)
 	resp, _ := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
+
+	verifier := strings.Replace(uuid.New(), "-", "", -1)
+	challenge := strings.Replace(uuid.New(), "-", "", -1)
+	err = h.r.ConsentManager().CreateDeviceGrantRequest(ctx, &consent.DeviceGrantRequest{
+		ID:                challenge,
+		Verifier:          verifier,
+		RequestedScope:    sqlxx.StringSlicePipeDelimiter(request.GetRequestedScopes()),
+		RequestedAudience: sqlxx.StringSlicePipeDelimiter(request.GetGrantedAudience()),
+		UserCode:          resp.GetUserCode(),
+		DeviceCode:        resp.GetDeviceCode(),
+		ClientID:          request.GetClient().GetID(),
+	})
+
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+	}
 
 	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(w, request, resp)
 }

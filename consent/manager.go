@@ -56,6 +56,9 @@ type Manager interface {
 	RevokeSubjectLoginSession(ctx context.Context, user string) error
 	ConfirmLoginSession(ctx context.Context, id string, authTime time.Time, subject string, remember bool) error
 
+	CreateDeviceGrantRequest(ctx context.Context, req *DeviceGrantRequest) error
+	HandleDeviceGrantRequest(ctx context.Context, challenge string, r *HandledDeviceGrantRequest) (*DeviceGrantRequest, error)
+
 	CreateLoginRequest(ctx context.Context, req *LoginRequest) error
 	GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error)
 	HandleLoginRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error)

@@ -153,6 +153,46 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 	return r, nil
 }
 
+func (p *Persister) GetDeviceGrantRequest(ctx context.Context, challenge string) (*consent.DeviceGrantRequest, error) {
+	r := &consent.DeviceGrantRequest{}
+
+	if err := r.FindInDB(p.Connection(ctx), challenge); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return r, nil
+}
+
+func (p *Persister) CreateDeviceGrantRequest(ctx context.Context, req *consent.DeviceGrantRequest) error {
+	return errorsx.WithStack(p.Connection(ctx).Create(req))
+}
+
+func (p *Persister) HandleDeviceGrantRequest(ctx context.Context, challenge string, r *consent.HandledDeviceGrantRequest) (*consent.DeviceGrantRequest, error) {
+	c := p.Connection(ctx)
+
+	if err := sqlcon.HandleError(c.Create(r)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+		hr := &consent.HandledConsentRequest{}
+		if err := c.Find(hr, r.ID); err != nil {
+			return nil, sqlcon.HandleError(err)
+		}
+
+		if hr.WasHandled {
+			return nil, errorsx.WithStack(x.ErrConflict.WithHint("The consent request was already used and can no longer be changed."))
+		}
+
+		if err := c.Update(r); err != nil {
+			return nil, sqlcon.HandleError(err)
+		}
+	} else if err != nil {
+		return nil, err
+	}
+
+	return p.GetDeviceGrantRequest(ctx, challenge)
+}
+
 func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRequest) error {
 	return errorsx.WithStack(p.Connection(ctx).Create(req))
 }

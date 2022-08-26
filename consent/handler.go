@@ -178,6 +178,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	if len(a) == 0 {
+
 		a = []PreviousConsentSession{}
 	}
 
@@ -232,22 +233,36 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 	user_code := r.URL.Query().Get("user_code")
 	state := r.URL.Query().Get("state")
 
+	/*
+			erifier := strings.Replace(uuid.New(), "-", "", -1)
+			challenge := strings.Replace(uuid.New(), "-", "", -1)
+
+
+			err := h.r.ConsentManager().CreateDeviceGrantRequest(r.Context(), &DeviceGrantRequest{
+				ID:         challenge,
+				Verifier:   verifier,
+				DeviceCode: "AAABBBCCCDDD",
+				UserCode:   "ABCD",
+			})
+
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	*/
 	if user_code == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'user_code' is not defined but should have been.`)))
 		return
 	}
 
-	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), user_code, &fosite.DefaultSession{})
+	user_code_hash := h.r.OAuth2HMACStrategy().DeviceCodeSignature(user_code)
+	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), user_code_hash, &fosite.DefaultSession{})
 
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
 	}
 
 	client_id := req.GetClient().GetID()
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 
 	var scopes []string = req.GetRequestedScopes()
 	scope_string := strings.Join(scopes, " ")

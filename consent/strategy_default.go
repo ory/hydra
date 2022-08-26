@@ -609,6 +609,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
+	fmt.Println("verifyConsent Subject : " + session.ConsentRequest.Subject)
 	pw, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
@@ -628,6 +629,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 
 	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
+	fmt.Println("verifyConsent pw : " + pw)
 	return session, nil
 }
 

@@ -452,7 +452,6 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 
 		ids := []string{}
 
-		// Select tokens' signatures with limit
 		q := p.Connection(ctx).RawQuery(
 			fmt.Sprintf(`
 			SELECT id

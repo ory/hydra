@@ -487,25 +487,25 @@ type LogoutResult struct {
 	FrontChannelLogoutURLs []string
 }
 
+// Contains information on an ongoing device grant request.
+//
+// swagger:model deviceGrantRequest
 type DeviceGrantRequest struct {
 	ID                string                         `json:"challenge" db:"challenge"`
 	RequestedScope    sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_audience"`
 	Client            *client.Client                 `json:"client" db:"-"`
 	ClientID          string                         `json:"-" db:"client_id"`
+	CSRF              string                         `json:"-" db:"csrf"`
 	Verifier          string                         `json:"-" db:"verifier"`
 	DeviceCode        string                         `json:"-" db:"device_code"`
 	UserCode          string                         `json:"-" db:"user_code"`
+	Accepted          bool                           `json:"-" db:"accepted"`
+	AcceptedAt        sqlxx.NullTime                 `json:"handled_at" db:"accepted_at"`
 }
 
 func (_ DeviceGrantRequest) TableName() string {
 	return "hydra_oauth2_device_grant_request"
-}
-
-func (r *DeviceGrantRequest) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("hydra_oauth2_device_grant_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
-		LeftJoin("hydra_oauth2_device_grant_request_handled as hr", "hydra_oauth2_device_grant_request.challenge = hr.challenge").
-		Find(r, id)
 }
 
 func (r *DeviceGrantRequest) BeforeSave(_ *pop.Connection) error {
@@ -515,25 +515,18 @@ func (r *DeviceGrantRequest) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
+/*
 func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
 	r.Client = &client.Client{}
 	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
-}
+}*/
 
-type HandledDeviceGrantRequest struct {
-	ID         string         `json:"-" db:"challenge"`
-	HandledAt  sqlxx.NullTime `json:"handled_at" db:"handled_at"`
-	WasHandled bool           `json:"-" db:"was_used"`
-}
-
-func (_ HandledDeviceGrantRequest) TableName() string {
-	return "hydra_oauth2_device_grant_request_handled"
-}
-
-func (r *HandledDeviceGrantRequest) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("hydra_oauth2_device_grant_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
-		LeftJoin("hydra_oauth2_device_grant_request_handled as hr", "hydra_oauth2_device_grant_request.challenge = hr.challenge").
-		Find(r, id)
+// Returned when the device grant request was used.
+//
+// swagger:ignore
+type DeviceGrantResponse struct {
+	RedirectTo   string `json:"redirect_to"`
+	ErrorMessage string `json:"error_message"`
 }
 
 // Contains information on an ongoing login request.

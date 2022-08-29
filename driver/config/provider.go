@@ -59,6 +59,7 @@ const (
 	KeyLogoutURL                                 = "urls.logout"
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
+	KeyDeviceURL                                 = "urls.device"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
@@ -363,6 +364,10 @@ func (p *Provider) ConsentURL() *url.URL {
 
 func (p *Provider) ErrorURL() *url.URL {
 	return urlRoot(p.p.RequestURIF(KeyErrorURL, p.publicFallbackURL("oauth2/fallbacks/error")))
+}
+
+func (p *Provider) DeviceGrantUrl() *url.URL {
+	return urlRoot(p.p.URIF(KeyDeviceURL, p.publicFallbackURL("oauth2/fallbacks/device")))
 }
 
 func (p *Provider) PublicURL() *url.URL {

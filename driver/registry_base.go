@@ -303,6 +303,7 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
 		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
 		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),
+		DeviceVerificationURL:                urlx.AppendPaths(m.C.PublicURL(), oauth2.DeviceGrantPath).String(),
 	}
 }
 

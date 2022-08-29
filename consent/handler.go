@@ -232,51 +232,37 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user_code := r.URL.Query().Get("user_code")
 	state := r.URL.Query().Get("state")
+	challange := r.URL.Query().Get("device_challenge")
 
-	/*
-			erifier := strings.Replace(uuid.New(), "-", "", -1)
-			challenge := strings.Replace(uuid.New(), "-", "", -1)
-
-
-			err := h.r.ConsentManager().CreateDeviceGrantRequest(r.Context(), &DeviceGrantRequest{
-				ID:         challenge,
-				Verifier:   verifier,
-				DeviceCode: "AAABBBCCCDDD",
-				UserCode:   "ABCD",
-			})
-
-		if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-	*/
 	if user_code == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'user_code' is not defined but should have been.`)))
 		return
 	}
 
-	user_code_hash := h.r.OAuth2HMACStrategy().DeviceCodeSignature(user_code)
-	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), user_code_hash, &fosite.DefaultSession{})
-
+	userCodeHash := h.r.OAuth2HMACStrategy().DeviceCodeSignature(user_code)
+	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeHash, &fosite.DefaultSession{})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
+		return
 	}
 
 	client_id := req.GetClient().GetID()
+	fmt.Println("Challange : " + challange)
+	fmt.Println("Code : " + user_code)
+	fmt.Println("State : " + state)
+	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challange, user_code, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
 
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	// Get and join the list of scopes requested from the device
 	var scopes []string = req.GetRequestedScopes()
 	scope_string := strings.Join(scopes, " ")
-	auth_url := h.c.OAuth2AuthURL()
-	auth_param := url.Values{"state": {state}, "user_code": {user_code}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}
-	q := auth_url.Query()
 
-	for k := range auth_param {
-		q.Set(k, auth_param.Get(k))
-	}
-	auth_url.RawQuery = q.Encode()
-	fmt.Println(auth_url.String())
-
-	http.Redirect(w, r, urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {state}, "user_code": {user_code}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(), http.StatusFound)
+	// Build the redirect to the /auth endpoint
+	http.Redirect(w, r, urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {state}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(), http.StatusFound)
 	return
 }
 

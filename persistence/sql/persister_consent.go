@@ -153,44 +153,46 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 	return r, nil
 }
 
-func (p *Persister) GetDeviceGrantRequest(ctx context.Context, challenge string) (*consent.DeviceGrantRequest, error) {
-	r := &consent.DeviceGrantRequest{}
-
-	if err := r.FindInDB(p.Connection(ctx), challenge); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(x.ErrNotFound)
+func (p *Persister) GetDeviceGrantRequest(ctx context.Context, verifier string) (*consent.DeviceGrantRequest, error) {
+	var d consent.DeviceGrantRequest
+	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.Where("verifier = ?", verifier).First(&d); err != nil {
+			return sqlcon.HandleError(err)
 		}
-		return nil, sqlcon.HandleError(err)
-	}
-
-	return r, nil
+		return nil
+	})
 }
 
 func (p *Persister) CreateDeviceGrantRequest(ctx context.Context, req *consent.DeviceGrantRequest) error {
 	return errorsx.WithStack(p.Connection(ctx).Create(req))
 }
 
-func (p *Persister) HandleDeviceGrantRequest(ctx context.Context, challenge string, r *consent.HandledDeviceGrantRequest) (*consent.DeviceGrantRequest, error) {
-	c := p.Connection(ctx)
-
-	if err := sqlcon.HandleError(c.Create(r)); errors.Is(err, sqlcon.ErrUniqueViolation) {
-		hr := &consent.HandledConsentRequest{}
-		if err := c.Find(hr, r.ID); err != nil {
-			return nil, sqlcon.HandleError(err)
+func (p *Persister) AcceptDeviceGrantRequest(ctx context.Context, challenge string, user_code string, client_id string, requested_scopes fosite.Arguments, requested_aud fosite.Arguments) (*consent.DeviceGrantRequest, error) {
+	var dgr consent.DeviceGrantRequest
+	return &dgr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.Where("challenge = ?", challenge).First(&dgr); err != nil {
+			return sqlcon.HandleError(err)
 		}
 
-		if hr.WasHandled {
-			return nil, errorsx.WithStack(x.ErrConflict.WithHint("The consent request was already used and can no longer be changed."))
+		dgr.Accepted = true
+		dgr.AcceptedAt = sqlxx.NullTime(time.Now())
+		dgr.UserCode = user_code
+		dgr.ClientID = client_id
+		dgr.RequestedScope = sqlxx.StringSlicePipeDelimiter(requested_scopes)
+		dgr.RequestedAudience = sqlxx.StringSlicePipeDelimiter(requested_aud)
+		return c.Update(&dgr)
+	})
+}
+
+func (p *Persister) VerifyAndInvalidateDeviceGrantRequest(ctx context.Context, verifier string) (*consent.DeviceGrantRequest, error) {
+	var d consent.DeviceGrantRequest
+	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&d); err != nil {
+			return sqlcon.HandleError(err)
 		}
 
-		if err := c.Update(r); err != nil {
-			return nil, sqlcon.HandleError(err)
-		}
-	} else if err != nil {
-		return nil, err
-	}
-
-	return p.GetDeviceGrantRequest(ctx, challenge)
+		return sqlcon.HandleError(c.Destroy(&consent.DeviceGrantRequest{ID: d.ID}))
+	})
 }
 
 func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRequest) error {

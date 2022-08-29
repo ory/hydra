@@ -629,6 +629,12 @@
           "format": "uri",
           "examples": ["https://my-logout.app/logout"]
         },
+        "device": {
+          "type": "string",
+          "description": "Sets the device endpoint. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": ["https://my-logout.app/device"]
+        },
         "error": {
           "type": "string",
           "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",

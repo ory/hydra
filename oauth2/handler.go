@@ -32,7 +32,6 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/ory/x/errorsx"
-	"github.com/ory/x/sqlxx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -55,6 +54,7 @@ const (
 	DefaultConsentPath    = "/oauth2/fallbacks/consent"
 	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
 	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
+	DefaultDevicePath     = "/oauth2/fallbacks/device"
 	DefaultErrorPath      = "/oauth2/fallbacks/error"
 	TokenPath             = "/oauth2/token" // #nosec G101
 	AuthPath              = "/oauth2/auth"
@@ -71,7 +71,8 @@ const (
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 
 	// Device Grant Handler
-	DeviceAuthPath = "/oauth2/device"
+	DeviceAuthPath  = "/oauth2/device/authenticate"
+	DeviceGrantPath = "/device"
 )
 
 type Handler struct {
@@ -95,6 +96,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLoginURL))
 	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.KeyConsentURL))
 	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLogoutURL))
+	public.GET(DefaultDevicePath, h.fallbackHandler("", "", http.StatusOK, config.KeyDeviceURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
@@ -113,10 +115,21 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	public.GET(DeviceAuthPath, h.DeviceAuthHandler)
 	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
+	public.GET(DeviceGrantPath, h.DeviceGranHandler)
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
 	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
+}
+
+func (h *Handler) DeviceGranHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	err := h.r.ConsentStrategy().ForwardDeviceGrantRequest(w, r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+	}
+
+	return
 }
 
 func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -136,22 +149,6 @@ func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	request.SetSession(session)
 	resp, _ := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
-
-	verifier := strings.Replace(uuid.New(), "-", "", -1)
-	challenge := strings.Replace(uuid.New(), "-", "", -1)
-	err = h.r.ConsentManager().CreateDeviceGrantRequest(ctx, &consent.DeviceGrantRequest{
-		ID:                challenge,
-		Verifier:          verifier,
-		RequestedScope:    sqlxx.StringSlicePipeDelimiter(request.GetRequestedScopes()),
-		RequestedAudience: sqlxx.StringSlicePipeDelimiter(request.GetGrantedAudience()),
-		UserCode:          resp.GetUserCode(),
-		DeviceCode:        resp.GetDeviceCode(),
-		ClientID:          request.GetClient().GetID(),
-	})
-
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-	}
 
 	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(w, request, resp)
 }

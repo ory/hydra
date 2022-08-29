@@ -62,3 +62,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
 	panic("not implemented")
 }
+
+func (c *consentMock) ForwardDeviceGrantRequest(w http.ResponseWriter, r *http.Request) error {
+	panic("not implemented")
+}

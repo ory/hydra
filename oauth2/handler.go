@@ -133,7 +133,6 @@ func (h *Handler) DeviceGranHandler(w http.ResponseWriter, r *http.Request, _ ht
 }
 
 func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Println("DeviceAuthHandler")
 	var ctx = r.Context()
 	request, err := h.r.OAuth2Provider().NewDeviceAuthorizeRequest(ctx, r)
 
@@ -148,8 +147,12 @@ func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}
 
 	request.SetSession(session)
-	resp, _ := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
+	resp, err := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
 
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(w, request, resp)
 }
 

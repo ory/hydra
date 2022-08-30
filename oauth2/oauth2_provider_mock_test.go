@@ -10,7 +10,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-
 	fosite "github.com/ory/fosite"
 )
 
@@ -118,6 +117,36 @@ func (mr *MockOAuth2ProviderMockRecorder) NewAuthorizeResponse(arg0, arg1, arg2 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewAuthorizeResponse), arg0, arg1, arg2)
 }
 
+// NewDeviceAuthorizeRequest mocks base method.
+func (m *MockOAuth2Provider) NewDeviceAuthorizeRequest(arg0 context.Context, arg1 *http.Request) (fosite.Requester, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewDeviceAuthorizeRequest", arg0, arg1)
+	ret0, _ := ret[0].(fosite.Requester)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewDeviceAuthorizeRequest indicates an expected call of NewDeviceAuthorizeRequest.
+func (mr *MockOAuth2ProviderMockRecorder) NewDeviceAuthorizeRequest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewDeviceAuthorizeRequest", reflect.TypeOf((*MockOAuth2Provider)(nil).NewDeviceAuthorizeRequest), arg0, arg1)
+}
+
+// NewDeviceAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) NewDeviceAuthorizeResponse(arg0 context.Context, arg1 fosite.Requester) (fosite.DeviceAuthorizeResponder, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewDeviceAuthorizeResponse", arg0, arg1)
+	ret0, _ := ret[0].(fosite.DeviceAuthorizeResponder)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewDeviceAuthorizeResponse indicates an expected call of NewDeviceAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) NewDeviceAuthorizeResponse(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewDeviceAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewDeviceAuthorizeResponse), arg0, arg1)
+}
+
 // NewIntrospectionRequest mocks base method.
 func (m *MockOAuth2Provider) NewIntrospectionRequest(arg0 context.Context, arg1 *http.Request, arg2 fosite.Session) (fosite.IntrospectionResponder, error) {
 	m.ctrl.T.Helper()
@@ -193,6 +222,18 @@ func (m *MockOAuth2Provider) WriteAuthorizeResponse(arg0 http.ResponseWriter, ar
 func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAuthorizeResponse), arg0, arg1, arg2)
+}
+
+// WriteDeviceAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) WriteDeviceAuthorizeResponse(arg0 http.ResponseWriter, arg1 fosite.Requester, arg2 fosite.DeviceAuthorizeResponder) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WriteDeviceAuthorizeResponse", arg0, arg1, arg2)
+}
+
+// WriteDeviceAuthorizeResponse indicates an expected call of WriteDeviceAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) WriteDeviceAuthorizeResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteDeviceAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteDeviceAuthorizeResponse), arg0, arg1, arg2)
 }
 
 // WriteIntrospectionError mocks base method.

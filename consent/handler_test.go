@@ -331,3 +331,38 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestGetDeviceSessionCreateDelete(t *testing.T) {
+	t.Run("case=should pass creating / deleting device sessions", func(t *testing.T) {
+
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf)
+
+		cl := &client.Client{OutfacingID: "test"}
+		reg.ClientManager().CreateClient(context.Background(), cl)
+
+		userCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("ABCD12345")
+		deviceCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("AAABBBCCCDDD")
+
+		req := &fosite.AccessRequest{
+			GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
+			Request: fosite.Request{
+				Client:      cl,
+				Session:     &fosite.DefaultSession{Subject: "A"},
+				RequestedAt: time.Now().UTC(),
+				Form:        url.Values{"device_code": {"ABC1234"}},
+			},
+		}
+		req.SetID(deviceCodeHash)
+		req.Session = &oauth2.Session{}
+		require.NoError(t, reg.OAuth2Storage().CreateUserCodeSession(context.TODO(), userCodeHash, req))
+		require.NoError(t, reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), deviceCodeHash, req))
+
+		_, err := reg.OAuth2Storage().GetDeviceCodeSession(context.TODO(), deviceCodeHash, req.Session.Clone())
+
+		require.NoError(t, err)
+
+		require.NoError(t, reg.OAuth2Storage().DeleteUserCodeSession(context.TODO(), userCodeHash))
+		require.NoError(t, reg.OAuth2Storage().DeleteDeviceCodeSession(context.TODO(), deviceCodeHash))
+	})
+}

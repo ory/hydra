@@ -128,8 +128,6 @@ func (h *Handler) DeviceGranHandler(w http.ResponseWriter, r *http.Request, _ ht
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 	}
-
-	return
 }
 
 func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

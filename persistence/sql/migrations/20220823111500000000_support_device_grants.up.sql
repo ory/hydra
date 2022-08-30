@@ -10,8 +10,8 @@ CREATE TABLE hydra_oauth2_device_code
     session_data       TEXT         NOT NULL,
     subject            VARCHAR(255) NOT NULL DEFAULT '',
     active             BOOL         NOT NULL DEFAULT true,
-    requested_audience TEXT         NULL     DEFAULT '',
-    granted_audience   TEXT         NULL     DEFAULT '',
+    requested_audience VARCHAR(255) NULL     DEFAULT '',
+    granted_audience   VARCHAR(255) NULL     DEFAULT '',
     challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_consent_request_handled (challenge) ON DELETE CASCADE
 );
 CREATE INDEX hydra_oauth2_device_code_client_id_idx ON hydra_oauth2_device_code (client_id);
@@ -30,8 +30,8 @@ CREATE TABLE hydra_oauth2_user_code
     session_data       TEXT         NOT NULL,
     subject            VARCHAR(255) NOT NULL DEFAULT '',
     active             BOOL         NOT NULL DEFAULT true,
-    requested_audience TEXT         NULL     DEFAULT '',
-    granted_audience   TEXT         NULL     DEFAULT '',
+    requested_audience VARCHAR(255) NULL     DEFAULT '',
+    granted_audience   VARCHAR(255) NULL     DEFAULT '',
     challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_consent_request_handled (challenge) ON DELETE CASCADE
 );
 CREATE INDEX hydra_oauth2_user_code_client_id_idx ON hydra_oauth2_user_code (client_id);

@@ -263,7 +263,6 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 
 	// Build the redirect to the /auth endpoint
 	http.Redirect(w, r, urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {state}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(), http.StatusFound)
-	return
 }
 
 // swagger:route GET /oauth2/auth/requests/login admin getLoginRequest

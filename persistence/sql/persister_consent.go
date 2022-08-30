@@ -484,6 +484,8 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 			return sqlcon.HandleError(err)
 		}
 
+		p.l.WithField("sessions_count", len(ids)).Infof("get %d sessions for delete", len(ids))
+
 		for i := 0; i < len(ids); i += batchSize {
 			j := i + batchSize
 			if j > len(ids) {
@@ -543,6 +545,8 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	if err := q.All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
+
+	p.l.WithField("requests_count", len(challenges)).Infof("get %d requests for delete", len(challenges))
 
 	// Delete in batch consent requests and their references in cascade
 	for i := 0; i < len(challenges); i += batchSize {

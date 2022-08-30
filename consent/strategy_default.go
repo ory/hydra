@@ -22,7 +22,6 @@ package consent
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -610,7 +609,6 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	fmt.Println("verifyConsent Subject : " + session.ConsentRequest.Subject)
 	pw, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
@@ -630,7 +628,6 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 
 	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
-	fmt.Println("verifyConsent pw : " + pw)
 	return session, nil
 }
 
@@ -998,7 +995,6 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(w http.ResponseWriter, r *ht
 
 func (s *DefaultStrategy) verifyDeviceGrant(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) error {
 	if !req.GetClient().GetGrantTypes().Has("urn:ietf:params:oauth:grant-type:device_code") {
-		fmt.Println(req.GetClient())
 		return errorsx.WithStack(fosite.ErrAccessDenied.WithHint("This client cannot use device_code grant type"))
 	}
 
@@ -1048,7 +1044,6 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 
 	// check if this a device verifier and that the client supports the needed grant
 	device_verifier := strings.TrimSpace(req.GetRequestForm().Get("device_verifier"))
-	fmt.Println("Verifier : " + device_verifier)
 	if device_verifier != "" {
 		err := s.verifyDeviceGrant(w, r, req, device_verifier)
 		if err != nil {

@@ -439,9 +439,6 @@ func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) err
 
 func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, req fosite.Requester) error {
 	err := p.createSession(ctx, signature, req, sqlTableDeviceCode)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	return err
 }
 
@@ -454,13 +451,7 @@ func (p *Persister) DeleteDeviceCodeSession(ctx context.Context, signature strin
 }
 
 func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, req fosite.Requester) error {
-	fmt.Println("CreateUserCodeSession :" + signature)
-	fmt.Println("CreateUserCodeSession :" + req.GetRequestForm().Encode())
-	fmt.Println(req.GetRequestForm())
 	err := p.createSession(ctx, signature, req, sqlTableUserCode)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	return err
 }
 

@@ -22,7 +22,6 @@ package consent
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -247,9 +246,7 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 	}
 
 	client_id := req.GetClient().GetID()
-	fmt.Println("Challange : " + challange)
-	fmt.Println("Code : " + user_code)
-	fmt.Println("State : " + state)
+
 	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challange, user_code, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
 
 	if err != nil {

@@ -26,9 +26,15 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	"github.com/pborman/uuid"
 
 	"github.com/ory/hydra/internal"
 
@@ -210,6 +216,117 @@ func TestGetConsentRequest(t *testing.T) {
 				require.Equal(t, requestURL, result.RequestURL)
 				require.NotNil(t, result.Client)
 			}
+		})
+	}
+}
+
+func TestGetDeviceLoginRequest(t *testing.T) {
+	for k, tc := range []struct {
+		createUserSession   bool
+		createDeviceSession bool
+		handled             bool
+		status              int
+		user_code           string
+		device_challenge    string
+	}{
+		{
+			createUserSession:   false,
+			createDeviceSession: false,
+			handled:             false,
+			status:              http.StatusBadRequest,
+			user_code:           "",
+			device_challenge:    "",
+		},
+		{
+			createUserSession:   false,
+			createDeviceSession: false,
+			handled:             false,
+			status:              http.StatusNotFound,
+			user_code:           "AAABBBCCC",
+			device_challenge:    "muyjbkdhjsbvc8",
+		},
+		{
+			createUserSession:   true,
+			createDeviceSession: false,
+			handled:             false,
+			status:              http.StatusNotFound,
+			user_code:           "AAABBBCCC",
+			device_challenge:    "muyjbkdhjsbvc8",
+		},
+		{
+			createUserSession:   true,
+			createDeviceSession: true,
+			handled:             false,
+			status:              http.StatusFound,
+			user_code:           "AAABBBCCC",
+			device_challenge:    "muyjbkdhjsbvc8",
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+
+			conf := internal.NewConfigurationWithDefaults()
+			reg := internal.NewRegistryMemory(t, conf)
+
+			h := NewHandler(reg, conf)
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r)
+			ts := httptest.NewServer(r)
+			defer ts.Close()
+
+			cl := &client.Client{OutfacingID: "test"}
+			reg.ClientManager().CreateClient(context.Background(), cl)
+
+			params := "?state=abc12345"
+			if tc.device_challenge != "" {
+				params = params + "&device_challenge=" + tc.device_challenge
+			}
+
+			if tc.user_code != "" {
+
+				verifier := strings.Replace(uuid.New(), "-", "", -1)
+				csrf := strings.Replace(uuid.New(), "-", "", -1)
+
+				if tc.createDeviceSession {
+					reg.ConsentManager().CreateDeviceGrantRequest(context.TODO(), &DeviceGrantRequest{
+						ID:       tc.device_challenge,
+						Verifier: verifier,
+						CSRF:     csrf,
+					})
+				}
+
+				userCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature(tc.user_code)
+				deviceCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("AAABBBCCCDDD")
+
+				req := &fosite.AccessRequest{
+					GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},
+					Request: fosite.Request{
+						Client:      cl,
+						Session:     &fosite.DefaultSession{Subject: "A"},
+						RequestedAt: time.Now().UTC(),
+						Form:        url.Values{"device_code": {"ABC1234"}},
+					},
+				}
+				req.SetID(deviceCodeHash)
+				req.Session = &oauth2.Session{}
+				if tc.createUserSession {
+					reg.OAuth2Storage().CreateUserCodeSession(context.TODO(), userCodeHash, req)
+				}
+				params = params + "&user_code=" + tc.user_code
+			}
+
+			req, err := http.NewRequest("GET", ts.URL+DevicePath+params, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			transport := http.Transport{}
+			resp, err := transport.RoundTrip(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			require.NoError(t, err)
+			require.EqualValues(t, tc.status, resp.StatusCode)
 		})
 	}
 }

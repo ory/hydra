@@ -457,3 +457,76 @@ func TestHandlerWellKnown(t *testing.T) {
 	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 	assert.EqualValues(t, trueConfig, wellKnownResp)
 }
+
+func TestDeviceAuthHandler(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf)
+
+	cm := reg.ClientManager()
+
+	h := oauth2.NewHandler(reg, conf)
+
+	require.NoError(t, cm.CreateClient(context.Background(), &client.Client{OutfacingID: "foobar", Scope: "offline"}))
+
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+		return h
+	})
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	data := url.Values{}
+	data.Set("client_id", "foobar")
+	data.Set("scope", "offline")
+
+	res, err := http.PostForm(ts.URL+"/oauth2/device/authenticate", data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type NewDeviceAuthorizeResponse struct {
+		DeviceCode string `json:"device_code"`
+		UserCode   string `json:"user_code"`
+	}
+
+	var resp NewDeviceAuthorizeResponse
+	err = json.NewDecoder(res.Body).Decode(&resp)
+
+	require.EqualValues(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.NotEmpty(t, resp.DeviceCode)
+	require.NotEmpty(t, resp.UserCode)
+
+	defer res.Body.Close()
+}
+
+func TestDeviceGranHandler(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf)
+
+	h := oauth2.NewHandler(reg, conf)
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+		return h
+	})
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	req, err := http.NewRequest("GET", ts.URL+"/device", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	transport := http.Transport{}
+	res, err := transport.RoundTrip(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	require.EqualValues(t, http.StatusFound, res.StatusCode)
+	require.NoError(t, err)
+
+	defer res.Body.Close()
+}

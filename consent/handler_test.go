@@ -310,6 +310,7 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 				req.Session = &oauth2.Session{}
 				if tc.createUserSession {
 					reg.OAuth2Storage().CreateUserCodeSession(context.TODO(), userCodeHash, req)
+					reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), tc.device_challenge, req)
 				}
 				params = params + "&user_code=" + tc.user_code
 			}

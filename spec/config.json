@@ -749,10 +749,14 @@
           "type": "object",
           "properties": {
             "token_polling_interval": {
-              "type": "integer",
-              "default": 5,
               "title": "Device Authorisation Token Polling Interval",
-              "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint."
+              "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.",
+              "default": "5m",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/duration"
+                }
+              ]
             }
           }
         },

@@ -438,7 +438,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(),
 		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint().String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
 		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", "RS256"},
@@ -481,7 +481,7 @@ func TestDeviceAuthHandler(t *testing.T) {
 	data.Set("client_id", "foobar")
 	data.Set("scope", "offline")
 
-	res, err := http.PostForm(ts.URL+"/oauth2/device/authenticate", data)
+	res, err := http.PostForm(ts.URL+"/oauth2/device/auth", data)
 	if err != nil {
 		t.Fatal(err)
 	}

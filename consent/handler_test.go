@@ -294,7 +294,7 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 					})
 				}
 
-				userCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature(tc.user_code)
+				userCodeHash := reg.OAuth2HMACStrategy().UserCodeSignature(tc.user_code)
 				deviceCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("AAABBBCCCDDD")
 
 				req := &fosite.AccessRequest{
@@ -341,8 +341,8 @@ func TestGetDeviceSessionCreateDelete(t *testing.T) {
 		cl := &client.Client{OutfacingID: "test"}
 		reg.ClientManager().CreateClient(context.Background(), cl)
 
-		userCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("ABCD12345")
-		deviceCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("AAABBBCCCDDD")
+		userCodeHash := reg.OAuth2HMACStrategy().UserCodeSignature("ABCD12345")
+		deviceCodeHash := reg.OAuth2HMACStrategy().DeviceCodeSignature("AAABBB.CCCDDD")
 
 		req := &fosite.AccessRequest{
 			GrantTypes: fosite.Arguments{"urn:ietf:params:oauth:grant-type:device_code"},

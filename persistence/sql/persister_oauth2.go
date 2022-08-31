@@ -381,6 +381,8 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
+	p.l.WithField("tokens_count", len(signatures)).Infof("get %d inactive tokens for delete", len(signatures))
+
 	// Delete tokens in batch
 	var err error
 	for i := 0; i < len(signatures); i += batchSize {
@@ -418,6 +420,8 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 	if err := q.All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
+
+	p.l.WithField("tokens_count", len(signatures)).Infof("get %d refresh tokens for delete", len(signatures))
 
 	// Delete tokens in batch
 	var err error

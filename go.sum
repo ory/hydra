@@ -68,10 +68,8 @@ github.com/Azure/go-autorest/logger v0.2.0/go.mod h1:T9E3cAhj2VqvPOtCYAvby9aBXkZ
 github.com/Azure/go-autorest/tracing v0.6.0/go.mod h1:+vhtPC754Xsa23ID7GlGsrdKBpUA79WCAKPPZVC2DeU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/BuzzBumbleBee/fosite v0.0.0-20220829215947-0964dbb3db85 h1:TQZH2z9OevnoNEpCZMEeZmp5lrj+jYC1UE/3HGSwnds=
-github.com/BuzzBumbleBee/fosite v0.0.0-20220829215947-0964dbb3db85/go.mod h1:CR0cBDLr2rNDTNWmu5x9TeB7qt8KA668N/yZbej3FtE=
-github.com/BuzzBumbleBee/fosite v0.0.0-20220830104321-ee2422d9b854 h1:OYCcu0EgBQDABymwob+hj/RGpylci/EnYvCrmW5DXz8=
-github.com/BuzzBumbleBee/fosite v0.0.0-20220830104321-ee2422d9b854/go.mod h1:CR0cBDLr2rNDTNWmu5x9TeB7qt8KA668N/yZbej3FtE=
+github.com/BuzzBumbleBee/fosite v0.0.0-20220831195444-53da310b1dfd h1:1OJBQnq0RqHoTTCoWjTb40MQO8FI/6lwLuVHPzgVKU4=
+github.com/BuzzBumbleBee/fosite v0.0.0-20220831195444-53da310b1dfd/go.mod h1:CR0cBDLr2rNDTNWmu5x9TeB7qt8KA668N/yZbej3FtE=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/DataDog/datadog-go v4.0.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/DataDog/datadog-go v4.4.0+incompatible h1:R7WqXWP4fIOAqWJtUKmSfuc7eDsBT58k9AY5WSHVosk=

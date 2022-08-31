@@ -104,6 +104,16 @@ type swaggerAcceptConsentRequest struct {
 	Body HandledConsentRequest
 }
 
+// swagger:parameters verifyUserCodeRequest
+type swaggerVerifyUserCodeRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"device_challenge"`
+
+	// in: body
+	Body VerifyUserCodeRequest
+}
+
 // swagger:parameters acceptLogoutRequest
 type swaggerAcceptLogoutRequest struct {
 	// in: query

@@ -1,9 +1,9 @@
 CREATE TABLE hydra_oauth2_device_grant_request
 (
     challenge             VARCHAR(40)  NOT NULL PRIMARY KEY,
-    requested_scope       TEXT          NOT NULL,
+    requested_scope       TEXT          NOT NULL UNIQUE,
     verifier              VARCHAR(40)   NOT NULL UNIQUE,
-    client_id             VARCHAR(255)  DEFAULT NULL,
+    client_id             VARCHAR(255)  NOT NULL REFERENCES hydra_client (id) ON DELETE CASCADE,
     requested_audience    VARCHAR(255)  NULL     DEFAULT '',
     csrf                  VARCHAR(40)   NOT NULL,
     device_code           VARCHAR(100)  NOT NULL,
@@ -13,3 +13,4 @@ CREATE TABLE hydra_oauth2_device_grant_request
 );
 CREATE INDEX hydra_oauth2_device_grant_request_client_id_idx ON hydra_oauth2_device_grant_request (client_id);
 CREATE INDEX hydra_oauth2_device_grant_request_verifier_idx ON hydra_oauth2_device_grant_request (verifier);
+CREATE INDEX hydra_oauth2_device_grant_request_challenge_idx ON hydra_oauth2_consent_request (challenge);

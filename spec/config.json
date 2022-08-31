@@ -751,7 +751,7 @@
             "token_polling_interval": {
               "title": "Device Authorisation Token Polling Interval",
               "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.",
-              "default": "5m",
+              "default": "10s",
               "allOf": [
                 {
                   "$ref": "#/definitions/duration"

@@ -223,82 +223,6 @@ func TestGetConsentRequest(t *testing.T) {
 	}
 }
 
-func TestGetDeviceLoginRequest(t *testing.T) {
-	for k, tc := range []struct {
-		createDeviceSession bool
-		handled             bool
-		status              int
-		device_challenge    string
-	}{
-		{
-			createDeviceSession: false,
-			handled:             false,
-			status:              http.StatusBadRequest,
-			device_challenge:    "",
-		},
-		{
-			createDeviceSession: false,
-			handled:             false,
-			status:              http.StatusNotFound,
-			device_challenge:    "muyjbkdhjsbvc8",
-		},
-		{
-			createDeviceSession: true,
-			handled:             false,
-			status:              http.StatusOK,
-			device_challenge:    "muyjbkdhjsbvc8",
-		},
-	} {
-		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-
-			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf)
-
-			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin()
-			h.SetRoutes(r)
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-
-			cl := &client.Client{OutfacingID: "test"}
-			reg.ClientManager().CreateClient(context.Background(), cl)
-
-			var params string
-			if tc.device_challenge != "" {
-				params = "?device_challenge=" + tc.device_challenge
-			}
-
-			verifier := strings.Replace(uuid.New(), "-", "", -1)
-			csrf := strings.Replace(uuid.New(), "-", "", -1)
-
-			if tc.createDeviceSession {
-				reg.ConsentManager().CreateDeviceGrantRequest(context.TODO(), &DeviceGrantRequest{
-					ID:       tc.device_challenge,
-					Verifier: verifier,
-					CSRF:     csrf,
-					Client:   cl,
-					DeviceCode: "AAAAAAA",
-					UserCode: "BBBBBB",
-				})
-			}
-
-			req, err := http.NewRequest("GET", ts.URL+DevicePath+params, nil)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			transport := http.Transport{}
-			resp, err := transport.RoundTrip(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			require.NoError(t, err)
-			require.EqualValues(t, tc.status, resp.StatusCode)
-		})
-	}
-}
-
 func TestVerifyDeviceLoginRequest(t *testing.T) {
 	for k, tc := range []struct {
 		createUserSession   bool
@@ -391,7 +315,7 @@ func TestVerifyDeviceLoginRequest(t *testing.T) {
 					reg.OAuth2Storage().CreateUserCodeSession(context.TODO(), userCodeHash, req)
 					reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), tc.device_challenge, req)
 				}
-				
+
 				userCodeBody = VerifyUserCodeRequest{UserCode: tc.user_code}
 			}
 

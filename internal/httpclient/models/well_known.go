@@ -86,6 +86,9 @@ type WellKnown struct {
 	// Example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
+	// URL of the authorization server's device authorization endpoint
+	DeviceAuthorisationEndpoint string `json:"device_authorization_endpoint"`
+
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
 	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
 	// the Request Object is passed by value (using the request parameter) and when it is passed by reference

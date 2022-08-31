@@ -432,6 +432,80 @@
         "title": "HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
+      "deviceAuthorizationRequest": {
+        "properties": {
+          "client_id": {
+            "description": "The client identifier as described in Section 2.2 of [RFC6749]",
+            "type": "string"
+          },
+          "scope": {
+            "description": "The scope of the access request as defined by Section 3.3 of [RFC6749].",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_id"
+        ],
+        "title": "Device Authorization Request is the request payload used to query a device user/device code and start a device authorization flow",
+        "type": "object"
+      },
+      "deviceAuthorizationResponse": {
+        "properties": {
+          "device_code": {
+            "description": "The device verification code.",
+            "type": "string"
+          },
+          "user_code": {
+            "description": "The end-user verification code.",
+            "type": "string"
+          },
+          "verification_uri": {
+            "description": "The end-user verification URI on the authorization server.  The URI should be short and easy to remember as end users will be asked to manually type it into their user agent.",
+            "type": "string"
+          },
+          "verification_uri_complete": {
+            "description": "A verification URI that includes the \"user_code\" (or other information with the same function as the \"user_code\"), which is designed for non-textual transmission.",
+            "type": "string"
+          },
+          "expires_in": {
+            "description": "The lifetime in seconds of the \"device_code\" and \"user_code\"",
+            "type": "string"
+          },
+          "interval": {
+            "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.  If no value is provided, clients MUST use 5 as the default.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_code",
+          "user_code",
+          "verification_uri"
+        ],
+        "title": "HandledLoginRequest is the request payload used to accept a login request.",
+        "type": "object"
+      },
+      "getDeviceLoginRequest": {
+        "properties": {
+          "user_code": {
+            "description": "The end-user verification code.",
+            "type": "string"
+          },
+          "device_challenge": {
+            "description": "The device challenge",
+            "type": "string"
+          },
+          "state": {
+            "description": "A state used for the login request",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_code",
+          "device_challenge"
+        ],
+        "title": "The response payload sent when verifying a device user_code request.",
+        "type": "object"
+      },
       "completedRequest": {
         "properties": {
           "redirect_to": {
@@ -1504,6 +1578,11 @@
           "registration_endpoint": {
             "description": "URL of the OP's Dynamic Client Registration Endpoint.",
             "example": "https://playground.ory.sh/ory-hydra/admin/client",
+            "type": "string"
+          },
+          "device_authorization_endpoint": {
+            "description": "URL of the server's device authorization authorization endpoint",
+            "example": "https://playground.ory.sh/ory-hydra/public/oauth2/device/auth",
             "type": "string"
           },
           "request_object_signing_alg_values_supported": {
@@ -2615,6 +2694,78 @@
         ]
       }
     },
+    "/oauth2/auth/device": {
+      "post": {
+        "description": "This is separate from the OAuth authorization endpoint defined in [RFC6749] with which the user interacts via a user agent (i.e., a browser)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/deviceAuthorizationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deviceAuthorizationResponse"
+                }
+              }
+            },
+            "description": "completedRequest"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/requestWasHandledResponse"
+                }
+              }
+            },
+            "description": "requestWasHandledResponse"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
+        "summary": "Initiate a device auth request",
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/oauth2/auth/requests/consent": {
       "get": {
         "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.",
@@ -3206,6 +3357,76 @@
           }
         },
         "summary": "Reject a Logout Request",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/oauth2/auth/requests/device": {
+      "get": {
+        "description": "Use this endpoint to fetch a device request.",
+        "operationId": "getDeviceRequest",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user_code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }, 
+          {
+            "in": "query",
+            "name": "device_challenge",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "$ref": "#/components/responses/emptyResponse"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/requestWasHandledResponse"
+                }
+              }
+            },
+            "description": "requestWasHandledResponse"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
+        "summary": "Get a Device Request",
         "tags": [
           "admin"
         ]
@@ -4175,6 +4396,50 @@
         "summary": "Return Running Software Version.",
         "tags": [
           "metadata"
+        ]
+      }
+    },
+    "/device": {
+      "get": {
+        "description": "This endpoint start an interactive device flow.",
+        "parameters": [
+          {
+            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
+            "in": "query",
+            "name": "user_code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "$ref": "#/components/responses/emptyResponse"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
+        "summary": "Get the device auth flow",
+        "tags": [
+          "public"
         ]
       }
     }

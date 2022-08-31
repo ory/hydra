@@ -490,6 +490,12 @@
               "format": "uri",
               "examples": ["https://my-service.com/clients"]
             },
+            "device_authorization_url": {
+              "description": "Sets the OpenID Connect Dynamic Client Registration Endpoint",
+              "type": "string",
+              "format": "uri",
+              "examples": ["https://my-service.com/device_authorization"]
+            },
             "supported_claims": {
               "type": "array",
               "description": "A list of supported claims to be broadcasted. Claim \"sub\" is always included.",
@@ -723,6 +729,24 @@
               "$ref": "#/definitions/duration"
             }
           ]
+        },
+        "device_code": {
+          "description": "Configures how long auth codes are valid.",
+          "default": "10m",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
+        "user_code": {
+          "description": "Configures how long user codes (device code flow) are valid.",
+          "default": "10m",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
         }
       }
     },
@@ -730,6 +754,17 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "device_authorization": {
+          "type": "object",
+          "properties": {
+            "token_polling_interval": {
+              "type": "integer",
+              "default": 5,
+              "title": "Device Authorisation Token Polling Interval",
+              "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint."
+            }
+          }
+        },
         "expose_internal_errors": {
           "type": "boolean",
           "description": "Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.",

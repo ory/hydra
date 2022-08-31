@@ -49,8 +49,8 @@ const (
 	LoginPath    = "/oauth2/auth/requests/login"
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
+	DevicePath   = "/oauth2/auth/requests/device"
 	SessionsPath = "/oauth2/auth/sessions"
-	DevicePath   = "/oauth2/auth/device"
 )
 
 func NewHandler(
@@ -231,14 +231,14 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user_code := r.URL.Query().Get("user_code")
 	state := r.URL.Query().Get("state")
-	challange := r.URL.Query().Get("device_challenge")
+	challenge := r.URL.Query().Get("device_challenge")
 
 	if user_code == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'user_code' is not defined but should have been.`)))
 		return
 	}
 
-	userCodeHash := h.r.OAuth2HMACStrategy().DeviceCodeSignature(user_code)
+	userCodeHash := h.r.OAuth2HMACStrategy().UserCodeSignature(user_code)
 	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeHash, &fosite.DefaultSession{})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
@@ -247,7 +247,7 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 
 	client_id := req.GetClient().GetID()
 
-	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challange, user_code, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
+	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challenge, user_code, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
 
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))

@@ -71,7 +71,7 @@ const (
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 
 	// Device Grant Handler
-	DeviceAuthPath  = "/oauth2/device/authenticate"
+	DeviceAuthPath  = "/oauth2/device/auth"
 	DeviceGrantPath = "/device"
 )
 
@@ -113,7 +113,6 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
-	public.GET(DeviceAuthPath, h.DeviceAuthHandler)
 	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
 	public.GET(DeviceGrantPath, h.DeviceGranHandler)
 
@@ -277,6 +276,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		JWKsURI:                                h.c.JWKSURL().String(),
 		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
 		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL().String(),
+		DeviceAuthorisationEndpoint:            h.c.OAuth2DeviceAuthorisationURL().String(),
 		SubjectTypes:                           h.c.SubjectTypesSupported(),
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(),
@@ -284,7 +284,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint().String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", "RS256"},
 		RequestParameterSupported:              true,

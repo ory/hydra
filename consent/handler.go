@@ -80,7 +80,6 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
 
-	admin.GET(DevicePath, h.GetDeviceLoginRequest)
 	admin.PUT(DevicePath+"/verify", h.VerifyUserCodeRequest)
 }
 
@@ -229,31 +228,25 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := stringsx.Coalesce(
-		r.URL.Query().Get("device_challenge"),
-		r.URL.Query().Get("challenge"),
-	)
-
-	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
-		return
-	}
-
-	request, err := h.r.ConsentManager().GetDeviceGrantRequest(r.Context(), challenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if request.Client != nil {
-		request.Client = sanitizeClient(request.Client)
-	}
-	h.r.Writer().Write(w, r, request)
-}
-
+// swagger:route PUT /oauth2/auth/requests/device/verify admin verifyUserCodeRequest
+//
+// # Verifies a device grant request
+// Verifies a device grant request
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: completedRequest
+//	  404: jsonError
+//	  500: jsonError
 func (h *Handler) VerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("device_challenge"),
 		r.URL.Query().Get("challenge"),

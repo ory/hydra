@@ -524,6 +524,9 @@ func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
 	return nil
 }
 
+// Contains information on an device verification
+//
+// swagger:model verifyUserCodeRequest
 type VerifyUserCodeRequest struct {
 	UserCode string `json:"user_code"`
 }

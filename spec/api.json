@@ -3422,7 +3422,7 @@
         "parameters": [
           {
             "in": "query",
-            "name": "consent_challenge",
+            "name": "device_challenge",
             "required": true,
             "schema": {
               "type": "string"

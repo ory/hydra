@@ -246,7 +246,9 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	request.Client = sanitizeClient(request.Client)
+	if request.Client != nil {
+		request.Client = sanitizeClient(request.Client)
+	}
 	h.r.Writer().Write(w, r, request)
 }
 

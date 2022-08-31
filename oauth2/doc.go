@@ -47,6 +47,9 @@ type WellKnown struct {
 	// example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
+	// URL of the authorization server's device authorization endpoint
+	DeviceAuthorisationEndpoint string `json:"device_authorization_endpoint"`
+
 	// URL of the OP's OAuth 2.0 Token Endpoint
 	//
 	// required: true

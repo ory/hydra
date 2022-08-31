@@ -49,8 +49,8 @@ const (
 	LoginPath    = "/oauth2/auth/requests/login"
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
+	DevicePath   = "/oauth2/auth/requests/device"
 	SessionsPath = "/oauth2/auth/sessions"
-	DevicePath   = "/oauth2/auth/device"
 )
 
 func NewHandler(
@@ -81,6 +81,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
 
 	admin.GET(DevicePath, h.GetDeviceLoginRequest)
+	admin.PUT(DevicePath+"/verify", h.VerifyUserCodeRequest)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
@@ -229,16 +230,53 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 }
 
 func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user_code := r.URL.Query().Get("user_code")
-	state := r.URL.Query().Get("state")
-	challange := r.URL.Query().Get("device_challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("device_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 
-	if user_code == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'user_code' is not defined but should have been.`)))
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
-	userCodeHash := h.r.OAuth2HMACStrategy().DeviceCodeSignature(user_code)
+	request, err := h.r.ConsentManager().GetDeviceGrantRequest(r.Context(), challenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	if request.Client != nil {
+		request.Client = sanitizeClient(request.Client)
+	}
+	h.r.Writer().Write(w, r, request)
+}
+
+func (h *Handler) VerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("device_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		return
+	}
+
+	var p VerifyUserCodeRequest
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&p); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+		return
+	}
+
+	if p.UserCode == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
+		return
+	}
+
+	userCodeHash := h.r.OAuth2HMACStrategy().UserCodeSignature(p.UserCode)
 	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeHash, &fosite.DefaultSession{})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
@@ -247,7 +285,7 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 
 	client_id := req.GetClient().GetID()
 
-	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challange, user_code, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
+	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challenge, p.UserCode, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
 
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -258,8 +296,9 @@ func (h *Handler) GetDeviceLoginRequest(w http.ResponseWriter, r *http.Request, 
 	var scopes []string = req.GetRequestedScopes()
 	scope_string := strings.Join(scopes, " ")
 
-	// Build the redirect to the /auth endpoint
-	http.Redirect(w, r, urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {state}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(), http.StatusFound)
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
+		RedirectTo: urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {"fake-state"}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(),
+	})
 }
 
 // swagger:route GET /oauth2/auth/requests/login admin getLoginRequest

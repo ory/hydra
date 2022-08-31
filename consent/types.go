@@ -515,11 +515,18 @@ func (r *DeviceGrantRequest) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
-/*
 func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
-	r.Client = &client.Client{}
-	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
-}*/
+	if r.ClientID != "" {
+		r.Client = &client.Client{}
+		return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
+	}
+
+	return nil
+}
+
+type VerifyUserCodeRequest struct {
+	UserCode string `json:"user_code"`
+}
 
 // Returned when the device grant request was used.
 //

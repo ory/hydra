@@ -54,9 +54,9 @@ const (
 	sqlTableAccess     tableName = "access"
 	sqlTableRefresh    tableName = "refresh"
 	sqlTableCode       tableName = "code"
-	sqlTablePKCE       tableName = "pkce"
 	sqlTableDeviceCode tableName = "device_code"
 	sqlTableUserCode   tableName = "user_code"
+	sqlTablePKCE       tableName = "pkce"
 )
 
 func (r OAuth2RequestSQL) TableName() string {
@@ -239,8 +239,14 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 			fr, err = r.toRequest(ctx, session, p)
 			if err != nil {
 				return err
-			} else if table == sqlTableCode {
+			}
+			switch table {
+			case sqlTableCode:
 				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			case sqlTableDeviceCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedDeviceCode)
+			case sqlTableUserCode:
+				return errorsx.WithStack(fosite.ErrInvalidatedUserCode)
 			}
 
 			return errorsx.WithStack(fosite.ErrInactiveToken)

@@ -998,7 +998,7 @@ func (s *DefaultStrategy) verifyDeviceGrant(w http.ResponseWriter, r *http.Reque
 		return errorsx.WithStack(fosite.ErrAccessDenied.WithHint("This client cannot use device_code grant type"))
 	}
 
-	handledRequest, err := s.r.ConsentManager().GetDeviceGrantRequest(r.Context(), verifier)
+	handledRequest, err := s.r.ConsentManager().GetDeviceGrantRequestByVerifier(r.Context(), verifier)
 
 	// Add the user code to form data for fosite to use later
 	req.GetRequestForm().Add("user_code", handledRequest.UserCode)

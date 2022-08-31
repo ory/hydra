@@ -484,26 +484,17 @@
         "title": "HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
-      "getDeviceLoginRequest": {
+      "verifyDeviceRequest": {
         "properties": {
           "user_code": {
             "description": "The end-user verification code.",
             "type": "string"
-          },
-          "device_challenge": {
-            "description": "The device challenge",
-            "type": "string"
-          },
-          "state": {
-            "description": "A state used for the login request",
-            "type": "string"
           }
         },
         "required": [
-          "user_code",
-          "device_challenge"
+          "user_code"
         ],
-        "title": "The response payload sent when verifying a device user_code request.",
+        "title": "VerifyDeviceRequest is the request payload used to verify a device request.",
         "type": "object"
       },
       "completedRequest": {
@@ -2717,7 +2708,7 @@
                 }
               }
             },
-            "description": "completedRequest"
+            "description": "deviceAuthorizationResponse"
           },
           "400": {
             "content": {
@@ -3369,31 +3360,23 @@
         "parameters": [
           {
             "in": "query",
-            "name": "user_code",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }, 
-          {
-            "in": "query",
             "name": "device_challenge",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "state",
             "schema": {
               "type": "string"
             }
           }
         ],
         "responses": {
-          "302": {
-            "$ref": "#/components/responses/emptyResponse"
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/completedRequest"
+                }
+              }
+            },
+            "description": "completedRequest"
           },
           "404": {
             "content": {
@@ -3427,6 +3410,88 @@
           }
         },
         "summary": "Get a Device Request",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "Use this endpoint to fetch a device request.",
+        "operationId": "verifyDeviceRequest",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "consent_challenge",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/verifyDeviceRequest"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/completedRequest"
+                }
+              }
+            },
+            "description": "completedRequest"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
+        "summary": "Verify a Device Auth Request via a User Code",
         "tags": [
           "admin"
         ]

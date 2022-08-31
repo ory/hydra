@@ -21,6 +21,7 @@
 package consent_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -42,6 +43,8 @@ import (
 
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
+
+	"github.com/ory/x/cmdx"
 )
 
 func TestGetLogoutRequest(t *testing.T) {
@@ -222,6 +225,82 @@ func TestGetConsentRequest(t *testing.T) {
 
 func TestGetDeviceLoginRequest(t *testing.T) {
 	for k, tc := range []struct {
+		createDeviceSession bool
+		handled             bool
+		status              int
+		device_challenge    string
+	}{
+		{
+			createDeviceSession: false,
+			handled:             false,
+			status:              http.StatusBadRequest,
+			device_challenge:    "",
+		},
+		{
+			createDeviceSession: false,
+			handled:             false,
+			status:              http.StatusNotFound,
+			device_challenge:    "muyjbkdhjsbvc8",
+		},
+		{
+			createDeviceSession: true,
+			handled:             false,
+			status:              http.StatusOK,
+			device_challenge:    "muyjbkdhjsbvc8",
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+
+			conf := internal.NewConfigurationWithDefaults()
+			reg := internal.NewRegistryMemory(t, conf)
+
+			h := NewHandler(reg, conf)
+			r := x.NewRouterAdmin()
+			h.SetRoutes(r)
+			ts := httptest.NewServer(r)
+			defer ts.Close()
+
+			cl := &client.Client{OutfacingID: "test"}
+			reg.ClientManager().CreateClient(context.Background(), cl)
+
+			var params string
+			if tc.device_challenge != "" {
+				params = "?device_challenge=" + tc.device_challenge
+			}
+
+			verifier := strings.Replace(uuid.New(), "-", "", -1)
+			csrf := strings.Replace(uuid.New(), "-", "", -1)
+
+			if tc.createDeviceSession {
+				reg.ConsentManager().CreateDeviceGrantRequest(context.TODO(), &DeviceGrantRequest{
+					ID:       tc.device_challenge,
+					Verifier: verifier,
+					CSRF:     csrf,
+					Client:   cl,
+					DeviceCode: "AAAAAAA",
+					UserCode: "BBBBBB",
+				})
+			}
+
+			req, err := http.NewRequest("GET", ts.URL+DevicePath+params, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			transport := http.Transport{}
+			resp, err := transport.RoundTrip(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			require.NoError(t, err)
+			require.EqualValues(t, tc.status, resp.StatusCode)
+		})
+	}
+}
+
+func TestVerifyDeviceLoginRequest(t *testing.T) {
+	for k, tc := range []struct {
 		createUserSession   bool
 		createDeviceSession bool
 		handled             bool
@@ -257,7 +336,7 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 			createUserSession:   true,
 			createDeviceSession: true,
 			handled:             false,
-			status:              http.StatusFound,
+			status:              http.StatusOK,
 			user_code:           "AAABBBCCC",
 			device_challenge:    "muyjbkdhjsbvc8",
 		},
@@ -281,6 +360,7 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 				params = params + "&device_challenge=" + tc.device_challenge
 			}
 
+			var userCodeBody VerifyUserCodeRequest
 			if tc.user_code != "" {
 
 				verifier := strings.Replace(uuid.New(), "-", "", -1)
@@ -303,7 +383,6 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 						Client:      cl,
 						Session:     &fosite.DefaultSession{Subject: "A"},
 						RequestedAt: time.Now().UTC(),
-						Form:        url.Values{"device_code": {"ABC1234"}},
 					},
 				}
 				req.SetID(deviceCodeHash)
@@ -312,10 +391,14 @@ func TestGetDeviceLoginRequest(t *testing.T) {
 					reg.OAuth2Storage().CreateUserCodeSession(context.TODO(), userCodeHash, req)
 					reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), tc.device_challenge, req)
 				}
-				params = params + "&user_code=" + tc.user_code
+				
+				userCodeBody = VerifyUserCodeRequest{UserCode: tc.user_code}
 			}
 
-			req, err := http.NewRequest("GET", ts.URL+DevicePath+params, nil)
+			body, err := json.Marshal(userCodeBody)
+			cmdx.Must(err, "Unable to encode  to JSON: %s", err)
+
+			req, err := http.NewRequest("PUT", ts.URL+DevicePath+"/verify"+params, bytes.NewReader(body))
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -52,8 +52,7 @@ const (
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
-	KeyDeviceCodeLifespan                        = "ttl.device_code"
-	KeyUserCodeLifespan                          = "ttl.user_code"
+	KeyDeviceAndUserCodeLifespan                 = "ttl.device_user_code"
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"
@@ -266,12 +265,8 @@ func (p *Provider) AuthCodeLifespan() time.Duration {
 	return p.p.DurationF(KeyAuthCodeLifespan, time.Minute*10)
 }
 
-func (p *Provider) DeviceCodeLifespan() time.Duration {
-	return p.p.DurationF(KeyDeviceCodeLifespan, time.Minute*15)
-}
-
-func (p *Provider) UserCodeLifespan() time.Duration {
-	return p.p.DurationF(KeyUserCodeLifespan, time.Minute*15)
+func (p *Provider) DeviceAndUserCodeLifespan() time.Duration {
+	return p.p.DurationF(KeyDeviceAndUserCodeLifespan, time.Minute*15)
 }
 
 func (p *Provider) DeviceAuthTokenPollingInterval() time.Duration {

@@ -114,8 +114,7 @@ ttl:
   refresh_token: 2h
   id_token: 2h
   auth_code: 2h
-  device_code: 2h
-  user_code: 2h
+  device_user_code: 2h
 
 oauth2:
   expose_internal_errors: true

@@ -730,18 +730,9 @@
             }
           ]
         },
-        "device_code": {
-          "description": "Configures how long auth codes are valid.",
-          "default": "10m",
-          "allOf": [
-            {
-              "$ref": "#/definitions/duration"
-            }
-          ]
-        },
-        "user_code": {
-          "description": "Configures how long user codes (device code flow) are valid.",
-          "default": "10m",
+        "device_user_code": {
+          "description": "Configures how long device/user codes are valid.",
+          "default": "5m",
           "allOf": [
             {
               "$ref": "#/definitions/duration"

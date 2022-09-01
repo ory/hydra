@@ -62,7 +62,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: OpenID Connect Discovery
+      summary: "# OpenID Connect Discovery"
       tags:
         - public
   /clients:
@@ -763,7 +763,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: The OAuth 2.0 Authorize Endpoint
+      summary: "# The OAuth 2.0 Authorize Endpoint"
       tags:
         - public
   /oauth2/auth/requests/consent:
@@ -813,7 +813,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Get Consent Request Information
+      summary: "# Get Consent Request Information"
       tags:
         - admin
   /oauth2/auth/requests/consent/accept:
@@ -869,7 +869,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Accept a Consent Request
+      summary: "# Accept a Consent Request"
       tags:
         - admin
   /oauth2/auth/requests/consent/reject:
@@ -924,7 +924,48 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Reject a Consent Request
+      summary: "# Reject a Consent Request"
+      tags:
+        - admin
+  /oauth2/auth/requests/device/verify:
+    put:
+      description: |-
+        # Verifies a device grant request
+        Verifies a device grant request
+      operationId: verifyUserCodeRequest
+      parameters:
+        - explode: true
+          in: query
+          name: device_challenge
+          required: true
+          schema:
+            type: string
+          style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/verifyUserCodeRequest"
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/completedRequest"
+          description: completedRequest
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jsonError"
+          description: jsonError
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jsonError"
+          description: jsonError
       tags:
         - admin
   /oauth2/auth/requests/login:
@@ -977,7 +1018,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Get a Login Request
+      summary: "# Get a Login Request"
       tags:
         - admin
   /oauth2/auth/requests/login/accept:
@@ -1042,7 +1083,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Accept a Login Request
+      summary: "# Accept a Login Request"
       tags:
         - admin
   /oauth2/auth/requests/login/reject:
@@ -1106,7 +1147,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Reject a Login Request
+      summary: "# Reject a Login Request"
       tags:
         - admin
   /oauth2/auth/requests/logout:
@@ -1146,7 +1187,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Get a Logout Request
+      summary: "# Get a Logout Request"
       tags:
         - admin
   /oauth2/auth/requests/logout/accept:
@@ -1184,7 +1225,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Accept a Logout Request
+      summary: "# Accept a Logout Request"
       tags:
         - admin
   /oauth2/auth/requests/logout/reject:
@@ -1229,7 +1270,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Reject a Logout Request
+      summary: "# Reject a Logout Request"
       tags:
         - admin
   /oauth2/auth/sessions/consent:
@@ -1286,7 +1327,7 @@ paths:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
       summary:
-        Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+        "# Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client"
       tags:
         - admin
     get:
@@ -1294,7 +1335,6 @@ paths:
         This endpoint lists all subject's granted consent sessions, including client and granted scope.
         If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
         empty JSON array with status code 200 OK.
-
 
         The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
         Multiple links can be included in this header, and will be separated by a comma.
@@ -1348,7 +1388,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Lists All Consent Sessions of a Subject
+      summary: "# Lists All Consent Sessions of a Subject"
       tags:
         - admin
   /oauth2/auth/sessions/login:
@@ -1418,7 +1458,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Flush Expired OAuth2 Access Tokens
+      summary: "# Flush Expired OAuth2 Access Tokens"
       tags:
         - admin
   /oauth2/introspect:
@@ -1474,7 +1514,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Introspect OAuth2 Tokens
+      summary: "# Introspect OAuth2 Tokens"
       tags:
         - admin
   /oauth2/register:
@@ -1691,7 +1731,7 @@ paths:
       security:
         - basic: []
         - oauth2: []
-      summary: Revoke OAuth2 Tokens
+      summary: "# Revoke OAuth2 Tokens"
       tags:
         - public
   /oauth2/sessions/logout:
@@ -1709,7 +1749,7 @@ paths:
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
             typically 201.
-      summary: OpenID Connect Front-Backchannel Enabled Logout
+      summary: "# OpenID Connect Front-Backchannel Enabled Logout"
       tags:
         - public
   /oauth2/token:
@@ -1778,7 +1818,7 @@ paths:
       security:
         - basic: []
         - oauth2: []
-      summary: The OAuth 2.0 Token Endpoint
+      summary: "# The OAuth 2.0 Token Endpoint"
       tags:
         - public
   /oauth2/tokens:
@@ -1812,7 +1852,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-      summary: Delete OAuth2 Access Tokens from a Client
+      summary: "# Delete OAuth2 Access Tokens from a Client"
       tags:
         - admin
   /trust/grants/jwt-bearer/issuers:
@@ -2013,7 +2053,7 @@ paths:
           description: jsonError
       security:
         - oauth2: []
-      summary: OpenID Connect Userinfo
+      summary: "# OpenID Connect Userinfo"
       tags:
         - public
   /version:
@@ -2910,6 +2950,32 @@ components:
             IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
             by anyone that has access to the ID Challenge. Use with care!
       title: Used to pass session data to a consent request.
+      type: object
+    deviceGrantRequest:
+      properties:
+        challenge:
+          type: string
+        client:
+          $ref: "#/components/schemas/oAuth2Client"
+        handled_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+      title: Contains information on an ongoing device grant request.
       type: object
     flushInactiveOAuth2TokensRequest:
       properties:
@@ -4285,6 +4351,12 @@ components:
             America/Los_Angeles.
           type: string
       type: object
+    verifyUserCodeRequest:
+      description: Contains information on an device verification
+      properties:
+        user_code:
+          type: string
+      type: object
     version:
       properties:
         version:
@@ -4304,6 +4376,7 @@ components:
           - scopes_supported
         issuer: https://playground.ory.sh/ory-hydra/public/
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
+        device_authorization_endpoint: device_authorization_endpoint
         claims_supported:
           - claims_supported
           - claims_supported
@@ -4379,6 +4452,10 @@ components:
           items:
             type: string
           type: array
+        device_authorization_endpoint:
+          description:
+            URL of the authorization server's device authorization endpoint
+          type: string
         end_session_endpoint:
           description:
             URL at the OP to which an RP can perform a redirect to request that

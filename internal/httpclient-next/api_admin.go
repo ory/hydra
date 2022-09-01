@@ -28,7 +28,7 @@ var (
 type AdminApi interface {
 
 	/*
-			 * AcceptConsentRequest Accept a Consent Request
+			 * AcceptConsentRequest # Accept a Consent Request
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 		the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -57,7 +57,7 @@ type AdminApi interface {
 	AcceptConsentRequestExecute(r AdminApiApiAcceptConsentRequestRequest) (*CompletedRequest, *http.Response, error)
 
 	/*
-			 * AcceptLoginRequest Accept a Login Request
+			 * AcceptLoginRequest # Accept a Login Request
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 		provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -83,7 +83,7 @@ type AdminApi interface {
 	AcceptLoginRequestExecute(r AdminApiApiAcceptLoginRequestRequest) (*CompletedRequest, *http.Response, error)
 
 	/*
-			 * AcceptLogoutRequest Accept a Logout Request
+			 * AcceptLogoutRequest # Accept a Logout Request
 			 * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 		No body is required.
 
@@ -188,7 +188,7 @@ type AdminApi interface {
 	DeleteOAuth2ClientExecute(r AdminApiApiDeleteOAuth2ClientRequest) (*http.Response, error)
 
 	/*
-	 * DeleteOAuth2Token Delete OAuth2 Access Tokens from a Client
+	 * DeleteOAuth2Token # Delete OAuth2 Access Tokens from a Client
 	 * This endpoint deletes OAuth2 access tokens issued for a client from the database
 	 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 * @return AdminApiApiDeleteOAuth2TokenRequest
@@ -219,7 +219,7 @@ type AdminApi interface {
 	DeleteTrustedJwtGrantIssuerExecute(r AdminApiApiDeleteTrustedJwtGrantIssuerRequest) (*http.Response, error)
 
 	/*
-			 * FlushInactiveOAuth2Tokens Flush Expired OAuth2 Access Tokens
+			 * FlushInactiveOAuth2Tokens # Flush Expired OAuth2 Access Tokens
 			 * This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
 		not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
 		automatically when performing the refresh flow.
@@ -234,7 +234,7 @@ type AdminApi interface {
 	FlushInactiveOAuth2TokensExecute(r AdminApiApiFlushInactiveOAuth2TokensRequest) (*http.Response, error)
 
 	/*
-			 * GetConsentRequest Get Consent Request Information
+			 * GetConsentRequest # Get Consent Request Information
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 		the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -290,7 +290,7 @@ type AdminApi interface {
 	GetJsonWebKeySetExecute(r AdminApiApiGetJsonWebKeySetRequest) (*JSONWebKeySet, *http.Response, error)
 
 	/*
-			 * GetLoginRequest Get a Login Request
+			 * GetLoginRequest # Get a Login Request
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 		provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -310,7 +310,7 @@ type AdminApi interface {
 	GetLoginRequestExecute(r AdminApiApiGetLoginRequestRequest) (*LoginRequest, *http.Response, error)
 
 	/*
-	 * GetLogoutRequest Get a Logout Request
+	 * GetLogoutRequest # Get a Logout Request
 	 * Use this endpoint to fetch a logout request.
 	 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	 * @return AdminApiApiGetLogoutRequestRequest
@@ -358,7 +358,7 @@ type AdminApi interface {
 	GetTrustedJwtGrantIssuerExecute(r AdminApiApiGetTrustedJwtGrantIssuerRequest) (*TrustedJwtGrantIssuer, *http.Response, error)
 
 	/*
-			 * IntrospectOAuth2Token Introspect OAuth2 Tokens
+			 * IntrospectOAuth2Token # Introspect OAuth2 Tokens
 			 * The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 		is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
 		set additional data for a token by setting `accessTokenExtra` during the consent flow.
@@ -398,11 +398,10 @@ type AdminApi interface {
 	ListOAuth2ClientsExecute(r AdminApiApiListOAuth2ClientsRequest) ([]OAuth2Client, *http.Response, error)
 
 	/*
-			 * ListSubjectConsentSessions Lists All Consent Sessions of a Subject
+			 * ListSubjectConsentSessions # Lists All Consent Sessions of a Subject
 			 * This endpoint lists all subject's granted consent sessions, including client and granted scope.
 		If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
 		empty JSON array with status code 200 OK.
-
 
 		The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 		Multiple links can be included in this header, and will be separated by a comma.
@@ -452,7 +451,7 @@ type AdminApi interface {
 	PatchOAuth2ClientExecute(r AdminApiApiPatchOAuth2ClientRequest) (*OAuth2Client, *http.Response, error)
 
 	/*
-			 * RejectConsentRequest Reject a Consent Request
+			 * RejectConsentRequest # Reject a Consent Request
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 		the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -480,7 +479,7 @@ type AdminApi interface {
 	RejectConsentRequestExecute(r AdminApiApiRejectConsentRequestRequest) (*CompletedRequest, *http.Response, error)
 
 	/*
-			 * RejectLoginRequest Reject a Login Request
+			 * RejectLoginRequest # Reject a Login Request
 			 * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 		(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 		provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -505,7 +504,7 @@ type AdminApi interface {
 	RejectLoginRequestExecute(r AdminApiApiRejectLoginRequestRequest) (*CompletedRequest, *http.Response, error)
 
 	/*
-			 * RejectLogoutRequest Reject a Logout Request
+			 * RejectLogoutRequest # Reject a Logout Request
 			 * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 		No body is required.
 
@@ -536,7 +535,7 @@ type AdminApi interface {
 	RevokeAuthenticationSessionExecute(r AdminApiApiRevokeAuthenticationSessionRequest) (*http.Response, error)
 
 	/*
-			 * RevokeConsentSessions Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+			 * RevokeConsentSessions # Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 			 * This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 		associated OAuth 2.0 Access Tokens.
 			 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -635,6 +634,21 @@ type AdminApi interface {
 	 * @return OAuth2Client
 	 */
 	UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdateOAuth2ClientLifespansRequest) (*OAuth2Client, *http.Response, error)
+
+	/*
+			 * VerifyUserCodeRequest Method for VerifyUserCodeRequest
+			 * # Verifies a device grant request
+		Verifies a device grant request
+			 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+			 * @return AdminApiApiVerifyUserCodeRequestRequest
+	*/
+	VerifyUserCodeRequest(ctx context.Context) AdminApiApiVerifyUserCodeRequestRequest
+
+	/*
+	 * VerifyUserCodeRequestExecute executes the request
+	 * @return CompletedRequest
+	 */
+	VerifyUserCodeRequestExecute(r AdminApiApiVerifyUserCodeRequestRequest) (*CompletedRequest, *http.Response, error)
 }
 
 // AdminApiService AdminApi service
@@ -661,7 +675,7 @@ func (r AdminApiApiAcceptConsentRequestRequest) Execute() (*CompletedRequest, *h
 }
 
 /*
- * AcceptConsentRequest Accept a Consent Request
+ * AcceptConsentRequest # Accept a Consent Request
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -813,7 +827,7 @@ func (r AdminApiApiAcceptLoginRequestRequest) Execute() (*CompletedRequest, *htt
 }
 
 /*
- * AcceptLoginRequest Accept a Login Request
+ * AcceptLoginRequest # Accept a Login Request
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -977,7 +991,7 @@ func (r AdminApiApiAcceptLogoutRequestRequest) Execute() (*CompletedRequest, *ht
 }
 
 /*
- * AcceptLogoutRequest Accept a Logout Request
+ * AcceptLogoutRequest # Accept a Logout Request
  * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 No body is required.
 
@@ -1738,7 +1752,7 @@ func (r AdminApiApiDeleteOAuth2TokenRequest) Execute() (*http.Response, error) {
 }
 
 /*
- * DeleteOAuth2Token Delete OAuth2 Access Tokens from a Client
+ * DeleteOAuth2Token # Delete OAuth2 Access Tokens from a Client
  * This endpoint deletes OAuth2 access tokens issued for a client from the database
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @return AdminApiApiDeleteOAuth2TokenRequest
@@ -1974,7 +1988,7 @@ func (r AdminApiApiFlushInactiveOAuth2TokensRequest) Execute() (*http.Response, 
 }
 
 /*
- * FlushInactiveOAuth2Tokens Flush Expired OAuth2 Access Tokens
+ * FlushInactiveOAuth2Tokens # Flush Expired OAuth2 Access Tokens
  * This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
 not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
 automatically when performing the refresh flow.
@@ -2093,7 +2107,7 @@ func (r AdminApiApiGetConsentRequestRequest) Execute() (*ConsentRequest, *http.R
 }
 
 /*
- * GetConsentRequest Get Consent Request Information
+ * GetConsentRequest # Get Consent Request Information
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -2506,7 +2520,7 @@ func (r AdminApiApiGetLoginRequestRequest) Execute() (*LoginRequest, *http.Respo
 }
 
 /*
- * GetLoginRequest Get a Login Request
+ * GetLoginRequest # Get a Login Request
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -2662,7 +2676,7 @@ func (r AdminApiApiGetLogoutRequestRequest) Execute() (*LogoutRequest, *http.Res
 }
 
 /*
- * GetLogoutRequest Get a Logout Request
+ * GetLogoutRequest # Get a Logout Request
  * Use this endpoint to fetch a logout request.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @return AdminApiApiGetLogoutRequestRequest
@@ -3047,7 +3061,7 @@ func (r AdminApiApiIntrospectOAuth2TokenRequest) Execute() (*OAuth2TokenIntrospe
 }
 
 /*
- * IntrospectOAuth2Token Introspect OAuth2 Tokens
+ * IntrospectOAuth2Token # Introspect OAuth2 Tokens
  * The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
 set additional data for a token by setting `accessTokenExtra` during the consent flow.
@@ -3343,11 +3357,10 @@ func (r AdminApiApiListSubjectConsentSessionsRequest) Execute() ([]PreviousConse
 }
 
 /*
- * ListSubjectConsentSessions Lists All Consent Sessions of a Subject
+ * ListSubjectConsentSessions # Lists All Consent Sessions of a Subject
  * This endpoint lists all subject's granted consent sessions, including client and granted scope.
 If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
 empty JSON array with status code 200 OK.
-
 
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
@@ -3753,7 +3766,7 @@ func (r AdminApiApiRejectConsentRequestRequest) Execute() (*CompletedRequest, *h
 }
 
 /*
- * RejectConsentRequest Reject a Consent Request
+ * RejectConsentRequest # Reject a Consent Request
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
@@ -3904,7 +3917,7 @@ func (r AdminApiApiRejectLoginRequestRequest) Execute() (*CompletedRequest, *htt
 }
 
 /*
- * RejectLoginRequest Reject a Login Request
+ * RejectLoginRequest # Reject a Login Request
  * When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
@@ -4072,7 +4085,7 @@ func (r AdminApiApiRejectLogoutRequestRequest) Execute() (*http.Response, error)
 }
 
 /*
- * RejectLogoutRequest Reject a Logout Request
+ * RejectLogoutRequest # Reject a Logout Request
  * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 No body is required.
 
@@ -4327,7 +4340,7 @@ func (r AdminApiApiRevokeConsentSessionsRequest) Execute() (*http.Response, erro
 }
 
 /*
- * RevokeConsentSessions Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+ * RevokeConsentSessions # Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
  * This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
@@ -5103,6 +5116,144 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r AdminApiApiUpdate
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type AdminApiApiVerifyUserCodeRequestRequest struct {
+	ctx                   context.Context
+	ApiService            AdminApi
+	deviceChallenge       *string
+	verifyUserCodeRequest *VerifyUserCodeRequest
+}
+
+func (r AdminApiApiVerifyUserCodeRequestRequest) DeviceChallenge(deviceChallenge string) AdminApiApiVerifyUserCodeRequestRequest {
+	r.deviceChallenge = &deviceChallenge
+	return r
+}
+func (r AdminApiApiVerifyUserCodeRequestRequest) VerifyUserCodeRequest(verifyUserCodeRequest VerifyUserCodeRequest) AdminApiApiVerifyUserCodeRequestRequest {
+	r.verifyUserCodeRequest = &verifyUserCodeRequest
+	return r
+}
+
+func (r AdminApiApiVerifyUserCodeRequestRequest) Execute() (*CompletedRequest, *http.Response, error) {
+	return r.ApiService.VerifyUserCodeRequestExecute(r)
+}
+
+/*
+ * VerifyUserCodeRequest Method for VerifyUserCodeRequest
+ * # Verifies a device grant request
+Verifies a device grant request
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @return AdminApiApiVerifyUserCodeRequestRequest
+*/
+func (a *AdminApiService) VerifyUserCodeRequest(ctx context.Context) AdminApiApiVerifyUserCodeRequestRequest {
+	return AdminApiApiVerifyUserCodeRequestRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return CompletedRequest
+ */
+func (a *AdminApiService) VerifyUserCodeRequestExecute(r AdminApiApiVerifyUserCodeRequestRequest) (*CompletedRequest, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  *CompletedRequest
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.VerifyUserCodeRequest")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/auth/requests/device/verify"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.deviceChallenge == nil {
+		return localVarReturnValue, nil, reportError("deviceChallenge is required and must be specified")
+	}
+
+	localVarQueryParams.Add("device_challenge", parameterToString(*r.deviceChallenge, ""))
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.verifyUserCodeRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v JsonError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v JsonError
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 

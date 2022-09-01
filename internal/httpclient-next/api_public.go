@@ -28,7 +28,7 @@ var (
 type PublicApi interface {
 
 	/*
-			 * DisconnectUser OpenID Connect Front-Backchannel Enabled Logout
+			 * DisconnectUser # OpenID Connect Front-Backchannel Enabled Logout
 			 * This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:
 
 		https://openid.net/specs/openid-connect-frontchannel-1_0.html
@@ -46,7 +46,7 @@ type PublicApi interface {
 	DisconnectUserExecute(r PublicApiApiDisconnectUserRequest) (*http.Response, error)
 
 	/*
-			 * DiscoverOpenIDConfiguration OpenID Connect Discovery
+			 * DiscoverOpenIDConfiguration # OpenID Connect Discovery
 			 * The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 		your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
 		flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
@@ -166,7 +166,7 @@ type PublicApi interface {
 	DynamicClientRegistrationUpdateOAuth2ClientExecute(r PublicApiApiDynamicClientRegistrationUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error)
 
 	/*
-			 * Oauth2Token The OAuth 2.0 Token Endpoint
+			 * Oauth2Token # The OAuth 2.0 Token Endpoint
 			 * The client makes a request to the token endpoint by sending the
 		following parameters using the "application/x-www-form-urlencoded" HTTP
 		request entity-body.
@@ -187,7 +187,7 @@ type PublicApi interface {
 	Oauth2TokenExecute(r PublicApiApiOauth2TokenRequest) (*Oauth2TokenResponse, *http.Response, error)
 
 	/*
-			 * OauthAuth The OAuth 2.0 Authorize Endpoint
+			 * OauthAuth # The OAuth 2.0 Authorize Endpoint
 			 * This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 		OAuth2 is a very popular protocol and a library for your programming language will exists.
 
@@ -203,7 +203,7 @@ type PublicApi interface {
 	OauthAuthExecute(r PublicApiApiOauthAuthRequest) (*http.Response, error)
 
 	/*
-			 * RevokeOAuth2Token Revoke OAuth2 Tokens
+			 * RevokeOAuth2Token # Revoke OAuth2 Tokens
 			 * Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 		longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
 		Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
@@ -219,7 +219,7 @@ type PublicApi interface {
 	RevokeOAuth2TokenExecute(r PublicApiApiRevokeOAuth2TokenRequest) (*http.Response, error)
 
 	/*
-			 * Userinfo OpenID Connect Userinfo
+			 * Userinfo # OpenID Connect Userinfo
 			 * This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 		the provided OAuth 2.0 Access Token.
 
@@ -269,7 +269,7 @@ func (r PublicApiApiDisconnectUserRequest) Execute() (*http.Response, error) {
 }
 
 /*
- * DisconnectUser OpenID Connect Front-Backchannel Enabled Logout
+ * DisconnectUser # OpenID Connect Front-Backchannel Enabled Logout
  * This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:
 
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
@@ -364,7 +364,7 @@ func (r PublicApiApiDiscoverOpenIDConfigurationRequest) Execute() (*WellKnown, *
 }
 
 /*
- * DiscoverOpenIDConfiguration OpenID Connect Discovery
+ * DiscoverOpenIDConfiguration # OpenID Connect Discovery
  * The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
 flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
@@ -1013,7 +1013,7 @@ func (r PublicApiApiOauth2TokenRequest) Execute() (*Oauth2TokenResponse, *http.R
 }
 
 /*
- * Oauth2Token The OAuth 2.0 Token Endpoint
+ * Oauth2Token # The OAuth 2.0 Token Endpoint
  * The client makes a request to the token endpoint by sending the
 following parameters using the "application/x-www-form-urlencoded" HTTP
 request entity-body.
@@ -1166,7 +1166,7 @@ func (r PublicApiApiOauthAuthRequest) Execute() (*http.Response, error) {
 }
 
 /*
- * OauthAuth The OAuth 2.0 Authorize Endpoint
+ * OauthAuth # The OAuth 2.0 Authorize Endpoint
  * This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 OAuth2 is a very popular protocol and a library for your programming language will exists.
 
@@ -1284,7 +1284,7 @@ func (r PublicApiApiRevokeOAuth2TokenRequest) Execute() (*http.Response, error) 
 }
 
 /*
- * RevokeOAuth2Token Revoke OAuth2 Tokens
+ * RevokeOAuth2Token # Revoke OAuth2 Tokens
  * Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
 Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
@@ -1400,7 +1400,7 @@ func (r PublicApiApiUserinfoRequest) Execute() (*UserinfoResponse, *http.Respons
 }
 
 /*
- * Userinfo OpenID Connect Userinfo
+ * Userinfo # OpenID Connect Userinfo
  * This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 the provided OAuth 2.0 Access Token.
 

@@ -29,6 +29,8 @@ type WellKnown struct {
 	ClaimsSupported []string `json:"claims_supported,omitempty"`
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by this authorization server.
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,omitempty"`
+	// URL of the authorization server's device authorization endpoint
+	DeviceAuthorizationEndpoint *string `json:"device_authorization_endpoint,omitempty"`
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint *string `json:"end_session_endpoint,omitempty"`
 	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.
@@ -279,6 +281,38 @@ func (o *WellKnown) HasCodeChallengeMethodsSupported() bool {
 // SetCodeChallengeMethodsSupported gets a reference to the given []string and assigns it to the CodeChallengeMethodsSupported field.
 func (o *WellKnown) SetCodeChallengeMethodsSupported(v []string) {
 	o.CodeChallengeMethodsSupported = v
+}
+
+// GetDeviceAuthorizationEndpoint returns the DeviceAuthorizationEndpoint field value if set, zero value otherwise.
+func (o *WellKnown) GetDeviceAuthorizationEndpoint() string {
+	if o == nil || o.DeviceAuthorizationEndpoint == nil {
+		var ret string
+		return ret
+	}
+	return *o.DeviceAuthorizationEndpoint
+}
+
+// GetDeviceAuthorizationEndpointOk returns a tuple with the DeviceAuthorizationEndpoint field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WellKnown) GetDeviceAuthorizationEndpointOk() (*string, bool) {
+	if o == nil || o.DeviceAuthorizationEndpoint == nil {
+		return nil, false
+	}
+	return o.DeviceAuthorizationEndpoint, true
+}
+
+// HasDeviceAuthorizationEndpoint returns a boolean if a field has been set.
+func (o *WellKnown) HasDeviceAuthorizationEndpoint() bool {
+	if o != nil && o.DeviceAuthorizationEndpoint != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDeviceAuthorizationEndpoint gets a reference to the given string and assigns it to the DeviceAuthorizationEndpoint field.
+func (o *WellKnown) SetDeviceAuthorizationEndpoint(v string) {
+	o.DeviceAuthorizationEndpoint = &v
 }
 
 // GetEndSessionEndpoint returns the EndSessionEndpoint field value if set, zero value otherwise.
@@ -924,6 +958,9 @@ func (o WellKnown) MarshalJSON() ([]byte, error) {
 	}
 	if o.CodeChallengeMethodsSupported != nil {
 		toSerialize["code_challenge_methods_supported"] = o.CodeChallengeMethodsSupported
+	}
+	if o.DeviceAuthorizationEndpoint != nil {
+		toSerialize["device_authorization_endpoint"] = o.DeviceAuthorizationEndpoint
 	}
 	if o.EndSessionEndpoint != nil {
 		toSerialize["end_session_endpoint"] = o.EndSessionEndpoint

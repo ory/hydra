@@ -15,6 +15,7 @@ docs/CompletedRequest.md
 docs/ConsentRequest.md
 docs/ConsentRequestSession.md
 docs/DefaultSession.md
+docs/DeviceGrantRequest.md
 docs/FlushInactiveOAuth2TokensRequest.md
 docs/FlushLoginConsentRequest.md
 docs/GenericError.md
@@ -51,6 +52,7 @@ docs/TrustedJsonWebKey.md
 docs/TrustedJwtGrantIssuer.md
 docs/UpdateOAuth2ClientLifespans.md
 docs/UserinfoResponse.md
+docs/VerifyUserCodeRequest.md
 docs/Version.md
 docs/WellKnown.md
 git_push.sh
@@ -62,6 +64,7 @@ model_completed_request.go
 model_consent_request.go
 model_consent_request_session.go
 model_default_session.go
+model_device_grant_request.go
 model_flush_inactive_o_auth2_tokens_request.go
 model_flush_login_consent_request.go
 model_generic_error.go
@@ -96,6 +99,7 @@ model_trusted_json_web_key.go
 model_trusted_jwt_grant_issuer.go
 model_update_o_auth2_client_lifespans.go
 model_userinfo_response.go
+model_verify_user_code_request.go
 model_version.go
 model_well_known.go
 response.go

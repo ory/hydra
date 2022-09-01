@@ -32,10 +32,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pborman/uuid"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/pborman/uuid"
 
 	"github.com/ory/hydra/internal"
 

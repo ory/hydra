@@ -4,23 +4,23 @@ All URIs are relative to _http://localhost_
 
 | Method                                                                                                      | HTTP request                              | Description                                                                                            |
 | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| [**DisconnectUser**](PublicApi.md#DisconnectUser)                                                           | **Get** /oauth2/sessions/logout           | OpenID Connect Front-Backchannel Enabled Logout                                                        |
-| [**DiscoverOpenIDConfiguration**](PublicApi.md#DiscoverOpenIDConfiguration)                                 | **Get** /.well-known/openid-configuration | OpenID Connect Discovery                                                                               |
+| [**DisconnectUser**](PublicApi.md#DisconnectUser)                                                           | **Get** /oauth2/sessions/logout           | # OpenID Connect Front-Backchannel Enabled Logout                                                      |
+| [**DiscoverOpenIDConfiguration**](PublicApi.md#DiscoverOpenIDConfiguration)                                 | **Get** /.well-known/openid-configuration | # OpenID Connect Discovery                                                                             |
 | [**DynamicClientRegistrationCreateOAuth2Client**](PublicApi.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                 | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
 | [**DynamicClientRegistrationDeleteOAuth2Client**](PublicApi.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}          | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
 | [**DynamicClientRegistrationGetOAuth2Client**](PublicApi.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}             | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
 | [**DynamicClientRegistrationUpdateOAuth2Client**](PublicApi.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}             | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
-| [**Oauth2Token**](PublicApi.md#Oauth2Token)                                                                 | **Post** /oauth2/token                    | The OAuth 2.0 Token Endpoint                                                                           |
-| [**OauthAuth**](PublicApi.md#OauthAuth)                                                                     | **Get** /oauth2/auth                      | The OAuth 2.0 Authorize Endpoint                                                                       |
-| [**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                   | Revoke OAuth2 Tokens                                                                                   |
-| [**Userinfo**](PublicApi.md#Userinfo)                                                                       | **Get** /userinfo                         | OpenID Connect Userinfo                                                                                |
+| [**Oauth2Token**](PublicApi.md#Oauth2Token)                                                                 | **Post** /oauth2/token                    | # The OAuth 2.0 Token Endpoint                                                                         |
+| [**OauthAuth**](PublicApi.md#OauthAuth)                                                                     | **Get** /oauth2/auth                      | # The OAuth 2.0 Authorize Endpoint                                                                     |
+| [**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                   | # Revoke OAuth2 Tokens                                                                                 |
+| [**Userinfo**](PublicApi.md#Userinfo)                                                                       | **Get** /userinfo                         | # OpenID Connect Userinfo                                                                              |
 | [**WellKnown**](PublicApi.md#WellKnown)                                                                     | **Get** /.well-known/jwks.json            | JSON Web Keys Discovery                                                                                |
 
 ## DisconnectUser
 
 > DisconnectUser(ctx).Execute()
 
-OpenID Connect Front-Backchannel Enabled Logout
+# OpenID Connect Front-Backchannel Enabled Logout
 
 ### Example
 
@@ -77,7 +77,7 @@ No authorization required
 
 > WellKnown DiscoverOpenIDConfiguration(ctx).Execute()
 
-OpenID Connect Discovery
+# OpenID Connect Discovery
 
 ### Example
 
@@ -408,7 +408,7 @@ No authorization required
 > Oauth2TokenResponse
 > Oauth2Token(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 
-The OAuth 2.0 Token Endpoint
+# The OAuth 2.0 Token Endpoint
 
 ### Example
 
@@ -478,7 +478,7 @@ via the builder pattern
 
 > OauthAuth(ctx).Execute()
 
-The OAuth 2.0 Authorize Endpoint
+# The OAuth 2.0 Authorize Endpoint
 
 ### Example
 
@@ -535,7 +535,7 @@ No authorization required
 
 > RevokeOAuth2Token(ctx).Token(token).Execute()
 
-Revoke OAuth2 Tokens
+# Revoke OAuth2 Tokens
 
 ### Example
 
@@ -595,7 +595,7 @@ struct via the builder pattern
 
 > UserinfoResponse Userinfo(ctx).Execute()
 
-OpenID Connect Userinfo
+# OpenID Connect Userinfo
 
 ### Example
 

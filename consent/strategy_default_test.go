@@ -32,6 +32,7 @@ import (
 	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/urlx"
 
 	"net/url"
@@ -95,6 +96,18 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	secret := uuid.New().String()
 	c.Secret = secret
 	c.Scope = "openid offline"
+	c.OutfacingID = uuid.New().String()
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+	c.Secret = secret
+	return c
+}
+
+func createDeviceClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
+	secret := uuid.New().String()
+	c.Secret = secret
+	c.Scope = "openid offline"
+	c.GrantTypes = sqlxx.StringSlicePipeDelimiter{"urn:ietf:params:oauth:grant-type:device_code"}
+	c.ResponseTypes = sqlxx.StringSlicePipeDelimiter{"device_code"}
 	c.OutfacingID = uuid.New().String()
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	c.Secret = secret

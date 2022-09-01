@@ -432,71 +432,6 @@
         "title": "HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
-      "deviceAuthorizationRequest": {
-        "properties": {
-          "client_id": {
-            "description": "The client identifier as described in Section 2.2 of [RFC6749]",
-            "type": "string"
-          },
-          "scope": {
-            "description": "The scope of the access request as defined by Section 3.3 of [RFC6749].",
-            "type": "string"
-          }
-        },
-        "required": [
-          "client_id"
-        ],
-        "title": "Device Authorization Request is the request payload used to query a device user/device code and start a device authorization flow",
-        "type": "object"
-      },
-      "deviceAuthorizationResponse": {
-        "properties": {
-          "device_code": {
-            "description": "The device verification code.",
-            "type": "string"
-          },
-          "user_code": {
-            "description": "The end-user verification code.",
-            "type": "string"
-          },
-          "verification_uri": {
-            "description": "The end-user verification URI on the authorization server.  The URI should be short and easy to remember as end users will be asked to manually type it into their user agent.",
-            "type": "string"
-          },
-          "verification_uri_complete": {
-            "description": "A verification URI that includes the \"user_code\" (or other information with the same function as the \"user_code\"), which is designed for non-textual transmission.",
-            "type": "string"
-          },
-          "expires_in": {
-            "description": "The lifetime in seconds of the \"device_code\" and \"user_code\"",
-            "type": "string"
-          },
-          "interval": {
-            "description": "The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.  If no value is provided, clients MUST use 5 as the default.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "device_code",
-          "user_code",
-          "verification_uri"
-        ],
-        "title": "HandledLoginRequest is the request payload used to accept a login request.",
-        "type": "object"
-      },
-      "verifyDeviceRequest": {
-        "properties": {
-          "user_code": {
-            "description": "The end-user verification code.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "user_code"
-        ],
-        "title": "VerifyDeviceRequest is the request payload used to verify a device request.",
-        "type": "object"
-      },
       "completedRequest": {
         "properties": {
           "redirect_to": {
@@ -575,6 +510,27 @@
           }
         },
         "title": "Used to pass session data to a consent request.",
+        "type": "object"
+      },
+      "deviceGrantRequest": {
+        "properties": {
+          "challenge": {
+            "type": "string"
+          },
+          "client": {
+            "$ref": "#/components/schemas/oAuth2Client"
+          },
+          "handled_at": {
+            "$ref": "#/components/schemas/nullTime"
+          },
+          "requested_access_token_audience": {
+            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+          },
+          "requested_scope": {
+            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+          }
+        },
+        "title": "Contains information on an ongoing device grant request.",
         "type": "object"
       },
       "flushInactiveOAuth2TokensRequest": {
@@ -1487,6 +1443,15 @@
         },
         "type": "object"
       },
+      "verifyUserCodeRequest": {
+        "description": "Contains information on an device verification",
+        "properties": {
+          "user_code": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "version": {
         "properties": {
           "version": {
@@ -1530,6 +1495,10 @@
             },
             "type": "array"
           },
+          "device_authorization_endpoint": {
+            "description": "URL of the authorization server's device authorization endpoint",
+            "type": "string"
+          },
           "end_session_endpoint": {
             "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
             "type": "string"
@@ -1569,11 +1538,6 @@
           "registration_endpoint": {
             "description": "URL of the OP's Dynamic Client Registration Endpoint.",
             "example": "https://playground.ory.sh/ory-hydra/admin/client",
-            "type": "string"
-          },
-          "device_authorization_endpoint": {
-            "description": "URL of the server's device authorization authorization endpoint",
-            "example": "https://playground.ory.sh/ory-hydra/public/oauth2/device/auth",
             "type": "string"
           },
           "request_object_signing_alg_values_supported": {
@@ -1766,7 +1730,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "OpenID Connect Discovery",
+        "summary": "# OpenID Connect Discovery",
         "tags": [
           "public"
         ]
@@ -2679,79 +2643,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "The OAuth 2.0 Authorize Endpoint",
-        "tags": [
-          "public"
-        ]
-      }
-    },
-    "/oauth2/auth/device": {
-      "post": {
-        "description": "This is separate from the OAuth authorization endpoint defined in [RFC6749] with which the user interacts via a user agent (i.e., a browser)",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/deviceAuthorizationRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-originalParamName": "Body"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/deviceAuthorizationResponse"
-                }
-              }
-            },
-            "description": "deviceAuthorizationResponse"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "410": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/requestWasHandledResponse"
-                }
-              }
-            },
-            "description": "requestWasHandledResponse"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Initiate a device auth request",
+        "summary": "# The OAuth 2.0 Authorize Endpoint",
         "tags": [
           "public"
         ]
@@ -2813,7 +2705,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Get Consent Request Information",
+        "summary": "# Get Consent Request Information",
         "tags": [
           "admin"
         ]
@@ -2875,7 +2767,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Accept a Consent Request",
+        "summary": "# Accept a Consent Request",
         "tags": [
           "admin"
         ]
@@ -2937,7 +2829,68 @@
             "description": "jsonError"
           }
         },
-        "summary": "Reject a Consent Request",
+        "summary": "# Reject a Consent Request",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "# Verifies a device grant request\nVerifies a device grant request",
+        "operationId": "verifyUserCodeRequest",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "device_challenge",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/verifyUserCodeRequest"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/completedRequest"
+                }
+              }
+            },
+            "description": "completedRequest"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/jsonError"
+                }
+              }
+            },
+            "description": "jsonError"
+          }
+        },
         "tags": [
           "admin"
         ]
@@ -3009,7 +2962,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Get a Login Request",
+        "summary": "# Get a Login Request",
         "tags": [
           "admin"
         ]
@@ -3091,7 +3044,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Accept a Login Request",
+        "summary": "# Accept a Login Request",
         "tags": [
           "admin"
         ]
@@ -3173,7 +3126,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Reject a Login Request",
+        "summary": "# Reject a Login Request",
         "tags": [
           "admin"
         ]
@@ -3235,7 +3188,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Get a Logout Request",
+        "summary": "# Get a Logout Request",
         "tags": [
           "admin"
         ]
@@ -3287,7 +3240,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Accept a Logout Request",
+        "summary": "# Accept a Logout Request",
         "tags": [
           "admin"
         ]
@@ -3347,151 +3300,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Reject a Logout Request",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/oauth2/auth/requests/device": {
-      "get": {
-        "description": "Use this endpoint to fetch a device request.",
-        "operationId": "getDeviceRequest",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "device_challenge",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/completedRequest"
-                }
-              }
-            },
-            "description": "completedRequest"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "410": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/requestWasHandledResponse"
-                }
-              }
-            },
-            "description": "requestWasHandledResponse"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Get a Device Request",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/oauth2/auth/requests/device/verify": {
-      "put": {
-        "description": "Use this endpoint to fetch a device request.",
-        "operationId": "verifyDeviceRequest",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "device_challenge",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/verifyDeviceRequest"
-              }
-            }
-          },
-          "x-originalParamName": "Body"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/completedRequest"
-                }
-              }
-            },
-            "description": "completedRequest"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Verify a Device Auth Request via a User Code",
+        "summary": "# Reject a Logout Request",
         "tags": [
           "admin"
         ]
@@ -3553,13 +3362,13 @@
             "description": "jsonError"
           }
         },
-        "summary": "Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
+        "summary": "# Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "tags": [
           "admin"
         ]
       },
       "get": {
-        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
+        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
         "operationId": "listSubjectConsentSessions",
         "parameters": [
           {
@@ -3614,7 +3423,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Lists All Consent Sessions of a Subject",
+        "summary": "# Lists All Consent Sessions of a Subject",
         "tags": [
           "admin"
         ]
@@ -3704,7 +3513,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Flush Expired OAuth2 Access Tokens",
+        "summary": "# Flush Expired OAuth2 Access Tokens",
         "tags": [
           "admin"
         ]
@@ -3773,7 +3582,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Introspect OAuth2 Tokens",
+        "summary": "# Introspect OAuth2 Tokens",
         "tags": [
           "admin"
         ]
@@ -4009,7 +3818,7 @@
             "oauth2": []
           }
         ],
-        "summary": "Revoke OAuth2 Tokens",
+        "summary": "# Revoke OAuth2 Tokens",
         "tags": [
           "public"
         ]
@@ -4024,7 +3833,7 @@
             "$ref": "#/components/responses/emptyResponse"
           }
         },
-        "summary": "OpenID Connect Front-Backchannel Enabled Logout",
+        "summary": "# OpenID Connect Front-Backchannel Enabled Logout",
         "tags": [
           "public"
         ]
@@ -4121,7 +3930,7 @@
             "oauth2": []
           }
         ],
-        "summary": "The OAuth 2.0 Token Endpoint",
+        "summary": "# The OAuth 2.0 Token Endpoint",
         "tags": [
           "public"
         ]
@@ -4166,7 +3975,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Delete OAuth2 Access Tokens from a Client",
+        "summary": "# Delete OAuth2 Access Tokens from a Client",
         "tags": [
           "admin"
         ]
@@ -4430,7 +4239,7 @@
             "oauth2": []
           }
         ],
-        "summary": "OpenID Connect Userinfo",
+        "summary": "# OpenID Connect Userinfo",
         "tags": [
           "public"
         ]
@@ -4461,50 +4270,6 @@
         "summary": "Return Running Software Version.",
         "tags": [
           "metadata"
-        ]
-      }
-    },
-    "/device": {
-      "get": {
-        "description": "This endpoint start an interactive device flow.",
-        "parameters": [
-          {
-            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
-            "in": "query",
-            "name": "user_code",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "302": {
-            "$ref": "#/components/responses/emptyResponse"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Get the device auth flow",
-        "tags": [
-          "public"
         ]
       }
     }

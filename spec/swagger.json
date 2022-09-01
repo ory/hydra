@@ -65,7 +65,7 @@
         "tags": [
           "public"
         ],
-        "summary": "OpenID Connect Discovery",
+        "summary": "# OpenID Connect Discovery",
         "operationId": "discoverOpenIDConfiguration",
         "responses": {
           "200": {
@@ -887,7 +887,7 @@
         "tags": [
           "public"
         ],
-        "summary": "The OAuth 2.0 Authorize Endpoint",
+        "summary": "# The OAuth 2.0 Authorize Endpoint",
         "operationId": "oauthAuth",
         "responses": {
           "302": {
@@ -924,7 +924,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get Consent Request Information",
+        "summary": "# Get Consent Request Information",
         "operationId": "getConsentRequest",
         "parameters": [
           {
@@ -978,7 +978,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a Consent Request",
+        "summary": "# Accept a Consent Request",
         "operationId": "acceptConsentRequest",
         "parameters": [
           {
@@ -1033,7 +1033,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a Consent Request",
+        "summary": "# Reject a Consent Request",
         "operationId": "rejectConsentRequest",
         "parameters": [
           {
@@ -1047,6 +1047,60 @@
             "in": "body",
             "schema": {
               "$ref": "#/definitions/rejectRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "completedRequest",
+            "schema": {
+              "$ref": "#/definitions/completedRequest"
+            }
+          },
+          "404": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          },
+          "500": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "# Verifies a device grant request\nVerifies a device grant request",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "verifyUserCodeRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "device_challenge",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/verifyUserCodeRequest"
             }
           }
         ],
@@ -1088,7 +1142,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get a Login Request",
+        "summary": "# Get a Login Request",
         "operationId": "getLoginRequest",
         "parameters": [
           {
@@ -1148,7 +1202,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a Login Request",
+        "summary": "# Accept a Login Request",
         "operationId": "acceptLoginRequest",
         "parameters": [
           {
@@ -1215,7 +1269,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a Login Request",
+        "summary": "# Reject a Login Request",
         "operationId": "rejectLoginRequest",
         "parameters": [
           {
@@ -1279,7 +1333,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get a Logout Request",
+        "summary": "# Get a Logout Request",
         "operationId": "getLogoutRequest",
         "parameters": [
           {
@@ -1330,7 +1384,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a Logout Request",
+        "summary": "# Accept a Logout Request",
         "operationId": "acceptLogoutRequest",
         "parameters": [
           {
@@ -1375,7 +1429,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a Logout Request",
+        "summary": "# Reject a Logout Request",
         "operationId": "rejectLogoutRequest",
         "parameters": [
           {
@@ -1413,7 +1467,7 @@
     },
     "/oauth2/auth/sessions/consent": {
       "get": {
-        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
+        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
         "consumes": [
           "application/json"
         ],
@@ -1427,7 +1481,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Lists All Consent Sessions of a Subject",
+        "summary": "# Lists All Consent Sessions of a Subject",
         "operationId": "listSubjectConsentSessions",
         "parameters": [
           {
@@ -1484,7 +1538,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
+        "summary": "# Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "operationId": "revokeConsentSessions",
         "parameters": [
           {
@@ -1584,7 +1638,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Flush Expired OAuth2 Access Tokens",
+        "summary": "# Flush Expired OAuth2 Access Tokens",
         "operationId": "flushInactiveOAuth2Tokens",
         "parameters": [
           {
@@ -1630,7 +1684,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Introspect OAuth2 Tokens",
+        "summary": "# Introspect OAuth2 Tokens",
         "operationId": "introspectOAuth2Token",
         "parameters": [
           {
@@ -1861,7 +1915,7 @@
         "tags": [
           "public"
         ],
-        "summary": "Revoke OAuth2 Tokens",
+        "summary": "# Revoke OAuth2 Tokens",
         "operationId": "revokeOAuth2Token",
         "parameters": [
           {
@@ -1900,7 +1954,7 @@
         "tags": [
           "public"
         ],
-        "summary": "OpenID Connect Front-Backchannel Enabled Logout",
+        "summary": "# OpenID Connect Front-Backchannel Enabled Logout",
         "operationId": "disconnectUser",
         "responses": {
           "302": {
@@ -1933,7 +1987,7 @@
         "tags": [
           "public"
         ],
-        "summary": "The OAuth 2.0 Token Endpoint",
+        "summary": "# The OAuth 2.0 Token Endpoint",
         "operationId": "oauth2Token",
         "parameters": [
           {
@@ -2004,7 +2058,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Delete OAuth2 Access Tokens from a Client",
+        "summary": "# Delete OAuth2 Access Tokens from a Client",
         "operationId": "deleteOAuth2Token",
         "parameters": [
           {
@@ -2253,7 +2307,7 @@
         "tags": [
           "public"
         ],
-        "summary": "OpenID Connect Userinfo",
+        "summary": "# OpenID Connect Userinfo",
         "operationId": "userinfo",
         "responses": {
           "200": {
@@ -2776,6 +2830,27 @@
           "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
           "type": "object",
           "additionalProperties": true
+        }
+      }
+    },
+    "deviceGrantRequest": {
+      "type": "object",
+      "title": "Contains information on an ongoing device grant request.",
+      "properties": {
+        "challenge": {
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "requested_access_token_audience": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
+        "requested_scope": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         }
       }
     },
@@ -3683,6 +3758,15 @@
         }
       }
     },
+    "verifyUserCodeRequest": {
+      "description": "Contains information on an device verification",
+      "type": "object",
+      "properties": {
+        "user_code": {
+          "type": "string"
+        }
+      }
+    },
     "version": {
       "type": "object",
       "properties": {
@@ -3736,6 +3820,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "device_authorization_endpoint": {
+          "description": "URL of the authorization server's device authorization endpoint",
+          "type": "string"
         },
         "end_session_endpoint": {
           "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",

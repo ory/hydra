@@ -45,6 +45,9 @@ type WellKnown struct {
 	// by this authorization server.
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
 
+	// URL of the authorization server's device authorization endpoint
+	DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint,omitempty"`
+
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint string `json:"end_session_endpoint,omitempty"`
 
@@ -85,9 +88,6 @@ type WellKnown struct {
 	// URL of the OP's Dynamic Client Registration Endpoint.
 	// Example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
-
-	// URL of the authorization server's device authorization endpoint
-	DeviceAuthorisationEndpoint string `json:"device_authorization_endpoint"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
 	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when

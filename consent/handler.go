@@ -289,8 +289,14 @@ func (h *Handler) VerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	var scopes []string = req.GetRequestedScopes()
 	scope_string := strings.Join(scopes, " ")
 
+	// As we dont have a redirectURI we know of, just pick the 1st one the client supports
+	response_redirect := ""
+	if len(req.GetClient().GetRedirectURIs()) > 0 {
+		response_redirect = req.GetClient().GetRedirectURIs()[0]
+	}
+
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
-		RedirectTo: urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {"fake-state"}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {"http://127.0.0.1:5555/callback"}, "response_type": {"device_code"}, "scope": {scope_string}}).String(),
+		RedirectTo: urlx.SetQuery(h.c.OAuth2AuthURL(), url.Values{"state": {"fake-state"}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {response_redirect}, "response_type": {"device_code"}, "scope": {scope_string}}).String(),
 	})
 }
 

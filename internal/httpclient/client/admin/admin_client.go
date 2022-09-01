@@ -100,6 +100,8 @@ type ClientService interface {
 
 	UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...ClientOption) (*UpdateOAuth2ClientOK, error)
 
+	VerifyUserCodeRequest(params *VerifyUserCodeRequestParams, opts ...ClientOption) (*VerifyUserCodeRequestOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -1120,7 +1122,6 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams, opts ...Clie
 If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
 empty JSON array with status code 200 OK.
 
-
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 */
@@ -1641,6 +1642,45 @@ func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...Cl
 	// unexpected success response
 	unexpectedSuccess := result.(*UpdateOAuth2ClientDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  VerifyUserCodeRequest # Verifies a device grant request
+Verifies a device grant request
+*/
+func (a *Client) VerifyUserCodeRequest(params *VerifyUserCodeRequestParams, opts ...ClientOption) (*VerifyUserCodeRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewVerifyUserCodeRequestParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "verifyUserCodeRequest",
+		Method:             "PUT",
+		PathPattern:        "/oauth2/auth/requests/device/verify",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &VerifyUserCodeRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*VerifyUserCodeRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for verifyUserCodeRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

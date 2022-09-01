@@ -153,16 +153,6 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 	return r, nil
 }
 
-func (p *Persister) GetDeviceGrantRequest(ctx context.Context, challenge string) (*consent.DeviceGrantRequest, error) {
-	var d consent.DeviceGrantRequest
-	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := c.Where("challenge = ?", challenge).First(&d); err != nil {
-			return sqlcon.HandleError(err)
-		}
-		return nil
-	})
-}
-
 func (p *Persister) GetDeviceGrantRequestByVerifier(ctx context.Context, verifier string) (*consent.DeviceGrantRequest, error) {
 	var d consent.DeviceGrantRequest
 	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {

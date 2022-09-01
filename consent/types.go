@@ -508,13 +508,6 @@ func (_ DeviceGrantRequest) TableName() string {
 	return "hydra_oauth2_device_grant_request"
 }
 
-func (r *DeviceGrantRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = r.Client.OutfacingID
-	}
-	return nil
-}
-
 func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
 	if r.ClientID != "" {
 		r.Client = &client.Client{}

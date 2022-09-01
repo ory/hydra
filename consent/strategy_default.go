@@ -230,14 +230,15 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	// Generate the request URL
 	iu := s.c.OAuth2AuthURL()
-	iu.RawQuery = r.URL.RawQuery
 
 	// Identify requester type
 	if _, ok := ar.(fosite.AuthorizeRequester); ok {
 		iu = s.c.OAuth2AuthURL()
-	} else if _, ok := ar.(*fosite.DeviceAuthorizeRequest); ok {
+	} 
+	if _, ok := ar.(*fosite.DeviceAuthorizeRequest); ok {
 		iu = s.c.OAuth2DeviceAuthURL()
 	}
+	iu.RawQuery = r.URL.RawQuery
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {

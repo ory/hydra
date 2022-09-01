@@ -1023,6 +1023,7 @@ func (s *DefaultStrategy) verifyDeviceGrant(w http.ResponseWriter, r *http.Reque
 func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error) {
 	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
+	deviceVerifier := strings.TrimSpace(req.GetRequestForm().Get("device_verifier"))
 
 	if authenticationVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to auth endpoint
@@ -1043,9 +1044,8 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 	}
 
 	// check if this a device verifier and that the client supports the needed grant
-	device_verifier := strings.TrimSpace(req.GetRequestForm().Get("device_verifier"))
-	if device_verifier != "" {
-		err := s.verifyDeviceGrant(w, r, req, device_verifier)
+	if deviceVerifier != "" {
+		err := s.verifyDeviceGrant(w, r, req, deviceVerifier)
 		if err != nil {
 			return nil, client.ErrInvalidClientMetadata
 		}

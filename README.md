@@ -673,7 +673,7 @@ $ test/conformity/test.sh
 ```
 
 Running these tests will take a significant amount of time which is why they are
-not part of the CircleCI pipeline.
+not part of the CI pipeline.
 
 #### Build Docker
 

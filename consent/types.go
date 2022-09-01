@@ -491,17 +491,43 @@ type LogoutResult struct {
 //
 // swagger:model deviceGrantRequest
 type DeviceGrantRequest struct {
-	ID                string                         `json:"challenge" db:"challenge"`
-	RequestedScope    sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+	// ID is the identifier ("device challenge") of the device grant request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ID string `json:"challenge" db:"challenge"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	//
+	// required: true
 	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_audience"`
-	Client            *client.Client                 `json:"client" db:"-"`
-	ClientID          string                         `json:"-" db:"client_id"`
-	CSRF              string                         `json:"-" db:"csrf"`
-	Verifier          string                         `json:"-" db:"verifier"`
-	DeviceCode        string                         `json:"-" db:"device_code"`
-	UserCode          string                         `json:"-" db:"user_code"`
-	Accepted          bool                           `json:"-" db:"accepted"`
-	AcceptedAt        sqlxx.NullTime                 `json:"handled_at" db:"accepted_at"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	//
+	// required: true
+	Client     *client.Client `json:"client" db:"-"`
+	ClientID   string         `json:"-" db:"client_id"`
+
+	// DeviceCode is the OAuth 2.0 Device Authorization Grant Device Code that validate the non-interactive device.
+	//
+	// required: true
+	DeviceCode string         `json:"-" db:"device_code"`
+
+	// UserCode is the OAuth 2.0 Device Authorization Grant User Code that validate the user on the interactive device.
+	//
+	// required: true
+	UserCode   string         `json:"-" db:"user_code"`
+
+	CSRF       string         `json:"-" db:"csrf"`
+	Verifier   string         `json:"-" db:"verifier"`
+
+	Accepted   bool           `json:"-" db:"accepted"`
+	AcceptedAt sqlxx.NullTime `json:"handled_at" db:"accepted_at"`
 }
 
 func (_ DeviceGrantRequest) TableName() string {

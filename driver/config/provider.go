@@ -62,8 +62,10 @@ const (
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
 	KeyDeviceURL                                 = "urls.device"
+	KeyDeviceDoneURL                             = "urls.post_device_done"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyIssuerURL                                 = "urls.self.issuer"
+	KeySelfDeviceURL                             = "urls.self.device"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
@@ -381,6 +383,10 @@ func (p *Provider) DeviceUrl() *url.URL {
 	return urlRoot(p.p.URIF(KeyDeviceURL, p.publicFallbackURL("oauth2/fallbacks/device")))
 }
 
+func (p *Provider) DeviceDoneURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyDeviceDoneURL, p.publicFallbackURL("oauth2/fallbacks/logout/callback")))
+}
+
 func (p *Provider) PublicURL() *url.URL {
 	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.IssuerURL()))
 }
@@ -389,6 +395,10 @@ func (p *Provider) IssuerURL() *url.URL {
 	issuerURL := p.p.RequestURIF(KeyIssuerURL, p.fallbackURL("/", p.host(PublicInterface), p.port(PublicInterface)))
 	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
 	return urlRoot(issuerURL)
+}
+
+func (p *Provider) SelfDeviceURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeySelfDeviceURL, urlx.AppendPaths(p.PublicURL(), "/device")))
 }
 
 func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {

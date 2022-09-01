@@ -98,10 +98,13 @@ urls:
   self:
     issuer: https://issuer
     public: https://public
+    device: https://public/device
   login: https://login
   consent: https://consent
   logout: https://logout
+  device: https://device
   error: https://error
+  post_device_done: https://post_device
   post_logout_redirect: https://post_logout
 
 strategies:

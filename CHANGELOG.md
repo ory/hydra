@@ -5,7 +5,7 @@
 
 **Table of Contents**
 
-- [0.0.0 (2022-08-26)](#000-2022-08-26)
+- [0.0.0 (2022-09-01)](#000-2022-09-01)
   - [Documentation](#documentation)
 - [1.11.10 (2022-08-25)](#11110-2022-08-25)
   - [Bug Fixes](#bug-fixes)
@@ -642,13 +642,15 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-08-26)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-09-01)
 
 ### Documentation
 
 - Add required key to all versions in the version schema
   ([#3233](https://github.com/ory/hydra/issues/3233))
   ([ac61740](https://github.com/ory/hydra/commit/ac617401718f11a09f77e41592166ec45a9b23cb))
+- Remove mention of CircleCI ([#3240](https://github.com/ory/hydra/issues/3240))
+  ([75f7b50](https://github.com/ory/hydra/commit/75f7b500394d6322f03d61678fb86d70a97eaab3))
 
 # [1.11.10](https://github.com/ory/hydra/compare/v1.11.9...v1.11.10) (2022-08-25)
 

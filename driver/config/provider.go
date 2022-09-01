@@ -65,7 +65,7 @@ const (
 	KeyDeviceDoneURL                             = "urls.post_device_done"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyIssuerURL                                 = "urls.self.issuer"
-	KeySelfDeviceURL                             = "urls.self.device"
+	KeyDeviceInternalURL                         = "urls.self.device"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
@@ -397,8 +397,8 @@ func (p *Provider) IssuerURL() *url.URL {
 	return urlRoot(issuerURL)
 }
 
-func (p *Provider) SelfDeviceURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeySelfDeviceURL, urlx.AppendPaths(p.PublicURL(), "/device")))
+func (p *Provider) DeviceInternalURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyDeviceInternalURL, urlx.AppendPaths(p.PublicURL(), "/device")))
 }
 
 func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {

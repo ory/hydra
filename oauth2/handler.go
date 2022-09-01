@@ -121,7 +121,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
 	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
-	public.GET(h.c.SelfDeviceURL().Path, h.DeviceGranHandler)
+	public.GET(h.c.DeviceInternalURL().Path, h.DeviceGranHandler)
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)

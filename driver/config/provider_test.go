@@ -367,16 +367,20 @@ func TestLoginConsentURL(t *testing.T) {
 	p := MustNew(context.Background(), l)
 	p.MustSet(KeyLoginURL, "http://localhost:8080/oauth/login")
 	p.MustSet(KeyConsentURL, "http://localhost:8080/oauth/consent")
+	p.MustSet(KeyDeviceURL, "http://localhost:8080/oauth/device")
 
 	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL().String())
 	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL().String())
+	assert.Equal(t, "http://localhost:8080/oauth/device", p.DeviceUrl().String())
 
 	p2 := MustNew(context.Background(), l)
 	p2.MustSet(KeyLoginURL, "http://localhost:3000/#/oauth/login")
 	p2.MustSet(KeyConsentURL, "http://localhost:3000/#/oauth/consent")
+	p2.MustSet(KeyDeviceURL, "http://localhost:3000/#/oauth/device")
 
 	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL().String())
 	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL().String())
+	assert.Equal(t, "http://localhost:3000/#/oauth/device", p2.DeviceUrl().String())
 }
 
 func TestInfinitRefreshTokenTTL(t *testing.T) {

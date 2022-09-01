@@ -377,7 +377,7 @@ func (p *Provider) ErrorURL() *url.URL {
 	return urlRoot(p.p.RequestURIF(KeyErrorURL, p.publicFallbackURL("oauth2/fallbacks/error")))
 }
 
-func (p *Provider) DeviceGrantUrl() *url.URL {
+func (p *Provider) DeviceUrl() *url.URL {
 	return urlRoot(p.p.URIF(KeyDeviceURL, p.publicFallbackURL("oauth2/fallbacks/device")))
 }
 

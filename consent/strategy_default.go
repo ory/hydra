@@ -1075,7 +1075,7 @@ func (s *DefaultStrategy) ForwardDeviceGrantRequest(w http.ResponseWriter, r *ht
 
 	http.Redirect(
 		w, r,
-		urlx.SetQuery(urlx.AppendPaths(s.c.DeviceGrantUrl()), url.Values{"device_challenge": {challenge}}).String(),
+		urlx.SetQuery(urlx.AppendPaths(s.c.DeviceUrl()), url.Values{"device_challenge": {challenge}}).String(),
 		http.StatusFound,
 	)
 

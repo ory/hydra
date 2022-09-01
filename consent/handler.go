@@ -256,7 +256,7 @@ func (h *Handler) VerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	var p VerifyUserCodeRequest
+	var p DeviceGrantVerifyUserCodeRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {

@@ -105,13 +105,13 @@ type swaggerAcceptConsentRequest struct {
 }
 
 // swagger:parameters verifyUserCodeRequest
-type swaggerVerifyUserCodeRequest struct {
+type swaggerDeviceGrantVerifyUserCodeRequest struct {
 	// in: query
 	// required: true
 	Challenge string `json:"device_challenge"`
 
 	// in: body
-	Body VerifyUserCodeRequest
+	Body DeviceGrantVerifyUserCodeRequest
 }
 
 // swagger:parameters acceptLogoutRequest

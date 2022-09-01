@@ -285,7 +285,7 @@ func TestVerifyDeviceLoginRequest(t *testing.T) {
 				params = params + "&device_challenge=" + tc.device_challenge
 			}
 
-			var userCodeBody VerifyUserCodeRequest
+			var userCodeBody DeviceGrantVerifyUserCodeRequest
 			if tc.user_code != "" {
 
 				verifier := strings.Replace(uuid.New(), "-", "", -1)
@@ -317,7 +317,7 @@ func TestVerifyDeviceLoginRequest(t *testing.T) {
 					reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), tc.device_challenge, req)
 				}
 
-				userCodeBody = VerifyUserCodeRequest{UserCode: tc.user_code}
+				userCodeBody = DeviceGrantVerifyUserCodeRequest{UserCode: tc.user_code}
 			}
 
 			body, err := json.Marshal(userCodeBody)

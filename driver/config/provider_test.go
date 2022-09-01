@@ -292,7 +292,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://post_device/"), c.DeviceDoneURL())
 
 	// self
-	assert.Equal(t, urlx.ParseOrPanic("https://public/device/"), c.SelfDeviceURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://public/device"), c.SelfDeviceURL())
 
 	// strategies
 	assert.Equal(t, "exact", c.ScopeStrategy())

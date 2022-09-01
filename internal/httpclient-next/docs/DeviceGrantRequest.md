@@ -2,19 +2,19 @@
 
 ## Properties
 
-| Name                             | Type                                           | Description | Notes      |
-| -------------------------------- | ---------------------------------------------- | ----------- | ---------- |
-| **Challenge**                    | Pointer to **string**                          |             | [optional] |
-| **Client**                       | Pointer to [**OAuth2Client**](OAuth2Client.md) |             | [optional] |
-| **HandledAt**                    | Pointer to **time.Time**                       |             | [optional] |
-| **RequestedAccessTokenAudience** | Pointer to **[]string**                        |             | [optional] |
-| **RequestedScope**               | Pointer to **[]string**                        |             | [optional] |
+| Name                             | Type                                | Description                                                                                                            | Notes      |
+| -------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **Challenge**                    | **string**                          | ID is the identifier (\&quot;device challenge\&quot;) of the device grant request. It is used to identify the session. |
+| **Client**                       | [**OAuth2Client**](OAuth2Client.md) |                                                                                                                        |
+| **HandledAt**                    | Pointer to **time.Time**            |                                                                                                                        | [optional] |
+| **RequestedAccessTokenAudience** | **[]string**                        |                                                                                                                        |
+| **RequestedScope**               | **[]string**                        |                                                                                                                        |
 
 ## Methods
 
 ### NewDeviceGrantRequest
 
-`func NewDeviceGrantRequest() *DeviceGrantRequest`
+`func NewDeviceGrantRequest(challenge string, client OAuth2Client, requestedAccessTokenAudience []string, requestedScope []string, ) *DeviceGrantRequest`
 
 NewDeviceGrantRequest instantiates a new DeviceGrantRequest object This
 constructor will assign default values to properties that have it defined, and
@@ -48,12 +48,6 @@ value otherwise and a boolean to check if the value has been set.
 
 SetChallenge sets Challenge field to given value.
 
-### HasChallenge
-
-`func (o *DeviceGrantRequest) HasChallenge() bool`
-
-HasChallenge returns a boolean if a field has been set.
-
 ### GetClient
 
 `func (o *DeviceGrantRequest) GetClient() OAuth2Client`
@@ -72,12 +66,6 @@ otherwise and a boolean to check if the value has been set.
 `func (o *DeviceGrantRequest) SetClient(v OAuth2Client)`
 
 SetClient sets Client field to given value.
-
-### HasClient
-
-`func (o *DeviceGrantRequest) HasClient() bool`
-
-HasClient returns a boolean if a field has been set.
 
 ### GetHandledAt
 
@@ -126,12 +114,6 @@ boolean to check if the value has been set.
 SetRequestedAccessTokenAudience sets RequestedAccessTokenAudience field to given
 value.
 
-### HasRequestedAccessTokenAudience
-
-`func (o *DeviceGrantRequest) HasRequestedAccessTokenAudience() bool`
-
-HasRequestedAccessTokenAudience returns a boolean if a field has been set.
-
 ### GetRequestedScope
 
 `func (o *DeviceGrantRequest) GetRequestedScope() []string`
@@ -151,12 +133,6 @@ non-nil, zero value otherwise and a boolean to check if the value has been set.
 `func (o *DeviceGrantRequest) SetRequestedScope(v []string)`
 
 SetRequestedScope sets RequestedScope field to given value.
-
-### HasRequestedScope
-
-`func (o *DeviceGrantRequest) HasRequestedScope() bool`
-
-HasRequestedScope returns a boolean if a field has been set.
 
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to API list]](../README.md#documentation-for-api-endpoints)

@@ -96,9 +96,9 @@ oidc:
 
 urls:
   self:
-    issuer: https://issuer
     public: https://public
     device: https://public/device
+    issuer: https://issuer
   login: https://login
   consent: https://consent
   logout: https://logout

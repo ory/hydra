@@ -510,21 +510,21 @@ type DeviceGrantRequest struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client     *client.Client `json:"client" db:"-"`
-	ClientID   string         `json:"-" db:"client_id"`
+	Client   *client.Client `json:"client" db:"-"`
+	ClientID string         `json:"-" db:"client_id"`
 
 	// DeviceCode is the OAuth 2.0 Device Authorization Grant Device Code that validate the non-interactive device.
 	//
 	// required: true
-	DeviceCode string         `json:"-" db:"device_code"`
+	DeviceCode string `json:"-" db:"device_code"`
 
 	// UserCode is the OAuth 2.0 Device Authorization Grant User Code that validate the user on the interactive device.
 	//
 	// required: true
-	UserCode   string         `json:"-" db:"user_code"`
+	UserCode string `json:"-" db:"user_code"`
 
-	CSRF       string         `json:"-" db:"csrf"`
-	Verifier   string         `json:"-" db:"verifier"`
+	CSRF     string `json:"-" db:"csrf"`
+	Verifier string `json:"-" db:"verifier"`
 
 	Accepted   bool           `json:"-" db:"accepted"`
 	AcceptedAt sqlxx.NullTime `json:"handled_at" db:"accepted_at"`

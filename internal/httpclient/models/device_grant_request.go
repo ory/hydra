@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // DeviceGrantRequest Contains information on an ongoing device grant request.
@@ -18,26 +19,35 @@ import (
 // swagger:model deviceGrantRequest
 type DeviceGrantRequest struct {
 
-	// challenge
-	Challenge string `json:"challenge,omitempty"`
+	// ID is the identifier ("device challenge") of the device grant request. It is used to
+	// identify the session.
+	// Required: true
+	Challenge *string `json:"challenge"`
 
 	// client
-	Client *OAuth2Client `json:"client,omitempty"`
+	// Required: true
+	Client *OAuth2Client `json:"client"`
 
 	// handled at
 	// Format: date-time
 	HandledAt NullTime `json:"handled_at,omitempty"`
 
 	// requested access token audience
-	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience,omitempty"`
+	// Required: true
+	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience"`
 
 	// requested scope
-	RequestedScope StringSlicePipeDelimiter `json:"requested_scope,omitempty"`
+	// Required: true
+	RequestedScope StringSlicePipeDelimiter `json:"requested_scope"`
 }
 
 // Validate validates this device grant request
 func (m *DeviceGrantRequest) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateChallenge(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateClient(formats); err != nil {
 		res = append(res, err)
@@ -61,9 +71,19 @@ func (m *DeviceGrantRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *DeviceGrantRequest) validateChallenge(formats strfmt.Registry) error {
+
+	if err := validate.Required("challenge", "body", m.Challenge); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *DeviceGrantRequest) validateClient(formats strfmt.Registry) error {
-	if swag.IsZero(m.Client) { // not required
-		return nil
+
+	if err := validate.Required("client", "body", m.Client); err != nil {
+		return err
 	}
 
 	if m.Client != nil {
@@ -94,8 +114,9 @@ func (m *DeviceGrantRequest) validateHandledAt(formats strfmt.Registry) error {
 }
 
 func (m *DeviceGrantRequest) validateRequestedAccessTokenAudience(formats strfmt.Registry) error {
-	if swag.IsZero(m.RequestedAccessTokenAudience) { // not required
-		return nil
+
+	if err := validate.Required("requested_access_token_audience", "body", m.RequestedAccessTokenAudience); err != nil {
+		return err
 	}
 
 	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
@@ -109,8 +130,9 @@ func (m *DeviceGrantRequest) validateRequestedAccessTokenAudience(formats strfmt
 }
 
 func (m *DeviceGrantRequest) validateRequestedScope(formats strfmt.Registry) error {
-	if swag.IsZero(m.RequestedScope) { // not required
-		return nil
+
+	if err := validate.Required("requested_scope", "body", m.RequestedScope); err != nil {
+		return err
 	}
 
 	if err := m.RequestedScope.Validate(formats); err != nil {

@@ -18,19 +18,24 @@ import (
 
 // DeviceGrantRequest struct for DeviceGrantRequest
 type DeviceGrantRequest struct {
-	Challenge                    *string       `json:"challenge,omitempty"`
-	Client                       *OAuth2Client `json:"client,omitempty"`
-	HandledAt                    *time.Time    `json:"handled_at,omitempty"`
-	RequestedAccessTokenAudience []string      `json:"requested_access_token_audience,omitempty"`
-	RequestedScope               []string      `json:"requested_scope,omitempty"`
+	// ID is the identifier (\"device challenge\") of the device grant request. It is used to identify the session.
+	Challenge                    string       `json:"challenge"`
+	Client                       OAuth2Client `json:"client"`
+	HandledAt                    *time.Time   `json:"handled_at,omitempty"`
+	RequestedAccessTokenAudience []string     `json:"requested_access_token_audience"`
+	RequestedScope               []string     `json:"requested_scope"`
 }
 
 // NewDeviceGrantRequest instantiates a new DeviceGrantRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDeviceGrantRequest() *DeviceGrantRequest {
+func NewDeviceGrantRequest(challenge string, client OAuth2Client, requestedAccessTokenAudience []string, requestedScope []string) *DeviceGrantRequest {
 	this := DeviceGrantRequest{}
+	this.Challenge = challenge
+	this.Client = client
+	this.RequestedAccessTokenAudience = requestedAccessTokenAudience
+	this.RequestedScope = requestedScope
 	return &this
 }
 
@@ -42,68 +47,52 @@ func NewDeviceGrantRequestWithDefaults() *DeviceGrantRequest {
 	return &this
 }
 
-// GetChallenge returns the Challenge field value if set, zero value otherwise.
+// GetChallenge returns the Challenge field value
 func (o *DeviceGrantRequest) GetChallenge() string {
-	if o == nil || o.Challenge == nil {
+	if o == nil {
 		var ret string
 		return ret
 	}
-	return *o.Challenge
+
+	return o.Challenge
 }
 
-// GetChallengeOk returns a tuple with the Challenge field value if set, nil otherwise
+// GetChallengeOk returns a tuple with the Challenge field value
 // and a boolean to check if the value has been set.
 func (o *DeviceGrantRequest) GetChallengeOk() (*string, bool) {
-	if o == nil || o.Challenge == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Challenge, true
+	return &o.Challenge, true
 }
 
-// HasChallenge returns a boolean if a field has been set.
-func (o *DeviceGrantRequest) HasChallenge() bool {
-	if o != nil && o.Challenge != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetChallenge gets a reference to the given string and assigns it to the Challenge field.
+// SetChallenge sets field value
 func (o *DeviceGrantRequest) SetChallenge(v string) {
-	o.Challenge = &v
+	o.Challenge = v
 }
 
-// GetClient returns the Client field value if set, zero value otherwise.
+// GetClient returns the Client field value
 func (o *DeviceGrantRequest) GetClient() OAuth2Client {
-	if o == nil || o.Client == nil {
+	if o == nil {
 		var ret OAuth2Client
 		return ret
 	}
-	return *o.Client
+
+	return o.Client
 }
 
-// GetClientOk returns a tuple with the Client field value if set, nil otherwise
+// GetClientOk returns a tuple with the Client field value
 // and a boolean to check if the value has been set.
 func (o *DeviceGrantRequest) GetClientOk() (*OAuth2Client, bool) {
-	if o == nil || o.Client == nil {
+	if o == nil {
 		return nil, false
 	}
-	return o.Client, true
+	return &o.Client, true
 }
 
-// HasClient returns a boolean if a field has been set.
-func (o *DeviceGrantRequest) HasClient() bool {
-	if o != nil && o.Client != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetClient gets a reference to the given OAuth2Client and assigns it to the Client field.
+// SetClient sets field value
 func (o *DeviceGrantRequest) SetClient(v OAuth2Client) {
-	o.Client = &v
+	o.Client = v
 }
 
 // GetHandledAt returns the HandledAt field value if set, zero value otherwise.
@@ -138,85 +127,69 @@ func (o *DeviceGrantRequest) SetHandledAt(v time.Time) {
 	o.HandledAt = &v
 }
 
-// GetRequestedAccessTokenAudience returns the RequestedAccessTokenAudience field value if set, zero value otherwise.
+// GetRequestedAccessTokenAudience returns the RequestedAccessTokenAudience field value
 func (o *DeviceGrantRequest) GetRequestedAccessTokenAudience() []string {
-	if o == nil || o.RequestedAccessTokenAudience == nil {
+	if o == nil {
 		var ret []string
 		return ret
 	}
+
 	return o.RequestedAccessTokenAudience
 }
 
-// GetRequestedAccessTokenAudienceOk returns a tuple with the RequestedAccessTokenAudience field value if set, nil otherwise
+// GetRequestedAccessTokenAudienceOk returns a tuple with the RequestedAccessTokenAudience field value
 // and a boolean to check if the value has been set.
 func (o *DeviceGrantRequest) GetRequestedAccessTokenAudienceOk() ([]string, bool) {
-	if o == nil || o.RequestedAccessTokenAudience == nil {
+	if o == nil {
 		return nil, false
 	}
 	return o.RequestedAccessTokenAudience, true
 }
 
-// HasRequestedAccessTokenAudience returns a boolean if a field has been set.
-func (o *DeviceGrantRequest) HasRequestedAccessTokenAudience() bool {
-	if o != nil && o.RequestedAccessTokenAudience != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetRequestedAccessTokenAudience gets a reference to the given []string and assigns it to the RequestedAccessTokenAudience field.
+// SetRequestedAccessTokenAudience sets field value
 func (o *DeviceGrantRequest) SetRequestedAccessTokenAudience(v []string) {
 	o.RequestedAccessTokenAudience = v
 }
 
-// GetRequestedScope returns the RequestedScope field value if set, zero value otherwise.
+// GetRequestedScope returns the RequestedScope field value
 func (o *DeviceGrantRequest) GetRequestedScope() []string {
-	if o == nil || o.RequestedScope == nil {
+	if o == nil {
 		var ret []string
 		return ret
 	}
+
 	return o.RequestedScope
 }
 
-// GetRequestedScopeOk returns a tuple with the RequestedScope field value if set, nil otherwise
+// GetRequestedScopeOk returns a tuple with the RequestedScope field value
 // and a boolean to check if the value has been set.
 func (o *DeviceGrantRequest) GetRequestedScopeOk() ([]string, bool) {
-	if o == nil || o.RequestedScope == nil {
+	if o == nil {
 		return nil, false
 	}
 	return o.RequestedScope, true
 }
 
-// HasRequestedScope returns a boolean if a field has been set.
-func (o *DeviceGrantRequest) HasRequestedScope() bool {
-	if o != nil && o.RequestedScope != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetRequestedScope gets a reference to the given []string and assigns it to the RequestedScope field.
+// SetRequestedScope sets field value
 func (o *DeviceGrantRequest) SetRequestedScope(v []string) {
 	o.RequestedScope = v
 }
 
 func (o DeviceGrantRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if o.Challenge != nil {
+	if true {
 		toSerialize["challenge"] = o.Challenge
 	}
-	if o.Client != nil {
+	if true {
 		toSerialize["client"] = o.Client
 	}
 	if o.HandledAt != nil {
 		toSerialize["handled_at"] = o.HandledAt
 	}
-	if o.RequestedAccessTokenAudience != nil {
+	if true {
 		toSerialize["requested_access_token_audience"] = o.RequestedAccessTokenAudience
 	}
-	if o.RequestedScope != nil {
+	if true {
 		toSerialize["requested_scope"] = o.RequestedScope
 	}
 	return json.Marshal(toSerialize)

@@ -2836,8 +2836,15 @@
     "deviceGrantRequest": {
       "type": "object",
       "title": "Contains information on an ongoing device grant request.",
+      "required": [
+        "challenge",
+        "requested_scope",
+        "requested_access_token_audience",
+        "client"
+      ],
       "properties": {
         "challenge": {
+          "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
           "type": "string"
         },
         "client": {

@@ -2954,6 +2954,9 @@ components:
     deviceGrantRequest:
       properties:
         challenge:
+          description: |-
+            ID is the identifier ("device challenge") of the device grant request. It is used to
+            identify the session.
           type: string
         client:
           $ref: "#/components/schemas/oAuth2Client"
@@ -2975,6 +2978,11 @@ components:
             StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
             string.
           type: array
+      required:
+        - challenge
+        - client
+        - requested_access_token_audience
+        - requested_scope
       title: Contains information on an ongoing device grant request.
       type: object
     flushInactiveOAuth2TokensRequest:

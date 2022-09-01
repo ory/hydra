@@ -515,6 +515,7 @@
       "deviceGrantRequest": {
         "properties": {
           "challenge": {
+            "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
             "type": "string"
           },
           "client": {
@@ -530,6 +531,12 @@
             "$ref": "#/components/schemas/StringSlicePipeDelimiter"
           }
         },
+        "required": [
+          "challenge",
+          "requested_scope",
+          "requested_access_token_audience",
+          "client"
+        ],
         "title": "Contains information on an ongoing device grant request.",
         "type": "object"
       },
@@ -3300,89 +3307,7 @@
             "description": "jsonError"
           }
         },
-        "summary": "Reject a Logout Request",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/oauth2/auth/requests/device/verify": {
-      "put": {
-        "description": "Use this endpoint to fetch a device request.",
-        "operationId": "verifyDeviceRequest",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "device_challenge",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/verifyDeviceRequest"
-              }
-            }
-          },
-          "x-originalParamName": "Body"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/completedRequest"
-                }
-              }
-            },
-            "description": "completedRequest"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Verify a Device Auth Request via a User Code",
+        "summary": "# Reject a Logout Request",
         "tags": [
           "admin"
         ]

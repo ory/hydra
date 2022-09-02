@@ -21,6 +21,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -62,6 +63,8 @@ const (
 	TokenPath             = "/oauth2/token" // #nosec G101
 	AuthPath              = "/oauth2/auth"
 	LogoutPath            = "/oauth2/sessions/logout"
+	DefaultDevicePath     = "/oauth2/fallbacks/device"
+	DefaultPostDevicePath = "/oauth2/fallbacks/device/done"
 
 	UserinfoPath  = "/userinfo"
 	WellKnownPath = "/.well-known/openid-configuration"
@@ -71,6 +74,10 @@ const (
 	IntrospectPath   = "/oauth2/introspect"
 	RevocationPath   = "/oauth2/revoke"
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
+
+	// Device Grant Handler
+	DeviceAuthPath  = "/oauth2/device/auth"
+	DeviceGrantPath = "/device"
 )
 
 type Handler struct {
@@ -90,6 +97,14 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.POST(AuthPath, h.performOAuth2AuthorizationFlow)
 	public.GET(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 	public.POST(LogoutPath, h.performOidcFrontOrBackChannelLogout)
+
+	public.GET(DefaultDevicePath, h.fallbackHandler("", "", http.StatusOK, config.KeyDeviceURL))
+	public.GET(DefaultPostDevicePath, h.fallbackHandler(
+		"You successfully authenticated on your device!",
+		"The Default Post Device URL is not set which is why you are seeing this fallback page. Your device login request however succeeded.",
+		http.StatusOK,
+		config.KeyDeviceDoneURL,
+	))
 
 	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLoginURL))
 	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.KeyConsentURL))
@@ -112,11 +127,46 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 
 	admin.POST(IntrospectPath, h.adminIntrospectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.adminDeleteOAuth2Token)
+
+	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
+	public.GET(h.c.SelfDeviceURL(context.Background()).Path, h.DeviceGranHandler)
+}
+
+func (h *Handler) DeviceGranHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	err := h.r.ConsentStrategy().ForwardDeviceGrantRequest(w, r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+	}
+}
+
+func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = r.Context()
+	request, err := h.r.OAuth2Provider().NewDeviceAuthorizeRequest(ctx, r)
+
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	var session = &Session{
+		DefaultSession: &openid.DefaultSession{
+			Headers: &jwt.Headers{}},
+	}
+
+	request.SetSession(session)
+	resp, err := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
+
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(w, request, resp)
 }
 
 // swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout
 //
-// OpenID Connect Front- or Back-channel Enabled Logout
+// # OpenID Connect Front- or Back-channel Enabled Logout
 //
 // This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
 //
@@ -125,10 +175,10 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //
 // Back-channel logout is performed asynchronously and does not affect logout flow.
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       302: emptyResponse
+//	Responses:
+//	  302: emptyResponse
 func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
@@ -240,6 +290,9 @@ type OIDCConfiguration struct {
 	// required: true
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/token
 	TokenURL string `json:"token_endpoint"`
+
+	// URL of the authorization server's device authorization endpoint
+	DeviceAuthorisationEndpoint string `json:"device_authorization_endpoint"`
 
 	// URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
 	// signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
@@ -355,7 +408,7 @@ type OIDCConfiguration struct {
 
 // swagger:route GET /.well-known/openid-configuration v0alpha2 discoverOidcConfiguration
 //
-// OpenID Connect Discovery
+// # OpenID Connect Discovery
 //
 // The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 // your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
@@ -364,14 +417,14 @@ type OIDCConfiguration struct {
 // Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 // For a full list of clients go here: https://openid.net/developers/certified/
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oidcConfiguration
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oidcConfiguration
+//	  default: oAuth2ApiError
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -385,6 +438,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		JWKsURI:                                h.c.JWKSURL(r.Context()).String(),
 		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(r.Context()), RevocationPath).String(),
 		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL(r.Context()).String(),
+		DeviceAuthorisationEndpoint:            h.c.OAuth2DeviceAuthorisationURL(r.Context()).String(),
 		SubjectTypes:                           h.c.SubjectTypesSupported(r.Context()),
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(r.Context()),
@@ -394,7 +448,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
 		IDTokenSignedResponseAlg:               []string{key.Algorithm},
 		UserinfoSignedResponseAlg:              []string{key.Algorithm},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,
@@ -473,7 +527,7 @@ type oidcUserInfo struct {
 
 // swagger:route GET /userinfo v0alpha2 getOidcUserInfo
 //
-// OpenID Connect Userinfo
+// # OpenID Connect Userinfo
 //
 // This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 // the provided OAuth 2.0 Access Token.
@@ -484,17 +538,17 @@ type oidcUserInfo struct {
 // with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 // for more details about header format.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       oauth2:
+//	Security:
+//	  oauth2:
 //
-//     Responses:
-//       200: oidcUserInfo
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oidcUserInfo
+//	  default: oAuth2ApiError
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -583,25 +637,25 @@ type revokeOAuth2Token struct {
 
 // swagger:route POST /oauth2/revoke v0alpha2 revokeOAuth2Token
 //
-// Revoke an OAuth2 Access or Refresh Token
+// # Revoke an OAuth2 Access or Refresh Token
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
 // Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 // the client the token was generated for.
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2:
+//	Security:
+//	  basic:
+//	  oauth2:
 //
-//     Responses:
-//       200: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -633,7 +687,7 @@ type adminIntrospectOAuth2Token struct {
 
 // swagger:route POST /admin/oauth2/introspect v0alpha2 adminIntrospectOAuth2Token
 //
-// Introspect OAuth2 Access or Refresh Tokens
+// # Introspect OAuth2 Access or Refresh Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -641,17 +695,17 @@ type adminIntrospectOAuth2Token struct {
 //
 // For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: introspectedOAuth2Token
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: introspectedOAuth2Token
+//	  default: oAuth2ApiError
 func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -787,7 +841,7 @@ type oAuth2TokenResponse struct {
 
 // swagger:route POST /oauth2/token v0alpha2 performOAuth2TokenFlow
 //
-// The OAuth 2.0 Token Endpoint
+// # The OAuth 2.0 Token Endpoint
 //
 // The client makes a request to the token endpoint by sending the
 // following parameters using the "application/x-www-form-urlencoded" HTTP
@@ -798,21 +852,21 @@ type oAuth2TokenResponse struct {
 // >
 // > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2:
+//	Security:
+//	  basic:
+//	  oauth2:
 //
-//     Responses:
-//       200: oAuth2TokenResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2TokenResponse
+//	  default: oAuth2ApiError
 func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -886,21 +940,21 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 
 // swagger:route GET /oauth2/auth v0alpha2 performOAuth2AuthorizationFlow
 //
-// The OAuth 2.0 Authorize Endpoint
+// # The OAuth 2.0 Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 // OAuth2 is a very popular protocol and a library for your programming language will exists.
 //
 // To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       302: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  302: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -1017,18 +1071,18 @@ type adminDeleteOAuth2Token struct {
 
 // swagger:route DELETE /admin/oauth2/tokens v0alpha2 adminDeleteOAuth2Token
 //
-// Delete OAuth2 Access Tokens from a Client
+// # Delete OAuth2 Access Tokens from a Client
 //
 // This endpoint deletes OAuth2 access tokens issued for a client from the database
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  204: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminDeleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/ory/x/httprouterx"
@@ -50,6 +51,7 @@ const (
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
 	SessionsPath = "/oauth2/auth/sessions"
+	DevicePath   = "/oauth2/auth/requests/device"
 )
 
 func NewHandler(
@@ -78,6 +80,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(LogoutPath, h.adminGetOAuth2LogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.adminAcceptOAuth2LogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.adminRejectOAuth2LogoutRequest)
+
+	admin.PUT(DevicePath+"/verify", h.adminVerifyUserCodeRequest)
 }
 
 // swagger:parameters adminRevokeOAuth2ConsentSessions
@@ -101,22 +105,22 @@ type adminRevokeOAuth2ConsentSessions struct {
 
 // swagger:route DELETE /admin/oauth2/auth/sessions/consent v0alpha2 adminRevokeOAuth2ConsentSessions
 //
-// Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+// # Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  204: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminRevokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -158,7 +162,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 
 // swagger:route GET /admin/oauth2/auth/sessions/consent v0alpha2 adminListOAuth2SubjectConsentSessions
 //
-// List OAuth 2.0 Consent Sessions of a Subject
+// # List OAuth 2.0 Consent Sessions of a Subject
 //
 // This endpoint lists all subject's granted consent sessions, including client and granted scope.
 // If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
@@ -167,17 +171,17 @@ type adminListOAuth2SubjectConsentSessions struct {
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: previousOAuth2ConsentSessions
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: previousOAuth2ConsentSessions
+//	  default: oAuth2ApiError
 func (h *Handler) adminListOAuth2SubjectConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -226,23 +230,23 @@ type adminRevokeOAuth2LoginSessions struct {
 
 // swagger:route DELETE /admin/oauth2/auth/sessions/login v0alpha2 adminRevokeOAuth2LoginSessions
 //
-// Invalidates All OAuth 2.0 Login Sessions of a Certain User
+// # Invalidates All OAuth 2.0 Login Sessions of a Certain User
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 // Front- or Back-channel logout.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  204: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminRevokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -267,7 +271,7 @@ type adminGetOAuth2LoginRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/login v0alpha2 adminGetOAuth2LoginRequest
 //
-// Get an OAuth 2.0 Login Request
+// # Get an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -277,19 +281,18 @@ type adminGetOAuth2LoginRequest struct {
 // The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
+//	Consumes:
+//	- application/json
 //
-//     Consumes:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Schemes: http, https
 //
-//     Schemes: http, https
-//
-//     Responses:
-//       200: oAuth2LoginRequest
-//       410: handledOAuth2LoginRequest
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2LoginRequest
+//	  410: handledOAuth2LoginRequest
+//	  default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -329,7 +332,7 @@ type adminAcceptOAuth2LoginRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/accept v0alpha2 adminAcceptOAuth2LoginRequest
 //
-// Accept an OAuth 2.0 Login Request
+// # Accept an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
@@ -345,17 +348,17 @@ type adminAcceptOAuth2LoginRequest struct {
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -429,7 +432,7 @@ type adminRejectOAuth2LoginRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/reject v0alpha2 adminRejectOAuth2LoginRequest
 //
-// Reject an OAuth 2.0 Login Request
+// # Reject an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -444,17 +447,17 @@ type adminRejectOAuth2LoginRequest struct {
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -511,7 +514,7 @@ type adminGetOAuth2ConsentRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/consent v0alpha2 adminGetOAuth2ConsentRequest
 //
-// Get OAuth 2.0 Consent Request Information
+// # Get OAuth 2.0 Consent Request Information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -524,18 +527,18 @@ type adminGetOAuth2ConsentRequest struct {
 // provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2ConsentRequest
-//       410: handledOAuth2ConsentRequest
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2ConsentRequest
+//	  410: handledOAuth2ConsentRequest
+//	  default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -582,7 +585,7 @@ type adminAcceptOAuth2ConsentRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/accept v0alpha2 adminAcceptOAuth2ConsentRequest
 //
-// Accept an OAuth 2.0 Consent Request
+// # Accept an OAuth 2.0 Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -601,17 +604,17 @@ type adminAcceptOAuth2ConsentRequest struct {
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -671,7 +674,7 @@ type adminRejectOAuth2ConsentRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/reject v0alpha2 adminRejectOAuth2ConsentRequest
 //
-// Reject an OAuth 2.0 Consent Request
+// # Reject an OAuth 2.0 Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -689,17 +692,17 @@ type adminRejectOAuth2ConsentRequest struct {
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -757,20 +760,20 @@ type adminAcceptOAuth2LogoutRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/logout/accept v0alpha2 adminAcceptOAuth2LogoutRequest
 //
-// Accept an OAuth 2.0 Logout Request
+// # Accept an OAuth 2.0 Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -800,21 +803,21 @@ type adminRejectOAuth2LogoutRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/logout/reject v0alpha2 adminRejectOAuth2LogoutRequest
 //
-// Reject an OAuth 2.0 Logout Request
+// # Reject an OAuth 2.0 Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 // No body is required.
 //
 // The response is empty as the logout provider has to chose what action to perform next.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  204: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -838,19 +841,19 @@ type adminGetOAuth2LogoutRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/logout v0alpha2 adminGetOAuth2LogoutRequest
 //
-// Get an OAuth 2.0 Logout Request
+// # Get an OAuth 2.0 Logout Request
 //
 // Use this endpoint to fetch a logout request.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2LogoutRequest
-//       410: handledOAuth2LogoutRequest
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2LogoutRequest
+//	  410: handledOAuth2LogoutRequest
+//	  default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -876,4 +879,86 @@ func (h *Handler) adminGetOAuth2LogoutRequest(w http.ResponseWriter, r *http.Req
 	}
 
 	h.r.Writer().Write(w, r, request)
+}
+
+// swagger:parameters adminVerifyUserCodeRequest
+type swaggerDeviceGrantVerifyUserCodeRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"device_challenge"`
+
+	// in: body
+	Body DeviceGrantVerifyUserCodeRequest
+}
+
+// swagger:route PUT /oauth2/auth/requests/device/verify admin adminVerifyUserCodeRequest
+//
+// # Verifies a device grant request
+// Verifies a device grant request
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: completedRequest
+//	  404: jsonError
+//	  500: jsonError
+func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("device_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		return
+	}
+
+	var p DeviceGrantVerifyUserCodeRequest
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&p); err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+		return
+	}
+
+	if p.UserCode == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
+		return
+	}
+
+	userCodeHash := h.r.OAuth2HMACStrategy().UserCodeSignature(r.Context(), p.UserCode)
+	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeHash, &fosite.DefaultSession{})
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
+		return
+	}
+
+	client_id := req.GetClient().GetID()
+
+	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challenge, p.UserCode, client_id, req.GetRequestedScopes(), req.GetRequestedAudience())
+
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	// Get and join the list of scopes requested from the device
+	var scopes []string = req.GetRequestedScopes()
+	scope_string := strings.Join(scopes, " ")
+
+	// As we dont have a redirectURI we know of, just pick the 1st one the client supports
+	response_redirect := ""
+	if len(req.GetClient().GetRedirectURIs()) > 0 {
+		response_redirect = req.GetClient().GetRedirectURIs()[0]
+	}
+
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
+		RedirectTo: urlx.SetQuery(h.c.OAuth2AuthURL(r.Context()), url.Values{"state": {"fake-state"}, "device_verifier": {grantRequest.Verifier}, "client_id": {client_id}, "redirect_uri": {response_redirect}, "response_type": {"device_code"}, "scope": {scope_string}}).String(),
+	})
 }

@@ -637,3 +637,74 @@ func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
 		IDToken:     map[string]interface{}{},
 	}
 }
+
+// Contains information on an ongoing device grant request.
+//
+// swagger:model deviceGrantRequest
+type DeviceGrantRequest struct {
+	// ID is the identifier ("device challenge") of the device grant request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ID string `json:"challenge" db:"challenge"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_audience"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	//
+	// required: true
+	Client   *client.Client `json:"client" db:"-"`
+	ClientID string         `json:"-" db:"client_id"`
+
+	// DeviceCode is the OAuth 2.0 Device Authorization Grant Device Code that validate the non-interactive device.
+	//
+	// required: true
+	DeviceCode string `json:"-" db:"device_code"`
+
+	// UserCode is the OAuth 2.0 Device Authorization Grant User Code that validate the user on the interactive device.
+	//
+	// required: true
+	UserCode string `json:"-" db:"user_code"`
+
+	CSRF     string `json:"-" db:"csrf"`
+	Verifier string `json:"-" db:"verifier"`
+
+	Accepted   bool           `json:"-" db:"accepted"`
+	AcceptedAt sqlxx.NullTime `json:"handled_at" db:"accepted_at"`
+}
+
+func (_ DeviceGrantRequest) TableName() string {
+	return "hydra_oauth2_device_grant_request"
+}
+
+func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
+	if r.ClientID != "" {
+		r.Client = &client.Client{}
+		return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
+	}
+
+	return nil
+}
+
+// Contains information on an device verification
+//
+// swagger:model verifyUserCodeRequest
+type DeviceGrantVerifyUserCodeRequest struct {
+	UserCode string `json:"user_code"`
+}
+
+// Returned when the device grant request was used.
+//
+// swagger:ignore
+type DeviceGrantResponse struct {
+	RedirectTo   string `json:"redirect_to"`
+	ErrorMessage string `json:"error_message"`
+}

@@ -1,0 +1,1 @@
+ALTER TABLE hydra_oauth2_pkce ALTER COLUMN request_id TYPE varchar(128);

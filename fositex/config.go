@@ -6,6 +6,7 @@ import (
 	"hash"
 	"html/template"
 	"net/url"
+	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 
@@ -33,10 +34,11 @@ type factory func(config fosite.Configurator, storage interface{}, strategy inte
 type Config struct {
 	deps configDependencies
 
-	authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
-	tokenEndpointHandlers      fosite.TokenEndpointHandlers
-	tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
-	revocationHandlers         fosite.RevocationHandlers
+	authorizeEndpointHandlers       fosite.AuthorizeEndpointHandlers
+	tokenEndpointHandlers           fosite.TokenEndpointHandlers
+	tokenIntrospectionHandlers      fosite.TokenIntrospectionHandlers
+	revocationHandlers              fosite.RevocationHandlers
+	deviceAuthorizeEndpointHandlers fosite.DeviceAuthorizeEndpointHandlers
 
 	*config.DefaultProvider
 }
@@ -105,6 +107,10 @@ func (c *Config) GetTokenIntrospectionHandlers(ctx context.Context) (r fosite.To
 
 func (c *Config) GetRevocationHandlers(ctx context.Context) fosite.RevocationHandlers {
 	return c.revocationHandlers
+}
+
+func (c *Config) GetDeviceAuthorizeEndpointHandlers(ctx context.Context) fosite.DeviceAuthorizeEndpointHandlers {
+	return c.deviceAuthorizeEndpointHandlers
 }
 
 func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(ctx context.Context) bool {
@@ -195,4 +201,15 @@ func (c *Config) GetFormPostHTMLTemplate(ctx context.Context) *template.Template
 
 func (c *Config) GetTokenURL(ctx context.Context) string {
 	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String()
+}
+
+func (c *Config) GetDeviceVerificationURL(ctx context.Context) string {
+	return urlx.AppendPaths(c.PublicURL(ctx), oauth2.DeviceGrantPath).String()
+}
+
+func (c *Config) GetDeviceAuthTokenPollingInterval(ctx context.Context) time.Duration {
+	if c.GetDeviceAuthTokenPollingInterval(ctx) == 0 {
+		return time.Second * 10
+	}
+	return c.GetDeviceAuthTokenPollingInterval(ctx)
 }

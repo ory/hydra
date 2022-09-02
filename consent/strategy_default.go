@@ -964,9 +964,36 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 	return s.completeLogout(ctx, w, r)
 }
 
+func (s *DefaultStrategy) verifyDeviceGrant(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) error {
+	if !req.GetClient().GetGrantTypes().Has("urn:ietf:params:oauth:grant-type:device_code") {
+		return errorsx.WithStack(fosite.ErrAccessDenied.WithHint("This client cannot use device_code grant type"))
+	}
+
+	handledRequest, err := s.r.ConsentManager().GetDeviceGrantRequestByVerifier(r.Context(), verifier)
+
+	// Add the user code to form data for fosite to use later
+	req.GetRequestForm().Add("user_code", handledRequest.UserCode)
+
+	if err != nil {
+		return errorsx.WithStack(fosite.ErrAccessDenied.WithHint("Device grant already used or invalid verifier."))
+	}
+	if err := validateCsrfSession(r, s.r.Config(), s.r.CookieStore(r.Context()), s.c.CookieNameDeviceVerifyCSRF(r.Context()), handledRequest.CSRF); err != nil {
+		return err
+	}
+
+	_, err = s.r.ConsentManager().VerifyAndInvalidateDeviceGrantRequest(r.Context(), verifier)
+
+	if err != nil {
+		return errorsx.WithStack(fosite.ErrAccessDenied.WithHint("Unable to clean up device grant request"))
+	}
+
+	return nil
+}
+
 func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*AcceptOAuth2ConsentRequest, error) {
 	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
+	deviceVerifier := strings.TrimSpace(req.GetRequestForm().Get("device_verifier"))
 	if authenticationVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to auth endpoint
 		return nil, s.requestAuthentication(ctx, w, r, req)
@@ -983,6 +1010,14 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, 
 	consentSession, err := s.verifyConsent(ctx, w, r, req, consentVerifier)
 	if err != nil {
 		return nil, err
+	}
+
+	// check if this a device verifier and that the client supports the needed grant
+	if deviceVerifier != "" {
+		err := s.verifyDeviceGrant(w, r, req, deviceVerifier)
+		if err != nil {
+			return nil, client.ErrInvalidClientMetadata
+		}
 	}
 
 	return consentSession, nil
@@ -1004,4 +1039,32 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
 	}
 	return subject, nil
+}
+
+func (s *DefaultStrategy) ForwardDeviceGrantRequest(w http.ResponseWriter, r *http.Request) error {
+
+	verifier := strings.Replace(uuid.New(), "-", "", -1)
+	challenge := strings.Replace(uuid.New(), "-", "", -1)
+	csrf := strings.Replace(uuid.New(), "-", "", -1)
+	err := s.r.ConsentManager().CreateDeviceGrantRequest(r.Context(), &DeviceGrantRequest{
+		ID:       challenge,
+		Verifier: verifier,
+		CSRF:     csrf,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if err = createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(r.Context()), s.r.Config().CookieNameDeviceVerifyCSRF(r.Context()), csrf); err != nil {
+		return err
+	}
+
+	http.Redirect(
+		w, r,
+		urlx.SetQuery(urlx.AppendPaths(s.c.DeviceUrl(r.Context())), url.Values{"device_challenge": {challenge}}).String(),
+		http.StatusFound,
+	)
+
+	return nil
 }

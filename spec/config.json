@@ -421,6 +421,11 @@
                   "title": "CSRF Cookie Name",
                   "default": "ory_hydra_consent_csrf"
                 },
+                "consent_device_verify": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_device_verify_csrf"
+                },
                 "session": {
                   "type": "string",
                   "title": "Session Cookie Name",
@@ -717,6 +722,15 @@
           "examples": [
             "https://my-logout.app/logout",
             "/ui/logout"
+          ]
+        },
+        "device": {
+          "type": "string",
+          "description": "Sets the device auth endpoint. Defaults to an internal fallback URL showing an error.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-logout.app/device",
+            "/ui/device"
           ]
         },
         "error": {

@@ -22,6 +22,7 @@ package consent
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -1055,6 +1056,11 @@ func (s *DefaultStrategy) ForwardDeviceGrantRequest(w http.ResponseWriter, r *ht
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("CookieNameDeviceVerifyCSRF : %v ", s.r.Config().CookieNameDeviceVerifyCSRF(r.Context()))
+	fmt.Printf("CookieStore : %v ", s.r.CookieStore(r.Context()))
+	fmt.Printf("Config : %v ", s.r.Config())
+	fmt.Printf("csrf : %v ", csrf)
 
 	if err = createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(r.Context()), s.r.Config().CookieNameDeviceVerifyCSRF(r.Context()), csrf); err != nil {
 		return err

@@ -1,1 +1,0 @@
-DROP TABLE IF EXISTS hydra_oauth2_device_grant_request;

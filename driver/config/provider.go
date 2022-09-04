@@ -356,7 +356,7 @@ func (p *DefaultProvider) GetDeviceAuthTokenPollingInterval(ctx context.Context)
 }
 
 func (p *DefaultProvider) DeviceUrl(ctx context.Context) *url.URL {
-	return urlRoot(p.p.URIF(KeyDeviceURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device")))
+	return urlRoot(p.getProvider(ctx).URIF(KeyDeviceURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device")))
 }
 
 func (p *DefaultProvider) DeviceDoneURL(ctx context.Context) *url.URL {
@@ -364,7 +364,7 @@ func (p *DefaultProvider) DeviceDoneURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) SelfDeviceURL(ctx context.Context) *url.URL {
-	return urlRoot(p.p.RequestURIF(KeySelfDeviceURL, urlx.AppendPaths(p.PublicURL(ctx), "/device")))
+	return urlRoot(p.getProvider(ctx).URIF(KeySelfDeviceURL, urlx.AppendPaths(p.PublicURL(ctx), "/device")))
 }
 func (p *DefaultProvider) OAuth2DeviceAuthorisationURL(ctx context.Context) *url.URL {
 	return p.p.RequestURIF(KeyOAuth2DeviceAuthorisationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth"))

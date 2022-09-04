@@ -6,7 +6,6 @@ import (
 	"hash"
 	"html/template"
 	"net/url"
-	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 
@@ -45,17 +44,21 @@ type Config struct {
 
 var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
 var defaultFactories = []factory{
+	compose.OAuth2DeviceAuthorizeFactory,
 	compose.OAuth2AuthorizeExplicitFactory,
 	compose.OAuth2AuthorizeImplicitFactory,
+	compose.OAuth2AuthorizeDeviceFactory,
 	compose.OAuth2ClientCredentialsGrantFactory,
 	compose.OAuth2RefreshTokenGrantFactory,
 	compose.OpenIDConnectExplicitFactory,
 	compose.OpenIDConnectHybridFactory,
 	compose.OpenIDConnectImplicitFactory,
 	compose.OpenIDConnectRefreshFactory,
+	compose.OpenIDConnectDeviceFactory,
 	compose.OAuth2TokenRevocationFactory,
 	compose.OAuth2TokenIntrospectionFactory,
 	compose.OAuth2PKCEFactory,
+	compose.OAuth2DevicePKCEFactory,
 	compose.RFC7523AssertionGrantFactory,
 }
 
@@ -68,8 +71,17 @@ func NewConfig(deps configDependencies) *Config {
 }
 
 func (c *Config) LoadDefaultHanlders(strategy interface{}) {
+
+	//res := compose.OAuth2DevicePKCEFactory(c, c.deps.Persister(), strategy)
+	//ret := res.(fosite.DeviceAuthorizeEndpointHandler)
+	//ret.HandleDeviceAuthorizeEndpointRequest(context.TODO(), nil, nil)
+
 	for _, factory := range defaultFactories {
 		res := factory(c, c.deps.Persister(), strategy)
+
+		if ah, ok := res.(fosite.DeviceAuthorizeEndpointHandler); ok {
+			c.deviceAuthorizeEndpointHandlers.Append(ah)
+		}
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)
 		}
@@ -205,11 +217,4 @@ func (c *Config) GetTokenURL(ctx context.Context) string {
 
 func (c *Config) GetDeviceVerificationURL(ctx context.Context) string {
 	return urlx.AppendPaths(c.PublicURL(ctx), oauth2.DeviceGrantPath).String()
-}
-
-func (c *Config) GetDeviceAuthTokenPollingInterval(ctx context.Context) time.Duration {
-	if c.GetDeviceAuthTokenPollingInterval(ctx) == 0 {
-		return time.Second * 10
-	}
-	return c.GetDeviceAuthTokenPollingInterval(ctx)
 }

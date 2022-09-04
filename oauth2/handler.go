@@ -448,7 +448,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
 		IDTokenSignedResponseAlg:               []string{key.Algorithm},
 		UserinfoSignedResponseAlg:              []string{key.Algorithm},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,

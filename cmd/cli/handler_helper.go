@@ -95,9 +95,13 @@ func configureClientBase(cmd *cobra.Command, withAuth bool) *hydra.OryHydra {
 
 		ht.Transport = newTransport(cmd)
 	}
+
 	if withAuth {
 		if token := flagx.MustGetString(cmd, "access-token"); token != "" {
 			ht.DefaultAuthentication = httptransport.BearerToken(token)
+		} else if u.User != nil {
+			pass, _ := u.User.Password()
+			ht.DefaultAuthentication = httptransport.BasicAuth(u.User.Username(), pass)
 		}
 	}
 

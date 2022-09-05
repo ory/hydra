@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -396,15 +397,16 @@ func TestCookieSecure(t *testing.T) {
 }
 
 func TestTokenRefreshHookURL(t *testing.T) {
+	ctx := context.Background()
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 	c := MustNew(context.Background(), l, configx.SkipValidation())
 
-	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL())
-	c.MustSet(KeyRefreshTokenHookURL, "")
-	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL())
-	c.MustSet(KeyRefreshTokenHookURL, "http://localhost:8080/oauth/token_refresh")
-	assert.EqualValues(t, "http://localhost:8080/oauth/token_refresh", c.TokenRefreshHookURL().String())
+	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL(ctx))
+	c.MustSet(ctx, KeyRefreshTokenHookURL, "")
+	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL(ctx))
+	c.MustSet(ctx, KeyRefreshTokenHookURL, "http://localhost:8080/oauth/token_refresh")
+	assert.EqualValues(t, "http://localhost:8080/oauth/token_refresh", c.TokenRefreshHookURL(ctx).String())
 }
 
 func TestJWTBearer(t *testing.T) {

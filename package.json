@@ -3,12 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "prettier": "ory-prettier-styles",
-  "config": {
-    "prettierTarget": "**/*.{js,ts,md,mdx,yml,yaml,json}"
-  },
   "scripts": {
-    "format": "prettier --write ${npm_package_config_prettierTarget}",
-    "format:check": "prettier --check ${npm_package_config_prettierTarget}",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "cypress run",
     "test:watch": "cypress open",
     "wait-on": "wait-on",

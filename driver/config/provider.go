@@ -384,10 +384,6 @@ func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(ctx), "/.well-known/jwks.json"))
 }
 
-func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).URIF(KeyRefreshTokenHookURL, nil)
-}
-
 func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context) AccessTokenStrategyType {
 	s, err := ToAccessTokenStrategyType(p.getProvider(ctx).String(KeyAccessTokenStrategy))
 	if err != nil {

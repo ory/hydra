@@ -1,12 +1,12 @@
 {
   "name": "ory-hydra-mock-oauth2-client",
   "version": "0.0.0",
-  "main": "./src/index.js",
   "private": true,
+  "main": "./src/index.js",
   "scripts": {
+    "consent": "hydra-login-consent-logout",
     "start": "node ./src/index.js",
-    "watch": "nodemon ./src/index.js",
-    "consent": "hydra-login-consent-logout"
+    "watch": "nodemon ./src/index.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

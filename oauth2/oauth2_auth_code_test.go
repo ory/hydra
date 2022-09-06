@@ -96,7 +96,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	ctx := context.TODO()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx,config.KeyRefreshTokenHookURL, "")
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {

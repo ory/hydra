@@ -9,6 +9,7 @@
   "grant_types": [
     "authorization_code"
   ],
+  "jwks": {},
   "logo_uri": "",
   "metadata": {
     "foo": "bar"

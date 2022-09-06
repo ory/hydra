@@ -5,6 +5,7 @@
   "grant_types": [
     "implicit"
   ],
+  "jwks": {},
   "logo_uri": "",
   "metadata": {},
   "owner": "",

@@ -23,7 +23,7 @@
         "description": "Headers is the jwt headers",
         "properties": {
           "extra": {
-            "additionalProperties": true,
+            "additionalProperties": {},
             "type": "object"
           }
         },
@@ -62,7 +62,7 @@
             "type": "string"
           },
           "ext": {
-            "additionalProperties": true,
+            "additionalProperties": {},
             "type": "object"
           },
           "iat": {
@@ -90,9 +90,6 @@
       },
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
-      },
-      "JoseJSONWebKeySet": {
-        "type": "object"
       },
       "NullBool": {
         "nullable": true,
@@ -451,7 +448,7 @@
             "type": "integer"
           },
           "ext": {
-            "additionalProperties": true,
+            "additionalProperties": {},
             "description": "Extra is arbitrary data set by the session.",
             "type": "object"
           },
@@ -782,7 +779,7 @@
             "$ref": "#/components/schemas/NullDuration"
           },
           "jwks": {
-            "$ref": "#/components/schemas/JoseJSONWebKeySet"
+            "description": "Client's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as\nthe jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter\nis intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for\ninstance, by native applications that might not have a location to host the contents of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation\n(which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be used together."
           },
           "jwks_uri": {
             "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
@@ -952,7 +949,7 @@
             "type": "string"
           },
           "id_token_hint_claims": {
-            "additionalProperties": true,
+            "additionalProperties": {},
             "description": "IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the\nEnd-User's current or past authenticated session with the Client.",
             "type": "object"
           },
@@ -1014,7 +1011,7 @@
             "type": "object"
           },
           "extra": {
-            "additionalProperties": true,
+            "additionalProperties": {},
             "type": "object"
           },
           "headers": {

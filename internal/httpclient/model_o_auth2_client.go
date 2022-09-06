@@ -53,8 +53,9 @@ type OAuth2Client struct {
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
 	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ImplicitGrantIdTokenLifespan *string                `json:"implicit_grant_id_token_lifespan,omitempty"`
-	Jwks                         map[string]interface{} `json:"jwks,omitempty"`
+	ImplicitGrantIdTokenLifespan *string `json:"implicit_grant_id_token_lifespan,omitempty"`
+	// Client's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks parameters MUST NOT be used together.
+	Jwks interface{} `json:"jwks,omitempty"`
 	// URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	JwksUri *string `json:"jwks_uri,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
@@ -761,10 +762,10 @@ func (o *OAuth2Client) SetImplicitGrantIdTokenLifespan(v string) {
 	o.ImplicitGrantIdTokenLifespan = &v
 }
 
-// GetJwks returns the Jwks field value if set, zero value otherwise.
-func (o *OAuth2Client) GetJwks() map[string]interface{} {
-	if o == nil || o.Jwks == nil {
-		var ret map[string]interface{}
+// GetJwks returns the Jwks field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *OAuth2Client) GetJwks() interface{} {
+	if o == nil {
+		var ret interface{}
 		return ret
 	}
 	return o.Jwks
@@ -772,11 +773,12 @@ func (o *OAuth2Client) GetJwks() map[string]interface{} {
 
 // GetJwksOk returns a tuple with the Jwks field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2Client) GetJwksOk() (map[string]interface{}, bool) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *OAuth2Client) GetJwksOk() (*interface{}, bool) {
 	if o == nil || o.Jwks == nil {
 		return nil, false
 	}
-	return o.Jwks, true
+	return &o.Jwks, true
 }
 
 // HasJwks returns a boolean if a field has been set.
@@ -788,8 +790,8 @@ func (o *OAuth2Client) HasJwks() bool {
 	return false
 }
 
-// SetJwks gets a reference to the given map[string]interface{} and assigns it to the Jwks field.
-func (o *OAuth2Client) SetJwks(v map[string]interface{}) {
+// SetJwks gets a reference to the given interface{} and assigns it to the Jwks field.
+func (o *OAuth2Client) SetJwks(v interface{}) {
 	o.Jwks = v
 }
 

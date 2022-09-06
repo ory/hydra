@@ -2034,7 +2034,7 @@ components:
       description: Headers is the jwt headers
       properties:
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
       type: object
     IDTokenClaims:
@@ -2062,7 +2062,7 @@ components:
           format: date-time
           type: string
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         iat:
           format: date-time
@@ -2083,8 +2083,6 @@ components:
       title: "JSONRawMessage represents a json.RawMessage that works well with
         JSON,\
         \ SQL, and Swagger."
-    JoseJSONWebKeySet:
-      type: object
     NullBool:
       nullable: true
       type: boolean
@@ -2609,7 +2607,7 @@ components:
           format: int64
           type: integer
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           description: Extra is arbitrary data set by the session.
           type: object
         iat:
@@ -2974,7 +2972,7 @@ components:
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
         client_uri: client_uri
         jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-        jwks: "{}"
+        jwks: ""
         logo_uri: logo_uri
         created_at: 2000-01-23T04:56:07.000+00:00
         registration_client_uri: registration_client_uri
@@ -3183,7 +3181,27 @@ components:
           title: Time duration
           type: string
         jwks:
-          type: object
+          description: "Client's JSON Web Key Set [JWK] document, passed by
+            value.\
+            \ The semantics of the jwks parameter are the same as\nthe jwks_uri
+            parameter,\
+            \ other than that the JWK Set is passed by value, rather than by
+            reference.\
+            \ This parameter\nis intended only to be used by Clients that, for
+            some\
+            \ reason, are unable to use the jwks_uri parameter, for\ninstance,
+            by\
+            \ native applications that might not have a location to host the
+            contents\
+            \ of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use
+            jwks.\
+            \ One significant downside of jwks is that it does not enable key
+            rotation\n\
+            (which jwks_uri does, as described in Section 10 of OpenID Connect
+            Core\
+            \ 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be
+            used\
+            \ together."
         jwks_uri:
           description: "URL for the Client's JSON Web Key Set [JWK] document. If
             the\
@@ -3400,7 +3418,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3620,7 +3638,7 @@ components:
             display."
           type: string
         id_token_hint_claims:
-          additionalProperties: true
+          additionalProperties: {}
           description: |-
             IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
             End-User's current or past authenticated session with the Client.
@@ -3668,7 +3686,7 @@ components:
         expires_at:
           $ref: "#/components/schemas/oAuth2ConsentSession_expires_at"
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         headers:
           $ref: "#/components/schemas/Headers"
@@ -3704,7 +3722,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3852,7 +3870,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -4538,7 +4556,7 @@ components:
             token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
             client_uri: client_uri
             jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-            jwks: "{}"
+            jwks: ""
             logo_uri: logo_uri
             created_at: 2000-01-23T04:56:07.000+00:00
             registration_client_uri: registration_client_uri

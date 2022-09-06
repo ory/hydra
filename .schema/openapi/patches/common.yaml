@@ -1,6 +1,4 @@
 - op: remove
-  path: /components/schemas/jsonPatch/properties/value/type
-- op: remove
   path: /components/schemas/JSONRawMessage/type
 - op: remove
   path: /components/schemas/genericError/properties/details/type

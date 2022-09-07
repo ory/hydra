@@ -89,6 +89,7 @@ All URIs are relative to _http://localhost_
 
 | Class         | Method                                                                                                             | HTTP request                                           | Description                                                                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| _AdminApi_    | [**AdminVerifyUserCodeRequest**](docs/AdminApi.md#adminverifyusercoderequest)                                      | **Put** /admin/oauth2/auth/requests/device/verify      |
 | _AdminApi_    | [**UpdateOAuth2ClientLifespans**](docs/AdminApi.md#updateoauth2clientlifespans)                                    | **Put** /admin/clients/{id}/lifespans                  |
 | _MetadataApi_ | [**GetVersion**](docs/MetadataApi.md#getversion)                                                                   | **Get** /version                                       | Return Running Software Version.                                                                       |
 | _MetadataApi_ | [**IsAlive**](docs/MetadataApi.md#isalive)                                                                         | **Get** /health/alive                                  | Check HTTP Server Status                                                                               |
@@ -143,6 +144,7 @@ All URIs are relative to _http://localhost_
 - [AcceptOAuth2LoginRequest](docs/AcceptOAuth2LoginRequest.md)
 - [AdminCreateJsonWebKeySetBody](docs/AdminCreateJsonWebKeySetBody.md)
 - [AdminTrustOAuth2JwtGrantIssuerBody](docs/AdminTrustOAuth2JwtGrantIssuerBody.md)
+- [DeviceGrantRequest](docs/DeviceGrantRequest.md)
 - [GenericError](docs/GenericError.md)
 - [GetVersion200Response](docs/GetVersion200Response.md)
 - [HandledOAuth2ConsentRequest](docs/HandledOAuth2ConsentRequest.md)
@@ -182,6 +184,7 @@ All URIs are relative to _http://localhost_
 - [TrustedOAuth2JwtGrantIssuer](docs/TrustedOAuth2JwtGrantIssuer.md)
 - [TrustedOAuth2JwtGrantJsonWebKey](docs/TrustedOAuth2JwtGrantJsonWebKey.md)
 - [UpdateOAuth2ClientLifespans](docs/UpdateOAuth2ClientLifespans.md)
+- [VerifyUserCodeRequest](docs/VerifyUserCodeRequest.md)
 - [Version](docs/Version.md)
 
 ## Documentation For Authorization

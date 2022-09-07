@@ -887,6 +887,54 @@
         }
       }
     },
+    "/admin/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "Verifies a device grant request\nVerifies a device grant request",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "adminVerifyUserCodeRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "device_challenge",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/verifyUserCodeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfulOAuth2RequestResponse",
+            "schema": {
+              "$ref": "#/definitions/successfulOAuth2RequestResponse"
+            }
+          },
+          "default": {
+            "description": "oAuth2ApiError",
+            "schema": {
+              "$ref": "#/definitions/oAuth2ApiError"
+            }
+          }
+        }
+      }
+    },
     "/admin/oauth2/auth/requests/login": {
       "get": {
         "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
@@ -2138,9 +2186,6 @@
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
     },
-    "JoseJSONWebKeySet": {
-      "type": "object"
-    },
     "NullDuration": {
       "description": "TODO delete this type and replace it with ory/x/sqlxx/NullDuration when applying the custom client token TTL patch to Hydra 2.x",
       "type": "string",
@@ -2149,6 +2194,13 @@
     "StringSliceJSONFormat": {
       "type": "array",
       "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "StringSlicePipeDelimiter": {
+      "type": "array",
+      "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
       "items": {
         "type": "string"
       }
@@ -2338,6 +2390,38 @@
           "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
           "type": "string",
           "example": "mike@example.com"
+        }
+      }
+    },
+    "deviceGrantRequest": {
+      "type": "object",
+      "title": "Contains information on an ongoing device grant request.",
+      "required": [
+        "challenge",
+        "requested_scope",
+        "requested_access_token_audience",
+        "client"
+      ],
+      "properties": {
+        "challenge": {
+          "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "request_url": {
+          "description": "RequestURL is the original Device Grant URL requested.",
+          "type": "string"
+        },
+        "requested_access_token_audience": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
+        "requested_scope": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         }
       }
     },
@@ -3186,6 +3270,10 @@
             "type": "string"
           }
         },
+        "device_authorization_endpoint": {
+          "description": "URL of the authorization server's device authorization endpoint",
+          "type": "string"
+        },
         "end_session_endpoint": {
           "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
           "type": "string"
@@ -3648,6 +3736,15 @@
           "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
           "type": "string",
           "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "verifyUserCodeRequest": {
+      "description": "Contains information on an device verification",
+      "type": "object",
+      "properties": {
+        "user_code": {
+          "type": "string"
         }
       }
     },

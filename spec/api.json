@@ -126,6 +126,13 @@
         "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
         "type": "array"
       },
+      "StringSlicePipeDelimiter": {
+        "items": {
+          "type": "string"
+        },
+        "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+        "type": "array"
+      },
       "Time": {
         "format": "date-time",
         "type": "string"
@@ -316,6 +323,38 @@
           "jwk",
           "expires_at"
         ],
+        "type": "object"
+      },
+      "deviceGrantRequest": {
+        "properties": {
+          "challenge": {
+            "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
+            "type": "string"
+          },
+          "client": {
+            "$ref": "#/components/schemas/oAuth2Client"
+          },
+          "handled_at": {
+            "$ref": "#/components/schemas/nullTime"
+          },
+          "request_url": {
+            "description": "RequestURL is the original Device Grant URL requested.",
+            "type": "string"
+          },
+          "requested_access_token_audience": {
+            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+          },
+          "requested_scope": {
+            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+          }
+        },
+        "required": [
+          "challenge",
+          "requested_scope",
+          "requested_access_token_audience",
+          "client"
+        ],
+        "title": "Contains information on an ongoing device grant request.",
         "type": "object"
       },
       "genericError": {
@@ -1175,6 +1214,10 @@
             },
             "type": "array"
           },
+          "device_authorization_endpoint": {
+            "description": "URL of the authorization server's device authorization endpoint",
+            "type": "string"
+          },
           "end_session_endpoint": {
             "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
             "type": "string"
@@ -1648,6 +1691,15 @@
           "set": {
             "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
             "example": "https://jwt-idp.example.com",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "verifyUserCodeRequest": {
+        "description": "Contains information on an device verification",
+        "properties": {
+          "user_code": {
             "type": "string"
           }
         },
@@ -2592,6 +2644,57 @@
         "summary": "Reject an OAuth 2.0 Consent Request",
         "tags": [
           "v0alpha2"
+        ]
+      }
+    },
+    "/admin/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "Verifies a device grant request\nVerifies a device grant request",
+        "operationId": "adminVerifyUserCodeRequest",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "device_challenge",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/verifyUserCodeRequest"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                }
+              }
+            },
+            "description": "successfulOAuth2RequestResponse"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2ApiError"
+                }
+              }
+            },
+            "description": "oAuth2ApiError"
+          }
+        },
+        "tags": [
+          "admin"
         ]
       }
     },

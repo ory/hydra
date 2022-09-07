@@ -267,6 +267,7 @@ func TestViperProviderValidates(t *testing.T) {
 	// webfinger
 	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OAuth2ClientRegistrationURL(ctx))
+	assert.Equal(t, urlx.ParseOrPanic("https://example.com/device_authorization"), c.OAuth2DeviceAuthorisationURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/jwks.json"), c.JWKSURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/auth"), c.OAuth2AuthURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/token"), c.OAuth2TokenURL(ctx))
@@ -285,9 +286,14 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://admin/"), c.AdminURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://login/"), c.LoginURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://consent/"), c.ConsentURL(ctx))
+	assert.Equal(t, urlx.ParseOrPanic("https://device/"), c.DeviceUrl(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://logout/"), c.LogoutURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://error/"), c.ErrorURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://post_logout/"), c.LogoutRedirectURL(ctx))
+	assert.Equal(t, urlx.ParseOrPanic("https://post_device/"), c.DeviceDoneURL(ctx))
+
+	// self
+	assert.Equal(t, urlx.ParseOrPanic("https://public/device"), c.DeviceInternalURL(ctx))
 
 	// strategies
 	assert.True(t, c.GetScopeStrategy(ctx)([]string{"openid"}, "openid"), "should us fosite.ExactScopeStrategy")
@@ -301,6 +307,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, 2*time.Hour, c.GetRefreshTokenLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetIDTokenLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetAuthorizeCodeLifespan(ctx))
+	assert.Equal(t, 2*time.Hour, c.GetDeviceAndUserCodeLifespan(ctx))
 
 	// oauth2
 	assert.Equal(t, true, c.GetSendDebugMessagesToClients(ctx))
@@ -359,16 +366,20 @@ func TestLoginConsentURL(t *testing.T) {
 	p := MustNew(context.Background(), l)
 	p.MustSet(ctx, KeyLoginURL, "http://localhost:8080/oauth/login")
 	p.MustSet(ctx, KeyConsentURL, "http://localhost:8080/oauth/consent")
+	p.MustSet(ctx, KeyDeviceURL, "http://localhost:8080/oauth/device")
 
 	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL(ctx).String())
 	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL(ctx).String())
+	assert.Equal(t, "http://localhost:8080/oauth/device", p.DeviceUrl(ctx).String())
 
 	p2 := MustNew(context.Background(), l)
 	p2.MustSet(ctx, KeyLoginURL, "http://localhost:3000/#/oauth/login")
 	p2.MustSet(ctx, KeyConsentURL, "http://localhost:3000/#/oauth/consent")
+	p2.MustSet(ctx, KeyDeviceURL, "http://localhost:3000/#/oauth/device")
 
 	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL(ctx).String())
 	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL(ctx).String())
+	assert.Equal(t, "http://localhost:3000/#/oauth/device", p2.DeviceUrl(ctx).String())
 }
 
 func TestInfinitRefreshTokenTTL(t *testing.T) {

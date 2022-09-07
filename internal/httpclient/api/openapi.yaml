@@ -903,6 +903,41 @@ paths:
       summary: Reject an OAuth 2.0 Consent Request
       tags:
         - v0alpha2
+  /admin/oauth2/auth/requests/device/verify:
+    put:
+      description: |-
+        Verifies a device grant request
+        Verifies a device grant request
+      operationId: adminVerifyUserCodeRequest
+      parameters:
+        - explode: true
+          in: query
+          name: device_challenge
+          required: true
+          schema:
+            type: string
+          style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/verifyUserCodeRequest"
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/successfulOAuth2RequestResponse"
+          description: successfulOAuth2RequestResponse
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuth2ApiError"
+          description: oAuth2ApiError
+      tags:
+        - admin
   /admin/oauth2/auth/requests/login:
     get:
       description: "When an authorization code, hybrid, or implicit OAuth 2.0
@@ -2113,6 +2148,13 @@ components:
         to/from\
         \ JSON for SQL storage."
       type: array
+    StringSlicePipeDelimiter:
+      items:
+        type: string
+      title:
+        StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+        string.
+      type: array
     Time:
       format: date-time
       type: string
@@ -2551,6 +2593,43 @@ components:
         - issuer
         - jwk
         - scope
+      type: object
+    deviceGrantRequest:
+      properties:
+        challenge:
+          description: |-
+            ID is the identifier ("device challenge") of the device grant request. It is used to
+            identify the session.
+          type: string
+        client:
+          $ref: "#/components/schemas/oAuth2Client"
+        handled_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
+        request_url:
+          description: RequestURL is the original Device Grant URL requested.
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+      required:
+        - challenge
+        - client
+        - requested_access_token_audience
+        - requested_scope
+      title: Contains information on an ongoing device grant request.
       type: object
     genericError:
       properties:
@@ -4203,6 +4282,7 @@ components:
           - userinfo_signed_response_alg
           - userinfo_signed_response_alg
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
+        device_authorization_endpoint: device_authorization_endpoint
         claims_supported:
           - claims_supported
           - claims_supported
@@ -4290,6 +4370,10 @@ components:
           items:
             type: string
           type: array
+        device_authorization_endpoint:
+          description:
+            URL of the authorization server's device authorization endpoint
+          type: string
         end_session_endpoint:
           description:
             URL at the OP to which an RP can perform a redirect to request that
@@ -5089,6 +5173,12 @@ components:
             The "set" is basically a name for a group(set) of keys. Will be the
             same as "issuer" in grant.
           example: https://jwt-idp.example.com
+          type: string
+      type: object
+    verifyUserCodeRequest:
+      description: Contains information on an device verification
+      properties:
+        user_code:
           type: string
       type: object
     version:

@@ -59,12 +59,12 @@ const (
 	DefaultConsentPath    = "/oauth2/fallbacks/consent"
 	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
 	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
+	DefaultDevicePath     = "/oauth2/fallbacks/device"
+	DefaultPostDevicePath = "/oauth2/fallbacks/device/done"
 	DefaultErrorPath      = "/oauth2/fallbacks/error"
 	TokenPath             = "/oauth2/token" // #nosec G101
 	AuthPath              = "/oauth2/auth"
 	LogoutPath            = "/oauth2/sessions/logout"
-	DefaultDevicePath     = "/oauth2/fallbacks/device"
-	DefaultPostDevicePath = "/oauth2/fallbacks/device/done"
 
 	UserinfoPath  = "/userinfo"
 	WellKnownPath = "/.well-known/openid-configuration"
@@ -98,6 +98,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.GET(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 	public.POST(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 
+	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLoginURL))
+	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.KeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLogoutURL))
 	public.GET(DefaultDevicePath, h.fallbackHandler("", "", http.StatusOK, config.KeyDeviceURL))
 	public.GET(DefaultPostDevicePath, h.fallbackHandler(
 		"You successfully authenticated on your device!",
@@ -105,10 +108,6 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 		http.StatusOK,
 		config.KeyDeviceDoneURL,
 	))
-
-	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLoginURL))
-	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.KeyConsentURL))
-	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLogoutURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
@@ -128,22 +127,116 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	admin.POST(IntrospectPath, h.adminIntrospectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.adminDeleteOAuth2Token)
 
-	public.POST(DeviceAuthPath, h.DeviceAuthHandler)
-	public.GET(h.c.SelfDeviceURL(context.Background()).Path, h.DeviceGranHandler)
+	public.GET(DeviceAuthPath, h.DeviceAuthGetHandler)
+	// This is only a shorthand to avoid people to type a long url;
+	public.GET(h.c.DeviceInternalURL(context.Background()).Path, h.DeviceAuthGetHandler)
+	public.POST(DeviceAuthPath, h.DeviceAuthPostHandler)
 }
 
-func (h *Handler) DeviceGranHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var ctx = r.Context()
 
-	err := h.r.ConsentStrategy().ForwardDeviceGrantRequest(w, r)
+	authorizeRequest, err := h.r.OAuth2Provider().NewDeviceAuthorizeGetRequest(ctx, r)
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return
+	}
+
+	session, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r, authorizeRequest)
+	if errors.Is(err, consent.ErrAbortOAuth2Request) {
+		x.LogAudit(r, nil, h.r.AuditLogger())
+		// do nothing
+		return
+	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+		x.LogAudit(r, err, h.r.AuditLogger())
+		return
+	} else if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return
+	}
+
+	for _, scope := range session.GrantedScope {
+		authorizeRequest.GrantScope(scope)
+	}
+
+	for _, audience := range session.GrantedAudience {
+		authorizeRequest.GrantAudience(audience)
+	}
+
+	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return
+	}
+
+	var accessTokenKeyID string
+	if h.c.AccessTokenStrategy(r.Context()) == "jwt" {
+		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			return
+		}
+	}
+
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+		x.LogAudit(r, err, h.r.AuditLogger())
+		return
+	} else if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return
+	}
+
+	authorizeRequest.SetID(session.ID)
+	claims := &jwt.IDTokenClaims{
+		Subject:                             obfuscatedSubject,
+		Issuer:                              h.c.IssuerURL(ctx).String(),
+		AuthTime:                            time.Time(session.AuthenticatedAt),
+		RequestedAt:                         session.RequestedAt,
+		Extra:                               session.Session.IDToken,
+		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
+
+		// These are required for work around https://github.com/ory/fosite/issues/530
+		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),
+		Audience: []string{authorizeRequest.GetClient().GetID()},
+		IssuedAt: time.Now().Truncate(time.Second).UTC(),
+
+		// This is set by the fosite strategy
+		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
+	}
+	claims.Add("sid", session.ConsentRequest.LoginSessionID)
+
+	authorizeRequest.SetSession(&Session{
+		DefaultSession: &openid.DefaultSession{
+			Claims: claims,
+			Headers: &jwt.Headers{Extra: map[string]interface{}{
+				// required for lookup on jwk endpoint
+				"kid": openIDKeyID,
+			}},
+			Subject: session.ConsentRequest.Subject,
+		},
+		Extra:                 session.Session.AccessToken,
+		KID:                   accessTokenKeyID,
+		ClientID:              authorizeRequest.GetClient().GetID(),
+		ConsentChallenge:      session.ID,
+		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
+		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+	})
+
+	err = h.r.OAuth2Storage().CreateDeviceCodeSession(ctx, authorizeRequest.GetDeviceCodeSignature(), authorizeRequest)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 	}
+
+	// Device flow is done, let's redirect the user back to the
+	//
+	http.Redirect(w, r, h.c.DeviceDoneURL(ctx).String(), http.StatusFound)
 }
 
-func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) DeviceAuthPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
-	request, err := h.r.OAuth2Provider().NewDeviceAuthorizeRequest(ctx, r)
-
+	request, err := h.r.OAuth2Provider().NewDeviceAuthorizePostRequest(ctx, r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -161,7 +254,7 @@ func (h *Handler) DeviceAuthHandler(w http.ResponseWriter, r *http.Request, _ ht
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(w, request, resp)
+	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(ctx, w, request, resp)
 }
 
 // swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout

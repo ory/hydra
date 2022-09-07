@@ -31,10 +31,9 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
@@ -467,6 +466,82 @@ type LogoutResult struct {
 	FrontChannelLogoutURLs []string
 }
 
+// Contains information on an ongoing device grant request.
+//
+// swagger:model deviceGrantRequest
+type DeviceGrantRequest struct {
+	// ID is the identifier ("device challenge") of the device grant request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ID string `json:"challenge" db:"challenge"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+
+	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	//
+	// required: true
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_audience"`
+
+	// RequestURL is the original Device Grant URL requested.
+	RequestURL string `json:"request_url" db:"request_url"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	//
+	// required: true
+	Client   *client.Client   `json:"client" db:"-"`
+	ClientID sqlxx.NullString `json:"-" db:"client_id"`
+
+	// DeviceCodeSignature is the OAuth 2.0 Device Authorization Grant Device Code Signature (HMAC)
+	//
+	// required: true
+	DeviceCodeSignature sqlxx.NullString `json:"-" db:"device_code_signature"`
+
+	CSRF     string `json:"-" db:"csrf"`
+	Verifier string `json:"-" db:"verifier"`
+
+	Accepted   bool           `json:"-" db:"accepted"`
+	AcceptedAt sqlxx.NullTime `json:"handled_at" db:"accepted_at"`
+}
+
+func (_ DeviceGrantRequest) TableName() string {
+	return "hydra_oauth2_device_grant_request"
+}
+
+func (r *DeviceGrantRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = sqlxx.NullString(r.Client.GetID())
+	}
+	return nil
+}
+
+func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
+	if r.ClientID != "" {
+		r.Client = &client.Client{}
+		return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
+	}
+
+	return nil
+}
+
+// Contains information on an device verification
+//
+// swagger:model verifyUserCodeRequest
+type DeviceGrantVerifyUserCodeRequest struct {
+	UserCode string `json:"user_code"`
+}
+
+// Returned when the device grant request was used.
+//
+// swagger:ignore
+type DeviceGrantResponse struct {
+	RedirectTo   string `json:"redirect_to"`
+	ErrorMessage string `json:"error_message"`
+}
+
 // Contains information on an ongoing login request.
 //
 // swagger:model oAuth2LoginRequest
@@ -636,75 +711,4 @@ func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
 		AccessToken: map[string]interface{}{},
 		IDToken:     map[string]interface{}{},
 	}
-}
-
-// Contains information on an ongoing device grant request.
-//
-// swagger:model deviceGrantRequest
-type DeviceGrantRequest struct {
-	// ID is the identifier ("device challenge") of the device grant request. It is used to
-	// identify the session.
-	//
-	// required: true
-	ID string `json:"challenge" db:"challenge"`
-
-	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	//
-	// required: true
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
-
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	//
-	// required: true
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_audience"`
-
-	// Client is the OAuth 2.0 Client that initiated the request.
-	//
-	// required: true
-	Client   *client.Client `json:"client" db:"-"`
-	ClientID string         `json:"-" db:"client_id"`
-
-	// DeviceCode is the OAuth 2.0 Device Authorization Grant Device Code that validate the non-interactive device.
-	//
-	// required: true
-	DeviceCode string `json:"-" db:"device_code"`
-
-	// UserCode is the OAuth 2.0 Device Authorization Grant User Code that validate the user on the interactive device.
-	//
-	// required: true
-	UserCode string `json:"-" db:"user_code"`
-
-	CSRF     string `json:"-" db:"csrf"`
-	Verifier string `json:"-" db:"verifier"`
-
-	Accepted   bool           `json:"-" db:"accepted"`
-	AcceptedAt sqlxx.NullTime `json:"handled_at" db:"accepted_at"`
-}
-
-func (_ DeviceGrantRequest) TableName() string {
-	return "hydra_oauth2_device_grant_request"
-}
-
-func (r *DeviceGrantRequest) AfterFind(c *pop.Connection) error {
-	if r.ClientID != "" {
-		r.Client = &client.Client{}
-		return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
-	}
-
-	return nil
-}
-
-// Contains information on an device verification
-//
-// swagger:model verifyUserCodeRequest
-type DeviceGrantVerifyUserCodeRequest struct {
-	UserCode string `json:"user_code"`
-}
-
-// Returned when the device grant request was used.
-//
-// swagger:ignore
-type DeviceGrantResponse struct {
-	RedirectTo   string `json:"redirect_to"`
-	ErrorMessage string `json:"error_message"`
 }

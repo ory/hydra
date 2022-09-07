@@ -481,7 +481,7 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 	return p.findSessionBySignature(ctx, signature, req, sqlTableDeviceCode)
 }
 
-func (p *Persister) DeleteDeviceCodeSession(ctx context.Context, signature string) error {
+func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature string) error {
 	return p.deleteSessionBySignature(ctx, signature, sqlTableDeviceCode)
 }
 
@@ -494,6 +494,6 @@ func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, re
 	return p.findSessionBySignature(ctx, signature, req, sqlTableUserCode)
 }
 
-func (p *Persister) DeleteUserCodeSession(ctx context.Context, signature string) error {
+func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature string) error {
 	return p.deleteSessionBySignature(ctx, signature, sqlTableUserCode)
 }

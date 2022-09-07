@@ -259,7 +259,7 @@ func (h *Handler) DeviceAuthPostHandler(w http.ResponseWriter, r *http.Request, 
 
 // swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout
 //
-// # OpenID Connect Front- or Back-channel Enabled Logout
+// OpenID Connect Front- or Back-channel Enabled Logout
 //
 // This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
 //
@@ -501,7 +501,7 @@ type OIDCConfiguration struct {
 
 // swagger:route GET /.well-known/openid-configuration v0alpha2 discoverOidcConfiguration
 //
-// # OpenID Connect Discovery
+// OpenID Connect Discovery
 //
 // The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 // your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
@@ -620,7 +620,7 @@ type oidcUserInfo struct {
 
 // swagger:route GET /userinfo v0alpha2 getOidcUserInfo
 //
-// # OpenID Connect Userinfo
+// OpenID Connect Userinfo
 //
 // This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 // the provided OAuth 2.0 Access Token.
@@ -730,7 +730,7 @@ type revokeOAuth2Token struct {
 
 // swagger:route POST /oauth2/revoke v0alpha2 revokeOAuth2Token
 //
-// # Revoke an OAuth2 Access or Refresh Token
+// Revoke an OAuth2 Access or Refresh Token
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
@@ -780,7 +780,7 @@ type adminIntrospectOAuth2Token struct {
 
 // swagger:route POST /admin/oauth2/introspect v0alpha2 adminIntrospectOAuth2Token
 //
-// # Introspect OAuth2 Access or Refresh Tokens
+// Introspect OAuth2 Access or Refresh Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -934,7 +934,7 @@ type oAuth2TokenResponse struct {
 
 // swagger:route POST /oauth2/token v0alpha2 performOAuth2TokenFlow
 //
-// # The OAuth 2.0 Token Endpoint
+// The OAuth 2.0 Token Endpoint
 //
 // The client makes a request to the token endpoint by sending the
 // following parameters using the "application/x-www-form-urlencoded" HTTP
@@ -1033,7 +1033,7 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 
 // swagger:route GET /oauth2/auth v0alpha2 performOAuth2AuthorizationFlow
 //
-// # The OAuth 2.0 Authorize Endpoint
+// The OAuth 2.0 Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 // OAuth2 is a very popular protocol and a library for your programming language will exists.
@@ -1164,7 +1164,7 @@ type adminDeleteOAuth2Token struct {
 
 // swagger:route DELETE /admin/oauth2/tokens v0alpha2 adminDeleteOAuth2Token
 //
-// # Delete OAuth2 Access Tokens from a Client
+// Delete OAuth2 Access Tokens from a Client
 //
 // This endpoint deletes OAuth2 access tokens issued for a client from the database
 //

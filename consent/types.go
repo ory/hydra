@@ -712,4 +712,3 @@ func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
 		IDToken:     map[string]interface{}{},
 	}
 }
-

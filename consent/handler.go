@@ -105,7 +105,7 @@ type adminRevokeOAuth2ConsentSessions struct {
 
 // swagger:route DELETE /admin/oauth2/auth/sessions/consent v0alpha2 adminRevokeOAuth2ConsentSessions
 //
-// # Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+// Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
@@ -162,7 +162,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 
 // swagger:route GET /admin/oauth2/auth/sessions/consent v0alpha2 adminListOAuth2SubjectConsentSessions
 //
-// # List OAuth 2.0 Consent Sessions of a Subject
+// List OAuth 2.0 Consent Sessions of a Subject
 //
 // This endpoint lists all subject's granted consent sessions, including client and granted scope.
 // If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
@@ -230,7 +230,7 @@ type adminRevokeOAuth2LoginSessions struct {
 
 // swagger:route DELETE /admin/oauth2/auth/sessions/login v0alpha2 adminRevokeOAuth2LoginSessions
 //
-// # Invalidates All OAuth 2.0 Login Sessions of a Certain User
+// Invalidates All OAuth 2.0 Login Sessions of a Certain User
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
@@ -271,7 +271,7 @@ type adminGetOAuth2LoginRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/login v0alpha2 adminGetOAuth2LoginRequest
 //
-// # Get an OAuth 2.0 Login Request
+// Get an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -332,7 +332,7 @@ type adminAcceptOAuth2LoginRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/accept v0alpha2 adminAcceptOAuth2LoginRequest
 //
-// # Accept an OAuth 2.0 Login Request
+// Accept an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
@@ -432,7 +432,7 @@ type adminRejectOAuth2LoginRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/reject v0alpha2 adminRejectOAuth2LoginRequest
 //
-// # Reject an OAuth 2.0 Login Request
+// Reject an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -514,7 +514,7 @@ type adminGetOAuth2ConsentRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/consent v0alpha2 adminGetOAuth2ConsentRequest
 //
-// # Get OAuth 2.0 Consent Request Information
+// Get OAuth 2.0 Consent Request Information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -585,7 +585,7 @@ type adminAcceptOAuth2ConsentRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/accept v0alpha2 adminAcceptOAuth2ConsentRequest
 //
-// # Accept an OAuth 2.0 Consent Request
+// Accept an OAuth 2.0 Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -674,7 +674,7 @@ type adminRejectOAuth2ConsentRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/reject v0alpha2 adminRejectOAuth2ConsentRequest
 //
-// # Reject an OAuth 2.0 Consent Request
+// Reject an OAuth 2.0 Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -760,7 +760,7 @@ type adminAcceptOAuth2LogoutRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/logout/accept v0alpha2 adminAcceptOAuth2LogoutRequest
 //
-// # Accept an OAuth 2.0 Logout Request
+// Accept an OAuth 2.0 Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 //
@@ -803,7 +803,7 @@ type adminRejectOAuth2LogoutRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/logout/reject v0alpha2 adminRejectOAuth2LogoutRequest
 //
-// # Reject an OAuth 2.0 Logout Request
+// Reject an OAuth 2.0 Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 // No body is required.
@@ -841,7 +841,7 @@ type adminGetOAuth2LogoutRequest struct {
 
 // swagger:route GET /admin/oauth2/auth/requests/logout v0alpha2 adminGetOAuth2LogoutRequest
 //
-// # Get an OAuth 2.0 Logout Request
+// Get an OAuth 2.0 Logout Request
 //
 // Use this endpoint to fetch a logout request.
 //
@@ -893,7 +893,7 @@ type adminVerifyUserCodeRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify admin adminVerifyUserCodeRequest
 //
-// # Verifies a device grant request
+// Verifies a device grant request
 // Verifies a device grant request
 //
 //	Consumes:

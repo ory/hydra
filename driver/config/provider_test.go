@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -306,8 +307,8 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, 2*time.Hour, c.GetRefreshTokenLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetIDTokenLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetAuthorizeCodeLifespan(ctx))
-	assert.Equal(t, 2*time.Hour, c.DeviceAndUserCodeLifespan(ctx))
-	
+	assert.Equal(t, 2*time.Hour, c.GetDeviceAndUserCodeLifespan(ctx))
+
 	// oauth2
 	assert.Equal(t, true, c.GetSendDebugMessagesToClients(ctx))
 	assert.Equal(t, 20, c.GetBCryptCost(ctx))
@@ -378,7 +379,7 @@ func TestLoginConsentURL(t *testing.T) {
 
 	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL(ctx).String())
 	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL(ctx).String())
-	assert.Equal(t, "http://localhost:3000/#/oauth/device", p2.DeviceUrl().String(ctx))
+	assert.Equal(t, "http://localhost:3000/#/oauth/device", p2.DeviceUrl(ctx).String())
 }
 
 func TestInfinitRefreshTokenTTL(t *testing.T) {

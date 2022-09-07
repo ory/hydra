@@ -348,6 +348,10 @@ urls:
     # to the issuer value. If left unspecified, it falls back to the issuer value.
     public: https://localhost:4444/
 
+    # This is the device endpoint location of your Ory Hydra installation.
+    # If left unspecified, it falls back to /device value.
+    device: https://localhost:4444/device
+
   # Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
   login: https://my-login.app/login
   # Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
@@ -359,6 +363,8 @@ urls:
   error: https://my-error.app/error
   # When a user agent requests to logout, it will be redirected to this url afterwards per default.
   post_logout_redirect: https://my-example.app/logout-successful
+  # When a user agent requests to device auth flow, it will be redirected to this url after a sucessfull login per default.
+  post_device_done: https://my-example.app/device-successful
 
 strategies:
   scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -381,6 +387,8 @@ ttl:
   id_token: 1h
   # configures how long auth codes are valid. Defaults to 10m.
   auth_code: 10m
+  # configures how long device and user codes are valid. Defaults to 10m.
+  device_user_code: 10m
 
 oauth2:
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients.
@@ -402,6 +410,9 @@ oauth2:
   session:
     # store encrypted data in database, default true
     encrypt_at_rest: true
+  device_authorization:
+    # configure how often a non-interactive device should poll the device token endpoint, default 5s
+    token_polling_interval: 5s
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
 # for more information on this topic navigate to:

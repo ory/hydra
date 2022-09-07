@@ -887,6 +887,54 @@
         }
       }
     },
+    "/admin/oauth2/auth/requests/device/verify": {
+      "put": {
+        "description": "Verifies a device grant request\nVerifies a device grant request",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "adminVerifyUserCodeRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "device_challenge",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/verifyUserCodeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfulOAuth2RequestResponse",
+            "schema": {
+              "$ref": "#/definitions/successfulOAuth2RequestResponse"
+            }
+          },
+          "default": {
+            "description": "oAuth2ApiError",
+            "schema": {
+              "$ref": "#/definitions/oAuth2ApiError"
+            }
+          }
+        }
+      }
+    },
     "/admin/oauth2/auth/requests/login": {
       "get": {
         "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
@@ -2071,7 +2119,7 @@
       "properties": {
         "extra": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       }
     },
@@ -2110,7 +2158,7 @@
         },
         "ext": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "iat": {
           "type": "string",
@@ -2138,9 +2186,6 @@
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
     },
-    "JoseJSONWebKeySet": {
-      "type": "object"
-    },
     "NullDuration": {
       "description": "TODO delete this type and replace it with ory/x/sqlxx/NullDuration when applying the custom client token TTL patch to Hydra 2.x",
       "type": "string",
@@ -2149,6 +2194,13 @@
     "StringSliceJSONFormat": {
       "type": "array",
       "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "StringSlicePipeDelimiter": {
+      "type": "array",
+      "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
       "items": {
         "type": "string"
       }
@@ -2230,12 +2282,12 @@
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "id_token": {
           "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         }
       }
     },
@@ -2341,6 +2393,38 @@
         }
       }
     },
+    "deviceGrantRequest": {
+      "type": "object",
+      "title": "Contains information on an ongoing device grant request.",
+      "required": [
+        "challenge",
+        "requested_scope",
+        "requested_access_token_audience",
+        "client"
+      ],
+      "properties": {
+        "challenge": {
+          "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "request_url": {
+          "description": "RequestURL is the original Device Grant URL requested.",
+          "type": "string"
+        },
+        "requested_access_token_audience": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
+        "requested_scope": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        }
+      }
+    },
     "genericError": {
       "type": "object",
       "required": [
@@ -2361,7 +2445,7 @@
         "details": {
           "description": "Further error details",
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "id": {
           "description": "The error ID\n\nUseful when trying to identify various errors in application logic.",
@@ -2479,7 +2563,7 @@
         "ext": {
           "description": "Extra is arbitrary data set by the session.",
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "iat": {
           "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
@@ -2546,7 +2630,6 @@
         },
         "value": {
           "description": "The value to be used within the operations.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
-          "type": "object",
           "example": "foobar"
         }
       }
@@ -2798,7 +2881,7 @@
           "$ref": "#/definitions/NullDuration"
         },
         "jwks": {
-          "$ref": "#/definitions/JoseJSONWebKeySet"
+          "description": "Client's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as\nthe jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter\nis intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for\ninstance, by native applications that might not have a location to host the contents of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation\n(which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be used together."
         },
         "jwks_uri": {
           "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
@@ -2970,7 +3053,7 @@
         "id_token_hint_claims": {
           "description": "IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the\nEnd-User's current or past authenticated session with the Client.",
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "login_hint": {
           "description": "LoginHint hints about the login identifier the End-User might use to log in (if necessary).\nThis hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)\nand then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a\nphone number in the format specified for the phone_number Claim. The use of this parameter is optional.",
@@ -3012,7 +3095,7 @@
         },
         "extra": {
           "type": "object",
-          "additionalProperties": true
+          "additionalProperties": {}
         },
         "headers": {
           "$ref": "#/definitions/Headers"
@@ -3186,6 +3269,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "device_authorization_endpoint": {
+          "description": "URL of the authorization server's device authorization endpoint",
+          "type": "string"
         },
         "end_session_endpoint": {
           "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
@@ -3649,6 +3736,15 @@
           "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
           "type": "string",
           "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "verifyUserCodeRequest": {
+      "description": "Contains information on an device verification",
+      "type": "object",
+      "properties": {
+        "user_code": {
+          "type": "string"
         }
       }
     },

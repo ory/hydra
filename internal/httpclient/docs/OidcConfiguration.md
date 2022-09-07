@@ -10,6 +10,7 @@
 | **ClaimsParameterSupported**               | Pointer to **bool**     | Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
 | **ClaimsSupported**                        | Pointer to **[]string** | JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | [optional] |
 | **CodeChallengeMethodsSupported**          | Pointer to **[]string** | JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by this authorization server.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
+| **DeviceAuthorizationEndpoint**            | Pointer to **string**   | URL of the authorization server&#39;s device authorization endpoint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | [optional] |
 | **EndSessionEndpoint**                     | Pointer to **string**   | URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
 | **FrontchannelLogoutSessionSupported**     | Pointer to **bool**     | Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | [optional] |
 | **FrontchannelLogoutSupported**            | Pointer to **bool**     | Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
@@ -210,6 +211,34 @@ given value.
 `func (o *OidcConfiguration) HasCodeChallengeMethodsSupported() bool`
 
 HasCodeChallengeMethodsSupported returns a boolean if a field has been set.
+
+### GetDeviceAuthorizationEndpoint
+
+`func (o *OidcConfiguration) GetDeviceAuthorizationEndpoint() string`
+
+GetDeviceAuthorizationEndpoint returns the DeviceAuthorizationEndpoint field if
+non-nil, zero value otherwise.
+
+### GetDeviceAuthorizationEndpointOk
+
+`func (o *OidcConfiguration) GetDeviceAuthorizationEndpointOk() (*string, bool)`
+
+GetDeviceAuthorizationEndpointOk returns a tuple with the
+DeviceAuthorizationEndpoint field if it's non-nil, zero value otherwise and a
+boolean to check if the value has been set.
+
+### SetDeviceAuthorizationEndpoint
+
+`func (o *OidcConfiguration) SetDeviceAuthorizationEndpoint(v string)`
+
+SetDeviceAuthorizationEndpoint sets DeviceAuthorizationEndpoint field to given
+value.
+
+### HasDeviceAuthorizationEndpoint
+
+`func (o *OidcConfiguration) HasDeviceAuthorizationEndpoint() bool`
+
+HasDeviceAuthorizationEndpoint returns a boolean if a field has been set.
 
 ### GetEndSessionEndpoint
 

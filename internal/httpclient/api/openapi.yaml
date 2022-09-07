@@ -903,6 +903,41 @@ paths:
       summary: Reject an OAuth 2.0 Consent Request
       tags:
         - v0alpha2
+  /admin/oauth2/auth/requests/device/verify:
+    put:
+      description: |-
+        Verifies a device grant request
+        Verifies a device grant request
+      operationId: adminVerifyUserCodeRequest
+      parameters:
+        - explode: true
+          in: query
+          name: device_challenge
+          required: true
+          schema:
+            type: string
+          style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/verifyUserCodeRequest"
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/successfulOAuth2RequestResponse"
+          description: successfulOAuth2RequestResponse
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuth2ApiError"
+          description: oAuth2ApiError
+      tags:
+        - admin
   /admin/oauth2/auth/requests/login:
     get:
       description: "When an authorization code, hybrid, or implicit OAuth 2.0
@@ -2034,7 +2069,7 @@ components:
       description: Headers is the jwt headers
       properties:
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
       type: object
     IDTokenClaims:
@@ -2062,7 +2097,7 @@ components:
           format: date-time
           type: string
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         iat:
           format: date-time
@@ -2083,8 +2118,6 @@ components:
       title: "JSONRawMessage represents a json.RawMessage that works well with
         JSON,\
         \ SQL, and Swagger."
-    JoseJSONWebKeySet:
-      type: object
     NullBool:
       nullable: true
       type: boolean
@@ -2114,6 +2147,13 @@ components:
       title: "StringSliceJSONFormat represents []string{} which is encoded
         to/from\
         \ JSON for SQL storage."
+      type: array
+    StringSlicePipeDelimiter:
+      items:
+        type: string
+      title:
+        StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+        string.
       type: array
     Time:
       format: date-time
@@ -2444,6 +2484,43 @@ components:
         - jwk
         - scope
       type: object
+    deviceGrantRequest:
+      properties:
+        challenge:
+          description: |-
+            ID is the identifier ("device challenge") of the device grant request. It is used to
+            identify the session.
+          type: string
+        client:
+          $ref: "#/components/schemas/oAuth2Client"
+        handled_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
+        request_url:
+          description: RequestURL is the original Device Grant URL requested.
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title:
+            StringSlicePipeDelimiter de/encodes the string slice to/from a SQL
+            string.
+          type: array
+      required:
+        - challenge
+        - client
+        - requested_access_token_audience
+        - requested_scope
+      title: Contains information on an ongoing device grant request.
+      type: object
     genericError:
       properties:
         code:
@@ -2609,7 +2686,7 @@ components:
           format: int64
           type: integer
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           description: Extra is arbitrary data set by the session.
           type: object
         iat:
@@ -2974,7 +3051,7 @@ components:
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
         client_uri: client_uri
         jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-        jwks: "{}"
+        jwks: ""
         logo_uri: logo_uri
         created_at: 2000-01-23T04:56:07.000+00:00
         registration_client_uri: registration_client_uri
@@ -3183,7 +3260,27 @@ components:
           title: Time duration
           type: string
         jwks:
-          type: object
+          description: "Client's JSON Web Key Set [JWK] document, passed by
+            value.\
+            \ The semantics of the jwks parameter are the same as\nthe jwks_uri
+            parameter,\
+            \ other than that the JWK Set is passed by value, rather than by
+            reference.\
+            \ This parameter\nis intended only to be used by Clients that, for
+            some\
+            \ reason, are unable to use the jwks_uri parameter, for\ninstance,
+            by\
+            \ native applications that might not have a location to host the
+            contents\
+            \ of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use
+            jwks.\
+            \ One significant downside of jwks is that it does not enable key
+            rotation\n\
+            (which jwks_uri does, as described in Section 10 of OpenID Connect
+            Core\
+            \ 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be
+            used\
+            \ together."
         jwks_uri:
           description: "URL for the Client's JSON Web Key Set [JWK] document. If
             the\
@@ -3400,7 +3497,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3620,7 +3717,7 @@ components:
             display."
           type: string
         id_token_hint_claims:
-          additionalProperties: true
+          additionalProperties: {}
           description: |-
             IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
             End-User's current or past authenticated session with the Client.
@@ -3668,7 +3765,7 @@ components:
         expires_at:
           $ref: "#/components/schemas/oAuth2ConsentSession_expires_at"
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         headers:
           $ref: "#/components/schemas/Headers"
@@ -3704,7 +3801,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3852,7 +3949,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3995,6 +4092,7 @@ components:
           - userinfo_signed_response_alg
           - userinfo_signed_response_alg
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
+        device_authorization_endpoint: device_authorization_endpoint
         claims_supported:
           - claims_supported
           - claims_supported
@@ -4082,6 +4180,10 @@ components:
           items:
             type: string
           type: array
+        device_authorization_endpoint:
+          description:
+            URL of the authorization server's device authorization endpoint
+          type: string
         end_session_endpoint:
           description:
             URL at the OP to which an RP can perform a redirect to request that
@@ -4538,7 +4640,7 @@ components:
             token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
             client_uri: client_uri
             jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-            jwks: "{}"
+            jwks: ""
             logo_uri: logo_uri
             created_at: 2000-01-23T04:56:07.000+00:00
             registration_client_uri: registration_client_uri
@@ -4848,6 +4950,12 @@ components:
             The "set" is basically a name for a group(set) of keys. Will be the
             same as "issuer" in grant.
           example: https://jwt-idp.example.com
+          type: string
+      type: object
+    verifyUserCodeRequest:
+      description: Contains information on an device verification
+      properties:
+        user_code:
           type: string
       type: object
     version:

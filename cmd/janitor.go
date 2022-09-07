@@ -31,7 +31,7 @@ this command with caution.
 Janitor can be used in several ways.
 
 1. By passing the database connection string (DSN) as an argument
-   Pass the database url (dsn) as an argument to janitor. E.g. janitor <database-url>
+   Pass the database url (dsn) as an argument to janitor. E.g. janitor {database-url}
 2. By passing the DSN as an environment variable
 
 		export DSN=...
@@ -45,7 +45,7 @@ Janitor can be used in several ways.
 
 5. Running only a certain cleanup
 
-		jhydra anitor --tokens <database-url>
+		hydra janitor --tokens <database-url>
 
    or
 

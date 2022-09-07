@@ -74,6 +74,7 @@ webfinger:
     auth_url: https://example.com/auth
     token_url: https://example.com/token
     client_registration_url: https://example.com
+    device_authorization_url: https://example.com/device_authorization
     supported_claims:
       - username
     supported_scope:
@@ -95,11 +96,14 @@ urls:
   self:
     issuer: https://issuer
     public: https://public
+    device: https://public/device
     admin: https://admin
   login: https://login
   consent: https://consent
   logout: https://logout
+  device: https://device
   error: https://error
+  post_device_done: https://post_device
   post_logout_redirect: https://post_logout
 
 strategies:
@@ -112,9 +116,12 @@ ttl:
   refresh_token: 2h
   id_token: 2h
   auth_code: 2h
+  device_user_code: 2h
 
 oauth2:
   expose_internal_errors: true
+  device_authorization:
+    token_polling_interval: 2h
   hashers:
     bcrypt:
       cost: 20

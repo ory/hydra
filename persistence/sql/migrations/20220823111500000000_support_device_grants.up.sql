@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_code
     signature          VARCHAR(255) NOT NULL PRIMARY KEY,
     request_id         VARCHAR(128) NOT NULL UNIQUE,
     requested_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    client_id          VARCHAR(255) NOT NULL,
+    client_id          VARCHAR(255) NOT NULL REFERENCES hydra_client (pk) ON DELETE CASCADE,
     scope              TEXT         NOT NULL,
     granted_scope      TEXT         NOT NULL,
     form_data          TEXT         NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_code
     active             BOOL         NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     ,
     granted_audience   TEXT         NULL     ,
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (login_challenge) ON DELETE CASCADE,
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE,
     nid                VARCHAR(36)
 );
 CREATE INDEX hydra_oauth2_device_code_requested_at_idx ON hydra_oauth2_device_code (requested_at);
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_user_code
     signature          VARCHAR(255) NOT NULL PRIMARY KEY,
     request_id         VARCHAR(128) NOT NULL UNIQUE,
     requested_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    client_id          VARCHAR(255) NOT NULL,
+    client_id          VARCHAR(255) NOT NULL REFERENCES hydra_client (pk) ON DELETE CASCADE,
     scope              TEXT         NOT NULL,
     granted_scope      TEXT         NOT NULL,
     form_data          TEXT         NOT NULL,

@@ -2034,7 +2034,7 @@ components:
       description: Headers is the jwt headers
       properties:
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
       type: object
     IDTokenClaims:
@@ -2062,7 +2062,7 @@ components:
           format: date-time
           type: string
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         iat:
           format: date-time
@@ -2083,8 +2083,6 @@ components:
       title: "JSONRawMessage represents a json.RawMessage that works well with
         JSON,\
         \ SQL, and Swagger."
-    JoseJSONWebKeySet:
-      type: object
     NullBool:
       nullable: true
       type: boolean
@@ -2269,6 +2267,7 @@ components:
         session:
           $ref: "#/components/schemas/acceptOAuth2ConsentRequestSession"
       title: The request payload used to accept a consent request.
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
       type: object
     acceptOAuth2ConsentRequestSession:
       example:
@@ -2297,6 +2296,36 @@ components:
       type: object
     acceptOAuth2LoginRequest:
       properties:
+=======
+      type: object
+    acceptOAuth2ConsentRequestSession:
+      example:
+        access_token: ""
+        id_token: ""
+      properties:
+        access_token:
+          description: "AccessToken sets session data for the access and refresh
+            token,\
+            \ as well as any future tokens issued by the\nrefresh grant. Keep in
+            mind\
+            \ that this data will be available to anyone performing OAuth 2.0
+            Challenge\
+            \ Introspection.\nIf only your services can perform OAuth 2.0
+            Challenge\
+            \ Introspection, this is usually fine. But if third parties\ncan
+            access\
+            \ that endpoint as well, sensitive data from the session might be
+            exposed\
+            \ to them. Use with care!"
+        id_token:
+          description: |-
+            IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
+            by anyone that has access to the ID Challenge. Use with care!
+      title: Pass session data to a consent request.
+      type: object
+    acceptOAuth2LoginRequest:
+      properties:
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
         acr:
           description: "ACR sets the Authentication AuthorizationContext Class
             Reference\
@@ -2385,6 +2414,7 @@ components:
           description: "The algorithm to be used for creating the key. Supports
             \"\
             RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\""
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           type: string
         kid:
           description: The kid of the key to be created
@@ -2396,6 +2426,19 @@ components:
             a public key is used for encrypting data or verifying the signature
             on data. Valid values are "enc" and "sig".
           type: string
+=======
+          type: string
+        kid:
+          description: The kid of the key to be created
+          type: string
+        use:
+          description: |-
+            The "use" (public key use) parameter identifies the intended use of
+            the public key. The "use" parameter is employed to indicate whether
+            a public key is used for encrypting data or verifying the signature
+            on data. Valid values are "enc" and "sig".
+          type: string
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
       required:
         - alg
         - kid
@@ -2404,6 +2447,7 @@ components:
     adminTrustOAuth2JwtGrantIssuerBody:
       properties:
         allow_any_subject:
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           description:
             The "allow_any_subject" indicates that the issuer is allowed to have
             any principal as the subject of the JWT.
@@ -2467,6 +2511,71 @@ components:
 
             Useful when trying to identify various errors in application logic.
           type: string
+=======
+          description:
+            The "allow_any_subject" indicates that the issuer is allowed to have
+            any principal as the subject of the JWT.
+          type: boolean
+        expires_at:
+          description: "The \"expires_at\" indicates, when grant will expire, so
+            we\
+            \ will reject assertion from \"issuer\" targeting \"subject\"."
+          format: date-time
+          type: string
+        issuer:
+          description:
+            The "issuer" identifies the principal that issued the JWT assertion
+            (same as "iss" claim in JWT).
+          example: https://jwt-idp.example.com
+          type: string
+        jwk:
+          $ref: "#/components/schemas/jsonWebKey"
+        scope:
+          description: "The \"scope\" contains list of scope values (as
+            described\
+            \ in Section 3.3 of OAuth 2.0 [RFC6749])"
+          example:
+            - openid
+            - offline
+          items:
+            type: string
+          type: array
+        subject:
+          description:
+            The "subject" identifies the principal that is the subject of the
+            JWT.
+          example: mike@example.com
+          type: string
+      required:
+        - expires_at
+        - issuer
+        - jwk
+        - scope
+      type: object
+    genericError:
+      properties:
+        code:
+          description: The status code
+          example: 404
+          format: int64
+          type: integer
+        debug:
+          description: |-
+            Debug information
+
+            This field is often not exposed to protect against leaking
+            sensitive information.
+          example: SQL field "foo" is not a bool.
+          type: string
+        details:
+          description: Further error details
+        id:
+          description: |-
+            The error ID
+
+            Useful when trying to identify various errors in application logic.
+          type: string
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
         message:
           description: |-
             Error message
@@ -2609,7 +2718,7 @@ components:
           format: int64
           type: integer
         ext:
-          additionalProperties: true
+          additionalProperties: {}
           description: Extra is arbitrary data set by the session.
           type: object
         iat:
@@ -2681,6 +2790,7 @@ components:
             \"remove\"\
             , \"replace\", \"move\", \"copy\", or \"test\"."
           example: replace
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           type: string
         path:
           description: "The path to the target path. Uses JSON pointer
@@ -2689,6 +2799,16 @@ components:
             Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5)."
           example: /name
           type: string
+=======
+          type: string
+        path:
+          description: "The path to the target path. Uses JSON pointer
+            notation.\n\
+            \nLearn more [about JSON
+            Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5)."
+          example: /name
+          type: string
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
         value:
           description: "The value to be used within the operations.\n\nLearn
             more\
@@ -2974,7 +3094,7 @@ components:
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
         client_uri: client_uri
         jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-        jwks: "{}"
+        jwks: ""
         logo_uri: logo_uri
         created_at: 2000-01-23T04:56:07.000+00:00
         registration_client_uri: registration_client_uri
@@ -3183,7 +3303,27 @@ components:
           title: Time duration
           type: string
         jwks:
-          type: object
+          description: "Client's JSON Web Key Set [JWK] document, passed by
+            value.\
+            \ The semantics of the jwks parameter are the same as\nthe jwks_uri
+            parameter,\
+            \ other than that the JWK Set is passed by value, rather than by
+            reference.\
+            \ This parameter\nis intended only to be used by Clients that, for
+            some\
+            \ reason, are unable to use the jwks_uri parameter, for\ninstance,
+            by\
+            \ native applications that might not have a location to host the
+            contents\
+            \ of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use
+            jwks.\
+            \ One significant downside of jwks is that it does not enable key
+            rotation\n\
+            (which jwks_uri does, as described in Section 10 of OpenID Connect
+            Core\
+            \ 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be
+            used\
+            \ together."
         jwks_uri:
           description: "URL for the Client's JSON Web Key Set [JWK] document. If
             the\
@@ -3400,7 +3540,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3480,6 +3620,7 @@ components:
             \ JSON for SQL storage."
           type: array
         challenge:
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           description: |-
             ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
             identify the session.
@@ -3545,6 +3686,73 @@ components:
             the\
             \ OAuth 2.0 client."
           type: string
+=======
+          description: |-
+            ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
+            identify the session.
+          type: string
+        client:
+          $ref: "#/components/schemas/oAuth2Client"
+        context:
+          title: "JSONRawMessage represents a json.RawMessage that works well
+            with\
+            \ JSON, SQL, and Swagger."
+        login_challenge:
+          description: |-
+            LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
+            a login and consent request in the login & consent app.
+          type: string
+        login_session_id:
+          description: |-
+            LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
+            this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
+            this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
+            channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
+          type: string
+        oidc_context:
+          $ref: "#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext"
+        request_url:
+          description: "RequestURL is the original OAuth 2.0 Authorization URL
+            requested\
+            \ by the OAuth 2.0 client. It is the URL which\ninitiates the OAuth
+            2.0\
+            \ Authorization Code or OAuth 2.0 Implicit flow. This URL is
+            typically\
+            \ not needed, but\nmight come in handy if you want to deal with
+            additional\
+            \ request parameters."
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded
+            to/from\
+            \ JSON for SQL storage."
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded
+            to/from\
+            \ JSON for SQL storage."
+          type: array
+        skip:
+          description: "Skip, if true, implies that the client has requested the
+            same\
+            \ scopes from the same user previously.\nIf true, you must not ask
+            the\
+            \ user to grant the requested scopes. You must however either allow
+            or\
+            \ deny the\nconsent request using the usual API call."
+          type: boolean
+        subject:
+          description: "Subject is the user ID of the end-user that
+            authenticated.\
+            \ Now, that end user needs to grant or deny the scope\nrequested by
+            the\
+            \ OAuth 2.0 client."
+          type: string
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
       required:
         - challenge
       title: Contains information on an ongoing consent request.
@@ -3620,7 +3828,7 @@ components:
             display."
           type: string
         id_token_hint_claims:
-          additionalProperties: true
+          additionalProperties: {}
           description: |-
             IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
             End-User's current or past authenticated session with the Client.
@@ -3668,7 +3876,7 @@ components:
         expires_at:
           $ref: "#/components/schemas/oAuth2ConsentSession_expires_at"
         extra:
-          additionalProperties: true
+          additionalProperties: {}
           type: object
         headers:
           $ref: "#/components/schemas/Headers"
@@ -3704,7 +3912,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -3852,7 +4060,7 @@ components:
           token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
           client_uri: client_uri
           jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: "{}"
+          jwks: ""
           logo_uri: logo_uri
           created_at: 2000-01-23T04:56:07.000+00:00
           registration_client_uri: registration_client_uri
@@ -4194,6 +4402,7 @@ components:
           description:
             JSON array containing a list of the OAuth 2.0 response_mode values
             that this OP supports.
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           items:
             type: string
           type: array
@@ -4206,6 +4415,20 @@ components:
           items:
             type: string
           type: array
+=======
+          items:
+            type: string
+          type: array
+        response_types_supported:
+          description: "JSON array containing a list of the OAuth 2.0
+            response_type\
+            \ values that this OP supports. Dynamic OpenID\nProviders MUST
+            support\
+            \ the code, id_token, and the token id_token Response Type values."
+          items:
+            type: string
+          type: array
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
         revocation_endpoint:
           description:
             URL of the authorization server's OAuth 2.0 revocation endpoint.
@@ -4231,6 +4454,7 @@ components:
         token_endpoint:
           description: URL of the OP's OAuth 2.0 Token Endpoint
           example: https://playground.ory.sh/ory-hydra/public/oauth2/token
+<<<<<<< HEAD:internal/httpclient/api/openapi.yaml
           type: string
         token_endpoint_auth_methods_supported:
           description: "JSON array containing a list of Client Authentication
@@ -4246,6 +4470,23 @@ components:
         userinfo_endpoint:
           description: URL of the OP's UserInfo Endpoint.
           type: string
+=======
+          type: string
+        token_endpoint_auth_methods_supported:
+          description: "JSON array containing a list of Client Authentication
+            methods\
+            \ supported by this Token Endpoint. The options
+            are\nclient_secret_post,\
+            \ client_secret_basic, client_secret_jwt, and private_key_jwt, as
+            described\
+            \ in Section 9 of OpenID Connect Core 1.0"
+          items:
+            type: string
+          type: array
+        userinfo_endpoint:
+          description: URL of the OP's UserInfo Endpoint.
+          type: string
+>>>>>>> github/master:internal/httpclient-next/api/openapi.yaml
         userinfo_signed_response_alg:
           description: Algorithm used to sign OpenID Connect Userinfo Responses.
           items:
@@ -4538,7 +4779,7 @@ components:
             token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
             client_uri: client_uri
             jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-            jwks: "{}"
+            jwks: ""
             logo_uri: logo_uri
             created_at: 2000-01-23T04:56:07.000+00:00
             registration_client_uri: registration_client_uri

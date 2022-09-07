@@ -268,10 +268,10 @@ func (h *Handler) DeviceAuthPostHandler(w http.ResponseWriter, r *http.Request, 
 //
 // Back-channel logout is performed asynchronously and does not affect logout flow.
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  302: emptyResponse
+//     Responses:
+//       302: emptyResponse
 func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
@@ -510,14 +510,14 @@ type OIDCConfiguration struct {
 // Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 // For a full list of clients go here: https://openid.net/developers/certified/
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: oidcConfiguration
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: oidcConfiguration
+//       default: oAuth2ApiError
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -631,17 +631,17 @@ type oidcUserInfo struct {
 // with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 // for more details about header format.
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Security:
-//	  oauth2:
+//     Security:
+//       oauth2:
 //
-//	Responses:
-//	  200: oidcUserInfo
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: oidcUserInfo
+//       default: oAuth2ApiError
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -737,18 +737,18 @@ type revokeOAuth2Token struct {
 // Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 // the client the token was generated for.
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+//     Consumes:
+//     - application/x-www-form-urlencoded
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Security:
-//	  basic:
-//	  oauth2:
+//     Security:
+//       basic:
+//       oauth2:
 //
-//	Responses:
-//	  200: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -788,17 +788,17 @@ type adminIntrospectOAuth2Token struct {
 //
 // For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+//     Consumes:
+//     - application/x-www-form-urlencoded
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: introspectedOAuth2Token
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: introspectedOAuth2Token
+//       default: oAuth2ApiError
 func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -945,21 +945,21 @@ type oAuth2TokenResponse struct {
 // >
 // > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+//     Consumes:
+//     - application/x-www-form-urlencoded
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Security:
-//	  basic:
-//	  oauth2:
+//     Security:
+//       basic:
+//       oauth2:
 //
-//	Responses:
-//	  200: oAuth2TokenResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: oAuth2TokenResponse
+//       default: oAuth2ApiError
 func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -1040,14 +1040,14 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 //
 // To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+//     Consumes:
+//     - application/x-www-form-urlencoded
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  302: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       302: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -1168,14 +1168,14 @@ type adminDeleteOAuth2Token struct {
 //
 // This endpoint deletes OAuth2 access tokens issued for a client from the database
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  204: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       204: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminDeleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

@@ -3,6 +3,7 @@
   "authorization_endpoint": "http://hydra.localhost/oauth2/auth",
   "registration_endpoint": "http://client-register/registration",
   "token_endpoint": "http://hydra.localhost/oauth2/token",
+  "device_authorization_endpoint": "http://hydra.localhost/oauth2/device/auth",
   "jwks_uri": "http://hydra.localhost/.well-known/jwks.json",
   "subject_types_supported": [
     "pairwise",
@@ -23,7 +24,8 @@
     "authorization_code",
     "implicit",
     "client_credentials",
-    "refresh_token"
+    "refresh_token",
+    "urn:ietf:params:oauth:grant-type:device_code"
   ],
   "response_modes_supported": [
     "query",

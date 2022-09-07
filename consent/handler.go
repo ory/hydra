@@ -110,17 +110,17 @@ type adminRevokeOAuth2ConsentSessions struct {
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  204: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       204: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminRevokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -171,17 +171,17 @@ type adminListOAuth2SubjectConsentSessions struct {
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: previousOAuth2ConsentSessions
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: previousOAuth2ConsentSessions
+//       default: oAuth2ApiError
 func (h *Handler) adminListOAuth2SubjectConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -236,17 +236,17 @@ type adminRevokeOAuth2LoginSessions struct {
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 // Front- or Back-channel logout.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  204: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       204: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminRevokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -281,18 +281,19 @@ type adminGetOAuth2LoginRequest struct {
 // The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
-//	Consumes:
-//	- application/json
 //
-//	Produces:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Schemes: http, https
+//     Produces:
+//     - application/json
 //
-//	Responses:
-//	  200: oAuth2LoginRequest
-//	  410: handledOAuth2LoginRequest
-//	  default: oAuth2ApiError
+//     Schemes: http, https
+//
+//     Responses:
+//       200: oAuth2LoginRequest
+//       410: handledOAuth2LoginRequest
+//       default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -348,17 +349,17 @@ type adminAcceptOAuth2LoginRequest struct {
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -447,17 +448,17 @@ type adminRejectOAuth2LoginRequest struct {
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -527,18 +528,18 @@ type adminGetOAuth2ConsentRequest struct {
 // provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: oAuth2ConsentRequest
-//	  410: handledOAuth2ConsentRequest
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: oAuth2ConsentRequest
+//       410: handledOAuth2ConsentRequest
+//       default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -604,17 +605,17 @@ type adminAcceptOAuth2ConsentRequest struct {
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -692,17 +693,17 @@ type adminRejectOAuth2ConsentRequest struct {
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//	Consumes:
-//	- application/json
+//     Consumes:
+//     - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -766,14 +767,14 @@ type adminAcceptOAuth2LogoutRequest struct {
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminAcceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -810,14 +811,14 @@ type adminRejectOAuth2LogoutRequest struct {
 //
 // The response is empty as the logout provider has to chose what action to perform next.
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  204: emptyResponse
-//	  default: oAuth2ApiError
+//     Responses:
+//       204: emptyResponse
+//       default: oAuth2ApiError
 func (h *Handler) adminRejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -845,15 +846,15 @@ type adminGetOAuth2LogoutRequest struct {
 //
 // Use this endpoint to fetch a logout request.
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
-//	  200: oAuth2LogoutRequest
-//	  410: handledOAuth2LogoutRequest
-//	  default: oAuth2ApiError
+//     Responses:
+//       200: oAuth2LogoutRequest
+//       410: handledOAuth2LogoutRequest
+//       default: oAuth2ApiError
 func (h *Handler) adminGetOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -894,17 +895,18 @@ type adminVerifyUserCodeRequest struct {
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify admin adminVerifyUserCodeRequest
 //
 // Verifies a device grant request
+// 
 // Verifies a device grant request
 //
-//	Consumes:
-//	- application/json
+//	   Consumes:
+//	   - application/json
 //
-//	Produces:
-//	- application/json
+//     Produces:
+//     - application/json
 //
-//	Schemes: http, https
+//     Schemes: http, https
 //
-//	Responses:
+//     Responses:
 //	  200: successfulOAuth2RequestResponse
 //	  default: oAuth2ApiError
 func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

@@ -71,14 +71,8 @@ func NewConfig(deps configDependencies) *Config {
 }
 
 func (c *Config) LoadDefaultHanlders(strategy interface{}) {
-
-	//res := compose.OAuth2DevicePKCEFactory(c, c.deps.Persister(), strategy)
-	//ret := res.(fosite.DeviceAuthorizeEndpointHandler)
-	//ret.HandleDeviceAuthorizeEndpointRequest(context.TODO(), nil, nil)
-
 	for _, factory := range defaultFactories {
 		res := factory(c, c.deps.Persister(), strategy)
-
 		if ah, ok := res.(fosite.DeviceAuthorizeEndpointHandler); ok {
 			c.deviceAuthorizeEndpointHandlers.Append(ah)
 		}

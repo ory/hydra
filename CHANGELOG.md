@@ -1069,6 +1069,8 @@ Signed-off-by: Grant Zvolsky <grant@zvolsky.org>
   ([7893a98](https://github.com/ory/hydra/commit/7893a980387e3d29978e535e81331014ac41820a))
 - Pop compile issue
   ([3e7b6b4](https://github.com/ory/hydra/commit/3e7b6b412ea524529cad8d716a23c785f7c3e466))
+- Postgres migration script ([#3249](https://github.com/ory/hydra/issues/3249))
+  ([d6e7f94](https://github.com/ory/hydra/commit/d6e7f94f5eb678c43d43af8054b6707ea545c9b1))
 - Prefix paths correctly with /admin
   ([e130dfa](https://github.com/ory/hydra/commit/e130dfa93c596f86b057dfb35bcea6e58874f76c))
 - Quickstart with SQLite

@@ -926,6 +926,9 @@ Signed-off-by: Grant Zvolsky <grant@zvolsky.org>
 
 ### Bug Fixes
 
+- `allowed_top_level_claims` set to nil
+  ([#3245](https://github.com/ory/hydra/issues/3245))
+  ([cd2c252](https://github.com/ory/hydra/commit/cd2c252b4bb737bdcf7db95ccd181b35337d31c7))
 - `max_age=0` forces authentication
   ([2597f19](https://github.com/ory/hydra/commit/2597f190e83b2fdc98818892b89da3ecab644303)),
   closes [#3034](https://github.com/ory/hydra/issues/3034)

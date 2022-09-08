@@ -41,23 +41,23 @@ Janitor can be used in several ways.
    janitor -c /path/to/conf.yml
 4. Extra *optional* parameters can also be added such as
 
-		hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m <database-url>
+		hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m {database-url}
 
 5. Running only a certain cleanup
 
-		hydra janitor --tokens <database-url>
+		hydra janitor --tokens {database-url}
 
    or
 
-		hydra janitor --requests <database-url>
+		hydra janitor --requests {database-url}
 
     or
 
-		hydra janitor --grants <database-url>
+		hydra janitor --grants {database-url}
 
    or any combination of them
 
-		hydra janitor --tokens --requests --grants <database-url>
+		hydra janitor --tokens --requests --grants {database-url}
 `,
 		RunE: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.RunE,
 		Args: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.Args,

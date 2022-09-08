@@ -57,7 +57,7 @@ app.use(
 
 const nc = (req) =>
   Issuer.discover(config.public).then((issuer) => {
-    // This is neccessary when working with docker...
+    // This is necessary when working with docker...
     issuer.metadata.token_endpoint = new URL(
       "/oauth2/token",
       config.public,

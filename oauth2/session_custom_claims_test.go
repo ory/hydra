@@ -191,6 +191,36 @@ func TestCustomClaimsInSession(t *testing.T) {
 		require.Contains(t, extClaims, "sub")
 		assert.EqualValues(t, "another-alice", extClaims["sub"])
 	})
+	t.Run("unused_config_claims", func(t *testing.T) {
+		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo", "bar"})
+		extra := map[string]interface{}{"foo": "foo_value", "baz": "baz_value", "sub": "another-alice"}
+
+		session := createSessionWithCustomClaims(extra, c.AllowedTopLevelClaims(ctx))
+
+		claims := session.GetJWTClaims().ToMapClaims()
+
+		assert.EqualValues(t, "alice", claims["sub"])
+		assert.NotEqual(t, "another-alice", claims["sub"])
+
+		require.Contains(t, claims, "iss")
+		assert.EqualValues(t, "hydra.localhost", claims["iss"])
+
+		require.Contains(t, claims, "foo")
+		assert.EqualValues(t, "foo_value", claims["foo"])
+
+		assert.NotContains(t, claims, "bar")
+		assert.NotContains(t, claims, "baz")
+
+		require.Contains(t, claims, "ext")
+		extClaims, ok := claims["ext"].(map[string]interface{})
+		require.True(t, ok)
+
+		require.Contains(t, extClaims, "foo")
+		assert.EqualValues(t, "foo_value", extClaims["foo"])
+
+		require.Contains(t, extClaims, "sub")
+		assert.EqualValues(t, "another-alice", extClaims["sub"])
+	})
 	t.Run("config_claims_contain_reserved_claims", func(t *testing.T) {
 		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"iss", "sub"})
 		extra := map[string]interface{}{"iss": "hydra.remote", "sub": "another-alice"}

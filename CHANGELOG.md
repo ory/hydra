@@ -5,7 +5,7 @@
 
 **Table of Contents**
 
-- [0.0.0 (2022-09-07)](#000-2022-09-07)
+- [0.0.0 (2022-09-08)](#000-2022-09-08)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
@@ -648,7 +648,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-09-07)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-09-08)
 
 ## Breaking Changes
 
@@ -988,6 +988,8 @@ Signed-off-by: Grant Zvolsky <grant@zvolsky.org>
 
 - Docker image build
   ([1d8a8ff](https://github.com/ory/hydra/commit/1d8a8fff8c41eece869c0fcc2c40d219ee2d0ff9))
+- Docker image build ([#3247](https://github.com/ory/hydra/issues/3247))
+  ([05bda6b](https://github.com/ory/hydra/commit/05bda6bfcc8f3b19830ccdf4df15d921e48ff3b8))
 - Docker instructions
   ([063f61b](https://github.com/ory/hydra/commit/063f61beb2e931844a9eb6e7cd6e8776182e46df))
 - Dont close crdb for reuse purposes

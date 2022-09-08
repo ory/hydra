@@ -57,7 +57,7 @@ app.use(
 
 const nc = (req) =>
   Issuer.discover(config.public).then((issuer) => {
-    // This is neccessary when working with docker...
+    // This is necessary when working with docker...
     issuer.metadata.token_endpoint = new URL(
       "/oauth2/token",
       config.public,
@@ -75,7 +75,12 @@ const nc = (req) =>
       config.admin,
     ).toString()
 
-    return Promise.resolve(new issuer.Client(req.session.oidc_credentials))
+    return Promise.resolve(
+      new issuer.Client({
+        ...issuer.metadata,
+        ...req.session.oidc_credentials,
+      }),
+    )
   })
 
 app.get("/oauth2/code", async (req, res) => {
@@ -393,6 +398,7 @@ app.get("/openid/session/end/fc", async (req, res) => {
 app.post("/openid/session/end/bc", (req, res) => {
   const client = jwksClient({
     jwksUri: new URL("/.well-known/jwks.json", config.public).toString(),
+    cache: false,
   })
 
   jwt.verify(

@@ -59,8 +59,7 @@ All sub-commands share command line flags and configuration options.
 	}
 
 	configx.RegisterFlags(cmd.PersistentFlags())
-	cmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")
-	cmd.PersistentFlags().StringSlice("dangerous-allow-insecure-redirect-urls", []string{}, "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs")
+	cmd.PersistentFlags().Bool("dev", false, "Disables critical security checks to improve local development experience. Do not use in production.")
 	cmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
 
 	return cmd

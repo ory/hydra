@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -16,8 +17,7 @@ import (
 )
 
 func TestGetOrCreateTLSCertificate(t *testing.T) {
-	keys, err := (&jwk.RS256Generator{KeyLength: 1024}). // this is ok because we're just using it for tests
-								Generate(uuid.New().String(), "sig")
+	keys, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New().String(), "sig")
 	require.NoError(t, err)
 
 	private := keys.Keys[0]

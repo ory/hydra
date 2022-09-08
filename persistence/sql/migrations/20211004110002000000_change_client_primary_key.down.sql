@@ -1,0 +1,1 @@
+-- this migration is only for cockroach

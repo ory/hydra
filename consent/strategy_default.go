@@ -43,8 +43,6 @@ import (
 
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/x/httpx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -58,21 +56,17 @@ import (
 )
 
 const (
-	CookieAuthenticationName    = "oauth2_authentication_session"
 	CookieAuthenticationSIDName = "sid"
-
-	cookieAuthenticationCSRFName = "oauth2_authentication_csrf"
-	cookieConsentCSRFName        = "oauth2_consent_csrf"
 )
 
 type DefaultStrategy struct {
-	c *config.Provider
+	c *config.DefaultProvider
 	r InternalRegistry
 }
 
 func NewStrategy(
 	r InternalRegistry,
-	c *config.Provider,
+	c *config.DefaultProvider,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		c: c,
@@ -86,7 +80,7 @@ var ErrNoAuthenticationSessionFound = errors.New("no previous login session was 
 var ErrHintDoesNotMatchAuthentication = errors.New("subject from hint does not match subject from session")
 
 func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject string, sessionSubject string) error {
-	obfuscatedUserID, err := s.obfuscateSubjectIdentifier(c, sessionSubject, "")
+	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(ctx, c, sessionSubject, "")
 	if err != nil {
 		return err
 	}
@@ -107,9 +101,9 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	return nil
 }
 
-func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
+func (s *DefaultStrategy) authenticationSession(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
-	cookie, err := s.r.CookieStore().Get(r, CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, err := s.r.CookieStore(ctx).Get(r, s.c.SessionCookieName(ctx))
 	if err != nil {
 		s.r.Logger().
 			WithRequest(r).
@@ -137,20 +131,20 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 	return session, nil
 }
 
-func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
+func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "login") {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
+		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil)
 	}
 
-	session, err := s.authenticationSession(w, r)
+	session, err := s.authenticationSession(ctx, w, r)
 	if errors.Is(err, ErrNoAuthenticationSessionFound) {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
+		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
 		return err
 	}
 
-	maxAge := int64(0)
+	maxAge := int64(-1)
 	if ma := ar.GetRequestForm().Get("max_age"); len(ma) > 0 {
 		var err error
 		maxAge, err = strconv.ParseInt(ma, 10, 64)
@@ -159,16 +153,16 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > -1 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because prompt is set to 'none' and authentication time reached 'max_age'."))
 		}
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
+		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil)
 	}
 
 	idTokenHint := ar.GetRequestForm().Get("id_token_hint")
 	if idTokenHint == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
+		return s.forwardAuthenticationRequest(ctx, w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
 	}
 
 	hintSub, err := s.getSubjectFromIDTokenHint(r.Context(), idTokenHint)
@@ -180,7 +174,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because subject claim from id_token_hint does not match subject from authentication session."))
 	}
 
-	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
+	return s.forwardAuthenticationRequest(ctx, w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
 }
 
 func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwtgo.MapClaims, error) {
@@ -207,7 +201,7 @@ func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idToken
 	return sub, nil
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errorsx.WithStack(fosite.ErrServerError.WithHint("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date."))
 	}
@@ -229,7 +223,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	// Generate the request URL
-	iu := s.c.OAuth2AuthURL()
+	iu := s.c.OAuth2AuthURL(ctx)
 	iu.RawQuery = r.URL.RawQuery
 
 	var idTokenHintClaims jwtgo.MapClaims
@@ -268,7 +262,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
 			RequestedAt:       time.Now().Truncate(time.Second).UTC(),
 			SessionID:         sqlxx.NullString(sessionID),
-			OpenIDConnectContext: &OpenIDConnectContext{
+			OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
 				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
@@ -280,18 +274,18 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	if err := createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameLoginCSRF(ctx), csrf); err != nil {
 		return errorsx.WithStack(err)
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(), url.Values{"login_challenge": {challenge}}).String(), http.StatusFound)
+	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {challenge}}).String(), http.StatusFound)
 
 	// generate the verifier
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *http.Request) error {
-	sid, err := s.revokeAuthenticationCookie(w, r, s.r.CookieStore())
+func (s *DefaultStrategy) revokeAuthenticationSession(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	sid, err := s.revokeAuthenticationCookie(w, r, s.r.CookieStore(ctx))
 	if err != nil {
 		return err
 	}
@@ -304,13 +298,16 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 }
 
 func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, ss sessions.Store) (string, error) {
-	cookie, _ := ss.Get(r, CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
+	ctx := r.Context()
+	cookie, _ := ss.Get(r, s.c.SessionCookieName(ctx))
 	sid, _ := mapx.GetString(cookie.Values, CookieAuthenticationSIDName)
 
 	cookie.Values[CookieAuthenticationSIDName] = ""
 	cookie.Options.HttpOnly = true
-	cookie.Options.SameSite = s.c.CookieSameSiteMode()
-	cookie.Options.Secure = s.c.TLS(config.PublicInterface).Enabled()
+	cookie.Options.Path = "/"
+	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
+	cookie.Options.Secure = s.c.CookieSecure(ctx)
+	cookie.Options.Domain = s.c.CookieDomain(ctx)
 	cookie.Options.MaxAge = -1
 
 	if err := cookie.Save(r, w); err != nil {
@@ -318,24 +315,6 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 	}
 
 	return sid, nil
-}
-
-func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
-	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
-		algorithm, ok := s.r.SubjectIdentifierAlgorithm()[c.SubjectType]
-		if !ok {
-			return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.OutfacingID))
-		}
-
-		if len(forcedIdentifier) > 0 {
-			return forcedIdentifier, nil
-		}
-
-		return algorithm.Obfuscate(subject, c)
-	} else if !ok {
-		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
-	}
-	return subject, nil
 }
 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
@@ -352,11 +331,11 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errorsx.WithStack(session.Error.toRFCError())
 	}
 
-	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
+	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
+	if err := validateCsrfSession(r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameLoginCSRF(ctx), session.LoginRequest.CSRF); err != nil {
 		return nil, err
 	}
 
@@ -366,14 +345,14 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 
 	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
 		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated
-		if err := s.revokeAuthenticationSession(w, r); err != nil {
+		if err := s.revokeAuthenticationSession(ctx, w, r); err != nil {
 			return nil, err
 		}
 
 		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
+	subjectIdentifier, err := s.ObfuscateSubjectIdentifier(ctx, req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +387,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		},
 	}); errors.Is(err, fosite.ErrLoginRequired) {
 		// This indicates that something went wrong with checking the subject id - let's destroy the session to be safe
-		if err := s.revokeAuthenticationSession(w, r); err != nil {
+		if err := s.revokeAuthenticationSession(ctx, w, r); err != nil {
 			return nil, err
 		}
 
@@ -440,7 +419,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	if !session.Remember && !session.LoginRequest.Skip {
 		// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
 		// wants us to store a cookie. So let's bust the authentication session (if one exists).
-		if err := s.revokeAuthenticationSession(w, r); err != nil {
+		if err := s.revokeAuthenticationSession(ctx, w, r); err != nil {
 			return nil, err
 		}
 	}
@@ -453,32 +432,33 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	// Not a skipped login and the user asked to remember its session, store a cookie
-	cookie, _ := s.r.CookieStore().Get(r, CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, _ := s.r.CookieStore(ctx).Get(r, s.c.SessionCookieName(ctx))
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true
-	cookie.Options.SameSite = s.c.CookieSameSiteMode()
-	cookie.Options.Secure = s.c.TLS(config.PublicInterface).Enabled()
+	cookie.Options.Path = "/"
+	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
+	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	if err := cookie.Save(r, w); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
 	s.r.Logger().WithRequest(r).
 		WithFields(logrus.Fields{
-			"cookie_name":      CookieName(s.c.TLS(config.PublicInterface).Enabled(), CookieAuthenticationName),
+			"cookie_name":      s.c.SessionCookieName(ctx),
 			"cookie_http_only": true,
-			"cookie_same_site": s.c.CookieSameSiteMode(),
-			"cookie_secure":    s.c.TLS(config.PublicInterface).Enabled(),
+			"cookie_same_site": s.c.CookieSameSiteMode(ctx),
+			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
 	return session, nil
 }
 
-func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, authenticationSession *HandledLoginRequest) error {
+func (s *DefaultStrategy) requestConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, authenticationSession *HandledLoginRequest) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "consent") {
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 	}
 
 	// https://tools.ietf.org/html/rfc6749
@@ -502,7 +482,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 		// This is tracked as issue: https://github.com/ory/hydra/issues/866
 		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
 		if !(ar.GetRedirectURI().Scheme == "https" || (fosite.IsLocalhost(ar.GetRedirectURI()) && ar.GetRedirectURI().Scheme == "http")) {
-			return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+			return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 		}
 	}
 
@@ -515,19 +495,19 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 
 	consentSessions, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+		return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 	} else if err != nil {
 		return err
 	}
 
-	if found := matchScopes(s.r.ScopeStrategy(), consentSessions, ar.GetRequestedScopes()); found != nil {
-		return s.forwardConsentRequest(w, r, ar, authenticationSession, found)
+	if found := matchScopes(s.r.Config().GetScopeStrategy(ctx), consentSessions, ar.GetRequestedScopes()); found != nil {
+		return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, found)
 	}
 
-	return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
+	return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 }
 
-func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *HandledConsentRequest) error {
+func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, as *HandledLoginRequest, cs *AcceptOAuth2ConsentRequest) error {
 	skip := false
 	if cs != nil {
 		skip = true
@@ -545,7 +525,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		r.Context(),
-		&ConsentRequest{
+		&OAuth2ConsentRequest{
 			ID:                     challenge,
 			ACR:                    as.ACR,
 			AMR:                    as.AMR,
@@ -569,13 +549,13 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	if err := createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameConsentCSRF(ctx), csrf); err != nil {
 		return errorsx.WithStack(err)
 	}
 
 	http.Redirect(
 		w, r,
-		urlx.SetQuery(s.c.ConsentURL(), url.Values{"consent_challenge": {challenge}}).String(),
+		urlx.SetQuery(s.c.ConsentURL(ctx), url.Values{"consent_challenge": {challenge}}).String(),
 		http.StatusFound,
 	)
 
@@ -583,7 +563,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
+func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*AcceptOAuth2ConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
@@ -591,7 +571,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
+	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
 
@@ -604,12 +584,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
-		return nil, err
-	}
-
-	pw, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
-	if err != nil {
+	if err := validateCsrfSession(r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameConsentCSRF(ctx), session.ConsentRequest.CSRF); err != nil {
 		return nil, err
 	}
 
@@ -625,7 +600,6 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		session.Session.IDToken = map[string]interface{}{}
 	}
 
-	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil
 }
@@ -644,7 +618,7 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 		}
 
 		urls = append(urls, urlx.SetQuery(u, url.Values{
-			"iss": {s.c.IssuerURL().String()},
+			"iss": {s.c.IssuerURL(ctx).String()},
 			"sid": {sid},
 		}).String())
 	}
@@ -679,8 +653,8 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		// sub := s.obfuscateSubjectIdentifier(c, subject, )
 
 		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
-			"iss":    s.c.IssuerURL().String(),
-			"aud":    []string{c.OutfacingID},
+			"iss":    s.c.IssuerURL(ctx).String(),
+			"aud":    []string{c.LegacyClientID},
 			"iat":    time.Now().UTC().Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
@@ -692,17 +666,15 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			return err
 		}
 
-		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.OutfacingID, token: t})
+		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.GetID(), token: t})
 	}
-
-	hc := httpx.NewResilientClient()
 
 	var execute = func(t task) {
 		log := s.r.Logger().WithRequest(r).
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
-		res, err := hc.PostForm(t.url, url.Values{"logout_token": {t.token}})
+		res, err := s.r.HTTPClient(ctx).PostForm(t.url, url.Values{"logout_token": {t.token}})
 		if err != nil {
 			log.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
@@ -725,7 +697,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 	return nil
 }
 
-func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	// There are two types of log out flows:
 	//
 	// - RP initiated logout
@@ -733,7 +705,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 	// Per default, we're redirecting to the global redirect URL. This is assuming that we're not an RP-initiated
 	// logout flow.
-	redir := s.c.LogoutRedirectURL().String()
+	redir := s.c.LogoutRedirectURL(ctx).String()
 
 	if err := r.ParseForm(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.
@@ -758,7 +730,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing."))
 		}
 
-		session, err := s.authenticationSession(w, r)
+		session, err := s.authenticationSession(ctx, w, r)
 		if errors.Is(err, ErrNoAuthenticationSessionFound) {
 			// OP initiated log out but no session was found. Since we can not identify the user we can not call
 			// any RPs.
@@ -789,7 +761,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		s.r.AuditLogger().
 			WithRequest(r).
 			Info("User logout requires user confirmation, redirecting to Logout UI.")
-		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
+		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 		return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 	}
 
@@ -799,12 +771,12 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	}
 
 	mksi := mapx.KeyStringToInterface(claims)
-	if !claims.VerifyIssuer(s.c.IssuerURL().String(), true) {
+	if !claims.VerifyIssuer(s.c.IssuerURL(ctx).String(), true) {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.
 			WithHintf(
 				`Logout failed because issuer claim value '%s' from query parameter id_token_hint does not match with issuer value from configuration '%s'.`,
 				mapx.GetStringDefault(mksi, "iss", ""),
-				s.c.IssuerURL().String(),
+				s.c.IssuerURL(ctx).String(),
 			),
 		)
 	}
@@ -909,11 +881,11 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		return nil, err
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
+	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 	return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 
 	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(r.Context(), verifier)
@@ -925,7 +897,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		// If this is true it means that no id_token_hint was given, so the session id and subject id
 		// came from an original cookie.
 
-		session, err := s.authenticationSession(w, r)
+		session, err := s.authenticationSession(ctx, w, r)
 		if errors.Is(err, ErrNoAuthenticationSessionFound) {
 			// If we end up here it means that the cookie was revoked between the initial logout request
 			// and ending up here - possibly due to a duplicate submit. In that case, we really have nothing to
@@ -950,7 +922,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	_, _ = s.revokeAuthenticationCookie(w, r, s.r.CookieStore()) // Cookie removal is optional
+	_, _ = s.revokeAuthenticationCookie(w, r, s.r.CookieStore(ctx)) // Cookie removal is optional
 
 	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
 	if err != nil {
@@ -983,21 +955,21 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 	}, nil
 }
 
-func (s *DefaultStrategy) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 	if verifier == "" {
-		return s.issueLogoutVerifier(w, r)
+		return s.issueLogoutVerifier(ctx, w, r)
 	}
 
-	return s.completeLogout(w, r)
+	return s.completeLogout(ctx, w, r)
 }
 
-func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error) {
+func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*AcceptOAuth2ConsentRequest, error) {
 	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
 	if authenticationVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to auth endpoint
-		return nil, s.requestAuthentication(w, r, req)
+		return nil, s.requestAuthentication(ctx, w, r, req)
 	} else if authenticationVerifier != "" {
 		authSession, err := s.verifyAuthentication(w, r, req, authenticationVerifier)
 		if err != nil {
@@ -1005,13 +977,31 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 		}
 
 		// ok, we need to process this request and redirect to auth endpoint
-		return nil, s.requestConsent(w, r, req, authSession)
+		return nil, s.requestConsent(ctx, w, r, req, authSession)
 	}
 
-	consentSession, err := s.verifyConsent(w, r, req, consentVerifier)
+	consentSession, err := s.verifyConsent(ctx, w, r, req, consentVerifier)
 	if err != nil {
 		return nil, err
 	}
 
 	return consentSession, nil
+}
+
+func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
+		algorithm, ok := s.r.SubjectIdentifierAlgorithm(ctx)[c.SubjectType]
+		if !ok {
+			return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.GetID()))
+		}
+
+		if len(forcedIdentifier) > 0 {
+			return forcedIdentifier, nil
+		}
+
+		return algorithm.Obfuscate(subject, c)
+	} else if !ok {
+		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
+	}
+	return subject, nil
 }

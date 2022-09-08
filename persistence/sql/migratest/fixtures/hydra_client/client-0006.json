@@ -1,0 +1,101 @@
+{
+  "AllowedCORSOrigins": [],
+  "Audience": [],
+  "AuthorizationCodeGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "BackChannelLogoutSessionRequired": false,
+  "BackChannelLogoutURI": "",
+  "ClientCredentialsGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ClientURI": "http://client/0006",
+  "Contacts": [
+    "contact-0006_1"
+  ],
+  "CreatedAt": "0001-01-01T00:00:00Z",
+  "FrontChannelLogoutSessionRequired": false,
+  "FrontChannelLogoutURI": "",
+  "GrantTypes": [
+    "grant-0006_1"
+  ],
+  "ID": "00000000-0000-0000-0000-000000000000",
+  "ImplicitGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ImplicitGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "JSONWebKeys": {
+    "JSONWebKeySet": null
+  },
+  "JSONWebKeysURI": "http://jwks/0006",
+  "JwtBearerGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "LegacyClientID": "client-0006",
+  "LogoURI": "http://logo/0006",
+  "Metadata": {},
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Name": "Client 0006",
+  "Owner": "owner-0006",
+  "PKDeprecated": 6,
+  "PasswordGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PasswordGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PolicyURI": "http://policy/0006",
+  "PostLogoutRedirectURIs": [],
+  "RedirectURIs": [
+    "http://redirect/0006_1"
+  ],
+  "RefreshTokenGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RegistrationAccessToken": "",
+  "RegistrationAccessTokenSignature": "",
+  "RegistrationClientURI": "",
+  "RequestObjectSigningAlgorithm": "r_alg-0006",
+  "RequestURIs": [
+    "http://request/0006_1"
+  ],
+  "ResponseTypes": [
+    "response-0006_1"
+  ],
+  "Scope": "scope-0006",
+  "Secret": "secret-0006",
+  "SecretExpiresAt": 0,
+  "SectorIdentifierURI": "http://sector_id/0006",
+  "SubjectType": "subject-0006",
+  "TermsOfServiceURI": "http://tos/0006",
+  "TokenEndpointAuthMethod": "token_auth-0006",
+  "TokenEndpointAuthSigningAlgorithm": "",
+  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UserinfoSignedResponseAlg": "u_alg-0006"
+}

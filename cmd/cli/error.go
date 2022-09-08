@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 )
 
-func formatSwaggerError(err error) string {
+func FormatSwaggerError(err error) string {
 	if err == nil {
 		return ""
 	}

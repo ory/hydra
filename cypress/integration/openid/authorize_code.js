@@ -2,7 +2,6 @@ import { prng } from "../../helpers"
 
 describe("OpenID Connect Authorize Code Grant", () => {
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "openid",
     subject_type: "public",

@@ -1,6 +1,6 @@
 {
-  "client_id": "create-client-1",
   "client_name": "",
+  "client_secret": "01bbf13a-ae3e-44d5-b4b4-dd78137041be",
   "redirect_uris": null,
   "grant_types": null,
   "response_types": null,
@@ -17,7 +17,6 @@
   "subject_type": "",
   "jwks": {},
   "metadata": {},
-  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-1",
   "authorization_code_grant_access_token_lifespan": null,
   "authorization_code_grant_id_token_lifespan": null,
   "authorization_code_grant_refresh_token_lifespan": null,

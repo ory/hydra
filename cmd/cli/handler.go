@@ -25,6 +25,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/spf13/cobra"
 
 	"github.com/ory/x/cmdx"
@@ -32,22 +36,18 @@ import (
 )
 
 type Handler struct {
-	Clients       *ClientHandler
-	Keys          *JWKHandler
-	Introspection *IntrospectionHandler
-	Token         *TokenHandler
-	Migration     *MigrateHandler
-	Janitor       *JanitorHandler
+	Migration *MigrateHandler
+	Janitor   *JanitorHandler
 }
 
 func Remote(cmd *cobra.Command) string {
 	if endpoint := flagx.MustGetString(cmd, "endpoint"); endpoint != "" {
 		return strings.TrimRight(endpoint, "/")
-	} else if endpoint := os.Getenv("HYDRA_URL"); endpoint != "" {
+	} else if endpoint := os.Getenv("ORY_SDK_URL"); endpoint != "" {
 		return strings.TrimRight(endpoint, "/")
 	}
 
-	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where Ory Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL if an administrative command was used.")
+	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where Ory Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable ORY_SDK_URL if an administrative command was used.")
 	return ""
 }
 
@@ -57,13 +57,9 @@ func RemoteURI(cmd *cobra.Command) *url.URL {
 	return endpoint
 }
 
-func NewHandler() *Handler {
+func NewHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *Handler {
 	return &Handler{
-		Clients:       newClientHandler(),
-		Keys:          newJWKHandler(),
-		Introspection: newIntrospectionHandler(),
-		Token:         newTokenHandler(),
-		Migration:     newMigrateHandler(),
-		Janitor:       NewJanitorHandler(),
+		Migration: newMigrateHandler(),
+		Janitor:   NewJanitorHandler(slOpts, dOpts, cOpts),
 	}
 }

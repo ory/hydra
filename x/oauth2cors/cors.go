@@ -28,9 +28,8 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/x"
-
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"
@@ -38,13 +37,14 @@ import (
 	"github.com/ory/fosite"
 )
 
-func Middleware(reg interface {
-	Config() *config.Provider
-	x.RegistryLogger
-	oauth2.Registry
-	client.Registry
-}) func(h http.Handler) http.Handler {
-	opts, enabled := reg.Config().CORS(config.PublicInterface)
+func Middleware(
+	ctx context.Context,
+	reg interface {
+		x.RegistryLogger
+		oauth2.Registry
+		client.Registry
+	}) func(h http.Handler) http.Handler {
+	opts, enabled := reg.Config().CORS(ctx, config.PublicInterface)
 	if !enabled {
 		return func(h http.Handler) http.Handler {
 			return h
@@ -80,6 +80,7 @@ func Middleware(reg interface {
 		OptionsPassthrough: opts.OptionsPassthrough,
 		Debug:              opts.Debug,
 		AllowOriginRequestFunc: func(r *http.Request, origin string) bool {
+			ctx := r.Context()
 			if alwaysAllow {
 				return true
 			}
@@ -104,8 +105,8 @@ func Middleware(reg interface {
 					return false
 				}
 
-				session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims())
-				_, ar, err := reg.OAuth2Provider().IntrospectToken(context.Background(), token, fosite.AccessToken, session)
+				session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims(ctx))
+				_, ar, err := reg.OAuth2Provider().IntrospectToken(ctx, token, fosite.AccessToken, session)
 				if err != nil {
 					return false
 				}
@@ -113,7 +114,7 @@ func Middleware(reg interface {
 				username = ar.GetClient().GetID()
 			}
 
-			cl, err := reg.ClientManager().GetConcreteClient(r.Context(), username)
+			cl, err := reg.ClientManager().GetConcreteClient(ctx, username)
 			if err != nil {
 				return false
 			}

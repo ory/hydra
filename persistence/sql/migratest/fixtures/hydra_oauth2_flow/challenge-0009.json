@@ -1,0 +1,68 @@
+{
+  "ID": "challenge-0009",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "RequestedScope": [
+    "requested_scope-0009_1"
+  ],
+  "RequestedAudience": [
+    "requested_audience-0009_1"
+  ],
+  "LoginSkip": true,
+  "Subject": "subject-0009",
+  "OpenIDConnectContext": {
+    "display": "display-0009"
+  },
+  "Client": null,
+  "ClientID": "",
+  "RequestURL": "http://request/0009",
+  "SessionID": "auth_session-0009",
+  "LoginVerifier": "verifier-0009",
+  "LoginCSRF": "csrf-0009",
+  "LoginInitializedAt": null,
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "State": 128,
+  "LoginRemember": true,
+  "LoginRememberFor": 9,
+  "ACR": "acr-0009",
+  "AMR": [],
+  "ForceSubjectIdentifier": "force_subject_id-0009",
+  "Context": {
+    "context": "0009"
+  },
+  "LoginWasUsed": true,
+  "LoginError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": ""
+  },
+  "LoginAuthenticatedAt": null,
+  "ConsentChallengeID": "challenge-0009",
+  "ConsentSkip": true,
+  "ConsentVerifier": "verifier-0009",
+  "ConsentCSRF": "csrf-0009",
+  "GrantedScope": [
+    "granted_scope-0009_1"
+  ],
+  "GrantedAudience": [
+    "granted_audience-0009_1"
+  ],
+  "ConsentRemember": true,
+  "ConsentRememberFor": 9,
+  "ConsentHandledAt": null,
+  "ConsentWasHandled": true,
+  "ConsentError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": ""
+  },
+  "SessionIDToken": {
+    "session_id_token-0009": "0009"
+  },
+  "SessionAccessToken": {
+    "session_access_token-0009": "0009"
+  }
+}

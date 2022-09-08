@@ -26,110 +26,113 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
+	hydra "github.com/ory/hydra-client-go"
+
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
-
-	hydra "github.com/ory/hydra/internal/httpclient/client"
 )
 
 var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
-var client = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{hydraURL.Scheme}, Host: hydraURL.Host, BasePath: hydraURL.Path})
+var client = hydra.NewAPIClient(hydra.NewConfiguration())
+
+func init() {
+	client.GetConfig().Servers = hydra.ServerConfigurations{{URL: hydraURL.String()}}
+}
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")
-	res, err := client.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(challenge))
+	lr, resp, err := client.V0alpha2Api.AdminGetOAuth2LoginRequest(r.Context()).LoginChallenge(challenge).Execute()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch clogin request: %s", err)
 	}
-	lr := res.Payload
 
-	var v *models.CompletedRequest
-	if strings.Contains(*lr.RequestURL, "mockLogin=accept") {
+	var redirectTo string
+	if strings.Contains(lr.RequestUrl, "mockLogin=accept") {
 		remember := false
-		if strings.Contains(*lr.RequestURL, "rememberLogin=yes") {
+		if strings.Contains(lr.RequestUrl, "rememberLogin=yes") {
 			remember = true
 		}
 
-		var vr *admin.AcceptLoginRequestOK
-		vr, err = client.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-			WithLoginChallenge(challenge).
-			WithBody(&models.AcceptLoginRequest{
-				Subject:  pointerx.String("the-subject"),
-				Remember: remember,
-			}))
-		if vr != nil {
-			v = vr.Payload
+		vr, resp, err := client.V0alpha2Api.AdminAcceptOAuth2LoginRequest(r.Context()).
+			LoginChallenge(challenge).
+			AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
+				Subject:  "the-subject",
+				Remember: pointerx.Bool(remember),
+			}).Execute()
+		defer resp.Body.Close()
+		if err != nil {
+			log.Fatalf("Unable to execute request: %s", err)
 		}
+		redirectTo = vr.RedirectTo
 	} else {
-		var vr *admin.RejectLoginRequestOK
-		vr, err = client.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
-			WithLoginChallenge(challenge).
-			WithBody(&models.RejectRequest{
-				Error: "invalid_request",
-			}))
-		if vr != nil {
-			v = vr.Payload
+		vr, resp, err := client.V0alpha2Api.AdminRejectOAuth2LoginRequest(r.Context()).
+			LoginChallenge(challenge).
+			RejectOAuth2Request(hydra.RejectOAuth2Request{
+				Error: pointerx.String("invalid_request"),
+			}).Execute()
+		defer resp.Body.Close()
+		if err != nil {
+			log.Fatalf("Unable to execute request: %s", err)
 		}
+		redirectTo = vr.RedirectTo
 	}
 	if err != nil {
 		log.Fatalf("Unable to accept/reject login request: %s", err)
 	}
-	http.Redirect(rw, r, *v.RedirectTo, http.StatusFound)
+	http.Redirect(rw, r, redirectTo, http.StatusFound)
 }
 
 func consent(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("consent_challenge")
 
-	rrr, err := client.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(challenge))
+	o, resp, err := client.V0alpha2Api.AdminGetOAuth2ConsentRequest(r.Context()).ConsentChallenge(challenge).Execute()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch consent request: %s", err)
 	}
-	o := rrr.Payload
 
-	var v *models.CompletedRequest
-	if strings.Contains(o.RequestURL, "mockConsent=accept") {
+	var redirectTo string
+	if strings.Contains(*o.RequestUrl, "mockConsent=accept") {
 		remember := false
-		if strings.Contains(o.RequestURL, "rememberConsent=yes") {
+		if strings.Contains(*o.RequestUrl, "rememberConsent=yes") {
 			remember = true
 		}
 		value := "bar"
-		if o.Skip {
+		if *o.Skip {
 			value = "rab"
 		}
 
-		var vr *admin.AcceptConsentRequestOK
-		vr, err = client.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-			WithConsentChallenge(challenge).
-			WithBody(&models.AcceptConsentRequest{
+		v, resp, err := client.V0alpha2Api.AdminAcceptOAuth2ConsentRequest(r.Context()).
+			ConsentChallenge(challenge).
+			AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 				GrantScope: o.RequestedScope,
-				Remember:   remember,
-				Session: &models.ConsentRequestSession{
+				Remember:   pointerx.Bool(remember),
+				Session: &hydra.AcceptOAuth2ConsentRequestSession{
 					AccessToken: map[string]interface{}{"foo": value},
-					IDToken:     map[string]interface{}{"baz": value},
+					IdToken:     map[string]interface{}{"baz": value},
 				},
-			}))
-		if vr != nil {
-			v = vr.Payload
+			}).Execute()
+		defer resp.Body.Close()
+		if err != nil {
+			log.Fatalf("Unable to execute request: %s", err)
 		}
+		redirectTo = v.RedirectTo
 	} else {
-		var vr *admin.RejectConsentRequestOK
-		vr, err = client.Admin.RejectConsentRequest(
-			admin.NewRejectConsentRequestParams().WithConsentChallenge(challenge).
-				WithBody(
-					&models.RejectRequest{
-						Error: "invalid_request",
-					}),
-		)
-		if vr != nil {
-			v = vr.Payload
+		v, resp, err := client.V0alpha2Api.AdminRejectOAuth2ConsentRequest(r.Context()).
+			ConsentChallenge(challenge).
+			RejectOAuth2Request(hydra.RejectOAuth2Request{Error: pointerx.String("invalid_request")}).Execute()
+		defer resp.Body.Close()
+		if err != nil {
+			log.Fatalf("Unable to execute request: %s", err)
 		}
+		redirectTo = v.RedirectTo
 	}
 	if err != nil {
 		log.Fatalf("Unable to accept/reject consent request: %s", err)
 	}
-	http.Redirect(rw, r, *v.RedirectTo, http.StatusFound)
+
+	http.Redirect(rw, r, redirectTo, http.StatusFound)
 }
 
 func errh(rw http.ResponseWriter, r *http.Request) {

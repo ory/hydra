@@ -20,9 +20,10 @@
 
 package oauth2
 
-// Introspection contains an access token's session data as specified by IETF RFC 7662, see:
-// https://tools.ietf.org/html/rfc7662
-// swagger:model oAuth2TokenIntrospection
+// Introspection contains an access token's session data as specified by
+// [IETF RFC 7662](https://tools.ietf.org/html/rfc7662)
+//
+// swagger:model introspectedOAuth2Token
 type Introspection struct {
 	// Active is a boolean indicator of whether or not the presented token
 	// is currently active.  The specifics of a token's "active" state

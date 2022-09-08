@@ -1,0 +1,117 @@
+{
+  "AllowedCORSOrigins": [
+    "http://cors/21_1",
+    "http://cors/21_2"
+  ],
+  "Audience": [
+    "autdience-21_1",
+    "autdience-21_2"
+  ],
+  "AuthorizationCodeGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "BackChannelLogoutSessionRequired": true,
+  "BackChannelLogoutURI": "http://back_logout/21",
+  "ClientCredentialsGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ClientURI": "http://client/21",
+  "Contacts": [
+    "contact-21_1",
+    "contact-21_2"
+  ],
+  "CreatedAt": "0001-01-01T00:00:00Z",
+  "FrontChannelLogoutSessionRequired": true,
+  "FrontChannelLogoutURI": "http://front_logout/21",
+  "GrantTypes": [
+    "grant-21_1",
+    "grant-21_2"
+  ],
+  "ID": "00000000-0000-0000-0000-000000000000",
+  "ImplicitGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ImplicitGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "JSONWebKeys": {
+    "JSONWebKeySet": null
+  },
+  "JSONWebKeysURI": "http://jwks/21",
+  "JwtBearerGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "LegacyClientID": "client-21",
+  "LogoURI": "http://logo/21",
+  "Metadata": {
+    "migration": "21"
+  },
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Name": "Client 21",
+  "Owner": "owner-21",
+  "PKDeprecated": 0,
+  "PasswordGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PasswordGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PolicyURI": "http://policy/21",
+  "PostLogoutRedirectURIs": [
+    "http://post_redirect/21_1",
+    "http://post_redirect/21_2"
+  ],
+  "RedirectURIs": [
+    "http://redirect/21_1",
+    "http://redirect/21_2"
+  ],
+  "RefreshTokenGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RegistrationAccessToken": "",
+  "RegistrationAccessTokenSignature": "",
+  "RegistrationClientURI": "",
+  "RequestObjectSigningAlgorithm": "r_alg-21",
+  "RequestURIs": [
+    "http://request/21_1",
+    "http://request/21_2"
+  ],
+  "ResponseTypes": [
+    "response-21_1",
+    "response-21_2"
+  ],
+  "Scope": "scope-21",
+  "Secret": "secret-21",
+  "SecretExpiresAt": 0,
+  "SectorIdentifierURI": "http://sector_id/21",
+  "SubjectType": "subject-21",
+  "TermsOfServiceURI": "http://tos/21",
+  "TokenEndpointAuthMethod": "token_auth-21",
+  "TokenEndpointAuthSigningAlgorithm": "",
+  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UserinfoSignedResponseAlg": "u_alg-21"
+}

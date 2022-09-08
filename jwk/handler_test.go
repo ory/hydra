@@ -25,10 +25,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/x/contextx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -41,22 +43,21 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
-	var testGenerator = &jwk.RS256Generator{}
-	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
-	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+	h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL), router, func(h http.Handler) http.Handler {
 		return h
 	})
 	testServer := httptest.NewServer(router)
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
-		if conf.HsmEnabled() {
+		if conf.HSMEnabled() {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
-		IDKS, _ := testGenerator.Generate("test-id-1", "sig")
+		IDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		res, err := http.Get(testServer.URL + JWKPath)
 		require.NoError(t, err, "problem in http request")
@@ -68,7 +69,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		require.Len(t, known.Keys, 1)
 
-		knownKey := known.Key("public:test-id-1")[0]
+		knownKey := known.Key("test-id-1")[0].Public()
 		require.NotNil(t, knownKey, "Could not find key public")
 
 		expectedKey, err := jwk.FindPublicKey(IDKS)
@@ -80,15 +81,15 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
 		var IDKS *jose.JSONWebKeySet
 
-		if conf.HsmEnabled() {
-			IDKS, _ = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
+		if conf.HSMEnabled() {
+			var err error
+			IDKS, err = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
+			require.NoError(t, err, "problem in generating keys")
 		} else {
-			IDKS, _ = testGenerator.Generate("test-id-2", "sig")
-			if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
-				IDKS.Keys[1].KeyID = "test-id-2"
-			} else {
-				IDKS.Keys[0].KeyID = "test-id-2"
-			}
+			var err error
+			IDKS, err = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
+			require.NoError(t, err, "problem in generating keys")
+			IDKS.Keys[0].KeyID = "test-id-2"
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
 
@@ -99,7 +100,11 @@ func TestHandlerWellKnown(t *testing.T) {
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
-		require.Len(t, known.Keys, 1)
+		if conf.HSMEnabled() {
+			require.Len(t, known.Keys, 2)
+		} else {
+			require.Len(t, known.Keys, 1)
+		}
 
 		knownKey := known.Key("test-id-2")[0]
 		require.NotNil(t, knownKey, "Could not find key public")

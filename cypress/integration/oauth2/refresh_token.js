@@ -1,8 +1,7 @@
-import { prng } from "../../helpers"
+import { createClient, prng } from "../../helpers"
 
 describe("The OAuth 2.0 Refresh Token Grant", function () {
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "offline_access openid",
     redirect_uris: [`${Cypress.env("client_url")}/oauth2/callback`],
@@ -11,7 +10,9 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
 
   it("should return an Access and Refresh Token and refresh the Access Token", function () {
     const client = nc()
-    cy.authCodeFlow(client, { consent: { scope: ["offline_access"] } })
+    cy.authCodeFlow(client, {
+      consent: { scope: ["offline_access"], createClient: true },
+    })
 
     cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
       .its("body")
@@ -26,7 +27,7 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
   it("should return an Access, ID, and Refresh Token and refresh the Access Token and ID Token", function () {
     const client = nc()
     cy.authCodeFlow(client, {
-      consent: { scope: ["offline_access", "openid"] },
+      consent: { scope: ["offline_access", "openid"], createClient: true },
     })
 
     cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
@@ -46,43 +47,43 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
       failOnStatusCode: false,
     })
 
-    const client = {
-      client_id: prng(),
+    createClient({
       scope: "offline_access",
       redirect_uris: [referrer],
       grant_types: ["authorization_code", "refresh_token"],
       response_types: ["code"],
       token_endpoint_auth_method: "none",
-    }
+    }).then((client) => {
+      cy.authCodeFlowBrowser(client, {
+        consent: { scope: ["offline_access"] },
+        createClient: false,
+      }).then((originalResponse) => {
+        expect(originalResponse.status).to.eq(200)
+        expect(originalResponse.body.refresh_token).to.not.be.empty
 
-    cy.authCodeFlowBrowser(client, {
-      consent: { scope: ["offline_access"] },
-    }).then((originalResponse) => {
-      expect(originalResponse.status).to.eq(200)
-      expect(originalResponse.body.refresh_token).to.not.be.empty
+        const originalToken = originalResponse.body.refresh_token
 
-      const originalToken = originalResponse.body.refresh_token
+        cy.refreshTokenBrowser(client, originalToken).then(
+          (refreshedResponse) => {
+            expect(refreshedResponse.status).to.eq(200)
+            expect(refreshedResponse.body.refresh_token).to.not.be.empty
 
-      cy.refreshTokenBrowser(client, originalToken).then(
-        (refreshedResponse) => {
-          expect(refreshedResponse.status).to.eq(200)
-          expect(refreshedResponse.body.refresh_token).to.not.be.empty
+            const refreshedToken = refreshedResponse.body.refresh_token
 
-          const refreshedToken = refreshedResponse.body.refresh_token
-
-          return cy
-            .refreshTokenBrowser(client, originalToken)
-            .then((response) => {
-              expect(response.status).to.eq(401)
-              expect(response.body.error).to.eq("token_inactive")
-            })
-            .then(() => cy.refreshTokenBrowser(client, refreshedToken))
-            .then((response) => {
-              expect(response.status).to.eq(401)
-              expect(response.body.error).to.eq("token_inactive")
-            })
-        },
-      )
+            return cy
+              .refreshTokenBrowser(client, originalToken)
+              .then((response) => {
+                expect(response.status).to.eq(401)
+                expect(response.body.error).to.eq("token_inactive")
+              })
+              .then(() => cy.refreshTokenBrowser(client, refreshedToken))
+              .then((response) => {
+                expect(response.status).to.eq(401)
+                expect(response.body.error).to.eq("token_inactive")
+              })
+          },
+        )
+      })
     })
   })
 })

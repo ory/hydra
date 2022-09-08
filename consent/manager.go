@@ -24,29 +24,32 @@ import (
 	"context"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/ory/hydra/client"
 )
 
 type ForcedObfuscatedLoginSession struct {
-	ClientID          string `db:"client_id"`
-	Subject           string `db:"subject"`
-	SubjectObfuscated string `db:"subject_obfuscated"`
+	ClientID          string    `db:"client_id"`
+	Subject           string    `db:"subject"`
+	SubjectObfuscated string    `db:"subject_obfuscated"`
+	NID               uuid.UUID `db:"nid"`
 }
 
-func (_ *ForcedObfuscatedLoginSession) TableName() string {
+func (_ ForcedObfuscatedLoginSession) TableName() string {
 	return "hydra_oauth2_obfuscated_authentication_session"
 }
 
 type Manager interface {
-	CreateConsentRequest(ctx context.Context, req *ConsentRequest) error
-	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
-	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
+	CreateConsentRequest(ctx context.Context, req *OAuth2ConsentRequest) error
+	GetConsentRequest(ctx context.Context, challenge string) (*OAuth2ConsentRequest, error)
+	HandleConsentRequest(ctx context.Context, r *AcceptOAuth2ConsentRequest) (*OAuth2ConsentRequest, error)
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 
-	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error)
-	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]HandledConsentRequest, error)
-	FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]HandledConsentRequest, error)
+	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*AcceptOAuth2ConsentRequest, error)
+	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]AcceptOAuth2ConsentRequest, error)
+	FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]AcceptOAuth2ConsentRequest, error)
 	CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 	// Cookie management

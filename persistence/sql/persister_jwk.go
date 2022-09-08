@@ -19,14 +19,12 @@ import (
 var _ jwk.Manager = &Persister{}
 
 func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	generator, found := p.r.KeyGenerators()[alg]
-	if !found {
-		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
-	}
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKey")
+	defer span.End()
 
-	keys, err := generator.Generate(kid, use)
+	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
 	}
 
 	err = p.AddKeySet(ctx, set, keys)
@@ -38,17 +36,20 @@ func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg,
 }
 
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey")
+	defer span.End()
+
 	out, err := json.Marshal(key)
 	if err != nil {
 		return errorsx.WithStack(err)
 	}
 
-	encrypted, err := p.r.KeyCipher().Encrypt(out)
+	encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
 	if err != nil {
 		return errorsx.WithStack(err)
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
+	return sqlcon.HandleError(p.CreateWithNetwork(ctx, &jwk.SQLData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -57,6 +58,9 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 }
 
 func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey")
+	defer span.End()
+
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		for _, key := range keys.Keys {
 			out, err := json.Marshal(key)
@@ -64,12 +68,12 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 				return errorsx.WithStack(err)
 			}
 
-			encrypted, err := p.r.KeyCipher().Encrypt(out)
+			encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
 			if err != nil {
 				return err
 			}
 
-			if err := c.Create(&jwk.SQLData{
+			if err := p.CreateWithNetwork(ctx, &jwk.SQLData{
 				Set:     set,
 				KID:     key.KeyID,
 				Version: 0,
@@ -82,7 +86,11 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 	})
 }
 
+// UpdateKey updates or creates the key.
 func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKey")
+	defer span.End()
+
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
 			return err
@@ -94,7 +102,11 @@ func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWeb
 	})
 }
 
+// UpdateKeySet updates or creates the key set.
 func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKeySet")
+	defer span.End()
+
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKeySet(ctx, set); err != nil {
 			return err
@@ -107,15 +119,18 @@ func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.J
 }
 
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKey")
+	defer span.End()
+
 	var j jwk.SQLData
-	if err := p.Connection(ctx).
+	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ? AND kid = ?", set, kid).
 		Order("created_at DESC").
 		First(&j); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, err := p.r.KeyCipher().Decrypt(j.Key)
+	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -131,8 +146,11 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 }
 
 func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet")
+	defer span.End()
+
 	var js []jwk.SQLData
-	if err := p.Connection(ctx).
+	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ?", set).
 		Order("created_at DESC").
 		All(&js); err != nil {
@@ -145,7 +163,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 
 	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range js {
-		key, err := p.r.KeyCipher().Decrypt(d.Key)
+		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -165,9 +183,17 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=?", set, kid).Exec())
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKey")
+	defer span.End()
+
+	err := p.QueryWithNetwork(ctx).Where("sid=? AND kid=?", set, kid).Delete(&jwk.SQLData{})
+	return sqlcon.HandleError(err)
 }
 
 func (p *Persister) DeleteKeySet(ctx context.Context, set string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=?", set).Exec())
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKeySet")
+	defer span.End()
+
+	err := p.QueryWithNetwork(ctx).Where("sid=?", set).Delete(&jwk.SQLData{})
+	return sqlcon.HandleError(err)
 }

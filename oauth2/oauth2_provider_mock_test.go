@@ -133,6 +133,36 @@ func (mr *MockOAuth2ProviderMockRecorder) NewIntrospectionRequest(arg0, arg1, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewIntrospectionRequest", reflect.TypeOf((*MockOAuth2Provider)(nil).NewIntrospectionRequest), arg0, arg1, arg2)
 }
 
+// NewPushedAuthorizeRequest mocks base method.
+func (m *MockOAuth2Provider) NewPushedAuthorizeRequest(arg0 context.Context, arg1 *http.Request) (fosite.AuthorizeRequester, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewPushedAuthorizeRequest", arg0, arg1)
+	ret0, _ := ret[0].(fosite.AuthorizeRequester)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewPushedAuthorizeRequest indicates an expected call of NewPushedAuthorizeRequest.
+func (mr *MockOAuth2ProviderMockRecorder) NewPushedAuthorizeRequest(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewPushedAuthorizeRequest", reflect.TypeOf((*MockOAuth2Provider)(nil).NewPushedAuthorizeRequest), arg0, arg1)
+}
+
+// NewPushedAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) NewPushedAuthorizeResponse(arg0 context.Context, arg1 fosite.AuthorizeRequester, arg2 fosite.Session) (fosite.PushedAuthorizeResponder, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewPushedAuthorizeResponse", arg0, arg1, arg2)
+	ret0, _ := ret[0].(fosite.PushedAuthorizeResponder)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// NewPushedAuthorizeResponse indicates an expected call of NewPushedAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) NewPushedAuthorizeResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewPushedAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewPushedAuthorizeResponse), arg0, arg1, arg2)
+}
+
 // NewRevocationRequest mocks base method.
 func (m *MockOAuth2Provider) NewRevocationRequest(arg0 context.Context, arg1 *http.Request) error {
 	m.ctrl.T.Helper()
@@ -148,85 +178,109 @@ func (mr *MockOAuth2ProviderMockRecorder) NewRevocationRequest(arg0, arg1 interf
 }
 
 // WriteAccessError mocks base method.
-func (m *MockOAuth2Provider) WriteAccessError(arg0 http.ResponseWriter, arg1 fosite.AccessRequester, arg2 error) {
+func (m *MockOAuth2Provider) WriteAccessError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AccessRequester, arg3 error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteAccessError", arg0, arg1, arg2)
+	m.ctrl.Call(m, "WriteAccessError", arg0, arg1, arg2, arg3)
 }
 
 // WriteAccessError indicates an expected call of WriteAccessError.
-func (mr *MockOAuth2ProviderMockRecorder) WriteAccessError(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteAccessError(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAccessError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAccessError), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAccessError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAccessError), arg0, arg1, arg2, arg3)
 }
 
 // WriteAccessResponse mocks base method.
-func (m *MockOAuth2Provider) WriteAccessResponse(arg0 http.ResponseWriter, arg1 fosite.AccessRequester, arg2 fosite.AccessResponder) {
+func (m *MockOAuth2Provider) WriteAccessResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AccessRequester, arg3 fosite.AccessResponder) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteAccessResponse", arg0, arg1, arg2)
+	m.ctrl.Call(m, "WriteAccessResponse", arg0, arg1, arg2, arg3)
 }
 
 // WriteAccessResponse indicates an expected call of WriteAccessResponse.
-func (mr *MockOAuth2ProviderMockRecorder) WriteAccessResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteAccessResponse(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAccessResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAccessResponse), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAccessResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAccessResponse), arg0, arg1, arg2, arg3)
 }
 
 // WriteAuthorizeError mocks base method.
-func (m *MockOAuth2Provider) WriteAuthorizeError(arg0 http.ResponseWriter, arg1 fosite.AuthorizeRequester, arg2 error) {
+func (m *MockOAuth2Provider) WriteAuthorizeError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteAuthorizeError", arg0, arg1, arg2)
+	m.ctrl.Call(m, "WriteAuthorizeError", arg0, arg1, arg2, arg3)
 }
 
 // WriteAuthorizeError indicates an expected call of WriteAuthorizeError.
-func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeError(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeError(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAuthorizeError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAuthorizeError), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAuthorizeError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAuthorizeError), arg0, arg1, arg2, arg3)
 }
 
 // WriteAuthorizeResponse mocks base method.
-func (m *MockOAuth2Provider) WriteAuthorizeResponse(arg0 http.ResponseWriter, arg1 fosite.AuthorizeRequester, arg2 fosite.AuthorizeResponder) {
+func (m *MockOAuth2Provider) WriteAuthorizeResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 fosite.AuthorizeResponder) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteAuthorizeResponse", arg0, arg1, arg2)
+	m.ctrl.Call(m, "WriteAuthorizeResponse", arg0, arg1, arg2, arg3)
 }
 
 // WriteAuthorizeResponse indicates an expected call of WriteAuthorizeResponse.
-func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeResponse(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAuthorizeResponse), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteAuthorizeResponse), arg0, arg1, arg2, arg3)
 }
 
 // WriteIntrospectionError mocks base method.
-func (m *MockOAuth2Provider) WriteIntrospectionError(arg0 http.ResponseWriter, arg1 error) {
+func (m *MockOAuth2Provider) WriteIntrospectionError(arg0 context.Context, arg1 http.ResponseWriter, arg2 error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteIntrospectionError", arg0, arg1)
+	m.ctrl.Call(m, "WriteIntrospectionError", arg0, arg1, arg2)
 }
 
 // WriteIntrospectionError indicates an expected call of WriteIntrospectionError.
-func (mr *MockOAuth2ProviderMockRecorder) WriteIntrospectionError(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteIntrospectionError(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIntrospectionError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteIntrospectionError), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIntrospectionError", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteIntrospectionError), arg0, arg1, arg2)
 }
 
 // WriteIntrospectionResponse mocks base method.
-func (m *MockOAuth2Provider) WriteIntrospectionResponse(arg0 http.ResponseWriter, arg1 fosite.IntrospectionResponder) {
+func (m *MockOAuth2Provider) WriteIntrospectionResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.IntrospectionResponder) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteIntrospectionResponse", arg0, arg1)
+	m.ctrl.Call(m, "WriteIntrospectionResponse", arg0, arg1, arg2)
 }
 
 // WriteIntrospectionResponse indicates an expected call of WriteIntrospectionResponse.
-func (mr *MockOAuth2ProviderMockRecorder) WriteIntrospectionResponse(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteIntrospectionResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIntrospectionResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteIntrospectionResponse), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteIntrospectionResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteIntrospectionResponse), arg0, arg1, arg2)
+}
+
+// WritePushedAuthorizeError mocks base method.
+func (m *MockOAuth2Provider) WritePushedAuthorizeError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 error) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WritePushedAuthorizeError", arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeError indicates an expected call of WritePushedAuthorizeError.
+func (mr *MockOAuth2ProviderMockRecorder) WritePushedAuthorizeError(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WritePushedAuthorizeError", reflect.TypeOf((*MockOAuth2Provider)(nil).WritePushedAuthorizeError), arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeResponse mocks base method.
+func (m *MockOAuth2Provider) WritePushedAuthorizeResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AuthorizeRequester, arg3 fosite.PushedAuthorizeResponder) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "WritePushedAuthorizeResponse", arg0, arg1, arg2, arg3)
+}
+
+// WritePushedAuthorizeResponse indicates an expected call of WritePushedAuthorizeResponse.
+func (mr *MockOAuth2ProviderMockRecorder) WritePushedAuthorizeResponse(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WritePushedAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WritePushedAuthorizeResponse), arg0, arg1, arg2, arg3)
 }
 
 // WriteRevocationResponse mocks base method.
-func (m *MockOAuth2Provider) WriteRevocationResponse(arg0 http.ResponseWriter, arg1 error) {
+func (m *MockOAuth2Provider) WriteRevocationResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 error) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteRevocationResponse", arg0, arg1)
+	m.ctrl.Call(m, "WriteRevocationResponse", arg0, arg1, arg2)
 }
 
 // WriteRevocationResponse indicates an expected call of WriteRevocationResponse.
-func (mr *MockOAuth2ProviderMockRecorder) WriteRevocationResponse(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteRevocationResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteRevocationResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteRevocationResponse), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteRevocationResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteRevocationResponse), arg0, arg1, arg2)
 }

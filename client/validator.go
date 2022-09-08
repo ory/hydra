@@ -21,20 +21,19 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/ipx"
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/pborman/uuid"
-
 	"github.com/ory/x/stringslice"
-	"github.com/ory/x/stringsx"
 )
 
 var (
@@ -51,29 +50,22 @@ var (
 	}
 )
 
+type validatorRegistry interface {
+	x.HTTPClientProvider
+	config.Provider
+}
+
 type Validator struct {
-	c    *http.Client
-	conf *config.Provider
+	r validatorRegistry
 }
 
-func NewValidator(conf *config.Provider) *Validator {
+func NewValidator(registry validatorRegistry) *Validator {
 	return &Validator{
-		c:    http.DefaultClient,
-		conf: conf,
+		r: registry,
 	}
 }
 
-func NewValidatorWithClient(conf *config.Provider, client *http.Client) *Validator {
-	return &Validator{
-		c:    client,
-		conf: conf,
-	}
-}
-
-func (v *Validator) Validate(c *Client) error {
-	id := uuid.New()
-	c.OutfacingID = stringsx.Coalesce(c.OutfacingID, id)
-
+func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	if c.TokenEndpointAuthMethod == "" {
 		c.TokenEndpointAuthMethod = "client_secret_basic"
 	} else if c.TokenEndpointAuthMethod == "private_key_jwt" {
@@ -89,12 +81,27 @@ func (v *Validator) Validate(c *Client) error {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Fields jwks and jwks_uri can not both be set, you must choose one."))
 	}
 
+	if v.r.Config().ClientHTTPNoPrivateIPRanges() {
+		values := map[string]string{
+			"jwks_uri":               c.JSONWebKeysURI,
+			"backchannel_logout_uri": c.BackChannelLogoutURI,
+		}
+
+		for k, v := range c.RequestURIs {
+			values[fmt.Sprintf("request_uris.%d", k)] = v
+		}
+
+		if err := ipx.AreAllAssociatedIPsAllowed(values); err != nil {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Client IP address is not allowed: %s", err))
+		}
+	}
+
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Field client_secret must contain a secret that is at least 6 characters long."))
 	}
 
 	if len(c.Scope) == 0 {
-		c.Scope = strings.Join(v.conf.DefaultClientScope(), " ")
+		c.Scope = strings.Join(v.r.Config().DefaultClientScope(ctx), " ")
 	}
 
 	for k, origin := range c.AllowedCORSOrigins {
@@ -123,7 +130,7 @@ func (v *Validator) Validate(c *Client) error {
 	c.SecretExpiresAt = 0
 
 	if len(c.SectorIdentifierURI) > 0 {
-		if err := v.ValidateSectorIdentifierURL(c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
+		if err := v.ValidateSectorIdentifierURL(ctx, c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
 			return err
 		}
 	}
@@ -150,14 +157,14 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.conf.SubjectTypesSupported(), c.SubjectType) {
-			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported()))
+		if !stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), c.SubjectType) {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config().SubjectTypesSupported(ctx)))
 		}
 	} else {
-		if stringslice.Has(v.conf.SubjectTypesSupported(), "public") {
+		if stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.conf.SubjectTypesSupported()[0]
+			c.SubjectType = v.r.Config().SubjectTypesSupported(ctx)[0]
 		}
 	}
 
@@ -186,17 +193,17 @@ func (v *Validator) Validate(c *Client) error {
 	return nil
 }
 
-func (v *Validator) ValidateDynamicRegistration(c *Client) error {
+func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) error {
 	if c.Metadata != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.
 			WithHint(`metadata cannot be set for dynamic client registration'`),
 		)
 	}
 
-	return v.Validate(c)
+	return v.Validate(ctx, c)
 }
 
-func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
+func (v *Validator) ValidateSectorIdentifierURL(ctx context.Context, location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Value of sector_identifier_uri could not be parsed because %s.", err))
@@ -206,7 +213,7 @@ func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
 	}
 
-	response, err := v.c.Get(location)
+	response, err := v.r.HTTPClient(ctx).Get(location)
 	if err != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}

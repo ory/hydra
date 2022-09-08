@@ -17,11 +17,15 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/hydra/cmd/server"
 )
 
 // servePublicCmd represents the public command
-func NewServePublicCmd() *cobra.Command {
+func NewServePublicCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	return &cobra.Command{
 		Use:   "public",
 		Short: "Serves Public HTTP/2 APIs",
@@ -38,6 +42,6 @@ This command does not work with the "memory" database. Both services (privileged
 connection to be able to synchronize.
 
 ` + serveControls,
-		Run: server.RunServePublic,
+		RunE: server.RunServePublic(slOpts, dOpts, cOpts),
 	}
 }

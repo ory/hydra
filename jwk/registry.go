@@ -1,6 +1,7 @@
 package jwk
 
 import (
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
 )
 
@@ -11,8 +12,8 @@ type InternalRegistry interface {
 }
 
 type Registry interface {
+	config.Provider
 	KeyManager() Manager
 	SoftwareKeyManager() Manager
-	KeyGenerators() map[string]KeyGenerator
 	KeyCipher() *AEAD
 }

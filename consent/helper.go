@@ -22,6 +22,9 @@ package consent
 
 import (
 	"net/http"
+	"strings"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/x/errorsx"
 
@@ -45,7 +48,7 @@ func sanitizeClient(c *client.Client) *client.Client {
 	return cc
 }
 
-func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledConsentRequest, requestedScope []string) *HandledConsentRequest {
+func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []AcceptOAuth2ConsentRequest, requestedScope []string) *AcceptOAuth2ConsentRequest {
 	for _, cs := range previousConsent {
 		var found = true
 		for _, scope := range requestedScope {
@@ -63,25 +66,34 @@ func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledCo
 	return nil
 }
 
-func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.Store, name, csrf string, secure bool, sameSiteMode http.SameSite, sameSiteLegacyWorkaround bool) error {
+func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name string, csrfValue string) error {
 	// Errors can be ignored here, because we always get a session session back. Error typically means that the
 	// session doesn't exist yet.
-	session, _ := store.Get(r, CookieName(secure, name))
-	session.Values["csrf"] = csrf
+	session, _ := store.Get(r, name)
+
+	sameSite := conf.CookieSameSiteMode(r.Context())
+	if isLegacyCsrfSessionName(name) {
+		sameSite = 0
+	}
+
+	session.Values["csrf"] = csrfValue
 	session.Options.HttpOnly = true
-	session.Options.Secure = secure
-	session.Options.SameSite = sameSiteMode
+	session.Options.Secure = conf.CookieSecure(r.Context())
+	session.Options.SameSite = sameSite
+	session.Options.Domain = conf.CookieDomain(r.Context())
 	if err := session.Save(r, w); err != nil {
 		return errorsx.WithStack(err)
 	}
-	if sameSiteMode == http.SameSiteNoneMode && sameSiteLegacyWorkaround {
-		return createCsrfSession(w, r, store, legacyCsrfSessionName(name), csrf, secure, 0, false)
+
+	if sameSite == http.SameSiteNoneMode && conf.CookieSameSiteLegacyWorkaround(r.Context()) {
+		return createCsrfSession(w, r, conf, store, legacyCsrfSessionName(name), csrfValue)
 	}
+
 	return nil
 }
 
-func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCSRF string, sameSiteLegacyWorkaround, secure bool) error {
-	if cookie, err := getCsrfSession(r, store, name, sameSiteLegacyWorkaround, secure); err != nil {
+func validateCsrfSession(r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string) error {
+	if cookie, err := getCsrfSession(r, store, conf, name); err != nil {
 		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("CSRF session cookie could not be decoded."))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
 		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("No CSRF value available in the session cookie."))
@@ -92,9 +104,9 @@ func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCS
 	return nil
 }
 
-func getCsrfSession(r *http.Request, store sessions.Store, name string, sameSiteLegacyWorkaround, secure bool) (*sessions.Session, error) {
-	cookie, err := store.Get(r, CookieName(secure, name))
-	if sameSiteLegacyWorkaround && (err != nil || len(cookie.Values) == 0) {
+func getCsrfSession(r *http.Request, store sessions.Store, conf x.CookieConfigProvider, name string) (*sessions.Session, error) {
+	cookie, err := store.Get(r, name)
+	if !isLegacyCsrfSessionName(name) && conf.CookieSameSiteMode(r.Context()) == http.SameSiteNoneMode && conf.CookieSameSiteLegacyWorkaround(r.Context()) && (err != nil || len(cookie.Values) == 0) {
 		return store.Get(r, legacyCsrfSessionName(name))
 	}
 	return cookie, err
@@ -104,9 +116,6 @@ func legacyCsrfSessionName(name string) string {
 	return name + "_legacy"
 }
 
-func CookieName(secure bool, name string) string {
-	if !secure {
-		return name + "_insecure"
-	}
-	return name
+func isLegacyCsrfSessionName(name string) bool {
+	return strings.HasSuffix(name, "_legacy")
 }

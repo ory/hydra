@@ -39,7 +39,7 @@ func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
 }
 
 func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp time.Duration) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
+	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), jwt.IDTokenClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(exp),
 		IssuedAt:  time.Now(),
@@ -49,19 +49,21 @@ func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp
 }
 
 func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClaims) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), claims, jwt.NewHeaders())
+	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
 }
 
-func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
-	reg.Config().MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	reg.Config().MustSet(config.KeyAccessTokenLifespan, time.Second*2)
-	reg.Config().MustSet(config.KeyRefreshTokenLifespan, time.Second*3)
-	reg.Config().MustSet(config.KeyScopeStrategy, "exact")
+	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().MustSet(ctx, config.PublicInterface.Key(config.KeySuffixTLSEnabled), false)
+	reg.Config().MustSet(ctx, config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
+	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
-	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
+	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
 	publicTS = httptest.NewServer(public)
 	t.Cleanup(publicTS.Close)
@@ -69,13 +71,13 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	adminTS = httptest.NewServer(admin)
 	t.Cleanup(adminTS.Close)
 
-	reg.Config().MustSet(config.KeyIssuerURL, publicTS.URL)
+	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterRoutes(admin, public)
+	reg.RegisterRoutes(ctx, admin, public)
 	return publicTS, adminTS
 }
 
@@ -93,7 +95,7 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
 	require.NotEmpty(t, token)
 
-	req := httpx.MustNewRequest("POST", adminTS.URL+"/oauth2/introspect",
+	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",
 		strings.NewReader((url.Values{"token": {token}}).Encode()),
 		"application/x-www-form-urlencoded")
 
@@ -109,7 +111,7 @@ func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID stri
 	require.NoError(t, err)
 	req := httpx.MustNewRequest(
 		"PUT",
-		adminTS.URL+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
+		adminTS.URL+"/admin"+client.ClientsHandlerPath+"/"+clientID+"/lifespans",
 		bytes.NewBuffer(b),
 		"application/json",
 	)
@@ -143,7 +145,7 @@ func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
 	}
 }
 
-func NewLoginConsentUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
+func NewLoginConsentUI(t *testing.T, c *config.DefaultProvider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}
@@ -158,8 +160,8 @@ func NewLoginConsentUI(t *testing.T, c *config.Provider, login, consent http.Han
 	t.Cleanup(lt.Close)
 	t.Cleanup(ct.Close)
 
-	c.MustSet(config.KeyLoginURL, lt.URL)
-	c.MustSet(config.KeyConsentURL, ct.URL)
+	c.MustSet(context.Background(), config.KeyLoginURL, lt.URL)
+	c.MustSet(context.Background(), config.KeyConsentURL, ct.URL)
 }
 
 func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {

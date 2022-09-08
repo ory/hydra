@@ -2,6 +2,7 @@ serve:
   cookies:
     same_site_mode: Lax
   tls:
+    enabled: true
     cert:
       path: /etc/ssl/certs/ory-conformity.crt
     key:
@@ -30,6 +31,7 @@ oidc:
     pairwise:
       salt: youReallyNeedToChangeThis
   dynamic_client_registration:
+    enabled: true
     default_scope:
       - email
       - offline_access
@@ -79,4 +81,4 @@ webfinger:
     userinfo_url: https://hydra:4444/userinfo
     token_url: https://hydra:4444/oauth2/token
     jwks_url: https://hydra:4444/.well-known/jwks.json
-    client_registration_url: https://hydra:4445/clients
+    client_registration_url: https://hydra:4445/admin/clients

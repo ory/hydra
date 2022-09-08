@@ -24,7 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -32,24 +32,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/internal/testhelpers"
+	hydra "github.com/ory/hydra-client-go"
 
-	"github.com/go-openapi/strfmt"
+	"github.com/ory/x/httprouterx"
 
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/x/snapshotx"
+
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/x/urlx"
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/internal"
 
 	jwt2 "github.com/ory/fosite/token/jwt"
 
@@ -57,16 +57,16 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/oauth2"
 )
 
 var lifespan = time.Hour
 
 func TestHandlerDeleteHandler(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -76,7 +76,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	deleteRequest := &fosite.Request{
 		ID:             "del-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -85,77 +85,31 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(context.Background(), deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(context.Background(), deleteRequest.ID, deleteRequest))
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-	_, err := c.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID("foobar"))
+	c := hydra.NewAPIClient(hydra.NewConfiguration())
+	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
+
+	_, err := c.V0alpha2Api.AdminDeleteOAuth2Token(context.Background()).ClientId("foobar").Execute()
 	require.NoError(t, err)
 
 	ds := new(oauth2.Session)
-	ctx := context.Background()
 	_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
 	require.Error(t, err, "not_found")
 }
 
-func TestHandlerFlushHandler(t *testing.T) {
-
-	t.Run("case=not-after", func(t *testing.T) {
-		ctx := context.Background()
-
-		// Setup database and tests
-		jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-		reg, err := jt.GetRegistry(ctx, t.Name())
-		require.NoError(t, err)
-
-		// Setup rest server
-		h := oauth2.NewHandler(reg, jt.GetConfig())
-
-		r := x.NewRouterAdmin()
-		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-			return h
-		})
-
-		ts := httptest.NewServer(r)
-		defer ts.Close()
-		c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-		// Get the notAfter test cycles
-		notAfterTests := testhelpers.NewConsentJanitorTestHelper(t.Name()).GetNotAfterTestCycles()
-
-		for k, v := range notAfterTests {
-			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-				ctx := context.Background()
-				jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-
-				notAfter := time.Now().Round(time.Second).Add(-v)
-
-				t.Run("step=setup-access-token", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
-				t.Run("step=setup-refresh-token", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
-
-				t.Run("step=cleanup", func(t *testing.T) {
-					_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(notAfter)}))
-					require.NoError(t, err)
-				})
-
-				t.Run("step=validate-access-token", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
-				t.Run("step=validate-refresh-token", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
-			})
-		}
-
-	})
-}
-
 func TestUserinfo(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "")
-	conf.MustSet(config.KeyAuthCodeLifespan, lifespan)
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	conf.MustSet(ctx, config.KeyScopeStrategy, "")
+	conf.MustSet(ctx, config.KeyAuthCodeLifespan, lifespan)
+	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
@@ -165,8 +119,8 @@ func TestUserinfo(t *testing.T) {
 
 	h := reg.OAuth2Handler()
 
-	router := x.NewRouterAdmin()
-	h.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(router)
@@ -225,7 +179,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID: "foobar",
+									LegacyClientID: "foobar",
 								},
 								Session: session,
 							},
@@ -259,7 +213,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID: "foobar",
+									LegacyClientID: "foobar",
 								},
 								Session: session,
 							},
@@ -294,7 +248,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID:               "foobar",
+									LegacyClientID:            "foobar",
 									UserinfoSignedResponseAlg: "none",
 								},
 								Session: session,
@@ -356,7 +310,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID:               "foobar-client",
+									LegacyClientID:            "foobar-client",
 									UserinfoSignedResponseAlg: "RS256",
 								},
 								Session: session,
@@ -371,7 +325,7 @@ func TestUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
 					key, err := jwk.FindPublicKey(keys)
-					return jwk.MustRSAPublic(key), nil
+					return key.Key, nil
 				})
 				require.NoError(t, err)
 				assert.EqualValues(t, "alice", claims.Claims["sub"])
@@ -390,7 +344,7 @@ func TestUserinfo(t *testing.T) {
 			require.NoError(t, err)
 			defer resp.Body.Close()
 			require.EqualValues(t, tc.expectStatusCode, resp.StatusCode)
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 			if tc.expectStatusCode == http.StatusOK {
 				tc.checkForSuccess(t, body)
@@ -402,58 +356,33 @@ func TestUserinfo(t *testing.T) {
 }
 
 func TestHandlerWellKnown(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	conf.MustSet(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
-	conf.MustSet(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
-	conf.MustSet(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(t, conf)
+	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {
+		conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+		conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+		conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+		conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
+		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	h := oauth2.NewHandler(reg, conf)
+		h := oauth2.NewHandler(reg, conf)
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-		return h
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
+			return h
+		})
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
+		require.NoError(t, err)
+		defer res.Body.Close()
+
+		var wellKnownResp oauth2.OIDCConfiguration
+		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
+		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
+		snapshotx.SnapshotT(t, wellKnownResp)
 	})
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
-	require.NoError(t, err)
-	defer res.Body.Close()
-
-	trueConfig := oauth2.WellKnown{
-		Issuer:                                 strings.TrimRight(conf.IssuerURL().String(), "/") + "/",
-		AuthURL:                                conf.OAuth2AuthURL().String(),
-		TokenURL:                               conf.OAuth2TokenURL().String(),
-		JWKsURI:                                conf.JWKSURL().String(),
-		RevocationEndpoint:                     urlx.AppendPaths(conf.IssuerURL(), oauth2.RevocationPath).String(),
-		RegistrationEndpoint:                   conf.OAuth2ClientRegistrationURL().String(),
-		SubjectTypes:                           []string{"pairwise", "public"},
-		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                        conf.OIDCDiscoverySupportedClaims(),
-		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(),
-		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint().String(),
-		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
-		ResponseModesSupported:                 []string{"query", "fragment"},
-		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
-		UserinfoSigningAlgValuesSupported:      []string{"none", "RS256"},
-		RequestParameterSupported:              true,
-		RequestURIParameterSupported:           true,
-		RequireRequestURIRegistration:          true,
-		BackChannelLogoutSupported:             true,
-		BackChannelLogoutSessionSupported:      true,
-		FrontChannelLogoutSupported:            true,
-		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(conf.IssuerURL(), oauth2.LogoutPath).String(),
-		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
-		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
-	}
-	var wellKnownResp oauth2.WellKnown
-	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
-	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
-	assert.EqualValues(t, trueConfig, wellKnownResp)
 }

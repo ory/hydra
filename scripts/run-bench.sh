@@ -6,9 +6,6 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
 numReqs=10000
 numParallel=100
-clientId=benchclient
-clientSecret=benchsecret
-basicAuth=YmVuY2hjbGllbnQ6YmVuY2hzZWNyZXQ=
 
 cat > BENCHMARKS.md << EOF
 ---
@@ -33,14 +30,19 @@ configuration.
 
 ## BCrypt
 
-ORY Hydra uses BCrypt to obfuscate secrets of OAuth 2.0 Clients. When using flows such as the OAuth 2.0 Client Credentials
-Grant, ORY Hydra validates the client credentials using BCrypt which causes (by design) CPU load. CPU load and performance
-depend on the BCrypt cost which can be set using the environment variable \`BCRYPT_COST\`. For these benchmarks,
-we have set \`BCRYPT_COST=8\`.
+Ory Hydra can use PBKDF2 and BCrypt to obfuscate secrets of OAuth 2.0 Clients. When using flows such as the OAuth 2.0
+Client Credentials Grant, Ory Hydra validates the client credentials using PBKDF2 or BCrypt which causes (by design)
+CPU load. CPU load and performance depend on the hashing cost.
 
+For the default PBKDF2 hasher, we use 25.000 rounds per default. For these benchmarks, 10.000 iterations using
+\`OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000\`. The lower the iterations, the faster the hashing.
+
+For BCrypt, set the cost using the environment variable \`OAUTH2_HASHERS_BCRYPT_COST\`. The lower the cost (minimum is
+6), the faster the hashing. The higher the cost, the slower.
 EOF
 
-BCRYPT_COST=8 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --sqa-opt-out > /dev/null 2>&1 &
+killall hydra || true
+OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 SERVE_TLS_ENABLED=false SERVE_PUBLIC_PORT=9000 SERVE_ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dev --sqa-opt-out > hydra.log 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
@@ -48,15 +50,19 @@ while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
 sleep 1
 
 echo "Creating benchmark client"
-hydra clients create \
-    -g client_credentials \
-    --id $clientId \
-    --secret $clientSecret \
-    -a foo \
-    --endpoint http://localhost:9001
+client=$(hydra create client \
+  -g client_credentials \
+  --scope foo \
+  --format json \
+  --endpoint http://localhost:9001)
+echo $client
+
+# Parse the JSON response using jq to get the client ID and client secret:
+clientId=$(echo $client | jq -r '.client_id')
+clientSecret=$(echo $client | jq -r '.client_secret')
 
 echo "Generating initial access tokens for token introspection benchmark"
-introToken=$(hydra token client --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
+introToken=$(hydra perform client-credentials --format json --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret | jq -r '.access_token')
 
 cat >> BENCHMARKS.md << EOF
 ## OAuth 2.0
@@ -69,11 +75,11 @@ This section contains various benchmarks against OAuth 2.0 endpoints
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "token=$introToken" \
-    http://localhost:9001/oauth2/introspect 2>&1 \
-    | tee -a BENCHMARKS.md
-
+	-a "$clientId:$clientSecret" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "token=$introToken" \
+  http://localhost:9001/oauth2/introspect 2>&1 \
+  | tee -a BENCHMARKS.md
 
 cat >> BENCHMARKS.md << EOF
 \`\`\`
@@ -86,12 +92,11 @@ This endpoint uses [BCrypt](#bcrypt).
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-	-H "Authorization: Basic $basicAuth" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=client_credentials" \
-    http://localhost:9000/oauth2/token 2>&1 \
-    | tee -a BENCHMARKS.md
-
+	-a "$clientId:$clientSecret" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  http://localhost:9000/oauth2/token 2>&1 \
+  | tee -a BENCHMARKS.md
 
 # shellcheck disable=SC2006
 cat >> BENCHMARKS.md << EOF

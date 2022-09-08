@@ -1,0 +1,20 @@
+{
+  "ID": "sig-0004",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Request": "req-0004",
+  "ConsentChallenge": {
+    "String": "",
+    "Valid": false
+  },
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "Client": "",
+  "Scopes": "scope-0004",
+  "GrantedScope": "granted_scope-0004",
+  "RequestedAudience": "",
+  "GrantedAudience": "",
+  "Form": "form_data-0004",
+  "Subject": "subject-0004",
+  "Active": false,
+  "Session": "c2Vzc2lvbi0wMDA0",
+  "Table": ""
+}

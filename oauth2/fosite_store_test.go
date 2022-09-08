@@ -32,6 +32,8 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -44,7 +46,7 @@ func TestMain(m *testing.M) {
 
 var registries = make(map[string]driver.Registry)
 var cleanRegistries = func(t *testing.T) {
-	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
+	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.Default{})
 }
 
 // returns clean registries that can safely be used for one test
@@ -53,7 +55,7 @@ func setupRegistries(t *testing.T) {
 	if len(registries) == 0 && !testing.Short() {
 		// first time called and sql tests
 		var cleanSQL func(*testing.T)
-		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t)
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, true, &contextx.Default{})
 		cleanMem := cleanRegistries
 		cleanMem(t)
 		cleanRegistries = func(t *testing.T) {
@@ -67,6 +69,7 @@ func setupRegistries(t *testing.T) {
 }
 
 func TestManagers(t *testing.T) {
+	ctx := context.TODO()
 	tests := []struct {
 		name                   string
 		enableSessionEncrypted bool
@@ -83,10 +86,14 @@ func TestManagers(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			setupRegistries(t)
-			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+
+			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
 			for k, store := range registries {
-				store.Config().MustSet(config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+				net := &networkx.Network{}
+				require.NoError(t, store.Persister().Connection(context.Background()).First(net))
+				store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+				store.WithContextualizer(&contextx.Static{NID: net.ID, C: store.Config().Source(ctx)})
 				TestHelperRunner(t, store, k)
 			}
 		})

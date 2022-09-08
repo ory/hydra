@@ -1,4 +1,4 @@
-FROM golang:1.17-buster AS builder
+FROM golang:1.18-buster AS builder
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -6,8 +6,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /go/src/github.com/ory/hydra
+RUN mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
@@ -16,7 +18,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -tags sqlite -o /usr/bin/hydra
+RUN go build -tags sqlite,json1 -o /usr/bin/hydra
 
 VOLUME /var/lib/sqlite
 

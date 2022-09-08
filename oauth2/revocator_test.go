@@ -28,22 +28,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/internal/httpclient/client/public"
-	"github.com/ory/x/urlx"
+	hydra "github.com/ory/hydra-client-go"
 
 	"github.com/ory/hydra/internal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	httptransport "github.com/go-openapi/runtime/client"
-
 	"github.com/ory/fosite"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 )
@@ -79,17 +78,17 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 
 func TestRevoke(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
-	tokens := Tokens(conf, 4)
+	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)
 	now := time.Now().UTC().Round(time.Second)
 
 	handler := reg.OAuth2Handler()
-	router := x.NewRouterAdmin()
-	handler.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin(conf.AdminURL)
+	handler.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)
@@ -99,11 +98,10 @@ func TestRevoke(t *testing.T) {
 	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
 	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 	createAccessTokenSession("siri", "encoded:client", tokens[3][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
-
 	require.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 
-	client := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
-
+	client := hydra.NewAPIClient(hydra.NewConfiguration())
+	client.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
 	for k, c := range []struct {
 		token  string
 		assert func(*testing.T)
@@ -144,13 +142,12 @@ func TestRevoke(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			//
-			//client.config.Username = "my-client"
-			//client.config.Password = "foobar"
-			_, err := client.Public.RevokeOAuth2Token(
-				public.NewRevokeOAuth2TokenParams().WithToken(c.token),
-				httptransport.BasicAuth("my-client", "foobar"),
-			)
+			_, err := client.V0alpha2Api.RevokeOAuth2Token(
+				context.WithValue(
+					context.Background(),
+					hydra.ContextBasicAuth,
+					hydra.BasicAuth{UserName: "my-client", Password: "foobar"},
+				)).Token(c.token).Execute()
 			require.NoError(t, err)
 
 			if c.assert != nil {

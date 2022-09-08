@@ -23,6 +23,8 @@ package jwk
 import (
 	"crypto/rsa"
 
+	"github.com/ory/x/josex"
+
 	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
 )
@@ -37,9 +39,10 @@ func MustRSAPublic(key *jose.JSONWebKey) *rsa.PublicKey {
 }
 
 func ToRSAPublic(key *jose.JSONWebKey) (*rsa.PublicKey, error) {
-	res, ok := key.Key.(*rsa.PublicKey)
+	pk := josex.ToPublicKey(key)
+	res, ok := pk.Key.(*rsa.PublicKey)
 	if !ok {
-		return res, errors.New("Could not convert key to RSA Private Key.")
+		return res, errors.Errorf("Could not convert key to RSA Public Key, got: %T", pk.Key)
 	}
 
 	return res, nil

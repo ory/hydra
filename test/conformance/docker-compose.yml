@@ -62,6 +62,14 @@ services:
     networks:
       - intranet
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 500M
 
   consent:
     image: oryd/hydra-login-consent-node:latest

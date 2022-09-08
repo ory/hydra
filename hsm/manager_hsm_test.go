@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
@@ -36,19 +37,19 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
+func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockHsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	c.MustSet(config.KeyDSN, "memory")
-	c.MustSet(config.HsmEnabled, "true")
+	c.MustSet(context.Background(), config.KeyDSN, "memory")
+	c.MustSet(context.Background(), config.HSMEnabled, "true")
 	reg := driver.NewRegistrySQL()
 	reg.WithLogger(l)
 	reg.WithConfig(c)
 	reg.WithHsmContext(mockHsmContext)
-	err := reg.Init(context.Background())
+	err := reg.Init(context.Background(), false, true, &contextx.TestContextualizer{})
 	assert.NoError(t, err)
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())

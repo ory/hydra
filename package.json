@@ -2,19 +2,16 @@
   "name": "@oryd/hydra",
   "version": "0.0.0",
   "private": true,
-  "prettier": "ory-prettier-styles",
-  "config": {
-    "prettierTarget": "**/*.{js,ts,md,mdx,yml,yaml,json}"
-  },
   "scripts": {
-    "format": "prettier --write ${npm_package_config_prettierTarget}",
-    "format:check": "prettier --check ${npm_package_config_prettierTarget}",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\"",
+    "openapi-generator-cli": "openapi-generator-cli",
     "test": "cypress run",
     "test:watch": "cypress open",
-    "wait-on": "wait-on",
-    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\"",
-    "openapi-generator-cli": "openapi-generator-cli"
+    "wait-on": "wait-on"
   },
+  "prettier": "ory-prettier-styles",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.1.18"
   },
@@ -24,6 +21,7 @@
     "jsonwebtoken": "^8.5.1",
     "ory-prettier-styles": "1.3.0",
     "prettier": "2.7.1",
+    "prettier-plugin-packagejson": "^2.2.18",
     "standard": "^12.0.1",
     "uuid": "^8.3.2",
     "wait-on": "^3.2.0"

@@ -894,7 +894,7 @@ type adminVerifyUserCodeRequest struct {
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify admin adminVerifyUserCodeRequest
 //
 // Verifies a device grant request
-// 
+//
 // Verifies a device grant request
 //
 //	   Consumes:

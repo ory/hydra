@@ -45,9 +45,8 @@ func (r ApiAdminVerifyUserCodeRequestRequest) Execute() (*SuccessfulOAuth2Reques
 }
 
 /*
-AdminVerifyUserCodeRequest Method for AdminVerifyUserCodeRequest
+AdminVerifyUserCodeRequest Verifies a device grant request
 
-Verifies a device grant request
 Verifies a device grant request
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().

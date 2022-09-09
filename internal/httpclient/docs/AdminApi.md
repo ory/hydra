@@ -2,15 +2,17 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                     | HTTP request                                      | Description |
-| -------------------------------------------------------------------------- | ------------------------------------------------- | ----------- |
-| [**AdminVerifyUserCodeRequest**](AdminApi.md#AdminVerifyUserCodeRequest)   | **Put** /admin/oauth2/auth/requests/device/verify |
+| Method                                                                     | HTTP request                                      | Description                     |
+| -------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------- |
+| [**AdminVerifyUserCodeRequest**](AdminApi.md#AdminVerifyUserCodeRequest)   | **Put** /admin/oauth2/auth/requests/device/verify | Verifies a device grant request |
 | [**UpdateOAuth2ClientLifespans**](AdminApi.md#UpdateOAuth2ClientLifespans) | **Put** /admin/clients/{id}/lifespans             |
 
 ## AdminVerifyUserCodeRequest
 
 > SuccessfulOAuth2RequestResponse
 > AdminVerifyUserCodeRequest(ctx).DeviceChallenge(deviceChallenge).VerifyUserCodeRequest(verifyUserCodeRequest).Execute()
+
+Verifies a device grant request
 
 ### Example
 

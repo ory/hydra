@@ -22,7 +22,6 @@ package consent
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -910,8 +909,6 @@ type adminVerifyUserCodeRequest struct {
 //	  200: successfulOAuth2RequestResponse
 //	  default: oAuth2ApiError
 func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
-	fmt.Println("adminVerifyUserCodeRequest ++")
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("device_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -921,8 +918,6 @@ func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	fmt.Printf("adminVerifyUserCodeRequest challange : %v\n", challenge)
-
 	var p DeviceGrantVerifyUserCodeRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -930,8 +925,6 @@ func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
-
-	fmt.Printf("adminVerifyUserCodeRequest user code : %v\n", p.UserCode)
 
 	if p.UserCode == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
@@ -945,7 +938,6 @@ func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	fmt.Printf("adminVerifyUserCodeRequest session id : %v\n", req.GetID())
 	// FIXME: Should we delete the UserCode after usage ?
 
 	clientId := req.GetClient().GetID()

@@ -5,7 +5,7 @@
 
 **Table of Contents**
 
-- [0.0.0 (2022-09-08)](#000-2022-09-08)
+- [0.0.0 (2022-09-09)](#000-2022-09-09)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
@@ -648,7 +648,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-09-08)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.10...v0.0.0) (2022-09-09)
 
 ## Breaking Changes
 

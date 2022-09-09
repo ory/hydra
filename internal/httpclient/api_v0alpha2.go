@@ -3839,6 +3839,130 @@ func (a *V0alpha2ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAut
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiAdminVerifyUserCodeRequestRequest struct {
+	ctx                   context.Context
+	ApiService            *V0alpha2ApiService
+	deviceChallenge       *string
+	verifyUserCodeRequest *VerifyUserCodeRequest
+}
+
+func (r ApiAdminVerifyUserCodeRequestRequest) DeviceChallenge(deviceChallenge string) ApiAdminVerifyUserCodeRequestRequest {
+	r.deviceChallenge = &deviceChallenge
+	return r
+}
+
+func (r ApiAdminVerifyUserCodeRequestRequest) VerifyUserCodeRequest(verifyUserCodeRequest VerifyUserCodeRequest) ApiAdminVerifyUserCodeRequestRequest {
+	r.verifyUserCodeRequest = &verifyUserCodeRequest
+	return r
+}
+
+func (r ApiAdminVerifyUserCodeRequestRequest) Execute() (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+	return r.ApiService.AdminVerifyUserCodeRequestExecute(r)
+}
+
+/*
+AdminVerifyUserCodeRequest Verifies a device grant request
+
+Verifies a device grant request
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiAdminVerifyUserCodeRequestRequest
+*/
+func (a *V0alpha2ApiService) AdminVerifyUserCodeRequest(ctx context.Context) ApiAdminVerifyUserCodeRequestRequest {
+	return ApiAdminVerifyUserCodeRequestRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return SuccessfulOAuth2RequestResponse
+func (a *V0alpha2ApiService) AdminVerifyUserCodeRequestExecute(r ApiAdminVerifyUserCodeRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *SuccessfulOAuth2RequestResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.AdminVerifyUserCodeRequest")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/oauth2/auth/requests/device/verify"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.deviceChallenge == nil {
+		return localVarReturnValue, nil, reportError("deviceChallenge is required and must be specified")
+	}
+
+	localVarQueryParams.Add("device_challenge", parameterToString(*r.deviceChallenge, ""))
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.verifyUserCodeRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiDiscoverJsonWebKeysRequest struct {
 	ctx        context.Context
 	ApiService *V0alpha2ApiService

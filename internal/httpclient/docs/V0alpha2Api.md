@@ -35,6 +35,7 @@ All URIs are relative to _http://localhost_
 | [**AdminUpdateJsonWebKey**](V0alpha2Api.md#AdminUpdateJsonWebKey)                                             | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                                  |
 | [**AdminUpdateJsonWebKeySet**](V0alpha2Api.md#AdminUpdateJsonWebKeySet)                                       | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                              |
 | [**AdminUpdateOAuth2Client**](V0alpha2Api.md#AdminUpdateOAuth2Client)                                         | **Put** /admin/clients/{id}                            | Update an OAuth 2.0 Client                                                                             |
+| [**AdminVerifyUserCodeRequest**](V0alpha2Api.md#AdminVerifyUserCodeRequest)                                   | **Put** /admin/oauth2/auth/requests/device/verify      | Verifies a device grant request                                                                        |
 | [**DiscoverJsonWebKeys**](V0alpha2Api.md#DiscoverJsonWebKeys)                                                 | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                                 |
 | [**DiscoverOidcConfiguration**](V0alpha2Api.md#DiscoverOidcConfiguration)                                     | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                               |
 | [**DynamicClientRegistrationCreateOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                              | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
@@ -2065,6 +2066,71 @@ apiAdminUpdateOAuth2ClientRequest struct via the builder pattern
 ### Return type
 
 [**OAuth2Client**](OAuth2Client.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+## AdminVerifyUserCodeRequest
+
+> SuccessfulOAuth2RequestResponse
+> AdminVerifyUserCodeRequest(ctx).DeviceChallenge(deviceChallenge).VerifyUserCodeRequest(verifyUserCodeRequest).Execute()
+
+Verifies a device grant request
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    deviceChallenge := "deviceChallenge_example" // string |
+    verifyUserCodeRequest := *openapiclient.NewVerifyUserCodeRequest() // VerifyUserCodeRequest |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.V0alpha2Api.AdminVerifyUserCodeRequest(context.Background()).DeviceChallenge(deviceChallenge).VerifyUserCodeRequest(verifyUserCodeRequest).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminVerifyUserCodeRequest``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `AdminVerifyUserCodeRequest`: SuccessfulOAuth2RequestResponse
+    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminVerifyUserCodeRequest`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiAdminVerifyUserCodeRequestRequest struct via the builder pattern
+
+| Name                      | Type                                                  | Description | Notes |
+| ------------------------- | ----------------------------------------------------- | ----------- | ----- |
+| **deviceChallenge**       | **string**                                            |             |
+| **verifyUserCodeRequest** | [**VerifyUserCodeRequest**](VerifyUserCodeRequest.md) |             |
+
+### Return type
+
+[**SuccessfulOAuth2RequestResponse**](SuccessfulOAuth2RequestResponse.md)
 
 ### Authorization
 

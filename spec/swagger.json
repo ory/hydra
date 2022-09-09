@@ -901,7 +901,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "v0alpha2"
         ],
         "summary": "Verifies a device grant request",
         "operationId": "adminVerifyUserCodeRequest",

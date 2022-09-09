@@ -936,7 +936,7 @@ paths:
           description: oAuth2ApiError
       summary: Verifies a device grant request
       tags:
-        - admin
+        - v0alpha2
   /admin/oauth2/auth/requests/login:
     get:
       description: "When an authorization code, hybrid, or implicit OAuth 2.0

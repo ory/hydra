@@ -2695,7 +2695,7 @@
         },
         "summary": "Verifies a device grant request",
         "tags": [
-          "admin"
+          "v0alpha2"
         ]
       }
     },

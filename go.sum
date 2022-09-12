@@ -65,6 +65,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/BuzzBumbleBee/fosite v0.0.0-20220907141036-7b5a9baddf73 h1:3Zqq/2kz7nv7ystZ/ITHI88zizaQxypE9Wmu+669w2o=
 github.com/BuzzBumbleBee/fosite v0.0.0-20220907141036-7b5a9baddf73/go.mod h1:BTd8+oG1mRtezZbQq0S4D2HBc815bedZHjjs2KRs39Y=
+github.com/BuzzBumbleBee/fosite v0.0.0-20220912122005-8585c750e894 h1:XZO5/f3AcTbxWyK5ac42L/WgERxnXuYCgscYin9pFgg=
+github.com/BuzzBumbleBee/fosite v0.0.0-20220912122005-8585c750e894/go.mod h1:BTd8+oG1mRtezZbQq0S4D2HBc815bedZHjjs2KRs39Y=
 github.com/DataDog/datadog-agent/pkg/obfuscate v0.0.0-20211129110424-6491aa3bf583 h1:3nVO1nQyh64IUY6BPZUpMYMZ738Pu+LsMt3E0eqqIYw=
 github.com/DataDog/datadog-agent/pkg/obfuscate v0.0.0-20211129110424-6491aa3bf583/go.mod h1:EP9f4GqaDJyP1F5jTNMtzdIpw3JpNs3rMSJOnYywCiw=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=

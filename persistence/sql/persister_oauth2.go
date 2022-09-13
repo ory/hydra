@@ -65,6 +65,16 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
+// contains is a case sensitive match, finding needle in a haystack
+func contains(haystack []string, needle string) bool {
+	for _, a := range haystack {
+		if a == needle {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
@@ -237,6 +247,39 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
+func (p *Persister) updateSessionByRequestId(ctx context.Context, id string, requester fosite.Requester, table tableName) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.updateSession")
+	defer span.End()
+
+	req, err := p.sqlSchemaFromRequest(ctx, "", requester, table)
+	if err != nil {
+		return err
+	}
+
+	m := pop.NewModel(req, ctx)
+	var cs []string
+	for _, t := range m.Columns().Cols {
+		// Blacklist some tables as they shoudn't be updated...
+		if (!contains([]string{"nid", "signature", "request_id", "requested_at"}, t.Name)) {
+			cs = append(cs, t.Name)
+		}
+	}
+
+	if count, err := p.QueryWithNetwork(ctx).
+					Where("request_id=?", id).
+					UpdateQuery(req, cs...); count != 1 {
+		return errorsx.WithStack(fosite.ErrNotFound)
+	} else if err := sqlcon.HandleError(err); err != nil {
+		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		} else if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
+			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		}
+		return err
+	}
+	return nil
+}
+
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.findSessionBySignature")
 	defer span.End()
@@ -267,8 +310,17 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 			}
 
 			return errorsx.WithStack(fosite.ErrInactiveToken)
-		}
+		} else if !r.ConsentChallenge.Valid {
+			fr, err = r.toRequest(ctx, session, p)
+			if err != nil {
+				return err
+			}
 
+			if table == sqlTableDeviceCode {
+				return errorsx.WithStack(fosite.ErrAuthorizationPending)
+			}
+		}
+		
 		fr, err = r.toRequest(ctx, session, p)
 		return err
 	})
@@ -472,28 +524,69 @@ func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) err
 	)
 }
 
-func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, req fosite.Requester) error {
-	err := p.createSession(ctx, signature, req, sqlTableDeviceCode)
-	return err
+func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
+	defer span.End()
+
+	return p.createSession(ctx, signature, requester, sqlTableDeviceCode)
 }
 
-func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, req fosite.Session) (fosite.Requester, error) {
-	return p.findSessionBySignature(ctx, signature, req, sqlTableDeviceCode)
+func (p *Persister) UpdateDeviceCodeSessionByRequestId(ctx context.Context, id string, requester fosite.Requester) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionByRequestId")
+	defer span.End()
+
+	return p.updateSessionByRequestId(ctx, id, requester, sqlTableDeviceCode)
+}
+
+func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSession")
+	defer span.End()
+
+	return p.findSessionBySignature(ctx, signature, session, sqlTableDeviceCode)
 }
 
 func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature string) error {
-	return p.deleteSessionBySignature(ctx, signature, sqlTableDeviceCode)
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateDeviceCodeSession")
+	defer span.End()
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableDeviceCode}.TableName()),
+				signature,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
 }
 
-func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, req fosite.Requester) error {
-	err := p.createSession(ctx, signature, req, sqlTableUserCode)
-	return err
+func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateUserCodeSession")
+	defer span.End()
+
+	return p.createSession(ctx, signature, requester, sqlTableUserCode)
 }
 
-func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, req fosite.Session) (fosite.Requester, error) {
-	return p.findSessionBySignature(ctx, signature, req, sqlTableUserCode)
+func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
+	defer span.End()
+
+	return p.findSessionBySignature(ctx, signature, session, sqlTableUserCode)
 }
 
 func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature string) error {
-	return p.deleteSessionBySignature(ctx, signature, sqlTableUserCode)
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateUserCodeSession")
+	defer span.End()
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+				signature,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
 }

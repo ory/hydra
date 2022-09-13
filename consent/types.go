@@ -495,10 +495,10 @@ type DeviceGrantRequest struct {
 	Client   *client.Client   `json:"client" db:"-"`
 	ClientID sqlxx.NullString `json:"-" db:"client_id"`
 
-	// DeviceCodeSignature is the OAuth 2.0 Device Authorization Grant Device Code Signature (HMAC)
+	// DeviceRequestId is the OAuth 2.0 Device Authorization Grant Device Request Id
 	//
 	// required: true
-	DeviceCodeSignature sqlxx.NullString `json:"-" db:"device_code_signature"`
+	DeviceRequestId sqlxx.NullString `json:"-" db:"device_request_id"`
 
 	CSRF     string `json:"-" db:"csrf"`
 	Verifier string `json:"-" db:"verifier"`

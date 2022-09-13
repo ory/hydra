@@ -155,10 +155,12 @@ func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _
 		return
 	}
 
+	authorizeRequest.SetRequestedScopes(fosite.Arguments(session.ConsentRequest.RequestedScope))
 	for _, scope := range session.GrantedScope {
 		authorizeRequest.GrantScope(scope)
 	}
 
+	authorizeRequest.SetRequestedAudience(fosite.Arguments(session.ConsentRequest.RequestedAudience))
 	for _, audience := range session.GrantedAudience {
 		authorizeRequest.GrantAudience(audience)
 	}
@@ -224,7 +226,7 @@ func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
 	})
 
-	err = h.r.OAuth2Storage().CreateDeviceCodeSession(ctx, authorizeRequest.GetDeviceCodeSignature(), authorizeRequest)
+	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestId(ctx, authorizeRequest.GetDeviceRequestId(), authorizeRequest)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 	}

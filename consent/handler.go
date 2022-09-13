@@ -932,20 +932,28 @@ func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Requ
 	}
 
 	userCodeSignature := h.r.OAuth2HMACStrategy().UserCodeSignature(r.Context(), p.UserCode)
-	req, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeSignature, &fosite.DefaultSession{})
+	userCodeRequest, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeSignature, &fosite.DefaultSession{})
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithHint(`User code session not found`)))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithWrap(err).WithHint(`'user_code' session not found`)))
+		return
+	}
+	
+	clientId := userCodeRequest.GetClient().GetID()
+	// UserCode & DeviceCode Request shares the same RequestId as it's the same request;
+	deviceRequestId := userCodeRequest.GetID()
+	requestedScopes := userCodeRequest.GetRequestedScopes()
+	requestedAudience := userCodeRequest.GetRequestedAudience()
+
+	err = h.r.OAuth2Storage().InvalidateUserCodeSession(r.Context(), userCodeSignature)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHint(`Could not invalidate 'user_code'`)))
 		return
 	}
 
-	// FIXME: Should we delete the UserCode after usage ?
-
-	clientId := req.GetClient().GetID()
-
 	// req.GetID() is actually the DeviceCodeSignature
-	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challenge, req.GetID(), clientId, req.GetRequestedScopes(), req.GetRequestedAudience())
+	grantRequest, err := h.r.ConsentManager().AcceptDeviceGrantRequest(r.Context(), challenge, deviceRequestId, clientId, requestedScopes, requestedAudience)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHint(`Could not accept device grant request`)))
 		return
 	}
 

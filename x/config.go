@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 //go:generate ../.bin/mockgen -package mock -destination ../internal/mock/config_cookie.go . CookieConfigProvider
 
 package x

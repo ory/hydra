@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { deleteClients, prng } from "../../helpers"
 
 const nc = () => ({

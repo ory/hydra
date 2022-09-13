@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { v4 as uuidv4 } from "uuid"
 
 export const prng = () => uuidv4()

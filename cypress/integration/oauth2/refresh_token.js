@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { createClient, prng } from "../../helpers"
 
 describe("The OAuth 2.0 Refresh Token Grant", function () {

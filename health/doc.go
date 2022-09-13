@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 package health
 
 // Alive returns an ok status if the instance is ready to handle HTTP requests.

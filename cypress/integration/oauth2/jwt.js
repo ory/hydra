@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { createClient, prng } from "../../helpers"
 
 describe("OAuth 2.0 JSON Web Token Access Tokens", () => {

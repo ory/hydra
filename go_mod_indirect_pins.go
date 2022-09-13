@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 //go:build go_mod_indirect_pins
 // +build go_mod_indirect_pins
 

@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite

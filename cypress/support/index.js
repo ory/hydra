@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 // ***********************************************************
 // This example support/index.js is processed and
 // loaded automatically before your test files.

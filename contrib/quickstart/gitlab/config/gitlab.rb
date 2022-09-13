@@ -1,3 +1,5 @@
+# Copyright © 2022 Ory Corp
+
 ## GitLab configuration settings
 ##! This file is generated during initial installation and **is not** modified
 ##! during upgrades.

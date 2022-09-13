@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 const dayjs = require("dayjs")
 const isBetween = require("dayjs/plugin/isBetween")
 const utc = require("dayjs/plugin/utc")

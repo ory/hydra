@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { prng } from "../../helpers"
 
 describe("The Clients Admin Interface", function () {

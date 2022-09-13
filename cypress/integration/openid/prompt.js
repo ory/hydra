@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 import { createClient, prng } from "../../helpers"
 import qs from "querystring"
 

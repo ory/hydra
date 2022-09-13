@@ -1,3 +1,5 @@
+// Copyright © 2022 Ory Corp
+
 const express = require("express")
 const session = require("express-session")
 const uuid = require("node-uuid")

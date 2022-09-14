@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_code
     session_data       TEXT         NOT NULL,
     subject            VARCHAR(255) NOT NULL DEFAULT '',
     active             BOOL         NOT NULL DEFAULT true,
-    requested_audience TEXT         NULL DEFAULT '',
-    granted_audience   TEXT         NULL DEFAULT '',
+    requested_audience TEXT         NULL,
+    granted_audience   TEXT         NULL,
     challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE,
     nid                VARCHAR(36)  NULL REFERENCES networks(id) ON DELETE CASCADE ON UPDATE RESTRICT
 );

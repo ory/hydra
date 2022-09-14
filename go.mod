@@ -13,7 +13,7 @@ replace (
 
 replace github.com/ory/hydra-client-go => ./internal/httpclient
 
-replace github.com/ory/fosite => github.com/BuzzBumbleBee/fosite v0.0.0-20220912122005-8585c750e894
+replace github.com/ory/fosite => github.com/BuzzBumbleBee/fosite v0.0.0-20220914120940-341d4112286e
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4

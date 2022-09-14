@@ -127,16 +127,16 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	admin.POST(IntrospectPath, h.adminIntrospectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.adminDeleteOAuth2Token)
 
-	public.GET(DeviceAuthPath, h.DeviceAuthGetHandler)
+	public.GET(DeviceAuthPath, h.performOAuth2DeviceAuthorizationFlow)
 	// This is only a shorthand to avoid people to type a long url;
-	public.GET(h.c.DeviceInternalURL(context.Background()).Path, h.DeviceAuthGetHandler)
-	public.POST(DeviceAuthPath, h.DeviceAuthPostHandler)
+	public.GET(h.c.DeviceInternalURL(context.Background()).Path, h.performOAuth2DeviceAuthorizationFlow)
+	public.POST(DeviceAuthPath, h.performOAuth2DeviceFlow)
 }
 
-func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
-	authorizeRequest, err := h.r.OAuth2Provider().NewDeviceAuthorizeGetRequest(ctx, r)
+	authorizeRequest, err := h.r.OAuth2Provider().NewDeviceAuthorizeRequest(ctx, r)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		return
@@ -209,7 +209,8 @@ func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _
 	}
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
-	authorizeRequest.SetSession(&Session{
+	// done
+	response, err := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: claims,
 			Headers: &jwt.Headers{Extra: map[string]interface{}{
@@ -225,20 +226,39 @@ func (h *Handler) DeviceAuthGetHandler(w http.ResponseWriter, r *http.Request, _
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
 	})
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return
+	}
 
-	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestId(ctx, authorizeRequest.GetDeviceRequestId(), authorizeRequest)
+	err = h.r.OAuth2Storage().UpdateDeviceCodeSession(ctx, authorizeRequest.GetDeviceCodeSignature(), authorizeRequest)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 	}
 
-	// Device flow is done, let's redirect the user back to the
-	//
-	http.Redirect(w, r, h.c.DeviceDoneURL(ctx).String(), http.StatusFound)
+	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(ctx, w, authorizeRequest, response)
 }
 
-func (h *Handler) DeviceAuthPostHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// swagger:route GET /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
+//
+// The OAuth 2.0 Device Authorize Endpoint
+//
+// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+// OAuth2 is a very popular protocol and a library for your programming language will exists.
+//
+// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
+//
+//     Consumes:
+//     - application/x-www-form-urlencoded
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: oAuth2ApiDeviceAuthorizationResponse
+//       default: oAuth2ApiError
+func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
-	request, err := h.r.OAuth2Provider().NewDeviceAuthorizePostRequest(ctx, r)
+	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -250,13 +270,13 @@ func (h *Handler) DeviceAuthPostHandler(w http.ResponseWriter, r *http.Request, 
 	}
 
 	request.SetSession(session)
-	resp, err := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, request)
-
+	resp, err := h.r.OAuth2Provider().NewDeviceResponse(ctx, request)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(ctx, w, request, resp)
+
+	h.r.OAuth2Provider().WriteDeviceResponse(ctx, w, request, resp)
 }
 
 // swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout

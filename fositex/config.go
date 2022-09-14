@@ -37,6 +37,7 @@ type Config struct {
 	tokenEndpointHandlers           fosite.TokenEndpointHandlers
 	tokenIntrospectionHandlers      fosite.TokenIntrospectionHandlers
 	revocationHandlers              fosite.RevocationHandlers
+	deviceEndpointHandlers 			fosite.DeviceEndpointHandlers
 	deviceAuthorizeEndpointHandlers fosite.DeviceAuthorizeEndpointHandlers
 
 	*config.DefaultProvider
@@ -44,15 +45,16 @@ type Config struct {
 
 var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
 var defaultFactories = []factory{
-	compose.OAuth2DeviceAuthorizeFactory,
 	compose.OAuth2AuthorizeExplicitFactory,
 	compose.OAuth2AuthorizeImplicitFactory,
 	compose.OAuth2ClientCredentialsGrantFactory,
 	compose.OAuth2RefreshTokenGrantFactory,
+	compose.OAuth2DeviceFactory,
 	compose.OpenIDConnectExplicitFactory,
 	compose.OpenIDConnectHybridFactory,
 	compose.OpenIDConnectImplicitFactory,
 	compose.OpenIDConnectRefreshFactory,
+	compose.OpenIDConnectDeviceFactory,
 	compose.OAuth2TokenRevocationFactory,
 	compose.OAuth2TokenIntrospectionFactory,
 	compose.OAuth2PKCEFactory,
@@ -71,8 +73,11 @@ func NewConfig(deps configDependencies) *Config {
 func (c *Config) LoadDefaultHanlders(strategy interface{}) {
 	for _, factory := range defaultFactories {
 		res := factory(c, c.deps.Persister(), strategy)
-		if ah, ok := res.(fosite.DeviceAuthorizeEndpointHandler); ok {
-			c.deviceAuthorizeEndpointHandlers.Append(ah)
+		if dh, ok := res.(fosite.DeviceEndpointHandler); ok {
+			c.deviceEndpointHandlers.Append(dh)
+		}
+		if dah, ok := res.(fosite.DeviceAuthorizeEndpointHandler); ok {
+			c.deviceAuthorizeEndpointHandlers.Append(dah)
 		}
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)
@@ -111,6 +116,10 @@ func (c *Config) GetTokenIntrospectionHandlers(ctx context.Context) (r fosite.To
 
 func (c *Config) GetRevocationHandlers(ctx context.Context) fosite.RevocationHandlers {
 	return c.revocationHandlers
+}
+
+func (c *Config) GetDeviceEndpointHandlers(ctx context.Context) fosite.DeviceEndpointHandlers {
+	return c.deviceEndpointHandlers
 }
 
 func (c *Config) GetDeviceAuthorizeEndpointHandlers(ctx context.Context) fosite.DeviceAuthorizeEndpointHandlers {
@@ -207,6 +216,10 @@ func (c *Config) GetTokenURL(ctx context.Context) string {
 	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String()
 }
 
+func (c *Config) GetDeviceDone(ctx context.Context) string {
+	return c.deps.Config().DeviceDoneURL(ctx).String()
+}
+
 func (c *Config) GetDeviceVerificationURL(ctx context.Context) string {
-	return urlx.AppendPaths(c.PublicURL(ctx), oauth2.DeviceGrantPath).String()
+	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.DeviceGrantPath).String()
 }

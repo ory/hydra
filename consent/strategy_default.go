@@ -1150,7 +1150,7 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(ctx context.Con
 	if err != nil {
 		return nil, err
 	}
-	req.SetDeviceRequestId(deviceSession.DeviceRequestId.String())
+	req.SetDeviceCodeSignature(deviceSession.DeviceCodeSignature.String())
 
 	consentSession, err := s.verifyConsent(ctx, w, r, req, consentVerifier)
 	if err != nil {

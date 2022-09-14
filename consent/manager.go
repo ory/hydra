@@ -79,6 +79,6 @@ type Manager interface {
 
 	CreateDeviceGrantRequest(ctx context.Context, req *DeviceGrantRequest) error
 	GetDeviceGrantRequestByVerifier(ctx context.Context, verifier string) (*DeviceGrantRequest, error)
-	AcceptDeviceGrantRequest(ctx context.Context, challenge string, device_request_id string, clientId string, requested_scopes fosite.Arguments, requested_aud fosite.Arguments) (*DeviceGrantRequest, error)
+	AcceptDeviceGrantRequest(ctx context.Context, challenge string, device_code_signature string, clientId string, requested_scopes fosite.Arguments, requested_aud fosite.Arguments) (*DeviceGrantRequest, error)
 	VerifyAndInvalidateDeviceGrantRequest(ctx context.Context, verifier string) (*DeviceGrantRequest, error)
 }

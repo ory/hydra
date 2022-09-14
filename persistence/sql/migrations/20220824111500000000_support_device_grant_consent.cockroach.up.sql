@@ -7,7 +7,7 @@ CREATE TABLE hydra_oauth2_device_grant_request
     request_url           TEXT         NOT NULL,
     requested_audience    VARCHAR(255) NULL     DEFAULT '',
     csrf                  VARCHAR(40)  NOT NULL,
-    device_request_id     VARCHAR(40)  NULL,
+    device_code_signature VARCHAR(255) NULL,
     accepted              BOOL         NOT NULL DEFAULT true,
     accepted_at           TIMESTAMP    NULL
 );

@@ -52,3 +52,46 @@ type oAuth2ApiError struct {
 //
 // swagger:response emptyResponse
 type emptyResponse struct{}
+
+// OAuth2 Device Flow
+//
+// Ory's OAuth 2.0 Device Authorization API
+//
+// swagger:model oAuth2ApiDeviceAuthorizationResponse
+type oAuth2ApiDeviceAuthorizationResponse struct {
+	// The device verification code.
+	//
+	// example: ory_dc_smldfksmdfkl.mslkmlkmlk
+	DeviceCode string `json:"device_code"`
+
+	// The end-user verification code.
+	//
+	// example: AAAAAA
+	UserCode string `json:"user_code"`
+
+	// The end-user verification URI on the authorization
+	// server.  The URI should be short and easy to remember as end users
+	// will be asked to manually type it into their user agent.
+	//
+	// example: https://auth.ory.sh/tv
+	VerificationUri string `json:"verification_uri"`
+
+	// A verification URI that includes the "user_code" (or
+	// other information with the same function as the "user_code"),
+	// which is designed for non-textual transmission.
+	//
+	// example: https://auth.ory.sh/tv?user_code=AAAAAA
+	VerificationUriComplete string `json:"verification_uri_complete"`
+
+	// The lifetime in seconds of the "device_code" and "user_code".
+	//
+	// example: 16830
+	ExpiresIn int `json:"expires_in"`
+
+	// The minimum amount of time in seconds that the client
+	// SHOULD wait between polling requests to the token endpoint.  If no
+	// value is provided, clients MUST use 5 as the default.
+	//
+	// example: 5
+	Interval int `json:"interval"`
+}

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_code
 (
     signature          VARCHAR(255) NOT NULL PRIMARY KEY,
     request_id         VARCHAR(255)  NOT NULL,
-    requested_at       TIMESTAMP    NOT NULL DEFAULT NOW(),
+    requested_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     client_id          VARCHAR(255) NOT NULL,
     scope              TEXT         NOT NULL,
     granted_scope      TEXT         NOT NULL,
@@ -18,13 +18,12 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_code
 CREATE INDEX hydra_oauth2_device_code_request_id_idx ON hydra_oauth2_device_code (request_id, nid);
 CREATE INDEX hydra_oauth2_device_code_client_id_idx ON hydra_oauth2_device_code (client_id, nid);
 CREATE INDEX hydra_oauth2_device_code_challenge_id_idx ON hydra_oauth2_device_code (challenge_id, nid);
-ALTER TABLE hydra_oauth2_device_code ADD CONSTRAINT hydra_oauth2_device_code_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
 
 CREATE TABLE IF NOT EXISTS hydra_oauth2_user_code 
 (
     signature          VARCHAR(255) NOT NULL PRIMARY KEY,
     request_id         VARCHAR(40)  NOT NULL,
-    requested_at       TIMESTAMP    NOT NULL DEFAULT NOW(),
+    requested_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     client_id          VARCHAR(255) NOT NULL,
     scope              TEXT         NOT NULL,
     granted_scope      TEXT         NOT NULL,
@@ -40,4 +39,3 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_user_code
 CREATE INDEX hydra_oauth2_user_code_request_id_idx ON hydra_oauth2_user_code (request_id, nid);
 CREATE INDEX hydra_oauth2_user_code_client_id_idx ON hydra_oauth2_user_code (client_id, nid);
 CREATE INDEX hydra_oauth2_user_code_challenge_id_idx ON hydra_oauth2_user_code (challenge_id, nid);
-ALTER TABLE hydra_oauth2_user_code ADD CONSTRAINT hydra_oauth2_user_code_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;

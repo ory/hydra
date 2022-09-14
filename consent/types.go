@@ -498,7 +498,7 @@ type DeviceGrantRequest struct {
 	// DeviceRequestId is the OAuth 2.0 Device Authorization Grant Device Request Id
 	//
 	// required: true
-	DeviceRequestId sqlxx.NullString `json:"-" db:"device_request_id"`
+	DeviceCodeSignature sqlxx.NullString `json:"-" db:"device_code_signature"`
 
 	CSRF     string `json:"-" db:"csrf"`
 	Verifier string `json:"-" db:"verifier"`

@@ -247,27 +247,16 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
-func (p *Persister) updateSessionByRequestId(ctx context.Context, id string, requester fosite.Requester, table tableName) error {
+func (p *Persister) updateSessionBySignature(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.updateSession")
 	defer span.End()
 
-	req, err := p.sqlSchemaFromRequest(ctx, "", requester, table)
+	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
 	}
 
-	m := pop.NewModel(req, ctx)
-	var cs []string
-	for _, t := range m.Columns().Cols {
-		// Blacklist some tables as they shoudn't be updated...
-		if (!contains([]string{"nid", "signature", "request_id", "requested_at"}, t.Name)) {
-			cs = append(cs, t.Name)
-		}
-	}
-
-	if count, err := p.QueryWithNetwork(ctx).
-					Where("request_id=?", id).
-					UpdateQuery(req, cs...); count != 1 {
+	if count, err := p.UpdateWithNetwork(ctx, req); count != 1 {
 		return errorsx.WithStack(fosite.ErrNotFound)
 	} else if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
@@ -531,11 +520,11 @@ func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature strin
 	return p.createSession(ctx, signature, requester, sqlTableDeviceCode)
 }
 
-func (p *Persister) UpdateDeviceCodeSessionByRequestId(ctx context.Context, id string, requester fosite.Requester) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionByRequestId")
+func (p *Persister) UpdateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSession")
 	defer span.End()
 
-	return p.updateSessionByRequestId(ctx, id, requester, sqlTableDeviceCode)
+	return p.updateSessionBySignature(ctx, signature, requester, sqlTableDeviceCode)
 }
 
 func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {

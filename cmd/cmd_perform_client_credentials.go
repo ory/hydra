@@ -23,10 +23,11 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/cmd/cliclient"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/ory/hydra/cmd/cliclient"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"

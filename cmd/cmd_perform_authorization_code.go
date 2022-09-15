@@ -26,13 +26,14 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/hydra/cmd/cliclient"
 	"html/template"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/cmd/cliclient"
 
 	"github.com/pkg/errors"
 
@@ -99,10 +100,12 @@ This command will help you to see if Ory Hydra has been configured properly.
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success, unless if the --no-shutdown flag is provided.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, _, err := cliclient.NewClient(cmd)
+			client, endpoint, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}
+
+			endpoint = cliclient.GetOAuth2URLOverride(cmd, endpoint)
 
 			ctx := context.WithValue(cmd.Context(), oauth2.HTTPClient, client)
 			isSSL := flagx.MustGetBool(cmd, "https")
@@ -132,7 +135,6 @@ and success, unless if the --no-shutdown flag is provided.`,
 				redirectUrl = serverLocation + "callback"
 			}
 
-			remote, err := cmdx.RemoteURI(cmd)
 			if err != nil {
 				return err
 			}
@@ -140,8 +142,8 @@ and success, unless if the --no-shutdown flag is provided.`,
 				ClientID:     clientID,
 				ClientSecret: clientSecret,
 				Endpoint: oauth2.Endpoint{
-					TokenURL: urlx.AppendPaths(remote, "/oauth2/token").String(),
-					AuthURL:  urlx.AppendPaths(remote, "/oauth2/auth").String(),
+					TokenURL: urlx.AppendPaths(endpoint, "/oauth2/token").String(),
+					AuthURL:  urlx.AppendPaths(endpoint, "/oauth2/auth").String(),
 				},
 				RedirectURL: redirectUrl,
 				Scopes:      scopes,

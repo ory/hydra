@@ -1,8 +1,9 @@
 package cliclient
 
 import (
-	"github.com/pkg/errors"
 	"net/url"
+
+	"github.com/pkg/errors"
 
 	"github.com/ory/x/cmdx"
 
@@ -15,7 +16,15 @@ type ContextKey int
 
 const (
 	ClientContextKey ContextKey = iota + 1
+	OAuth2URLOverrideContextKey
 )
+
+func GetOAuth2URLOverride(cmd *cobra.Command, fallback *url.URL) *url.URL {
+	if override, ok := cmd.Context().Value(OAuth2URLOverrideContextKey).(func(cmd *cobra.Command) *url.URL); ok {
+		return override(cmd)
+	}
+	return fallback
+}
 
 func NewClient(cmd *cobra.Command) (*hydra.APIClient, *url.URL, error) {
 	if f, ok := cmd.Context().Value(ClientContextKey).(func(cmd *cobra.Command) (*hydra.APIClient, *url.URL, error)); ok {

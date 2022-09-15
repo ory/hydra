@@ -5,7 +5,6 @@ export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
-				  golang.org/x/tools/cmd/goimports \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
 				  github.com/go-bindata/go-bindata/go-bindata
@@ -21,8 +20,9 @@ endef
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
-node_modules: package.json
+node_modules: package-lock.json
 		npm ci
+		touch node_modules
 
 .PHONY: .bin/yq
 .bin/yq:
@@ -33,6 +33,9 @@ node_modules: package.json
 
 docs/cli: .bin/clidoc
 		clidoc .
+
+.bin/goimports: go.sum
+	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
 .bin/ory: Makefile
 		bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -d -b .bin ory v0.1.22
@@ -89,7 +92,7 @@ quicktest-hsm:
 # Formats the code
 .PHONY: format
 format: .bin/goimports node_modules
-		goimports -w --local github.com/ory .
+		.bin/goimports -w --local github.com/ory .
 		npm exec -- prettier --write .
 
 # Generates mocks

@@ -3,7 +3,7 @@ CREATE TABLE hydra_oauth2_device_grant_request
     challenge             VARCHAR(40)  NOT NULL PRIMARY KEY,
     requested_scope       TEXT         NOT NULL,
     verifier              VARCHAR(40)  NOT NULL UNIQUE,
-    client_id             VARCHAR(255) NULL REFERENCES hydra_client (pk) ON DELETE CASCADE,
+    client_id             VARCHAR(255) NULL,
     request_url           TEXT         NOT NULL,
     requested_audience    VARCHAR(255) NULL     DEFAULT '',
     csrf                  VARCHAR(40)  NOT NULL,

@@ -23,6 +23,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/ory/hydra/cmd/cliclient"
 	"net/url"
 	"os"
 	"strings"
@@ -45,7 +46,7 @@ func NewPerformClientCredentialsCmd(parent *cobra.Command) *cobra.Command {
 		Long: `Performs the OAuth 2.0 Client Credentials Flow. Useful to exchange a client_id and client_secret for an access_token.
 using the CLI.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			hc, target, err := cmdx.NewClient(cmd)
+			hc, target, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

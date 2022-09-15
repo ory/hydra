@@ -26,6 +26,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/hydra/cmd/cliclient"
 	"html/template"
 	"net/http"
 	"os"
@@ -98,7 +99,7 @@ This command will help you to see if Ory Hydra has been configured properly.
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success, unless if the --no-shutdown flag is provided.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, _, err := cmdx.NewClient(cmd)
+			client, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

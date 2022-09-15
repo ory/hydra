@@ -65,16 +65,6 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
-// contains is a case sensitive match, finding needle in a haystack
-func contains(haystack []string, needle string) bool {
-	for _, a := range haystack {
-		if a == needle {
-			return true
-		}
-	}
-	return false
-}
-
 func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {

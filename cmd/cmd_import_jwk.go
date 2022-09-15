@@ -44,7 +44,7 @@ func NewKeysImportCmd(parent *cobra.Command) *cobra.Command {
 Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If the JSON Web Key Set exists already,
 the imported keys will be added to that set. Otherwise, a new set will be created.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,5 @@
 .schema
 .snapshots
+CHANGELOG.md
 spec
 fixtures

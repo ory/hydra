@@ -90,7 +90,7 @@ quicktest-hsm:
 .PHONY: format
 format: .bin/goimports node_modules
 		goimports -w --local github.com/ory .
-		npm run format
+		npm exec -- prettier --write .
 
 # Generates mocks
 .PHONY: mocks

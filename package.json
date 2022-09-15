@@ -3,8 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\"",
     "openapi-generator-cli": "openapi-generator-cli",
     "test": "cypress run",

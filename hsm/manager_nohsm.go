@@ -37,7 +37,7 @@ func NewContext(c *config.DefaultProvider, l *logrusx.Logger) Context {
 	return nil
 }
 
-func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
+func NewKeyManager(hsm Context, config *config.DefaultProvider, l *logrusx.Logger) *KeyManager {
 	return nil
 }
 
@@ -50,6 +50,10 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 }
 
 func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeySet, error) {
+	return nil, errors.WithStack(ErrOpSysNotSupported)
+}
+
+func (m *KeyManager) GetWellKnownKeys(_ context.Context) (*jose.JSONWebKeySet, error) {
 	return nil, errors.WithStack(ErrOpSysNotSupported)
 }
 

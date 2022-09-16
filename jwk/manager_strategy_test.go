@@ -155,6 +155,36 @@ func TestKeyManagerStrategy(t *testing.T) {
 		assert.Nil(t, resultKeySet)
 	})
 
+	t.Run("GetWellKnownKeys_WithResultFromHardwareKeyManager", func(t *testing.T) {
+		hardwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(hwKeySet, nil)
+		resultKeySet, err := keyManager.GetWellKnownKeys(context.TODO())
+		assert.NoError(t, err)
+		assert.Equal(t, hwKeySet, resultKeySet)
+	})
+
+	t.Run("GetWellKnownKeys_WithErrorFromHardwareKeyManager", func(t *testing.T) {
+		hardwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(nil, errors.New("test"))
+		resultKeySet, err := keyManager.GetWellKnownKeys(context.TODO())
+		assert.Error(t, err, "test")
+		assert.Nil(t, resultKeySet)
+	})
+
+	t.Run("GetWellKnownKeys_WithErrNotFoundFromHardwareKeyManager", func(t *testing.T) {
+		hardwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(nil, errors.WithStack(x.ErrNotFound))
+		softwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(swKeySet, nil)
+		resultKeySet, err := keyManager.GetWellKnownKeys(context.TODO())
+		assert.NoError(t, err)
+		assert.Equal(t, swKeySet, resultKeySet)
+	})
+
+	t.Run("GetWellKnownKeys_WithErrNotFoundFromSoftwareKeyManager", func(t *testing.T) {
+		hardwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(nil, errors.WithStack(x.ErrNotFound))
+		softwareKeyManager.EXPECT().GetWellKnownKeys(gomock.Any()).Return(nil, errors.WithStack(x.ErrNotFound))
+		resultKeySet, err := keyManager.GetWellKnownKeys(context.TODO())
+		assert.Error(t, err, "Not Found")
+		assert.Nil(t, resultKeySet)
+	})
+
 	t.Run("DeleteKey_FromHardwareKeyManager", func(t *testing.T) {
 		hardwareKeyManager.EXPECT().DeleteKey(gomock.Any(), gomock.Eq("set1"), gomock.Eq("kid1")).Return(nil)
 		err := keyManager.DeleteKey(context.TODO(), "set1", "kid1")

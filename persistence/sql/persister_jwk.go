@@ -7,6 +7,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/gofrs/uuid"
+
+	"github.com/ory/x/stringslice"
+
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
@@ -183,6 +187,31 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 	}
 
 	return keys, nil
+}
+
+func (p *Persister) GetWellKnownKeys(ctx context.Context) (*jose.JSONWebKeySet, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetWellKnownKeys")
+	defer span.End()
+
+	var wellKnownKeys []jose.JSONWebKey
+	for _, set := range stringslice.Unique(p.config.WellKnownKeys(ctx)) {
+		keys, err := p.GetKeySet(ctx, set)
+		if errors.Is(err, x.ErrNotFound) {
+			p.l.Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+			keys, err = p.GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
+			if err != nil {
+				return nil, err
+			}
+		} else if err != nil {
+			return nil, err
+		}
+
+		keys = jwk.ExcludePrivateKeys(keys)
+		wellKnownKeys = append(wellKnownKeys, keys.Keys...)
+	}
+	return &jose.JSONWebKeySet{
+		Keys: wellKnownKeys,
+	}, nil
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {

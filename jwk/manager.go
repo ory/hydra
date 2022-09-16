@@ -42,6 +42,8 @@ type (
 
 		GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error)
 
+		GetWellKnownKeys(ctx context.Context) (*jose.JSONWebKeySet, error)
+
 		DeleteKey(ctx context.Context, set, kid string) error
 
 		DeleteKeySet(ctx context.Context, set string) error

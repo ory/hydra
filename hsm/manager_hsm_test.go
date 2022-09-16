@@ -17,6 +17,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/contextx"
 
@@ -61,6 +63,8 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
@@ -79,11 +83,8 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 
 	keySetPrefix := "application_specific_prefix."
 	expectedPrefixedOpenIDConnectKeyName := fmt.Sprintf("%s%s", keySetPrefix, x.OpenIDConnectKeyName)
-
-	m := &hsm.KeyManager{
-		Context:      hsmContext,
-		KeySetPrefix: keySetPrefix,
-	}
+	conf.MustSet(context.Background(), config.HSMKeySetPrefix, keySetPrefix)
+	m := hsm.NewKeyManager(hsmContext, conf, l)
 
 	t.Run("case=GenerateAndPersistKeySet", func(t *testing.T) {
 		privateAttrSet, publicAttrSet := expectedKeyAttributes(t, expectedPrefixedOpenIDConnectKeyName, kid)
@@ -144,6 +145,8 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
@@ -303,9 +306,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
-			m := &hsm.KeyManager{
-				Context: hsmContext,
-			}
+			m := hsm.NewKeyManager(hsmContext, conf, l)
 			got, err := m.GenerateAndPersistKeySet(tt.args.ctx, tt.args.set, tt.args.kid, tt.args.alg, tt.args.use)
 			if tt.wantErr != nil {
 				require.Nil(t, got)
@@ -325,6 +326,8 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 func TestKeyManager_GetKey(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
@@ -493,9 +496,8 @@ func TestKeyManager_GetKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
-			m := &hsm.KeyManager{
-				Context: hsmContext,
-			}
+			m := hsm.NewKeyManager(hsmContext, conf, l)
+
 			got, err := m.GetKey(tt.args.ctx, tt.args.set, tt.args.kid)
 			if tt.wantErr != nil {
 				require.Nil(t, got)
@@ -515,6 +517,8 @@ func TestKeyManager_GetKey(t *testing.T) {
 func TestKeyManager_GetKeySet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
@@ -641,9 +645,7 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
-			m := &hsm.KeyManager{
-				Context: hsmContext,
-			}
+			m := hsm.NewKeyManager(hsmContext, conf, l)
 			got, err := m.GetKeySet(tt.args.ctx, tt.args.set)
 			if tt.wantErr != nil {
 				require.Nil(t, got)
@@ -660,9 +662,57 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 	}
 }
 
+func TestKeyManager_GetWellKnownKeySet(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
+	defer ctrl.Finish()
+	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
+	require.NoError(t, err)
+	rsaKeyPair := NewMockSignerDecrypter(ctrl)
+	rsaKeyPair.EXPECT().Public().Return(&rsaKey.PublicKey).AnyTimes()
+	var kid = uuid.New()
+	expectedKeySet := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{
+		Algorithm:                   "RS256",
+		Use:                         "sig",
+		Key:                         rsaKeyPair.Public(),
+		KeyID:                       kid,
+		Certificates:                []*x509.Certificate{},
+		CertificateThumbprintSHA1:   []uint8{},
+		CertificateThumbprintSHA256: []uint8{},
+	}}}
+	m := hsm.NewKeyManager(hsmContext, conf, l)
+
+	t.Run("case=GetWellKnownKeySet cache miss", func(t *testing.T) {
+		hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return([]crypto11.Signer{rsaKeyPair}, nil)
+		hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(kid)), nil)
+		hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
+
+		got, err := m.GetWellKnownKeys(context.TODO())
+
+		assert.NoError(t, err)
+		assert.Len(t, got.Keys, 1)
+		if !reflect.DeepEqual(got, expectedKeySet) {
+			t.Errorf("GetKey() got = %v, want %v", got, expectedKeySet)
+		}
+	})
+	t.Run("case=GetWellKnownKeySet cache hit", func(t *testing.T) {
+		got, err := m.GetWellKnownKeys(context.TODO())
+
+		assert.NoError(t, err)
+		assert.Len(t, got.Keys, 1)
+		if !reflect.DeepEqual(got, expectedKeySet) {
+			t.Errorf("GetKey() got = %v, want %v", got, expectedKeySet)
+		}
+	})
+}
+
 func TestKeyManager_DeleteKey(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKeyPair := NewMockSignerDecrypter(ctrl)
@@ -733,9 +783,7 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
-			m := &hsm.KeyManager{
-				Context: hsmContext,
-			}
+			m := hsm.NewKeyManager(hsmContext, conf, l)
 			if err := m.DeleteKey(tt.args.ctx, tt.args.set, tt.args.kid); len(tt.wantErrMsg) != 0 {
 				require.EqualError(t, err, tt.wantErrMsg)
 			}
@@ -746,6 +794,8 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 func TestKeyManager_DeleteKeySet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
+	conf := internal.NewConfigurationWithDefaults()
+	l := logrusx.New("", "")
 	defer ctrl.Finish()
 
 	rsaKeyPair1 := NewMockSignerDecrypter(ctrl)
@@ -812,9 +862,7 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setup(t)
-			m := &hsm.KeyManager{
-				Context: hsmContext,
-			}
+			m := hsm.NewKeyManager(hsmContext, conf, l)
 			if err := m.DeleteKeySet(tt.args.ctx, tt.args.set); len(tt.wantErrMsg) != 0 {
 				require.EqualError(t, err, tt.wantErrMsg)
 			}

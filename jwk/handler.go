@@ -9,14 +9,9 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/x/errorsx"
-
-	"github.com/ory/x/stringslice"
 
 	"github.com/ory/hydra/x"
 
@@ -87,28 +82,12 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
 func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
-	var jwks jose.JSONWebKeySet
-
-	ctx := r.Context()
-	for _, set := range stringslice.Unique(h.r.Config().WellKnownKeys(ctx)) {
-		keys, err := h.r.KeyManager().GetKeySet(ctx, set)
-		if errors.Is(err, x.ErrNotFound) {
-			h.r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
-			keys, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
-			if err != nil {
-				h.r.Writer().WriteError(w, r, err)
-				return
-			}
-		} else if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-
-		keys = ExcludePrivateKeys(keys)
-		jwks.Keys = append(jwks.Keys, keys.Keys...)
+	if keys, err := h.r.KeyManager().GetWellKnownKeys(r.Context()); err == nil {
+		h.r.Writer().Write(w, r, &keys)
+	} else {
+		h.r.Writer().WriteError(w, r, err)
+		return
 	}
-
-	h.r.Writer().Write(w, r, &jwks)
 }
 
 // Get JSON Web Key Request

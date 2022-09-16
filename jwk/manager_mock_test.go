@@ -133,10 +133,25 @@ func (m *MockManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebK
 	return ret0, ret1
 }
 
+// GetWellKnownKeys mocks base method.
+func (m *MockManager) GetWellKnownKeys(ctx context.Context) (*jose.JSONWebKeySet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWellKnownKeys", ctx)
+	ret0, _ := ret[0].(*jose.JSONWebKeySet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
 // GetKeySet indicates an expected call of GetKeySet.
 func (mr *MockManagerMockRecorder) GetKeySet(ctx, set interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKeySet", reflect.TypeOf((*MockManager)(nil).GetKeySet), ctx, set)
+}
+
+// GetWellKnownKeys indicates an expected call of GetWellKnownKeys.
+func (mr *MockManagerMockRecorder) GetWellKnownKeys(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWellKnownKeys", reflect.TypeOf((*MockManager)(nil).GetWellKnownKeys), ctx)
 }
 
 // UpdateKey mocks base method.

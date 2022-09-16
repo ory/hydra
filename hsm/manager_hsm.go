@@ -16,12 +16,15 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/ory/x/logrusx"
+
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/stringslice"
 
 	"github.com/pkg/errors"
 
-	"github.com/pborman/uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/jwk"
@@ -42,7 +45,10 @@ type KeyManager struct {
 	jwk.Manager
 	sync.RWMutex
 	Context
-	KeySetPrefix string
+
+	config      *config.DefaultProvider
+	l           *logrusx.Logger
+	keySetCache map[string]jose.JSONWebKeySet
 }
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
@@ -51,10 +57,12 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
+func NewKeyManager(hsm Context, config *config.DefaultProvider, l *logrusx.Logger) *KeyManager {
 	return &KeyManager{
-		Context:      hsm,
-		KeySetPrefix: config.HSMKeySetPrefix(),
+		Context:     hsm,
+		config:      config,
+		l:           l,
+		keySetCache: make(map[string]jose.JSONWebKeySet),
 	}
 }
 
@@ -78,9 +86,10 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 	if err != nil {
 		return nil, err
 	}
+	m.evictKeySet(set)
 
 	if len(kid) == 0 {
-		kid = uuid.New()
+		kid = uuid.Must(uuid.NewV4()).String()
 	}
 
 	privateAttrSet, publicAttrSet, err := getKeyPairAttributes(kid, set, use)
@@ -94,19 +103,19 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 		if err != nil {
 			return nil, err
 		}
-		return createKeySet(key, kid, alg, use)
+		return createKeySet(key, kid, alg, use), nil
 	case alg == "ES256":
 		key, err := m.GenerateECDSAKeyPairWithAttributes(publicAttrSet, privateAttrSet, elliptic.P256())
 		if err != nil {
 			return nil, err
 		}
-		return createKeySet(key, kid, alg, use)
+		return createKeySet(key, kid, alg, use), nil
 	case alg == "ES512":
 		key, err := m.GenerateECDSAKeyPairWithAttributes(publicAttrSet, privateAttrSet, elliptic.P521())
 		if err != nil {
 			return nil, err
 		}
-		return createKeySet(key, kid, alg, use)
+		return createKeySet(key, kid, alg, use), nil
 
 	// NOTE:
 	//	- HS256, HS512 not supported. Makes sense only if shared HSM is used between Hydra and authenticating client.
@@ -142,12 +151,12 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
-	id, alg, use, err := getKeySetAttributes(m, keyPair, []byte(kid))
+	_, alg, use, err := getKeySetAttributes(m, keyPair, []byte(kid))
 	if err != nil {
 		return nil, err
 	}
 
-	return createKeySet(keyPair, id, alg, use)
+	return createKeySet(keyPair, kid, alg, use), nil
 }
 
 func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
@@ -186,6 +195,37 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 	}, nil
 }
 
+func (m *KeyManager) GetWellKnownKeys(ctx context.Context) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetWellKnownKeys")
+	defer span.End()
+	attrs := map[string]string{}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
+	m.RLock()
+	defer m.RUnlock()
+
+	var wellKnownKeys []jose.JSONWebKey
+	for _, set := range stringslice.Unique(m.config.WellKnownKeys(ctx)) {
+		if cachedSet, ok := m.keySetCache[set]; ok {
+			wellKnownKeys = append(wellKnownKeys, cachedSet.Keys...)
+		} else if keys, err := m.GetKeySet(ctx, set); err == nil {
+			keys = jwk.ExcludeOpaquePrivateKeys(keys)
+			wellKnownKeys = append(wellKnownKeys, keys.Keys...)
+			m.keySetCache[set] = *keys
+		} else if errors.Is(err, x.ErrNotFound) {
+			m.l.Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+			keys, err = m.GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
+			wellKnownKeys = append(wellKnownKeys, keys.Keys...)
+			m.keySetCache[set] = *keys
+		} else {
+			return nil, err
+		}
+	}
+	return &jose.JSONWebKeySet{
+		Keys: wellKnownKeys,
+	}, nil
+}
+
 func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
 	defer span.End()
@@ -213,6 +253,9 @@ func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 	} else {
 		return errors.WithStack(x.ErrNotFound)
 	}
+
+	m.evictKeySet(set)
+
 	return nil
 }
 
@@ -244,6 +287,9 @@ func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) error {
 			return err
 		}
 	}
+
+	m.evictKeySet(set)
+
 	return nil
 }
 
@@ -346,10 +392,10 @@ func (m *KeyManager) deleteExistingKeySet(set string) error {
 	return nil
 }
 
-func createKeySet(key crypto11.Signer, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+func createKeySet(key crypto11.Signer, kid, alg, use string) *jose.JSONWebKeySet {
 	return &jose.JSONWebKeySet{
 		Keys: createKeys(key, kid, alg, use),
-	}, nil
+	}
 }
 
 func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
@@ -373,5 +419,11 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 }
 
 func (m *KeyManager) prefixKeySet(set string) string {
-	return fmt.Sprintf("%s%s", m.KeySetPrefix, set)
+	return fmt.Sprintf("%s%s", m.config.HSMKeySetPrefix(), set)
+}
+
+func (m *KeyManager) evictKeySet(set string) {
+	if _, ok := m.keySetCache[set]; ok {
+		delete(m.keySetCache, set)
+	}
 }

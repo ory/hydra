@@ -3633,10 +3633,26 @@
                     ],
                     "type": "string",
                     "x-formData-name": "token"
+                  },
+                  "client_id": {
+                    "required": [
+                      "client_id"
+                    ],
+                    "type": "string",
+                    "x-formData-name": "client_id"
+                  },
+                  "client_secret": {
+                    "required": [
+                      "client_secret"
+                    ],
+                    "type": "string",
+                    "x-formData-name": "client_secret"
                   }
                 },
                 "required": [
-                  "token"
+                  "token",
+                  "client_id",
+                  "client_secret"
                 ],
                 "type": "object"
               }

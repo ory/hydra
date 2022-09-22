@@ -176,11 +176,9 @@ request, go through this checklist:
    changes against the `master` branch.
 1. Run the full project test suite with the `go test -tags sqlite ./...` (or
    equivalent) command and confirm that it passes.
-1. Run `make format` if a `Makefile` is available, `gofmt -s` if the project is
-   written in Go, `npm run format` if the project is written for NodeJS.
+1. Run `make format`
 1. Add a descriptive prefix to commits. This ensures a uniform commit history
-   and helps structure the changelog.  
-   Please refer to this
+   and helps structure the changelog. Please refer to this
    [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
    for an overview.
 
@@ -232,11 +230,7 @@ Please disclose vulnerabilities exclusively to
 
 ## Code style
 
-Please follow these guidelines when formatting source code:
-
-- Go code should match the output of `gofmt -s` and pass `golangci-lint run`.
-- NodeJS and JavaScript code should be prettified using `npm run format` where
-  appropriate.
+Please run `make format` to format all source code following the Ory standard.
 
 ### Working with forks
 

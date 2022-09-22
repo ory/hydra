@@ -237,8 +237,7 @@ type adminUpdateOAuth2Client struct {
 //
 // Update an OAuth 2.0 Client
 //
-// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret
-// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
+// Update an existing OAuth 2.0 Client. If you pass `client_secret` error will be returned.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.

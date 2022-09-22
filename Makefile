@@ -34,7 +34,7 @@ node_modules: package-lock.json
 docs/cli: .bin/clidoc
 		clidoc .
 
-.bin/goimports: go.sum
+.bin/goimports: go.sum Makefile
 	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
 .bin/ory: Makefile

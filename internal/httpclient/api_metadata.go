@@ -42,8 +42,8 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of this service, the version will never
 refer to the cluster state, only to a single instance.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetVersionRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetVersionRequest
 */
 func (a *MetadataApiService) GetVersion(ctx context.Context) ApiGetVersionRequest {
 	return ApiGetVersionRequest{
@@ -53,7 +53,8 @@ func (a *MetadataApiService) GetVersion(ctx context.Context) ApiGetVersionReques
 }
 
 // Execute executes the request
-//  @return GetVersion200Response
+//
+//	@return GetVersion200Response
 func (a *MetadataApiService) GetVersionExecute(r ApiGetVersionRequest) (*GetVersion200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -148,8 +149,8 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of this service, the health status will never
 refer to the cluster state, only to a single instance.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiIsAliveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiIsAliveRequest
 */
 func (a *MetadataApiService) IsAlive(ctx context.Context) ApiIsAliveRequest {
 	return ApiIsAliveRequest{
@@ -159,7 +160,8 @@ func (a *MetadataApiService) IsAlive(ctx context.Context) ApiIsAliveRequest {
 }
 
 // Execute executes the request
-//  @return HealthStatus
+//
+//	@return HealthStatus
 func (a *MetadataApiService) IsAliveExecute(r ApiIsAliveRequest) (*HealthStatus, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -263,8 +265,8 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of Ory Hydra, the health status will never
 refer to the cluster state, only to a single instance.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiIsReadyRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiIsReadyRequest
 */
 func (a *MetadataApiService) IsReady(ctx context.Context) ApiIsReadyRequest {
 	return ApiIsReadyRequest{
@@ -274,7 +276,8 @@ func (a *MetadataApiService) IsReady(ctx context.Context) ApiIsReadyRequest {
 }
 
 // Execute executes the request
-//  @return IsReady200Response
+//
+//	@return IsReady200Response
 func (a *MetadataApiService) IsReadyExecute(r ApiIsReadyRequest) (*IsReady200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

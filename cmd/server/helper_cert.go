@@ -37,7 +37,6 @@ import (
 	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 
 	"github.com/ory/x/tlsx"
 
@@ -59,7 +58,7 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 
 var lock sync.Mutex
 
-func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface, reloadCtx context.Context) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, iface config.ServeInterface, reloadCtx context.Context) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	lock.Lock()
 	defer lock.Unlock()
 

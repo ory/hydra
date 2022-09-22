@@ -64,8 +64,8 @@ consent request should be used as basis for future requests.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminAcceptOAuth2ConsentRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminAcceptOAuth2ConsentRequestRequest
 */
 func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequest(ctx context.Context) ApiAdminAcceptOAuth2ConsentRequestRequest {
 	return ApiAdminAcceptOAuth2ConsentRequestRequest{
@@ -75,7 +75,8 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequest(ctx context.Context
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAcceptOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -200,8 +201,8 @@ a cookie.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminAcceptOAuth2LoginRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminAcceptOAuth2LoginRequestRequest
 */
 func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequest(ctx context.Context) ApiAdminAcceptOAuth2LoginRequestRequest {
 	return ApiAdminAcceptOAuth2LoginRequestRequest{
@@ -211,7 +212,8 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequest(ctx context.Context) 
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcceptOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -320,8 +322,8 @@ When a user or an application requests ORY Hydra to log out a user, this endpoin
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminAcceptOAuth2LogoutRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminAcceptOAuth2LogoutRequestRequest
 */
 func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequest(ctx context.Context) ApiAdminAcceptOAuth2LogoutRequestRequest {
 	return ApiAdminAcceptOAuth2LogoutRequestRequest{
@@ -331,7 +333,8 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequest(ctx context.Context)
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcceptOAuth2LogoutRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -439,9 +442,9 @@ This endpoint is capable of generating JSON Web Key Sets for you. There a differ
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @return ApiAdminCreateJsonWebKeySetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@return ApiAdminCreateJsonWebKeySetRequest
 */
 func (a *V0alpha2ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set string) ApiAdminCreateJsonWebKeySetRequest {
 	return ApiAdminCreateJsonWebKeySetRequest{
@@ -452,7 +455,8 @@ func (a *V0alpha2ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set s
 }
 
 // Execute executes the request
-//  @return JsonWebKeySet
+//
+//	@return JsonWebKeySet
 func (a *V0alpha2ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -563,8 +567,8 @@ is generated. The secret is echoed in the response. It is not possible to retrie
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminCreateOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminCreateOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) AdminCreateOAuth2Client(ctx context.Context) ApiAdminCreateOAuth2ClientRequest {
 	return ApiAdminCreateOAuth2ClientRequest{
@@ -574,7 +578,8 @@ func (a *V0alpha2ApiService) AdminCreateOAuth2Client(ctx context.Context) ApiAdm
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -678,10 +683,10 @@ Use this endpoint to delete a single JSON Web Key.
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @param kid The JSON Web Key ID (kid)
- @return ApiAdminDeleteJsonWebKeyRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@param kid The JSON Web Key ID (kid)
+	@return ApiAdminDeleteJsonWebKeyRequest
 */
 func (a *V0alpha2ApiService) AdminDeleteJsonWebKey(ctx context.Context, set string, kid string) ApiAdminDeleteJsonWebKeyRequest {
 	return ApiAdminDeleteJsonWebKeyRequest{
@@ -782,9 +787,9 @@ Use this endpoint to delete a complete JSON Web Key Set and all the keys in that
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @return ApiAdminDeleteJsonWebKeySetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@return ApiAdminDeleteJsonWebKeySetRequest
 */
 func (a *V0alpha2ApiService) AdminDeleteJsonWebKeySet(ctx context.Context, set string) ApiAdminDeleteJsonWebKeySetRequest {
 	return ApiAdminDeleteJsonWebKeySetRequest{
@@ -886,9 +891,9 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
 
 Make sure that this endpoint is well protected and only callable by first-party components.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiAdminDeleteOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiAdminDeleteOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) AdminDeleteOAuth2Client(ctx context.Context, id string) ApiAdminDeleteOAuth2ClientRequest {
 	return ApiAdminDeleteOAuth2ClientRequest{
@@ -990,8 +995,8 @@ AdminDeleteOAuth2Token Delete OAuth2 Access Tokens from a Client
 
 This endpoint deletes OAuth2 access tokens issued for a client from the database
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminDeleteOAuth2TokenRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminDeleteOAuth2TokenRequest
 */
 func (a *V0alpha2ApiService) AdminDeleteOAuth2Token(ctx context.Context) ApiAdminDeleteOAuth2TokenRequest {
 	return ApiAdminDeleteOAuth2TokenRequest{
@@ -1094,9 +1099,9 @@ created the trust relationship.
 Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
 for OAuth 2.0 Client Authentication and Authorization Grant.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the desired grant
- @return ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the desired grant
+	@return ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest
 */
 func (a *V0alpha2ApiService) AdminDeleteTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest {
 	return ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest{
@@ -1194,10 +1199,10 @@ AdminGetJsonWebKey Fetch a JSON Web Key
 
 This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @param kid The JSON Web Key ID (kid)
- @return ApiAdminGetJsonWebKeyRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@param kid The JSON Web Key ID (kid)
+	@return ApiAdminGetJsonWebKeyRequest
 */
 func (a *V0alpha2ApiService) AdminGetJsonWebKey(ctx context.Context, set string, kid string) ApiAdminGetJsonWebKeyRequest {
 	return ApiAdminGetJsonWebKeyRequest{
@@ -1209,7 +1214,8 @@ func (a *V0alpha2ApiService) AdminGetJsonWebKey(ctx context.Context, set string,
 }
 
 // Execute executes the request
-//  @return JsonWebKeySet
+//
+//	@return JsonWebKeySet
 func (a *V0alpha2ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1309,9 +1315,9 @@ This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @return ApiAdminGetJsonWebKeySetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@return ApiAdminGetJsonWebKeySetRequest
 */
 func (a *V0alpha2ApiService) AdminGetJsonWebKeySet(ctx context.Context, set string) ApiAdminGetJsonWebKeySetRequest {
 	return ApiAdminGetJsonWebKeySetRequest{
@@ -1322,7 +1328,8 @@ func (a *V0alpha2ApiService) AdminGetJsonWebKeySet(ctx context.Context, set stri
 }
 
 // Execute executes the request
-//  @return JsonWebKeySet
+//
+//	@return JsonWebKeySet
 func (a *V0alpha2ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1422,9 +1429,9 @@ Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiAdminGetOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiAdminGetOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) AdminGetOAuth2Client(ctx context.Context, id string) ApiAdminGetOAuth2ClientRequest {
 	return ApiAdminGetOAuth2ClientRequest{
@@ -1435,7 +1442,8 @@ func (a *V0alpha2ApiService) AdminGetOAuth2Client(ctx context.Context, id string
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) AdminGetOAuth2ClientExecute(r ApiAdminGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1546,8 +1554,8 @@ The consent challenge is appended to the consent provider's URL to which the sub
 provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 or rejected the request.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminGetOAuth2ConsentRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminGetOAuth2ConsentRequestRequest
 */
 func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequest(ctx context.Context) ApiAdminGetOAuth2ConsentRequestRequest {
 	return ApiAdminGetOAuth2ConsentRequestRequest{
@@ -1557,7 +1565,8 @@ func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequest(ctx context.Context) A
 }
 
 // Execute executes the request
-//  @return OAuth2ConsentRequest
+//
+//	@return OAuth2ConsentRequest
 func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOAuth2ConsentRequestRequest) (*OAuth2ConsentRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1678,8 +1687,8 @@ a subject (in OAuth2 the proper name for subject is "resource owner").
 The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminGetOAuth2LoginRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminGetOAuth2LoginRequestRequest
 */
 func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequest(ctx context.Context) ApiAdminGetOAuth2LoginRequestRequest {
 	return ApiAdminGetOAuth2LoginRequestRequest{
@@ -1689,7 +1698,8 @@ func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequest(ctx context.Context) Api
 }
 
 // Execute executes the request
-//  @return OAuth2LoginRequest
+//
+//	@return OAuth2LoginRequest
 func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAuth2LoginRequestRequest) (*OAuth2LoginRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1804,8 +1814,8 @@ AdminGetOAuth2LogoutRequest Get an OAuth 2.0 Logout Request
 
 Use this endpoint to fetch a logout request.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminGetOAuth2LogoutRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminGetOAuth2LogoutRequestRequest
 */
 func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequest(ctx context.Context) ApiAdminGetOAuth2LogoutRequestRequest {
 	return ApiAdminGetOAuth2LogoutRequestRequest{
@@ -1815,7 +1825,8 @@ func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequest(ctx context.Context) Ap
 }
 
 // Execute executes the request
-//  @return OAuth2LogoutRequest
+//
+//	@return OAuth2LogoutRequest
 func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAuth2LogoutRequestRequest) (*OAuth2LogoutRequest, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -1926,9 +1937,9 @@ AdminGetTrustedOAuth2JwtGrantIssuer Get a Trusted OAuth2 JWT Bearer Grant Type I
 Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 created the trust relationship.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the desired grant
- @return ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the desired grant
+	@return ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest
 */
 func (a *V0alpha2ApiService) AdminGetTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest {
 	return ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest{
@@ -1939,7 +1950,8 @@ func (a *V0alpha2ApiService) AdminGetTrustedOAuth2JwtGrantIssuer(ctx context.Con
 }
 
 // Execute executes the request
-//  @return TrustedOAuth2JwtGrantIssuer
+//
+//	@return TrustedOAuth2JwtGrantIssuer
 func (a *V0alpha2ApiService) AdminGetTrustedOAuth2JwtGrantIssuerExecute(r ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2053,8 +2065,8 @@ set additional data for a token by setting `accessTokenExtra` during the consent
 
 For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminIntrospectOAuth2TokenRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminIntrospectOAuth2TokenRequest
 */
 func (a *V0alpha2ApiService) AdminIntrospectOAuth2Token(ctx context.Context) ApiAdminIntrospectOAuth2TokenRequest {
 	return ApiAdminIntrospectOAuth2TokenRequest{
@@ -2064,7 +2076,8 @@ func (a *V0alpha2ApiService) AdminIntrospectOAuth2Token(ctx context.Context) Api
 }
 
 // Execute executes the request
-//  @return IntrospectedOAuth2Token
+//
+//	@return IntrospectedOAuth2Token
 func (a *V0alpha2ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrospectOAuth2TokenRequest) (*IntrospectedOAuth2Token, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -2204,8 +2217,8 @@ formatted like so: '<https://project-slug.projects.oryapis.com/admin/clients?lim
 where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can
 be included in this header, and will be separated by a comma.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminListOAuth2ClientsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminListOAuth2ClientsRequest
 */
 func (a *V0alpha2ApiService) AdminListOAuth2Clients(ctx context.Context) ApiAdminListOAuth2ClientsRequest {
 	return ApiAdminListOAuth2ClientsRequest{
@@ -2215,7 +2228,8 @@ func (a *V0alpha2ApiService) AdminListOAuth2Clients(ctx context.Context) ApiAdmi
 }
 
 // Execute executes the request
-//  @return []OAuth2Client
+//
+//	@return []OAuth2Client
 func (a *V0alpha2ApiService) AdminListOAuth2ClientsExecute(r ApiAdminListOAuth2ClientsRequest) ([]OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2348,8 +2362,8 @@ empty JSON array with status code 200 OK.
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminListOAuth2SubjectConsentSessionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminListOAuth2SubjectConsentSessionsRequest
 */
 func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessions(ctx context.Context) ApiAdminListOAuth2SubjectConsentSessionsRequest {
 	return ApiAdminListOAuth2SubjectConsentSessionsRequest{
@@ -2359,7 +2373,8 @@ func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessions(ctx context.C
 }
 
 // Execute executes the request
-//  @return []PreviousOAuth2ConsentSession
+//
+//	@return []PreviousOAuth2ConsentSession
 func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiAdminListOAuth2SubjectConsentSessionsRequest) ([]PreviousOAuth2ConsentSession, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2497,8 +2512,8 @@ AdminListTrustedOAuth2JwtGrantIssuers List Trusted OAuth2 JWT Bearer Grant Type 
 
 Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminListTrustedOAuth2JwtGrantIssuersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminListTrustedOAuth2JwtGrantIssuersRequest
 */
 func (a *V0alpha2ApiService) AdminListTrustedOAuth2JwtGrantIssuers(ctx context.Context) ApiAdminListTrustedOAuth2JwtGrantIssuersRequest {
 	return ApiAdminListTrustedOAuth2JwtGrantIssuersRequest{
@@ -2508,7 +2523,8 @@ func (a *V0alpha2ApiService) AdminListTrustedOAuth2JwtGrantIssuers(ctx context.C
 }
 
 // Execute executes the request
-//  @return []TrustedOAuth2JwtGrantIssuer
+//
+//	@return []TrustedOAuth2JwtGrantIssuer
 func (a *V0alpha2ApiService) AdminListTrustedOAuth2JwtGrantIssuersExecute(r ApiAdminListTrustedOAuth2JwtGrantIssuersRequest) ([]TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -2630,9 +2646,9 @@ only time you will be able to retrieve the client secret, so write it down and k
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiAdminPatchOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiAdminPatchOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) AdminPatchOAuth2Client(ctx context.Context, id string) ApiAdminPatchOAuth2ClientRequest {
 	return ApiAdminPatchOAuth2ClientRequest{
@@ -2643,7 +2659,8 @@ func (a *V0alpha2ApiService) AdminPatchOAuth2Client(ctx context.Context, id stri
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch
@@ -2770,8 +2787,8 @@ The consent provider must include a reason why the consent was not granted.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminRejectOAuth2ConsentRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminRejectOAuth2ConsentRequestRequest
 */
 func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context) ApiAdminRejectOAuth2ConsentRequestRequest {
 	return ApiAdminRejectOAuth2ConsentRequestRequest{
@@ -2781,7 +2798,8 @@ func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequest(ctx context.Context
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRejectOAuth2ConsentRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -2905,8 +2923,8 @@ was denied.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminRejectOAuth2LoginRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminRejectOAuth2LoginRequestRequest
 */
 func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequest(ctx context.Context) ApiAdminRejectOAuth2LoginRequestRequest {
 	return ApiAdminRejectOAuth2LoginRequestRequest{
@@ -2916,7 +2934,8 @@ func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequest(ctx context.Context) 
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminRejectOAuth2LoginRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3032,8 +3051,8 @@ No body is required.
 
 The response is empty as the logout provider has to chose what action to perform next.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminRejectOAuth2LogoutRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminRejectOAuth2LogoutRequestRequest
 */
 func (a *V0alpha2ApiService) AdminRejectOAuth2LogoutRequest(ctx context.Context) ApiAdminRejectOAuth2LogoutRequestRequest {
 	return ApiAdminRejectOAuth2LogoutRequestRequest{
@@ -3155,8 +3174,8 @@ AdminRevokeOAuth2ConsentSessions Revokes OAuth 2.0 Consent Sessions of a Subject
 This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminRevokeOAuth2ConsentSessionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminRevokeOAuth2ConsentSessionsRequest
 */
 func (a *V0alpha2ApiService) AdminRevokeOAuth2ConsentSessions(ctx context.Context) ApiAdminRevokeOAuth2ConsentSessionsRequest {
 	return ApiAdminRevokeOAuth2ConsentSessionsRequest{
@@ -3269,8 +3288,8 @@ This endpoint invalidates a subject's authentication session. After revoking the
 has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 Front- or Back-channel logout.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminRevokeOAuth2LoginSessionsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminRevokeOAuth2LoginSessionsRequest
 */
 func (a *V0alpha2ApiService) AdminRevokeOAuth2LoginSessions(ctx context.Context) ApiAdminRevokeOAuth2LoginSessionsRequest {
 	return ApiAdminRevokeOAuth2LoginSessionsRequest{
@@ -3376,8 +3395,8 @@ Use this endpoint to establish a trust relationship for a JWT issuer
 to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
 and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminTrustOAuth2JwtGrantIssuerRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminTrustOAuth2JwtGrantIssuerRequest
 */
 func (a *V0alpha2ApiService) AdminTrustOAuth2JwtGrantIssuer(ctx context.Context) ApiAdminTrustOAuth2JwtGrantIssuerRequest {
 	return ApiAdminTrustOAuth2JwtGrantIssuerRequest{
@@ -3387,7 +3406,8 @@ func (a *V0alpha2ApiService) AdminTrustOAuth2JwtGrantIssuer(ctx context.Context)
 }
 
 // Execute executes the request
-//  @return TrustedOAuth2JwtGrantIssuer
+//
+//	@return TrustedOAuth2JwtGrantIssuer
 func (a *V0alpha2ApiService) AdminTrustOAuth2JwtGrantIssuerExecute(r ApiAdminTrustOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -3494,10 +3514,10 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @param kid The JSON Web Key ID (kid)
- @return ApiAdminUpdateJsonWebKeyRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@param kid The JSON Web Key ID (kid)
+	@return ApiAdminUpdateJsonWebKeyRequest
 */
 func (a *V0alpha2ApiService) AdminUpdateJsonWebKey(ctx context.Context, set string, kid string) ApiAdminUpdateJsonWebKeyRequest {
 	return ApiAdminUpdateJsonWebKeyRequest{
@@ -3509,7 +3529,8 @@ func (a *V0alpha2ApiService) AdminUpdateJsonWebKey(ctx context.Context, set stri
 }
 
 // Execute executes the request
-//  @return JsonWebKey
+//
+//	@return JsonWebKey
 func (a *V0alpha2ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3617,9 +3638,9 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param set The JSON Web Key Set
- @return ApiAdminUpdateJsonWebKeySetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param set The JSON Web Key Set
+	@return ApiAdminUpdateJsonWebKeySetRequest
 */
 func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set string) ApiAdminUpdateJsonWebKeySetRequest {
 	return ApiAdminUpdateJsonWebKeySetRequest{
@@ -3630,7 +3651,8 @@ func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set s
 }
 
 // Execute executes the request
-//  @return JsonWebKeySet
+//
+//	@return JsonWebKeySet
 func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3739,9 +3761,9 @@ is generated. The secret is echoed in the response. It is not possible to retrie
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiAdminUpdateOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiAdminUpdateOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) AdminUpdateOAuth2Client(ctx context.Context, id string) ApiAdminUpdateOAuth2ClientRequest {
 	return ApiAdminUpdateOAuth2ClientRequest{
@@ -3752,7 +3774,8 @@ func (a *V0alpha2ApiService) AdminUpdateOAuth2Client(ctx context.Context, id str
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -3855,8 +3878,8 @@ This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Toke
 if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
 [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiDiscoverJsonWebKeysRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiDiscoverJsonWebKeysRequest
 */
 func (a *V0alpha2ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonWebKeysRequest {
 	return ApiDiscoverJsonWebKeysRequest{
@@ -3866,7 +3889,8 @@ func (a *V0alpha2ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscove
 }
 
 // Execute executes the request
-//  @return JsonWebKeySet
+//
+//	@return JsonWebKeySet
 func (a *V0alpha2ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -3966,8 +3990,8 @@ flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
 Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 For a full list of clients go here: https://openid.net/developers/certified/
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiDiscoverOidcConfigurationRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiDiscoverOidcConfigurationRequest
 */
 func (a *V0alpha2ApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscoverOidcConfigurationRequest {
 	return ApiDiscoverOidcConfigurationRequest{
@@ -3977,7 +4001,8 @@ func (a *V0alpha2ApiService) DiscoverOidcConfiguration(ctx context.Context) ApiD
 }
 
 // Execute executes the request
-//  @return OidcConfiguration
+//
+//	@return OidcConfiguration
 func (a *V0alpha2ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigurationRequest) (*OidcConfiguration, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -4088,8 +4113,8 @@ values will be server generated when specifying `token_endpoint_auth_method` as 
 The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
 Write the secret down and keep it somewhere safe.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiDynamicClientRegistrationCreateOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiDynamicClientRegistrationCreateOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) DynamicClientRegistrationCreateOAuth2Client(ctx context.Context) ApiDynamicClientRegistrationCreateOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationCreateOAuth2ClientRequest{
@@ -4099,7 +4124,8 @@ func (a *V0alpha2ApiService) DynamicClientRegistrationCreateOAuth2Client(ctx con
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r ApiDynamicClientRegistrationCreateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -4210,9 +4236,9 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) DynamicClientRegistrationDeleteOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationDeleteOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationDeleteOAuth2ClientRequest{
@@ -4319,9 +4345,9 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationGetOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiDynamicClientRegistrationGetOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) DynamicClientRegistrationGetOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationGetOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationGetOAuth2ClientRequest{
@@ -4332,7 +4358,8 @@ func (a *V0alpha2ApiService) DynamicClientRegistrationGetOAuth2Client(ctx contex
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r ApiDynamicClientRegistrationGetOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -4448,9 +4475,9 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest
 */
 func (a *V0alpha2ApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx context.Context, id string) ApiDynamicClientRegistrationUpdateOAuth2ClientRequest {
 	return ApiDynamicClientRegistrationUpdateOAuth2ClientRequest{
@@ -4461,7 +4488,8 @@ func (a *V0alpha2ApiService) DynamicClientRegistrationUpdateOAuth2Client(ctx con
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *V0alpha2ApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r ApiDynamicClientRegistrationUpdateOAuth2ClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
@@ -4569,8 +4597,8 @@ In the case of authentication error, a WWW-Authenticate header might be set in t
 with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 for more details about header format.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetOidcUserInfoRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetOidcUserInfoRequest
 */
 func (a *V0alpha2ApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRequest {
 	return ApiGetOidcUserInfoRequest{
@@ -4580,7 +4608,8 @@ func (a *V0alpha2ApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUser
 }
 
 // Execute executes the request
-//  @return OidcUserInfo
+//
+//	@return OidcUserInfo
 func (a *V0alpha2ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*OidcUserInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -4678,8 +4707,8 @@ OAuth2 is a very popular protocol and a library for your programming language wi
 
 To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiPerformOAuth2AuthorizationFlowRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPerformOAuth2AuthorizationFlowRequest
 */
 func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context) ApiPerformOAuth2AuthorizationFlowRequest {
 	return ApiPerformOAuth2AuthorizationFlowRequest{
@@ -4689,7 +4718,8 @@ func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context)
 }
 
 // Execute executes the request
-//  @return OAuth2ApiError
+//
+//	@return OAuth2ApiError
 func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2AuthorizationFlowRequest) (*OAuth2ApiError, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -4821,8 +4851,8 @@ request entity-body.
 >
 > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiPerformOAuth2TokenFlowRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPerformOAuth2TokenFlowRequest
 */
 func (a *V0alpha2ApiService) PerformOAuth2TokenFlow(ctx context.Context) ApiPerformOAuth2TokenFlowRequest {
 	return ApiPerformOAuth2TokenFlowRequest{
@@ -4832,7 +4862,8 @@ func (a *V0alpha2ApiService) PerformOAuth2TokenFlow(ctx context.Context) ApiPerf
 }
 
 // Execute executes the request
-//  @return OAuth2TokenResponse
+//
+//	@return OAuth2TokenResponse
 func (a *V0alpha2ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2TokenFlowRequest) (*OAuth2TokenResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -4948,8 +4979,8 @@ https://openid.net/specs/openid-connect-backchannel-1_0.html
 
 Back-channel logout is performed asynchronously and does not affect logout flow.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiPerformOidcFrontOrBackChannelLogoutRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPerformOidcFrontOrBackChannelLogoutRequest
 */
 func (a *V0alpha2ApiService) PerformOidcFrontOrBackChannelLogout(ctx context.Context) ApiPerformOidcFrontOrBackChannelLogoutRequest {
 	return ApiPerformOidcFrontOrBackChannelLogoutRequest{
@@ -5045,8 +5076,8 @@ longer be used to make access requests, and a revoked refresh token can no longe
 Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 the client the token was generated for.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiRevokeOAuth2TokenRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiRevokeOAuth2TokenRequest
 */
 func (a *V0alpha2ApiService) RevokeOAuth2Token(ctx context.Context) ApiRevokeOAuth2TokenRequest {
 	return ApiRevokeOAuth2TokenRequest{

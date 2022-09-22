@@ -57,66 +57,67 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
-var mapLock sync.RWMutex
-var locks = map[string]*sync.RWMutex{}
+var lock sync.Mutex
 
-func getLock(set string) *sync.RWMutex {
-	mapLock.Lock()
-	defer mapLock.Unlock()
-	if _, ok := locks[set]; !ok {
-		locks[set] = new(sync.RWMutex)
-	}
-	return locks[set]
-}
+func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface, reloadCtx context.Context) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+	lock.Lock()
+	defer lock.Unlock()
 
-func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
-	getLock(TlsKeyName).Lock()
-	defer getLock(TlsKeyName).Unlock()
-
-	cert, err := d.Config().TLS(ctx, iface).Certificate()
-
+	// check if certificates are configured
+	certFunc, err := d.Config().TLS(ctx, iface).GetCertificateFunc(reloadCtx, d.Logger())
 	if err == nil {
-		return cert
+		return certFunc
 	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {
-		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
+		d.Logger().WithError(err).Fatal("Unable to load HTTPS TLS Certificate")
+		return nil // in case Fatal is hooked
 	}
 
+	// no certificates configured: self-sign a new cert
 	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
+		return nil // in case Fatal is hooked
 	}
 
 	if len(priv.Certificates) == 0 {
 		cert, err := tlsx.CreateSelfSignedCertificate(priv.Key)
 		if err != nil {
-			d.Logger().WithError(err).Fatalf(`Could not generate a self signed TLS certificate`)
+			d.Logger().WithError(err).Fatal(`Could not generate a self signed TLS certificate`)
+			return nil // in case Fatal is hooked
 		}
 
 		AttachCertificate(priv, cert)
 		if err := d.SoftwareKeyManager().DeleteKey(ctx, TlsKeyName, priv.KeyID); err != nil {
 			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
+			return nil // in case Fatal is hooked
 		}
 
 		if err := d.SoftwareKeyManager().AddKey(ctx, TlsKeyName, priv); err != nil {
 			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
+			return nil // in case Fatalf is hooked
 		}
 	}
 
 	block, err := jwk.PEMBlockForKey(priv.Key)
 	if err != nil {
-		d.Logger().WithError(err).Fatalf("Could not encode key to PEM")
+		d.Logger().WithError(err).Fatal("Could not encode key to PEM")
+		return nil // in case Fatal is hooked
 	}
 
 	if len(priv.Certificates) == 0 {
 		d.Logger().Fatal("TLS certificate chain can not be empty")
+		return nil // in case Fatal is hooked
 	}
 
 	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: priv.Certificates[0].Raw})
 	pemKey := pem.EncodeToMemory(block)
 	ct, err := tls.X509KeyPair(pemCert, pemKey)
 	if err != nil {
-		d.Logger().WithError(err).Fatalf("Could not decode certificate")
+		d.Logger().WithError(err).Fatal("Could not decode certificate")
+		return nil // in case Fatal is hooked
 	}
 
-	return []tls.Certificate{ct}
+	return func(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		return &ct, nil
+	}
 }

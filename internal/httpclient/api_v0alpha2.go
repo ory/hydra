@@ -45,7 +45,7 @@ func (r ApiAdminAcceptOAuth2ConsentRequestRequest) Execute() (*SuccessfulOAuth2R
 }
 
 /*
-AdminAcceptOAuth2ConsentRequest # Accept an OAuth 2.0 Consent Request
+AdminAcceptOAuth2ConsentRequest Accept an OAuth 2.0 Consent Request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -185,7 +185,7 @@ func (r ApiAdminAcceptOAuth2LoginRequestRequest) Execute() (*SuccessfulOAuth2Req
 }
 
 /*
-AdminAcceptOAuth2LoginRequest # Accept an OAuth 2.0 Login Request
+AdminAcceptOAuth2LoginRequest Accept an OAuth 2.0 Login Request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
@@ -316,7 +316,7 @@ func (r ApiAdminAcceptOAuth2LogoutRequestRequest) Execute() (*SuccessfulOAuth2Re
 }
 
 /*
-AdminAcceptOAuth2LogoutRequest # Accept an OAuth 2.0 Logout Request
+AdminAcceptOAuth2LogoutRequest Accept an OAuth 2.0 Logout Request
 
 When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 
@@ -436,7 +436,7 @@ func (r ApiAdminCreateJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Res
 }
 
 /*
-AdminCreateJsonWebKeySet # Generate a New JSON Web Key
+AdminCreateJsonWebKeySet Generate a New JSON Web Key
 
 This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 
@@ -559,7 +559,7 @@ func (r ApiAdminCreateOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Respo
 }
 
 /*
-AdminCreateOAuth2Client # Create an OAuth 2.0 Client
+AdminCreateOAuth2Client Create an OAuth 2.0 Client
 
 Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret
 is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
@@ -677,7 +677,7 @@ func (r ApiAdminDeleteJsonWebKeyRequest) Execute() (*http.Response, error) {
 }
 
 /*
-AdminDeleteJsonWebKey # Delete a JSON Web Key
+AdminDeleteJsonWebKey Delete a JSON Web Key
 
 Use this endpoint to delete a single JSON Web Key.
 
@@ -781,7 +781,7 @@ func (r ApiAdminDeleteJsonWebKeySetRequest) Execute() (*http.Response, error) {
 }
 
 /*
-AdminDeleteJsonWebKeySet # Delete a JSON Web Key Set
+AdminDeleteJsonWebKeySet Delete a JSON Web Key Set
 
 Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
 
@@ -882,7 +882,7 @@ func (r ApiAdminDeleteOAuth2ClientRequest) Execute() (*http.Response, error) {
 }
 
 /*
-AdminDeleteOAuth2Client # Deletes an OAuth 2.0 Client
+AdminDeleteOAuth2Client Deletes an OAuth 2.0 Client
 
 Delete an existing OAuth 2.0 Client by its ID.
 
@@ -991,7 +991,7 @@ func (r ApiAdminDeleteOAuth2TokenRequest) Execute() (*http.Response, error) {
 }
 
 /*
-AdminDeleteOAuth2Token # Delete OAuth2 Access Tokens from a Client
+AdminDeleteOAuth2Token Delete OAuth2 Access Tokens from a Client
 
 This endpoint deletes OAuth2 access tokens issued for a client from the database
 
@@ -1091,7 +1091,7 @@ func (r ApiAdminDeleteTrustedOAuth2JwtGrantIssuerRequest) Execute() (*http.Respo
 }
 
 /*
-AdminDeleteTrustedOAuth2JwtGrantIssuer # Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
+AdminDeleteTrustedOAuth2JwtGrantIssuer Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 
 Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 created the trust relationship.
@@ -1195,7 +1195,7 @@ func (r ApiAdminGetJsonWebKeyRequest) Execute() (*JsonWebKeySet, *http.Response,
 }
 
 /*
-AdminGetJsonWebKey # Fetch a JSON Web Key
+AdminGetJsonWebKey Fetch a JSON Web Key
 
 This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
 
@@ -1309,7 +1309,7 @@ func (r ApiAdminGetJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Respon
 }
 
 /*
-AdminGetJsonWebKeySet # Retrieve a JSON Web Key Set
+AdminGetJsonWebKeySet Retrieve a JSON Web Key Set
 
 This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
 
@@ -1422,7 +1422,7 @@ func (r ApiAdminGetOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Response
 }
 
 /*
-AdminGetOAuth2Client # Get an OAuth 2.0 Client
+AdminGetOAuth2Client Get an OAuth 2.0 Client
 
 Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
 
@@ -1541,7 +1541,7 @@ func (r ApiAdminGetOAuth2ConsentRequestRequest) Execute() (*OAuth2ConsentRequest
 }
 
 /*
-AdminGetOAuth2ConsentRequest # Get OAuth 2.0 Consent Request Information
+AdminGetOAuth2ConsentRequest Get OAuth 2.0 Consent Request Information
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -1677,7 +1677,7 @@ func (r ApiAdminGetOAuth2LoginRequestRequest) Execute() (*OAuth2LoginRequest, *h
 }
 
 /*
-AdminGetOAuth2LoginRequest # Get an OAuth 2.0 Login Request
+AdminGetOAuth2LoginRequest Get an OAuth 2.0 Login Request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -1810,7 +1810,7 @@ func (r ApiAdminGetOAuth2LogoutRequestRequest) Execute() (*OAuth2LogoutRequest, 
 }
 
 /*
-AdminGetOAuth2LogoutRequest # Get an OAuth 2.0 Logout Request
+AdminGetOAuth2LogoutRequest Get an OAuth 2.0 Logout Request
 
 Use this endpoint to fetch a logout request.
 
@@ -1932,7 +1932,7 @@ func (r ApiAdminGetTrustedOAuth2JwtGrantIssuerRequest) Execute() (*TrustedOAuth2
 }
 
 /*
-AdminGetTrustedOAuth2JwtGrantIssuer # Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
+AdminGetTrustedOAuth2JwtGrantIssuer Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 
 Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 created the trust relationship.
@@ -2057,7 +2057,7 @@ func (r ApiAdminIntrospectOAuth2TokenRequest) Execute() (*IntrospectedOAuth2Toke
 }
 
 /*
-AdminIntrospectOAuth2Token # Introspect OAuth2 Access or Refresh Tokens
+AdminIntrospectOAuth2Token Introspect OAuth2 Access or Refresh Tokens
 
 The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -2203,7 +2203,7 @@ func (r ApiAdminListOAuth2ClientsRequest) Execute() ([]OAuth2Client, *http.Respo
 }
 
 /*
-AdminListOAuth2Clients # List OAuth 2.0 Clients
+AdminListOAuth2Clients List OAuth 2.0 Clients
 
 This endpoint lists all clients in the database, and never returns client secrets.
 As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
@@ -2353,7 +2353,7 @@ func (r ApiAdminListOAuth2SubjectConsentSessionsRequest) Execute() ([]PreviousOA
 }
 
 /*
-AdminListOAuth2SubjectConsentSessions # List OAuth 2.0 Consent Sessions of a Subject
+AdminListOAuth2SubjectConsentSessions List OAuth 2.0 Consent Sessions of a Subject
 
 This endpoint lists all subject's granted consent sessions, including client and granted scope.
 If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
@@ -2508,7 +2508,7 @@ func (r ApiAdminListTrustedOAuth2JwtGrantIssuersRequest) Execute() ([]TrustedOAu
 }
 
 /*
-AdminListTrustedOAuth2JwtGrantIssuers # List Trusted OAuth2 JWT Bearer Grant Type Issuers
+AdminListTrustedOAuth2JwtGrantIssuers List Trusted OAuth2 JWT Bearer Grant Type Issuers
 
 Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
 
@@ -2637,7 +2637,7 @@ func (r ApiAdminPatchOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Respon
 }
 
 /*
-AdminPatchOAuth2Client # Patch an OAuth 2.0 Client
+AdminPatchOAuth2Client Patch an OAuth 2.0 Client
 
 Patch an existing OAuth 2.0 Client. If you pass `client_secret`
 the secret will be updated and returned via the API. This is the
@@ -2769,7 +2769,7 @@ func (r ApiAdminRejectOAuth2ConsentRequestRequest) Execute() (*SuccessfulOAuth2R
 }
 
 /*
-AdminRejectOAuth2ConsentRequest # Reject an OAuth 2.0 Consent Request
+AdminRejectOAuth2ConsentRequest Reject an OAuth 2.0 Consent Request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -2908,7 +2908,7 @@ func (r ApiAdminRejectOAuth2LoginRequestRequest) Execute() (*SuccessfulOAuth2Req
 }
 
 /*
-AdminRejectOAuth2LoginRequest # Reject an OAuth 2.0 Login Request
+AdminRejectOAuth2LoginRequest Reject an OAuth 2.0 Login Request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -3044,7 +3044,7 @@ func (r ApiAdminRejectOAuth2LogoutRequestRequest) Execute() (*http.Response, err
 }
 
 /*
-AdminRejectOAuth2LogoutRequest # Reject an OAuth 2.0 Logout Request
+AdminRejectOAuth2LogoutRequest Reject an OAuth 2.0 Logout Request
 
 When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 No body is required.
@@ -3169,7 +3169,7 @@ func (r ApiAdminRevokeOAuth2ConsentSessionsRequest) Execute() (*http.Response, e
 }
 
 /*
-AdminRevokeOAuth2ConsentSessions # Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+AdminRevokeOAuth2ConsentSessions Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 
 This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
@@ -3282,7 +3282,7 @@ func (r ApiAdminRevokeOAuth2LoginSessionsRequest) Execute() (*http.Response, err
 }
 
 /*
-AdminRevokeOAuth2LoginSessions # Invalidates All OAuth 2.0 Login Sessions of a Certain User
+AdminRevokeOAuth2LoginSessions Invalidates All OAuth 2.0 Login Sessions of a Certain User
 
 This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
@@ -3389,7 +3389,7 @@ func (r ApiAdminTrustOAuth2JwtGrantIssuerRequest) Execute() (*TrustedOAuth2JwtGr
 }
 
 /*
-AdminTrustOAuth2JwtGrantIssuer # Trust an OAuth2 JWT Bearer Grant Type Issuer
+AdminTrustOAuth2JwtGrantIssuer Trust an OAuth2 JWT Bearer Grant Type Issuer
 
 Use this endpoint to establish a trust relationship for a JWT issuer
 to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
@@ -3508,7 +3508,7 @@ func (r ApiAdminUpdateJsonWebKeyRequest) Execute() (*JsonWebKey, *http.Response,
 }
 
 /*
-AdminUpdateJsonWebKey # Update a JSON Web Key
+AdminUpdateJsonWebKey Update a JSON Web Key
 
 Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
@@ -3632,7 +3632,7 @@ func (r ApiAdminUpdateJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Res
 }
 
 /*
-AdminUpdateJsonWebKeySet # Update a JSON Web Key Set
+AdminUpdateJsonWebKeySet Update a JSON Web Key Set
 
 Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
@@ -3753,7 +3753,7 @@ func (r ApiAdminUpdateOAuth2ClientRequest) Execute() (*OAuth2Client, *http.Respo
 }
 
 /*
-AdminUpdateOAuth2Client # Update an OAuth 2.0 Client
+AdminUpdateOAuth2Client Update an OAuth 2.0 Client
 
 Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret
 is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
@@ -3872,7 +3872,7 @@ func (r ApiDiscoverJsonWebKeysRequest) Execute() (*JsonWebKeySet, *http.Response
 }
 
 /*
-DiscoverJsonWebKeys # Discover JSON Web Keys
+DiscoverJsonWebKeys Discover JSON Web Keys
 
 This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
 if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
@@ -3981,7 +3981,7 @@ func (r ApiDiscoverOidcConfigurationRequest) Execute() (*OidcConfiguration, *htt
 }
 
 /*
-DiscoverOidcConfiguration # OpenID Connect Discovery
+DiscoverOidcConfiguration OpenID Connect Discovery
 
 The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
@@ -4586,7 +4586,7 @@ func (r ApiGetOidcUserInfoRequest) Execute() (*OidcUserInfo, *http.Response, err
 }
 
 /*
-GetOidcUserInfo # OpenID Connect Userinfo
+GetOidcUserInfo OpenID Connect Userinfo
 
 This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 the provided OAuth 2.0 Access Token.
@@ -4700,7 +4700,7 @@ func (r ApiPerformOAuth2AuthorizationFlowRequest) Execute() (*OAuth2ApiError, *h
 }
 
 /*
-PerformOAuth2AuthorizationFlow # The OAuth 2.0 Authorize Endpoint
+PerformOAuth2AuthorizationFlow The OAuth 2.0 Authorize Endpoint
 
 This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 OAuth2 is a very popular protocol and a library for your programming language will exists.
@@ -4840,7 +4840,7 @@ func (r ApiPerformOAuth2TokenFlowRequest) Execute() (*OAuth2TokenResponse, *http
 }
 
 /*
-PerformOAuth2TokenFlow # The OAuth 2.0 Token Endpoint
+PerformOAuth2TokenFlow The OAuth 2.0 Token Endpoint
 
 The client makes a request to the token endpoint by sending the
 following parameters using the "application/x-www-form-urlencoded" HTTP
@@ -4970,7 +4970,7 @@ func (r ApiPerformOidcFrontOrBackChannelLogoutRequest) Execute() (*http.Response
 }
 
 /*
-PerformOidcFrontOrBackChannelLogout # OpenID Connect Front- or Back-channel Enabled Logout
+PerformOidcFrontOrBackChannelLogout OpenID Connect Front- or Back-channel Enabled Logout
 
 This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
 
@@ -5069,7 +5069,7 @@ func (r ApiRevokeOAuth2TokenRequest) Execute() (*http.Response, error) {
 }
 
 /*
-RevokeOAuth2Token # Revoke an OAuth2 Access or Refresh Token
+RevokeOAuth2Token Revoke an OAuth2 Access or Refresh Token
 
 Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.

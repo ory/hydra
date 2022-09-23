@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"os"
 	"testing"
@@ -93,6 +94,44 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 		}
 	}
 	require.Contains(t, hook.LastEntry().Message, "Failed to reload TLS certificates. Using the previously loaded certificates.")
+}
+
+func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
+	certPath, keyPath, cert, priv := testhelpers.GenerateTLSCertificateFilesForTests(t)
+	certPEM, err := os.ReadFile(certPath)
+	require.NoError(t, err)
+	certBase64 := base64.StdEncoding.EncodeToString(certPEM)
+	keyPEM, err := os.ReadFile(keyPath)
+	require.NoError(t, err)
+	keyBase64 := base64.StdEncoding.EncodeToString(keyPEM)
+
+	logger := logrusx.New("", "")
+	logger.Logger.ExitFunc = func(code int) { t.Fatalf("Logger called os.Exit(%v)", code) }
+	hook := test.NewLocal(logger.Logger)
+	_ = hook
+	cfg := config.MustNew(
+		context.Background(),
+		logger,
+		configx.WithValues(map[string]interface{}{
+			"dsn":                   config.DSNMemory,
+			"serve.tls.enabled":     true,
+			"serve.tls.cert.base64": certBase64,
+			"serve.tls.key.base64":  keyBase64,
+		}),
+	)
+	d, err := driver.NewRegistryWithoutInit(cfg, logger)
+	require.NoError(t, err)
+	getCert := server.GetOrCreateTLSCertificate(context.Background(), d, config.AdminInterface, nil)
+	require.NotNil(t, getCert)
+	tlsCert, err := getCert(nil)
+	require.NoError(t, err)
+	require.NotNil(t, tlsCert)
+	if tlsCert.Leaf == nil {
+		tlsCert.Leaf, err = x509.ParseCertificate(tlsCert.Certificate[0])
+		require.NoError(t, err)
+	}
+	require.True(t, tlsCert.Leaf.Equal(cert))
+	require.True(t, priv.Equal(tlsCert.PrivateKey))
 }
 
 func TestCreateSelfSignedCertificate(t *testing.T) {

@@ -58,12 +58,15 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 
 var lock sync.Mutex
 
-func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, iface config.ServeInterface, reloadCtx context.Context) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+// GetOrCreateTLSCertificate returns a function for use with
+// "net/tls".Config.GetCertificate. If the certificate and key are read from
+// disk, they will be automatically reloaded until stopReload is close()'d.
+func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, iface config.ServeInterface, stopReload <-chan struct{}) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
 	// check if certificates are configured
-	certFunc, err := d.Config().TLS(ctx, iface).GetCertificateFunc(reloadCtx, d.Logger())
+	certFunc, err := d.Config().TLS(ctx, iface).GetCertificateFunc(stopReload, d.Logger())
 	if err == nil {
 		return certFunc
 	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {

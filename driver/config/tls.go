@@ -29,7 +29,7 @@ const (
 type TLSConfig interface {
 	Enabled() bool
 	AllowTerminationFrom() []string
-	GetCertificateFunc(context.Context, *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
+	GetCertificateFunc(stopReload <-chan struct{}, _ *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
 }
 
 var _ TLSConfig = (*tlsConfig)(nil)
@@ -63,8 +63,13 @@ func (p *DefaultProvider) TLS(ctx context.Context, iface ServeInterface) TLSConf
 	}
 }
 
-func (c *tlsConfig) GetCertificateFunc(ctx context.Context, log *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+func (c *tlsConfig) GetCertificateFunc(stopReload <-chan struct{}, log *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
 	if c.certPath != "" && c.keyPath != "" { // attempt to load from disk first (enables hot-reloading)
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-stopReload
+			cancel()
+		}()
 		errs := make(chan error, 1)
 		getCert, err := tlsx.GetCertificate(ctx, c.certPath, c.keyPath, errs)
 		if err != nil {

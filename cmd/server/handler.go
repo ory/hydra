@@ -331,12 +331,10 @@ func serve(
 	}
 
 	var tlsConfig *tls.Config
-	var stopReload context.CancelFunc
+	stopReload := make(chan struct{})
 	if tc := d.Config().TLS(ctx, iface); tc.Enabled() {
-		var reloadCtx context.Context
-		reloadCtx, stopReload = context.WithCancel(context.Background())
 		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
-		tlsConfig = &tls.Config{GetCertificate: GetOrCreateTLSCertificate(ctx, d, iface, reloadCtx)}
+		tlsConfig = &tls.Config{GetCertificate: GetOrCreateTLSCertificate(ctx, d, iface, stopReload)}
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{
@@ -366,9 +364,7 @@ func serve(
 
 		return srv.Serve(listener)
 	}, func(ctx context.Context) error {
-		if stopReload != nil {
-			stopReload()
-		}
+		close(stopReload)
 		return srv.Shutdown(ctx)
 	}); err != nil {
 		d.Logger().WithError(err).Fatal("Could not gracefully run server")

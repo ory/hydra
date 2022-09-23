@@ -15,12 +15,12 @@ jobs:
           stale-issue-message: |
             Hello contributors!
 
-            I am marking this issue as stale as it has not received any engagement from the community or maintainers a year. That does not imply that the issue has no merit! If you feel strongly about this issue
+            I am marking this issue as stale as it has not received any engagement from the community or maintainers for a year. That does not imply that the issue has no merit! If you feel strongly about this issue
 
             - open a PR referencing and resolving the issue;
-            - leave a comment on it and discuss ideas how you could contribute towards resolving it;
+            - leave a comment on it and discuss ideas on how you could contribute towards resolving it;
             - leave a comment and describe in detail why this issue is critical for your use case;
-            - open a new issue with updated details and a plan on resolving the issue.
+            - open a new issue with updated details and a plan for resolving the issue.
 
             Throughout its lifetime, Ory has received over 10.000 issues and PRs. To sustain that growth, we need to prioritize and focus on issues that are important to the community. A good indication of importance, and thus priority, is activity on a topic.
 
@@ -30,7 +30,7 @@ jobs:
 
             The motivation for this automation is to help prioritize issues in the backlog and not ignore, reject, or belittle anyone.
 
-            If this issue was marked as stale erroneous you can exempt it by adding the `backlog` label, assigning someone, or setting a milestone for it.
+            If this issue was marked as stale erroneously you can exempt it by adding the `backlog` label, assigning someone, or setting a milestone for it.
 
             Thank you for your understanding and to anyone who participated in the conversation! And as written above, please do participate in the conversation if this topic is important to you!
 

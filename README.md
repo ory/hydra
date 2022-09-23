@@ -601,8 +601,8 @@ deal with: Self-service Login and Registration, Multi-Factor Authentication
 
 [Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
-writing a tiny "bridge" application. Gives absolute control over user interface
-and user experience flows.
+writing a tiny "bridge" application. It gives absolute control over the user
+interface and user experience flows.
 
 ### Ory Oathkeeper: Identity & Access Proxy
 

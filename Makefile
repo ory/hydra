@@ -92,7 +92,8 @@ quicktest-hsm:
 # Formats the code
 .PHONY: format
 format: .bin/goimports node_modules
-		.bin/goimports -w --local github.com/ory .
+		# workaround because goimports doesn't allow ignoring folders yet, see https://github.com/golang/go/issues/42965
+		find . -type f -name '*.go' -not -path './internal/httpclient/*' | xargs -L 1 .bin/goimports -w --local github.com/ory
 		npm exec -- prettier --write .
 
 # Generates mocks

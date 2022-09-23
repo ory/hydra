@@ -13,8 +13,8 @@ body:
         Ory is leaning heavily on [Google's design docs process](https://www.industrialempathy.com/posts/design-docs-at-google/)
         and [Golang Proposals](https://github.com/golang/proposal).
 
-        Writing a design doc prior to contributing your change ensures that your ideas are checked with
-        the community and maintainers. It will save you a lot of time developing things which might need changed
+        Writing a design doc before contributing your change ensures that your ideas are checked with
+        the community and maintainers. It will save you a lot of time developing things that might need to be changed
         after code reviews, and your pull requests will be merged faster.
     type: markdown
   - attributes:
@@ -64,7 +64,7 @@ body:
         This section should start with an overview and then go into details.
         The design doc is the place to write down the trade-offs you made in designing your software. Focus on those trade-offs to produce a useful document with long-term value. That is, given the context (facts), goals and non-goals (requirements), the design doc is the place to suggest solutions and show why a particular solution best satisfies those goals.
 
-        The point of writing a document over a more formal medium is to provide the flexibility to express the problem set at hand in an appropriate manner. Because of this, there is no explicit guidance for how to actually describe the design.
+        The point of writing a document over a more formal medium is to provide the flexibility to express the problem at hand in an appropriate manner. Because of this, there is no explicit guidance on how to actually describe the design.
       label: "The design"
     id: design
     type: textarea
@@ -73,21 +73,21 @@ body:
 
   - attributes:
       description: |
-        If the system under design exposes an API, then sketching out that API is usually a good idea. In most cases, however, one should withstand the temptation to copy-paste formal interface or data definitions into the doc as these are often verbose, contain unnecessary detail and quickly get out of date. Instead focus on the parts that are relevant to the design and its trade-offs.
+        If the system under design exposes an API, then sketching out that API is usually a good idea. In most cases, however, one should withstand the temptation to copy-paste formal interface or data definitions into the doc as these are often verbose, contain unnecessary detail and quickly get out of date. Instead, focus on the parts that are relevant to the design and its trade-offs.
       label: "APIs"
     id: apis
     type: textarea
 
   - attributes:
       description: |
-        Systems that store data should likely discuss how and in what rough form this happens. Similar to the advice on APIs, and for the same reasons, copy-pasting complete schema definitions should be avoided. Instead focus on the parts that are relevant to the design and its trade-offs.
+        Systems that store data should likely discuss how and in what rough form this happens. Similar to the advice on APIs, and for the same reasons, copy-pasting complete schema definitions should be avoided. Instead, focus on the parts that are relevant to the design and its trade-offs.
       label: "Data storage"
     id: persistence
     type: textarea
 
   - attributes:
       description: |
-        Design docs should rarely contain code, or pseudo-code except in situations where novel algorithms are described. As appropriate, link to prototypes that show the implementability of the design.
+        Design docs should rarely contain code, or pseudo-code except in situations where novel algorithms are described. As appropriate, link to prototypes that show the feasibility of the design.
       label: "Code and pseudo-code"
     id: pseudocode
     type: textarea
@@ -98,9 +98,9 @@ body:
 
         On one end of the extreme is the “greenfield software project”, where all we know are the goals, and the solution can be whatever makes the most sense. Such a document may be wide-ranging, but it also needs to quickly define a set of rules that allow zooming in on a manageable set of solutions.
 
-        On the other end are systems where the possible solutions are very well defined, but it isn’t at all obvious how they could even be combined to achieve the goals. This may be a legacy system that is difficult to change and wasn’t designed to do what you want it to do or a library design that needs to operate within the constraints of the host programming language.
+        On the other end are systems where the possible solutions are very well defined, but it isn't at all obvious how they could even be combined to achieve the goals. This may be a legacy system that is difficult to change and wasn't designed to do what you want it to do or a library design that needs to operate within the constraints of the host programming language.
 
-        In this situation you may be able to enumerate all the things you can do relatively easily, but you need to creatively put those things together to achieve the goals. There may be multiple solutions, and none of them are really great, and hence such a document should focus on selecting the best way given all identified trade-offs.
+        In this situation, you may be able to enumerate all the things you can do relatively easily, but you need to creatively put those things together to achieve the goals. There may be multiple solutions, and none of them are great, and hence such a document should focus on selecting the best way given all identified trade-offs.
       label: "Degree of constraint"
     id: constrait
     type: textarea
@@ -109,7 +109,7 @@ body:
       description: |
         This section lists alternative designs that would have reasonably achieved similar outcomes. The focus should be on the trade-offs that each respective design makes and how those trade-offs led to the decision to select the design that is the primary topic of the document.
 
-        While it is fine to be succinct about solution that ended up not being selected, this section is one of the most important ones as it shows very explicitly why the selected solution is the best given the project goals and how other solutions, that the reader may be wondering about, introduce trade-offs that are less desirable given the goals.
+        While it is fine to be succinct about a solution that ended up not being selected, this section is one of the most important ones as it shows very explicitly why the selected solution is the best given the project goals and how other solutions, that the reader may be wondering about, introduce trade-offs that are less desirable given the goals.
 
       label: Alternatives considered
     id: alternatives

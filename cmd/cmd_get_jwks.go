@@ -41,7 +41,7 @@ func NewGetJWKSCmd(root *cobra.Command) *cobra.Command {
 
 	%s get jwks <set-id> | jq -r '.[].use'`, root.Use),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

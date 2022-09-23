@@ -17,9 +17,10 @@ import (
 
 func NewUpdateClientCmd(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "client [id]",
-		Short: "Update an OAuth 2.0 Client",
-		Args:  cobra.ExactArgs(1),
+		Use:     "oauth2-client [id]",
+		Aliases: []string{"client"},
+		Short:   "Update an OAuth 2.0 Client",
+		Args:    cobra.ExactArgs(1),
 		Example: fmt.Sprintf(`%s update client <client-id-here> -c http://localhost/cb -g authorization_code -r code -a core,foobar
 
 To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, `+"`--pgp-key-url`"+` or `+"`--keybase`"+` flag, for example:
@@ -28,7 +29,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, 
 `, root.Use),
 		Long: `This command replaces an OAuth 2.0 Client by its ID. Please be aware that this command replaces the entire client. If only the name flag (-n "my updated app") is provided, the all other fields are updated to their default values.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

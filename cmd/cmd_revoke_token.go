@@ -42,7 +42,7 @@ func NewRevokeTokenCmd(parent *cobra.Command) *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		Short:   "Revoke an access or refresh token",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := cliclient.NewClient(cmd)
+			client, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

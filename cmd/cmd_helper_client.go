@@ -60,10 +60,10 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.StringSlice(flagClientRequestURI, nil, "Array of request_uri values that are pre-registered by the RP for use at the OP.")
 	flags.String(flagClientRequestObjectSigningAlg, "RS256", "Algorithm that must be used for signing Request Objects sent to the OP.")
 	flags.String(flagClientSectorIdentifierURI, "", "URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.")
-	flags.StringSliceP(flagClientRedirectURI, "c", []string{}, "List of allowed OAuth2 Redirect URIs.")
-	flags.StringSliceP(flagClientGrantType, "g", []string{"authorization_code"}, "A list of allowed grant types.")
-	flags.StringSliceP(flagClientResponseType, "r", []string{"code"}, "A list of allowed response types.")
-	flags.StringSliceP(flagClientScope, "a", []string{}, "The scope the client is allowed to request.")
+	flags.StringSlice(flagClientRedirectURI, []string{}, "List of allowed OAuth2 Redirect URIs.")
+	flags.StringSlice(flagClientGrantType, []string{"authorization_code"}, "A list of allowed grant types.")
+	flags.StringSlice(flagClientResponseType, []string{"code"}, "A list of allowed response types.")
+	flags.StringSlice(flagClientScope, []string{}, "The scope the client is allowed to request.")
 	flags.StringSlice(flagClientAudience, []string{}, "The audience this client is allowed to request.")
 	flags.String(flagClientTokenEndpointAuthMethod, "client_secret_basic", "Define which authentication method the client may use at the Token Endpoint. Valid values are `client_secret_post`, `client_secret_basic`, `private_key_jwt`, and `none`.")
 	flags.String(flagClientJWKSURI, "", "Define the URL where the JSON Web Key Set should be fetched from when performing the `private_key_jwt` client authentication method.")
@@ -74,7 +74,7 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.StringSlice(flagClientAllowedCORSOrigin, []string{}, "The list of URLs allowed to make CORS requests. Requires CORS_ENABLED.")
 	flags.String(flagClientSubjectType, "public", "A identifier algorithm. Valid values are `public` and `pairwise`.")
 	flags.String(flagClientSecret, "", "Provide the client's secret.")
-	flags.StringP(flagClientName, "n", "", "The client's name.")
+	flags.String(flagClientName, "", "The client's name.")
 	flags.StringSlice(flagClientPostLogoutCallback, []string{}, "List of allowed URLs to be redirected to after a logout.")
 
 	// back-channel logout options

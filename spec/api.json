@@ -1727,7 +1727,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Discover JSON Web Keys",
+        "summary": "# Discover JSON Web Keys",
         "tags": [
           "v0alpha2"
         ]
@@ -1759,7 +1759,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "OpenID Connect Discovery",
+        "summary": "# OpenID Connect Discovery",
         "tags": [
           "v0alpha2"
         ]
@@ -1824,7 +1824,7 @@
             "description": "genericError"
           }
         },
-        "summary": "List OAuth 2.0 Clients",
+        "summary": "# List OAuth 2.0 Clients",
         "tags": [
           "v0alpha2"
         ]
@@ -1865,7 +1865,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Create an OAuth 2.0 Client",
+        "summary": "# Create an OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -1901,7 +1901,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Deletes an OAuth 2.0 Client",
+        "summary": "# Deletes an OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -1942,7 +1942,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Get an OAuth 2.0 Client",
+        "summary": "# Get an OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -1994,7 +1994,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Patch an OAuth 2.0 Client",
+        "summary": "# Patch an OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -2046,7 +2046,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Update an OAuth 2.0 Client",
+        "summary": "# Update an OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -2134,7 +2134,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Delete a JSON Web Key Set",
+        "summary": "# Delete a JSON Web Key Set",
         "tags": [
           "v0alpha2"
         ]
@@ -2175,7 +2175,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Retrieve a JSON Web Key Set",
+        "summary": "# Retrieve a JSON Web Key Set",
         "tags": [
           "v0alpha2"
         ]
@@ -2227,7 +2227,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Generate a New JSON Web Key",
+        "summary": "# Generate a New JSON Web Key",
         "tags": [
           "v0alpha2"
         ]
@@ -2278,7 +2278,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Update a JSON Web Key Set",
+        "summary": "# Update a JSON Web Key Set",
         "tags": [
           "v0alpha2"
         ]
@@ -2323,7 +2323,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Delete a JSON Web Key",
+        "summary": "# Delete a JSON Web Key",
         "tags": [
           "v0alpha2"
         ]
@@ -2373,7 +2373,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Fetch a JSON Web Key",
+        "summary": "# Fetch a JSON Web Key",
         "tags": [
           "v0alpha2"
         ]
@@ -2433,7 +2433,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Update a JSON Web Key",
+        "summary": "# Update a JSON Web Key",
         "tags": [
           "v0alpha2"
         ]
@@ -2485,7 +2485,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Get OAuth 2.0 Consent Request Information",
+        "summary": "# Get OAuth 2.0 Consent Request Information",
         "tags": [
           "v0alpha2"
         ]
@@ -2537,7 +2537,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Accept an OAuth 2.0 Consent Request",
+        "summary": "# Accept an OAuth 2.0 Consent Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2589,7 +2589,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Reject an OAuth 2.0 Consent Request",
+        "summary": "# Reject an OAuth 2.0 Consent Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2641,7 +2641,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Get an OAuth 2.0 Login Request",
+        "summary": "# Get an OAuth 2.0 Login Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2693,7 +2693,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Accept an OAuth 2.0 Login Request",
+        "summary": "# Accept an OAuth 2.0 Login Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2745,7 +2745,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Reject an OAuth 2.0 Login Request",
+        "summary": "# Reject an OAuth 2.0 Login Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2797,7 +2797,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Get an OAuth 2.0 Logout Request",
+        "summary": "# Get an OAuth 2.0 Logout Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2839,7 +2839,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Accept an OAuth 2.0 Logout Request",
+        "summary": "# Accept an OAuth 2.0 Logout Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2889,7 +2889,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Reject an OAuth 2.0 Logout Request",
+        "summary": "# Reject an OAuth 2.0 Logout Request",
         "tags": [
           "v0alpha2"
         ]
@@ -2941,7 +2941,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
+        "summary": "# Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "tags": [
           "v0alpha2"
         ]
@@ -2998,7 +2998,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "List OAuth 2.0 Consent Sessions of a Subject",
+        "summary": "# List OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
           "v0alpha2"
         ]
@@ -3034,7 +3034,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Invalidates All OAuth 2.0 Login Sessions of a Certain User",
+        "summary": "# Invalidates All OAuth 2.0 Login Sessions of a Certain User",
         "tags": [
           "v0alpha2"
         ]
@@ -3093,7 +3093,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Introspect OAuth2 Access or Refresh Tokens",
+        "summary": "# Introspect OAuth2 Access or Refresh Tokens",
         "tags": [
           "v0alpha2"
         ]
@@ -3128,7 +3128,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "Delete OAuth2 Access Tokens from a Client",
+        "summary": "# Delete OAuth2 Access Tokens from a Client",
         "tags": [
           "v0alpha2"
         ]
@@ -3204,7 +3204,7 @@
             "description": "genericError"
           }
         },
-        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "summary": "# List Trusted OAuth2 JWT Bearer Grant Type Issuers",
         "tags": [
           "v0alpha2"
         ]
@@ -3244,7 +3244,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "# Trust an OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "v0alpha2"
         ]
@@ -3280,7 +3280,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "# Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "v0alpha2"
         ]
@@ -3321,7 +3321,7 @@
             "description": "genericError"
           }
         },
-        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "# Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "v0alpha2"
         ]
@@ -3425,7 +3425,7 @@
             "description": "oAuth2ApiError"
           }
         },
-        "summary": "The OAuth 2.0 Authorize Endpoint",
+        "summary": "# The OAuth 2.0 Authorize Endpoint",
         "tags": [
           "v0alpha2"
         ]
@@ -3666,7 +3666,7 @@
             "oauth2": []
           }
         ],
-        "summary": "Revoke an OAuth2 Access or Refresh Token",
+        "summary": "# Revoke an OAuth2 Access or Refresh Token",
         "tags": [
           "v0alpha2"
         ]
@@ -3681,7 +3681,7 @@
             "$ref": "#/components/responses/emptyResponse"
           }
         },
-        "summary": "OpenID Connect Front- or Back-channel Enabled Logout",
+        "summary": "# OpenID Connect Front- or Back-channel Enabled Logout",
         "tags": [
           "v0alpha2"
         ]
@@ -3758,7 +3758,7 @@
             "oauth2": []
           }
         ],
-        "summary": "The OAuth 2.0 Token Endpoint",
+        "summary": "# The OAuth 2.0 Token Endpoint",
         "tags": [
           "v0alpha2"
         ]
@@ -3795,7 +3795,7 @@
             "oauth2": []
           }
         ],
-        "summary": "OpenID Connect Userinfo",
+        "summary": "# OpenID Connect Userinfo",
         "tags": [
           "v0alpha2"
         ]

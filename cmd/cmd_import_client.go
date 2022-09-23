@@ -41,8 +41,9 @@ import (
 
 func NewImportClientCmd(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "client [file-1.json] [file-2.json] [file-3.json] [file-n.json]",
-		Short: "Import OAuth 2.0 Clients from files or STDIN",
+		Use:     "oauth2-client [file-1.json] [file-2.json] [file-3.json] [file-n.json]",
+		Aliases: []string{"client"},
+		Short:   "Import OAuth 2.0 Clients from files or STDIN",
 		Example: fmt.Sprintf(`Create an example OAuth2 Client:
 	cat > ./file.json <<EOF
 	[
@@ -80,7 +81,7 @@ The format for the JSON file is:
 
 Please be aware that this command does not update existing clients. If the client exists already, this command will fail.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

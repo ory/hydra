@@ -40,7 +40,7 @@ func NewDeleteJWKSCommand(root *cobra.Command) *cobra.Command {
 		Long:    "This command deletes one or more JSON Web Key Sets by their respective set IDs.",
 		Example: fmt.Sprintf(`%[1]s delete jwks set-1 set-2 set-3`, root.Use),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

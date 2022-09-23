@@ -44,7 +44,7 @@ func NewCreateJWKSCmd(parent *cobra.Command) *cobra.Command {
 		Example: fmt.Sprintf(`%[1]s createjwks my-jwk-set --alg RS256 --use sig`, parent.Use),
 		Short:   "Create a JSON Web Key Set with a JSON Web Key",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

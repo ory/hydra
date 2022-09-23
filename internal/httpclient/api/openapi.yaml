@@ -34,7 +34,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Discover JSON Web Keys
+      summary: "# Discover JSON Web Keys"
       tags:
         - v0alpha2
   /.well-known/openid-configuration:
@@ -66,7 +66,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: OpenID Connect Discovery
+      summary: "# OpenID Connect Discovery"
       tags:
         - v0alpha2
   /admin/clients:
@@ -155,7 +155,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: List OAuth 2.0 Clients
+      summary: "# List OAuth 2.0 Clients"
       tags:
         - v0alpha2
     post:
@@ -191,7 +191,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Create an OAuth 2.0 Client
+      summary: "# Create an OAuth 2.0 Client"
       tags:
         - v0alpha2
   /admin/clients/{id}:
@@ -227,7 +227,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Deletes an OAuth 2.0 Client
+      summary: "# Deletes an OAuth 2.0 Client"
       tags:
         - v0alpha2
     get:
@@ -261,7 +261,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Get an OAuth 2.0 Client
+      summary: "# Get an OAuth 2.0 Client"
       tags:
         - v0alpha2
     patch:
@@ -306,7 +306,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Patch an OAuth 2.0 Client
+      summary: "# Patch an OAuth 2.0 Client"
       tags:
         - v0alpha2
     put:
@@ -351,7 +351,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Update an OAuth 2.0 Client
+      summary: "# Update an OAuth 2.0 Client"
       tags:
         - v0alpha2
   /admin/clients/{id}/lifespans:
@@ -428,7 +428,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Delete a JSON Web Key Set
+      summary: "# Delete a JSON Web Key Set"
       tags:
         - v0alpha2
     get:
@@ -468,7 +468,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Retrieve a JSON Web Key Set
+      summary: "# Retrieve a JSON Web Key Set"
       tags:
         - v0alpha2
     post:
@@ -521,7 +521,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Generate a New JSON Web Key
+      summary: "# Generate a New JSON Web Key"
       tags:
         - v0alpha2
     put:
@@ -567,7 +567,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Update a JSON Web Key Set
+      summary: "# Update a JSON Web Key Set"
       tags:
         - v0alpha2
   /admin/keys/{set}/{kid}:
@@ -615,7 +615,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Delete a JSON Web Key
+      summary: "# Delete a JSON Web Key"
       tags:
         - v0alpha2
     get:
@@ -653,7 +653,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Fetch a JSON Web Key
+      summary: "# Fetch a JSON Web Key"
       tags:
         - v0alpha2
     put:
@@ -707,7 +707,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Update a JSON Web Key
+      summary: "# Update a JSON Web Key"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/consent:
@@ -765,7 +765,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Get OAuth 2.0 Consent Request Information
+      summary: "# Get OAuth 2.0 Consent Request Information"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/consent/accept:
@@ -834,7 +834,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Accept an OAuth 2.0 Consent Request
+      summary: "# Accept an OAuth 2.0 Consent Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/consent/reject:
@@ -900,7 +900,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Reject an OAuth 2.0 Consent Request
+      summary: "# Reject an OAuth 2.0 Consent Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/login:
@@ -952,7 +952,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Get an OAuth 2.0 Login Request
+      summary: "# Get an OAuth 2.0 Login Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/login/accept:
@@ -1014,7 +1014,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Accept an OAuth 2.0 Login Request
+      summary: "# Accept an OAuth 2.0 Login Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/login/reject:
@@ -1072,7 +1072,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Reject an OAuth 2.0 Login Request
+      summary: "# Reject an OAuth 2.0 Login Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/logout:
@@ -1106,7 +1106,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Get an OAuth 2.0 Logout Request
+      summary: "# Get an OAuth 2.0 Logout Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/logout/accept:
@@ -1140,7 +1140,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Accept an OAuth 2.0 Logout Request
+      summary: "# Accept an OAuth 2.0 Logout Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/requests/logout/reject:
@@ -1182,7 +1182,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Reject an OAuth 2.0 Logout Request
+      summary: "# Reject an OAuth 2.0 Logout Request"
       tags:
         - v0alpha2
   /admin/oauth2/auth/sessions/consent:
@@ -1234,8 +1234,8 @@ paths:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
       summary:
-        Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0
-        Client
+        "# Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth
+        2.0 Client"
       tags:
         - v0alpha2
     get:
@@ -1298,7 +1298,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: List OAuth 2.0 Consent Sessions of a Subject
+      summary: "# List OAuth 2.0 Consent Sessions of a Subject"
       tags:
         - v0alpha2
   /admin/oauth2/auth/sessions/login:
@@ -1332,7 +1332,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Invalidates All OAuth 2.0 Login Sessions of a Certain User
+      summary: "# Invalidates All OAuth 2.0 Login Sessions of a Certain User"
       tags:
         - v0alpha2
   /admin/oauth2/introspect:
@@ -1366,7 +1366,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Introspect OAuth2 Access or Refresh Tokens
+      summary: "# Introspect OAuth2 Access or Refresh Tokens"
       tags:
         - v0alpha2
   /admin/oauth2/tokens:
@@ -1395,7 +1395,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: Delete OAuth2 Access Tokens from a Client
+      summary: "# Delete OAuth2 Access Tokens from a Client"
       tags:
         - v0alpha2
   /admin/trust/grants/jwt-bearer/issuers:
@@ -1463,7 +1463,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: List Trusted OAuth2 JWT Bearer Grant Type Issuers
+      summary: "# List Trusted OAuth2 JWT Bearer Grant Type Issuers"
       tags:
         - v0alpha2
     post:
@@ -1493,7 +1493,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Trust an OAuth2 JWT Bearer Grant Type Issuer
+      summary: "# Trust an OAuth2 JWT Bearer Grant Type Issuer"
       tags:
         - v0alpha2
   /admin/trust/grants/jwt-bearer/issuers/{id}:
@@ -1529,7 +1529,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
+      summary: "# Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer"
       tags:
         - v0alpha2
     get:
@@ -1559,7 +1559,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/genericError"
           description: genericError
-      summary: Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
+      summary: "# Get a Trusted OAuth2 JWT Bearer Grant Type Issuer"
       tags:
         - v0alpha2
   /health/alive:
@@ -1647,7 +1647,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/oAuth2ApiError"
           description: oAuth2ApiError
-      summary: The OAuth 2.0 Authorize Endpoint
+      summary: "# The OAuth 2.0 Authorize Endpoint"
       tags:
         - v0alpha2
   /oauth2/register:
@@ -1899,7 +1899,7 @@ paths:
       security:
         - basic: []
         - oauth2: []
-      summary: Revoke an OAuth2 Access or Refresh Token
+      summary: "# Revoke an OAuth2 Access or Refresh Token"
       tags:
         - v0alpha2
   /oauth2/sessions/logout:
@@ -1918,7 +1918,7 @@ paths:
             are\
             \ deleted. The HTTP status code for empty responses is\ntypically
             201."
-      summary: OpenID Connect Front- or Back-channel Enabled Logout
+      summary: "# OpenID Connect Front- or Back-channel Enabled Logout"
       tags:
         - v0alpha2
   /oauth2/token:
@@ -1958,7 +1958,7 @@ paths:
       security:
         - basic: []
         - oauth2: []
-      summary: The OAuth 2.0 Token Endpoint
+      summary: "# The OAuth 2.0 Token Endpoint"
       tags:
         - v0alpha2
   /userinfo:
@@ -1990,7 +1990,7 @@ paths:
           description: oAuth2ApiError
       security:
         - oauth2: []
-      summary: OpenID Connect Userinfo
+      summary: "# OpenID Connect Userinfo"
       tags:
         - v0alpha2
   /version:

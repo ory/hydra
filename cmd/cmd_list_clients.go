@@ -13,13 +13,14 @@ import (
 
 func NewListClientsCmd(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "clients",
+		Use:     "oauth2-clients",
+		Aliases: []string{"clients"},
 		Short:   "List OAuth 2.0 Clients",
 		Long:    `This command list an OAuth 2.0 Clients.`,
 		Args:    cobra.NoArgs,
 		Example: fmt.Sprintf("%s ls identities --%s eyJwYWdlIjoxfQ --%s 10", root.Use, cmdx.FlagPageToken, cmdx.FlagPageSize),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

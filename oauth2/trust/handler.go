@@ -80,23 +80,23 @@ type adminTrustOAuth2JwtGrantIssuer struct {
 
 // swagger:route POST /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminTrustOAuth2JwtGrantIssuer
 //
-// Trust an OAuth2 JWT Bearer Grant Type Issuer
+// # Trust an OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to establish a trust relationship for a JWT issuer
 // to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
 // and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       201: trustedOAuth2JwtGrantIssuer
-//       default: genericError
+//	Responses:
+//	  201: trustedOAuth2JwtGrantIssuer
+//	  default: genericError
 func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var grantRequest createGrantRequest
 
@@ -143,22 +143,23 @@ type adminGetTrustedOAuth2JwtGrantIssuer struct {
 
 // swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminGetTrustedOAuth2JwtGrantIssuer
 //
-// Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
+// # Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 // created the trust relationship.
-///
-//     Consumes:
-//     - application/json
+// /
 //
-//     Produces:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Schemes: http, https
+//	Produces:
+//	- application/json
 //
-//     Responses:
-//       200: trustedOAuth2JwtGrantIssuer
-//       default: genericError
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: trustedOAuth2JwtGrantIssuer
+//	  default: genericError
 func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -181,7 +182,7 @@ type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
 
 // swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminDeleteTrustedOAuth2JwtGrantIssuer
 //
-// Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
+// # Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 // created the trust relationship.
@@ -189,17 +190,17 @@ type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
 // Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
 // for OAuth 2.0 Client Authentication and Authorization Grant.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: genericError
+//	Responses:
+//	  204: emptyResponse
+//	  default: genericError
 func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -232,21 +233,21 @@ type adminListTrustedOAuth2JwtGrantIssuers struct {
 
 // swagger:route GET /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminListTrustedOAuth2JwtGrantIssuers
 //
-// List Trusted OAuth2 JWT Bearer Grant Type Issuers
+// # List Trusted OAuth2 JWT Bearer Grant Type Issuers
 //
 // Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: trustedOAuth2JwtGrantIssuers
-//       default: genericError
+//	Responses:
+//	  200: trustedOAuth2JwtGrantIssuers
+//	  default: genericError
 func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	page, itemsPerPage := x.ParsePagination(r)
 	optionalIssuer := r.URL.Query().Get("issuer")

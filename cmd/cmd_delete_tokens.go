@@ -38,7 +38,7 @@ func NewDeleteAccessTokensCmd(parent *cobra.Command) *cobra.Command {
 		Example: fmt.Sprintf(`%s delete access-tokens 33137249-dd2c-49e6-a066-75ad2a72f221`, parent.Use),
 		Short:   "Invalidate all OAuth2 Access Tokens of an OAuth2 Client",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := cliclient.NewClient(cmd)
+			client, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

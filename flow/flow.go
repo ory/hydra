@@ -20,15 +20,16 @@ import (
 // FlowState* constants enumerate the states of a flow. The below graph
 // describes possible flow state transitions.
 //
-//graph TD
-//    LOGIN_INITIALIZED --> LOGIN_UNUSED
-//    LOGIN_UNUSED --> LOGIN_USED
-//    LOGIN_UNUSED --> LOGIN_ERROR
-//    LOGIN_USED --> CONSENT_INITIALIZED
-//    CONSENT_INITIALIZED --> CONSENT_UNUSED
-//    CONSENT_UNUSED --> CONSENT_UNUSED
-//    CONSENT_UNUSED --> CONSENT_USED
-//    CONSENT_UNUSED --> CONSENT_ERROR
+// graph TD
+//
+//	LOGIN_INITIALIZED --> LOGIN_UNUSED
+//	LOGIN_UNUSED --> LOGIN_USED
+//	LOGIN_UNUSED --> LOGIN_ERROR
+//	LOGIN_USED --> CONSENT_INITIALIZED
+//	CONSENT_INITIALIZED --> CONSENT_UNUSED
+//	CONSENT_UNUSED --> CONSENT_UNUSED
+//	CONSENT_UNUSED --> CONSENT_USED
+//	CONSENT_UNUSED --> CONSENT_ERROR
 const (
 	// FlowStateLoginInitialized applies before the login app either
 	// accepts or rejects the login request.
@@ -76,7 +77,6 @@ const (
 // layer. We currently limit the use of Flow to the persistence layer and keep
 // using the original structs in the API in order to minimize the impact of the
 // database refactoring on the API.
-//
 type Flow struct {
 	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.

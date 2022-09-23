@@ -66,15 +66,15 @@ const (
 
 func NewCreateClientsCommand(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "client",
-		Short: "Create an OAuth 2.0 Client",
-		Args:  cobra.NoArgs,
+		Use:     "oauth2-client",
+		Short:   "Create an OAuth 2.0 Client",
+		Aliases: []string{"client"},
+		Args:    cobra.NoArgs,
 		Example: fmt.Sprintf(`%[1]s create client -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
 
 Use the tool jq (or any other JSON tool) to get the OAuth2 Client ID and and Secret:
 
 client=$(hydra create client \
-    --endpoint ... \
     --format json \
     ...
 echo $client
@@ -90,7 +90,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, 
   %[1]s create client -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 `, root.Use),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := cliclient.NewClient(cmd)
+			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}

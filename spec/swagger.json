@@ -34,7 +34,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Discover JSON Web Keys",
+        "summary": "Discover JSON Web Keys",
         "operationId": "discoverJsonWebKeys",
         "responses": {
           "200": {
@@ -65,7 +65,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# OpenID Connect Discovery",
+        "summary": "OpenID Connect Discovery",
         "operationId": "discoverOidcConfiguration",
         "responses": {
           "200": {
@@ -99,7 +99,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# List OAuth 2.0 Clients",
+        "summary": "List OAuth 2.0 Clients",
         "operationId": "adminListOAuth2Clients",
         "parameters": [
           {
@@ -160,7 +160,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Create an OAuth 2.0 Client",
+        "summary": "Create an OAuth 2.0 Client",
         "operationId": "adminCreateOAuth2Client",
         "parameters": [
           {
@@ -204,7 +204,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Get an OAuth 2.0 Client",
+        "summary": "Get an OAuth 2.0 Client",
         "operationId": "adminGetOAuth2Client",
         "parameters": [
           {
@@ -245,7 +245,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Update an OAuth 2.0 Client",
+        "summary": "Update an OAuth 2.0 Client",
         "operationId": "adminUpdateOAuth2Client",
         "parameters": [
           {
@@ -294,7 +294,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Deletes an OAuth 2.0 Client",
+        "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "adminDeleteOAuth2Client",
         "parameters": [
           {
@@ -332,7 +332,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Patch an OAuth 2.0 Client",
+        "summary": "Patch an OAuth 2.0 Client",
         "operationId": "adminPatchOAuth2Client",
         "parameters": [
           {
@@ -429,7 +429,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Retrieve a JSON Web Key Set",
+        "summary": "Retrieve a JSON Web Key Set",
         "operationId": "adminGetJsonWebKeySet",
         "parameters": [
           {
@@ -470,7 +470,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Update a JSON Web Key Set",
+        "summary": "Update a JSON Web Key Set",
         "operationId": "adminUpdateJsonWebKeySet",
         "parameters": [
           {
@@ -518,7 +518,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Generate a New JSON Web Key",
+        "summary": "Generate a New JSON Web Key",
         "operationId": "adminCreateJsonWebKeySet",
         "parameters": [
           {
@@ -567,7 +567,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Delete a JSON Web Key Set",
+        "summary": "Delete a JSON Web Key Set",
         "operationId": "adminDeleteJsonWebKeySet",
         "parameters": [
           {
@@ -607,7 +607,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Fetch a JSON Web Key",
+        "summary": "Fetch a JSON Web Key",
         "operationId": "adminGetJsonWebKey",
         "parameters": [
           {
@@ -655,7 +655,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Update a JSON Web Key",
+        "summary": "Update a JSON Web Key",
         "operationId": "adminUpdateJsonWebKey",
         "parameters": [
           {
@@ -710,7 +710,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Delete a JSON Web Key",
+        "summary": "Delete a JSON Web Key",
         "operationId": "adminDeleteJsonWebKey",
         "parameters": [
           {
@@ -757,7 +757,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Get OAuth 2.0 Consent Request Information",
+        "summary": "Get OAuth 2.0 Consent Request Information",
         "operationId": "adminGetOAuth2ConsentRequest",
         "parameters": [
           {
@@ -805,7 +805,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Accept an OAuth 2.0 Consent Request",
+        "summary": "Accept an OAuth 2.0 Consent Request",
         "operationId": "adminAcceptOAuth2ConsentRequest",
         "parameters": [
           {
@@ -854,7 +854,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Reject an OAuth 2.0 Consent Request",
+        "summary": "Reject an OAuth 2.0 Consent Request",
         "operationId": "adminRejectOAuth2ConsentRequest",
         "parameters": [
           {
@@ -903,7 +903,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Get an OAuth 2.0 Login Request",
+        "summary": "Get an OAuth 2.0 Login Request",
         "operationId": "adminGetOAuth2LoginRequest",
         "parameters": [
           {
@@ -951,7 +951,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Accept an OAuth 2.0 Login Request",
+        "summary": "Accept an OAuth 2.0 Login Request",
         "operationId": "adminAcceptOAuth2LoginRequest",
         "parameters": [
           {
@@ -1000,7 +1000,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Reject an OAuth 2.0 Login Request",
+        "summary": "Reject an OAuth 2.0 Login Request",
         "operationId": "adminRejectOAuth2LoginRequest",
         "parameters": [
           {
@@ -1046,7 +1046,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Get an OAuth 2.0 Logout Request",
+        "summary": "Get an OAuth 2.0 Logout Request",
         "operationId": "adminGetOAuth2LogoutRequest",
         "parameters": [
           {
@@ -1091,7 +1091,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Accept an OAuth 2.0 Logout Request",
+        "summary": "Accept an OAuth 2.0 Logout Request",
         "operationId": "adminAcceptOAuth2LogoutRequest",
         "parameters": [
           {
@@ -1130,7 +1130,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Reject an OAuth 2.0 Logout Request",
+        "summary": "Reject an OAuth 2.0 Logout Request",
         "operationId": "adminRejectOAuth2LogoutRequest",
         "parameters": [
           {
@@ -1176,7 +1176,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# List OAuth 2.0 Consent Sessions of a Subject",
+        "summary": "List OAuth 2.0 Consent Sessions of a Subject",
         "operationId": "adminListOAuth2SubjectConsentSessions",
         "parameters": [
           {
@@ -1229,7 +1229,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
+        "summary": "Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "operationId": "adminRevokeOAuth2ConsentSessions",
         "parameters": [
           {
@@ -1281,7 +1281,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Invalidates All OAuth 2.0 Login Sessions of a Certain User",
+        "summary": "Invalidates All OAuth 2.0 Login Sessions of a Certain User",
         "operationId": "adminRevokeOAuth2LoginSessions",
         "parameters": [
           {
@@ -1321,7 +1321,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Introspect OAuth2 Access or Refresh Tokens",
+        "summary": "Introspect OAuth2 Access or Refresh Tokens",
         "operationId": "adminIntrospectOAuth2Token",
         "parameters": [
           {
@@ -1367,7 +1367,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Delete OAuth2 Access Tokens from a Client",
+        "summary": "Delete OAuth2 Access Tokens from a Client",
         "operationId": "adminDeleteOAuth2Token",
         "parameters": [
           {
@@ -1406,7 +1406,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
         "operationId": "adminListTrustedOAuth2JwtGrantIssuers",
         "parameters": [
           {
@@ -1472,7 +1472,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
         "operationId": "adminTrustOAuth2JwtGrantIssuer",
         "parameters": [
           {
@@ -1515,7 +1515,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "operationId": "adminGetTrustedOAuth2JwtGrantIssuer",
         "parameters": [
           {
@@ -1556,7 +1556,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "operationId": "adminDeleteTrustedOAuth2JwtGrantIssuer",
         "parameters": [
           {
@@ -1589,7 +1589,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "# Check Alive Status",
+        "summary": "Check Alive Status",
         "operationId": "isInstanceAlive",
         "responses": {
           "200": {
@@ -1616,7 +1616,7 @@
         "tags": [
           "public"
         ],
-        "summary": "# Check Readiness Status",
+        "summary": "Check Readiness Status",
         "operationId": "isInstanceReady",
         "responses": {
           "200": {
@@ -1647,7 +1647,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# The OAuth 2.0 Authorize Endpoint",
+        "summary": "The OAuth 2.0 Authorize Endpoint",
         "operationId": "performOAuth2AuthorizationFlow",
         "responses": {
           "302": {
@@ -1869,7 +1869,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# Revoke an OAuth2 Access or Refresh Token",
+        "summary": "Revoke an OAuth2 Access or Refresh Token",
         "operationId": "revokeOAuth2Token",
         "parameters": [
           {
@@ -1902,7 +1902,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# OpenID Connect Front- or Back-channel Enabled Logout",
+        "summary": "OpenID Connect Front- or Back-channel Enabled Logout",
         "operationId": "performOidcFrontOrBackChannelLogout",
         "responses": {
           "302": {
@@ -1935,7 +1935,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# The OAuth 2.0 Token Endpoint",
+        "summary": "The OAuth 2.0 Token Endpoint",
         "operationId": "performOAuth2TokenFlow",
         "parameters": [
           {
@@ -1999,7 +1999,7 @@
         "tags": [
           "v0alpha2"
         ],
-        "summary": "# OpenID Connect Userinfo",
+        "summary": "OpenID Connect Userinfo",
         "operationId": "getOidcUserInfo",
         "responses": {
           "200": {
@@ -2026,7 +2026,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "# Get Service Version",
+        "summary": "Get Service Version",
         "operationId": "getVersion",
         "responses": {
           "200": {

@@ -477,6 +477,17 @@ that your company deserves a spot here, reach out to
             </td>
             <td><a href="https://www.lunasec.io/">lunasec.io</a></td>
         </tr>
+                <tr>
+            <td>Adopter *</td>
+            <td>Serlo</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/serlo.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/serlo.svg" alt="Serlo">
+                </picture>
+            </td>
+            <td><a href="https://serlo.org/">serlo.org</a></td>
+        </tr>
     </tbody>
 </table>
 

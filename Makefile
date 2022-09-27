@@ -12,7 +12,7 @@ GO_DEPENDENCIES = github.com/ory/go-acc \
 define make-go-dependency
   # go install is responsible for not re-building when the code hasn't changed
   .bin/$(notdir $1): go.sum go.mod
-	GOBIN=$(PWD)/.bin/ go install $1
+		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
 .bin/golangci-lint: Makefile

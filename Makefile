@@ -5,9 +5,9 @@ export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
-			  github.com/golang/mock/mockgen \
-			  github.com/go-swagger/go-swagger/cmd/swagger \
-			  github.com/go-bindata/go-bindata/go-bindata
+ 				  github.com/golang/mock/mockgen \
+				  github.com/go-swagger/go-swagger/cmd/swagger \
+				  github.com/go-bindata/go-bindata/go-bindata
 
 define make-go-dependency
   # go install is responsible for not re-building when the code hasn't changed

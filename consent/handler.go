@@ -892,21 +892,21 @@ type adminVerifyUserCodeRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify v0alpha2 adminVerifyUserCodeRequest
 //
-// Verifies a device grant request
+// # Verifies a device grant request
 //
 // Verifies a device grant request
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("device_challenge"),

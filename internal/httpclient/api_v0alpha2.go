@@ -3888,8 +3888,8 @@ AdminVerifyUserCodeRequest Verifies a device grant request
 
 Verifies a device grant request
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAdminVerifyUserCodeRequestRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiAdminVerifyUserCodeRequestRequest
 */
 func (a *V0alpha2ApiService) AdminVerifyUserCodeRequest(ctx context.Context) ApiAdminVerifyUserCodeRequestRequest {
 	return ApiAdminVerifyUserCodeRequestRequest{
@@ -3899,7 +3899,8 @@ func (a *V0alpha2ApiService) AdminVerifyUserCodeRequest(ctx context.Context) Api
 }
 
 // Execute executes the request
-//  @return SuccessfulOAuth2RequestResponse
+//
+//	@return SuccessfulOAuth2RequestResponse
 func (a *V0alpha2ApiService) AdminVerifyUserCodeRequestExecute(r ApiAdminVerifyUserCodeRequestRequest) (*SuccessfulOAuth2RequestResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut

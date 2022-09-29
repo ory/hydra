@@ -2,7 +2,7 @@
 Describe the big picture of your changes here to communicate to the maintainers why we should accept this pull request.
 
 This text will be included in the changelog. If applicable, include links to documentation or pieces of code.
-If your change includes breaking changes please add a codeblock documenting the breaking change:
+If your change includes breaking changes please add a code block documenting the breaking change:
 
 ```
 BREAKING CHANGES: This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -23,7 +23,7 @@ If this pull request
 Pull requests introducing new features, which do not have a design document linked are more likely to be rejected and take on average 2-8 weeks longer to
 get merged.
 
-You can discuss changes with maintainers either in the Github Discusssions in this repository or
+You can discuss changes with maintainers either in the Github Discussions in this repository or
 join the [Ory Chat](https://www.ory.sh/chat).
 -->
 
@@ -44,8 +44,8 @@ If you're unsure about any of them, don't hesitate to ask. We're here to help!
       [contributing code guidelines](../blob/master/CONTRIBUTING.md#contributing-code).
 - [ ] I have read the [security policy](../security/policy).
 - [ ] I confirm that this pull request does not address a security
-      vulnerability. If this pull request addresses a security. vulnerability, I
-      confirm that I got green light (please contact
+      vulnerability. If this pull request addresses a security vulnerability, I
+      confirm that I got the approval (please contact
       [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push
       the changes.
 - [ ] I have added tests that prove my fix is effective or that my feature

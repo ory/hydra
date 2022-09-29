@@ -46,9 +46,9 @@ UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. Thi
 client configuration takes precedence over the instance-wide token lifespan
 configuration.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id The id of the OAuth 2.0 Client.
- @return ApiUpdateOAuth2ClientLifespansRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiUpdateOAuth2ClientLifespansRequest
 */
 func (a *AdminApiService) UpdateOAuth2ClientLifespans(ctx context.Context, id string) ApiUpdateOAuth2ClientLifespansRequest {
 	return ApiUpdateOAuth2ClientLifespansRequest{
@@ -59,7 +59,8 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespans(ctx context.Context, id st
 }
 
 // Execute executes the request
-//  @return OAuth2Client
+//
+//	@return OAuth2Client
 func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r ApiUpdateOAuth2ClientLifespansRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut

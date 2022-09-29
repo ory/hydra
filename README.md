@@ -477,6 +477,17 @@ that your company deserves a spot here, reach out to
             </td>
             <td><a href="https://www.lunasec.io/">lunasec.io</a></td>
         </tr>
+                <tr>
+            <td>Adopter *</td>
+            <td>Serlo</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/serlo.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/serlo.svg" alt="Serlo">
+                </picture>
+            </td>
+            <td><a href="https://serlo.org/">serlo.org</a></td>
+        </tr>
     </tbody>
 </table>
 
@@ -601,8 +612,8 @@ deal with: Self-service Login and Registration, Multi-Factor Authentication
 
 [Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
-writing a tiny "bridge" application. Gives absolute control over user interface
-and user experience flows.
+writing a tiny "bridge" application. It gives absolute control over the user
+interface and user experience flows.
 
 ### Ory Oathkeeper: Identity & Access Proxy
 

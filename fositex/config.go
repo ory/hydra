@@ -37,7 +37,7 @@ type Config struct {
 	tokenEndpointHandlers           fosite.TokenEndpointHandlers
 	tokenIntrospectionHandlers      fosite.TokenIntrospectionHandlers
 	revocationHandlers              fosite.RevocationHandlers
-	deviceEndpointHandlers 			fosite.DeviceEndpointHandlers
+	deviceEndpointHandlers          fosite.DeviceEndpointHandlers
 	deviceAuthorizeEndpointHandlers fosite.DeviceAuthorizeEndpointHandlers
 
 	*config.DefaultProvider

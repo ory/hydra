@@ -892,21 +892,21 @@ type adminVerifyUserCodeRequest struct {
 
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify v0alpha2 adminVerifyUserCodeRequest
 //
-// Verifies a device grant request
+// # Verifies a device grant request
 //
 // Verifies a device grant request
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: successfulOAuth2RequestResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: successfulOAuth2RequestResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("device_challenge"),
@@ -936,7 +936,7 @@ func (h *Handler) adminVerifyUserCodeRequest(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithWrap(err).WithHint(`'user_code' session not found`)))
 		return
 	}
-	
+
 	clientId := userCodeRequest.GetClient().GetID()
 	// UserCode & DeviceCode Request shares the same RequestId as it's the same request;
 	deviceRequestId := userCodeRequest.GetID()

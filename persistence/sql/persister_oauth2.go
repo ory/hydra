@@ -299,7 +299,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 				return errorsx.WithStack(fosite.ErrAuthorizationPending)
 			}
 		}
-		
+
 		fr, err = r.toRequest(ctx, session, p)
 		return err
 	})

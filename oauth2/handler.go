@@ -249,21 +249,21 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 
 // swagger:route GET /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
 //
-// The OAuth 2.0 Device Authorize Endpoint
+// # The OAuth 2.0 Device Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 // OAuth2 is a very popular protocol and a library for your programming language will exists.
 //
 // To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oAuth2ApiDeviceAuthorizationResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2ApiDeviceAuthorizationResponse
+//	  default: oAuth2ApiError
 func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)

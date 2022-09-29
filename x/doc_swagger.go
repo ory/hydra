@@ -55,7 +55,7 @@ type emptyResponse struct{}
 
 // OAuth2 Device Flow
 //
-// Ory's OAuth 2.0 Device Authorization API
+// # Ory's OAuth 2.0 Device Authorization API
 //
 // swagger:model oAuth2ApiDeviceAuthorizationResponse
 type oAuth2ApiDeviceAuthorizationResponse struct {

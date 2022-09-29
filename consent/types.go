@@ -474,7 +474,7 @@ type DeviceGrantRequest struct {
 	// identify the session.
 	//
 	// required: true
-	ID string `json:"challenge" db:"challenge"`
+	ID  string    `json:"challenge" db:"challenge"`
 	NID uuid.UUID `json:"-" db:"nid"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.

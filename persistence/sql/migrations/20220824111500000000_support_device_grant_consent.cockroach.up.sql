@@ -10,9 +10,10 @@ CREATE TABLE hydra_oauth2_device_grant_request
     device_code_signature VARCHAR(255) NULL,
     accepted              BOOL         NOT NULL DEFAULT true,
     accepted_at           TIMESTAMP    NULL,
-    nid                   UUID         NULL REFERENCES networks(id) ON DELETE CASCADE ON UPDATE RESTRICT
+    nid                   UUID         NULL
 );
 CREATE INDEX hydra_oauth2_device_grant_request_client_id_idx ON hydra_oauth2_device_grant_request (client_id, nid);
 CREATE INDEX hydra_oauth2_device_grant_request_verifier_idx ON hydra_oauth2_device_grant_request (verifier, nid);
 CREATE INDEX hydra_oauth2_device_grant_request_challenge_idx ON hydra_oauth2_device_grant_request (challenge, nid);
-ALTER TABLE hydra_oauth2_device_grant_request ADD CONSTRAINT hydra_oauth2_device_grant_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+ALTER TABLE hydra_oauth2_device_grant_request ADD CONSTRAINT hydra_oauth2_device_grant_request_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+ALTER TABLE hydra_oauth2_device_grant_request ADD CONSTRAINT hydra_oauth2_device_grant_request_nid_fk_idx FOREIGN KEY (nid) REFERENCES networks(id) ON UPDATE RESTRICT ON DELETE CASCADE;

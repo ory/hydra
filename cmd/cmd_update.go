@@ -6,7 +6,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewUpdateCmd(root *cobra.Command) *cobra.Command {
+func NewUpdateCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update resources",

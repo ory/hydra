@@ -89,10 +89,10 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
 </body>
 </html>`))
 
-func NewPerformAuthorizationCodeCmd(parent *cobra.Command) *cobra.Command {
+func NewPerformAuthorizationCodeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "authorization-code",
-		Example: fmt.Sprintf("%s perform authorization-code --client-id ... --client-secret ...", parent.Use),
+		Example: "{{ .CommandPath }} --client-id ... --client-secret ...",
 		Short:   "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
 		Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
 This command will help you to see if Ory Hydra has been configured properly.

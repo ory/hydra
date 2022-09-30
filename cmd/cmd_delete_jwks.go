@@ -22,7 +22,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -30,13 +29,13 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewDeleteJWKSCommand(root *cobra.Command) *cobra.Command {
+func NewDeleteJWKSCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "jwks id-1 [id-2] [id-n]",
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Delete one or more JSON Web Key Sets by their set ID",
 		Long:    "This command deletes one or more JSON Web Key Sets by their respective set IDs.",
-		Example: fmt.Sprintf(`%[1]s delete jwks set-1 set-2 set-3`, root.Use),
+		Example: `{{ .CommandPath }} set-1 set-2 set-3`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

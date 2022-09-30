@@ -7,7 +7,6 @@ import (
 
 	"github.com/ory/hydra/client"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
@@ -16,7 +15,7 @@ import (
 )
 
 func TestListClient(t *testing.T) {
-	c := cmd.NewListClientsCmd(new(cobra.Command))
+	c := cmd.NewListClientsCmd()
 	reg := setup(t, c)
 
 	expected1 := createClient(t, reg, nil)

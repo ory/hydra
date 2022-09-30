@@ -9,14 +9,14 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewListClientsCmd(root *cobra.Command) *cobra.Command {
+func NewListClientsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "oauth2-clients",
 		Aliases: []string{"clients"},
 		Short:   "List OAuth 2.0 Clients",
 		Long:    `This command list an OAuth 2.0 Clients.`,
 		Args:    cobra.NoArgs,
-		Example: fmt.Sprintf("%s ls identities --%s eyJwYWdlIjoxfQ --%s 10", root.Use, cmdx.FlagPageToken, cmdx.FlagPageSize),
+		Example: fmt.Sprintf("{{ .CommandPath }} --%s eyJwYWdlIjoxfQ --%s 10", cmdx.FlagPageToken, cmdx.FlagPageSize),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

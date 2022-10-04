@@ -58,9 +58,11 @@ var defaultInitialPing = func(m *RegistrySQL) error {
 }
 
 func init() {
-	dbal.RegisterDriver(func() dbal.Driver {
-		return NewRegistrySQL()
-	})
+	dbal.RegisterDriver(
+		func() dbal.Driver {
+			return NewRegistrySQL()
+		},
+	)
 }
 
 func NewRegistrySQL() *RegistrySQL {
@@ -88,7 +90,9 @@ func (m *RegistrySQL) determineNetwork(c *pop.Connection, ctx context.Context) (
 	return networkx.NewManager(c, m.Logger(), m.Tracer(ctx)).Determine(ctx)
 }
 
-func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error {
+func (m *RegistrySQL) Init(
+	ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer,
+) error {
 	if m.persister == nil {
 		m.WithContextualizer(ctxer)
 		var opts []instrumentedsql.Opt
@@ -99,16 +103,21 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		}
 
 		// new db connection
-		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.Config().DSN())
-		c, err := pop.NewConnection(&pop.ConnectionDetails{
-			URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
-			IdlePool:                  idlePool,
-			ConnMaxLifetime:           connMaxLifetime,
-			ConnMaxIdleTime:           connMaxIdleTime,
-			Pool:                      pool,
-			UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
-			InstrumentedDriverOptions: opts,
-		})
+		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(
+			m.l, m.Config().DSN(),
+		)
+		c, err := pop.NewConnection(
+			&pop.ConnectionDetails{
+				URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
+				IdlePool:                  idlePool,
+				ConnMaxLifetime:           connMaxLifetime,
+				ConnMaxIdleTime:           connMaxIdleTime,
+				Pool:                      pool,
+				UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
+				InstrumentedDriverOptions: opts,
+				Unsafe:                    m.Config().DbIgnoreUnknownTableColumns(),
+			},
+		)
 		if err != nil {
 			return errorsx.WithStack(err)
 		}

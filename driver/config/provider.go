@@ -81,6 +81,7 @@ const (
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyDeviceInternalURL                         = "urls.self.device"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
+	KeyDbIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyDeviceAuthTokenPollingInterval            = "oauth2.device_authorization.token_polling_interval" // #nosec G101
@@ -151,12 +152,14 @@ func (p *DefaultProvider) getProvider(ctx context.Context) *configx.Provider {
 }
 
 func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*DefaultProvider, error) {
-	opts = append([]configx.OptionModifier{
-		configx.WithStderrValidationReporter(),
-		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
-		configx.WithImmutables("log", "serve", "dsn", "profiling"),
-		configx.WithLogrusWatcher(l),
-	}, opts...)
+	opts = append(
+		[]configx.OptionModifier{
+			configx.WithStderrValidationReporter(),
+			configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
+			configx.WithImmutables("log", "serve", "dsn", "profiling"),
+			configx.WithLogrusWatcher(l),
+		}, opts...,
+	)
 
 	p, err := configx.New(ctx, spec.ConfigValidationSchema, opts...)
 	if err != nil {
@@ -224,13 +227,17 @@ func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context) []string {
 	if stringslice.Has(types, "pairwise") {
 		if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
 			p.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.supported_types" (e.g. oidc.subject_identifiers.supported_types=public) or set strategies.access_token to "opaque".`)
-			types = stringslice.Filter(types,
+			types = stringslice.Filter(
+				types,
 				func(s string) bool {
 					return !(s == "public")
 				},
 			)
 		} else if len(p.SubjectIdentifierAlgorithmSalt(ctx)) < 8 {
-			p.l.Fatalf(`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`, len(p.SubjectIdentifierAlgorithmSalt(ctx)))
+			p.l.Fatalf(
+				`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`,
+				len(p.SubjectIdentifierAlgorithmSalt(ctx)),
+			)
 		}
 	}
 
@@ -324,7 +331,11 @@ func (p *DefaultProvider) GetCookieSecrets(ctx context.Context) [][]byte {
 }
 
 func (p *DefaultProvider) LogoutRedirectURL(ctx context.Context) *url.URL {
-	return urlRoot(p.getProvider(ctx).RequestURIF(KeyLogoutRedirectURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/logout/callback")))
+	return urlRoot(
+		p.getProvider(ctx).RequestURIF(
+			KeyLogoutRedirectURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/logout/callback"),
+		),
+	)
 }
 
 func (p *DefaultProvider) publicFallbackURL(ctx context.Context, path string) *url.URL {
@@ -384,7 +395,11 @@ func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) AdminURL(ctx context.Context) *url.URL {
-	return urlRoot(p.getProvider(ctx).RequestURIF(KeyAdminURL, p.fallbackURL(ctx, "/", p.host(AdminInterface), p.port(AdminInterface))))
+	return urlRoot(
+		p.getProvider(ctx).RequestURIF(
+			KeyAdminURL, p.fallbackURL(ctx, "/", p.host(AdminInterface), p.port(AdminInterface)),
+		),
+	)
 }
 
 func (p *DefaultProvider) DeviceInternalURL(ctx context.Context) *url.URL {
@@ -392,7 +407,9 @@ func (p *DefaultProvider) DeviceInternalURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)))
+	return p.getProvider(ctx).RequestURIF(
+		KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)),
+	)
 }
 
 func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {
@@ -433,6 +450,10 @@ func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
 }
 
+func (p *DefaultProvider) DbIgnoreUnknownTableColumns() bool {
+	return p.p.Bool(KeyDbIgnoreUnknownTableColumns)
+}
+
 func (p *DefaultProvider) SubjectIdentifierAlgorithmSalt(ctx context.Context) string {
 	return p.getProvider(ctx).String(KeySubjectIdentifierAlgorithmSalt)
 }
@@ -456,7 +477,9 @@ func (p *DefaultProvider) OIDCDiscoverySupportedScope(ctx context.Context) []str
 }
 
 func (p *DefaultProvider) OIDCDiscoveryUserinfoEndpoint(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(ctx), "/userinfo"))
+	return p.getProvider(ctx).RequestURIF(
+		KeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(ctx), "/userinfo"),
+	)
 }
 
 func (p *DefaultProvider) GetSendDebugMessagesToClients(ctx context.Context) bool {

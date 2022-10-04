@@ -17,11 +17,15 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/hydra/cmd/server"
 )
 
 // allCmd represents the all command
-func NewServeAllCmd() *cobra.Command {
+func NewServeAllCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	return &cobra.Command{
 		Use:   "all",
 		Short: "Serves both public and administrative HTTP/2 APIs",
@@ -38,6 +42,6 @@ All possible controls are listed below. This command exposes exposes command lin
 the controls section.
 
 ` + serveControls,
-		Run: server.RunServeAll,
+		RunE: server.RunServeAll(slOpts, dOpts, cOpts),
 	}
 }

@@ -37,6 +37,7 @@ import (
 	"github.com/ory/x/stringslice"
 )
 
+// swagger:model oAuth2ConsentSession
 type Session struct {
 	*openid.DefaultSession `json:"id_token"`
 	Extra                  map[string]interface{} `json:"extra"`
@@ -77,7 +78,9 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 
 	//setting every allowed claim top level in jwt with respective value
 	for _, allowedClaim := range allowedClaimsFromConfigWithoutReserved {
-		topLevelExtraWithMirrorExt[allowedClaim] = s.Extra[allowedClaim]
+		if cl, ok := s.Extra[allowedClaim]; ok {
+			topLevelExtraWithMirrorExt[allowedClaim] = cl
+		}
 	}
 
 	//for every other claim that was already reserved and for mirroring, add original extra under "ext"

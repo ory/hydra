@@ -18,7 +18,7 @@ import (
 )
 
 func newJanitorCmd() *cobra.Command {
-	return cmd.NewRootCmd()
+	return cmd.NewRootCmd(nil, nil, nil)
 }
 
 func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
@@ -42,10 +42,10 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan().String()),
-					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan().String()),
+					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan(ctx).String()),
+					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyTokens),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -75,14 +75,14 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan().String()),
+					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
 			notAfter := time.Now().Round(time.Second).Add(-v)
-			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
 			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
 		})
 	}
@@ -111,7 +111,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -133,7 +133,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -159,7 +159,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -180,42 +180,40 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
 			// validate
 			t.Run("step=validate", jt.ConsentRejectionValidate(ctx, reg.ConsentManager()))
 		})
-
 	})
-
 }
 
 func TestJanitorHandler_Arguments(t *testing.T) {
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		"memory",
 	)
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyTokens),
 		"memory",
 	)
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyGrants),
 		"memory",
 	)
 
-	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		"memory")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests or --grants to be set")
 
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "1000"),
@@ -223,7 +221,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory",
 	)
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "0"),
@@ -231,7 +229,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "-100"),
@@ -239,7 +237,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "0"),
@@ -247,7 +245,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "-100"),
@@ -255,7 +253,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "100"),
@@ -286,7 +284,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s", cli.OnlyGrants),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 

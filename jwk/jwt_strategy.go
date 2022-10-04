@@ -22,142 +22,78 @@ package jwk
 
 import (
 	"context"
-	"crypto/rsa"
-	"strings"
-	"sync"
+	"net"
 
+	"github.com/ory/x/josex"
+
+	"github.com/gofrs/uuid"
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
 
-	jwt2 "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite/token/jwt"
 )
 
-type JWTStrategy interface {
+type JWTSigner interface {
 	GetPublicKeyID(ctx context.Context) (string, error)
-
-	jwt.JWTStrategy
+	GetPublicKey(ctx context.Context) (jose.JSONWebKey, error)
+	jwt.Signer
 }
 
-type RS256JWTStrategy struct {
-	sync.RWMutex
-
-	RS256JWTStrategy *jwt.RS256JWTStrategy
-	r                InternalRegistry
-	c                *config.Provider
-	rs               func() string
-
-	publicKey    *rsa.PublicKey
-	privateKey   interface{}
-	publicKeyID  string
-	privateKeyID string
+type DefaultJWTSigner struct {
+	*jwt.DefaultSigner
+	r     InternalRegistry
+	c     *config.DefaultProvider
+	setID string
 }
 
-func NewRS256JWTStrategy(c config.Provider, r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
-	j := &RS256JWTStrategy{c: &c, r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
-	if err := j.refresh(context.TODO()); err != nil {
-		return nil, err
-	}
-	return j, nil
+func NewDefaultJWTSigner(c *config.DefaultProvider, r InternalRegistry, setID string) *DefaultJWTSigner {
+	j := &DefaultJWTSigner{c: c, r: r, setID: setID, DefaultSigner: &jwt.DefaultSigner{}}
+	j.DefaultSigner.GetPrivateKey = j.getPrivateKey
+	return j
 }
 
-func (j *RS256JWTStrategy) Hash(ctx context.Context, in []byte) ([]byte, error) {
-	return j.RS256JWTStrategy.Hash(ctx, in)
-}
-
-// GetSigningMethodLength will return the length of the signing method
-func (j *RS256JWTStrategy) GetSigningMethodLength() int {
-	return j.RS256JWTStrategy.GetSigningMethodLength()
-}
-
-func (j *RS256JWTStrategy) GetSignature(ctx context.Context, token string) (string, error) {
-	return j.RS256JWTStrategy.GetSignature(ctx, token)
-}
-
-func (j *RS256JWTStrategy) Generate(ctx context.Context, claims jwt2.MapClaims, header jwt.Mapper) (string, string, error) {
-	if err := j.refresh(ctx); err != nil {
-		return "", "", err
+func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKey, err error) {
+	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, uuid.Must(uuid.NewV4()).String(), string(jose.RS256))
+	if err == nil {
+		return private, nil
 	}
 
-	return j.RS256JWTStrategy.Generate(ctx, claims, header)
-}
-
-func (j *RS256JWTStrategy) Validate(ctx context.Context, token string) (string, error) {
-	if err := j.refresh(ctx); err != nil {
-		return "", err
+	var netError net.Error
+	if errors.As(err, &netError) {
+		return nil, errors.WithStack(fosite.ErrServerError.
+			WithHintf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, j.setID))
 	}
 
-	return j.RS256JWTStrategy.Validate(ctx, token)
+	return nil, errors.WithStack(fosite.ErrServerError.
+		WithWrap(err).
+		WithHintf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql..`, j.setID))
 }
 
-func (j *RS256JWTStrategy) Decode(ctx context.Context, token string) (*jwt2.Token, error) {
-	if err := j.refresh(ctx); err != nil {
+func (j *DefaultJWTSigner) GetPublicKeyID(ctx context.Context) (string, error) {
+	private, err := j.getKeys(ctx)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	return josex.ToPublicKey(private).KeyID, nil
+}
+
+func (j *DefaultJWTSigner) GetPublicKey(ctx context.Context) (jose.JSONWebKey, error) {
+	private, err := j.getKeys(ctx)
+	if err != nil {
+		return jose.JSONWebKey{}, errors.WithStack(err)
+	}
+	return josex.ToPublicKey(private), nil
+}
+
+func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, error) {
+	private, err := j.getKeys(ctx)
+	if err != nil {
 		return nil, err
 	}
 
-	return j.RS256JWTStrategy.Decode(ctx, token)
-}
-
-func (j *RS256JWTStrategy) GetPublicKeyID(ctx context.Context) (string, error) {
-	if err := j.refresh(ctx); err != nil {
-		return "", err
-	}
-
-	return j.publicKeyID, nil
-}
-
-func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
-	keys, err := j.r.KeyManager().GetKeySet(ctx, j.rs())
-	if err != nil {
-		return err
-	}
-
-	public, err := FindPublicKey(keys)
-	if err != nil {
-		return err
-	}
-
-	private, err := FindPrivateKey(keys)
-	if err != nil {
-		return err
-	}
-
-	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
-		return errors.New("public and private key pair kids do not match")
-	}
-
-	if k, ok := public.Key.(*rsa.PublicKey); !ok {
-		return errors.New("unable to type assert key to *rsa.PublicKey")
-	} else {
-		j.Lock()
-		j.publicKey = k
-		j.publicKeyID = public.KeyID
-		j.Unlock()
-	}
-
-	if k, ok := private.Key.(*rsa.PrivateKey); ok {
-		j.Lock()
-		j.privateKey = k
-		j.RS256JWTStrategy.PrivateKey = k
-		j.Unlock()
-
-		j.RLock()
-		defer j.RUnlock()
-		if k.PublicKey.E != j.publicKey.E ||
-			k.PublicKey.N.String() != j.publicKey.N.String() {
-			return errors.New("public and private key pair fetched from store does not match")
-		}
-	} else if k, ok := private.Key.(jose.OpaqueSigner); ok {
-		j.Lock()
-		j.privateKey = k
-		j.RS256JWTStrategy.PrivateKey = k
-		j.Unlock()
-	} else {
-		return errors.New("unknown private key type")
-	}
-	return nil
+	return private, nil
 }

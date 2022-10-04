@@ -43,7 +43,7 @@ PORT=$hydraport \
     OAUTH2_SHARE_ERROR_DEBUG=1 \
     OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,offline_access,profile,email,address,phone \
     LOG_LEVEL=debug \
-    DATABASE_URL=memory \
-    hydra serve --dangerous-force-http
+    DSN=memory \
+    hydra serve --dev
 
 kill %1

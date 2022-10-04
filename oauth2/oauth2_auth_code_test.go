@@ -25,7 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,12 +35,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/requirex"
+
+	hydra "github.com/ory/hydra-client-go"
+
+	"github.com/ory/x/httprouterx"
+
+	"github.com/ory/x/assertx"
+
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -53,14 +63,10 @@ import (
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
 	hydraoauth2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/urlx"
 )
 
 func noopHandler(t *testing.T) httprouter.Handle {
@@ -80,20 +86,22 @@ type clientCreator interface {
 // - [x] If `authenticatedAt` is properly managed across the lifecycle
 //   - [x] The value `authenticatedAt` should be an old time if no user interaction wrt login was required
 //   - [x] The value `authenticatedAt` should be a recent time if user interaction wrt login was required
+//
 // - [x] If `requestedAt` is properly managed across the lifecycle
 //   - [x] The value of `requestedAt` must be the initial request time, not some other time (e.g. when accepting login)
+//
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(config.KeyRefreshTokenHookURL, "")
-	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
+	ctx := context.TODO()
+	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
+	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
 		secret := uuid.New()
 		c := &hc.Client{
-			OutfacingID:   uuid.New(),
 			Secret:        secret,
 			RedirectURIs:  []string{cb},
 			ResponseTypes: []string{"id_token", "code", "token"},
@@ -103,18 +111,19 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 		require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c))
 		return c, &oauth2.Config{
-			ClientID:     c.OutfacingID,
+			ClientID:     c.GetID(),
 			ClientSecret: secret,
 			Endpoint: oauth2.Endpoint{
-				AuthURL:   reg.Config().OAuth2AuthURL().String(),
-				TokenURL:  reg.Config().OAuth2TokenURL().String(),
+				AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
+				TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
 				AuthStyle: oauth2.AuthStyleInHeader,
 			},
 			Scopes: strings.Split(c.Scope, " "),
 		}
 	}
 
-	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
+	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
+	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
 	getAuthorizeCode := func(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
 		if c == nil {
@@ -131,81 +140,83 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return q.Get("code"), resp
 	}
 
-	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*admin.GetLoginRequestOK) *models.AcceptLoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, err := adminClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+			rr, _, err := adminClient.V0alpha2Api.AdminGetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), rr.Payload.Client.ClientID)
-			assert.Empty(t, rr.Payload.Client.ClientSecret)
-			assert.EqualValues(t, c.GrantTypes, rr.Payload.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, rr.Payload.Client.LogoURI)
-			assert.EqualValues(t, c.RedirectURIs, rr.Payload.Client.RedirectUris)
-			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *rr.Payload.Challenge)
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
-			assert.Contains(t, *rr.Payload.RequestURL, reg.Config().OAuth2AuthURL().String())
+			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
+			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
+			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
+			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
+			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.Contains(t, rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
 
-			acceptBody := &models.AcceptLoginRequest{
-				Subject:  &subject,
-				Remember: !*rr.Payload.Skip,
-				Acr:      "1",
-				Amr:      models.StringSlicePipeDelimiter{"pwd"},
+			acceptBody := hydra.AcceptOAuth2LoginRequest{
+				Subject:  subject,
+				Remember: pointerx.Bool(!rr.Skip),
+				Acr:      pointerx.String("1"),
+				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
 			if checkRequestPayload != nil {
 				if b := checkRequestPayload(rr); b != nil {
-					acceptBody = b
+					acceptBody = *b
 				}
 			}
 
-			v, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-				WithBody(acceptBody))
+			v, _, err := adminClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(context.Background()).
+				LoginChallenge(r.URL.Query().Get("login_challenge")).
+				AcceptOAuth2LoginRequest(acceptBody).
+				Execute()
 			require.NoError(t, err)
-			require.NotEmpty(t, *v.Payload.RedirectTo)
-			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 		}
 	}
 
-	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*admin.GetConsentRequestOK)) http.HandlerFunc {
+	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, err := adminClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+			rr, _, err := adminClient.V0alpha2Api.AdminGetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), rr.Payload.Client.ClientID)
-			assert.Empty(t, rr.Payload.Client.ClientSecret)
-			assert.EqualValues(t, c.GrantTypes, rr.Payload.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, rr.Payload.Client.LogoURI)
-			assert.EqualValues(t, c.RedirectURIs, rr.Payload.Client.RedirectUris)
-			assert.EqualValues(t, subject, rr.Payload.Subject)
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
-			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *rr.Payload.Challenge)
-			assert.Contains(t, rr.Payload.RequestURL, reg.Config().OAuth2AuthURL().String())
+			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
+			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
+			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
+			assert.EqualValues(t, subject, pointerx.StringR(rr.Subject))
+			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
+			assert.Contains(t, *rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
 			if checkRequestPayload != nil {
 				checkRequestPayload(rr)
 			}
 
-			assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Payload.Context)
-			v, err := adminClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-				WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-				WithBody(&models.AcceptConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
-					GrantAccessTokenAudience: rr.Payload.RequestedAccessTokenAudience,
-					Session: &models.ConsentRequestSession{
+			assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Context)
+			v, _, err := adminClient.V0alpha2Api.AdminAcceptOAuth2ConsentRequest(context.Background()).
+				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
+					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Bool(true), RememberFor: pointerx.Int64(0),
+					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
-						IDToken:     map[string]interface{}{"bar": "baz"},
+						IdToken:     map[string]interface{}{"bar": "baz"},
 					},
-				}))
+				}).
+				Execute()
 			require.NoError(t, err)
-			require.NotEmpty(t, *v.Payload.RedirectTo)
-			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 		}
 	}
 
 	assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
 		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
 		require.NoError(t, err)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
 	}
 
 	assertIDToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
@@ -220,9 +231,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
-		assert.EqualValues(t, reg.Config().IssuerURL().String(), claims.Get("iss").String(), "%s", claims)
+		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
 		assert.Equal(t, "1", claims.Get("acr").String(), "%s", claims)
 		require.Len(t, claims.Get("amr").Array(), 1, "%s", claims)
@@ -263,18 +274,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.NotEmpty(t, i.Get("jti").String())
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(t, reg.Config().IssuerURL().String(), i.Get("iss").String(), "%s", i)
+		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), i.Get("iss").String(), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-		testhelpers.RequireEqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
+		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
 		assert.EqualValues(t, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
 		return i
 	}
 
 	waitForRefreshTokenExpiry := func() {
-		time.Sleep(reg.Config().RefreshTokenLifespan() + time.Second)
+		time.Sleep(reg.Config().GetRefreshTokenLifespan(ctx) + time.Second)
 	}
 
 	t.Run("case=checks if request fails when audience does not match", func(t *testing.T) {
@@ -301,9 +312,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			introspectAccessToken(t, conf, token, subject)
-			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().AccessTokenLifespan()))
-			assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().IDTokenLifespan()))
-			assertRefreshToken(t, token, conf, iat.Add(reg.Config().RefreshTokenLifespan()))
+			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+			assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+			assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 
 			t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
 				require.NotEmpty(t, token.RefreshToken)
@@ -318,9 +329,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				introspectAccessToken(t, conf, refreshedToken, subject)
 
 				t.Run("followup=refreshed tokens contain valid tokens", func(t *testing.T) {
-					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().AccessTokenLifespan()))
-					assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().IDTokenLifespan()))
-					assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().RefreshTokenLifespan()))
+					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+					assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+					assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 				})
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
@@ -345,23 +356,24 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 
 		t.Run("strategy=jwt", func(t *testing.T) {
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "jwt")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 			run(t, "jwt")
 		})
 
 		t.Run("strategy=opaque", func(t *testing.T) {
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque")
 		})
 	})
 
 	t.Run("case=checks if request fails when subject is empty", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
-			_, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(""), Remember: true}))
+			_, res, err := adminClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(ctx).
+				LoginChallenge(r.URL.Query().Get("login_challenge")).
+				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Bool(true)}).Execute()
 			require.Error(t, err) // expects 400
-			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload)
+			body := string(ioutilx.MustReadAll(res.Body))
+			assert.Contains(t, body, "Field 'subject' must not be empty", "%s", body)
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
@@ -373,14 +385,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		expectAud := "https://api.ory.sh/"
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				assert.False(t, *r.Payload.Skip)
-				assert.EqualValues(t, []string{expectAud}, r.Payload.RequestedAccessTokenAudience)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				assert.False(t, r.Skip)
+				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 				return nil
 			}),
-			acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-				assert.False(t, r.Payload.Skip)
-				assert.EqualValues(t, []string{expectAud}, r.Payload.RequestedAccessTokenAudience)
+			acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+				assert.False(t, *r.Skip)
+				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 			}))
 
 		code, _ := getAuthorizeCode(t, conf, nil,
@@ -396,7 +408,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		require.Len(t, aud, 1)
 		assert.EqualValues(t, aud[0].String(), expectAud)
 
-		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().IDTokenLifespan()))
+		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 	})
 
 	t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
@@ -413,7 +425,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			body := introspectAccessToken(t, conf, token, subject)
-			testhelpers.RequireEqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+			requirex.EqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration))
 			assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.AuthorizationCodeGrantIDTokenLifespan.Duration))
@@ -434,7 +446,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
 
 				body := introspectAccessToken(t, conf, refreshedToken, subject)
-				testhelpers.RequireEqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+				requirex.EqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
 					i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
@@ -454,11 +466,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret},
-				c.OutfacingID,
+				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				c.GetID(),
 				ls, adminTS,
 			)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "jwt")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 			run(t, "jwt", c, conf, ls)
 		})
 
@@ -468,33 +480,33 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret},
-				c.OutfacingID,
+				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				c.GetID(),
 				ls, adminTS,
 			)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque", c, conf, ls)
 		})
 
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
 			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret}, c.OutfacingID, testhelpers.TestLifespans, adminTS)
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.OutfacingID, ClientSecret: conf.ClientSecret}, c.OutfacingID, client.UpdateOAuth2ClientLifespans{}, adminTS)
-			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.UpdateOAuth2ClientLifespans{}, adminTS)
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
 			expectedLifespans := client.UpdateOAuth2ClientLifespans{
-				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
-				ClientCredentialsGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				ImplicitGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				ImplicitGrantIDTokenLifespan:               x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				JwtBearerGrantAccessTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				PasswordGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				PasswordGrantRefreshTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
-				RefreshTokenGrantIDTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().IDTokenLifespan()},
-				RefreshTokenGrantAccessTokenLifespan:       x.NullDuration{Valid: true, Duration: reg.Config().AccessTokenLifespan()},
-				RefreshTokenGrantRefreshTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().RefreshTokenLifespan()},
+				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
+				ClientCredentialsGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				ImplicitGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				ImplicitGrantIDTokenLifespan:               x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				JwtBearerGrantAccessTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				PasswordGrantAccessTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				PasswordGrantRefreshTokenLifespan:          x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
+				RefreshTokenGrantIDTokenLifespan:           x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
+				RefreshTokenGrantAccessTokenLifespan:       x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
+				RefreshTokenGrantRefreshTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
 			}
 			run(t, "opaque", c, conf, expectedLifespans)
 		})
@@ -520,14 +532,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		// Reset UI to check for skip values
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				require.True(t, *r.Payload.Skip)
-				require.EqualValues(t, subject, *r.Payload.Subject)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				require.True(t, r.Skip)
+				require.EqualValues(t, subject, r.Subject)
 				return nil
 			}),
-			acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-				require.True(t, r.Payload.Skip)
-				require.EqualValues(t, subject, r.Payload.Subject)
+			acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+				require.True(t, *r.Skip)
+				require.EqualValues(t, subject, *r.Subject)
 			}),
 		)
 
@@ -574,14 +586,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 			t.Run("followup=passes and resets skip when prompt=login", func(t *testing.T) {
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
-					acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-						require.False(t, *r.Payload.Skip)
-						require.Empty(t, *r.Payload.Subject)
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						require.False(t, r.Skip)
+						require.Empty(t, r.Subject)
 						return nil
 					}),
-					acceptConsentHandler(t, c, subject, func(r *admin.GetConsentRequestOK) {
-						require.True(t, r.Payload.Skip)
-						require.EqualValues(t, subject, r.Payload.Subject)
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						require.True(t, *r.Skip)
+						require.EqualValues(t, subject, *r.Subject)
 					}),
 				)
 				code, _ := getAuthorizeCode(t, conf, oc,
@@ -593,7 +605,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				token, err := conf.Exchange(context.Background(), code)
 				require.NoError(t, err)
 				introspectAccessToken(t, conf, token, subject)
-				assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().IDTokenLifespan()))
+				assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 			})
 		})
 	})
@@ -615,9 +627,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=requires re-authentication when id_token_hint is set to a user 'patrik-neu' but the session is 'aeneas-rekkas' and then fails because the user id from the log in endpoint is 'aeneas-rekkas'", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
-				require.False(t, *r.Payload.Skip)
-				require.Empty(t, *r.Payload.Subject)
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+				require.False(t, r.Skip)
+				require.Empty(t, r.Subject)
 				return nil
 			}),
 			acceptConsentHandler(t, c, subject, nil),
@@ -639,7 +651,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=should not cause issues if max_age is very low and consent takes a long time", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
-			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
+			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				time.Sleep(time.Second * 2)
 				return nil
 			}),
@@ -663,7 +675,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		token, err := conf.Exchange(context.Background(), code)
 		require.NoError(t, err)
 
-		idClaims := assertIDToken(t, token, conf, subject, "", time.Now().Add(reg.Config().IDTokenLifespan()))
+		idClaims := assertIDToken(t, token, conf, subject, "", time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 
 		time.Sleep(time.Second)
 		uiClaims := testhelpers.Userinfo(t, token, publicTS)
@@ -702,13 +714,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
+	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
-			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
-			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistryMemory(t, conf)
+			conf.MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
+			conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+			conf.MustSet(ctx, config.KeyAccessTokenStrategy, strat.d)
+			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
@@ -719,7 +732,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 			reg.WithConsentStrategy(consentStrategy)
 			handler := reg.OAuth2Handler()
-			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+			handler.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL), router, func(h http.Handler) http.Handler {
 				return h
 			})
 
@@ -730,12 +743,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
-				OutfacingID:   "app-client",
-				Secret:        "secret",
-				RedirectURIs:  []string{ts.URL + "/callback"},
-				ResponseTypes: []string{"id_token", "code", "token"},
-				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-				Scope:         "hydra.* offline openid",
+				LegacyClientID: "app-client",
+				Secret:         "secret",
+				RedirectURIs:   []string{ts.URL + "/callback"},
+				ResponseTypes:  []string{"id_token", "code", "token"},
+				GrantTypes:     []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+				Scope:          "hydra.* offline openid",
 			}))
 
 			oauthConfig := &oauth2.Config{
@@ -918,17 +931,15 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					require.NotEmpty(t, code)
 
 					token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-
 					if tc.expectOAuthTokenError {
 						require.Error(t, err)
 						return
 					}
 
+					require.NoError(t, err, code)
 					if tc.assertAccessToken != nil {
 						tc.assertAccessToken(t, token.AccessToken)
 					}
-
-					require.NoError(t, err, code)
 
 					t.Run("case=userinfo", func(t *testing.T) {
 						var makeRequest = func(req *http.Request) *http.Response {
@@ -964,21 +975,16 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						resp := makeRequest(req)
 						require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 					})
-					t.Logf("Got token: %s", token.AccessToken)
-
-					// time.Sleep(time.Millisecond * 1200) // Makes sure exp/iat/nbf time is different later on
 
 					res, err := testRefresh(t, token, ts.URL, tc.checkExpiry)
 					require.NoError(t, err)
 					assert.Equal(t, http.StatusOK, res.StatusCode)
 
-					body, err := ioutil.ReadAll(res.Body)
+					body, err := io.ReadAll(res.Body)
 					require.NoError(t, err)
 
 					var refreshedToken oauth2.Token
 					require.NoError(t, json.Unmarshal(body, &refreshedToken))
-
-					t.Logf("Got refresh token: %s", refreshedToken.AccessToken)
 
 					if tc.assertAccessToken != nil {
 						tc.assertAccessToken(t, refreshedToken.AccessToken)
@@ -1026,7 +1032,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err := ioutil.ReadAll(res.Body)
+						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 					})
@@ -1068,7 +1074,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							}
 
 							hookResp := hydraoauth2.RefreshTokenHookResponse{
-								Session: consent.ConsentRequestSessionData{
+								Session: consent.AcceptOAuth2ConsentRequestSession{
 									AccessToken: claims,
 									IDToken:     claims,
 								},
@@ -1079,14 +1085,14 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err := ioutil.ReadAll(res.Body)
+						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
@@ -1104,14 +1110,38 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.True(t, gjson.GetBytes(idTokenBody, "hooked").Bool())
 					})
 
+					t.Run("should not override session data if token refresh hook returns no content", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusNoContent)
+						}))
+						defer hs.Close()
+
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+
+						origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusOK, res.StatusCode)
+
+						body, err = io.ReadAll(res.Body)
+						require.NoError(t, err)
+
+						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+
+						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
+					})
+
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 							w.WriteHeader(http.StatusInternalServerError)
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -1120,7 +1150,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
+						require.Equal(t, "An error occurred while executing the refresh token hook.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `access_denied` if hook denied the request", func(t *testing.T) {
@@ -1129,8 +1159,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -1139,7 +1169,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrAccessDenied.GetDescription(), errBody.Description)
+						require.Equal(t, "The refresh token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook response is malformed", func(t *testing.T) {
@@ -1148,8 +1178,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -1158,7 +1188,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
+						require.Equal(t, "The refresh token hook target responded with an error.", errBody.Description)
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {

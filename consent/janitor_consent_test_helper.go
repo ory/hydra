@@ -28,7 +28,7 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 	}
 }
 
-func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *HandledConsentRequest {
+func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *AcceptOAuth2ConsentRequest {
 	var deniedErr *RequestDeniedError
 	if hasError {
 		deniedErr = &RequestDeniedError{
@@ -41,7 +41,7 @@ func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.
 		}
 	}
 
-	return &HandledConsentRequest{
+	return &AcceptOAuth2ConsentRequest{
 		ID:              challenge,
 		HandledAt:       sqlxx.NullTime(time.Now().Round(time.Second)),
 		Error:           deniedErr,

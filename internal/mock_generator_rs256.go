@@ -28,8 +28,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
-
-	"github.com/ory/hydra/jwk"
 )
 
 type veryInsecureRS256Generator struct{}
@@ -55,14 +53,7 @@ func (g *veryInsecureRS256Generator) Generate(id, use string) (*jose.JSONWebKeyS
 				Algorithm:    "RS256",
 				Key:          key,
 				Use:          use,
-				KeyID:        jwk.Ider("private", id),
-				Certificates: []*x509.Certificate{},
-			},
-			{
-				Algorithm:    "RS256",
-				Use:          use,
-				Key:          &key.PublicKey,
-				KeyID:        jwk.Ider("public", id),
+				KeyID:        id,
 				Certificates: []*x509.Certificate{},
 			},
 		},

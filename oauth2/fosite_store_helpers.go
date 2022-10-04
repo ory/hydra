@@ -28,7 +28,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/jwk"
+
 	"github.com/gobuffalo/pop/v6"
+	"github.com/pborman/uuid"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/handler/rfc7523"
@@ -40,7 +43,7 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/pborman/uuid"
+	gofrsuuid "github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -58,9 +61,10 @@ func signatureFromJTI(jti string) string {
 }
 
 type BlacklistedJTI struct {
-	JTI    string    `db:"-"`
-	ID     string    `db:"signature"`
-	Expiry time.Time `db:"expires_at"`
+	JTI    string         `db:"-"`
+	ID     string         `db:"signature"`
+	Expiry time.Time      `db:"expires_at"`
+	NID    gofrsuuid.UUID `db:"nid"`
 }
 
 func (j *BlacklistedJTI) AfterFind(_ *pop.Connection) error {
@@ -92,7 +96,7 @@ type AssertionJWTReader interface {
 var defaultRequest = fosite.Request{
 	ID:                "blank",
 	RequestedAt:       time.Now().UTC().Round(time.Second),
-	Client:            &client.Client{OutfacingID: "foobar"},
+	Client:            &client.Client{LegacyClientID: "foobar"},
 	RequestedScope:    fosite.Arguments{"fa", "ba"},
 	GrantedScope:      fosite.Arguments{"fa", "ba"},
 	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
@@ -106,7 +110,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -115,7 +119,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-2",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -124,7 +128,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-3",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -133,20 +137,26 @@ var flushRequests = []*fosite.Request{
 }
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
-	cl := &client.Client{OutfacingID: "foobar"}
-	cr := &consent.ConsentRequest{
-		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: sqlxx.NullString(id),
-		ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now(),
+	cl := &client.Client{LegacyClientID: "foobar"}
+	cr := &consent.OAuth2ConsentRequest{
+		Client:               cl,
+		OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
+		LoginChallenge:       sqlxx.NullString(id),
+		ID:                   id,
+		Verifier:             id,
+		CSRF:                 id,
+		AuthenticatedAt:      sqlxx.NullTime(time.Now()),
+		RequestedAt:          time.Now(),
 	}
 
 	if createClient {
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
+	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
 	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
-	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
-		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: sqlxx.NullTime(time.Now()),
+	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.AcceptOAuth2ConsentRequest{
+		ConsentRequest: cr, Session: new(consent.AcceptOAuth2ConsentRequestSession), AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		ID:          id,
 		RequestedAt: time.Now(),
 		HandledAt:   sqlxx.NullTime(time.Now()),
@@ -192,7 +202,7 @@ func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.
 	return func(t *testing.T) {
 		requestId := uuid.New()
 		mockRequestForeignKey(t, requestId, m, true)
-		cl := &client.Client{OutfacingID: "foobar"}
+		cl := &client.Client{LegacyClientID: "foobar"}
 
 		fositeRequest := &fosite.Request{
 			ID:          requestId,
@@ -277,10 +287,10 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		mockRequestForeignKey(t, reqIdOne, x, false)
 		mockRequestForeignKey(t, reqIdTwo, x, false)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{OutfacingID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{OutfacingID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
@@ -334,7 +344,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		c := &client.Client{OutfacingID: "nil-request-client-id-123"}
+		c := &client.Client{LegacyClientID: "nil-request-client-id-123"}
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
 		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
 			ID:                "",
@@ -473,6 +483,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		require.Error(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
+		require.NoError(t, m.DeleteAccessTokens(ctx, "foobar"))
 	}
 }
 
@@ -655,6 +666,8 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 
 			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
+			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
+			cmp.NID = gofrsuuid.Nil
 			require.NoError(t, err)
 			assert.Equal(t, jti, cmp)
 		})
@@ -681,6 +694,8 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 			cmp, err := store.GetClientAssertionJWT(context.Background(), newJTI.JTI)
 			require.NoError(t, err)
+			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
+			cmp.NID = gofrsuuid.Nil
 			assert.Equal(t, newJTI, cmp)
 		})
 
@@ -734,16 +749,13 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		grantManager := x.GrantManager()
 		keyManager := x.KeyManager()
-		keyGenerators := x.KeyGenerators()
-		keyGenerator, ok := keyGenerators[string(jose.RS256)]
-		require.True(t, ok)
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
 
 		t.Run("case=associated key added with grant", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("token-service-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "token-service-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "token-service"
 			subject := "bob@example.com"
 			grant := trust.Grant{
@@ -786,16 +798,16 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=only associated key returns", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("some-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "some-key", "sig")
 			require.NoError(t, err)
 
 			err = keyManager.AddKeySet(context.TODO(), "some-set", keySet)
 			require.NoError(t, err)
 
-			keySet, err = keyGenerator.Generate("maria-key", "sig")
+			keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "maria-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "maria"
 			subject := "maria@example.com"
 			grant := trust.Grant{
@@ -828,10 +840,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("hackerman-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "hackerman-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "aeneas"
 			subject := "aeneas@example.com"
 			grant := trust.Grant{
@@ -865,10 +877,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("vladimir-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "vladimir-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "vladimir"
 			subject := "vladimir@example.com"
 			grant := trust.Grant{
@@ -902,10 +914,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=only returns the key when subject matches", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "limited-issuer"
 			subject := "jagoba"
 			grant := trust.Grant{
@@ -944,10 +956,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=returns the key when any subject is allowed", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "unlimited-issuer"
 			grant := trust.Grant{
 				ID:              uuid.New(),
@@ -1060,7 +1072,7 @@ func createTestRequest(id string) *fosite.Request {
 	return &fosite.Request{
 		ID:                id,
 		RequestedAt:       time.Now().UTC().Round(time.Second),
-		Client:            &client.Client{OutfacingID: "foobar"},
+		Client:            &client.Client{LegacyClientID: "foobar"},
 		RequestedScope:    fosite.Arguments{"fa", "ba"},
 		GrantedScope:      fosite.Arguments{"fa", "ba"},
 		RequestedAudience: fosite.Arguments{"ad1", "ad2"},

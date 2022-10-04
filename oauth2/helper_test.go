@@ -1,24 +1,18 @@
 package oauth2_test
 
 import (
-	"time"
+	"context"
 
+	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/hydra/driver/config"
 )
 
-func Tokens(c *config.Provider, length int) (res [][]string) {
-	s := &oauth2.HMACSHAStrategy{
-		Enigma: &hmac.HMACStrategy{
-			GlobalSecret: c.GetSystemSecret(),
-		},
-		AccessTokenLifespan:   time.Hour,
-		AuthorizeCodeLifespan: time.Hour,
-	}
+func Tokens(c fosite.Configurator, length int) (res [][]string) {
+	s := &oauth2.HMACSHAStrategy{Enigma: &hmac.HMACStrategy{Config: c}, Config: c}
 
 	for i := 0; i < length; i++ {
-		tok, sig, _ := s.Enigma.Generate()
+		tok, sig, _ := s.Enigma.Generate(context.Background())
 		res = append(res, []string{sig, tok})
 	}
 	return res

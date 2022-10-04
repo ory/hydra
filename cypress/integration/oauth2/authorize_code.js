@@ -2,7 +2,6 @@ import { prng } from "../../helpers"
 
 describe("The OAuth 2.0 Authorization Code Grant", function () {
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "offline_access openid",
     subject_type: "public",

@@ -1,5 +1,4 @@
 {
-  "client_id": "create-client-2",
   "client_name": "",
   "client_secret": "averylongsecret",
   "redirect_uris": [
@@ -24,7 +23,6 @@
   "metadata": {
     "foo": "bar"
   },
-  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-2",
   "authorization_code_grant_access_token_lifespan": null,
   "authorization_code_grant_id_token_lifespan": null,
   "authorization_code_grant_refresh_token_lifespan": null,

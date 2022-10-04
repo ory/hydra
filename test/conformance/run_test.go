@@ -5,21 +5,19 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/x/pointerx"
+	hydrac "github.com/ory/hydra-client-go"
 
 	"github.com/cenkalti/backoff/v3"
 
@@ -105,7 +103,7 @@ var (
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
-	config, _  = ioutil.ReadFile("./config.json")
+	config, _  = os.ReadFile("./config.json")
 	httpClient = httpx.NewResilientClient(
 		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
 		httpx.ResilientClientWithClient(&http.Client{
@@ -119,14 +117,13 @@ var (
 
 	workdir string
 
-	hydra = client.NewHTTPClientWithConfig(nil, &client.TransportConfig{
-		Host:     "127.0.0.1:4445",
-		BasePath: "/",
-		Schemes:  []string{"https"}})
+	hydra = hydrac.NewAPIClient(hydrac.NewConfiguration())
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	hydra.GetConfig().HTTPClient = httpClient.HTTPClient
+	hydra.GetConfig().Servers = hydrac.ServerConfigurations{{URL: "https://127.0.0.1:4445"}}
 }
 
 func waitForServices(t *testing.T) {
@@ -187,7 +184,7 @@ func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
 	res, err := httpClient.Post(href, "application/json", payload)
 	require.NoError(t, err)
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, esc, res.StatusCode, "%s\n%s", href, body)
 	return body
@@ -277,9 +274,9 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								bo := conf.NextBackOff()
 								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
 
-								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient.StandardClient()).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
-									Alg: pointerx.String("RS256"),
-								}))
+								_, _, err = hydra.V0alpha2Api.AdminCreateJsonWebKeySet(context.Background(), "hydra.openid.id-token").AdminCreateJsonWebKeySetBody(hydrac.AdminCreateJsonWebKeySetBody{
+									Alg: "RS256",
+								}).Execute()
 								if err == nil {
 									break
 								}
@@ -303,7 +300,7 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 	res, err := httpClient.Get(urlx.AppendPaths(server, "/api/info", testID).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, 200, res.StatusCode, "%s", body)
 

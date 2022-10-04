@@ -2,15 +2,15 @@ package sql
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/stringsx"
 
 	"github.com/ory/x/sqlcon"
@@ -19,10 +19,13 @@ import (
 var _ trust.GrantManager = &Persister{}
 
 func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateGrant")
+	defer span.End()
+
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
 		if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
-			if errorsx.Cause(err) != sqlcon.ErrNoRows {
+			if !errors.Is(err, sqlcon.ErrNoRows) {
 				return sqlcon.HandleError(err)
 			}
 
@@ -32,14 +35,16 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 		}
 
 		data := p.sqlDataFromJWTGrant(g)
-
-		return sqlcon.HandleError(p.Connection(ctx).Create(&data))
+		return sqlcon.HandleError(p.CreateWithNetwork(ctx, &data))
 	})
 }
 
 func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Grant, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteGrant")
+	defer span.End()
+
 	var data trust.SQLData
-	if err := p.Connection(ctx).Where("id = ?", id).First(&data); err != nil {
+	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&data); err != nil {
 		return trust.Grant{}, sqlcon.HandleError(err)
 	}
 
@@ -47,13 +52,16 @@ func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Gran
 }
 
 func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteGrant")
+	defer span.End()
+
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		grant, err := p.GetConcreteGrant(ctx, id)
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		if err := p.Connection(ctx).Destroy(&trust.SQLData{ID: grant.ID}); err != nil {
+		if err := p.QueryWithNetwork(ctx).Where("id = ?", grant.ID).Delete(&trust.SQLData{}); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
@@ -62,9 +70,14 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 }
 
 func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]trust.Grant, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetGrants")
+	defer span.End()
+
 	grantsData := make([]trust.SQLData, 0)
 
-	query := p.Connection(ctx).Paginate(offset/limit+1, limit).Order("id")
+	query := p.QueryWithNetwork(ctx).
+		Paginate(offset/limit+1, limit).
+		Order("id")
 	if optionalIssuer != "" {
 		query = query.Where("issuer = ?", optionalIssuer)
 	}
@@ -82,16 +95,24 @@ func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIs
 }
 
 func (p *Persister) CountGrants(ctx context.Context) (int, error) {
-	n, err := p.Connection(ctx).Count(&trust.SQLData{})
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountGrants")
+	defer span.End()
+
+	n, err := p.QueryWithNetwork(ctx).
+		Count(&trust.SQLData{})
 	return n, sqlcon.HandleError(err)
 }
 
 func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (*jose.JSONWebKey, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKey")
+	defer span.End()
+
 	var data trust.SQLData
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ? OR allow_any_subject IS TRUE", subject).
-		Where("key_id = ?", keyId)
+		Where("key_id = ?", keyId).
+		Where("nid = ?", p.NetworkID(ctx))
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -105,10 +126,15 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 }
 
 func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (*jose.JSONWebKeySet, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeys")
+	defer span.End()
+
 	grantsData := make([]trust.SQLData, 0)
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ? OR allow_any_subject IS TRUE", subject)
+		Where("subject = ? OR allow_any_subject IS TRUE", subject).
+		Where("nid = ?", p.NetworkID(ctx))
+
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -135,11 +161,16 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 }
 
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) ([]string, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeyScopes")
+	defer span.End()
+
 	var data trust.SQLData
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ? OR allow_any_subject IS TRUE", subject).
-		Where("key_id = ?", keyId)
+		Where("key_id = ?", keyId).
+		Where("nid = ?", p.NetworkID(ctx))
+
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -148,6 +179,9 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 }
 
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.IsJWTUsed")
+	defer span.End()
+
 	err := p.ClientAssertionJWTValid(ctx, jti)
 	if err != nil {
 		return true, nil
@@ -157,6 +191,9 @@ func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
 }
 
 func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time.Time) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.MarkJWTUsedForTime")
+	defer span.End()
+
 	return p.SetClientAssertionJWT(ctx, jti, exp)
 }
 
@@ -191,12 +228,12 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 }
 
 func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveGrants")
+	defer span.End()
+
 	deleteUntil := time.Now().UTC()
 	if deleteUntil.After(notAfter) {
 		deleteUntil = notAfter
 	}
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ?", trust.SQLData{}.TableName()),
-		deleteUntil,
-	).Exec())
+	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("expires_at < ?", deleteUntil).Delete(&trust.SQLData{}))
 }

@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/x/errorsx"
 
@@ -43,9 +44,9 @@ const (
 	loginRequestDeniedErrorName   = "login request denied"
 )
 
-// The response payload sent when accepting or rejecting a login or consent request.
+// The response payload sent when accepting or rejecting a login, consent, or logout request.
 //
-// swagger:model completedRequest
+// swagger:model successfulOAuth2RequestResponse
 type RequestHandlerResponse struct {
 	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
 	//
@@ -56,6 +57,7 @@ type RequestHandlerResponse struct {
 // swagger:ignore
 type LoginSession struct {
 	ID              string         `db:"id"`
+	NID             uuid.UUID      `db:"nid"`
 	AuthenticatedAt sqlxx.NullTime `db:"authenticated_at"`
 	Subject         string         `db:"subject"`
 	Remember        bool           `db:"remember"`
@@ -67,7 +69,7 @@ func (_ LoginSession) TableName() string {
 
 // The request payload used to accept a login or consent request.
 //
-// swagger:model rejectRequest
+// swagger:model rejectOAuth2Request
 type RequestDeniedError struct {
 	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
 	//
@@ -151,10 +153,30 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
-// The response payload sent when there is an attempt to access already handled request.
+// The response payload sent when there is an attempt to access an already handled consent request.
 //
-// swagger:model requestWasHandledResponse
-type RequestWasHandledResponse struct {
+// swagger:model handledOAuth2ConsentRequest
+type HandledOAuth2ConsentRequest struct {
+	// Original request URL to which you should redirect the user if request was already handled.
+	//
+	// required: true
+	RedirectTo string `json:"redirect_to"`
+}
+
+// The response payload sent when there is an attempt to access an already handled logout request.
+//
+// swagger:model handledOAuth2LogoutRequest
+type HandledOAuth2LogoutRequest struct {
+	// Original request URL to which you should redirect the user if request was already handled.
+	//
+	// required: true
+	RedirectTo string `json:"redirect_to"`
+}
+
+// The response payload sent when there is an attempt to access an already handled login request.
+//
+// swagger:model handledOAuth2LoginRequest
+type HandledOAuth2LoginRequest struct {
 	// Original request URL to which you should redirect the user if request was already handled.
 	//
 	// required: true
@@ -163,96 +185,69 @@ type RequestWasHandledResponse struct {
 
 // The request payload used to accept a consent request.
 //
-// swagger:model acceptConsentRequest
-type HandledConsentRequest struct {
+// swagger:model acceptOAuth2ConsentRequest
+type AcceptOAuth2ConsentRequest struct {
 	// ID instead of Challenge because of pop
-	ID string `json:"-" db:"challenge"`
+	ID string `json:"-"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience" db:"granted_at_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session" db:"-"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session" faker:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
-	Remember bool `json:"remember" db:"remember"`
+	Remember bool `json:"remember"`
 
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	RememberFor int `json:"remember_for" db:"remember_for"`
+	RememberFor int `json:"remember_for"`
 
 	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
+	HandledAt sqlxx.NullTime `json:"handled_at"`
 
 	// If set to true means that the request was already handled. This
 	// can happen on form double-submit or other errors. If this is set
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
-	WasHandled bool `json:"-" db:"was_used"`
+	WasHandled bool `json:"-"`
 
-	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
-	Error           *RequestDeniedError `json:"-" db:"error"`
-	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
+	ConsentRequest  *OAuth2ConsentRequest `json:"-"`
+	Error           *RequestDeniedError   `json:"-"`
+	RequestedAt     time.Time             `json:"-"`
+	AuthenticatedAt sqlxx.NullTime        `json:"-"`
 
-	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
-	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
+	SessionIDToken     sqlxx.MapStringInterface `json:"-" faker:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `json:"-" faker:"-"`
 }
 
-func (_ HandledConsentRequest) TableName() string {
-	return "hydra_oauth2_consent_request_handled"
-}
-
-func (r *HandledConsentRequest) HasError() bool {
+func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-func (r *HandledConsentRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Session != nil {
-		r.SessionAccessToken = r.Session.AccessToken
-		r.SessionIDToken = r.Session.IDToken
-	}
-	return nil
-}
-
-func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
-	r.ConsentRequest = &ConsentRequest{}
-	if err := r.ConsentRequest.FindInDB(c, r.ID); err != nil {
-		return errorsx.WithStack(err)
-	}
-
-	if r.SessionAccessToken == nil {
-		r.SessionAccessToken = make(map[string]interface{})
-	}
-	if r.SessionIDToken == nil {
-		r.SessionIDToken = make(map[string]interface{})
-	}
-	r.Session = &ConsentRequestSessionData{AccessToken: r.SessionAccessToken, IDToken: r.SessionIDToken}
-	return nil
-}
-
-func (r *HandledConsentRequest) AfterFind(c *pop.Connection) error {
-	return r.AfterSave(c)
-}
+// swagger:model previousOAuth2ConsentSessions
+type previousOAuth2ConsentSessions []PreviousOAuth2ConsentSession
 
 // The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
-type PreviousConsentSession struct {
+//
+// swagger:model previousOAuth2ConsentSession
+type PreviousOAuth2ConsentSession struct {
 	// Named ID because of pop
 	ID string `json:"-" db:"challenge"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope" db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience" db:"granted_at_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session" db:"-"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session" db:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -271,10 +266,10 @@ type PreviousConsentSession struct {
 	// the flow.
 	WasHandled bool `json:"-" db:"was_used"`
 
-	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
-	Error           *RequestDeniedError `json:"-" db:"error"`
-	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
+	ConsentRequest  *OAuth2ConsentRequest `json:"consent_request" db:"-"`
+	Error           *RequestDeniedError   `json:"-" db:"error"`
+	RequestedAt     time.Time             `json:"-" db:"requested_at"`
+	AuthenticatedAt sqlxx.NullTime        `json:"-" db:"authenticated_at"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
@@ -282,34 +277,34 @@ type PreviousConsentSession struct {
 
 // HandledLoginRequest is the request payload used to accept a login request.
 //
-// swagger:model acceptLoginRequest
+// swagger:model acceptOAuth2LoginRequest
 type HandledLoginRequest struct {
 	// ID instead of challenge for pop
-	ID string `json:"-" db:"challenge"`
+	ID string `json:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
-	Remember bool `json:"remember" db:"remember"`
+	Remember bool `json:"remember"`
 
 	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
-	RememberFor int `json:"remember_for" db:"remember_for"`
+	RememberFor int `json:"remember_for"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `json:"acr" db:"acr"`
+	ACR string `json:"acr"`
 
 	// AMR sets the Authentication Methods References value for this
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `json:"amr" db:"amr"`
+	AMR sqlxx.StringSliceJSONFormat `json:"amr"`
 
 	// Subject is the user ID of the end-user that authenticated.
 	//
 	// required: true
-	Subject string `json:"subject" db:"subject"`
+	Subject string `json:"subject"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -328,49 +323,33 @@ type HandledLoginRequest struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `json:"force_subject_identifier" db:"forced_subject_identifier"`
+	ForceSubjectIdentifier string `json:"force_subject_identifier"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context sqlxx.JSONRawMessage `json:"context" db:"context"`
+	Context sqlxx.JSONRawMessage `json:"context"`
 
 	// If set to true means that the request was already handled. This
 	// can happen on form double-submit or other errors. If this is set
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
-	WasHandled bool `json:"-" db:"was_used"`
+	WasHandled bool `json:"-"`
 
-	LoginRequest    *LoginRequest       `json:"-" db:"-"`
-	Error           *RequestDeniedError `json:"-" db:"error"`
-	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
-}
-
-func (_ HandledLoginRequest) TableName() string {
-	return "hydra_oauth2_authentication_request_handled"
+	LoginRequest    *LoginRequest       `json:"-" faker:"-"`
+	Error           *RequestDeniedError `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-"`
 }
 
 func (r *HandledLoginRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-func (r *HandledLoginRequest) AfterUpdate(c *pop.Connection) error {
-	r.LoginRequest = &LoginRequest{}
-	return r.LoginRequest.FindInDB(c, r.ID)
-}
-
-func (r *HandledLoginRequest) BeforeSave(_ *pop.Connection) error {
-	if string(r.Context) == "" {
-		r.Context = sqlxx.JSONRawMessage("{}")
-	}
-	return nil
-}
-
 // Contains optional information about the OpenID Connect request.
 //
-// swagger:model openIDConnectContext
-type OpenIDConnectContext struct {
+// swagger:model oAuth2ConsentRequestOpenIDConnectContext
+type OAuth2ConsentRequestOpenIDConnectContext struct {
 	// ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.
 	// It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.
 	//
@@ -401,7 +380,7 @@ type OpenIDConnectContext struct {
 
 	// IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
 	// End-User's current or past authenticated session with the Client.
-	IDTokenHintClaims map[string]interface{} `json:"id_token_hint_claims,omitempty"`
+	IDTokenHintClaims map[string]interface{} `json:"id_token_hint_claims,omitempty" faker:"-"`
 
 	// LoginHint hints about the login identifier the End-User might use to log in (if necessary).
 	// This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)
@@ -410,7 +389,7 @@ type OpenIDConnectContext struct {
 	LoginHint string `json:"login_hint,omitempty"`
 }
 
-func (n *OpenIDConnectContext) Scan(value interface{}) error {
+func (n *OAuth2ConsentRequestOpenIDConnectContext) Scan(value interface{}) error {
 	v := fmt.Sprintf("%s", value)
 	if len(v) == 0 {
 		return nil
@@ -418,18 +397,19 @@ func (n *OpenIDConnectContext) Scan(value interface{}) error {
 	return errorsx.WithStack(json.Unmarshal([]byte(v), n))
 }
 
-func (n *OpenIDConnectContext) Value() (driver.Value, error) {
+func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error) {
 	value, err := json.Marshal(n)
 	return value, errorsx.WithStack(err)
 }
 
 // Contains information about an ongoing logout request.
 //
-// swagger:model logoutRequest
+// swagger:model oAuth2LogoutRequest
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
-	ID string `json:"challenge" db:"challenge"`
+	ID  string    `json:"challenge" db:"challenge"`
+	NID uuid.UUID `json:"-" db:"nid"`
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject" db:"subject"`
@@ -465,7 +445,7 @@ func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
 			Valid:  true,
-			String: r.Client.OutfacingID,
+			String: r.Client.GetID(),
 		}
 	}
 	return nil
@@ -489,23 +469,23 @@ type LogoutResult struct {
 
 // Contains information on an ongoing login request.
 //
-// swagger:model loginRequest
+// swagger:model oAuth2LoginRequest
 type LoginRequest struct {
 	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
 	//
 	// required: true
-	ID string `json:"challenge" db:"challenge"`
+	ID string `json:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
 
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
@@ -513,178 +493,132 @@ type LoginRequest struct {
 	// This feature allows you to update / set session information.
 	//
 	// required: true
-	Skip bool `json:"skip" db:"skip"`
+	Skip bool `json:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
 	//
 	// required: true
-	Subject string `json:"subject" db:"subject"`
+	Subject string `json:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client *client.Client `json:"client" db:"-"`
+	Client *client.Client `json:"client"`
 
-	ClientID string `json:"-" db:"client_id"`
+	ClientID string `json:"-"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
 	//
 	// required: true
-	RequestURL string `json:"request_url" db:"request_url"`
+	RequestURL string `json:"request_url"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
-	SessionID sqlxx.NullString `json:"session_id" db:"login_session_id"`
+	SessionID sqlxx.NullString `json:"session_id"`
 
 	// If set to true means that the request was already handled. This
 	// can happen on form double-submit or other errors. If this is set
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
-	WasHandled bool `json:"-" db:"was_handled,r"`
+	WasHandled bool `json:"-"`
 
-	ForceSubjectIdentifier string `json:"-" db:"-"` // this is here but has no meaning apart from sql_helper working properly.
-	Verifier               string `json:"-" db:"verifier"`
-	CSRF                   string `json:"-" db:"csrf"`
+	ForceSubjectIdentifier string `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
+	Verifier               string `json:"-"`
+	CSRF                   string `json:"-"`
 
-	AuthenticatedAt sqlxx.NullTime `json:"-" db:"authenticated_at"`
-	RequestedAt     time.Time      `json:"-" db:"requested_at"`
-}
-
-func (_ LoginRequest) TableName() string {
-	return "hydra_oauth2_authentication_request"
-}
-
-func (r *LoginRequest) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
-		LeftJoin("hydra_oauth2_authentication_request_handled as hr", "hydra_oauth2_authentication_request.challenge = hr.challenge").
-		Find(r, id)
-}
-
-func (r *LoginRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = r.Client.OutfacingID
-	}
-	return nil
-}
-
-func (r *LoginRequest) AfterFind(c *pop.Connection) error {
-	r.Client = &client.Client{}
-	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
+	AuthenticatedAt sqlxx.NullTime `json:"-"`
+	RequestedAt     time.Time      `json:"-"`
 }
 
 // Contains information on an ongoing consent request.
 //
-// swagger:model consentRequest
-type ConsentRequest struct {
+// swagger:model oAuth2ConsentRequest
+type OAuth2ConsentRequest struct {
 	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
 	//
 	// required: true
-	ID string `json:"challenge" db:"challenge"`
+	ID string `json:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
 
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
-	Skip bool `json:"skip" db:"skip"`
+	Skip bool `json:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client.
-	Subject string `json:"subject" db:"subject"`
+	Subject string `json:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client   *client.Client `json:"client" db:"-"`
-	ClientID string         `json:"-" db:"client_id"`
+	Client   *client.Client `json:"client"`
+	ClientID string         `json:"-"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
-	RequestURL string `json:"request_url" db:"request_url"`
+	RequestURL string `json:"request_url"`
 
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
 	// a login and consent request in the login & consent app.
-	LoginChallenge sqlxx.NullString `json:"login_challenge" db:"login_challenge"`
+	LoginChallenge sqlxx.NullString `json:"login_challenge"`
 
 	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
-	LoginSessionID sqlxx.NullString `json:"login_session_id" db:"login_session_id"`
+	LoginSessionID sqlxx.NullString `json:"login_session_id"`
 
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `json:"acr" db:"acr"`
+	ACR string `json:"acr"`
 
 	// AMR is the Authentication Methods References value for this
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `json:"amr" db:"amr"`
+	AMR sqlxx.StringSliceJSONFormat `json:"amr"`
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
-	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`
+	Context sqlxx.JSONRawMessage `json:"context,omitempty"`
 
 	// If set to true means that the request was already handled. This
 	// can happen on form double-submit or other errors. If this is set
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
-	WasHandled bool `json:"-" db:"was_handled,r"`
+	WasHandled bool `json:"-"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
-	ForceSubjectIdentifier string         `json:"-" db:"forced_subject_identifier"`
-	SubjectIdentifier      string         `json:"-" db:"-"`
-	Verifier               string         `json:"-" db:"verifier"`
-	CSRF                   string         `json:"-" db:"csrf"`
-	AuthenticatedAt        sqlxx.NullTime `json:"-" db:"authenticated_at"`
-	RequestedAt            time.Time      `json:"-" db:"requested_at"`
+	ForceSubjectIdentifier string         `json:"-"`
+	Verifier               string         `json:"-"`
+	CSRF                   string         `json:"-"`
+	AuthenticatedAt        sqlxx.NullTime `json:"-"`
+	RequestedAt            time.Time      `json:"-"`
 }
 
-func (_ ConsentRequest) TableName() string {
-	return "hydra_oauth2_consent_request"
-}
-
-func (r *ConsentRequest) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("COALESCE(hr.was_used, false) as was_handled", "hydra_oauth2_consent_request.*").
-		Where("hydra_oauth2_consent_request.challenge = ?", id).
-		LeftJoin("hydra_oauth2_consent_request_handled AS hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
-		First(r)
-}
-
-func (r *ConsentRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = r.Client.OutfacingID
-	}
-	return nil
-}
-
-func (r *ConsentRequest) AfterFind(c *pop.Connection) error {
-	r.Client = &client.Client{}
-	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
-}
-
-// Used to pass session data to a consent request.
+// Pass session data to a consent request.
 //
-// swagger:model consentRequestSession
-type ConsentRequestSessionData struct {
+// swagger:model acceptOAuth2ConsentRequestSession
+type AcceptOAuth2ConsentRequestSession struct {
 	// AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the
 	// refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
 	// If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties
@@ -694,12 +628,11 @@ type ConsentRequestSessionData struct {
 	// IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
 	// by anyone that has access to the ID Challenge. Use with care!
 	IDToken map[string]interface{} `json:"id_token"`
-
-	// UserInfo map[string]interface{} `json:"userinfo"`
 }
 
-func NewConsentRequestSessionData() *ConsentRequestSessionData {
-	return &ConsentRequestSessionData{
+// NewConsentRequestSessionData creates a new AcceptOAuth2ConsentRequestSession.
+func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
+	return &AcceptOAuth2ConsentRequestSession{
 		AccessToken: map[string]interface{}{},
 		IDToken:     map[string]interface{}{},
 	}

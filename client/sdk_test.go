@@ -22,20 +22,25 @@ package client_test
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/go-openapi/strfmt"
+	"github.com/ory/x/assertx"
+
+	"github.com/ory/x/ioutilx"
+
+	"github.com/ory/x/snapshotx"
+
+	"github.com/ory/x/uuidx"
+
 	"github.com/mohae/deepcopy"
 
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
-
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/pointerx"
 
 	"github.com/ory/hydra/driver/config"
 
@@ -44,61 +49,62 @@ import (
 
 	"github.com/ory/hydra/internal"
 
+	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/client"
-	hydra "github.com/ory/hydra/internal/httpclient/client"
 )
 
-func createTestClient(prefix string) *models.OAuth2Client {
-	return &models.OAuth2Client{
-		ClientID:                  "1234",
-		ClientName:                prefix + "name",
-		ClientSecret:              prefix + "secret",
-		ClientURI:                 prefix + "uri",
+func createTestClient(prefix string) hydra.OAuth2Client {
+	return hydra.OAuth2Client{
+		ClientName:                pointerx.String(prefix + "name"),
+		ClientSecret:              pointerx.String(prefix + "secret"),
+		ClientUri:                 pointerx.String(prefix + "uri"),
 		Contacts:                  []string{prefix + "peter", prefix + "pan"},
 		GrantTypes:                []string{prefix + "client_credentials", prefix + "authorize_code"},
-		LogoURI:                   prefix + "logo",
-		Owner:                     prefix + "an-owner",
-		PolicyURI:                 prefix + "policy-uri",
-		Scope:                     prefix + "foo bar baz",
-		TosURI:                    prefix + "tos-uri",
+		LogoUri:                   pointerx.String(prefix + "logo"),
+		Owner:                     pointerx.String(prefix + "an-owner"),
+		PolicyUri:                 pointerx.String(prefix + "policy-uri"),
+		Scope:                     pointerx.String(prefix + "foo bar baz"),
+		TosUri:                    pointerx.String(prefix + "tos-uri"),
 		ResponseTypes:             []string{prefix + "id_token", prefix + "code"},
 		RedirectUris:              []string{"https://" + prefix + "redirect-url", "https://" + prefix + "redirect-uri"},
-		ClientSecretExpiresAt:     0,
-		TokenEndpointAuthMethod:   "client_secret_basic",
-		UserinfoSignedResponseAlg: "none",
-		SubjectType:               "public",
+		ClientSecretExpiresAt:     pointerx.Int64(0),
+		TokenEndpointAuthMethod:   pointerx.String("client_secret_basic"),
+		UserinfoSignedResponseAlg: pointerx.String("none"),
+		SubjectType:               pointerx.String("public"),
 		Metadata:                  map[string]interface{}{"foo": "bar"},
 		// because these values are not nullable in the SQL schema, we have to set them not nil
-		AllowedCorsOrigins: models.StringSlicePipeDelimiter{},
-		Audience:           models.StringSlicePipeDelimiter{},
-		Jwks:               models.JoseJSONWebKeySet(map[string]interface{}{}),
-		// SectorIdentifierUri:   "https://sector.com/foo",
+		AllowedCorsOrigins: []string{},
+		Audience:           []string{},
+		Jwks:               map[string]interface{}{},
 	}
 }
 
-func TestClientSDK(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
-	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
-	r := internal.NewRegistryMemory(t, conf)
+var defaultIgnoreFields = []string{"client_id", "registration_access_token", "registration_client_uri", "created_at", "updated_at"}
 
-	routerAdmin := x.NewRouterAdmin()
+func TestClientSDK(t *testing.T) {
+	ctx := context.Background()
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"public"})
+	conf.MustSet(ctx, config.KeyDefaultClientScope, []string{"foo", "bar"})
+	conf.MustSet(ctx, config.KeyPublicAllowDynamicRegistration, true)
+	r := internal.NewRegistryMemory(t, conf, &contextx.Static{C: conf.Source(ctx)})
+
+	routerAdmin := x.NewRouterAdmin(conf.AdminURL)
 	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
 	handler.SetRoutes(routerAdmin, routerPublic)
 	server := httptest.NewServer(routerAdmin)
+	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
 
-	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
+	c := hydra.NewAPIClient(hydra.NewConfiguration())
+	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
 
 	t.Run("case=client default scopes are set", func(t *testing.T) {
-		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&models.OAuth2Client{
-			ClientID: "scoped",
-		}))
+		result, _, err := c.V0alpha2Api.AdminCreateOAuth2Client(ctx).OAuth2Client(hydra.OAuth2Client{}).Execute()
 		require.NoError(t, err)
-		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Payload.Scope, " "))
+		assert.EqualValues(t, conf.DefaultClientScope(ctx), strings.Split(*result.Scope, " "))
 
-		_, err = c.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID("scoped"))
+		_, err = c.V0alpha2Api.AdminDeleteOAuth2Client(ctx, *result.ClientId).Execute()
 		require.NoError(t, err)
 	})
 
@@ -109,155 +115,107 @@ func TestClientSDK(t *testing.T) {
 		// 		createClient.SecretExpiresAt = 10
 
 		// returned client is correct on Create
-		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(createClient))
+		result, _, err := c.V0alpha2Api.AdminCreateOAuth2Client(ctx).OAuth2Client(createClient).Execute()
 		require.NoError(t, err)
-		assert.NotEmpty(t, result.Payload.UpdatedAt)
-		result.Payload.UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, result.Payload.CreatedAt)
-		result.Payload.CreatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, result.Payload.RegistrationAccessToken)
-		assert.NotEmpty(t, result.Payload.RegistrationClientURI)
-		result.Payload.RegistrationAccessToken = ""
-		result.Payload.RegistrationClientURI = ""
+		assert.NotEmpty(t, result.UpdatedAt)
+		assert.NotEmpty(t, result.CreatedAt)
+		assert.NotEmpty(t, result.RegistrationAccessToken)
+		assert.NotEmpty(t, result.RegistrationClientUri)
+		assert.NotEmpty(t, result.ClientId)
+		createClient.ClientId = result.ClientId
 
-		assert.EqualValues(t, compareClient, result.Payload)
-		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
+		assertx.EqualAsJSONExcept(t, compareClient, result, defaultIgnoreFields)
+		assert.EqualValues(t, "bar", result.Metadata.(map[string]interface{})["foo"])
 
 		// secret is not returned on GetOAuth2Client
-		compareClient.ClientSecret = ""
-		gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(createClient.ClientID).WithContext(context.Background()))
+		compareClient.ClientSecret = x.ToPointer("")
+		gresult, _, err := c.V0alpha2Api.AdminGetOAuth2Client(context.Background(), *createClient.ClientId).Execute()
 		require.NoError(t, err)
-		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
-		gresult.Payload.UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, gresult.Payload.CreatedAt)
-		gresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, gresult.Payload)
+		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
 
 		// get client will return The request could not be authorized
-		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))
+		gresult, _, err = c.V0alpha2Api.AdminGetOAuth2Client(context.Background(), "unknown").Execute()
 		require.Error(t, err)
 		assert.Empty(t, gresult)
 		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
-		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))
+		results, _, err := c.V0alpha2Api.AdminListOAuth2Clients(context.Background()).PageSize(100).Execute()
 		require.NoError(t, err)
-		assert.Len(t, results.Payload, 1)
-		assert.NotEmpty(t, results.Payload[0].UpdatedAt)
-		results.Payload[0].UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, results.Payload[0].CreatedAt)
-		results.Payload[0].CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, results.Payload[0])
+		assert.Len(t, results, 1)
+		assertx.EqualAsJSONExcept(t, compareClient, results[0], append(defaultIgnoreFields, "client_secret"))
 
 		// SecretExpiresAt gets overwritten with 0 on Update
 		compareClient.ClientSecret = createClient.ClientSecret
-		uresult, err := c.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(createClient.ClientID).WithBody(createClient))
+		uresult, _, err := c.V0alpha2Api.AdminUpdateOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(createClient).Execute()
 		require.NoError(t, err)
-		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
-		uresult.Payload.UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, uresult.Payload.CreatedAt)
-		uresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, uresult.Payload)
+		assertx.EqualAsJSONExcept(t, compareClient, uresult, append(defaultIgnoreFields, "client_secret"))
 
 		// create another client
 		updateClient := createTestClient("foo")
-		uresult, err = c.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(createClient.ClientID).WithBody(updateClient))
+		uresult, _, err = c.V0alpha2Api.AdminUpdateOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(updateClient).Execute()
 		require.NoError(t, err)
-		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
-		uresult.Payload.UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, uresult.Payload.CreatedAt)
-		uresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, updateClient, uresult.Payload)
+		assert.NotEqual(t, updateClient.ClientId, uresult.ClientId)
+		updateClient.ClientId = uresult.ClientId
+		assertx.EqualAsJSONExcept(t, updateClient, uresult, append(defaultIgnoreFields, "client_secret"))
 
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
-		compareClient.ClientSecret = ""
-		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(updateClient.ClientID))
+		compareClient.ClientSecret = x.ToPointer("")
+		gresult, _, err = c.V0alpha2Api.AdminGetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
-		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
-		gresult.Payload.UpdatedAt = strfmt.DateTime{}
-		assert.NotEmpty(t, gresult.Payload.CreatedAt)
-		gresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, gresult.Payload)
+		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
 
 		// client can not be found after being deleted
-		_, err = c.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(updateClient.ClientID))
+		_, err = c.V0alpha2Api.AdminDeleteOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
 
-		_, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(updateClient.ClientID))
+		_, _, err = c.V0alpha2Api.AdminGetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.Error(t, err)
 	})
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
-		result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&models.OAuth2Client{
-			TokenEndpointAuthMethod: "none",
-		}))
+		result, _, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{
+			TokenEndpointAuthMethod: x.ToPointer("none"),
+		}).Execute()
 		require.NoError(t, err)
 
-		assert.Equal(t, "", result.Payload.ClientSecret)
+		assert.Equal(t, "", x.FromPointer[string](result.ClientSecret))
 
-		result, err = c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(createTestClient("")))
+		result, _, err = c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
 		require.NoError(t, err)
 
-		assert.Equal(t, "secret", result.Payload.ClientSecret)
+		assert.Equal(t, "secret", x.FromPointer[string](result.ClientSecret))
 	})
 
-	t.Run("case=id should be set properly", func(t *testing.T) {
-		for k, tc := range []struct {
-			client   *models.OAuth2Client
-			expectID string
-		}{
-			{
-				client: &models.OAuth2Client{},
-			},
-			{
-				client:   &models.OAuth2Client{ClientID: "set-properly-1"},
-				expectID: "set-properly-1",
-			},
-			{
-				client:   &models.OAuth2Client{ClientID: "set-properly-2"},
-				expectID: "set-properly-2",
-			},
-		} {
-			t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-				result, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(tc.client))
-				require.NoError(t, err)
-
-				assert.NotEmpty(t, result.Payload.ClientID)
-
-				id := result.Payload.ClientID
-				if tc.expectID != "" {
-					assert.EqualValues(t, tc.expectID, result.Payload.ClientID)
-					id = tc.expectID
-				}
-
-				gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(id))
-				require.NoError(t, err)
-
-				assert.EqualValues(t, id, gresult.Payload.ClientID)
-			})
-		}
+	t.Run("case=id can not be set", func(t *testing.T) {
+		_, res, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: x.ToPointer(uuidx.NewV4().String())}).Execute()
+		require.Error(t, err)
+		body, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		snapshotx.SnapshotT(t, json.RawMessage(body))
 	})
+
 	t.Run("case=patch client legally", func(t *testing.T) {
 		op := "add"
 		path := "/redirect_uris/-"
 		value := "http://foo.bar"
 
 		client := createTestClient("")
-		client.ClientID = "patch1_client"
-		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		created, _, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
 		require.NoError(t, err)
+		client.ClientId = created.ClientId
 
-		expected := deepcopy.Copy(client).(*models.OAuth2Client)
+		expected := deepcopy.Copy(client).(hydra.OAuth2Client)
 		expected.RedirectUris = append(expected.RedirectUris, value)
 
-		result, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result, _, err := c.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
-		expected.CreatedAt = result.Payload.CreatedAt
-		expected.UpdatedAt = result.Payload.UpdatedAt
-		expected.ClientSecret = result.Payload.ClientSecret
-		expected.ClientSecretExpiresAt = result.Payload.ClientSecretExpiresAt
-		require.Equal(t, expected, result.Payload)
+		expected.CreatedAt = result.CreatedAt
+		expected.UpdatedAt = result.UpdatedAt
+		expected.ClientSecret = result.ClientSecret
+		expected.ClientSecretExpiresAt = result.ClientSecretExpiresAt
+		assertx.EqualAsJSONExcept(t, expected, result, nil)
 	})
 
 	t.Run("case=patch client illegally", func(t *testing.T) {
@@ -266,11 +224,11 @@ func TestClientSDK(t *testing.T) {
 		value := "foo"
 
 		client := createTestClient("")
-		client.ClientID = "patch2_client"
-		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
-		require.NoError(t, err)
+		created, res, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		require.NoError(t, err, "%s", ioutilx.MustReadAll(res.Body))
+		client.ClientId = created.ClientId
 
-		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		_, _, err = c.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.Error(t, err)
 	})
 
@@ -280,16 +238,16 @@ func TestClientSDK(t *testing.T) {
 		value := "http://foo.bar"
 
 		client := createTestClient("")
-		client.ClientID = "patch3_client"
-		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		created, _, err := c.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
 		require.NoError(t, err)
+		client.ClientId = created.ClientId
 
-		result1, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result1, _, err := c.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
-		result2, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result2, _, err := c.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
 
 		// secret hashes shouldn't change between these PUT calls
-		require.Equal(t, result1.Payload.ClientSecret, result2.Payload.ClientSecret)
+		require.Equal(t, result1.ClientSecret, result2.ClientSecret)
 	})
 }

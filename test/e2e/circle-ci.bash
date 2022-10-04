@@ -26,7 +26,7 @@ if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 
-(cd ../../; go build -tags sqlite -o test/e2e/hydra . )
+(cd ../../; go build -tags sqlite,json1 -o test/e2e/hydra . )
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then
@@ -37,7 +37,7 @@ fi
 # Install consent app
 (cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
-export URLS_SELF_ISSUER=http://127.0.0.1:5004
+export URLS_SELF_ISSUER=http://127.0.0.1:5004/
 export URLS_CONSENT=http://127.0.0.1:5002/consent
 export URLS_LOGIN=http://127.0.0.1:5002/login
 export URLS_LOGOUT=http://127.0.0.1:5002/logout
@@ -94,7 +94,7 @@ done
 
 ./hydra migrate sql --yes $TEST_DATABASE > ./hydra-migrate.e2e.log 2>&1
     DSN=$TEST_DATABASE \
-    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+    ./hydra serve all --dev --sqa-opt-out > ./hydra.e2e.log 2>&1 &
 
 npm run wait-on -- -l -t 300000 \
   --interval 1000 -s 1 -d 1000 \

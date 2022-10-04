@@ -3,8 +3,12 @@ package driver
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/httpx"
 
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
@@ -12,25 +16,42 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
 
 	"github.com/gorilla/sessions"
 )
+
+func TestGetJWKSFetcherStrategyHostEnforcment(t *testing.T) {
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
+	c.MustSet(ctx, config.KeyDSN, "memory")
+	c.MustSet(ctx, config.HSMEnabled, "false")
+	c.MustSet(ctx, config.ViperKeyClientHTTPNoPrivateIPRanges, true)
+
+	registry, err := NewRegistryWithoutInit(c, l)
+	require.NoError(t, err)
+
+	_, err = registry.GetJWKSFetcherStrategy().Resolve(ctx, "http://localhost:8080", true)
+	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
+}
 
 func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	// Test ensures any network specific error is logged with a
 	// specific message when attempting to create a new key strategy: issue #2338
 
 	hook := test.Hook{} // Test hook for asserting log messages
+	ctx := context.Background()
 
 	l := logrusx.New("", "", logrusx.WithHook(&hook))
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN
 	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
-	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
-	c.MustSet(config.HsmEnabled, "false")
+	c.MustSet(ctx, config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
+	c.MustSet(ctx, config.HSMEnabled, "false")
 
 	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
@@ -41,7 +62,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	r := registry.(*RegistrySQL)
 	r.initialPing = failedPing(errors.New("snizzles"))
 
-	_ = r.Init(context.Background())
+	_ = r.Init(context.Background(), true, false, &contextx.TestContextualizer{})
 
 	registryBase := RegistryBase{r: r, l: l}
 	registryBase.WithConfig(c)
@@ -53,10 +74,11 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 	// Test ensures that CookieStore MaxAge option is equal to zero after initialization
 
+	ctx := context.Background()
 	r := new(RegistryBase)
 	r.WithConfig(config.MustNew(context.Background(), logrusx.New("", "")))
 
-	cs := r.CookieStore().(*sessions.CookieStore)
+	cs := r.CookieStore(ctx).(*sessions.CookieStore)
 
 	assert.Equal(t, cs.Options.MaxAge, 0)
 }

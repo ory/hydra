@@ -1,39 +1,24 @@
 package x
 
 import (
+	"context"
+	"net/url"
+
 	"github.com/julienschmidt/httprouter"
+
+	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/x/serverx"
 )
 
-type RouterAdmin struct {
-	*httprouter.Router
-}
-
-type RouterPublic struct {
-	*httprouter.Router
-}
-
-func (r *RouterPublic) RouterAdmin() *RouterAdmin {
-	return &RouterAdmin{Router: r.Router}
-}
-
-func (r *RouterAdmin) RouterPublic() *RouterPublic {
-	return &RouterPublic{Router: r.Router}
-}
-
-func NewRouterPublic() *RouterPublic {
+func NewRouterPublic() *httprouterx.RouterPublic {
 	router := httprouter.New()
 	router.NotFound = serverx.DefaultNotFoundHandler
-	return &RouterPublic{
-		Router: router,
-	}
+	return httprouterx.NewRouterPublic()
 }
 
-func NewRouterAdmin() *RouterAdmin {
-	router := httprouter.New()
+func NewRouterAdmin(f func(context.Context) *url.URL) *httprouterx.RouterAdmin {
+	router := httprouterx.NewRouterAdminWithPrefix("/admin", f)
 	router.NotFound = serverx.DefaultNotFoundHandler
-	return &RouterAdmin{
-		Router: router,
-	}
+	return router
 }

@@ -23,43 +23,70 @@ package x
 import (
 	"context"
 
-	"github.com/ory/x/errorsx"
+	"github.com/ory/fosite"
+	"github.com/ory/x/hasherx"
 
-	"golang.org/x/crypto/bcrypt"
+	"go.opentelemetry.io/otel"
+
+	"github.com/ory/x/errorsx"
 )
 
-const defaultBCryptWorkFactor = 12
+const tracingComponent = "github.com/ory/hydra/x"
 
-// BCrypt implements a BCrypt hasher.
-type BCrypt struct {
-	c config
+var _ fosite.Hasher = (*Hasher)(nil)
+
+type HashAlgorithm string
+
+func (a HashAlgorithm) String() string {
+	return string(a)
+}
+
+const (
+	HashAlgorithmBCrypt = HashAlgorithm("bcrypt")
+	HashAlgorithmPBKDF2 = HashAlgorithm("pbkdf2")
+)
+
+// Hasher implements fosite.Hasher.
+type Hasher struct {
+	c      config
+	bcrypt *hasherx.Bcrypt
+	pbkdf2 *hasherx.PBKDF2
 }
 
 type config interface {
-	BCryptCost() int
+	hasherx.PBKDF2Configurator
+	hasherx.BCryptConfigurator
+	GetHasherAlgorithm(ctx context.Context) HashAlgorithm
 }
 
-// NewBCrypt returns a new BCrypt instance.
-func NewBCrypt(c config) *BCrypt {
-	return &BCrypt{
-		c: c,
+// NewHasher returns a new BCrypt instance.
+func NewHasher(c config) *Hasher {
+	return &Hasher{
+		c:      c,
+		bcrypt: hasherx.NewHasherBcrypt(c),
+		pbkdf2: hasherx.NewHasherPBKDF2(c),
 	}
 }
 
-func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
-	cf := b.c.BCryptCost()
-	if cf == 0 {
-		cf = defaultBCryptWorkFactor
+func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
+	defer span.End()
+
+	switch b.c.GetHasherAlgorithm(ctx) {
+	case HashAlgorithmBCrypt:
+		return b.bcrypt.Generate(ctx, data)
+	case HashAlgorithmPBKDF2:
+		fallthrough
+	default:
+		return b.pbkdf2.Generate(ctx, data)
 	}
-	s, err := bcrypt.GenerateFromPassword(data, cf)
-	if err != nil {
-		return nil, errorsx.WithStack(err)
-	}
-	return s, nil
 }
 
-func (b *BCrypt) Compare(ctx context.Context, hash, data []byte) error {
-	if err := bcrypt.CompareHashAndPassword(hash, data); err != nil {
+func (b *Hasher) Compare(ctx context.Context, hash, data []byte) error {
+	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
+	defer span.End()
+
+	if err := hasherx.Compare(ctx, data, hash); err != nil {
 		return errorsx.WithStack(err)
 	}
 	return nil

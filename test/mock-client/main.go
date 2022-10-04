@@ -22,10 +22,11 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
@@ -34,17 +35,21 @@ import (
 	"strings"
 	"time"
 
+	hydra "github.com/ory/hydra-client-go"
+
 	"golang.org/x/oauth2"
 
-	hydra "github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/urlx"
 )
 
 var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
-var sdk = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{hydraURL.Scheme}, Host: hydraURL.Host, BasePath: hydraURL.Path})
+var sdk = hydra.NewAPIClient(hydra.NewConfiguration())
+
+func init() {
+	sdk.GetConfig().Servers = hydra.ServerConfigurations{{URL: hydraURL.String()}}
+}
 
 type oauth2token struct {
 	IDToken      string    `json:"id_token"`
@@ -98,7 +103,7 @@ func main() {
 	cmdx.CheckResponse(err, http.StatusOK, resp)
 	defer resp.Body.Close()
 
-	out, err := ioutil.ReadAll(resp.Body)
+	out, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Unable to read body: %s", err)
 	}
@@ -193,22 +198,22 @@ func checkTokenResponse(token oauth2token) {
 		}
 	}
 
-	res, err := sdk.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().WithToken(token.AccessToken))
+	intro, resp, err := sdk.V0alpha2Api.AdminIntrospectOAuth2Token(context.Background()).Token(token.AccessToken).Execute()
+	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to introspect OAuth2 token: %s", err)
 	}
-	intro := res.Payload
 
-	if !*intro.Active {
+	if !intro.Active {
 		log.Fatalf("Expected token to be active: %s", token.AccessToken)
 	}
 
-	if intro.Sub != "the-subject" {
-		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
+	if *intro.Sub != "the-subject" {
+		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", *intro.Sub)
 	}
 
-	if intro.Ext.(map[string]interface{})["foo"] != expectedValue {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext.(map[string]interface{})["foo"])
+	if intro.Ext["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
 	}
 
 	idt := token.IDToken

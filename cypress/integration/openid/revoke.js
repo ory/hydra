@@ -2,7 +2,6 @@ import { prng } from "../../helpers"
 
 describe("OpenID Connect Token Revokation", () => {
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "openid offline_access",
     redirect_uris: [`${Cypress.env("client_url")}/openid/callback`],

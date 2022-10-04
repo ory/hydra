@@ -11,15 +11,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pborman/uuid"
+	"github.com/gofrs/uuid"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/networkx"
 )
 
 // TestCreateRefreshTokenSessionStress is a sanity test to verify the fix for https://github.com/ory/hydra/issues/1719 &
@@ -45,7 +49,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 	token := "234c678fed33c1d2025537ae464a1ebf7d23fc4a"
 	tokenSignature := "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31"
 	testClient := hc.Client{
-		OutfacingID:   uuid.New(),
+		ID:            uuid.Must(uuid.NewV4()),
 		Secret:        "secret",
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
@@ -59,9 +63,9 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		},
 		Request: fosite.Request{
 			RequestedAt: time.Now(),
-			ID:          uuid.New(),
+			ID:          uuid.Must(uuid.NewV4()).String(),
 			Client: &hc.Client{
-				OutfacingID: testClient.OutfacingID,
+				ID: uuid.FromStringOrNil(testClient.GetID()),
 			},
 			RequestedScope: []string{"offline"},
 			GrantedScope:   []string{"offline"},
@@ -80,6 +84,10 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			// should be fine though as nobody should use sqlite in production
 			continue
 		}
+		net := &networkx.Network{}
+		require.NoError(t, dbRegistry.Persister().Connection(context.Background()).First(net))
+		dbRegistry.WithContextualizer(&contextx.Static{NID: net.ID, C: internal.NewConfigurationWithDefaults().Source(context.Background())})
+
 		ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 		require.NoError(t, dbRegistry.OAuth2Storage().(clientCreator).CreateClient(ctx, &testClient))
 		require.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))

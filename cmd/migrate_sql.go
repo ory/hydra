@@ -23,11 +23,14 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/hydra/cmd/cli"
 )
 
-// migrateSqlCmd represents the sql command
-func NewMigrateSqlCmd() *cobra.Command {
+func NewMigrateSqlCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sql <database-url>",
 		Short: "Create SQL schemas and apply migration plans",
@@ -43,9 +46,8 @@ You can read in the database URL using the -e flag, for example:
 
 ### WARNING ###
 
-Before running this command on an existing database, create a back up!
-`,
-		Run: cli.NewHandler().Migration.MigrateSQL,
+Before running this command on an existing database, create a back up!`,
+		RunE: cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQL,
 	}
 
 	cmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")

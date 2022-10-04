@@ -1,0 +1,14 @@
+{
+  "client_name": "",
+  "client_secret_expires_at": 0,
+  "client_uri": "",
+  "jwks": {},
+  "logo_uri": "",
+  "metadata": {},
+  "owner": "",
+  "policy_uri": "",
+  "scope": "",
+  "subject_type": "",
+  "token_endpoint_auth_method": "client_secret_post",
+  "tos_uri": ""
+}

@@ -1,7 +1,6 @@
 import { deleteClients, prng } from "../../helpers"
 
 const nc = () => ({
-  client_id: prng(),
   client_secret: prng(),
   scope: "openid",
   subject_type: "public",
@@ -85,7 +84,7 @@ describe("OpenID Connect Logout", () => {
   })
 
   // The Back-Channel test should run before the front-channel test because otherwise both tests need a long time to finish.
-  describe("Back-Channel", () => {
+  describe.only("Back-Channel", () => {
     beforeEach(() => {
       Cypress.Cookies.preserveOnce(
         "oauth2_authentication_session",

@@ -27,6 +27,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"sync"
+
+	"github.com/gofrs/uuid"
 
 	"gopkg.in/square/go-jose.v2"
 
@@ -54,8 +57,23 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
-func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
-	cert, err := d.Config().TLS(iface).Certificate()
+var mapLock sync.RWMutex
+var locks = map[string]*sync.RWMutex{}
+
+func getLock(set string) *sync.RWMutex {
+	mapLock.Lock()
+	defer mapLock.Unlock()
+	if _, ok := locks[set]; !ok {
+		locks[set] = new(sync.RWMutex)
+	}
+	return locks[set]
+}
+
+func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
+	getLock(TlsKeyName).Lock()
+	defer getLock(TlsKeyName).Unlock()
+
+	cert, err := d.Config().TLS(ctx, iface).Certificate()
 
 	if err == nil {
 		return cert
@@ -63,7 +81,7 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	_, priv, err := jwk.GetOrGenerateKeys(context.Background(), d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
+	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 	}
@@ -75,11 +93,11 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		}
 
 		AttachCertificate(priv, cert)
-		if err := d.SoftwareKeyManager().DeleteKey(context.TODO(), TlsKeyName, priv.KeyID); err != nil {
+		if err := d.SoftwareKeyManager().DeleteKey(ctx, TlsKeyName, priv.KeyID); err != nil {
 			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 		}
 
-		if err := d.SoftwareKeyManager().AddKey(context.TODO(), TlsKeyName, priv); err != nil {
+		if err := d.SoftwareKeyManager().AddKey(ctx, TlsKeyName, priv); err != nil {
 			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 		}
 	}

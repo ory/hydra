@@ -1,12 +1,12 @@
 {
   "name": "ory-hydra-mock-oauth2-client",
   "version": "0.0.0",
-  "main": "./src/index.js",
   "private": true,
+  "main": "./src/index.js",
   "scripts": {
+    "consent": "hydra-login-consent-logout",
     "start": "node ./src/index.js",
-    "watch": "nodemon ./src/index.js",
-    "consent": "hydra-login-consent-logout"
+    "watch": "nodemon ./src/index.js"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -16,7 +16,7 @@
     "express-winston": "^3.4.0",
     "hydra-login-consent-logout": "1.4.3",
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.8.0",
+    "jwks-rsa": "^2.1.4",
     "node-fetch": "^2.6.0",
     "node-uuid": "^1.4.8",
     "openid-client": "^2.5.0",

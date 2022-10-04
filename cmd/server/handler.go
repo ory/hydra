@@ -21,6 +21,7 @@
 package server
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
@@ -28,9 +29,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/configx"
+	"github.com/ory/x/servicelocatorx"
+
+	"github.com/ory/x/corsx"
+	"github.com/ory/x/httprouterx"
 
 	analytics "github.com/ory/analytics-go/v4"
+	"github.com/ory/x/configx"
 
 	"github.com/ory/x/reqlog"
 
@@ -44,6 +49,7 @@ import (
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -57,125 +63,141 @@ import (
 
 var _ = &consent.Handler{}
 
-func EnhanceMiddleware(d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
+func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
 	if !networkx.AddressIsUnixSocket(address) {
-		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(iface)))
+		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(ctx, iface)))
 	}
+
+	for _, mw := range sl.HTTPMiddlewares() {
+		n.UseFunc(mw)
+	}
+
 	n.UseHandler(router)
+	corsx.ContextualizedMiddleware(func(ctx context.Context) (opts cors.Options, enabled bool) {
+		return d.Config().CORS(ctx, iface)
+	})
 
-	if !enableCORS {
-		return n
-	}
-
-	options, enabled := d.Config().CORS(iface)
-	if !enabled {
-		return n
-	}
-
-	if enabled {
-		d.Logger().
-			WithField("options", fmt.Sprintf("%+v", options)).
-			Infof("Enabling CORS on interface: %s", address)
-		return cors.New(options).Handler(n)
-	}
 	return n
 }
 
-func isDSNAllowed(r driver.Registry) {
+func isDSNAllowed(ctx context.Context, r driver.Registry) {
 	if r.Config().DSN() == "memory" {
 		r.Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
 }
 
-func RunServeAdmin(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
-	isDSNAllowed(d)
+func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
 
-	admin, _, adminmw, _ := setup(d, cmd)
-	cert := GetOrCreateTLSCertificate(cmd, d, config.AdminInterface) // we do not want to run this concurrently.
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
+		isDSNAllowed(ctx, d)
 
-	d.PrometheusManager().RegisterRouter(admin.Router)
+		admin, _, adminmw, _ := setup(ctx, d, cmd)
+		d.PrometheusManager().RegisterRouter(admin.Router)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+		var wg sync.WaitGroup
+		wg.Add(1)
 
-	go serve(
-		d,
-		cmd,
-		&wg,
-		config.AdminInterface,
-		EnhanceMiddleware(d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(config.AdminInterface),
-		d.Config().SocketPermission(config.AdminInterface),
-		cert,
-	)
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.AdminInterface,
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			d.Config().ListenOn(config.AdminInterface),
+			d.Config().SocketPermission(config.AdminInterface),
+		)
 
-	wg.Wait()
+		wg.Wait()
+		return nil
+	}
 }
 
-func RunServePublic(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
-	isDSNAllowed(d)
+func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
 
-	_, public, _, publicmw := setup(d, cmd)
-	cert := GetOrCreateTLSCertificate(cmd, d, config.PublicInterface) // we do not want to run this concurrently.
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
+		isDSNAllowed(ctx, d)
 
-	d.PrometheusManager().RegisterRouter(public.Router)
+		_, public, _, publicmw := setup(ctx, d, cmd)
+		d.PrometheusManager().RegisterRouter(public.Router)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
+		var wg sync.WaitGroup
+		wg.Add(1)
 
-	go serve(
-		d,
-		cmd,
-		&wg,
-		config.PublicInterface,
-		EnhanceMiddleware(d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(config.PublicInterface),
-		d.Config().SocketPermission(config.PublicInterface),
-		cert,
-	)
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.PublicInterface,
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			d.Config().ListenOn(config.PublicInterface),
+			d.Config().SocketPermission(config.PublicInterface),
+		)
 
-	wg.Wait()
+		wg.Wait()
+		return nil
+	}
 }
 
-func RunServeAll(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		sl := servicelocatorx.NewOptions(slOpts...)
 
-	admin, public, adminmw, publicmw := setup(d, cmd)
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		if err != nil {
+			return err
+		}
 
-	d.PrometheusManager().RegisterRouter(admin.Router)
-	d.PrometheusManager().RegisterRouter(public.Router)
+		admin, public, adminmw, publicmw := setup(ctx, d, cmd)
 
-	var wg sync.WaitGroup
-	wg.Add(2)
+		d.PrometheusManager().RegisterRouter(admin.Router)
+		d.PrometheusManager().RegisterRouter(public.Router)
 
-	go serve(
-		d,
-		cmd,
-		&wg,
-		config.PublicInterface,
-		EnhanceMiddleware(d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(config.PublicInterface),
-		d.Config().SocketPermission(config.PublicInterface),
-		GetOrCreateTLSCertificate(cmd, d, config.PublicInterface),
-	)
+		var wg sync.WaitGroup
+		wg.Add(2)
 
-	go serve(
-		d,
-		cmd,
-		&wg,
-		config.AdminInterface,
-		EnhanceMiddleware(d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(config.AdminInterface),
-		d.Config().SocketPermission(config.AdminInterface),
-		GetOrCreateTLSCertificate(cmd, d, config.AdminInterface),
-	)
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.PublicInterface,
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			d.Config().ListenOn(config.PublicInterface),
+			d.Config().SocketPermission(config.PublicInterface),
+		)
 
-	wg.Wait()
+		go serve(
+			ctx,
+			d,
+			cmd,
+			&wg,
+			config.AdminInterface,
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			d.Config().ListenOn(config.AdminInterface),
+			d.Config().SocketPermission(config.AdminInterface),
+		)
+
+		wg.Wait()
+		return nil
+	}
 }
 
-func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
+func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(config.Version))
 
 	if d.Config().CGroupsV1AutoMaxProcsEnabled() {
@@ -189,19 +211,14 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 	adminmw = negroni.New()
 	publicmw = negroni.New()
 
-	admin = x.NewRouterAdmin()
+	admin = x.NewRouterAdmin(d.Config().AdminURL)
 	public = x.NewRouterPublic()
-
-	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		adminmw.Use(tracer)
-		publicmw.Use(tracer)
-	}
 
 	adminLogger := reqlog.
 		NewMiddlewareFromLogger(d.Logger(),
-			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL().String()))
+			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL(ctx).String()))
 	if d.Config().DisableHealthAccessLog(config.AdminInterface) {
-		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
+		adminLogger = adminLogger.ExcludePaths("/admin"+healthx.AliveCheckPath, "/admin"+healthx.ReadyCheckPath)
 	}
 
 	adminmw.Use(adminLogger)
@@ -209,7 +226,7 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 
 	publicLogger := reqlog.NewMiddlewareFromLogger(
 		d.Logger(),
-		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL().String()),
+		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL(ctx).String()),
 	)
 	if d.Config().DisableHealthAccessLog(config.PublicInterface) {
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
@@ -221,22 +238,23 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 	metrics := metricsx.New(
 		cmd,
 		d.Logger(),
-		d.Config().Source(),
+		d.Config().Source(ctx),
 		&metricsx.Options{
 			Service: "ory-hydra",
 			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
-				d.Config().IssuerURL().String(),
+				d.Config().IssuerURL(ctx).String(),
 				d.Config().DSN(),
 			)),
 			IsDevelopment: d.Config().DSN() == "memory" ||
-				d.Config().IssuerURL().String() == "" ||
-				strings.Contains(d.Config().IssuerURL().String(), "localhost"),
+				d.Config().IssuerURL(ctx).String() == "" ||
+				strings.Contains(d.Config().IssuerURL(ctx).String(), "localhost"),
 			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			WhitelistedPaths: []string{
-				jwk.KeyHandlerPath,
+				"/admin" + jwk.KeyHandlerPath,
 				jwk.WellKnownKeysPath,
 
-				client.ClientsHandlerPath,
+				"/admin" + client.ClientsHandlerPath,
+				client.DynClientsHandlerPath,
 
 				oauth2.DefaultConsentPath,
 				oauth2.DefaultLoginPath,
@@ -249,26 +267,30 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 				oauth2.UserinfoPath,
 				oauth2.WellKnownPath,
 				oauth2.JWKPath,
-				oauth2.IntrospectPath,
+				"/admin" + oauth2.IntrospectPath,
+				"/admin" + oauth2.DeleteTokensPath,
 				oauth2.RevocationPath,
-				oauth2.FlushPath,
 
-				consent.ConsentPath,
-				consent.ConsentPath + "/accept",
-				consent.ConsentPath + "/reject",
-				consent.LoginPath,
-				consent.LoginPath + "/accept",
-				consent.LoginPath + "/reject",
-				consent.LogoutPath,
-				consent.LogoutPath + "/accept",
-				consent.LogoutPath + "/reject",
-				consent.SessionsPath + "/login",
-				consent.SessionsPath + "/consent",
+				"/admin" + consent.ConsentPath,
+				"/admin" + consent.ConsentPath + "/accept",
+				"/admin" + consent.ConsentPath + "/reject",
+				"/admin" + consent.LoginPath,
+				"/admin" + consent.LoginPath + "/accept",
+				"/admin" + consent.LoginPath + "/reject",
+				"/admin" + consent.LogoutPath,
+				"/admin" + consent.LogoutPath + "/accept",
+				"/admin" + consent.LogoutPath + "/reject",
+				"/admin" + consent.SessionsPath + "/login",
+				"/admin" + consent.SessionsPath + "/consent",
 
 				healthx.AliveCheckPath,
 				healthx.ReadyCheckPath,
+				"/admin" + healthx.AliveCheckPath,
+				"/admin" + healthx.ReadyCheckPath,
 				healthx.VersionPath,
+				"/admin" + healthx.VersionPath,
 				prometheus.MetricsPrometheusPath,
+				"/admin" + prometheus.MetricsPrometheusPath,
 				"/",
 			},
 			BuildVersion: config.Version,
@@ -287,12 +309,13 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 	adminmw.Use(metrics)
 	publicmw.Use(metrics)
 
-	d.RegisterRoutes(admin, public)
+	d.RegisterRoutes(ctx, admin, public)
 
 	return
 }
 
 func serve(
+	ctx context.Context,
 	d driver.Registry,
 	cmd *cobra.Command,
 	wg *sync.WaitGroup,
@@ -300,22 +323,24 @@ func serve(
 	handler http.Handler,
 	address string,
 	permission *configx.UnixPermission,
-	cert []tls.Certificate,
 ) {
 	defer wg.Done()
 
-	// #nosec G112 false positive
-	var srv = graceful.WithDefaults(&http.Server{
-		Handler: handler,
-		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
-		TLSConfig: &tls.Config{
-			Certificates: cert,
-		},
-	})
-
-	if d.Tracer(cmd.Context()).IsLoaded() {
-		srv.RegisterOnShutdown(d.Tracer(cmd.Context()).Close)
+	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
+		handler = otelx.TraceHandler(handler)
 	}
+
+	var tlsConfig *tls.Config
+	if tc := d.Config().TLS(ctx, iface); tc.Enabled() {
+		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
+		tlsConfig = &tls.Config{Certificates: GetOrCreateTLSCertificate(ctx, cmd, d, iface)}
+	}
+
+	var srv = graceful.WithDefaults(&http.Server{
+		Handler:           handler,
+		TLSConfig:         tlsConfig,
+		ReadHeaderTimeout: time.Second * 5,
+	})
 
 	if err := graceful.Graceful(func() error {
 		d.Logger().Infof("Setting up http server on %s", address)
@@ -326,20 +351,17 @@ func serve(
 
 		if networkx.AddressIsUnixSocket(address) {
 			return srv.Serve(listener)
-		} else {
-			tls := d.Config().TLS(iface)
-			if !tls.Enabled() {
-				if iface == config.PublicInterface {
-					d.Logger().Warnln("HTTPS disabled. Never do this in production.")
-				}
-				return srv.Serve(listener)
-			} else if len(tls.AllowTerminationFrom()) > 0 {
-				d.Logger().Infoln("Upstream TLS termination enabled, disabling https.")
-				return srv.Serve(listener)
-			} else {
-				return srv.ServeTLS(listener, "", "")
-			}
 		}
+
+		if tlsConfig != nil {
+			return srv.ServeTLS(listener, "", "")
+		}
+
+		if iface == config.PublicInterface {
+			d.Logger().Warnln("HTTPS is disabled. Please ensure that your proxy is configured to provide HTTPS, and that it redirects HTTP to HTTPS.")
+		}
+
+		return srv.Serve(listener)
 	}, srv.Shutdown); err != nil {
 		d.Logger().WithError(err).Fatal("Could not gracefully run server")
 	}

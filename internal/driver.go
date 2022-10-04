@@ -2,7 +2,7 @@ package internal
 
 import (
 	"context"
-	"strings"
+
 	"sync"
 	"testing"
 
@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/driver"
@@ -19,60 +20,49 @@ import (
 	"github.com/ory/x/logrusx"
 )
 
-func resetConfig(p *config.Provider) {
-	p.MustSet(config.KeyBCryptCost, "4")
-	p.MustSet(config.KeySubjectIdentifierAlgorithmSalt, "00000000")
-	p.MustSet(config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(config.KeyLogLevel, "trace")
+func resetConfig(p *config.DefaultProvider) {
+	p.MustSet(context.Background(), config.KeyBCryptCost, "4")
+	p.MustSet(context.Background(), config.KeySubjectIdentifierAlgorithmSalt, "00000000")
+	p.MustSet(context.Background(), config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(context.Background(), config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(context.Background(), config.KeyLogLevel, "trace")
 }
 
-func NewConfigurationWithDefaults() *config.Provider {
+func NewConfigurationWithDefaults() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet("dangerous-force-http", true)
+	p.MustSet(context.Background(), config.KeyTLSEnabled, false)
 	return p
 }
 
-func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
+func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet("dangerous-force-http", false)
+	p.MustSet(context.Background(), config.KeyTLSEnabled, true)
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.Provider) driver.Registry {
-	return newRegistryDefault(t, "memory", c)
+func NewRegistryMemory(t *testing.T, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", c, true, ctxer)
 }
 
-func NewMockedRegistry(t *testing.T) driver.Registry {
-	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults())
+func NewMockedRegistry(t *testing.T, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true, ctxer)
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
-	return newRegistryDefault(t, url, NewConfigurationWithDefaults())
+func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Registry {
-	c.MustSet(config.KeyLogLevel, "trace")
-	c.MustSet(config.KeyDSN, url)
+func newRegistryDefault(t *testing.T, url string, c *config.DefaultProvider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+	ctx := context.Background()
+	c.MustSet(ctx, config.KeyLogLevel, "trace")
+	c.MustSet(ctx, config.KeyDSN, url)
+	c.MustSet(ctx, "dev", true)
 
-	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"))
-
-	kg := map[string]jwk.KeyGenerator{
-		"RS256": new(veryInsecureRS256Generator),
-		"ES256": &jwk.ECDSA256Generator{},
-		"ES512": &jwk.ECDSA512Generator{},
-		"EdDSA": &jwk.EdDSAGenerator{},
-		"HS256": &jwk.HS256Generator{},
-		"HS512": &jwk.HS512Generator{},
-	}
-
-	r = r.WithKeyGenerators(kg)
-
+	r, err := driver.NewRegistryFromDSN(ctx, c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
 	require.NoError(t, err)
 
-	require.NoError(t, r.Init(context.Background()))
 	return r
 }
 
@@ -85,32 +75,18 @@ func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 }
 
 func ConnectToMySQL(t *testing.T) string {
-	c := dockertest.ConnectToTestMySQLPop(t)
-	url := c.URL()
-	if !strings.HasPrefix(url, "mysql://") {
-		url = "mysql://" + url
-	}
-	require.NoError(t, c.Close())
-	return url
+	return dockertest.RunTestMySQLWithVersion(t, "11.8")
 }
 
 func ConnectToPG(t *testing.T) string {
-	c := dockertest.ConnectToTestPostgreSQLPop(t)
-	require.NoError(t, c.Close())
-	return c.URL()
+	return dockertest.RunTestPostgreSQLWithVersion(t, "11.8")
 }
 
 func ConnectToCRDB(t *testing.T) string {
-	c := dockertest.ConnectToTestCockroachDBPop(t)
-	url := c.URL()
-	if !strings.HasPrefix(url, "cockroach") {
-		url = "cockroach://" + strings.Split(url, "://")[1]
-	}
-	require.NoError(t, c.Close())
-	return url
+	return dockertest.RunTestCockroachDBWithVersion(t, "v22.1.2")
 }
 
-func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
+func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
 
@@ -134,9 +110,9 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistrySQLFromURL(t, pgURL)
-	mysql = NewRegistrySQLFromURL(t, mysqlURL)
-	crdb = NewRegistrySQLFromURL(t, crdbURL)
+	pg = NewRegistrySQLFromURL(t, pgURL, migrate, ctxer)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate, ctxer)
+	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate, ctxer)
 	dbs := []driver.Registry{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {

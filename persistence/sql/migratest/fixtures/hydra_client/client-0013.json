@@ -1,0 +1,107 @@
+{
+  "AllowedCORSOrigins": [
+    "http://cors/0013_1"
+  ],
+  "Audience": [
+    "autdience-0013_1"
+  ],
+  "AuthorizationCodeGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "AuthorizationCodeGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "BackChannelLogoutSessionRequired": true,
+  "BackChannelLogoutURI": "http://back_logout/0013",
+  "ClientCredentialsGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ClientURI": "http://client/0013",
+  "Contacts": [
+    "contact-0013_1"
+  ],
+  "CreatedAt": "0001-01-01T00:00:00Z",
+  "FrontChannelLogoutSessionRequired": true,
+  "FrontChannelLogoutURI": "http://front_logout/0013",
+  "GrantTypes": [
+    "grant-0013_1"
+  ],
+  "ID": "00000000-0000-0000-0000-000000000000",
+  "ImplicitGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "ImplicitGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "JSONWebKeys": {
+    "JSONWebKeySet": null
+  },
+  "JSONWebKeysURI": "http://jwks/0013",
+  "JwtBearerGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "LegacyClientID": "client-0013",
+  "LogoURI": "http://logo/0013",
+  "Metadata": {},
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Name": "Client 0013",
+  "Owner": "owner-0013",
+  "PKDeprecated": 13,
+  "PasswordGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PasswordGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "PolicyURI": "http://policy/0013",
+  "PostLogoutRedirectURIs": [
+    "http://post_redirect/0013_1"
+  ],
+  "RedirectURIs": [
+    "http://redirect/0013_1"
+  ],
+  "RefreshTokenGrantAccessTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantIDTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RefreshTokenGrantRefreshTokenLifespan": {
+    "Duration": 0,
+    "Valid": false
+  },
+  "RegistrationAccessToken": "",
+  "RegistrationAccessTokenSignature": "",
+  "RegistrationClientURI": "",
+  "RequestObjectSigningAlgorithm": "r_alg-0013",
+  "RequestURIs": [
+    "http://request/0013_1"
+  ],
+  "ResponseTypes": [
+    "response-0013_1"
+  ],
+  "Scope": "scope-0013",
+  "Secret": "secret-0013",
+  "SecretExpiresAt": 0,
+  "SectorIdentifierURI": "http://sector_id/0013",
+  "SubjectType": "subject-0013",
+  "TermsOfServiceURI": "http://tos/0013",
+  "TokenEndpointAuthMethod": "token_auth-0013",
+  "TokenEndpointAuthSigningAlgorithm": "",
+  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UserinfoSignedResponseAlg": "u_alg-0013"
+}

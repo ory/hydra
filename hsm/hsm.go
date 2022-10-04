@@ -20,22 +20,22 @@ type Context interface {
 	GetAttribute(key interface{}, attribute crypto11.AttributeType) (a *crypto11.Attribute, err error)
 }
 
-func NewContext(c *config.Provider, l *logrusx.Logger) Context {
+func NewContext(c *config.DefaultProvider, l *logrusx.Logger) Context {
 	config11 := &crypto11.Config{
-		Path: c.HsmLibraryPath(),
-		Pin:  c.HsmPin(),
+		Path: c.HSMLibraryPath(),
+		Pin:  c.HSMPin(),
 	}
 
-	if c.HsmTokenLabel() != "" {
-		config11.TokenLabel = c.HsmTokenLabel()
+	if c.HSMTokenLabel() != "" {
+		config11.TokenLabel = c.HSMTokenLabel()
 	} else {
-		config11.SlotNumber = c.HsmSlotNumber()
+		config11.SlotNumber = c.HSMSlotNumber()
 	}
 
 	ctx11, err := crypto11.Configure(config11)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to configure Hardware Security Module. Library path: %s, slot: %v, token label: %s",
-			c.HsmLibraryPath(), *c.HsmSlotNumber(), c.HsmTokenLabel())
+			c.HSMLibraryPath(), *c.HSMSlotNumber(), c.HSMTokenLabel())
 	} else {
 		l.Info("Hardware Security Module is configured.")
 	}

@@ -1,10 +1,12 @@
-FROM golang:1.18-alpine AS builder
+FROM golang:1.18-alpine3.16 AS builder
 
-RUN apk --no-cache add --upgrade --latest build-base git gcc bash
+RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
 WORKDIR /go/src/github.com/ory/hydra
+RUN mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
@@ -14,7 +16,7 @@ RUN go mod download
 COPY . .
 
 FROM builder as build-hydra
-RUN go build -tags=sqlite,hsm -o /usr/bin/hydra
+RUN go build -tags sqlite,json1,hsm -o /usr/bin/hydra
 
 FROM builder as test-hsm
 ENV HSM_ENABLED=true

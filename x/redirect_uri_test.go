@@ -1,6 +1,7 @@
 package x
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
@@ -8,30 +9,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type mockrc struct{}
+type mockrc struct{ dm bool }
 
-func (m *mockrc) InsecureRedirects() []string {
-	return []string{
-		"http://foo.com/bar",
-		"http://baz.com/bar",
-	}
+func (m *mockrc) IsDevelopmentMode(ctx context.Context) bool {
+	return m.dm
 }
 
 func TestIsRedirectURISecure(t *testing.T) {
 	for d, c := range []struct {
 		u   string
 		err bool
+		dev bool
 	}{
 		{u: "http://google.com", err: true},
 		{u: "https://google.com", err: false},
 		{u: "http://localhost", err: false},
 		{u: "http://test.localhost", err: false},
 		{u: "wta://auth", err: false},
-		{u: "http://foo.com/bar", err: false},
-		{u: "http://baz.com/bar", err: false},
+		{u: "http://foo.com/bar", err: false, dev: true},
+		{u: "http://baz.com/bar", err: false, dev: true},
 	} {
 		uu, err := url.Parse(c.u)
 		require.NoError(t, err)
-		assert.Equal(t, !c.err, IsRedirectURISecure(new(mockrc))(uu), "case %d", d)
+		assert.Equal(t, !c.err, IsRedirectURISecure(&mockrc{dm: c.dev})(context.Background(), uu), "case %d", d)
 	}
 }

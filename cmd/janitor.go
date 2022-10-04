@@ -3,30 +3,35 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/x/configx"
 )
 
-func NewJanitorCmd() *cobra.Command {
+func NewJanitorCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "janitor [<database-url>]",
-		Short: "Clean the database of old tokens, login/consent requests and jwt grant issuers",
-		Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
-This will select records to delete with a limit and delete records in batch to ensure that no table locking issues arise in big production databases.
+		Use:     "janitor [<database-url>]",
+		Short:   "This command cleans up stale database rows.",
+		Example: `hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m <database-url>`,
+		Long: `This command cleans up stale database rows. This will select records to delete with a limit
+and delete records in batch to ensure that no table locking issues arise in big production
+databases.
 
 ### Warning ###
 
-This command is in beta. Proceed with caution!
+This command is irreversible. Proceed with caution!
 
-This is a destructive command and will purge data directly from the database.
-Please use this command with caution if you need to keep historic data for any reason.
+This is a destructive command and will purge data directly from the database. Please use
+this command with caution.
 
 ###############
 
 Janitor can be used in several ways.
 
 1. By passing the database connection string (DSN) as an argument
-   Pass the database url (dsn) as an argument to janitor. E.g. janitor <database-url>
+   Pass the database url (dsn) as an argument to janitor. E.g. janitor {database-url}
 2. By passing the DSN as an environment variable
 
 		export DSN=...
@@ -36,26 +41,26 @@ Janitor can be used in several ways.
    janitor -c /path/to/conf.yml
 4. Extra *optional* parameters can also be added such as
 
-		janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m <database-url>
+		hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m {database-url}
 
 5. Running only a certain cleanup
 
-		janitor --tokens <database-url>
+		hydra janitor --tokens {database-url}
 
    or
 
-		janitor --requests <database-url>
+		hydra janitor --requests {database-url}
 
     or
 
-		janitor --grants <database-url>
+		hydra janitor --grants {database-url}
 
    or any combination of them
 
-		janitor --tokens --requests --grants <database-url>
+		hydra janitor --tokens --requests --grants {database-url}
 `,
-		RunE: cli.NewHandler().Janitor.RunE,
-		Args: cli.NewHandler().Janitor.Args,
+		RunE: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.RunE,
+		Args: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.Args,
 	}
 	cmd.Flags().Int(cli.Limit, 10000, "Limit the number of records retrieved from database for deletion.")
 	cmd.Flags().Int(cli.BatchSize, 100, "Define how many records are deleted with each iteration.")

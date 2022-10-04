@@ -244,7 +244,8 @@ ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT hydra_oauth2_
 --split
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issue_issuer_subject_key_id_key UNIQUE (issuer, subject, key_id, nid);
 --split
-ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT IF EXISTS hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT IF EXISTS hydra_oauth2_trusted_jwt_bearer_issuer_key_set_key_id_fkey;
 --split
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey FOREIGN KEY (key_set, key_id, nid) REFERENCES hydra_jwk(sid, kid, nid) ON DELETE CASCADE;
 --split

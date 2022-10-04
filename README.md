@@ -245,7 +245,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Sainsbury's</td>
@@ -278,7 +278,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Zero</td>
@@ -289,7 +289,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Padis</td>
@@ -322,7 +322,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Factly</td>
@@ -366,7 +366,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Sponsor</td>
             <td>Strivacity</td>
@@ -899,5 +899,7 @@ Community:
 
 Developer Blog:
 
+- Visit the [Ory Blog](https://www.ory.sh/blog/) for guides, tutorials and
+  articles around Ory Hydra and the Ory ecosystem.
 - Visit the [Ory Blog](https://www.ory.sh/blog/) for guides, tutorials and
   articles around Ory Hydra and the Ory ecosystem.

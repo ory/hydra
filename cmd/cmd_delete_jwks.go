@@ -31,11 +31,12 @@ import (
 
 func NewDeleteJWKSCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:     "jwks id-1 [id-2] [id-n]",
+		Use:     "jwk <id-1> [<id-2> ...]",
+		Aliases: []string{"jwks"},
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Delete one or more JSON Web Key Sets by their set ID",
 		Long:    "This command deletes one or more JSON Web Key Sets by their respective set IDs.",
-		Example: `{{ .CommandPath }} set-1 set-2 set-3`,
+		Example: `{{ .CommandPath }} <set-1> <set-2> <set-3>`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

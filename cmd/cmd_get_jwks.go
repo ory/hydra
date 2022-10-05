@@ -29,10 +29,11 @@ import (
 
 func NewGetJWKSCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "jwks set-1",
-		Args:  cobra.ExactArgs(1),
-		Short: "Get a JSON Web Key Set by its ID(s)",
-		Long:  `This command gets all the details about an JSON Web Key. You can use this command in combination with jq.`,
+		Use:     "jwk set-1 [set-2] ...",
+		Aliases: []string{"jwks"},
+		Args:    cobra.MinimumNArgs(1),
+		Short:   "Get one or more JSON Web Key Set by its ID(s)",
+		Long:    `This command gets all the details about an JSON Web Key. You can use this command in combination with jq.`,
 		Example: `To get the JSON Web Key Set's secret, run:
 
 	{{ .CommandPath }} <set-id> | jq -r '.[].use'`,

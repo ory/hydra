@@ -36,9 +36,10 @@ func NewCreateJWKSCmd() *cobra.Command {
 	const use = "use"
 
 	cmd := &cobra.Command{
-		Use:     "jwks set-id [key-id]",
+		Use:     "jwk <set-id> [<key-id>]",
+		Aliases: []string{"jwks"},
 		Args:    cobra.RangeArgs(1, 2),
-		Example: `{{ .CommandPath }} my-jwk-set --alg RS256 --use sig`,
+		Example: `{{ .CommandPath }} <my-jwk-set> --alg RS256 --use sig`,
 		Short:   "Create a JSON Web Key Set with a JSON Web Key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmd.CommandPath()

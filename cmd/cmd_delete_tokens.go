@@ -29,10 +29,10 @@ import (
 
 func NewDeleteAccessTokensCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "access-tokens client-id",
+		Use:     "access-tokens <client-id>",
 		Args:    cobra.ExactArgs(1),
-		Example: `{{ .CommandPath }} 33137249-dd2c-49e6-a066-75ad2a72f221`,
-		Short:   "Invalidate all OAuth2 Access Tokens of an OAuth2 Client",
+		Example: `{{ .CommandPath }} <client-id>`,
+		Short:   "Delete all OAuth2 Access Tokens of an OAuth2 Client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, _, err := cliclient.NewClient(cmd)
 			if err != nil {

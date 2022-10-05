@@ -30,8 +30,8 @@ import (
 
 func NewGetClientsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "oauth2-client id-1 [id-2] [id-n]",
-		Aliases: []string{"client"},
+		Use:     "oauth2-client <id-1> [<id-2> ...]",
+		Aliases: []string{"client", "clients", "oauth2-clients"},
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Get one or more OAuth 2.0 Clients by their ID(s)",
 		Long:    `This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`,

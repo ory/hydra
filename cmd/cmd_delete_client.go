@@ -29,16 +29,16 @@ import (
 
 func NewDeleteClientCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "oauth2-client id-1 [id-2] [id-n]",
-		Aliases: []string{"client"},
+		Use:     "oauth2-client <id-1> [<id-2> ...]",
+		Aliases: []string{"client", "clients", "oauth2-clients"},
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Delete one or more OAuth 2.0 Clients by their ID(s)",
 		Long:    "This command deletes one or more OAuth 2.0 Clients by their respective IDs.",
-		Example: `{{ .CommandPath }} client-1 client-2 client-3
+		Example: `{{ .CommandPath }} <client-1> <client-2> <client-3>
 
 To delete OAuth 2.0 Clients with the owner of "foo@bar.com", run:
 
-	{{ .CommandPath }} $({{ .Root.Name }} list clients --format json | jq -r 'map(select(.contacts[] == "foo@bar.com")) | .[].client_id')`,
+	{{ .CommandPath }} $({{ .Root.Name }} list oauth2-clients --format json | jq -r 'map(select(.contacts[] == "foo@bar.com")) | .[].client_id')`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

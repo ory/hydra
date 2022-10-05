@@ -39,9 +39,9 @@ import (
 
 func NewImportClientCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "oauth2-client [file-1.json] [file-2.json] [file-3.json] [file-n.json]",
-		Aliases: []string{"client"},
-		Short:   "Import OAuth 2.0 Clients from files or STDIN",
+		Use:     "oauth2-client <file-1.json> [<file-2.json> ...]",
+		Aliases: []string{"client", "clients", "oauth2-clients"},
+		Short:   "Import one or more OAuth 2.0 Clients from files or STDIN",
 		Example: `Import an example OAuth2 Client:
 	cat > ./file.json <<EOF
 	[

@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -19,7 +18,7 @@ import (
 
 func TestCreateClient(t *testing.T) {
 	ctx := context.Background()
-	c := cmd.NewCreateClientsCommand(new(cobra.Command))
+	c := cmd.NewCreateClientsCommand()
 	reg := setup(t, c)
 
 	t.Run("case=creates successfully", func(t *testing.T) {

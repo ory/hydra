@@ -8,7 +8,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewPerformCmd(root *cobra.Command) *cobra.Command {
+func NewPerformCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "perform",
 		Short: "Perform OAuth 2.0 Flows",

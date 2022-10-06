@@ -8,7 +8,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewListCmd(root *cobra.Command) *cobra.Command {
+func NewListCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},

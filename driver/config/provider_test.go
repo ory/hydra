@@ -328,6 +328,9 @@ func TestViperProviderValidates(t *testing.T) {
 					ServerURL: "http://sampling",
 				},
 			},
+			Zipkin: otelx.ZipkinConfig{
+				ServerURL: "http://zipkin/api/v2/spans",
+			},
 		},
 	}, c.Tracing())
 }

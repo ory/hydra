@@ -6,7 +6,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -18,7 +17,7 @@ import (
 )
 
 func TestRevokeToken(t *testing.T) {
-	c := cmd.NewRevokeTokenCmd(new(cobra.Command))
+	c := cmd.NewRevokeTokenCmd()
 	public, _, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, public.URL))
 

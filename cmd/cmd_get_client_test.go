@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -19,7 +18,7 @@ import (
 
 func TestGetClient(t *testing.T) {
 	ctx := context.Background()
-	c := cmd.NewGetClientsCmd(new(cobra.Command))
+	c := cmd.NewGetClientsCmd()
 	reg := setup(t, c)
 
 	expected := createClient(t, reg, nil)

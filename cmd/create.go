@@ -8,7 +8,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewCreateCmd(root *cobra.Command) *cobra.Command {
+func NewCreateCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create resources",

@@ -40,11 +40,11 @@ import (
 	"github.com/ory/x/urlx"
 )
 
-func NewPerformClientCredentialsCmd(parent *cobra.Command) *cobra.Command {
+func NewPerformClientCredentialsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "client-credentials",
 		Args:    cobra.NoArgs,
-		Example: fmt.Sprintf(`%[1]s perform client-credentials --client-id ... --client-secret`, parent.Use),
+		Example: `{{ .CommandPath }} --client-id ... --client-secret`,
 		Short:   "Perform the OAuth2 Client Credentials Flow",
 		Long: `Performs the OAuth 2.0 Client Credentials Flow. Useful to exchange a client_id and client_secret for an access_token.
 using the CLI.`,

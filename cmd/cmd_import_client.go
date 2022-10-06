@@ -39,12 +39,12 @@ import (
 	"github.com/ory/x/pointerx"
 )
 
-func NewImportClientCmd(root *cobra.Command) *cobra.Command {
+func NewImportClientCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "oauth2-client [file-1.json] [file-2.json] [file-3.json] [file-n.json]",
-		Aliases: []string{"client"},
-		Short:   "Import OAuth 2.0 Clients from files or STDIN",
-		Example: fmt.Sprintf(`Create an example OAuth2 Client:
+		Use:     "oauth2-client <file-1.json> [<file-2.json> ...]",
+		Aliases: []string{"client", "clients", "oauth2-clients"},
+		Short:   "Import one or more OAuth 2.0 Clients from files or STDIN",
+		Example: `Import an example OAuth2 Client:
 	cat > ./file.json <<EOF
 	[
       {
@@ -58,16 +58,16 @@ func NewImportClientCmd(root *cobra.Command) *cobra.Command {
     ]
 	EOF
 
-	%[1]s import client file.json
+	{{ .CommandPath }} file.json
 
 Alternatively:
 
-	cat file.json | %[1]s import client
+	cat file.json | {{ .CommandPath }}
 
-To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, `+"`--pgp-key-url`"+` or `+"`--keybase`"+` flag, for example:
+To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" + `, ` + "`--pgp-key-url`" + ` or ` + "`--keybase`" + ` flag, for example:
 
-  %[1]s create client -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
-`, root.Use),
+  {{ .CommandPath }} -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
+`,
 		Long: `This command reads in each listed JSON file and imports their contents as a list of OAuth 2.0 Clients.
 
 The format for the JSON file is:

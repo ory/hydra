@@ -8,7 +8,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewImportCmd(root *cobra.Command) *cobra.Command {
+func NewImportCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "import",
 		Short: "Import resources",

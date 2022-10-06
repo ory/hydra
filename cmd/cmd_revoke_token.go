@@ -35,10 +35,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRevokeTokenCmd(parent *cobra.Command) *cobra.Command {
+func NewRevokeTokenCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "token the-token",
-		Example: fmt.Sprintf(`%s revoke token --client-id a0184d6c-b313-4e70-a0b9-905b581e9218 --client-secret Hh1BjioNNm ciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNT`, parent.Use),
+		Example: `{{ .CommandPath }} --client-id a0184d6c-b313-4e70-a0b9-905b581e9218 --client-secret Hh1BjioNNm ciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNT`,
 		Args:    cobra.ExactArgs(1),
 		Short:   "Revoke an access or refresh token",
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -23,20 +23,18 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 )
 
-func NewDeleteAccessTokensCmd(parent *cobra.Command) *cobra.Command {
+func NewDeleteAccessTokensCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "access-tokens client-id",
+		Use:     "access-tokens <client-id>",
 		Args:    cobra.ExactArgs(1),
-		Example: fmt.Sprintf(`%s delete access-tokens 33137249-dd2c-49e6-a066-75ad2a72f221`, parent.Use),
-		Short:   "Invalidate all OAuth2 Access Tokens of an OAuth2 Client",
+		Example: `{{ .CommandPath }} <client-id>`,
+		Short:   "Delete all OAuth2 Access Tokens of an OAuth2 Client",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, _, err := cliclient.NewClient(cmd)
 			if err != nil {

@@ -23,23 +23,22 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 )
 
-func NewGetJWKSCmd(root *cobra.Command) *cobra.Command {
+func NewGetJWKSCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "jwks set-1",
-		Args:  cobra.ExactArgs(1),
-		Short: "Get a JSON Web Key Set by its ID(s)",
-		Long:  `This command gets all the details about an JSON Web Key. You can use this command in combination with jq.`,
-		Example: fmt.Sprintf(`To get the JSON Web Key Set's secret, run:
+		Use:     "jwk set-1 [set-2] ...",
+		Aliases: []string{"jwks"},
+		Args:    cobra.MinimumNArgs(1),
+		Short:   "Get one or more JSON Web Key Set by its ID(s)",
+		Long:    `This command gets all the details about an JSON Web Key. You can use this command in combination with jq.`,
+		Example: `To get the JSON Web Key Set's secret, run:
 
-	%s get jwks <set-id> | jq -r '.[].use'`, root.Use),
+	{{ .CommandPath }} <set-id> | jq -r '.[].use'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

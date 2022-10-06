@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/client"
@@ -35,51 +37,41 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 }
 
 func TestDbUnknownTableColumns(t *testing.T) {
-	tests := []struct {
-		name         string
-		flagValue    string
-		expectError  bool
-		expectedSize int
-	}{
-		{name: "with unsafe", flagValue: "true", expectError: false, expectedSize: 1},
-		{name: "without unsafe", flagValue: "false", expectError: true, expectedSize: 0},
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	c := config.MustNew(ctx, l, configx.SkipValidation())
+	postgresDsn := dockertest.RunTestPostgreSQL(t)
+	c.MustSet(ctx, config.KeyDSN, postgresDsn)
+	reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
+	require.NoError(t, err)
+
+	statement := "ALTER TABLE \"hydra_client\" ADD COLUMN \"temp_column\" VARCHAR(128) NOT NULL DEFAULT '';"
+	require.NoError(t, reg.Persister().Connection(ctx).RawQuery(statement).Exec())
+
+	cl := &client.Client{
+		LegacyClientID: strconv.Itoa(rand.Int()),
+	}
+	require.NoError(t, reg.Persister().CreateClient(ctx, cl))
+	getClients := func(reg Registry) ([]client.Client, error) {
+		readClients := make([]client.Client, 0)
+		return readClients, reg.Persister().Connection(ctx).RawQuery("SELECT * FROM \"hydra_client\"").All(&readClients)
 	}
 
-	for _, test := range tests {
-		t.Run(
-			test.name, func(t *testing.T) {
-				ctx := context.Background()
-				l := logrusx.New("", "")
-				c := config.MustNew(ctx, l, configx.SkipValidation())
-				postgresDsn := dockertest.RunTestPostgreSQL(t)
-				c.MustSet(ctx, config.KeyDSN, postgresDsn)
-				c.MustSet(ctx, config.KeyDbIgnoreUnknownTableColumns, test.flagValue)
-				reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
-				assert.NoError(t, err)
+	t.Run("with ignore disabled (default behavior)", func(t *testing.T) {
+		_, err := getClients(reg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "missing destination name temp_column")
+	})
 
-				statement := "ALTER TABLE \"hydra_client\" ADD COLUMN \"temp_column\" VARCHAR(128) NOT NULL DEFAULT '';"
-				err = reg.Persister().Connection(ctx).RawQuery(statement).Exec()
-				assert.NoError(t, err)
+	t.Run("with ignore enabled", func(t *testing.T) {
+		c.MustSet(ctx, config.KeyDBIgnoreUnknownTableColumns, true)
+		reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
+		require.NoError(t, err)
 
-				cl := &client.Client{
-					LegacyClientID: strconv.Itoa(rand.Int()),
-				}
-
-				err = reg.Persister().CreateClient(ctx, cl)
-				assert.NoError(t, err)
-
-				readClients := make([]client.Client, 0)
-				err = reg.Persister().Connection(ctx).RawQuery("SELECT * FROM \"hydra_client\"").All(&readClients)
-				if test.expectError {
-					assert.Error(t, err)
-					assert.Contains(t, err.Error(), "missing destination name temp_column")
-				} else {
-					assert.NoError(t, err)
-				}
-				assert.Len(t, readClients, test.expectedSize)
-			},
-		)
-	}
+		actual, err := getClients(reg)
+		require.NoError(t, err)
+		assert.Len(t, actual, 1)
+	})
 }
 
 func sussessfulPing() func(r *RegistrySQL) error {

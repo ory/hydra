@@ -2,50 +2,41 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                                                        | HTTP request                                           | Description                                                                                            |
-| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| [**AdminAcceptOAuth2ConsentRequest**](V0alpha2Api.md#AdminAcceptOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                                    |
-| [**AdminAcceptOAuth2LoginRequest**](V0alpha2Api.md#AdminAcceptOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                                      |
-| [**AdminAcceptOAuth2LogoutRequest**](V0alpha2Api.md#AdminAcceptOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                                     |
-| [**AdminCreateJsonWebKeySet**](V0alpha2Api.md#AdminCreateJsonWebKeySet)                                       | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                                            |
-| [**AdminCreateOAuth2Client**](V0alpha2Api.md#AdminCreateOAuth2Client)                                         | **Post** /admin/clients                                | Create an OAuth 2.0 Client                                                                             |
-| [**AdminDeleteJsonWebKey**](V0alpha2Api.md#AdminDeleteJsonWebKey)                                             | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                                  |
-| [**AdminDeleteJsonWebKeySet**](V0alpha2Api.md#AdminDeleteJsonWebKeySet)                                       | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                              |
-| [**AdminDeleteOAuth2Client**](V0alpha2Api.md#AdminDeleteOAuth2Client)                                         | **Delete** /admin/clients/{id}                         | Deletes an OAuth 2.0 Client                                                                            |
-| [**AdminDeleteOAuth2Token**](V0alpha2Api.md#AdminDeleteOAuth2Token)                                           | **Delete** /admin/oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                              |
-| [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer)           | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                   |
-| [**AdminGetJsonWebKey**](V0alpha2Api.md#AdminGetJsonWebKey)                                                   | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                                   |
-| [**AdminGetJsonWebKeySet**](V0alpha2Api.md#AdminGetJsonWebKeySet)                                             | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                                            |
-| [**AdminGetOAuth2Client**](V0alpha2Api.md#AdminGetOAuth2Client)                                               | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                                |
-| [**AdminGetOAuth2ConsentRequest**](V0alpha2Api.md#AdminGetOAuth2ConsentRequest)                               | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                              |
-| [**AdminGetOAuth2LoginRequest**](V0alpha2Api.md#AdminGetOAuth2LoginRequest)                                   | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                                         |
-| [**AdminGetOAuth2LogoutRequest**](V0alpha2Api.md#AdminGetOAuth2LogoutRequest)                                 | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                                        |
-| [**AdminGetTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminGetTrustedOAuth2JwtGrantIssuer)                 | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                      |
-| [**AdminIntrospectOAuth2Token**](V0alpha2Api.md#AdminIntrospectOAuth2Token)                                   | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                                             |
-| [**AdminListOAuth2Clients**](V0alpha2Api.md#AdminListOAuth2Clients)                                           | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                                 |
-| [**AdminListOAuth2SubjectConsentSessions**](V0alpha2Api.md#AdminListOAuth2SubjectConsentSessions)             | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                                           |
-| [**AdminListTrustedOAuth2JwtGrantIssuers**](V0alpha2Api.md#AdminListTrustedOAuth2JwtGrantIssuers)             | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                                      |
-| [**AdminPatchOAuth2Client**](V0alpha2Api.md#AdminPatchOAuth2Client)                                           | **Patch** /admin/clients/{id}                          | Patch an OAuth 2.0 Client                                                                              |
-| [**AdminRejectOAuth2ConsentRequest**](V0alpha2Api.md#AdminRejectOAuth2ConsentRequest)                         | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                                    |
-| [**AdminRejectOAuth2LoginRequest**](V0alpha2Api.md#AdminRejectOAuth2LoginRequest)                             | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                                      |
-| [**AdminRejectOAuth2LogoutRequest**](V0alpha2Api.md#AdminRejectOAuth2LogoutRequest)                           | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                                     |
-| [**AdminRevokeOAuth2ConsentSessions**](V0alpha2Api.md#AdminRevokeOAuth2ConsentSessions)                       | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client                        |
-| [**AdminRevokeOAuth2LoginSessions**](V0alpha2Api.md#AdminRevokeOAuth2LoginSessions)                           | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                                             |
-| [**AdminTrustOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminTrustOAuth2JwtGrantIssuer)                           | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                                           |
-| [**AdminUpdateJsonWebKey**](V0alpha2Api.md#AdminUpdateJsonWebKey)                                             | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                                  |
-| [**AdminUpdateJsonWebKeySet**](V0alpha2Api.md#AdminUpdateJsonWebKeySet)                                       | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                              |
-| [**AdminUpdateOAuth2Client**](V0alpha2Api.md#AdminUpdateOAuth2Client)                                         | **Put** /admin/clients/{id}                            | Update an OAuth 2.0 Client                                                                             |
-| [**DiscoverJsonWebKeys**](V0alpha2Api.md#DiscoverJsonWebKeys)                                                 | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                                 |
-| [**DiscoverOidcConfiguration**](V0alpha2Api.md#DiscoverOidcConfiguration)                                     | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                               |
-| [**DynamicClientRegistrationCreateOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register                              | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol |
-| [**DynamicClientRegistrationDeleteOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id}                       | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol  |
-| [**DynamicClientRegistrationGetOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationGetOAuth2Client)       | **Get** /oauth2/register/{id}                          | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol      |
-| [**DynamicClientRegistrationUpdateOAuth2Client**](V0alpha2Api.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id}                          | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol   |
-| [**GetOidcUserInfo**](V0alpha2Api.md#GetOidcUserInfo)                                                         | **Get** /userinfo                                      | OpenID Connect Userinfo                                                                                |
-| [**PerformOAuth2AuthorizationFlow**](V0alpha2Api.md#PerformOAuth2AuthorizationFlow)                           | **Get** /oauth2/auth                                   | The OAuth 2.0 Authorize Endpoint                                                                       |
-| [**PerformOAuth2TokenFlow**](V0alpha2Api.md#PerformOAuth2TokenFlow)                                           | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                                                           |
-| [**PerformOidcFrontOrBackChannelLogout**](V0alpha2Api.md#PerformOidcFrontOrBackChannelLogout)                 | **Get** /oauth2/sessions/logout                        | OpenID Connect Front- or Back-channel Enabled Logout                                                   |
-| [**RevokeOAuth2Token**](V0alpha2Api.md#RevokeOAuth2Token)                                                     | **Post** /oauth2/revoke                                | Revoke an OAuth2 Access or Refresh Token                                                               |
+| Method                                                                                              | HTTP request                                           | Description                                                                              |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| [**AdminAcceptOAuth2ConsentRequest**](V0alpha2Api.md#AdminAcceptOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                      |
+| [**AdminAcceptOAuth2LoginRequest**](V0alpha2Api.md#AdminAcceptOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                        |
+| [**AdminAcceptOAuth2LogoutRequest**](V0alpha2Api.md#AdminAcceptOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                       |
+| [**AdminCreateJsonWebKeySet**](V0alpha2Api.md#AdminCreateJsonWebKeySet)                             | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                              |
+| [**AdminDeleteJsonWebKey**](V0alpha2Api.md#AdminDeleteJsonWebKey)                                   | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                    |
+| [**AdminDeleteJsonWebKeySet**](V0alpha2Api.md#AdminDeleteJsonWebKeySet)                             | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                |
+| [**AdminDeleteOAuth2Token**](V0alpha2Api.md#AdminDeleteOAuth2Token)                                 | **Delete** /admin/oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                |
+| [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminDeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                     |
+| [**AdminGetJsonWebKey**](V0alpha2Api.md#AdminGetJsonWebKey)                                         | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                     |
+| [**AdminGetJsonWebKeySet**](V0alpha2Api.md#AdminGetJsonWebKeySet)                                   | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                              |
+| [**AdminGetOAuth2ConsentRequest**](V0alpha2Api.md#AdminGetOAuth2ConsentRequest)                     | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                |
+| [**AdminGetOAuth2LoginRequest**](V0alpha2Api.md#AdminGetOAuth2LoginRequest)                         | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                           |
+| [**AdminGetOAuth2LogoutRequest**](V0alpha2Api.md#AdminGetOAuth2LogoutRequest)                       | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                          |
+| [**AdminGetTrustedOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminGetTrustedOAuth2JwtGrantIssuer)       | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                        |
+| [**AdminIntrospectOAuth2Token**](V0alpha2Api.md#AdminIntrospectOAuth2Token)                         | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                               |
+| [**AdminListOAuth2SubjectConsentSessions**](V0alpha2Api.md#AdminListOAuth2SubjectConsentSessions)   | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                             |
+| [**AdminListTrustedOAuth2JwtGrantIssuers**](V0alpha2Api.md#AdminListTrustedOAuth2JwtGrantIssuers)   | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                        |
+| [**AdminRejectOAuth2ConsentRequest**](V0alpha2Api.md#AdminRejectOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                      |
+| [**AdminRejectOAuth2LoginRequest**](V0alpha2Api.md#AdminRejectOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                        |
+| [**AdminRejectOAuth2LogoutRequest**](V0alpha2Api.md#AdminRejectOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                       |
+| [**AdminRevokeOAuth2ConsentSessions**](V0alpha2Api.md#AdminRevokeOAuth2ConsentSessions)             | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client          |
+| [**AdminRevokeOAuth2LoginSessions**](V0alpha2Api.md#AdminRevokeOAuth2LoginSessions)                 | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                               |
+| [**AdminTrustOAuth2JwtGrantIssuer**](V0alpha2Api.md#AdminTrustOAuth2JwtGrantIssuer)                 | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                             |
+| [**AdminUpdateJsonWebKey**](V0alpha2Api.md#AdminUpdateJsonWebKey)                                   | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                    |
+| [**AdminUpdateJsonWebKeySet**](V0alpha2Api.md#AdminUpdateJsonWebKeySet)                             | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                |
+| [**DeleteOidcDynamicClient**](V0alpha2Api.md#DeleteOidcDynamicClient)                               | **Delete** /oauth2/register/{id}                       | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol |
+| [**DiscoverJsonWebKeys**](V0alpha2Api.md#DiscoverJsonWebKeys)                                       | **Get** /.well-known/jwks.json                         | Discover JSON Web Keys                                                                   |
+| [**DiscoverOidcConfiguration**](V0alpha2Api.md#DiscoverOidcConfiguration)                           | **Get** /.well-known/openid-configuration              | OpenID Connect Discovery                                                                 |
+| [**GetOidcUserInfo**](V0alpha2Api.md#GetOidcUserInfo)                                               | **Get** /userinfo                                      | OpenID Connect Userinfo                                                                  |
+| [**PerformOAuth2AuthorizationFlow**](V0alpha2Api.md#PerformOAuth2AuthorizationFlow)                 | **Get** /oauth2/auth                                   | The OAuth 2.0 Authorize Endpoint                                                         |
+| [**PerformOAuth2TokenFlow**](V0alpha2Api.md#PerformOAuth2TokenFlow)                                 | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                                             |
+| [**PerformOidcFrontOrBackChannelLogout**](V0alpha2Api.md#PerformOidcFrontOrBackChannelLogout)       | **Get** /oauth2/sessions/logout                        | OpenID Connect Front- or Back-channel Enabled Logout                                     |
+| [**RevokeOAuth2Token**](V0alpha2Api.md#RevokeOAuth2Token)                                           | **Post** /oauth2/revoke                                | Revoke an OAuth2 Access or Refresh Token                                                 |
 
 ## AdminAcceptOAuth2ConsentRequest
 
@@ -311,68 +302,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## AdminCreateOAuth2Client
-
-> OAuth2Client AdminCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
-
-Create an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminCreateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AdminCreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminCreateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiAdminCreateOAuth2ClientRequest struct via the builder pattern
-
-| Name             | Type                                | Description | Notes |
-| ---------------- | ----------------------------------- | ----------- | ----- |
-| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
 ## AdminDeleteJsonWebKey
 
 > AdminDeleteJsonWebKey(ctx, set, kid).Execute()
@@ -481,70 +410,6 @@ func main() {
 
 Other parameters are passed through a pointer to a
 apiAdminDeleteJsonWebKeySetRequest struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-(empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## AdminDeleteOAuth2Client
-
-> AdminDeleteOAuth2Client(ctx, id).Execute()
-
-Deletes an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminDeleteOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminDeleteOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiAdminDeleteOAuth2ClientRequest struct via the builder pattern
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
@@ -810,72 +675,6 @@ apiAdminGetJsonWebKeySetRequest struct via the builder pattern
 ### Return type
 
 [**JsonWebKeySet**](JsonWebKeySet.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## AdminGetOAuth2Client
-
-> OAuth2Client AdminGetOAuth2Client(ctx, id).Execute()
-
-Get an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminGetOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminGetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AdminGetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminGetOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiAdminGetOAuth2ClientRequest struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
 
 ### Authorization
 
@@ -1212,75 +1011,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## AdminListOAuth2Clients
-
-> []OAuth2Client
-> AdminListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
-
-List OAuth 2.0 Clients
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    pageSize := int64(789) // int64 | Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-    pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
-    clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
-    owner := "owner_example" // string | The owner of the clients to filter by. (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminListOAuth2Clients``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AdminListOAuth2Clients`: []OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminListOAuth2Clients`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiAdminListOAuth2ClientsRequest struct via the builder pattern
-
-| Name           | Type       | Description                                                                                                                                                                                           | Notes                      |
-| -------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| **pageSize**   | **int64**  | Items per page This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]           |
-| **pageToken**  | **string** | Next Page Token The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).                           | [default to &quot;1&quot;] |
-| **clientName** | **string** | The name of the clients to filter by.                                                                                                                                                                 |
-| **owner**      | **string** | The owner of the clients to filter by.                                                                                                                                                                |
-
-### Return type
-
-[**[]OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
 ## AdminListOAuth2SubjectConsentSessions
 
 > []PreviousOAuth2ConsentSession
@@ -1412,75 +1142,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## AdminPatchOAuth2Client
-
-> OAuth2Client AdminPatchOAuth2Client(ctx, id).JsonPatch(jsonPatch).Execute()
-
-Patch an OAuth 2.0 Client
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminPatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminPatchOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AdminPatchOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminPatchOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiAdminPatchOAuth2ClientRequest struct via the builder pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-**jsonPatch** | [**[]JsonPatch**](JsonPatch.md) | |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#)
@@ -2010,12 +1671,12 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## AdminUpdateOAuth2Client
+## DeleteOidcDynamicClient
 
-> OAuth2Client AdminUpdateOAuth2Client(ctx,
-> id).OAuth2Client(oAuth2Client).Execute()
+> DeleteOidcDynamicClient(ctx, id).Execute()
 
-Update an OAuth 2.0 Client
+Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management
+Protocol
 
 ### Example
 
@@ -2031,17 +1692,14 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.AdminUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+    resp, r, err := apiClient.V0alpha2Api.DeleteOidcDynamicClient(context.Background(), id).Execute()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.AdminUpdateOAuth2Client``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DeleteOidcDynamicClient``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `AdminUpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.AdminUpdateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -2055,24 +1713,22 @@ func main() {
 ### Other Parameters
 
 Other parameters are passed through a pointer to a
-apiAdminUpdateOAuth2ClientRequest struct via the builder pattern
+apiDeleteOidcDynamicClientRequest struct via the builder pattern
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
 
-**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
-
 ### Return type
 
-[**OAuth2Client**](OAuth2Client.md)
+(empty response body)
 
 ### Authorization
 
-No authorization required
+[bearer](../README.md#bearer)
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#)
@@ -2191,277 +1847,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## DynamicClientRegistrationCreateOAuth2Client
-
-> OAuth2Client
-> DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
-
-Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
-Registration Management Protocol
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationCreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationCreateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder
-pattern
-
-| Name             | Type                                | Description | Notes |
-| ---------------- | ----------------------------------- | ----------- | ----- |
-| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |             |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## DynamicClientRegistrationDeleteOAuth2Client
-
-> DynamicClientRegistrationDeleteOAuth2Client(ctx, id).Execute()
-
-Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
-Registration Management Protocol
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationDeleteOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationDeleteOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder
-pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-(empty response body)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## DynamicClientRegistrationGetOAuth2Client
-
-> OAuth2Client DynamicClientRegistrationGetOAuth2Client(ctx, id).Execute()
-
-Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
-Management Protocol
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationGetOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationGetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationGetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationGetOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder
-pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-## DynamicClientRegistrationUpdateOAuth2Client
-
-> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx,
-> id).OAuth2Client(oAuth2Client).Execute()
-
-Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
-Management Protocol
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client |
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationUpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.DynamicClientRegistrationUpdateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder
-pattern
-
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
-
-**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | |
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#)

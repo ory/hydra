@@ -32,9 +32,9 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "wellknown"
         ],
-        "summary": "Discover JSON Web Keys",
+        "summary": "Discover Well-Known JSON Web Keys",
         "operationId": "discoverJsonWebKeys",
         "responses": {
           "200": {
@@ -428,14 +428,14 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
         "summary": "Retrieve a JSON Web Key Set",
-        "operationId": "adminGetJsonWebKeySet",
+        "operationId": "getJsonWebKeySet",
         "parameters": [
           {
             "type": "string",
-            "description": "The JSON Web Key Set",
+            "description": "JSON Web Key Set ID",
             "name": "set",
             "in": "path",
             "required": true
@@ -469,14 +469,14 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
         "summary": "Update a JSON Web Key Set",
-        "operationId": "adminUpdateJsonWebKeySet",
+        "operationId": "setJsonWebKeySet",
         "parameters": [
           {
             "type": "string",
-            "description": "The JSON Web Key Set",
+            "description": "The JSON Web Key Set ID",
             "name": "set",
             "in": "path",
             "required": true
@@ -517,14 +517,14 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
-        "summary": "Generate a New JSON Web Key",
-        "operationId": "adminCreateJsonWebKeySet",
+        "summary": "Create JSON Web Key",
+        "operationId": "createJsonWebKeySet",
         "parameters": [
           {
             "type": "string",
-            "description": "The JSON Web Key Set",
+            "description": "The JSON Web Key Set ID",
             "name": "set",
             "in": "path",
             "required": true
@@ -534,7 +534,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/adminCreateJsonWebKeySetBody"
+              "$ref": "#/definitions/createJsonWebKeySet"
             }
           }
         ],
@@ -566,10 +566,10 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
-        "summary": "Delete a JSON Web Key Set",
-        "operationId": "adminDeleteJsonWebKeySet",
+        "summary": "Delete JSON Web Key Set",
+        "operationId": "deleteJsonWebKeySet",
         "parameters": [
           {
             "type": "string",
@@ -594,7 +594,7 @@
     },
     "/admin/keys/{set}/{kid}": {
       "get": {
-        "description": "This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).",
+        "description": "This endpoint returns a singular JSON Web Key contained in a set. It is identified by the set and the specific key ID (kid).",
         "consumes": [
           "application/json"
         ],
@@ -606,21 +606,21 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
-        "summary": "Fetch a JSON Web Key",
-        "operationId": "adminGetJsonWebKey",
+        "summary": "Get JSON Web Key",
+        "operationId": "getJsonWebKey",
         "parameters": [
           {
             "type": "string",
-            "description": "The JSON Web Key Set",
+            "description": "JSON Web Key Set ID",
             "name": "set",
             "in": "path",
             "required": true
           },
           {
             "type": "string",
-            "description": "The JSON Web Key ID (kid)",
+            "description": "JSON Web Key ID",
             "name": "kid",
             "in": "path",
             "required": true
@@ -654,21 +654,21 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
-        "summary": "Update a JSON Web Key",
-        "operationId": "adminUpdateJsonWebKey",
+        "summary": "Set JSON Web Key",
+        "operationId": "setJsonWebKey",
         "parameters": [
           {
             "type": "string",
-            "description": "The JSON Web Key Set",
+            "description": "The JSON Web Key Set ID",
             "name": "set",
             "in": "path",
             "required": true
           },
           {
             "type": "string",
-            "description": "The JSON Web Key ID (kid)",
+            "description": "JSON Web Key ID",
             "name": "kid",
             "in": "path",
             "required": true
@@ -697,7 +697,7 @@
         }
       },
       "delete": {
-        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A\nJWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses\nthis functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),\nand allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -709,10 +709,10 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "jwk"
         ],
-        "summary": "Delete a JSON Web Key",
-        "operationId": "adminDeleteJsonWebKey",
+        "summary": "Delete JSON Web Key",
+        "operationId": "deleteJsonWebKey",
         "parameters": [
           {
             "type": "string",
@@ -2235,28 +2235,6 @@
         }
       }
     },
-    "adminCreateJsonWebKeySetBody": {
-      "type": "object",
-      "required": [
-        "alg",
-        "use",
-        "kid"
-      ],
-      "properties": {
-        "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
-          "type": "string"
-        },
-        "kid": {
-          "description": "The kid of the key to be created",
-          "type": "string"
-        },
-        "use": {
-          "description": "The \"use\" (public key use) parameter identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Valid values are \"enc\" and \"sig\".",
-          "type": "string"
-        }
-      }
-    },
     "adminTrustOAuth2JwtGrantIssuerBody": {
       "type": "object",
       "required": [
@@ -2298,6 +2276,29 @@
           "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
           "type": "string",
           "example": "mike@example.com"
+        }
+      }
+    },
+    "createJsonWebKeySet": {
+      "description": "Create JSON Web Key Set Request Body",
+      "type": "object",
+      "required": [
+        "alg",
+        "use",
+        "kid"
+      ],
+      "properties": {
+        "alg": {
+          "description": "JSON Web Key Algorithm\n\nThe algorithm to be used for creating the key. Supports `RS256`, `ES256`, `ES512`, `HS512`, and `HS256`.",
+          "type": "string"
+        },
+        "kid": {
+          "description": "JSON Web Key ID\n\nThe Key ID of the key to be created.",
+          "type": "string"
+        },
+        "use": {
+          "description": "JSON Web Key Use\n\nThe \"use\" (public key use) parameter identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Valid values are \"enc\" and \"sig\".",
+          "type": "string"
         }
       }
     },
@@ -2594,11 +2595,11 @@
       }
     },
     "jsonWebKeySet": {
-      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "JSON Web Key Set",
       "type": "object",
       "properties": {
         "keys": {
-          "description": "The value of the \"keys\" parameter is an array of JSON Web Key (JWK)\nvalues. By default, the order of the JWK values within the array does\nnot imply an order of preference among them, although applications\nof JWK Sets can choose to assign a meaning to the order for their\npurposes, if desired.",
+          "description": "List of JSON Web Keys\n\nThe value of the \"keys\" parameter is an array of JSON Web Key (JWK)\nvalues. By default, the order of the JWK values within the array does\nnot imply an order of preference among them, although applications\nof JWK Sets can choose to assign a meaning to the order for their\npurposes, if desired.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/jsonWebKey"
@@ -2956,11 +2957,11 @@
           "$ref": "#/definitions/nullTime"
         },
         "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+          "description": "Remember Consent\n\nRemember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
           "type": "boolean"
         },
         "remember_for": {
-          "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
+          "description": "Remember Consent For\n\nRememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
           "type": "integer",
           "format": "int64"
         },

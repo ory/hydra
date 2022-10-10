@@ -271,7 +271,7 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// Get OAuth 2.0 Login Request Parameters
+// Get OAuth 2.0 Login Request
 //
 // swagger:parameters getOAuth2LoginRequest
 type getOAuth2LoginRequest struct {
@@ -335,7 +335,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 	h.r.Writer().Write(w, r, request)
 }
 
-// Accept OAuth 2.0 Login Request Parameters
+// Accept OAuth 2.0 Login Request
 //
 // swagger:parameters acceptOAuth2LoginRequest
 type acceptOAuth2LoginRequest struct {
@@ -437,7 +437,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	})
 }
 
-// Reject OAuth 2.0 Login Request Parameters
+// Reject OAuth 2.0 Login Request
 //
 // swagger:parameters rejectOAuth2LoginRequest
 type rejectOAuth2LoginRequest struct {
@@ -524,7 +524,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	})
 }
 
-// Get OAuth 2.0 Consent Request Parameters
+// Get OAuth 2.0 Consent Request
 //
 // swagger:parameters getOAuth2ConsentRequest
 type getOAuth2ConsentRequest struct {
@@ -596,7 +596,7 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 	h.r.Writer().Write(w, r, request)
 }
 
-// Accept OAuth 2.0 Consent Request Parameters
+// Accept OAuth 2.0 Consent Request
 //
 // swagger:parameters acceptOAuth2ConsentRequest
 type acceptOAuth2ConsentRequest struct {
@@ -689,7 +689,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	})
 }
 
-// Reject OAuth 2.0 Consent Request Parameters
+// Reject OAuth 2.0 Consent Request
 //
 // swagger:parameters rejectOAuth2ConsentRequest
 type adminRejectOAuth2ConsentRequest struct {
@@ -782,7 +782,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	})
 }
 
-// Accept OAuth 2.0 Logout Request Parameters
+// Accept OAuth 2.0 Logout Request
 //
 // swagger:parameters acceptOAuth2LogoutRequest
 type acceptOAuth2LogoutRequest struct {
@@ -826,7 +826,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 	})
 }
 
-// Reject OAuth 2.0 Logout Request Parameters
+// Reject OAuth 2.0 Logout Request
 //
 // swagger:parameters rejectOAuth2LogoutRequest
 type rejectOAuth2LogoutRequest struct {
@@ -866,7 +866,7 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// Get OAuth 2.0 Logout Request Parameters
+// Get OAuth 2.0 Logout Request
 //
 // swagger:parameters getOAuth2LogoutRequest
 type getOAuth2LogoutRequest struct {

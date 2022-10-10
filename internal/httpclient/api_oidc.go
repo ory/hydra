@@ -131,7 +131,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -140,7 +140,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -257,7 +257,7 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -395,7 +395,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -404,7 +404,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

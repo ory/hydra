@@ -109,8 +109,8 @@ type createOAuth2Client struct {
 //
 //	Responses:
 //	  201: oAuth2Client
-//	  400: errorBadRequest
-//	  default: errorDefault
+//	  400: errorOAuth2BadRequest
+//	  default: errorOAuth2Default
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -158,8 +158,8 @@ type createOidcDynamicClient struct {
 //
 //	Responses:
 //	  201: oAuth2Client
-//	  400: errorBadRequest
-//	  default: errorDefault
+//	  400: errorOAuth2BadRequest
+//	  default: errorOAuth2Default
 func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -267,9 +267,9 @@ type setOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  400: errorBadRequest
-//	  404: errorNotFound
-//	  default: errorDefault
+//	  400: errorOAuth2BadRequest
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -354,8 +354,8 @@ type setOidcDynamicClient struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  404: errorNotFound
-//	  default: errorDefault
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
 func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -435,8 +435,8 @@ type patchOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  404: errorNotFound
-//	  default: errorDefault
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
 func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -520,7 +520,7 @@ type listOAuth2ClientsParameters struct {
 //
 //	Responses:
 //	  200: listOAuth2Clients
-//	  default: errorDefault
+//	  default: errorOAuth2Default
 func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	page, itemsPerPage := x.ParsePagination(r)
 	filters := Filter{
@@ -584,7 +584,7 @@ type adminGetOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: errorDefault
+//	  default: errorOAuth2Default
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -633,7 +633,7 @@ type getOidcDynamicClient struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: errorDefault
+//	  default: errorOAuth2Default
 func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)

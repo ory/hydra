@@ -1915,7 +1915,7 @@ struct via the builder pattern
 
 ## PerformOAuth2AuthorizationFlow
 
-> OAuth2ApiError PerformOAuth2AuthorizationFlow(ctx).Execute()
+> ErrorOAuth2 PerformOAuth2AuthorizationFlow(ctx).Execute()
 
 The OAuth 2.0 Authorize Endpoint
 
@@ -1940,7 +1940,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `V0alpha2Api.PerformOAuth2AuthorizationFlow``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `PerformOAuth2AuthorizationFlow`: OAuth2ApiError
+    // response from `PerformOAuth2AuthorizationFlow`: ErrorOAuth2
     fmt.Fprintf(os.Stdout, "Response from `V0alpha2Api.PerformOAuth2AuthorizationFlow`: %v\n", resp)
 }
 ```
@@ -1956,7 +1956,7 @@ apiPerformOAuth2AuthorizationFlowRequest struct via the builder pattern
 
 ### Return type
 
-[**OAuth2ApiError**](OAuth2ApiError.md)
+[**ErrorOAuth2**](ErrorOAuth2.md)
 
 ### Authorization
 

@@ -104,7 +104,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
@@ -160,7 +160,7 @@ type adminGetJsonWebKey struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminGetJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
@@ -201,7 +201,7 @@ type adminGetJsonWebKeySet struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminGetJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -265,7 +265,7 @@ type adminCreateJsonWebKeySetBody struct {
 //
 //	Responses:
 //	  201: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keyRequest adminCreateJsonWebKeySetBody
 	var set = ps.ByName("set")
@@ -311,7 +311,7 @@ type adminUpdateJsonWebKeySet struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminUpdateJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
@@ -364,7 +364,7 @@ type adminUpdateJsonWebKey struct {
 //
 //	Responses:
 //	  200: jsonWebKey
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
@@ -408,7 +408,7 @@ type adminDeleteJsonWebKeySet struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -452,7 +452,7 @@ type adminDeleteJsonWebKey struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminDeleteJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")

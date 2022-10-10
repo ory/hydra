@@ -122,7 +122,7 @@ func (a *Oauth2ApiService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -131,7 +131,7 @@ func (a *Oauth2ApiService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -349,7 +349,7 @@ func (a *Oauth2ApiService) GetOAuth2ClientExecute(r ApiGetOAuth2ClientRequest) (
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -497,7 +497,7 @@ func (a *Oauth2ApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -626,7 +626,7 @@ func (a *Oauth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -635,7 +635,7 @@ func (a *Oauth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -765,7 +765,7 @@ func (a *Oauth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -775,7 +775,7 @@ func (a *Oauth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
-			var v ErrorBody
+			var v ErrorOAuth2
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -784,7 +784,7 @@ func (a *Oauth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v ErrorBody
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

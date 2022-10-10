@@ -116,7 +116,7 @@ type adminRevokeOAuth2ConsentSessions struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminRevokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -177,7 +177,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 //
 //	Responses:
 //	  200: previousOAuth2ConsentSessions
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminListOAuth2SubjectConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -242,7 +242,7 @@ type adminRevokeOAuth2LoginSessions struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminRevokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -288,7 +288,7 @@ type adminGetOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2LoginRequest
 //	  410: handledOAuth2LoginRequest
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminGetOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -354,7 +354,7 @@ type adminAcceptOAuth2LoginRequest struct {
 //
 //	Responses:
 //	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminAcceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -453,7 +453,7 @@ type adminRejectOAuth2LoginRequest struct {
 //
 //	Responses:
 //	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminRejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -534,7 +534,7 @@ type adminGetOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2ConsentRequest
 //	  410: handledOAuth2ConsentRequest
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminGetOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -610,7 +610,7 @@ type adminAcceptOAuth2ConsentRequest struct {
 //
 //	Responses:
 //	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminAcceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -698,7 +698,7 @@ type adminRejectOAuth2ConsentRequest struct {
 //
 //	Responses:
 //	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminRejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -769,7 +769,7 @@ type adminAcceptOAuth2LogoutRequest struct {
 //
 //	Responses:
 //	  200: successfulOAuth2RequestResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminAcceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -813,7 +813,7 @@ type adminRejectOAuth2LogoutRequest struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminRejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -849,7 +849,7 @@ type adminGetOAuth2LogoutRequest struct {
 //	Responses:
 //	  200: oAuth2LogoutRequest
 //	  410: handledOAuth2LogoutRequest
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminGetOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),

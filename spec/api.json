@@ -4,31 +4,31 @@
       "emptyResponse": {
         "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
       },
-      "errorBadRequest": {
+      "errorOAuth2BadRequest": {
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/errorBody"
+              "$ref": "#/components/schemas/errorOAuth2"
             }
           }
         },
         "description": "Bad Request Error Response"
       },
-      "errorDefault": {
+      "errorOAuth2Default": {
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/errorBody"
+              "$ref": "#/components/schemas/errorOAuth2"
             }
           }
         },
         "description": "Default Error Response"
       },
-      "errorNotFound": {
+      "errorOAuth2NotFound": {
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/errorBody"
+              "$ref": "#/components/schemas/errorOAuth2"
             }
           }
         },
@@ -305,101 +305,33 @@
         ],
         "type": "object"
       },
-      "error": {
+      "errorOAuth2": {
         "description": "Error",
         "properties": {
-          "code": {
+          "error": {
+            "description": "Error",
+            "type": "string"
+          },
+          "error_debug": {
+            "description": "Error Debug Information\n\nOnly available in dev mode.",
+            "type": "string"
+          },
+          "error_description": {
+            "description": "Error Description",
+            "type": "string"
+          },
+          "error_hint": {
+            "description": "Error Hint\n\nHelps the user identify the error cause.",
+            "example": "The redirect URL is not allowed.",
+            "type": "string"
+          },
+          "status_code": {
             "description": "HTTP Status Code",
-            "example": 404,
+            "example": 401,
             "format": "int64",
             "type": "integer"
-          },
-          "debug": {
-            "description": "Debug Details\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-            "example": "SQL field \"foo\" is not a bool.",
-            "type": "string"
-          },
-          "details": {
-            "additionalProperties": {},
-            "description": "Additional Error Details\n\nFurther error details",
-            "type": "object"
-          },
-          "id": {
-            "description": "Error ID\n\nUseful when trying to identify various errors in application logic.",
-            "type": "string"
-          },
-          "message": {
-            "description": "Error Message\n\nThe error's message.",
-            "example": "The resource could not be found",
-            "type": "string"
-          },
-          "reason": {
-            "description": "Error Reason",
-            "example": "User with ID 1234 does not exist.",
-            "type": "string"
-          },
-          "request": {
-            "description": "HTTP Request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
-            "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6",
-            "type": "string"
-          },
-          "status": {
-            "description": "HTTP Status Description",
-            "example": "Not Found",
-            "type": "string"
           }
         },
-        "required": [
-          "message"
-        ],
-        "type": "object"
-      },
-      "errorBody": {
-        "properties": {
-          "code": {
-            "description": "HTTP Status Code",
-            "example": 404,
-            "format": "int64",
-            "type": "integer"
-          },
-          "debug": {
-            "description": "Debug Details\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-            "example": "SQL field \"foo\" is not a bool.",
-            "type": "string"
-          },
-          "details": {
-            "additionalProperties": {},
-            "description": "Additional Error Details\n\nFurther error details",
-            "type": "object"
-          },
-          "id": {
-            "description": "Error ID\n\nUseful when trying to identify various errors in application logic.",
-            "type": "string"
-          },
-          "message": {
-            "description": "Error Message\n\nThe error's message.",
-            "example": "The resource could not be found",
-            "type": "string"
-          },
-          "reason": {
-            "description": "Error Reason",
-            "example": "User with ID 1234 does not exist.",
-            "type": "string"
-          },
-          "request": {
-            "description": "HTTP Request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
-            "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6",
-            "type": "string"
-          },
-          "status": {
-            "description": "HTTP Status Description",
-            "example": "Not Found",
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
         "type": "object"
       },
       "genericError": {
@@ -758,34 +690,6 @@
           }
         },
         "title": "Requester is a token endpoint's request context.",
-        "type": "object"
-      },
-      "oAuth2ApiError": {
-        "description": "An API error caused by Ory's OAuth 2.0 APIs.",
-        "properties": {
-          "error": {
-            "description": "Name is the error name.",
-            "example": "The requested resource could not be found",
-            "type": "string"
-          },
-          "error_debug": {
-            "description": "Debug contains debug information. This is usually not available and has to be enabled.",
-            "example": "The database adapter was unable to find the element",
-            "type": "string"
-          },
-          "error_description": {
-            "description": "Description contains further information on the nature of the error.",
-            "example": "Object with ID 12345 does not exist",
-            "type": "string"
-          },
-          "status_code": {
-            "description": "Code represents the error status code (404, 403, 401, ...).",
-            "example": 404,
-            "format": "int64",
-            "type": "integer"
-          }
-        },
-        "title": "OAuth2 API Error",
         "type": "object"
       },
       "oAuth2Client": {
@@ -1873,11 +1777,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Discover JSON Web Keys",
@@ -1905,11 +1809,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "OpenID Connect Discovery",
@@ -1967,7 +1871,7 @@
             "$ref": "#/components/responses/listOAuth2Clients"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "List OAuth 2.0 Clients",
@@ -2002,10 +1906,10 @@
             "description": "oAuth2Client"
           },
           "400": {
-            "$ref": "#/components/responses/errorBadRequest"
+            "$ref": "#/components/responses/errorOAuth2BadRequest"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "Create OAuth 2.0 Client",
@@ -2075,7 +1979,7 @@
             "description": "oAuth2Client"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "Get an OAuth 2.0 Client",
@@ -2121,10 +2025,10 @@
             "description": "oAuth2Client"
           },
           "404": {
-            "$ref": "#/components/responses/errorNotFound"
+            "$ref": "#/components/responses/errorOAuth2NotFound"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "Patch OAuth 2.0 Client",
@@ -2170,13 +2074,13 @@
             "description": "oAuth2Client"
           },
           "400": {
-            "$ref": "#/components/responses/errorBadRequest"
+            "$ref": "#/components/responses/errorOAuth2BadRequest"
           },
           "404": {
-            "$ref": "#/components/responses/errorNotFound"
+            "$ref": "#/components/responses/errorOAuth2NotFound"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "Set OAuth 2.0 Client",
@@ -2261,11 +2165,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Delete a JSON Web Key Set",
@@ -2302,11 +2206,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Retrieve a JSON Web Key Set",
@@ -2354,11 +2258,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Generate a New JSON Web Key",
@@ -2405,11 +2309,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Update a JSON Web Key Set",
@@ -2450,11 +2354,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Delete a JSON Web Key",
@@ -2500,11 +2404,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Fetch a JSON Web Key",
@@ -2560,11 +2464,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Update a JSON Web Key",
@@ -2612,11 +2516,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Get OAuth 2.0 Consent Request Information",
@@ -2664,11 +2568,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Accept an OAuth 2.0 Consent Request",
@@ -2716,11 +2620,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Reject an OAuth 2.0 Consent Request",
@@ -2768,11 +2672,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Get an OAuth 2.0 Login Request",
@@ -2820,11 +2724,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Accept an OAuth 2.0 Login Request",
@@ -2872,11 +2776,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Reject an OAuth 2.0 Login Request",
@@ -2924,11 +2828,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Get an OAuth 2.0 Logout Request",
@@ -2966,11 +2870,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Accept an OAuth 2.0 Logout Request",
@@ -3016,11 +2920,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Reject an OAuth 2.0 Logout Request",
@@ -3068,11 +2972,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
@@ -3125,11 +3029,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "List OAuth 2.0 Consent Sessions of a Subject",
@@ -3161,11 +3065,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Invalidates All OAuth 2.0 Login Sessions of a Certain User",
@@ -3220,11 +3124,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Introspect OAuth2 Access or Refresh Tokens",
@@ -3255,11 +3159,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "Delete OAuth2 Access Tokens from a Client",
@@ -3552,11 +3456,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "summary": "The OAuth 2.0 Authorize Endpoint",
@@ -3593,10 +3497,10 @@
             "description": "oAuth2Client"
           },
           "400": {
-            "$ref": "#/components/responses/errorBadRequest"
+            "$ref": "#/components/responses/errorOAuth2BadRequest"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "summary": "Register OAuth2 Client using OpenID Dynamic Client Registration",
@@ -3671,7 +3575,7 @@
             "description": "oAuth2Client"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "security": [
@@ -3722,10 +3626,10 @@
             "description": "oAuth2Client"
           },
           "404": {
-            "$ref": "#/components/responses/errorNotFound"
+            "$ref": "#/components/responses/errorOAuth2NotFound"
           },
           "default": {
-            "$ref": "#/components/responses/errorDefault"
+            "$ref": "#/components/responses/errorOAuth2Default"
           }
         },
         "security": [
@@ -3772,11 +3676,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "security": [
@@ -3864,11 +3768,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "security": [
@@ -3904,11 +3808,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2ApiError"
+                  "$ref": "#/components/schemas/errorOAuth2"
                 }
               }
             },
-            "description": "oAuth2ApiError"
+            "description": "errorOAuth2"
           }
         },
         "security": [

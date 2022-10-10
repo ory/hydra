@@ -92,7 +92,7 @@ type createOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route POST /admin/clients oauth2 createOAuth2Client
+// swagger:route POST /admin/clients oAuth2 createOAuth2Client
 //
 // # Create OAuth 2.0 Client
 //
@@ -245,7 +245,7 @@ type setOAuth2Client struct {
 	Body Client
 }
 
-// swagger:route PUT /admin/clients/{id} oauth2 setOAuth2Client
+// swagger:route PUT /admin/clients/{id} oAuth2 setOAuth2Client
 //
 // # Set OAuth 2.0 Client
 //
@@ -414,7 +414,7 @@ type patchOAuth2Client struct {
 	Body openapix.JSONPatchDocument
 }
 
-// swagger:route PATCH /admin/clients/{id} oauth2 patchOAuth2Client
+// swagger:route PATCH /admin/clients/{id} oAuth2 patchOAuth2Client
 //
 // # Patch OAuth 2.0 Client
 //
@@ -503,7 +503,7 @@ type listOAuth2ClientsParameters struct {
 	Owner string `json:"owner"`
 }
 
-// swagger:route GET /admin/clients oauth2 listOAuth2Clients
+// swagger:route GET /admin/clients oAuth2 listOAuth2Clients
 //
 // # List OAuth 2.0 Clients
 //
@@ -565,7 +565,7 @@ type adminGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /admin/clients/{id} oauth2 getOAuth2Client
+// swagger:route GET /admin/clients/{id} oAuth2 getOAuth2Client
 //
 // # Get an OAuth 2.0 Client
 //
@@ -669,7 +669,7 @@ type deleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /admin/clients/{id} oauth2 deleteOAuth2Client
+// swagger:route DELETE /admin/clients/{id} oAuth2 deleteOAuth2Client
 //
 // # Delete OAuth 2.0 Client
 //
@@ -715,7 +715,7 @@ type setOAuth2ClientLifespans struct {
 	Body Lifespans
 }
 
-// swagger:route PUT /admin/clients/{id}/lifespans oauth2 setOAuth2ClientLifespans
+// swagger:route PUT /admin/clients/{id}/lifespans oAuth2 setOAuth2ClientLifespans
 //
 // # Set OAuth2 Client Token Lifespans
 //

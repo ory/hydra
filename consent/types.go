@@ -44,13 +44,16 @@ const (
 	loginRequestDeniedErrorName   = "login request denied"
 )
 
-// The response payload sent when accepting or rejecting a login, consent, or logout request.
+// OAuth 2.0 Redirect Browser To
 //
-// swagger:model successfulOAuth2RequestResponse
-type RequestHandlerResponse struct {
-	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
+// Contains a redirect URL used to complete a login, consent, or logout request.
+//
+// swagger:model oAuth2RedirectTo
+type OAuth2RedirectTo struct {
+	// RedirectURL is the URL which you should redirect the user's browser to once the authentication process is completed.
 	//
 	// required: true
+	// in: body
 	RedirectTo string `json:"redirect_to"`
 }
 
@@ -153,36 +156,6 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
-// The response payload sent when there is an attempt to access an already handled consent request.
-//
-// swagger:model handledOAuth2ConsentRequest
-type HandledOAuth2ConsentRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
-// The response payload sent when there is an attempt to access an already handled logout request.
-//
-// swagger:model handledOAuth2LogoutRequest
-type HandledOAuth2LogoutRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
-// The response payload sent when there is an attempt to access an already handled login request.
-//
-// swagger:model handledOAuth2LoginRequest
-type HandledOAuth2LoginRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptOAuth2ConsentRequest
@@ -229,14 +202,17 @@ func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-// swagger:model previousOAuth2ConsentSessions
-type previousOAuth2ConsentSessions []PreviousOAuth2ConsentSession
-
-// The response used to return used consent requests
-// same as HandledLoginRequest, just with consent_request exposed as json
+// List of OAuth 2.0 Consent Sessions
 //
-// swagger:model previousOAuth2ConsentSession
-type PreviousOAuth2ConsentSession struct {
+// swagger:model oAuth2ConsentSessions
+type oAuth2ConsentSessions []OAuth2ConsentSession
+
+// OAuth 2.0 Consent Session
+//
+// A completed OAuth 2.0 Consent Session.
+//
+// swagger:model oAuth2ConsentSession
+type OAuth2ConsentSession struct {
 	// Named ID because of pop
 	ID string `json:"-" db:"challenge"`
 

@@ -100,8 +100,8 @@ func TestIntrospectorSDK(t *testing.T) {
 			//	token:          tokens[0][1],
 			//	expectInactive: true,
 			//	expectCode:     http.StatusUnauthorized,
-			//	prepare: func(*testing.T) *hydra.OAuth2Api {
-			//		client := hydra.NewOAuth2ApiWithBasePath(server.URL)
+			//	prepare: func(*testing.T) *hydra.OAuth2Api.{
+			//		client := hydra.Ne.OAuth2Api.ithBasePath(server.URL)
 			//		client.config.Username = "foo"
 			//		client.config.Password = "foo"
 			//		return client

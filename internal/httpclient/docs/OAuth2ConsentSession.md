@@ -2,19 +2,16 @@
 
 ## Properties
 
-| Name                      | Type                                                                             | Description | Notes      |
-| ------------------------- | -------------------------------------------------------------------------------- | ----------- | ---------- |
-| **AllowedTopLevelClaims** | Pointer to **[]string**                                                          |             | [optional] |
-| **ClientId**              | Pointer to **string**                                                            |             | [optional] |
-| **ConsentChallenge**      | Pointer to **string**                                                            |             | [optional] |
-| **ExcludeNotBeforeClaim** | Pointer to **bool**                                                              |             | [optional] |
-| **ExpiresAt**             | Pointer to [**OAuth2ConsentSessionExpiresAt**](OAuth2ConsentSessionExpiresAt.md) |             | [optional] |
-| **Extra**                 | Pointer to **map[string]interface{}**                                            |             | [optional] |
-| **Headers**               | Pointer to [**Headers**](Headers.md)                                             |             | [optional] |
-| **IdTokenClaims**         | Pointer to [**IDTokenClaims**](IDTokenClaims.md)                                 |             | [optional] |
-| **Kid**                   | Pointer to **string**                                                            |             | [optional] |
-| **Subject**               | Pointer to **string**                                                            |             | [optional] |
-| **Username**              | Pointer to **string**                                                            |             | [optional] |
+| Name                         | Type                                                                                     | Description                                                                                                                                                              | Notes      |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| **ConsentRequest**           | Pointer to [**OAuth2ConsentRequest**](OAuth2ConsentRequest.md)                           |                                                                                                                                                                          | [optional] |
+| **ExpiresAt**                | Pointer to [**OAuth2ConsentSessionExpiresAt**](OAuth2ConsentSessionExpiresAt.md)         |                                                                                                                                                                          | [optional] |
+| **GrantAccessTokenAudience** | Pointer to **[]string**                                                                  |                                                                                                                                                                          | [optional] |
+| **GrantScope**               | Pointer to **[]string**                                                                  |                                                                                                                                                                          | [optional] |
+| **HandledAt**                | Pointer to **time.Time**                                                                 |                                                                                                                                                                          | [optional] |
+| **Remember**                 | Pointer to **bool**                                                                      | Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope. | [optional] |
+| **RememberFor**              | Pointer to **int64**                                                                     | RememberFor sets how long the consent authorization should be remembered for in seconds. If set to &#x60;0&#x60;, the authorization will be remembered indefinitely.     | [optional] |
+| **Session**                  | Pointer to [**AcceptOAuth2ConsentRequestSession**](AcceptOAuth2ConsentRequestSession.md) |                                                                                                                                                                          | [optional] |
 
 ## Methods
 
@@ -35,110 +32,31 @@ NewOAuth2ConsentSessionWithDefaults instantiates a new OAuth2ConsentSession
 object This constructor will only assign default values to properties that have
 it defined, but it doesn't guarantee that properties required by API are set
 
-### GetAllowedTopLevelClaims
+### GetConsentRequest
 
-`func (o *OAuth2ConsentSession) GetAllowedTopLevelClaims() []string`
+`func (o *OAuth2ConsentSession) GetConsentRequest() OAuth2ConsentRequest`
 
-GetAllowedTopLevelClaims returns the AllowedTopLevelClaims field if non-nil,
-zero value otherwise.
-
-### GetAllowedTopLevelClaimsOk
-
-`func (o *OAuth2ConsentSession) GetAllowedTopLevelClaimsOk() (*[]string, bool)`
-
-GetAllowedTopLevelClaimsOk returns a tuple with the AllowedTopLevelClaims field
-if it's non-nil, zero value otherwise and a boolean to check if the value has
-been set.
-
-### SetAllowedTopLevelClaims
-
-`func (o *OAuth2ConsentSession) SetAllowedTopLevelClaims(v []string)`
-
-SetAllowedTopLevelClaims sets AllowedTopLevelClaims field to given value.
-
-### HasAllowedTopLevelClaims
-
-`func (o *OAuth2ConsentSession) HasAllowedTopLevelClaims() bool`
-
-HasAllowedTopLevelClaims returns a boolean if a field has been set.
-
-### GetClientId
-
-`func (o *OAuth2ConsentSession) GetClientId() string`
-
-GetClientId returns the ClientId field if non-nil, zero value otherwise.
-
-### GetClientIdOk
-
-`func (o *OAuth2ConsentSession) GetClientIdOk() (*string, bool)`
-
-GetClientIdOk returns a tuple with the ClientId field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
-
-### SetClientId
-
-`func (o *OAuth2ConsentSession) SetClientId(v string)`
-
-SetClientId sets ClientId field to given value.
-
-### HasClientId
-
-`func (o *OAuth2ConsentSession) HasClientId() bool`
-
-HasClientId returns a boolean if a field has been set.
-
-### GetConsentChallenge
-
-`func (o *OAuth2ConsentSession) GetConsentChallenge() string`
-
-GetConsentChallenge returns the ConsentChallenge field if non-nil, zero value
+GetConsentRequest returns the ConsentRequest field if non-nil, zero value
 otherwise.
 
-### GetConsentChallengeOk
+### GetConsentRequestOk
 
-`func (o *OAuth2ConsentSession) GetConsentChallengeOk() (*string, bool)`
+`func (o *OAuth2ConsentSession) GetConsentRequestOk() (*OAuth2ConsentRequest, bool)`
 
-GetConsentChallengeOk returns a tuple with the ConsentChallenge field if it's
+GetConsentRequestOk returns a tuple with the ConsentRequest field if it's
 non-nil, zero value otherwise and a boolean to check if the value has been set.
 
-### SetConsentChallenge
+### SetConsentRequest
 
-`func (o *OAuth2ConsentSession) SetConsentChallenge(v string)`
+`func (o *OAuth2ConsentSession) SetConsentRequest(v OAuth2ConsentRequest)`
 
-SetConsentChallenge sets ConsentChallenge field to given value.
+SetConsentRequest sets ConsentRequest field to given value.
 
-### HasConsentChallenge
+### HasConsentRequest
 
-`func (o *OAuth2ConsentSession) HasConsentChallenge() bool`
+`func (o *OAuth2ConsentSession) HasConsentRequest() bool`
 
-HasConsentChallenge returns a boolean if a field has been set.
-
-### GetExcludeNotBeforeClaim
-
-`func (o *OAuth2ConsentSession) GetExcludeNotBeforeClaim() bool`
-
-GetExcludeNotBeforeClaim returns the ExcludeNotBeforeClaim field if non-nil,
-zero value otherwise.
-
-### GetExcludeNotBeforeClaimOk
-
-`func (o *OAuth2ConsentSession) GetExcludeNotBeforeClaimOk() (*bool, bool)`
-
-GetExcludeNotBeforeClaimOk returns a tuple with the ExcludeNotBeforeClaim field
-if it's non-nil, zero value otherwise and a boolean to check if the value has
-been set.
-
-### SetExcludeNotBeforeClaim
-
-`func (o *OAuth2ConsentSession) SetExcludeNotBeforeClaim(v bool)`
-
-SetExcludeNotBeforeClaim sets ExcludeNotBeforeClaim field to given value.
-
-### HasExcludeNotBeforeClaim
-
-`func (o *OAuth2ConsentSession) HasExcludeNotBeforeClaim() bool`
-
-HasExcludeNotBeforeClaim returns a boolean if a field has been set.
+HasConsentRequest returns a boolean if a field has been set.
 
 ### GetExpiresAt
 
@@ -165,156 +83,157 @@ SetExpiresAt sets ExpiresAt field to given value.
 
 HasExpiresAt returns a boolean if a field has been set.
 
-### GetExtra
+### GetGrantAccessTokenAudience
 
-`func (o *OAuth2ConsentSession) GetExtra() map[string]interface{}`
+`func (o *OAuth2ConsentSession) GetGrantAccessTokenAudience() []string`
 
-GetExtra returns the Extra field if non-nil, zero value otherwise.
+GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field if
+non-nil, zero value otherwise.
 
-### GetExtraOk
+### GetGrantAccessTokenAudienceOk
 
-`func (o *OAuth2ConsentSession) GetExtraOk() (*map[string]interface{}, bool)`
+`func (o *OAuth2ConsentSession) GetGrantAccessTokenAudienceOk() (*[]string, bool)`
 
-GetExtraOk returns a tuple with the Extra field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetGrantAccessTokenAudienceOk returns a tuple with the GrantAccessTokenAudience
+field if it's non-nil, zero value otherwise and a boolean to check if the value
+has been set.
 
-### SetExtra
+### SetGrantAccessTokenAudience
 
-`func (o *OAuth2ConsentSession) SetExtra(v map[string]interface{})`
+`func (o *OAuth2ConsentSession) SetGrantAccessTokenAudience(v []string)`
 
-SetExtra sets Extra field to given value.
+SetGrantAccessTokenAudience sets GrantAccessTokenAudience field to given value.
 
-### HasExtra
+### HasGrantAccessTokenAudience
 
-`func (o *OAuth2ConsentSession) HasExtra() bool`
+`func (o *OAuth2ConsentSession) HasGrantAccessTokenAudience() bool`
 
-HasExtra returns a boolean if a field has been set.
+HasGrantAccessTokenAudience returns a boolean if a field has been set.
 
-### GetHeaders
+### GetGrantScope
 
-`func (o *OAuth2ConsentSession) GetHeaders() Headers`
+`func (o *OAuth2ConsentSession) GetGrantScope() []string`
 
-GetHeaders returns the Headers field if non-nil, zero value otherwise.
+GetGrantScope returns the GrantScope field if non-nil, zero value otherwise.
 
-### GetHeadersOk
+### GetGrantScopeOk
 
-`func (o *OAuth2ConsentSession) GetHeadersOk() (*Headers, bool)`
+`func (o *OAuth2ConsentSession) GetGrantScopeOk() (*[]string, bool)`
 
-GetHeadersOk returns a tuple with the Headers field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
-
-### SetHeaders
-
-`func (o *OAuth2ConsentSession) SetHeaders(v Headers)`
-
-SetHeaders sets Headers field to given value.
-
-### HasHeaders
-
-`func (o *OAuth2ConsentSession) HasHeaders() bool`
-
-HasHeaders returns a boolean if a field has been set.
-
-### GetIdTokenClaims
-
-`func (o *OAuth2ConsentSession) GetIdTokenClaims() IDTokenClaims`
-
-GetIdTokenClaims returns the IdTokenClaims field if non-nil, zero value
-otherwise.
-
-### GetIdTokenClaimsOk
-
-`func (o *OAuth2ConsentSession) GetIdTokenClaimsOk() (*IDTokenClaims, bool)`
-
-GetIdTokenClaimsOk returns a tuple with the IdTokenClaims field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
-
-### SetIdTokenClaims
-
-`func (o *OAuth2ConsentSession) SetIdTokenClaims(v IDTokenClaims)`
-
-SetIdTokenClaims sets IdTokenClaims field to given value.
-
-### HasIdTokenClaims
-
-`func (o *OAuth2ConsentSession) HasIdTokenClaims() bool`
-
-HasIdTokenClaims returns a boolean if a field has been set.
-
-### GetKid
-
-`func (o *OAuth2ConsentSession) GetKid() string`
-
-GetKid returns the Kid field if non-nil, zero value otherwise.
-
-### GetKidOk
-
-`func (o *OAuth2ConsentSession) GetKidOk() (*string, bool)`
-
-GetKidOk returns a tuple with the Kid field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
-
-### SetKid
-
-`func (o *OAuth2ConsentSession) SetKid(v string)`
-
-SetKid sets Kid field to given value.
-
-### HasKid
-
-`func (o *OAuth2ConsentSession) HasKid() bool`
-
-HasKid returns a boolean if a field has been set.
-
-### GetSubject
-
-`func (o *OAuth2ConsentSession) GetSubject() string`
-
-GetSubject returns the Subject field if non-nil, zero value otherwise.
-
-### GetSubjectOk
-
-`func (o *OAuth2ConsentSession) GetSubjectOk() (*string, bool)`
-
-GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
-
-### SetSubject
-
-`func (o *OAuth2ConsentSession) SetSubject(v string)`
-
-SetSubject sets Subject field to given value.
-
-### HasSubject
-
-`func (o *OAuth2ConsentSession) HasSubject() bool`
-
-HasSubject returns a boolean if a field has been set.
-
-### GetUsername
-
-`func (o *OAuth2ConsentSession) GetUsername() string`
-
-GetUsername returns the Username field if non-nil, zero value otherwise.
-
-### GetUsernameOk
-
-`func (o *OAuth2ConsentSession) GetUsernameOk() (*string, bool)`
-
-GetUsernameOk returns a tuple with the Username field if it's non-nil, zero
+GetGrantScopeOk returns a tuple with the GrantScope field if it's non-nil, zero
 value otherwise and a boolean to check if the value has been set.
 
-### SetUsername
+### SetGrantScope
 
-`func (o *OAuth2ConsentSession) SetUsername(v string)`
+`func (o *OAuth2ConsentSession) SetGrantScope(v []string)`
 
-SetUsername sets Username field to given value.
+SetGrantScope sets GrantScope field to given value.
 
-### HasUsername
+### HasGrantScope
 
-`func (o *OAuth2ConsentSession) HasUsername() bool`
+`func (o *OAuth2ConsentSession) HasGrantScope() bool`
 
-HasUsername returns a boolean if a field has been set.
+HasGrantScope returns a boolean if a field has been set.
+
+### GetHandledAt
+
+`func (o *OAuth2ConsentSession) GetHandledAt() time.Time`
+
+GetHandledAt returns the HandledAt field if non-nil, zero value otherwise.
+
+### GetHandledAtOk
+
+`func (o *OAuth2ConsentSession) GetHandledAtOk() (*time.Time, bool)`
+
+GetHandledAtOk returns a tuple with the HandledAt field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
+
+### SetHandledAt
+
+`func (o *OAuth2ConsentSession) SetHandledAt(v time.Time)`
+
+SetHandledAt sets HandledAt field to given value.
+
+### HasHandledAt
+
+`func (o *OAuth2ConsentSession) HasHandledAt() bool`
+
+HasHandledAt returns a boolean if a field has been set.
+
+### GetRemember
+
+`func (o *OAuth2ConsentSession) GetRemember() bool`
+
+GetRemember returns the Remember field if non-nil, zero value otherwise.
+
+### GetRememberOk
+
+`func (o *OAuth2ConsentSession) GetRememberOk() (*bool, bool)`
+
+GetRememberOk returns a tuple with the Remember field if it's non-nil, zero
+value otherwise and a boolean to check if the value has been set.
+
+### SetRemember
+
+`func (o *OAuth2ConsentSession) SetRemember(v bool)`
+
+SetRemember sets Remember field to given value.
+
+### HasRemember
+
+`func (o *OAuth2ConsentSession) HasRemember() bool`
+
+HasRemember returns a boolean if a field has been set.
+
+### GetRememberFor
+
+`func (o *OAuth2ConsentSession) GetRememberFor() int64`
+
+GetRememberFor returns the RememberFor field if non-nil, zero value otherwise.
+
+### GetRememberForOk
+
+`func (o *OAuth2ConsentSession) GetRememberForOk() (*int64, bool)`
+
+GetRememberForOk returns a tuple with the RememberFor field if it's non-nil,
+zero value otherwise and a boolean to check if the value has been set.
+
+### SetRememberFor
+
+`func (o *OAuth2ConsentSession) SetRememberFor(v int64)`
+
+SetRememberFor sets RememberFor field to given value.
+
+### HasRememberFor
+
+`func (o *OAuth2ConsentSession) HasRememberFor() bool`
+
+HasRememberFor returns a boolean if a field has been set.
+
+### GetSession
+
+`func (o *OAuth2ConsentSession) GetSession() AcceptOAuth2ConsentRequestSession`
+
+GetSession returns the Session field if non-nil, zero value otherwise.
+
+### GetSessionOk
+
+`func (o *OAuth2ConsentSession) GetSessionOk() (*AcceptOAuth2ConsentRequestSession, bool)`
+
+GetSessionOk returns a tuple with the Session field if it's non-nil, zero value
+otherwise and a boolean to check if the value has been set.
+
+### SetSession
+
+`func (o *OAuth2ConsentSession) SetSession(v AcceptOAuth2ConsentRequestSession)`
+
+SetSession sets Session field to given value.
+
+### HasSession
+
+`func (o *OAuth2ConsentSession) HasSession() bool`
+
+HasSession returns a boolean if a field has been set.
 
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to API list]](../README.md#documentation-for-api-endpoints)

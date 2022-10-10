@@ -537,13 +537,13 @@ This has different impacts for the different code-generated client libraries.
 ##### Go
 
 If you use the `hydra.SDK` interface only and the `hydra.NewSDK()` factory,
-everything will work as before. If you rely on e.g. `hydra.NewOAuth2Api()`, you
+everything will work as before. If you rely on e.g. `hydra.Ne.OAuth2Api.)`, you
 will be affected by this change.
 
 ##### Others
 
 All method signatures stayed the same, but the factory names for instantiating
-the SDK client have changed. For example, `hydra.NewOAuth2Api()` is now
+the SDK client have changed. For example, `hydra.Ne.OAuth2Api.)` is now
 `hydra.NewAdminApi()` and `hydra.NewPublicApi()` - depending on which endpoints
 you need to interact with.
 

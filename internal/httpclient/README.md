@@ -92,19 +92,28 @@ All URIs are relative to _http://localhost_
 | _MetadataApi_ | [**GetVersion**](docs/MetadataApi.md#getversion)                                                         | **Get** /version                                       | Return Running Software Version.                                                         |
 | _MetadataApi_ | [**IsAlive**](docs/MetadataApi.md#isalive)                                                               | **Get** /health/alive                                  | Check HTTP Server Status                                                                 |
 | _MetadataApi_ | [**IsReady**](docs/MetadataApi.md#isready)                                                               | **Get** /health/ready                                  | Check HTTP Server and Database Status                                                    |
-| _Oauth2Api_   | [**CreateOAuth2Client**](docs/Oauth2Api.md#createoauth2client)                                           | **Post** /admin/clients                                | Create OAuth 2.0 Client                                                                  |
-| _Oauth2Api_   | [**DeleteOAuth2Client**](docs/Oauth2Api.md#deleteoauth2client)                                           | **Delete** /admin/clients/{id}                         | Delete OAuth 2.0 Client                                                                  |
-| _Oauth2Api_   | [**GetOAuth2Client**](docs/Oauth2Api.md#getoauth2client)                                                 | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                  |
-| _Oauth2Api_   | [**ListOAuth2Clients**](docs/Oauth2Api.md#listoauth2clients)                                             | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                   |
-| _Oauth2Api_   | [**PatchOAuth2Client**](docs/Oauth2Api.md#patchoauth2client)                                             | **Patch** /admin/clients/{id}                          | Patch OAuth 2.0 Client                                                                   |
-| _Oauth2Api_   | [**SetOAuth2Client**](docs/Oauth2Api.md#setoauth2client)                                                 | **Put** /admin/clients/{id}                            | Set OAuth 2.0 Client                                                                     |
-| _Oauth2Api_   | [**SetOAuth2ClientLifespans**](docs/Oauth2Api.md#setoauth2clientlifespans)                               | **Put** /admin/clients/{id}/lifespans                  | Set OAuth2 Client Token Lifespans                                                        |
+| _OAuth2Api_   | [**AcceptOAuth2ConsentRequest**](docs/OAuth2Api.md#acceptoauth2consentrequest)                           | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept OAuth 2.0 Consent Request                                                         |
+| _OAuth2Api_   | [**AcceptOAuth2LoginRequest**](docs/OAuth2Api.md#acceptoauth2loginrequest)                               | **Put** /admin/oauth2/auth/requests/login/accept       | Accept OAuth 2.0 Login Request                                                           |
+| _OAuth2Api_   | [**AcceptOAuth2LogoutRequest**](docs/OAuth2Api.md#acceptoauth2logoutrequest)                             | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept OAuth 2.0 Session Logout Request                                                  |
+| _OAuth2Api_   | [**CreateOAuth2Client**](docs/OAuth2Api.md#createoauth2client)                                           | **Post** /admin/clients                                | Create OAuth 2.0 Client                                                                  |
+| _OAuth2Api_   | [**DeleteOAuth2Client**](docs/OAuth2Api.md#deleteoauth2client)                                           | **Delete** /admin/clients/{id}                         | Delete OAuth 2.0 Client                                                                  |
+| _OAuth2Api_   | [**GetOAuth2Client**](docs/OAuth2Api.md#getoauth2client)                                                 | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                                                  |
+| _OAuth2Api_   | [**GetOAuth2ConsentRequest**](docs/OAuth2Api.md#getoauth2consentrequest)                                 | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request                                                            |
+| _OAuth2Api_   | [**GetOAuth2LoginRequest**](docs/OAuth2Api.md#getoauth2loginrequest)                                     | **Get** /admin/oauth2/auth/requests/login              | Get OAuth 2.0 Login Request                                                              |
+| _OAuth2Api_   | [**GetOAuth2LogoutRequest**](docs/OAuth2Api.md#getoauth2logoutrequest)                                   | **Get** /admin/oauth2/auth/requests/logout             | Get OAuth 2.0 Session Logout Request                                                     |
+| _OAuth2Api_   | [**ListOAuth2Clients**](docs/OAuth2Api.md#listoauth2clients)                                             | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                                                   |
+| _OAuth2Api_   | [**ListOAuth2ConsentSessions**](docs/OAuth2Api.md#listoauth2consentsessions)                             | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                             |
+| _OAuth2Api_   | [**PatchOAuth2Client**](docs/OAuth2Api.md#patchoauth2client)                                             | **Patch** /admin/clients/{id}                          | Patch OAuth 2.0 Client                                                                   |
+| _OAuth2Api_   | [**RejectOAuth2ConsentRequest**](docs/OAuth2Api.md#rejectoauth2consentrequest)                           | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject OAuth 2.0 Consent Request                                                         |
+| _OAuth2Api_   | [**RejectOAuth2LoginRequest**](docs/OAuth2Api.md#rejectoauth2loginrequest)                               | **Put** /admin/oauth2/auth/requests/login/reject       | Reject OAuth 2.0 Login Request                                                           |
+| _OAuth2Api_   | [**RejectOAuth2LogoutRequest**](docs/OAuth2Api.md#rejectoauth2logoutrequest)                             | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject OAuth 2.0 Session Logout Request                                                  |
+| _OAuth2Api_   | [**RevokeOAuth2ConsentSessions**](docs/OAuth2Api.md#revokeoauth2consentsessions)                         | **Delete** /admin/oauth2/auth/sessions/consent         | Revoke OAuth 2.0 Consent Sessions of a Subject                                           |
+| _OAuth2Api_   | [**RevokeOAuth2LoginSessions**](docs/OAuth2Api.md#revokeoauth2loginsessions)                             | **Delete** /admin/oauth2/auth/sessions/login           | Revokes All OAuth 2.0 Login Sessions of a Subject                                        |
+| _OAuth2Api_   | [**SetOAuth2Client**](docs/OAuth2Api.md#setoauth2client)                                                 | **Put** /admin/clients/{id}                            | Set OAuth 2.0 Client                                                                     |
+| _OAuth2Api_   | [**SetOAuth2ClientLifespans**](docs/OAuth2Api.md#setoauth2clientlifespans)                               | **Put** /admin/clients/{id}/lifespans                  | Set OAuth2 Client Token Lifespans                                                        |
 | _OidcApi_     | [**CreateOidcDynamicClient**](docs/OidcApi.md#createoidcdynamicclient)                                   | **Post** /oauth2/register                              | Register OAuth2 Client using OpenID Dynamic Client Registration                          |
 | _OidcApi_     | [**GetOidcDynamicClient**](docs/OidcApi.md#getoidcdynamicclient)                                         | **Get** /oauth2/register/{id}                          | Get OAuth2 Client using OpenID Dynamic Client Registration                               |
 | _OidcApi_     | [**SetOidcDynamicClient**](docs/OidcApi.md#setoidcdynamicclient)                                         | **Put** /oauth2/register/{id}                          | Set OAuth2 Client using OpenID Dynamic Client Registration                               |
-| _V0alpha2Api_ | [**AdminAcceptOAuth2ConsentRequest**](docs/V0alpha2Api.md#adminacceptoauth2consentrequest)               | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept an OAuth 2.0 Consent Request                                                      |
-| _V0alpha2Api_ | [**AdminAcceptOAuth2LoginRequest**](docs/V0alpha2Api.md#adminacceptoauth2loginrequest)                   | **Put** /admin/oauth2/auth/requests/login/accept       | Accept an OAuth 2.0 Login Request                                                        |
-| _V0alpha2Api_ | [**AdminAcceptOAuth2LogoutRequest**](docs/V0alpha2Api.md#adminacceptoauth2logoutrequest)                 | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept an OAuth 2.0 Logout Request                                                       |
 | _V0alpha2Api_ | [**AdminCreateJsonWebKeySet**](docs/V0alpha2Api.md#admincreatejsonwebkeyset)                             | **Post** /admin/keys/{set}                             | Generate a New JSON Web Key                                                              |
 | _V0alpha2Api_ | [**AdminDeleteJsonWebKey**](docs/V0alpha2Api.md#admindeletejsonwebkey)                                   | **Delete** /admin/keys/{set}/{kid}                     | Delete a JSON Web Key                                                                    |
 | _V0alpha2Api_ | [**AdminDeleteJsonWebKeySet**](docs/V0alpha2Api.md#admindeletejsonwebkeyset)                             | **Delete** /admin/keys/{set}                           | Delete a JSON Web Key Set                                                                |
@@ -112,18 +121,9 @@ All URIs are relative to _http://localhost_
 | _V0alpha2Api_ | [**AdminDeleteTrustedOAuth2JwtGrantIssuer**](docs/V0alpha2Api.md#admindeletetrustedoauth2jwtgrantissuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                     |
 | _V0alpha2Api_ | [**AdminGetJsonWebKey**](docs/V0alpha2Api.md#admingetjsonwebkey)                                         | **Get** /admin/keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                     |
 | _V0alpha2Api_ | [**AdminGetJsonWebKeySet**](docs/V0alpha2Api.md#admingetjsonwebkeyset)                                   | **Get** /admin/keys/{set}                              | Retrieve a JSON Web Key Set                                                              |
-| _V0alpha2Api_ | [**AdminGetOAuth2ConsentRequest**](docs/V0alpha2Api.md#admingetoauth2consentrequest)                     | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request Information                                                |
-| _V0alpha2Api_ | [**AdminGetOAuth2LoginRequest**](docs/V0alpha2Api.md#admingetoauth2loginrequest)                         | **Get** /admin/oauth2/auth/requests/login              | Get an OAuth 2.0 Login Request                                                           |
-| _V0alpha2Api_ | [**AdminGetOAuth2LogoutRequest**](docs/V0alpha2Api.md#admingetoauth2logoutrequest)                       | **Get** /admin/oauth2/auth/requests/logout             | Get an OAuth 2.0 Logout Request                                                          |
 | _V0alpha2Api_ | [**AdminGetTrustedOAuth2JwtGrantIssuer**](docs/V0alpha2Api.md#admingettrustedoauth2jwtgrantissuer)       | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                        |
 | _V0alpha2Api_ | [**AdminIntrospectOAuth2Token**](docs/V0alpha2Api.md#adminintrospectoauth2token)                         | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access or Refresh Tokens                                               |
-| _V0alpha2Api_ | [**AdminListOAuth2SubjectConsentSessions**](docs/V0alpha2Api.md#adminlistoauth2subjectconsentsessions)   | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                                             |
 | _V0alpha2Api_ | [**AdminListTrustedOAuth2JwtGrantIssuers**](docs/V0alpha2Api.md#adminlisttrustedoauth2jwtgrantissuers)   | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                        |
-| _V0alpha2Api_ | [**AdminRejectOAuth2ConsentRequest**](docs/V0alpha2Api.md#adminrejectoauth2consentrequest)               | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject an OAuth 2.0 Consent Request                                                      |
-| _V0alpha2Api_ | [**AdminRejectOAuth2LoginRequest**](docs/V0alpha2Api.md#adminrejectoauth2loginrequest)                   | **Put** /admin/oauth2/auth/requests/login/reject       | Reject an OAuth 2.0 Login Request                                                        |
-| _V0alpha2Api_ | [**AdminRejectOAuth2LogoutRequest**](docs/V0alpha2Api.md#adminrejectoauth2logoutrequest)                 | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject an OAuth 2.0 Logout Request                                                       |
-| _V0alpha2Api_ | [**AdminRevokeOAuth2ConsentSessions**](docs/V0alpha2Api.md#adminrevokeoauth2consentsessions)             | **Delete** /admin/oauth2/auth/sessions/consent         | Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client          |
-| _V0alpha2Api_ | [**AdminRevokeOAuth2LoginSessions**](docs/V0alpha2Api.md#adminrevokeoauth2loginsessions)                 | **Delete** /admin/oauth2/auth/sessions/login           | Invalidates All OAuth 2.0 Login Sessions of a Certain User                               |
 | _V0alpha2Api_ | [**AdminTrustOAuth2JwtGrantIssuer**](docs/V0alpha2Api.md#admintrustoauth2jwtgrantissuer)                 | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                             |
 | _V0alpha2Api_ | [**AdminUpdateJsonWebKey**](docs/V0alpha2Api.md#adminupdatejsonwebkey)                                   | **Put** /admin/keys/{set}/{kid}                        | Update a JSON Web Key                                                                    |
 | _V0alpha2Api_ | [**AdminUpdateJsonWebKeySet**](docs/V0alpha2Api.md#adminupdatejsonwebkeyset)                             | **Put** /admin/keys/{set}                              | Update a JSON Web Key Set                                                                |
@@ -146,9 +146,6 @@ All URIs are relative to _http://localhost_
 - [ErrorOAuth2](docs/ErrorOAuth2.md)
 - [GenericError](docs/GenericError.md)
 - [GetVersion200Response](docs/GetVersion200Response.md)
-- [HandledOAuth2ConsentRequest](docs/HandledOAuth2ConsentRequest.md)
-- [HandledOAuth2LoginRequest](docs/HandledOAuth2LoginRequest.md)
-- [HandledOAuth2LogoutRequest](docs/HandledOAuth2LogoutRequest.md)
 - [Headers](docs/Headers.md)
 - [HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
 - [HealthStatus](docs/HealthStatus.md)
@@ -168,16 +165,15 @@ All URIs are relative to _http://localhost_
 - [OAuth2ConsentSessionExpiresAt](docs/OAuth2ConsentSessionExpiresAt.md)
 - [OAuth2LoginRequest](docs/OAuth2LoginRequest.md)
 - [OAuth2LogoutRequest](docs/OAuth2LogoutRequest.md)
+- [OAuth2RedirectTo](docs/OAuth2RedirectTo.md)
 - [OAuth2TokenResponse](docs/OAuth2TokenResponse.md)
 - [OidcConfiguration](docs/OidcConfiguration.md)
 - [OidcUserInfo](docs/OidcUserInfo.md)
 - [Pagination](docs/Pagination.md)
 - [PaginationHeaders](docs/PaginationHeaders.md)
-- [PreviousOAuth2ConsentSession](docs/PreviousOAuth2ConsentSession.md)
 - [RefreshTokenHookRequest](docs/RefreshTokenHookRequest.md)
 - [RefreshTokenHookResponse](docs/RefreshTokenHookResponse.md)
 - [RejectOAuth2Request](docs/RejectOAuth2Request.md)
-- [SuccessfulOAuth2RequestResponse](docs/SuccessfulOAuth2RequestResponse.md)
 - [TokenPagination](docs/TokenPagination.md)
 - [TokenPaginationHeaders](docs/TokenPaginationHeaders.md)
 - [TokenPaginationRequestParameters](docs/TokenPaginationRequestParameters.md)

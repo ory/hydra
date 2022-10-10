@@ -7188,7 +7188,7 @@ Signed-off-by: Michael DeRazon <mderazon@gmail.com> Signed-off-by: arekkas
 - Add flags for newly introduced oidc client settings
   ([c4b902d](https://github.com/ory/hydra/commit/c4b902d8f86fa4ef03704fc16d17e921e5710e61)),
   closes [#938](https://github.com/ory/hydra/issues/938)
-- Add ListUserConsentSessions to OAuth2API interface
+- Add ListUserConsentSessions to.OAuth2Api.interface
   ([#977](https://github.com/ory/hydra/issues/977))
   ([1bd8ab7](https://github.com/ory/hydra/commit/1bd8ab7d6bfe224e33f700959416b5c5e726bdbc))
 - Add logout api endpoint ([#984](https://github.com/ory/hydra/issues/984))

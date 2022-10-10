@@ -142,7 +142,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, _, err := adminClient.V0alpha2Api.AdminGetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
 
 			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
@@ -167,7 +167,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 			}
 
-			v, _, err := adminClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(context.Background()).
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				AcceptOAuth2LoginRequest(acceptBody).
 				Execute()
@@ -179,7 +179,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, _, err := adminClient.V0alpha2Api.AdminGetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
 
 			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
@@ -196,7 +196,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			}
 
 			assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Context)
-			v, _, err := adminClient.V0alpha2Api.AdminAcceptOAuth2ConsentRequest(context.Background()).
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Bool(true), RememberFor: pointerx.Int64(0),
@@ -368,7 +368,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=checks if request fails when subject is empty", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
-			_, res, err := adminClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(ctx).
+			_, res, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Bool(true)}).Execute()
 			require.Error(t, err) // expects 400

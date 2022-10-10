@@ -380,45 +380,6 @@
         ],
         "type": "object"
       },
-      "handledOAuth2ConsentRequest": {
-        "properties": {
-          "redirect_to": {
-            "description": "Original request URL to which you should redirect the user if request was already handled.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "redirect_to"
-        ],
-        "title": "The response payload sent when there is an attempt to access an already handled consent request.",
-        "type": "object"
-      },
-      "handledOAuth2LoginRequest": {
-        "properties": {
-          "redirect_to": {
-            "description": "Original request URL to which you should redirect the user if request was already handled.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "redirect_to"
-        ],
-        "title": "The response payload sent when there is an attempt to access an already handled login request.",
-        "type": "object"
-      },
-      "handledOAuth2LogoutRequest": {
-        "properties": {
-          "redirect_to": {
-            "description": "Original request URL to which you should redirect the user if request was already handled.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "redirect_to"
-        ],
-        "title": "The response payload sent when there is an attempt to access an already handled logout request.",
-        "type": "object"
-      },
       "healthNotReadyStatus": {
         "properties": {
           "errors": {
@@ -989,21 +950,10 @@
         "type": "object"
       },
       "oAuth2ConsentSession": {
+        "description": "A completed OAuth 2.0 Consent Session.",
         "properties": {
-          "allowed_top_level_claims": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "client_id": {
-            "type": "string"
-          },
-          "consent_challenge": {
-            "type": "string"
-          },
-          "exclude_not_before_claim": {
-            "type": "boolean"
+          "consent_request": {
+            "$ref": "#/components/schemas/oAuth2ConsentRequest"
           },
           "expires_at": {
             "properties": {
@@ -1030,27 +980,37 @@
             },
             "type": "object"
           },
-          "extra": {
-            "additionalProperties": {},
-            "type": "object"
+          "grant_access_token_audience": {
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
-          "headers": {
-            "$ref": "#/components/schemas/Headers"
+          "grant_scope": {
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
-          "id_token_claims": {
-            "$ref": "#/components/schemas/IDTokenClaims"
+          "handled_at": {
+            "$ref": "#/components/schemas/nullTime"
           },
-          "kid": {
-            "type": "string"
+          "remember": {
+            "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+            "type": "boolean"
           },
-          "subject": {
-            "type": "string"
+          "remember_for": {
+            "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
+            "format": "int64",
+            "type": "integer"
           },
-          "username": {
-            "type": "string"
+          "session": {
+            "$ref": "#/components/schemas/acceptOAuth2ConsentRequestSession"
           }
         },
+        "title": "OAuth 2.0 Consent Session",
         "type": "object"
+      },
+      "oAuth2ConsentSessions": {
+        "description": "List of OAuth 2.0 Consent Sessions",
+        "items": {
+          "$ref": "#/components/schemas/oAuth2ConsentSession"
+        },
+        "type": "array"
       },
       "oAuth2LoginRequest": {
         "properties": {
@@ -1126,6 +1086,20 @@
           }
         },
         "title": "Contains information about an ongoing logout request.",
+        "type": "object"
+      },
+      "oAuth2RedirectTo": {
+        "description": "Contains a redirect URL used to complete a login, consent, or logout request.",
+        "properties": {
+          "redirect_to": {
+            "description": "RedirectURL is the URL which you should redirect the user's browser to once the authentication process is completed.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "redirect_to"
+        ],
+        "title": "OAuth 2.0 Redirect Browser To",
         "type": "object"
       },
       "oAuth2TokenResponse": {
@@ -1454,42 +1428,6 @@
         },
         "type": "object"
       },
-      "previousOAuth2ConsentSession": {
-        "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
-        "properties": {
-          "consent_request": {
-            "$ref": "#/components/schemas/oAuth2ConsentRequest"
-          },
-          "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
-          },
-          "grant_scope": {
-            "$ref": "#/components/schemas/StringSliceJSONFormat"
-          },
-          "handled_at": {
-            "$ref": "#/components/schemas/nullTime"
-          },
-          "remember": {
-            "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
-            "type": "boolean"
-          },
-          "remember_for": {
-            "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
-            "format": "int64",
-            "type": "integer"
-          },
-          "session": {
-            "$ref": "#/components/schemas/acceptOAuth2ConsentRequestSession"
-          }
-        },
-        "type": "object"
-      },
-      "previousOAuth2ConsentSessions": {
-        "items": {
-          "$ref": "#/components/schemas/previousOAuth2ConsentSession"
-        },
-        "type": "array"
-      },
       "refreshTokenHookRequest": {
         "properties": {
           "client_id": {
@@ -1558,19 +1496,6 @@
           }
         },
         "title": "The request payload used to accept a login or consent request.",
-        "type": "object"
-      },
-      "successfulOAuth2RequestResponse": {
-        "properties": {
-          "redirect_to": {
-            "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "redirect_to"
-        ],
-        "title": "The response payload sent when accepting or rejecting a login, consent, or logout request.",
         "type": "object"
       },
       "tokenPagination": {
@@ -1876,7 +1801,7 @@
         },
         "summary": "List OAuth 2.0 Clients",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       },
       "post": {
@@ -1914,7 +1839,7 @@
         },
         "summary": "Create OAuth 2.0 Client",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       }
     },
@@ -1950,7 +1875,7 @@
         },
         "summary": "Delete OAuth 2.0 Client",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       },
       "get": {
@@ -1984,7 +1909,7 @@
         },
         "summary": "Get an OAuth 2.0 Client",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       },
       "patch": {
@@ -2033,7 +1958,7 @@
         },
         "summary": "Patch OAuth 2.0 Client",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       },
       "put": {
@@ -2085,7 +2010,7 @@
         },
         "summary": "Set OAuth 2.0 Client",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       }
     },
@@ -2138,7 +2063,7 @@
         },
         "summary": "Set OAuth2 Client Token Lifespans",
         "tags": [
-          "oauth2"
+          "oAuth2"
         ]
       }
     },
@@ -2479,10 +2404,11 @@
     },
     "/admin/oauth2/auth/requests/consent": {
       "get": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.",
-        "operationId": "adminGetOAuth2ConsentRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted\nor rejected the request.\n\nThe default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please\nhead over to the OAuth 2.0 documentation.",
+        "operationId": "getOAuth2ConsentRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Consent Request Challenge",
             "in": "query",
             "name": "consent_challenge",
             "required": true,
@@ -2506,11 +2432,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/handledOAuth2ConsentRequest"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "handledOAuth2ConsentRequest"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2523,18 +2449,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Get OAuth 2.0 Consent Request Information",
+        "summary": "Get OAuth 2.0 Consent Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/consent/accept": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider includes additional information, such as session data for access and ID tokens, and if the\nconsent request should be used as basis for future requests.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
-        "operationId": "adminAcceptOAuth2ConsentRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted\nor rejected the request.\n\nThis endpoint tells Ory that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider includes additional information, such as session data for access and ID tokens, and if the\nconsent request should be used as basis for future requests.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.\n\nThe default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please\nhead over to the OAuth 2.0 documentation.",
+        "operationId": "acceptOAuth2ConsentRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Consent Request Challenge",
             "in": "query",
             "name": "consent_challenge",
             "required": true,
@@ -2558,11 +2485,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "successfulOAuth2RequestResponse"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2575,18 +2502,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Accept an OAuth 2.0 Consent Request",
+        "summary": "Accept OAuth 2.0 Consent Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/consent/reject": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider must include a reason why the consent was not granted.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
-        "operationId": "adminRejectOAuth2ConsentRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted\nor rejected the request.\n\nThis endpoint tells Ory that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider must include a reason why the consent was not granted.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.\n\nThe default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please\nhead over to the OAuth 2.0 documentation.",
+        "operationId": "rejectOAuth2ConsentRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Consent Request Challenge",
             "in": "query",
             "name": "consent_challenge",
             "required": true,
@@ -2610,11 +2538,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "successfulOAuth2RequestResponse"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2627,18 +2555,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Reject an OAuth 2.0 Consent Request",
+        "summary": "Reject OAuth 2.0 Consent Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/login": {
       "get": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
-        "operationId": "adminGetOAuth2LoginRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell the Ory OAuth2 Service about it.\n\nPer default, the login provider is Ory itself. You may use a different login provider which needs to be a web-app\nyou write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
+        "operationId": "getOAuth2LoginRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Login Request Challenge",
             "in": "query",
             "name": "login_challenge",
             "required": true,
@@ -2662,11 +2591,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/handledOAuth2LoginRequest"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "handledOAuth2LoginRequest"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2679,18 +2608,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Get an OAuth 2.0 Login Request",
+        "summary": "Get OAuth 2.0 Login Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/login/accept": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell Ory Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as\nthe subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting\na cookie.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
-        "operationId": "adminAcceptOAuth2LoginRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell the Ory OAuth2 Service about it.\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells Ory that the subject has successfully authenticated and includes additional information such as\nthe subject's ID and if Ory should remember the subject's subject agent for future authentication attempts by setting\na cookie.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
+        "operationId": "acceptOAuth2LoginRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Login Request Challenge",
             "in": "query",
             "name": "login_challenge",
             "required": true,
@@ -2714,11 +2644,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "successfulOAuth2RequestResponse"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2731,18 +2661,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Accept an OAuth 2.0 Login Request",
+        "summary": "Accept OAuth 2.0 Login Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/login/reject": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication\nwas denied.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
-        "operationId": "adminRejectOAuth2LoginRequest",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell the Ory OAuth2 Service about it.\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells Ory that the subject has not authenticated and includes a reason why the authentication\nwas denied.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
+        "operationId": "rejectOAuth2LoginRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Login Request Challenge",
             "in": "query",
             "name": "login_challenge",
             "required": true,
@@ -2766,11 +2697,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "successfulOAuth2RequestResponse"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2783,16 +2714,16 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Reject an OAuth 2.0 Login Request",
+        "summary": "Reject OAuth 2.0 Login Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/logout": {
       "get": {
-        "description": "Use this endpoint to fetch a logout request.",
-        "operationId": "adminGetOAuth2LogoutRequest",
+        "description": "Use this endpoint to fetch an Ory OAuth 2.0 logout request.",
+        "operationId": "getOAuth2LogoutRequest",
         "parameters": [
           {
             "in": "query",
@@ -2818,11 +2749,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/handledOAuth2LogoutRequest"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "handledOAuth2LogoutRequest"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2835,18 +2766,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Get an OAuth 2.0 Logout Request",
+        "summary": "Get OAuth 2.0 Session Logout Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/logout/accept": {
       "put": {
-        "description": "When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
-        "operationId": "adminAcceptOAuth2LogoutRequest",
+        "description": "When a user or an application requests Ory OAuth 2.0 to remove the session state of a subject, this endpoint is used to confirm that logout request.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
+        "operationId": "acceptOAuth2LogoutRequest",
         "parameters": [
           {
+            "description": "OAuth 2.0 Logout Request Challenge",
             "in": "query",
             "name": "logout_challenge",
             "required": true,
@@ -2860,11 +2792,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/successfulOAuth2RequestResponse"
+                  "$ref": "#/components/schemas/oAuth2RedirectTo"
                 }
               }
             },
-            "description": "successfulOAuth2RequestResponse"
+            "description": "oAuth2RedirectTo"
           },
           "default": {
             "content": {
@@ -2877,16 +2809,16 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Accept an OAuth 2.0 Logout Request",
+        "summary": "Accept OAuth 2.0 Session Logout Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/requests/logout/reject": {
       "put": {
-        "description": "When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.\nNo body is required.\n\nThe response is empty as the logout provider has to chose what action to perform next.",
-        "operationId": "adminRejectOAuth2LogoutRequest",
+        "description": "When a user or an application requests Ory OAuth 2.0 to remove the session state of a subject, this endpoint is used to deny that logout request.\nNo HTTP request body is required.\n\nThe response is empty as the logout provider has to chose what action to perform next.",
+        "operationId": "rejectOAuth2LogoutRequest",
         "parameters": [
           {
             "in": "query",
@@ -2897,21 +2829,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/rejectOAuth2Request"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/rejectOAuth2Request"
-              }
-            }
-          },
-          "x-originalParamName": "Body"
-        },
         "responses": {
           "204": {
             "$ref": "#/components/responses/emptyResponse"
@@ -2927,19 +2844,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Reject an OAuth 2.0 Logout Request",
+        "summary": "Reject OAuth 2.0 Session Logout Request",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/sessions/consent": {
       "delete": {
-        "description": "This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all\nassociated OAuth 2.0 Access Tokens.",
-        "operationId": "adminRevokeOAuth2ConsentSessions",
+        "description": "This endpoint revokes a subject's granted consent sessions and invalidates all\nassociated OAuth 2.0 Access Tokens. You may also only revoke sessions for a specific OAuth 2.0 Client ID.",
+        "operationId": "revokeOAuth2ConsentSessions",
         "parameters": [
           {
-            "description": "The subject (Subject) whose consent sessions should be deleted.",
+            "description": "OAuth 2.0 Consent Subject\n\nThe subject whose consent sessions should be deleted.",
             "in": "query",
             "name": "subject",
             "required": true,
@@ -2948,7 +2865,7 @@
             }
           },
           {
-            "description": "If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID",
+            "description": "OAuth 2.0 Client ID\n\nIf set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID.",
             "in": "query",
             "name": "client",
             "schema": {
@@ -2956,7 +2873,7 @@
             }
           },
           {
-            "description": "If set to `true` deletes all consent sessions by the Subject that have been granted.",
+            "description": "Revoke All Consent Sessions\n\nIf set to `true` deletes all consent sessions by the Subject that have been granted.",
             "in": "query",
             "name": "all",
             "schema": {
@@ -2979,28 +2896,34 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
+        "summary": "Revoke OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       },
       "get": {
-        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}\u0026limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
-        "operationId": "adminListOAuth2SubjectConsentSessions",
+        "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.",
+        "operationId": "listOAuth2ConsentSessions",
         "parameters": [
           {
-            "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
-            "in": "header",
-            "name": "link",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "in": "query",
+            "name": "page_size",
             "schema": {
-              "type": "string"
+              "default": 250,
+              "format": "int64",
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
             }
           },
           {
-            "description": "The total number of clients.",
-            "in": "header",
-            "name": "x-total-count",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "in": "query",
+            "name": "page_token",
             "schema": {
+              "default": "1",
+              "minimum": 1,
               "type": "string"
             }
           },
@@ -3019,11 +2942,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/previousOAuth2ConsentSessions"
+                  "$ref": "#/components/schemas/oAuth2ConsentSessions"
                 }
               }
             },
-            "description": "previousOAuth2ConsentSessions"
+            "description": "oAuth2ConsentSessions"
           },
           "default": {
             "content": {
@@ -3038,17 +2961,17 @@
         },
         "summary": "List OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect\nFront- or Back-channel logout.",
-        "operationId": "adminRevokeOAuth2LoginSessions",
+        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens and\ndoes not work with OpenID Connect Front- or Back-channel logout.",
+        "operationId": "revokeOAuth2LoginSessions",
         "parameters": [
           {
-            "description": "The subject to revoke authentication sessions for.",
+            "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
             "in": "query",
             "name": "subject",
             "required": true,
@@ -3072,9 +2995,9 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Invalidates All OAuth 2.0 Login Sessions of a Certain User",
+        "summary": "Revokes All OAuth 2.0 Login Sessions of a Subject",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },

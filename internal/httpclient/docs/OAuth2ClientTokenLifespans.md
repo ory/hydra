@@ -1,4 +1,4 @@
-# UpdateOAuth2ClientLifespans
+# OAuth2ClientTokenLifespans
 
 ## Properties
 
@@ -11,35 +11,33 @@
 | **ImplicitGrantAccessTokenLifespan**           | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 | **ImplicitGrantIdTokenLifespan**               | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 | **JwtBearerGrantAccessTokenLifespan**          | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
-| **PasswordGrantAccessTokenLifespan**           | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
-| **PasswordGrantRefreshTokenLifespan**          | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 | **RefreshTokenGrantAccessTokenLifespan**       | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 | **RefreshTokenGrantIdTokenLifespan**           | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 | **RefreshTokenGrantRefreshTokenLifespan**      | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] |
 
 ## Methods
 
-### NewUpdateOAuth2ClientLifespans
+### NewOAuth2ClientTokenLifespans
 
-`func NewUpdateOAuth2ClientLifespans() *UpdateOAuth2ClientLifespans`
+`func NewOAuth2ClientTokenLifespans() *OAuth2ClientTokenLifespans`
 
-NewUpdateOAuth2ClientLifespans instantiates a new UpdateOAuth2ClientLifespans
+NewOAuth2ClientTokenLifespans instantiates a new OAuth2ClientTokenLifespans
 object This constructor will assign default values to properties that have it
 defined, and makes sure properties required by API are set, but the set of
 arguments will change when the set of required properties is changed
 
-### NewUpdateOAuth2ClientLifespansWithDefaults
+### NewOAuth2ClientTokenLifespansWithDefaults
 
-`func NewUpdateOAuth2ClientLifespansWithDefaults() *UpdateOAuth2ClientLifespans`
+`func NewOAuth2ClientTokenLifespansWithDefaults() *OAuth2ClientTokenLifespans`
 
-NewUpdateOAuth2ClientLifespansWithDefaults instantiates a new
-UpdateOAuth2ClientLifespans object This constructor will only assign default
+NewOAuth2ClientTokenLifespansWithDefaults instantiates a new
+OAuth2ClientTokenLifespans object This constructor will only assign default
 values to properties that have it defined, but it doesn't guarantee that
 properties required by API are set
 
 ### GetAuthorizationCodeGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantAccessTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantAccessTokenLifespan() string`
 
 GetAuthorizationCodeGrantAccessTokenLifespan returns the
 AuthorizationCodeGrantAccessTokenLifespan field if non-nil, zero value
@@ -47,7 +45,7 @@ otherwise.
 
 ### GetAuthorizationCodeGrantAccessTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string, bool)`
 
 GetAuthorizationCodeGrantAccessTokenLifespanOk returns a tuple with the
 AuthorizationCodeGrantAccessTokenLifespan field if it's non-nil, zero value
@@ -55,28 +53,28 @@ otherwise and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetAuthorizationCodeGrantAccessTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetAuthorizationCodeGrantAccessTokenLifespan(v string)`
 
 SetAuthorizationCodeGrantAccessTokenLifespan sets
 AuthorizationCodeGrantAccessTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasAuthorizationCodeGrantAccessTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasAuthorizationCodeGrantAccessTokenLifespan() bool`
 
 HasAuthorizationCodeGrantAccessTokenLifespan returns a boolean if a field has
 been set.
 
 ### GetAuthorizationCodeGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantIdTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantIdTokenLifespan() string`
 
 GetAuthorizationCodeGrantIdTokenLifespan returns the
 AuthorizationCodeGrantIdTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetAuthorizationCodeGrantIdTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bool)`
 
 GetAuthorizationCodeGrantIdTokenLifespanOk returns a tuple with the
 AuthorizationCodeGrantIdTokenLifespan field if it's non-nil, zero value
@@ -84,21 +82,21 @@ otherwise and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetAuthorizationCodeGrantIdTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetAuthorizationCodeGrantIdTokenLifespan(v string)`
 
 SetAuthorizationCodeGrantIdTokenLifespan sets
 AuthorizationCodeGrantIdTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasAuthorizationCodeGrantIdTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasAuthorizationCodeGrantIdTokenLifespan() bool`
 
 HasAuthorizationCodeGrantIdTokenLifespan returns a boolean if a field has been
 set.
 
 ### GetAuthorizationCodeGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantRefreshTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantRefreshTokenLifespan() string`
 
 GetAuthorizationCodeGrantRefreshTokenLifespan returns the
 AuthorizationCodeGrantRefreshTokenLifespan field if non-nil, zero value
@@ -106,7 +104,7 @@ otherwise.
 
 ### GetAuthorizationCodeGrantRefreshTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*string, bool)`
 
 GetAuthorizationCodeGrantRefreshTokenLifespanOk returns a tuple with the
 AuthorizationCodeGrantRefreshTokenLifespan field if it's non-nil, zero value
@@ -114,21 +112,21 @@ otherwise and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetAuthorizationCodeGrantRefreshTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetAuthorizationCodeGrantRefreshTokenLifespan(v string)`
 
 SetAuthorizationCodeGrantRefreshTokenLifespan sets
 AuthorizationCodeGrantRefreshTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasAuthorizationCodeGrantRefreshTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasAuthorizationCodeGrantRefreshTokenLifespan() bool`
 
 HasAuthorizationCodeGrantRefreshTokenLifespan returns a boolean if a field has
 been set.
 
 ### GetClientCredentialsGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetClientCredentialsGrantAccessTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetClientCredentialsGrantAccessTokenLifespan() string`
 
 GetClientCredentialsGrantAccessTokenLifespan returns the
 ClientCredentialsGrantAccessTokenLifespan field if non-nil, zero value
@@ -136,7 +134,7 @@ otherwise.
 
 ### GetClientCredentialsGrantAccessTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetClientCredentialsGrantAccessTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetClientCredentialsGrantAccessTokenLifespanOk() (*string, bool)`
 
 GetClientCredentialsGrantAccessTokenLifespanOk returns a tuple with the
 ClientCredentialsGrantAccessTokenLifespan field if it's non-nil, zero value
@@ -144,28 +142,28 @@ otherwise and a boolean to check if the value has been set.
 
 ### SetClientCredentialsGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetClientCredentialsGrantAccessTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetClientCredentialsGrantAccessTokenLifespan(v string)`
 
 SetClientCredentialsGrantAccessTokenLifespan sets
 ClientCredentialsGrantAccessTokenLifespan field to given value.
 
 ### HasClientCredentialsGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasClientCredentialsGrantAccessTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasClientCredentialsGrantAccessTokenLifespan() bool`
 
 HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has
 been set.
 
 ### GetImplicitGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetImplicitGrantAccessTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetImplicitGrantAccessTokenLifespan() string`
 
 GetImplicitGrantAccessTokenLifespan returns the ImplicitGrantAccessTokenLifespan
 field if non-nil, zero value otherwise.
 
 ### GetImplicitGrantAccessTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetImplicitGrantAccessTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetImplicitGrantAccessTokenLifespanOk() (*string, bool)`
 
 GetImplicitGrantAccessTokenLifespanOk returns a tuple with the
 ImplicitGrantAccessTokenLifespan field if it's non-nil, zero value otherwise and
@@ -173,27 +171,27 @@ a boolean to check if the value has been set.
 
 ### SetImplicitGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetImplicitGrantAccessTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetImplicitGrantAccessTokenLifespan(v string)`
 
 SetImplicitGrantAccessTokenLifespan sets ImplicitGrantAccessTokenLifespan field
 to given value.
 
 ### HasImplicitGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasImplicitGrantAccessTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasImplicitGrantAccessTokenLifespan() bool`
 
 HasImplicitGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetImplicitGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetImplicitGrantIdTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetImplicitGrantIdTokenLifespan() string`
 
 GetImplicitGrantIdTokenLifespan returns the ImplicitGrantIdTokenLifespan field
 if non-nil, zero value otherwise.
 
 ### GetImplicitGrantIdTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetImplicitGrantIdTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetImplicitGrantIdTokenLifespanOk() (*string, bool)`
 
 GetImplicitGrantIdTokenLifespanOk returns a tuple with the
 ImplicitGrantIdTokenLifespan field if it's non-nil, zero value otherwise and a
@@ -201,27 +199,27 @@ boolean to check if the value has been set.
 
 ### SetImplicitGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetImplicitGrantIdTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetImplicitGrantIdTokenLifespan(v string)`
 
 SetImplicitGrantIdTokenLifespan sets ImplicitGrantIdTokenLifespan field to given
 value.
 
 ### HasImplicitGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasImplicitGrantIdTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasImplicitGrantIdTokenLifespan() bool`
 
 HasImplicitGrantIdTokenLifespan returns a boolean if a field has been set.
 
 ### GetJwtBearerGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetJwtBearerGrantAccessTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetJwtBearerGrantAccessTokenLifespan() string`
 
 GetJwtBearerGrantAccessTokenLifespan returns the
 JwtBearerGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetJwtBearerGrantAccessTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool)`
 
 GetJwtBearerGrantAccessTokenLifespanOk returns a tuple with the
 JwtBearerGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
@@ -229,83 +227,27 @@ and a boolean to check if the value has been set.
 
 ### SetJwtBearerGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetJwtBearerGrantAccessTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetJwtBearerGrantAccessTokenLifespan(v string)`
 
 SetJwtBearerGrantAccessTokenLifespan sets JwtBearerGrantAccessTokenLifespan
 field to given value.
 
 ### HasJwtBearerGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasJwtBearerGrantAccessTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasJwtBearerGrantAccessTokenLifespan() bool`
 
 HasJwtBearerGrantAccessTokenLifespan returns a boolean if a field has been set.
 
-### GetPasswordGrantAccessTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) GetPasswordGrantAccessTokenLifespan() string`
-
-GetPasswordGrantAccessTokenLifespan returns the PasswordGrantAccessTokenLifespan
-field if non-nil, zero value otherwise.
-
-### GetPasswordGrantAccessTokenLifespanOk
-
-`func (o *UpdateOAuth2ClientLifespans) GetPasswordGrantAccessTokenLifespanOk() (*string, bool)`
-
-GetPasswordGrantAccessTokenLifespanOk returns a tuple with the
-PasswordGrantAccessTokenLifespan field if it's non-nil, zero value otherwise and
-a boolean to check if the value has been set.
-
-### SetPasswordGrantAccessTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) SetPasswordGrantAccessTokenLifespan(v string)`
-
-SetPasswordGrantAccessTokenLifespan sets PasswordGrantAccessTokenLifespan field
-to given value.
-
-### HasPasswordGrantAccessTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) HasPasswordGrantAccessTokenLifespan() bool`
-
-HasPasswordGrantAccessTokenLifespan returns a boolean if a field has been set.
-
-### GetPasswordGrantRefreshTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) GetPasswordGrantRefreshTokenLifespan() string`
-
-GetPasswordGrantRefreshTokenLifespan returns the
-PasswordGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
-
-### GetPasswordGrantRefreshTokenLifespanOk
-
-`func (o *UpdateOAuth2ClientLifespans) GetPasswordGrantRefreshTokenLifespanOk() (*string, bool)`
-
-GetPasswordGrantRefreshTokenLifespanOk returns a tuple with the
-PasswordGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetPasswordGrantRefreshTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) SetPasswordGrantRefreshTokenLifespan(v string)`
-
-SetPasswordGrantRefreshTokenLifespan sets PasswordGrantRefreshTokenLifespan
-field to given value.
-
-### HasPasswordGrantRefreshTokenLifespan
-
-`func (o *UpdateOAuth2ClientLifespans) HasPasswordGrantRefreshTokenLifespan() bool`
-
-HasPasswordGrantRefreshTokenLifespan returns a boolean if a field has been set.
-
 ### GetRefreshTokenGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantAccessTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantAccessTokenLifespan() string`
 
 GetRefreshTokenGrantAccessTokenLifespan returns the
 RefreshTokenGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantAccessTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, bool)`
 
 GetRefreshTokenGrantAccessTokenLifespanOk returns a tuple with the
 RefreshTokenGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
@@ -313,28 +255,28 @@ and a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetRefreshTokenGrantAccessTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetRefreshTokenGrantAccessTokenLifespan(v string)`
 
 SetRefreshTokenGrantAccessTokenLifespan sets
 RefreshTokenGrantAccessTokenLifespan field to given value.
 
 ### HasRefreshTokenGrantAccessTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasRefreshTokenGrantAccessTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasRefreshTokenGrantAccessTokenLifespan() bool`
 
 HasRefreshTokenGrantAccessTokenLifespan returns a boolean if a field has been
 set.
 
 ### GetRefreshTokenGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantIdTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantIdTokenLifespan() string`
 
 GetRefreshTokenGrantIdTokenLifespan returns the RefreshTokenGrantIdTokenLifespan
 field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantIdTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool)`
 
 GetRefreshTokenGrantIdTokenLifespanOk returns a tuple with the
 RefreshTokenGrantIdTokenLifespan field if it's non-nil, zero value otherwise and
@@ -342,27 +284,27 @@ a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetRefreshTokenGrantIdTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetRefreshTokenGrantIdTokenLifespan(v string)`
 
 SetRefreshTokenGrantIdTokenLifespan sets RefreshTokenGrantIdTokenLifespan field
 to given value.
 
 ### HasRefreshTokenGrantIdTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasRefreshTokenGrantIdTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasRefreshTokenGrantIdTokenLifespan() bool`
 
 HasRefreshTokenGrantIdTokenLifespan returns a boolean if a field has been set.
 
 ### GetRefreshTokenGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantRefreshTokenLifespan() string`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantRefreshTokenLifespan() string`
 
 GetRefreshTokenGrantRefreshTokenLifespan returns the
 RefreshTokenGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantRefreshTokenLifespanOk
 
-`func (o *UpdateOAuth2ClientLifespans) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bool)`
+`func (o *OAuth2ClientTokenLifespans) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bool)`
 
 GetRefreshTokenGrantRefreshTokenLifespanOk returns a tuple with the
 RefreshTokenGrantRefreshTokenLifespan field if it's non-nil, zero value
@@ -370,14 +312,14 @@ otherwise and a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) SetRefreshTokenGrantRefreshTokenLifespan(v string)`
+`func (o *OAuth2ClientTokenLifespans) SetRefreshTokenGrantRefreshTokenLifespan(v string)`
 
 SetRefreshTokenGrantRefreshTokenLifespan sets
 RefreshTokenGrantRefreshTokenLifespan field to given value.
 
 ### HasRefreshTokenGrantRefreshTokenLifespan
 
-`func (o *UpdateOAuth2ClientLifespans) HasRefreshTokenGrantRefreshTokenLifespan() bool`
+`func (o *OAuth2ClientTokenLifespans) HasRefreshTokenGrantRefreshTokenLifespan() bool`
 
 HasRefreshTokenGrantRefreshTokenLifespan returns a boolean if a field has been
 set.

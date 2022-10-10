@@ -412,7 +412,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
-		run := func(t *testing.T, strategy string, c *hc.Client, conf *oauth2.Config, expectedLifespans client.UpdateOAuth2ClientLifespans) {
+		run := func(t *testing.T, strategy string, c *hc.Client, conf *oauth2.Config, expectedLifespans client.Lifespans) {
 			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				acceptLoginHandler(t, c, subject, nil),
 				acceptConsentHandler(t, c, subject, nil),
@@ -491,10 +491,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
 			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.UpdateOAuth2ClientLifespans{}, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.Lifespans{}, adminTS)
 			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
-			expectedLifespans := client.UpdateOAuth2ClientLifespans{
+			expectedLifespans := client.Lifespans{
 				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
 				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
 				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},

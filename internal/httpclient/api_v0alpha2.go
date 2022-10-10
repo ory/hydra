@@ -141,7 +141,7 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2ConsentRequestExecute(r ApiAdminAc
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -278,7 +278,7 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2LoginRequestExecute(r ApiAdminAcce
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -397,7 +397,7 @@ func (a *V0alpha2ApiService) AdminAcceptOAuth2LogoutRequestExecute(r ApiAdminAcc
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -521,7 +521,7 @@ func (a *V0alpha2ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJso
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -635,7 +635,7 @@ func (a *V0alpha2ApiService) AdminDeleteJsonWebKeyExecute(r ApiAdminDeleteJsonWe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -736,7 +736,7 @@ func (a *V0alpha2ApiService) AdminDeleteJsonWebKeySetExecute(r ApiAdminDeleteJso
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -841,7 +841,7 @@ func (a *V0alpha2ApiService) AdminDeleteOAuth2TokenExecute(r ApiAdminDeleteOAuth
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1050,7 +1050,7 @@ func (a *V0alpha2ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1163,7 +1163,7 @@ func (a *V0alpha2ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1299,7 +1299,7 @@ func (a *V0alpha2ApiService) AdminGetOAuth2ConsentRequestExecute(r ApiAdminGetOA
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1432,7 +1432,7 @@ func (a *V0alpha2ApiService) AdminGetOAuth2LoginRequestExecute(r ApiAdminGetOAut
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1559,7 +1559,7 @@ func (a *V0alpha2ApiService) AdminGetOAuth2LogoutRequestExecute(r ApiAdminGetOAu
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1803,7 +1803,7 @@ func (a *V0alpha2ApiService) AdminIntrospectOAuth2TokenExecute(r ApiAdminIntrosp
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -1946,7 +1946,7 @@ func (a *V0alpha2ApiService) AdminListOAuth2SubjectConsentSessionsExecute(r ApiA
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2240,7 +2240,7 @@ func (a *V0alpha2ApiService) AdminRejectOAuth2ConsentRequestExecute(r ApiAdminRe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2376,7 +2376,7 @@ func (a *V0alpha2ApiService) AdminRejectOAuth2LoginRequestExecute(r ApiAdminReje
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2501,7 +2501,7 @@ func (a *V0alpha2ApiService) AdminRejectOAuth2LogoutRequestExecute(r ApiAdminRej
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2628,7 +2628,7 @@ func (a *V0alpha2ApiService) AdminRevokeOAuth2ConsentSessionsExecute(r ApiAdminR
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2736,7 +2736,7 @@ func (a *V0alpha2ApiService) AdminRevokeOAuth2LoginSessionsExecute(r ApiAdminRev
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2969,7 +2969,7 @@ func (a *V0alpha2ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWe
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3090,7 +3090,7 @@ func (a *V0alpha2ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJso
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3308,7 +3308,7 @@ func (a *V0alpha2ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeys
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3420,7 +3420,7 @@ func (a *V0alpha2ApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcC
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3534,7 +3534,7 @@ func (a *V0alpha2ApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest)
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3561,7 +3561,7 @@ type ApiPerformOAuth2AuthorizationFlowRequest struct {
 	ApiService *V0alpha2ApiService
 }
 
-func (r ApiPerformOAuth2AuthorizationFlowRequest) Execute() (*OAuth2ApiError, *http.Response, error) {
+func (r ApiPerformOAuth2AuthorizationFlowRequest) Execute() (*ErrorOAuth2, *http.Response, error) {
 	return r.ApiService.PerformOAuth2AuthorizationFlowExecute(r)
 }
 
@@ -3585,13 +3585,13 @@ func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlow(ctx context.Context)
 
 // Execute executes the request
 //
-//	@return OAuth2ApiError
-func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2AuthorizationFlowRequest) (*OAuth2ApiError, *http.Response, error) {
+//	@return ErrorOAuth2
+func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformOAuth2AuthorizationFlowRequest) (*ErrorOAuth2, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *OAuth2ApiError
+		localVarReturnValue *ErrorOAuth2
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V0alpha2ApiService.PerformOAuth2AuthorizationFlow")
@@ -3644,7 +3644,7 @@ func (a *V0alpha2ApiService) PerformOAuth2AuthorizationFlowExecute(r ApiPerformO
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -3804,7 +3804,7 @@ func (a *V0alpha2ApiService) PerformOAuth2TokenFlowExecute(r ApiPerformOAuth2Tok
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -4014,7 +4014,7 @@ func (a *V0alpha2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenRequ
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v OAuth2ApiError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

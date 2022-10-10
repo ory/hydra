@@ -14,7 +14,7 @@ docs/AcceptOAuth2ConsentRequestSession.md
 docs/AcceptOAuth2LoginRequest.md
 docs/AdminCreateJsonWebKeySetBody.md
 docs/AdminTrustOAuth2JwtGrantIssuerBody.md
-docs/ErrorBody.md
+docs/ErrorOAuth2.md
 docs/GenericError.md
 docs/GetVersion200Response.md
 docs/HandledOAuth2ConsentRequest.md
@@ -31,9 +31,7 @@ docs/JsonPatch.md
 docs/JsonWebKey.md
 docs/JsonWebKeySet.md
 docs/MetadataApi.md
-docs/ModelError.md
 docs/OAuth2AccessRequest.md
-docs/OAuth2ApiError.md
 docs/OAuth2Client.md
 docs/OAuth2ClientTokenLifespans.md
 docs/OAuth2ConsentRequest.md
@@ -70,8 +68,7 @@ model_accept_o_auth2_consent_request_session.go
 model_accept_o_auth2_login_request.go
 model_admin_create_json_web_key_set_body.go
 model_admin_trust_o_auth2_jwt_grant_issuer_body.go
-model_error.go
-model_error_body.go
+model_error_o_auth2.go
 model_generic_error.go
 model_get_version_200_response.go
 model_handled_o_auth2_consent_request.go
@@ -88,7 +85,6 @@ model_json_patch.go
 model_json_web_key.go
 model_json_web_key_set.go
 model_o_auth2_access_request.go
-model_o_auth2_api_error.go
 model_o_auth2_client.go
 model_o_auth2_client_token_lifespans.go
 model_o_auth2_consent_request.go

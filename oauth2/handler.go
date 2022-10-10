@@ -371,7 +371,7 @@ type OIDCConfiguration struct {
 //
 //	Responses:
 //	  200: oidcConfiguration
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -494,7 +494,7 @@ type oidcUserInfo struct {
 //
 //	Responses:
 //	  200: oidcUserInfo
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -601,7 +601,7 @@ type revokeOAuth2Token struct {
 //
 //	Responses:
 //	  200: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -651,7 +651,7 @@ type adminIntrospectOAuth2Token struct {
 //
 //	Responses:
 //	  200: introspectedOAuth2Token
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -812,7 +812,7 @@ type oAuth2TokenResponse struct {
 //
 //	Responses:
 //	  200: oAuth2TokenResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -900,7 +900,7 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 //
 //	Responses:
 //	  302: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -1028,7 +1028,7 @@ type adminDeleteOAuth2Token struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminDeleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

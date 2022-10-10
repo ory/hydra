@@ -41,8 +41,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Discover JSON Web Keys
       tags:
         - v0alpha2
@@ -73,8 +73,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: OpenID Connect Discovery
       tags:
         - v0alpha2
@@ -142,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: List OAuth 2.0 Clients
       tags:
@@ -173,13 +173,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Bad Request Error Response
         default:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: Create OAuth 2.0 Client
       tags:
@@ -249,7 +249,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: Get an OAuth 2.0 Client
       tags:
@@ -297,13 +297,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Not Found Error Response
         default:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: Patch OAuth 2.0 Client
       tags:
@@ -351,19 +351,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Bad Request Error Response
         "404":
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Not Found Error Response
         default:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: Set OAuth 2.0 Client
       tags:
@@ -440,8 +440,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Delete a JSON Web Key Set
       tags:
         - v0alpha2
@@ -480,8 +480,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Retrieve a JSON Web Key Set
       tags:
         - v0alpha2
@@ -533,8 +533,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Generate a New JSON Web Key
       tags:
         - v0alpha2
@@ -579,8 +579,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Update a JSON Web Key Set
       tags:
         - v0alpha2
@@ -627,8 +627,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Delete a JSON Web Key
       tags:
         - v0alpha2
@@ -665,8 +665,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Fetch a JSON Web Key
       tags:
         - v0alpha2
@@ -719,8 +719,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Update a JSON Web Key
       tags:
         - v0alpha2
@@ -777,8 +777,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Get OAuth 2.0 Consent Request Information
       tags:
         - v0alpha2
@@ -846,8 +846,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Accept an OAuth 2.0 Consent Request
       tags:
         - v0alpha2
@@ -912,8 +912,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Reject an OAuth 2.0 Consent Request
       tags:
         - v0alpha2
@@ -964,8 +964,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Get an OAuth 2.0 Login Request
       tags:
         - v0alpha2
@@ -1026,8 +1026,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Accept an OAuth 2.0 Login Request
       tags:
         - v0alpha2
@@ -1084,8 +1084,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Reject an OAuth 2.0 Login Request
       tags:
         - v0alpha2
@@ -1118,8 +1118,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Get an OAuth 2.0 Logout Request
       tags:
         - v0alpha2
@@ -1152,8 +1152,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Accept an OAuth 2.0 Logout Request
       tags:
         - v0alpha2
@@ -1194,8 +1194,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Reject an OAuth 2.0 Logout Request
       tags:
         - v0alpha2
@@ -1245,8 +1245,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary:
         Revokes OAuth 2.0 Consent Sessions of a Subject for a Specific OAuth 2.0
         Client
@@ -1310,8 +1310,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: List OAuth 2.0 Consent Sessions of a Subject
       tags:
         - v0alpha2
@@ -1344,8 +1344,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Invalidates All OAuth 2.0 Login Sessions of a Certain User
       tags:
         - v0alpha2
@@ -1378,8 +1378,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Introspect OAuth2 Access or Refresh Tokens
       tags:
         - v0alpha2
@@ -1407,8 +1407,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: Delete OAuth2 Access Tokens from a Client
       tags:
         - v0alpha2
@@ -1659,8 +1659,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       summary: The OAuth 2.0 Authorize Endpoint
       tags:
         - v0alpha2
@@ -1698,13 +1698,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Bad Request Error Response
         default:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       summary: Register OAuth2 Client using OpenID Dynamic Client Registration
       tags:
@@ -1800,7 +1800,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       security:
         - bearer: []
@@ -1864,13 +1864,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Not Found Error Response
         default:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBody"
+                $ref: "#/components/schemas/errorOAuth2"
           description: Default Error Response
       security:
         - bearer: []
@@ -1906,8 +1906,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       security:
         - basic: []
         - oauth2: []
@@ -1965,8 +1965,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       security:
         - basic: []
         - oauth2: []
@@ -1998,8 +1998,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/oAuth2ApiError"
-          description: oAuth2ApiError
+                $ref: "#/components/schemas/errorOAuth2"
+          description: errorOAuth2
       security:
         - oauth2: []
       summary: OpenID Connect Userinfo
@@ -2033,23 +2033,23 @@ components:
       description: "Empty responses are sent when, for example, resources are
         deleted.\
         \ The HTTP status code for empty responses is\ntypically 201."
-    errorBadRequest:
+    errorOAuth2BadRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorBody"
+            $ref: "#/components/schemas/errorOAuth2"
       description: Bad Request Error Response
-    errorDefault:
+    errorOAuth2Default:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorBody"
+            $ref: "#/components/schemas/errorOAuth2"
       description: Default Error Response
-    errorNotFound:
+    errorOAuth2NotFound:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/errorBody"
+            $ref: "#/components/schemas/errorOAuth2"
       description: Not Found Error Response
     listOAuth2Clients:
       content:
@@ -2362,114 +2362,39 @@ components:
         - jwk
         - scope
       type: object
-    error:
+    errorOAuth2:
       description: Error
+      example:
+        error_debug: error_debug
+        status_code: 401
+        error_description: error_description
+        error: error
+        error_hint: The redirect URL is not allowed.
       properties:
-        code:
+        error:
+          description: Error
+          type: string
+        error_debug:
+          description: |-
+            Error Debug Information
+
+            Only available in dev mode.
+          type: string
+        error_description:
+          description: Error Description
+          type: string
+        error_hint:
+          description: |-
+            Error Hint
+
+            Helps the user identify the error cause.
+          example: The redirect URL is not allowed.
+          type: string
+        status_code:
           description: HTTP Status Code
-          example: 404
+          example: 401
           format: int64
           type: integer
-        debug:
-          description: |-
-            Debug Details
-
-            This field is often not exposed to protect against leaking
-            sensitive information.
-          example: SQL field "foo" is not a bool.
-          type: string
-        details:
-          additionalProperties: {}
-          description: |-
-            Additional Error Details
-
-            Further error details
-          type: object
-        id:
-          description: |-
-            Error ID
-
-            Useful when trying to identify various errors in application logic.
-          type: string
-        message:
-          description: |-
-            Error Message
-
-            The error's message.
-          example: The resource could not be found
-          type: string
-        reason:
-          description: Error Reason
-          example: User with ID 1234 does not exist.
-          type: string
-        request:
-          description: |-
-            HTTP Request ID
-
-            The request ID is often exposed internally in order to trace
-            errors across service architectures. This is often a UUID.
-          example: d7ef54b1-ec15-46e6-bccb-524b82c035e6
-          type: string
-        status:
-          description: HTTP Status Description
-          example: Not Found
-          type: string
-      required:
-        - message
-      type: object
-    errorBody:
-      properties:
-        code:
-          description: HTTP Status Code
-          example: 404
-          format: int64
-          type: integer
-        debug:
-          description: |-
-            Debug Details
-
-            This field is often not exposed to protect against leaking
-            sensitive information.
-          example: SQL field "foo" is not a bool.
-          type: string
-        details:
-          additionalProperties: {}
-          description: |-
-            Additional Error Details
-
-            Further error details
-          type: object
-        id:
-          description: |-
-            Error ID
-
-            Useful when trying to identify various errors in application logic.
-          type: string
-        message:
-          description: |-
-            Error Message
-
-            The error's message.
-          example: The resource could not be found
-          type: string
-        reason:
-          description: Error Reason
-          example: User with ID 1234 does not exist.
-          type: string
-        request:
-          description: |-
-            HTTP Request ID
-
-            The request ID is often exposed internally in order to trace
-            errors across service architectures. This is often a UUID.
-          example: d7ef54b1-ec15-46e6-bccb-524b82c035e6
-          type: string
-        status:
-          description: HTTP Status Description
-          example: Not Found
-          type: string
-      required:
-        - message
       type: object
     genericError:
       properties:
@@ -2963,37 +2888,6 @@ components:
             type: string
           type: array
       title: Requester is a token endpoint's request context.
-      type: object
-    oAuth2ApiError:
-      description: An API error caused by Ory's OAuth 2.0 APIs.
-      example:
-        error_debug: The database adapter was unable to find the element
-        status_code: 404
-        error_description: Object with ID 12345 does not exist
-        error: The requested resource could not be found
-      properties:
-        error:
-          description: Name is the error name.
-          example: The requested resource could not be found
-          type: string
-        error_debug:
-          description:
-            Debug contains debug information. This is usually not available and
-            has to be enabled.
-          example: The database adapter was unable to find the element
-          type: string
-        error_description:
-          description:
-            Description contains further information on the nature of the error.
-          example: Object with ID 12345 does not exist
-          type: string
-        status_code:
-          description:
-            "Code represents the error status code (404, 403, 401, ...)."
-          example: 404
-          format: int64
-          type: integer
-      title: OAuth2 API Error
       type: object
     oAuth2Client:
       description: "OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID

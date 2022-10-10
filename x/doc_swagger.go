@@ -20,33 +20,6 @@
 
 package x
 
-// OAuth2 API Error
-//
-// An API error caused by Ory's OAuth 2.0 APIs.
-//
-// swagger:model oAuth2ApiError
-type oAuth2ApiError struct {
-	// Name is the error name.
-	//
-	// example: The requested resource could not be found
-	Name string `json:"error"`
-
-	// Description contains further information on the nature of the error.
-	//
-	// example: Object with ID 12345 does not exist
-	Description string `json:"error_description"`
-
-	// Code represents the error status code (404, 403, 401, ...).
-	//
-	// example: 404
-	Code int `json:"status_code"`
-
-	// Debug contains debug information. This is usually not available and has to be enabled.
-	//
-	// example: The database adapter was unable to find the element
-	Debug string `json:"error_debug"`
-}
-
 // Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 // typically 201.
 //
@@ -55,83 +28,52 @@ type emptyResponse struct{}
 
 // Error
 //
-// swagger:model error
-type errorModel struct {
-	// Error ID
+// swagger:model errorOAuth2
+type errorOAuth2 struct {
+	// Error
+	Name string `json:"error"`
+
+	// Error Description
+	Description string `json:"error_description"`
+
+	// Error Hint
 	//
-	// Useful when trying to identify various errors in application logic.
-	ID string `json:"id,omitempty"`
+	// Helps the user identify the error cause.
+	//
+	// Example: The redirect URL is not allowed.
+	Hint string `json:"error_hint"`
 
 	// HTTP Status Code
 	//
-	// example: 404
-	StatusCode int `json:"code,omitempty"`
+	// Example: 401
+	Code int `json:"status_code"`
 
-	// HTTP Status Description
+	// Error Debug Information
 	//
-	// example: Not Found
-	Status string `json:"status,omitempty"`
-
-	// HTTP Request ID
-	//
-	// The request ID is often exposed internally in order to trace
-	// errors across service architectures. This is often a UUID.
-	//
-	// example: d7ef54b1-ec15-46e6-bccb-524b82c035e6
-	RIDField string `json:"request,omitempty"`
-
-	// Error Reason
-	//
-	// example: User with ID 1234 does not exist.
-	ReasonField string `json:"reason,omitempty"`
-
-	// Debug Details
-	//
-	// This field is often not exposed to protect against leaking
-	// sensitive information.
-	//
-	// example: SQL field "foo" is not a bool.
-	DebugField string `json:"debug,omitempty"`
-
-	// Additional Error Details
-	//
-	// Further error details
-	DetailsField map[string]interface{} `json:"details,omitempty"`
-
-	// Error Message
-	//
-	// The error's message.
-	//
-	// example: The resource could not be found
-	// required: true
-	ErrorField string `json:"message"`
-}
-
-// swagger:model errorBody
-type errorBody struct {
-	errorModel
+	// Only available in dev mode.
+	Debug string `json:"error_debug,omitempty"`
 }
 
 // Default Error Response
 //
-// swagger:response errorDefault
-type errorDefault struct {
+// swagger:response errorOAuth2Default
+type errorOAuth2Default struct {
 	// in: body
-	Body errorBody
+	Body errorOAuth2
 }
 
 // Bad Request Error Response
 //
-// swagger:response errorBadRequest
-type errorBadRequest struct {
+// swagger:response errorOAuth2BadRequest
+type errorOAuth2BadRequest struct {
 	// in: body
-	Body errorBody
+	Body errorOAuth2
 }
 
 // Not Found Error Response
 //
-// swagger:response errorNotFound
-type errorNotFound struct {
+// swagger:response errorOAuth2NotFound
+type errorOAuth2NotFound struct {
 	// in: body
-	Body errorBody
+	Body errorOAuth2
 }

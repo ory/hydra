@@ -43,9 +43,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Discover JSON Web Keys
+      summary: Discover Well-Known JSON Web Keys
       tags:
-        - v0alpha2
+        - wellknown
   /.well-known/openid-configuration:
     get:
       description: "The well known endpoint an be used to retrieve information
@@ -420,7 +420,7 @@ paths:
         \ keys used for TLS and JSON Web Tokens (such as OpenID Connect ID
         tokens),\
         \ and allows storing user-defined keys as well."
-      operationId: adminDeleteJsonWebKeySet
+      operationId: deleteJsonWebKeySet
       parameters:
         - description: The JSON Web Key Set
           explode: false
@@ -442,9 +442,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Delete a JSON Web Key Set
+      summary: Delete JSON Web Key Set
       tags:
-        - v0alpha2
+        - jwk
     get:
       description: "This endpoint can be used to retrieve JWK Sets stored in ORY
         Hydra.\n\
@@ -459,9 +459,9 @@ paths:
         \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and
         allows\
         \ storing user-defined keys as well."
-      operationId: adminGetJsonWebKeySet
+      operationId: getJsonWebKeySet
       parameters:
-        - description: The JSON Web Key Set
+        - description: JSON Web Key Set ID
           explode: false
           in: path
           name: set
@@ -484,7 +484,7 @@ paths:
           description: errorOAuth2
       summary: Retrieve a JSON Web Key Set
       tags:
-        - v0alpha2
+        - jwk
     post:
       description: "This endpoint is capable of generating JSON Web Key Sets for
         you.\
@@ -505,9 +505,9 @@ paths:
         \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and
         allows\
         \ storing user-defined keys as well."
-      operationId: adminCreateJsonWebKeySet
+      operationId: createJsonWebKeySet
       parameters:
-        - description: The JSON Web Key Set
+        - description: The JSON Web Key Set ID
           explode: false
           in: path
           name: set
@@ -519,7 +519,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/adminCreateJsonWebKeySetBody"
+              $ref: "#/components/schemas/createJsonWebKeySet"
         required: true
         x-originalParamName: Body
       responses:
@@ -535,9 +535,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Generate a New JSON Web Key
+      summary: Create JSON Web Key
       tags:
-        - v0alpha2
+        - jwk
     put:
       description: "Use this method if you do not want to let Hydra generate the
         JWKs\
@@ -552,9 +552,9 @@ paths:
         \ to store cryptographic keys used for TLS and JSON Web Tokens (such as
         OpenID\
         \ Connect ID tokens), and allows storing user-defined keys as well."
-      operationId: adminUpdateJsonWebKeySet
+      operationId: setJsonWebKeySet
       parameters:
-        - description: The JSON Web Key Set
+        - description: The JSON Web Key Set ID
           explode: false
           in: path
           name: set
@@ -583,23 +583,23 @@ paths:
           description: errorOAuth2
       summary: Update a JSON Web Key Set
       tags:
-        - v0alpha2
+        - jwk
   /admin/keys/{set}/{kid}:
     delete:
       description: "Use this endpoint to delete a single JSON Web Key.\n\nA JSON
         Web\
         \ Key (JWK) is a JavaScript Object Notation (JSON) data structure that
         represents\
-        \ a cryptographic key. A JWK Set is a JSON data structure that
+        \ a cryptographic key. A\nJWK Set is a JSON data structure that
         represents\
         \ a set of JWKs. A JSON Web Key is identified by its set and key id. ORY
         Hydra\
-        \ uses this functionality to store cryptographic keys used for TLS and
+        \ uses\nthis functionality to store cryptographic keys used for TLS and
         JSON\
-        \ Web Tokens (such as OpenID Connect ID tokens), and allows storing
+        \ Web Tokens (such as OpenID Connect ID tokens),\nand allows storing
         user-defined\
         \ keys as well."
-      operationId: adminDeleteJsonWebKey
+      operationId: deleteJsonWebKey
       parameters:
         - description: The JSON Web Key Set
           explode: false
@@ -629,16 +629,16 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Delete a JSON Web Key
+      summary: Delete JSON Web Key
       tags:
-        - v0alpha2
+        - jwk
     get:
       description:
-        This endpoint returns a singular JSON Web Key. It is identified by the
-        set and the specific key ID (kid).
-      operationId: adminGetJsonWebKey
+        This endpoint returns a singular JSON Web Key contained in a set. It is
+        identified by the set and the specific key ID (kid).
+      operationId: getJsonWebKey
       parameters:
-        - description: The JSON Web Key Set
+        - description: JSON Web Key Set ID
           explode: false
           in: path
           name: set
@@ -646,7 +646,7 @@ paths:
           schema:
             type: string
           style: simple
-        - description: The JSON Web Key ID (kid)
+        - description: JSON Web Key ID
           explode: false
           in: path
           name: kid
@@ -667,9 +667,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Fetch a JSON Web Key
+      summary: Get JSON Web Key
       tags:
-        - v0alpha2
+        - jwk
     put:
       description: "Use this method if you do not want to let Hydra generate the
         JWKs\
@@ -684,9 +684,9 @@ paths:
         \ to store cryptographic keys used for TLS and JSON Web Tokens (such as
         OpenID\
         \ Connect ID tokens), and allows storing user-defined keys as well."
-      operationId: adminUpdateJsonWebKey
+      operationId: setJsonWebKey
       parameters:
-        - description: The JSON Web Key Set
+        - description: The JSON Web Key Set ID
           explode: false
           in: path
           name: set
@@ -694,7 +694,7 @@ paths:
           schema:
             type: string
           style: simple
-        - description: The JSON Web Key ID (kid)
+        - description: JSON Web Key ID
           explode: false
           in: path
           name: kid
@@ -721,9 +721,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
-      summary: Update a JSON Web Key
+      summary: Set JSON Web Key
       tags:
-        - v0alpha2
+        - jwk
   /admin/oauth2/auth/requests/consent:
     get:
       description: "When an authorization code, hybrid, or implicit OAuth 2.0
@@ -2275,28 +2275,6 @@ components:
         HandledLoginRequest is the request payload used to accept a login
         request.
       type: object
-    adminCreateJsonWebKeySetBody:
-      properties:
-        alg:
-          description: "The algorithm to be used for creating the key. Supports
-            \"\
-            RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\""
-          type: string
-        kid:
-          description: The kid of the key to be created
-          type: string
-        use:
-          description: |-
-            The "use" (public key use) parameter identifies the intended use of
-            the public key. The "use" parameter is employed to indicate whether
-            a public key is used for encrypting data or verifying the signature
-            on data. Valid values are "enc" and "sig".
-          type: string
-      required:
-        - alg
-        - kid
-        - use
-      type: object
     adminTrustOAuth2JwtGrantIssuerBody:
       properties:
         allow_any_subject:
@@ -2339,6 +2317,34 @@ components:
         - issuer
         - jwk
         - scope
+      type: object
+    createJsonWebKeySet:
+      description: Create JSON Web Key Set Request Body
+      properties:
+        alg:
+          description: "JSON Web Key Algorithm\n\nThe algorithm to be used for
+            creating\
+            \ the key. Supports `RS256`, `ES256`, `ES512`, `HS512`, and `HS256`."
+          type: string
+        kid:
+          description: |-
+            JSON Web Key ID
+
+            The Key ID of the key to be created.
+          type: string
+        use:
+          description: |-
+            JSON Web Key Use
+
+            The "use" (public key use) parameter identifies the intended use of
+            the public key. The "use" parameter is employed to indicate whether
+            a public key is used for encrypting data or verifying the signature
+            on data. Valid values are "enc" and "sig".
+          type: string
+      required:
+        - alg
+        - kid
+        - use
       type: object
     errorOAuth2:
       description: Error
@@ -2728,15 +2734,7 @@ components:
         - use
       type: object
     jsonWebKeySet:
-      description: "It is important that this model object is named
-        JSONWebKeySet\
-        \ for\n\"swagger generate spec\" to generate only on definition of
-        a\nJSONWebKeySet.\
-        \ Since one with the same name is previously defined
-        as\nclient.Client.JSONWebKeys\
-        \ and this one is last, this one will be\neffectively written in the
-        swagger\
-        \ spec."
+      description: JSON Web Key Set
       example:
         keys:
           - d: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
@@ -2779,15 +2777,15 @@ components:
             alg: RS256
       properties:
         keys:
-          description: "The value of the \"keys\" parameter is an array of JSON
-            Web\
-            \ Key (JWK)\nvalues. By default, the order of the JWK values within
-            the\
-            \ array does\nnot imply an order of preference among them, although
-            applications\n\
-            of JWK Sets can choose to assign a meaning to the order for
-            their\npurposes,\
-            \ if desired."
+          description: "List of JSON Web Keys\n\nThe value of the \"keys\"
+            parameter\
+            \ is an array of JSON Web Key (JWK)\nvalues. By default, the order
+            of\
+            \ the JWK values within the array does\nnot imply an order of
+            preference\
+            \ among them, although applications\nof JWK Sets can choose to
+            assign\
+            \ a meaning to the order for their\npurposes, if desired."
           items:
             $ref: "#/components/schemas/jsonWebKey"
           type: array
@@ -3771,18 +3769,18 @@ components:
           title: NullTime implements sql.NullTime functionality.
           type: string
         remember:
-          description: "Remember, if set to true, tells ORY Hydra to remember
-            this\
-            \ consent authorization and reuse it if the same\nclient asks the
-            same\
-            \ user for the same, or a subset of, scope."
+          description: "Remember Consent\n\nRemember, if set to true, tells ORY
+            Hydra\
+            \ to remember this consent authorization and reuse it if the
+            same\nclient\
+            \ asks the same user for the same, or a subset of, scope."
           type: boolean
         remember_for:
-          description: "RememberFor sets how long the consent authorization
-            should\
-            \ be remembered for in seconds. If set to `0`, the\nauthorization
-            will\
-            \ be remembered indefinitely."
+          description: "Remember Consent For\n\nRememberFor sets how long the
+            consent\
+            \ authorization should be remembered for in seconds. If set to `0`,
+            the\n\
+            authorization will be remembered indefinitely."
           format: int64
           type: integer
         session:

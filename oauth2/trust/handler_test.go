@@ -197,7 +197,7 @@ func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
 	s.Require().NoError(err, "no error expected on grant creation")
 
-	getResult, _, err := s.hydraClient.V0alpha2Api.AdminGetJsonWebKey(context.Background(), createRequestParams.Issuer, createRequestParams.Jwk.Kid).Execute()
+	getResult, _, err := s.hydraClient.JwkApi.GetJsonWebKey(context.Background(), createRequestParams.Issuer, createRequestParams.Jwk.Kid).Execute()
 
 	s.Require().NoError(err, "no error expected on fetching public key")
 	s.Equal(createRequestParams.Jwk.Kid, getResult.Keys[0].Kid)

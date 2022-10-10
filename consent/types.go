@@ -213,26 +213,37 @@ type oAuth2ConsentSessions []OAuth2ConsentSession
 //
 // swagger:model oAuth2ConsentSession
 type OAuth2ConsentSession struct {
-	// Named ID because of pop
 	ID string `json:"-" db:"challenge"`
 
+	// Scope Granted
+	//
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope" db:"granted_scope"`
 
+	// Audience Granted
+	//
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
 	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
 
+	// Session Details
+	//
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *AcceptOAuth2ConsentRequestSession `json:"session" db:"-"`
 
+	// Remember Consent
+	//
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
 	Remember bool `json:"remember" db:"remember"`
 
+	// Remember Consent For
+	//
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for" db:"remember_for"`
 
+	// Consent Handled At
+	//
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
@@ -242,10 +253,14 @@ type OAuth2ConsentSession struct {
 	// the flow.
 	WasHandled bool `json:"-" db:"was_used"`
 
-	ConsentRequest  *OAuth2ConsentRequest `json:"consent_request" db:"-"`
-	Error           *RequestDeniedError   `json:"-" db:"error"`
-	RequestedAt     time.Time             `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime        `json:"-" db:"authenticated_at"`
+	// Consent Request
+	//
+	// The consent request that lead to this consent session.
+	ConsentRequest *OAuth2ConsentRequest `json:"consent_request" db:"-"`
+
+	Error           *RequestDeniedError `json:"-" db:"error"`
+	RequestedAt     time.Time           `json:"-" db:"requested_at"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`

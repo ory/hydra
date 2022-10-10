@@ -23,9 +23,9 @@ type OAuth2ConsentSession struct {
 	GrantAccessTokenAudience []string                       `json:"grant_access_token_audience,omitempty"`
 	GrantScope               []string                       `json:"grant_scope,omitempty"`
 	HandledAt                *time.Time                     `json:"handled_at,omitempty"`
-	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
+	// Remember Consent  Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
 	Remember *bool `json:"remember,omitempty"`
-	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
+	// Remember Consent For  RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
 	RememberFor *int64                             `json:"remember_for,omitempty"`
 	Session     *AcceptOAuth2ConsentRequestSession `json:"session,omitempty"`
 }

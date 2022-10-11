@@ -1,12 +1,44 @@
 {
-  "issuer": "http://hydra.localhost",
   "authorization_endpoint": "http://hydra.localhost/oauth2/auth",
-  "registration_endpoint": "http://client-register/registration",
-  "token_endpoint": "http://hydra.localhost/oauth2/token",
+  "backchannel_logout_session_supported": true,
+  "backchannel_logout_supported": true,
+  "claims_parameter_supported": false,
+  "claims_supported": [
+    "sub"
+  ],
+  "code_challenge_methods_supported": [
+    "plain",
+    "S256"
+  ],
+  "end_session_endpoint": "http://hydra.localhost/oauth2/sessions/logout",
+  "frontchannel_logout_session_supported": true,
+  "frontchannel_logout_supported": true,
+  "grant_types_supported": [
+    "authorization_code",
+    "implicit",
+    "client_credentials",
+    "refresh_token"
+  ],
+  "id_token_signed_response_alg": [
+    "RS256"
+  ],
+  "id_token_signing_alg_values_supported": [
+    "RS256"
+  ],
+  "issuer": "http://hydra.localhost",
   "jwks_uri": "http://hydra.localhost/.well-known/jwks.json",
-  "subject_types_supported": [
-    "pairwise",
-    "public"
+  "registration_endpoint": "http://client-register/registration",
+  "request_object_signing_alg_values_supported": [
+    "none",
+    "RS256",
+    "ES256"
+  ],
+  "request_parameter_supported": true,
+  "request_uri_parameter_supported": true,
+  "require_request_uri_registration": true,
+  "response_modes_supported": [
+    "query",
+    "fragment"
   ],
   "response_types_supported": [
     "code",
@@ -16,61 +48,29 @@
     "token",
     "token id_token code"
   ],
-  "claims_supported": [
-    "sub"
-  ],
-  "grant_types_supported": [
-    "authorization_code",
-    "implicit",
-    "client_credentials",
-    "refresh_token"
-  ],
-  "response_modes_supported": [
-    "query",
-    "fragment"
-  ],
-  "userinfo_endpoint": "/userinfo",
+  "revocation_endpoint": "http://hydra.localhost/oauth2/revoke",
   "scopes_supported": [
     "offline_access",
     "offline",
     "openid"
   ],
+  "subject_types_supported": [
+    "pairwise",
+    "public"
+  ],
+  "token_endpoint": "http://hydra.localhost/oauth2/token",
   "token_endpoint_auth_methods_supported": [
     "client_secret_post",
     "client_secret_basic",
     "private_key_jwt",
     "none"
   ],
-  "userinfo_signing_alg_values_supported": [
-    "none",
-    "RS256"
-  ],
-  "id_token_signing_alg_values_supported": [
-    "RS256"
-  ],
-  "id_token_signed_response_alg": [
-    "RS256"
-  ],
+  "userinfo_endpoint": "/userinfo",
   "userinfo_signed_response_alg": [
     "RS256"
   ],
-  "request_parameter_supported": true,
-  "request_uri_parameter_supported": true,
-  "require_request_uri_registration": true,
-  "claims_parameter_supported": false,
-  "revocation_endpoint": "http://hydra.localhost/oauth2/revoke",
-  "backchannel_logout_supported": true,
-  "backchannel_logout_session_supported": true,
-  "frontchannel_logout_supported": true,
-  "frontchannel_logout_session_supported": true,
-  "end_session_endpoint": "http://hydra.localhost/oauth2/sessions/logout",
-  "request_object_signing_alg_values_supported": [
+  "userinfo_signing_alg_values_supported": [
     "none",
-    "RS256",
-    "ES256"
-  ],
-  "code_challenge_methods_supported": [
-    "plain",
-    "S256"
+    "RS256"
   ]
 }

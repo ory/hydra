@@ -94,7 +94,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	model := createRequestParams
 
 	ctx := context.Background()
-	createResult, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	createResult, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no errors expected on grant creation")
 	s.NotEmpty(createResult.Id, " grant id expected to be non-empty")
 	s.Equal(model.Issuer, *createResult.Issuer, "issuer must match")
@@ -104,7 +104,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	s.Equal(model.Jwk.Kid, *createResult.PublicKey.Kid, "public key id must match")
 	s.Equal(model.ExpiresAt.Round(time.Second).UTC().String(), createResult.ExpiresAt.Round(time.Second).UTC().String(), "expiration date must match")
 
-	getResult, _, err := s.hydraClient.V0alpha2Api.AdminGetTrustedOAuth2JwtGrantIssuer(ctx, *createResult.Id).Execute()
+	getResult, _, err := s.hydraClient.OAuth2Api.GetTrustedOAuth2JwtGrantIssuer(ctx, *createResult.Id).Execute()
 	s.Require().NoError(err, "no errors expected on grant fetching")
 	s.Equal(*createResult.Id, *getResult.Id, " grant id must match")
 	s.Equal(model.Issuer, *getResult.Issuer, "issuer must match")
@@ -125,15 +125,15 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSameIssuerSubjectKey() {
 	)
 
 	ctx := context.Background()
-	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	_, _, err = s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err = s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because grant with same issuer+subject+kid exists")
 
 	kid := uuid.New().String()
 	createRequestParams.Jwk.Kid = kid
-	_, _, err = s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(ctx).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err = s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.NoError(err, "no errors expected on grant creation, because kid is now different")
 }
 
@@ -146,7 +146,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSubjectAndAnySubject() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because a grant with a subject and allow_any_subject cannot be created")
 }
 
@@ -159,7 +159,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because grant missing issuer")
 
 	createRequestParams = s.newCreateJwtBearerGrantParams(
@@ -170,7 +170,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, _, err = s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err = s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because grant missing subject")
 
 	createRequestParams = s.newCreateJwtBearerGrantParams(
@@ -181,7 +181,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Time{},
 	)
 
-	_, _, err = s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err = s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Error(err, "expected error, because grant missing expiration date")
 }
 
@@ -194,7 +194,7 @@ func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no error expected on grant creation")
 
 	getResult, _, err := s.hydraClient.JwkApi.GetJsonWebKey(context.Background(), createRequestParams.Issuer, createRequestParams.Jwk.Kid).Execute()
@@ -212,7 +212,7 @@ func (s *HandlerTestSuite) TestGrantWithAnySubjectCanBeCreated() {
 		time.Now().Add(time.Hour),
 	)
 
-	grant, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	grant, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no error expected on grant creation")
 
 	assert.Empty(s.T(), grant.Subject)
@@ -235,17 +235,17 @@ func (s *HandlerTestSuite) TestGrantListCanBeFetched() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	_, _, err = s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams2).Execute()
+	_, _, err = s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams2).Execute()
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	getResult, _, err := s.hydraClient.V0alpha2Api.AdminListTrustedOAuth2JwtGrantIssuers(context.Background()).Execute()
+	getResult, _, err := s.hydraClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).Execute()
 	s.Require().NoError(err, "no errors expected on grant list fetching")
 	s.Len(getResult, 2, "expected to get list of 2 grants")
 
-	getResult, _, err = s.hydraClient.V0alpha2Api.AdminListTrustedOAuth2JwtGrantIssuers(context.Background()).Issuer(createRequestParams2.Issuer).Execute()
+	getResult, _, err = s.hydraClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).Issuer(createRequestParams2.Issuer).Execute()
 
 	s.Require().NoError(err, "no errors expected on grant list fetching")
 	s.Len(getResult, 1, "expected to get list of 1 grant, when filtering by issuer")
@@ -261,13 +261,13 @@ func (s *HandlerTestSuite) TestGrantCanBeDeleted() {
 		time.Now().Add(time.Hour),
 	)
 
-	createResult, _, err := s.hydraClient.V0alpha2Api.AdminTrustOAuth2JwtGrantIssuer(context.Background()).AdminTrustOAuth2JwtGrantIssuerBody(createRequestParams).Execute()
+	createResult, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	_, err = s.hydraClient.V0alpha2Api.AdminDeleteTrustedOAuth2JwtGrantIssuer(context.Background(), *createResult.Id).Execute()
+	_, err = s.hydraClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), *createResult.Id).Execute()
 	s.Require().NoError(err, "no errors expected on grant deletion")
 
-	_, err = s.hydraClient.V0alpha2Api.AdminDeleteTrustedOAuth2JwtGrantIssuer(context.Background(), *createResult.Id).Execute()
+	_, err = s.hydraClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), *createResult.Id).Execute()
 	s.Error(err, "expected error, because grant has been already deleted")
 }
 
@@ -287,8 +287,8 @@ func (s *HandlerTestSuite) generateJWK(publicKey *rsa.PublicKey) hydra.JsonWebKe
 
 func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 	issuer, subject string, allowAnySubject bool, scope []string, expiresAt time.Time,
-) hydra.AdminTrustOAuth2JwtGrantIssuerBody {
-	return hydra.AdminTrustOAuth2JwtGrantIssuerBody{
+) hydra.TrustOAuth2JwtGrantIssuer {
+	return hydra.TrustOAuth2JwtGrantIssuer{
 		ExpiresAt:       expiresAt,
 		Issuer:          issuer,
 		Jwk:             s.generateJWK(s.publicKey),

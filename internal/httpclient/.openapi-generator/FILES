@@ -14,7 +14,6 @@ configuration.go
 docs/AcceptOAuth2ConsentRequest.md
 docs/AcceptOAuth2ConsentRequestSession.md
 docs/AcceptOAuth2LoginRequest.md
-docs/AdminTrustOAuth2JwtGrantIssuerBody.md
 docs/CreateJsonWebKeySet.md
 docs/ErrorOAuth2.md
 docs/GenericError.md
@@ -55,6 +54,7 @@ docs/TokenPagination.md
 docs/TokenPaginationHeaders.md
 docs/TokenPaginationRequestParameters.md
 docs/TokenPaginationResponseHeaders.md
+docs/TrustOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantJsonWebKey.md
 docs/V0alpha2Api.md
@@ -66,7 +66,6 @@ go.sum
 model_accept_o_auth2_consent_request.go
 model_accept_o_auth2_consent_request_session.go
 model_accept_o_auth2_login_request.go
-model_admin_trust_o_auth2_jwt_grant_issuer_body.go
 model_create_json_web_key_set.go
 model_error_o_auth2.go
 model_generic_error.go
@@ -103,6 +102,7 @@ model_token_pagination.go
 model_token_pagination_headers.go
 model_token_pagination_request_parameters.go
 model_token_pagination_response_headers.go
+model_trust_o_auth2_jwt_grant_issuer.go
 model_trusted_o_auth2_jwt_grant_issuer.go
 model_trusted_o_auth2_jwt_grant_json_web_key.go
 model_version.go

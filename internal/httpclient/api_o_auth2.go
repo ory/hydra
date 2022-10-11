@@ -654,6 +654,109 @@ func (a *OAuth2ApiService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 	return localVarHTTPResponse, nil
 }
 
+type ApiDeleteTrustedOAuth2JwtGrantIssuerRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	id         string
+}
+
+func (r ApiDeleteTrustedOAuth2JwtGrantIssuerRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteTrustedOAuth2JwtGrantIssuerExecute(r)
+}
+
+/*
+DeleteTrustedOAuth2JwtGrantIssuer Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+for OAuth 2.0 Client Authentication and Authorization Grant.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the desired grant
+	@return ApiDeleteTrustedOAuth2JwtGrantIssuerRequest
+*/
+func (a *OAuth2ApiService) DeleteTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiDeleteTrustedOAuth2JwtGrantIssuerRequest {
+	return ApiDeleteTrustedOAuth2JwtGrantIssuerRequest{
+		ApiService: a,
+		ctx:        ctx,
+		id:         id,
+	}
+}
+
+// Execute executes the request
+func (a *OAuth2ApiService) DeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiDeleteTrustedOAuth2JwtGrantIssuerRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.DeleteTrustedOAuth2JwtGrantIssuer")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v GenericError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiGetOAuth2ClientRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService
@@ -1168,6 +1271,118 @@ func (a *OAuth2ApiService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetTrustedOAuth2JwtGrantIssuerRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	id         string
+}
+
+func (r ApiGetTrustedOAuth2JwtGrantIssuerRequest) Execute() (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	return r.ApiService.GetTrustedOAuth2JwtGrantIssuerExecute(r)
+}
+
+/*
+GetTrustedOAuth2JwtGrantIssuer Get Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the desired grant
+	@return ApiGetTrustedOAuth2JwtGrantIssuerRequest
+*/
+func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuer(ctx context.Context, id string) ApiGetTrustedOAuth2JwtGrantIssuerRequest {
+	return ApiGetTrustedOAuth2JwtGrantIssuerRequest{
+		ApiService: a,
+		ctx:        ctx,
+		id:         id,
+	}
+}
+
+// Execute executes the request
+//
+//	@return TrustedOAuth2JwtGrantIssuer
+func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrustedOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TrustedOAuth2JwtGrantIssuer
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.GetTrustedOAuth2JwtGrantIssuer")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v GenericError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiListOAuth2ClientsRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService
@@ -1435,6 +1650,141 @@ func (a *OAuth2ApiService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 			error: localVarHTTPResponse.Status,
 		}
 		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListTrustedOAuth2JwtGrantIssuersRequest struct {
+	ctx          context.Context
+	ApiService   *OAuth2ApiService
+	maxItems     *int64
+	defaultItems *int64
+	issuer       *string
+}
+
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) MaxItems(maxItems int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	r.maxItems = &maxItems
+	return r
+}
+
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) DefaultItems(defaultItems int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	r.defaultItems = &defaultItems
+	return r
+}
+
+// If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned.
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) Issuer(issuer string) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	r.issuer = &issuer
+	return r
+}
+
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) Execute() ([]TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	return r.ApiService.ListTrustedOAuth2JwtGrantIssuersExecute(r)
+}
+
+/*
+ListTrustedOAuth2JwtGrantIssuers List Trusted OAuth2 JWT Bearer Grant Type Issuers
+
+Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListTrustedOAuth2JwtGrantIssuersRequest
+*/
+func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuers(ctx context.Context) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	return ApiListTrustedOAuth2JwtGrantIssuersRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return []TrustedOAuth2JwtGrantIssuer
+func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrustedOAuth2JwtGrantIssuersRequest) ([]TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue []TrustedOAuth2JwtGrantIssuer
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.ListTrustedOAuth2JwtGrantIssuers")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.maxItems != nil {
+		localVarQueryParams.Add("MaxItems", parameterToString(*r.maxItems, ""))
+	}
+	if r.defaultItems != nil {
+		localVarQueryParams.Add("DefaultItems", parameterToString(*r.defaultItems, ""))
+	}
+	if r.issuer != nil {
+		localVarQueryParams.Add("issuer", parameterToString(*r.issuer, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v GenericError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2436,6 +2786,123 @@ func (a *OAuth2ApiService) SetOAuth2ClientLifespansExecute(r ApiSetOAuth2ClientL
 	}
 	// body params
 	localVarPostBody = r.oAuth2ClientTokenLifespans
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v GenericError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiTrustOAuth2JwtGrantIssuerRequest struct {
+	ctx                       context.Context
+	ApiService                *OAuth2ApiService
+	trustOAuth2JwtGrantIssuer *TrustOAuth2JwtGrantIssuer
+}
+
+func (r ApiTrustOAuth2JwtGrantIssuerRequest) TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer TrustOAuth2JwtGrantIssuer) ApiTrustOAuth2JwtGrantIssuerRequest {
+	r.trustOAuth2JwtGrantIssuer = &trustOAuth2JwtGrantIssuer
+	return r
+}
+
+func (r ApiTrustOAuth2JwtGrantIssuerRequest) Execute() (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	return r.ApiService.TrustOAuth2JwtGrantIssuerExecute(r)
+}
+
+/*
+TrustOAuth2JwtGrantIssuer Trust OAuth2 JWT Bearer Grant Type Issuer
+
+Use this endpoint to establish a trust relationship for a JWT issuer
+to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiTrustOAuth2JwtGrantIssuerRequest
+*/
+func (a *OAuth2ApiService) TrustOAuth2JwtGrantIssuer(ctx context.Context) ApiTrustOAuth2JwtGrantIssuerRequest {
+	return ApiTrustOAuth2JwtGrantIssuerRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return TrustedOAuth2JwtGrantIssuer
+func (a *OAuth2ApiService) TrustOAuth2JwtGrantIssuerExecute(r ApiTrustOAuth2JwtGrantIssuerRequest) (*TrustedOAuth2JwtGrantIssuer, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TrustedOAuth2JwtGrantIssuer
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.TrustOAuth2JwtGrantIssuer")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.trustOAuth2JwtGrantIssuer
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

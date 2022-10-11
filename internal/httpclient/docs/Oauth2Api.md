@@ -2,27 +2,31 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                      | HTTP request                                       | Description                                       |
-| --------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------- |
-| [**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest)   | **Put** /admin/oauth2/auth/requests/consent/accept | Accept OAuth 2.0 Consent Request                  |
-| [**AcceptOAuth2LoginRequest**](OAuth2Api.md#AcceptOAuth2LoginRequest)       | **Put** /admin/oauth2/auth/requests/login/accept   | Accept OAuth 2.0 Login Request                    |
-| [**AcceptOAuth2LogoutRequest**](OAuth2Api.md#AcceptOAuth2LogoutRequest)     | **Put** /admin/oauth2/auth/requests/logout/accept  | Accept OAuth 2.0 Session Logout Request           |
-| [**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client)                   | **Post** /admin/clients                            | Create OAuth 2.0 Client                           |
-| [**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client)                   | **Delete** /admin/clients/{id}                     | Delete OAuth 2.0 Client                           |
-| [**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client)                         | **Get** /admin/clients/{id}                        | Get an OAuth 2.0 Client                           |
-| [**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest)         | **Get** /admin/oauth2/auth/requests/consent        | Get OAuth 2.0 Consent Request                     |
-| [**GetOAuth2LoginRequest**](OAuth2Api.md#GetOAuth2LoginRequest)             | **Get** /admin/oauth2/auth/requests/login          | Get OAuth 2.0 Login Request                       |
-| [**GetOAuth2LogoutRequest**](OAuth2Api.md#GetOAuth2LogoutRequest)           | **Get** /admin/oauth2/auth/requests/logout         | Get OAuth 2.0 Session Logout Request              |
-| [**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients)                     | **Get** /admin/clients                             | List OAuth 2.0 Clients                            |
-| [**ListOAuth2ConsentSessions**](OAuth2Api.md#ListOAuth2ConsentSessions)     | **Get** /admin/oauth2/auth/sessions/consent        | List OAuth 2.0 Consent Sessions of a Subject      |
-| [**PatchOAuth2Client**](OAuth2Api.md#PatchOAuth2Client)                     | **Patch** /admin/clients/{id}                      | Patch OAuth 2.0 Client                            |
-| [**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest)   | **Put** /admin/oauth2/auth/requests/consent/reject | Reject OAuth 2.0 Consent Request                  |
-| [**RejectOAuth2LoginRequest**](OAuth2Api.md#RejectOAuth2LoginRequest)       | **Put** /admin/oauth2/auth/requests/login/reject   | Reject OAuth 2.0 Login Request                    |
-| [**RejectOAuth2LogoutRequest**](OAuth2Api.md#RejectOAuth2LogoutRequest)     | **Put** /admin/oauth2/auth/requests/logout/reject  | Reject OAuth 2.0 Session Logout Request           |
-| [**RevokeOAuth2ConsentSessions**](OAuth2Api.md#RevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent     | Revoke OAuth 2.0 Consent Sessions of a Subject    |
-| [**RevokeOAuth2LoginSessions**](OAuth2Api.md#RevokeOAuth2LoginSessions)     | **Delete** /admin/oauth2/auth/sessions/login       | Revokes All OAuth 2.0 Login Sessions of a Subject |
-| [**SetOAuth2Client**](OAuth2Api.md#SetOAuth2Client)                         | **Put** /admin/clients/{id}                        | Set OAuth 2.0 Client                              |
-| [**SetOAuth2ClientLifespans**](OAuth2Api.md#SetOAuth2ClientLifespans)       | **Put** /admin/clients/{id}/lifespans              | Set OAuth2 Client Token Lifespans                 |
+| Method                                                                                  | HTTP request                                           | Description                                        |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| [**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept OAuth 2.0 Consent Request                   |
+| [**AcceptOAuth2LoginRequest**](OAuth2Api.md#AcceptOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/accept       | Accept OAuth 2.0 Login Request                     |
+| [**AcceptOAuth2LogoutRequest**](OAuth2Api.md#AcceptOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept OAuth 2.0 Session Logout Request            |
+| [**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client)                               | **Post** /admin/clients                                | Create OAuth 2.0 Client                            |
+| [**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client)                               | **Delete** /admin/clients/{id}                         | Delete OAuth 2.0 Client                            |
+| [**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer |
+| [**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client)                                     | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                            |
+| [**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest)                     | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request                      |
+| [**GetOAuth2LoginRequest**](OAuth2Api.md#GetOAuth2LoginRequest)                         | **Get** /admin/oauth2/auth/requests/login              | Get OAuth 2.0 Login Request                        |
+| [**GetOAuth2LogoutRequest**](OAuth2Api.md#GetOAuth2LogoutRequest)                       | **Get** /admin/oauth2/auth/requests/logout             | Get OAuth 2.0 Session Logout Request               |
+| [**GetTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#GetTrustedOAuth2JwtGrantIssuer)       | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get Trusted OAuth2 JWT Bearer Grant Type Issuer    |
+| [**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients)                                 | **Get** /admin/clients                                 | List OAuth 2.0 Clients                             |
+| [**ListOAuth2ConsentSessions**](OAuth2Api.md#ListOAuth2ConsentSessions)                 | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject       |
+| [**ListTrustedOAuth2JwtGrantIssuers**](OAuth2Api.md#ListTrustedOAuth2JwtGrantIssuers)   | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers  |
+| [**PatchOAuth2Client**](OAuth2Api.md#PatchOAuth2Client)                                 | **Patch** /admin/clients/{id}                          | Patch OAuth 2.0 Client                             |
+| [**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject OAuth 2.0 Consent Request                   |
+| [**RejectOAuth2LoginRequest**](OAuth2Api.md#RejectOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/reject       | Reject OAuth 2.0 Login Request                     |
+| [**RejectOAuth2LogoutRequest**](OAuth2Api.md#RejectOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject OAuth 2.0 Session Logout Request            |
+| [**RevokeOAuth2ConsentSessions**](OAuth2Api.md#RevokeOAuth2ConsentSessions)             | **Delete** /admin/oauth2/auth/sessions/consent         | Revoke OAuth 2.0 Consent Sessions of a Subject     |
+| [**RevokeOAuth2LoginSessions**](OAuth2Api.md#RevokeOAuth2LoginSessions)                 | **Delete** /admin/oauth2/auth/sessions/login           | Revokes All OAuth 2.0 Login Sessions of a Subject  |
+| [**SetOAuth2Client**](OAuth2Api.md#SetOAuth2Client)                                     | **Put** /admin/clients/{id}                            | Set OAuth 2.0 Client                               |
+| [**SetOAuth2ClientLifespans**](OAuth2Api.md#SetOAuth2ClientLifespans)                   | **Put** /admin/clients/{id}/lifespans                  | Set OAuth2 Client Token Lifespans                  |
+| [**TrustOAuth2JwtGrantIssuer**](OAuth2Api.md#TrustOAuth2JwtGrantIssuer)                 | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust OAuth2 JWT Bearer Grant Type Issuer          |
 
 ## AcceptOAuth2ConsentRequest
 
@@ -343,6 +347,70 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+## DeleteTrustedOAuth2JwtGrantIssuer
+
+> DeleteTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
+
+Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    id := "id_example" // string | The id of the desired grant
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the desired grant                                                 |
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiDeleteTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
+
+### Return type
+
+(empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
 ## GetOAuth2Client
 
 > OAuth2Client GetOAuth2Client(ctx, id).Execute()
@@ -598,6 +666,72 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+## GetTrustedOAuth2JwtGrantIssuer
+
+> TrustedOAuth2JwtGrantIssuer GetTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
+
+Get Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    id := "id_example" // string | The id of the desired grant
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OAuth2Api.GetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `GetTrustedOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
+    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the desired grant                                                 |
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiGetTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
+
+### Return type
+
+[**TrustedOAuth2JwtGrantIssuer**](TrustedOAuth2JwtGrantIssuer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
 ## ListOAuth2Clients
 
 > []OAuth2Client
@@ -719,6 +853,73 @@ apiListOAuth2ConsentSessionsRequest struct via the builder pattern
 ### Return type
 
 [**[]OAuth2ConsentSession**](OAuth2ConsentSession.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+## ListTrustedOAuth2JwtGrantIssuers
+
+> []TrustedOAuth2JwtGrantIssuer
+> ListTrustedOAuth2JwtGrantIssuers(ctx).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
+
+List Trusted OAuth2 JWT Bearer Grant Type Issuers
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    maxItems := int64(789) // int64 |  (optional)
+    defaultItems := int64(789) // int64 |  (optional)
+    issuer := "issuer_example" // string | If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned. (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `ListTrustedOAuth2JwtGrantIssuers`: []TrustedOAuth2JwtGrantIssuer
+    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiListTrustedOAuth2JwtGrantIssuersRequest struct via the builder pattern
+
+| Name             | Type       | Description                                                                                             | Notes |
+| ---------------- | ---------- | ------------------------------------------------------------------------------------------------------- | ----- |
+| **maxItems**     | **int64**  |                                                                                                         |
+| **defaultItems** | **int64**  |                                                                                                         |
+| **issuer**       | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. |
+
+### Return type
+
+[**[]TrustedOAuth2JwtGrantIssuer**](TrustedOAuth2JwtGrantIssuer.md)
 
 ### Authorization
 
@@ -1244,6 +1445,70 @@ apiSetOAuth2ClientLifespansRequest struct via the builder pattern
 ### Return type
 
 [**OAuth2Client**](OAuth2Client.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+## TrustOAuth2JwtGrantIssuer
+
+> TrustedOAuth2JwtGrantIssuer
+> TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
+
+Trust OAuth2 JWT Bearer Grant Type Issuer
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    "time"
+    openapiclient "./openapi"
+)
+
+func main() {
+    trustOAuth2JwtGrantIssuer := *openapiclient.NewTrustOAuth2JwtGrantIssuer(time.Now(), "https://jwt-idp.example.com", *openapiclient.NewJsonWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig"), []string{"Scope_example"}) // TrustOAuth2JwtGrantIssuer |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.TrustOAuth2JwtGrantIssuer``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `TrustOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
+    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.TrustOAuth2JwtGrantIssuer`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiTrustOAuth2JwtGrantIssuerRequest struct via the builder pattern
+
+| Name                          | Type                                                          | Description | Notes |
+| ----------------------------- | ------------------------------------------------------------- | ----------- | ----- |
+| **trustOAuth2JwtGrantIssuer** | [**TrustOAuth2JwtGrantIssuer**](TrustOAuth2JwtGrantIssuer.md) |             |
+
+### Return type
+
+[**TrustedOAuth2JwtGrantIssuer**](TrustedOAuth2JwtGrantIssuer.md)
 
 ### Authorization
 

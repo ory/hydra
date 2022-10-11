@@ -42,7 +42,7 @@ func NewIntrospectTokenCmd() *cobra.Command {
 				return err
 			}
 
-			result, _, err := client.V0alpha2Api.AdminIntrospectOAuth2Token(cmd.Context()).
+			result, _, err := client.OAuth2Api.IntrospectOAuth2Token(cmd.Context()).
 				Token(args[0]).
 				Scope(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " ")).Execute() //nolint:bodyclose
 			if err != nil {

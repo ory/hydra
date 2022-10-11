@@ -654,6 +654,112 @@ func (a *OAuth2ApiService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 	return localVarHTTPResponse, nil
 }
 
+type ApiDeleteOAuth2TokenRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	clientId   *string
+}
+
+// OAuth 2.0 Client ID
+func (r ApiDeleteOAuth2TokenRequest) ClientId(clientId string) ApiDeleteOAuth2TokenRequest {
+	r.clientId = &clientId
+	return r
+}
+
+func (r ApiDeleteOAuth2TokenRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteOAuth2TokenExecute(r)
+}
+
+/*
+DeleteOAuth2Token Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+
+This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiDeleteOAuth2TokenRequest
+*/
+func (a *OAuth2ApiService) DeleteOAuth2Token(ctx context.Context) ApiDeleteOAuth2TokenRequest {
+	return ApiDeleteOAuth2TokenRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+func (a *OAuth2ApiService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.DeleteOAuth2Token")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/oauth2/tokens"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.clientId == nil {
+		return nil, reportError("clientId is required and must be specified")
+	}
+
+	localVarQueryParams.Add("client_id", parameterToString(*r.clientId, ""))
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiDeleteTrustedOAuth2JwtGrantIssuerRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService
@@ -1383,6 +1489,136 @@ func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrusted
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiIntrospectOAuth2TokenRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	token      *string
+	scope      *string
+}
+
+// The string value of the token. For access tokens, this is the \\\&quot;access_token\\\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\&quot;refresh_token\\\&quot; value returned.
+func (r ApiIntrospectOAuth2TokenRequest) Token(token string) ApiIntrospectOAuth2TokenRequest {
+	r.token = &token
+	return r
+}
+
+// An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
+func (r ApiIntrospectOAuth2TokenRequest) Scope(scope string) ApiIntrospectOAuth2TokenRequest {
+	r.scope = &scope
+	return r
+}
+
+func (r ApiIntrospectOAuth2TokenRequest) Execute() (*IntrospectedOAuth2Token, *http.Response, error) {
+	return r.ApiService.IntrospectOAuth2TokenExecute(r)
+}
+
+/*
+IntrospectOAuth2Token Introspect OAuth2 Access and Refresh Tokens
+
+The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
+is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
+set additional data for a token by setting `session.access_token` during the consent flow.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiIntrospectOAuth2TokenRequest
+*/
+func (a *OAuth2ApiService) IntrospectOAuth2Token(ctx context.Context) ApiIntrospectOAuth2TokenRequest {
+	return ApiIntrospectOAuth2TokenRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return IntrospectedOAuth2Token
+func (a *OAuth2ApiService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2TokenRequest) (*IntrospectedOAuth2Token, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *IntrospectedOAuth2Token
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.IntrospectOAuth2Token")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/oauth2/introspect"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.token == nil {
+		return localVarReturnValue, nil, reportError("token is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.scope != nil {
+		localVarFormParams.Add("scope", parameterToString(*r.scope, ""))
+	}
+	localVarFormParams.Add("token", parameterToString(*r.token, ""))
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiListOAuth2ClientsRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService
@@ -1785,6 +2021,272 @@ func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 			error: localVarHTTPResponse.Status,
 		}
 		var v GenericError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiOAuth2AuthorizeRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+}
+
+func (r ApiOAuth2AuthorizeRequest) Execute() (*ErrorOAuth2, *http.Response, error) {
+	return r.ApiService.OAuth2AuthorizeExecute(r)
+}
+
+/*
+OAuth2Authorize OAuth 2.0 Authorize Endpoint
+
+Use open source libraries to perform OAuth 2.0 and OpenID Connect
+available for any programming language. You can find a list of libraries at https://oauth.net/code/
+
+The Ory SDK is not yet able to this endpoint properly.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiOAuth2AuthorizeRequest
+*/
+func (a *OAuth2ApiService) OAuth2Authorize(ctx context.Context) ApiOAuth2AuthorizeRequest {
+	return ApiOAuth2AuthorizeRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return ErrorOAuth2
+func (a *OAuth2ApiService) OAuth2AuthorizeExecute(r ApiOAuth2AuthorizeRequest) (*ErrorOAuth2, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *ErrorOAuth2
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.OAuth2Authorize")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/auth"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiOauth2TokenExchangeRequest struct {
+	ctx          context.Context
+	ApiService   *OAuth2ApiService
+	grantType    *string
+	clientId     *string
+	code         *string
+	redirectUri  *string
+	refreshToken *string
+}
+
+func (r ApiOauth2TokenExchangeRequest) GrantType(grantType string) ApiOauth2TokenExchangeRequest {
+	r.grantType = &grantType
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) ClientId(clientId string) ApiOauth2TokenExchangeRequest {
+	r.clientId = &clientId
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) Code(code string) ApiOauth2TokenExchangeRequest {
+	r.code = &code
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) RedirectUri(redirectUri string) ApiOauth2TokenExchangeRequest {
+	r.redirectUri = &redirectUri
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) RefreshToken(refreshToken string) ApiOauth2TokenExchangeRequest {
+	r.refreshToken = &refreshToken
+	return r
+}
+
+func (r ApiOauth2TokenExchangeRequest) Execute() (*OAuth2TokenExchange, *http.Response, error) {
+	return r.ApiService.Oauth2TokenExchangeExecute(r)
+}
+
+/*
+Oauth2TokenExchange The OAuth 2.0 Token Endpoint
+
+Use open source libraries to perform OAuth 2.0 and OpenID Connect
+available for any programming language. You can find a list of libraries here https://oauth.net/code/
+
+The Ory SDK is not yet able to this endpoint properly.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiOauth2TokenExchangeRequest
+*/
+func (a *OAuth2ApiService) Oauth2TokenExchange(ctx context.Context) ApiOauth2TokenExchangeRequest {
+	return ApiOauth2TokenExchangeRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return OAuth2TokenExchange
+func (a *OAuth2ApiService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRequest) (*OAuth2TokenExchange, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *OAuth2TokenExchange
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.Oauth2TokenExchange")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/token"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.grantType == nil {
+		return localVarReturnValue, nil, reportError("grantType is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.clientId != nil {
+		localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
+	}
+	if r.code != nil {
+		localVarFormParams.Add("code", parameterToString(*r.code, ""))
+	}
+	localVarFormParams.Add("grant_type", parameterToString(*r.grantType, ""))
+	if r.redirectUri != nil {
+		localVarFormParams.Add("redirect_uri", parameterToString(*r.redirectUri, ""))
+	}
+	if r.refreshToken != nil {
+		localVarFormParams.Add("refresh_token", parameterToString(*r.refreshToken, ""))
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -2527,6 +3029,114 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiRevokeOAuth2TokenRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	token      *string
+}
+
+func (r ApiRevokeOAuth2TokenRequest) Token(token string) ApiRevokeOAuth2TokenRequest {
+	r.token = &token
+	return r
+}
+
+func (r ApiRevokeOAuth2TokenRequest) Execute() (*http.Response, error) {
+	return r.ApiService.RevokeOAuth2TokenExecute(r)
+}
+
+/*
+RevokeOAuth2Token Revoke OAuth 2.0 Access or Refresh Token
+
+Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
+longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
+Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
+the client the token was generated for.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiRevokeOAuth2TokenRequest
+*/
+func (a *OAuth2ApiService) RevokeOAuth2Token(ctx context.Context) ApiRevokeOAuth2TokenRequest {
+	return ApiRevokeOAuth2TokenRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.RevokeOAuth2Token")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/revoke"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.token == nil {
+		return nil, reportError("token is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/x-www-form-urlencoded"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	localVarFormParams.Add("token", parameterToString(*r.token, ""))
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err

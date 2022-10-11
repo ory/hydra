@@ -18,10 +18,8 @@ docs/CreateJsonWebKeySet.md
 docs/ErrorOAuth2.md
 docs/GenericError.md
 docs/GetVersion200Response.md
-docs/Headers.md
 docs/HealthNotReadyStatus.md
 docs/HealthStatus.md
-docs/IDTokenClaims.md
 docs/IntrospectedOAuth2Token.md
 docs/IsReady200Response.md
 docs/IsReady503Response.md
@@ -30,7 +28,6 @@ docs/JsonWebKey.md
 docs/JsonWebKeySet.md
 docs/JwkApi.md
 docs/MetadataApi.md
-docs/OAuth2AccessRequest.md
 docs/OAuth2Api.md
 docs/OAuth2Client.md
 docs/OAuth2ClientTokenLifespans.md
@@ -47,8 +44,6 @@ docs/OidcConfiguration.md
 docs/OidcUserInfo.md
 docs/Pagination.md
 docs/PaginationHeaders.md
-docs/RefreshTokenHookRequest.md
-docs/RefreshTokenHookResponse.md
 docs/RejectOAuth2Request.md
 docs/TokenPagination.md
 docs/TokenPaginationHeaders.md
@@ -70,17 +65,14 @@ model_create_json_web_key_set.go
 model_error_o_auth2.go
 model_generic_error.go
 model_get_version_200_response.go
-model_headers.go
 model_health_not_ready_status.go
 model_health_status.go
-model_id_token_claims.go
 model_introspected_o_auth2_token.go
 model_is_ready_200_response.go
 model_is_ready_503_response.go
 model_json_patch.go
 model_json_web_key.go
 model_json_web_key_set.go
-model_o_auth2_access_request.go
 model_o_auth2_client.go
 model_o_auth2_client_token_lifespans.go
 model_o_auth2_consent_request.go
@@ -95,8 +87,6 @@ model_oidc_configuration.go
 model_oidc_user_info.go
 model_pagination.go
 model_pagination_headers.go
-model_refresh_token_hook_request.go
-model_refresh_token_hook_response.go
 model_reject_o_auth2_request.go
 model_token_pagination.go
 model_token_pagination_headers.go

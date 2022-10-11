@@ -2002,55 +2002,6 @@ components:
             type: array
       description: Paginated OAuth2 Client List Response
   schemas:
-    Headers:
-      description: Headers is the jwt headers
-      properties:
-        extra:
-          additionalProperties: {}
-          type: object
-      type: object
-    IDTokenClaims:
-      description:
-        IDTokenClaims represent the claims used in open id connect requests
-      properties:
-        acr:
-          type: string
-        amr:
-          items:
-            type: string
-          type: array
-        at_hash:
-          type: string
-        aud:
-          items:
-            type: string
-          type: array
-        auth_time:
-          format: date-time
-          type: string
-        c_hash:
-          type: string
-        exp:
-          format: date-time
-          type: string
-        ext:
-          additionalProperties: {}
-          type: object
-        iat:
-          format: date-time
-          type: string
-        iss:
-          type: string
-        jti:
-          type: string
-        nonce:
-          type: string
-        rat:
-          format: date-time
-          type: string
-        sub:
-          type: string
-      type: object
     JSONRawMessage:
       title: "JSONRawMessage represents a json.RawMessage that works well with
         JSON,\
@@ -2722,31 +2673,6 @@ components:
       format: date-time
       title: NullTime implements sql.NullTime functionality.
       type: string
-    oAuth2AccessRequest:
-      properties:
-        client_id:
-          description: ClientID is the identifier of the OAuth 2.0 client.
-          type: string
-        grant_types:
-          description: GrantTypes is the requests grant types.
-          items:
-            type: string
-          type: array
-        granted_audience:
-          description:
-            GrantedAudience is the list of audiences granted to the OAuth 2.0
-            client.
-          items:
-            type: string
-          type: array
-        granted_scopes:
-          description:
-            GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-          items:
-            type: string
-          type: array
-      title: Requester is a token endpoint's request context.
-      type: object
     oAuth2Client:
       description: "OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID
         Connect\
@@ -4591,43 +4517,6 @@ components:
         x-total-count:
           description: "The total number of clients.\n\nin: header"
           type: string
-      type: object
-    refreshTokenHookRequest:
-      properties:
-        client_id:
-          description: ClientID is the identifier of the OAuth 2.0 client.
-          type: string
-        granted_audience:
-          description:
-            GrantedAudience is the list of audiences granted to the OAuth 2.0
-            client.
-          items:
-            type: string
-          type: array
-        granted_scopes:
-          description:
-            GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-          items:
-            type: string
-          type: array
-        requester:
-          $ref: "#/components/schemas/oAuth2AccessRequest"
-        session:
-          $ref: "#/components/schemas/oAuth2ConsentSession"
-        subject:
-          description: Subject is the identifier of the authenticated end-user.
-          type: string
-      title:
-        RefreshTokenHookRequest is the request body sent to the refresh token
-        hook.
-      type: object
-    refreshTokenHookResponse:
-      properties:
-        session:
-          $ref: "#/components/schemas/acceptOAuth2ConsentRequestSession"
-      title:
-        RefreshTokenHookResponse is the response body received from the refresh
-        token hook.
       type: object
     rejectOAuth2Request:
       properties:

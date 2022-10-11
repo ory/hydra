@@ -2033,100 +2033,6 @@
     }
   },
   "definitions": {
-    "DefaultSession": {
-      "description": "IDTokenSession is a session container for the id token",
-      "type": "object",
-      "properties": {
-        "expires_at": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "id_token_claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "Headers": {
-      "description": "Headers is the jwt headers",
-      "type": "object",
-      "properties": {
-        "extra": {
-          "type": "object",
-          "additionalProperties": {}
-        }
-      }
-    },
-    "IDTokenClaims": {
-      "description": "IDTokenClaims represent the claims used in open id connect requests",
-      "type": "object",
-      "properties": {
-        "acr": {
-          "type": "string"
-        },
-        "amr": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "at_hash": {
-          "type": "string"
-        },
-        "aud": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "auth_time": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "c_hash": {
-          "type": "string"
-        },
-        "exp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "ext": {
-          "type": "object",
-          "additionalProperties": {}
-        },
-        "iat": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "iss": {
-          "type": "string"
-        },
-        "jti": {
-          "type": "string"
-        },
-        "nonce": {
-          "type": "string"
-        },
-        "rat": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "sub": {
-          "type": "string"
-        }
-      }
-    },
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -2554,37 +2460,6 @@
       "type": "string",
       "format": "date-time",
       "title": "NullTime implements sql.NullTime functionality."
-    },
-    "oAuth2AccessRequest": {
-      "type": "object",
-      "title": "Requester is a token endpoint's request context.",
-      "properties": {
-        "client_id": {
-          "description": "ClientID is the identifier of the OAuth 2.0 client.",
-          "type": "string"
-        },
-        "grant_types": {
-          "description": "GrantTypes is the requests grant types.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_audience": {
-          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_scopes": {
-          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
     },
     "oAuth2Client": {
       "description": "OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -3333,49 +3208,6 @@
         "x-total-count": {
           "description": "The total number of clients.\n\nin: header",
           "type": "string"
-        }
-      }
-    },
-    "refreshTokenHookRequest": {
-      "type": "object",
-      "title": "RefreshTokenHookRequest is the request body sent to the refresh token hook.",
-      "properties": {
-        "client_id": {
-          "description": "ClientID is the identifier of the OAuth 2.0 client.",
-          "type": "string"
-        },
-        "granted_audience": {
-          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_scopes": {
-          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "requester": {
-          "$ref": "#/definitions/oAuth2AccessRequest"
-        },
-        "session": {
-          "$ref": "#/definitions/oAuth2ConsentSession"
-        },
-        "subject": {
-          "description": "Subject is the identifier of the authenticated end-user.",
-          "type": "string"
-        }
-      }
-    },
-    "refreshTokenHookResponse": {
-      "type": "object",
-      "title": "RefreshTokenHookResponse is the response body received from the refresh token hook.",
-      "properties": {
-        "session": {
-          "$ref": "#/definitions/acceptOAuth2ConsentRequestSession"
         }
       }
     },

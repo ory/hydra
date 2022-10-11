@@ -19,7 +19,7 @@
     "jwks-rsa": "^2.1.4",
     "node-fetch": "^2.6.0",
     "node-uuid": "^1.4.8",
-    "openid-client": "^2.5.0",
+    "openid-client": "^5.1.10",
     "simple-oauth2": "^2.5.2",
     "winston": "^3.2.1"
   },

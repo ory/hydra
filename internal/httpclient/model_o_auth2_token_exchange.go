@@ -15,11 +15,11 @@ import (
 	"encoding/json"
 )
 
-// OAuth2TokenResponse OAuth2 Token Response
-type OAuth2TokenResponse struct {
+// OAuth2TokenExchange OAuth2 Token Exchange Result
+type OAuth2TokenExchange struct {
 	// The access token issued by the authorization server.
 	AccessToken *string `json:"access_token,omitempty"`
-	// The lifetime in seconds of the access token.  For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
+	// The lifetime in seconds of the access token. For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
 	ExpiresIn *int64 `json:"expires_in,omitempty"`
 	// To retrieve a refresh token request the id_token scope.
 	IdToken *int64 `json:"id_token,omitempty"`
@@ -31,25 +31,25 @@ type OAuth2TokenResponse struct {
 	TokenType *string `json:"token_type,omitempty"`
 }
 
-// NewOAuth2TokenResponse instantiates a new OAuth2TokenResponse object
+// NewOAuth2TokenExchange instantiates a new OAuth2TokenExchange object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOAuth2TokenResponse() *OAuth2TokenResponse {
-	this := OAuth2TokenResponse{}
+func NewOAuth2TokenExchange() *OAuth2TokenExchange {
+	this := OAuth2TokenExchange{}
 	return &this
 }
 
-// NewOAuth2TokenResponseWithDefaults instantiates a new OAuth2TokenResponse object
+// NewOAuth2TokenExchangeWithDefaults instantiates a new OAuth2TokenExchange object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewOAuth2TokenResponseWithDefaults() *OAuth2TokenResponse {
-	this := OAuth2TokenResponse{}
+func NewOAuth2TokenExchangeWithDefaults() *OAuth2TokenExchange {
+	this := OAuth2TokenExchange{}
 	return &this
 }
 
 // GetAccessToken returns the AccessToken field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetAccessToken() string {
+func (o *OAuth2TokenExchange) GetAccessToken() string {
 	if o == nil || o.AccessToken == nil {
 		var ret string
 		return ret
@@ -59,7 +59,7 @@ func (o *OAuth2TokenResponse) GetAccessToken() string {
 
 // GetAccessTokenOk returns a tuple with the AccessToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetAccessTokenOk() (*string, bool) {
+func (o *OAuth2TokenExchange) GetAccessTokenOk() (*string, bool) {
 	if o == nil || o.AccessToken == nil {
 		return nil, false
 	}
@@ -67,7 +67,7 @@ func (o *OAuth2TokenResponse) GetAccessTokenOk() (*string, bool) {
 }
 
 // HasAccessToken returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasAccessToken() bool {
+func (o *OAuth2TokenExchange) HasAccessToken() bool {
 	if o != nil && o.AccessToken != nil {
 		return true
 	}
@@ -76,12 +76,12 @@ func (o *OAuth2TokenResponse) HasAccessToken() bool {
 }
 
 // SetAccessToken gets a reference to the given string and assigns it to the AccessToken field.
-func (o *OAuth2TokenResponse) SetAccessToken(v string) {
+func (o *OAuth2TokenExchange) SetAccessToken(v string) {
 	o.AccessToken = &v
 }
 
 // GetExpiresIn returns the ExpiresIn field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetExpiresIn() int64 {
+func (o *OAuth2TokenExchange) GetExpiresIn() int64 {
 	if o == nil || o.ExpiresIn == nil {
 		var ret int64
 		return ret
@@ -91,7 +91,7 @@ func (o *OAuth2TokenResponse) GetExpiresIn() int64 {
 
 // GetExpiresInOk returns a tuple with the ExpiresIn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetExpiresInOk() (*int64, bool) {
+func (o *OAuth2TokenExchange) GetExpiresInOk() (*int64, bool) {
 	if o == nil || o.ExpiresIn == nil {
 		return nil, false
 	}
@@ -99,7 +99,7 @@ func (o *OAuth2TokenResponse) GetExpiresInOk() (*int64, bool) {
 }
 
 // HasExpiresIn returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasExpiresIn() bool {
+func (o *OAuth2TokenExchange) HasExpiresIn() bool {
 	if o != nil && o.ExpiresIn != nil {
 		return true
 	}
@@ -108,12 +108,12 @@ func (o *OAuth2TokenResponse) HasExpiresIn() bool {
 }
 
 // SetExpiresIn gets a reference to the given int64 and assigns it to the ExpiresIn field.
-func (o *OAuth2TokenResponse) SetExpiresIn(v int64) {
+func (o *OAuth2TokenExchange) SetExpiresIn(v int64) {
 	o.ExpiresIn = &v
 }
 
 // GetIdToken returns the IdToken field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetIdToken() int64 {
+func (o *OAuth2TokenExchange) GetIdToken() int64 {
 	if o == nil || o.IdToken == nil {
 		var ret int64
 		return ret
@@ -123,7 +123,7 @@ func (o *OAuth2TokenResponse) GetIdToken() int64 {
 
 // GetIdTokenOk returns a tuple with the IdToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetIdTokenOk() (*int64, bool) {
+func (o *OAuth2TokenExchange) GetIdTokenOk() (*int64, bool) {
 	if o == nil || o.IdToken == nil {
 		return nil, false
 	}
@@ -131,7 +131,7 @@ func (o *OAuth2TokenResponse) GetIdTokenOk() (*int64, bool) {
 }
 
 // HasIdToken returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasIdToken() bool {
+func (o *OAuth2TokenExchange) HasIdToken() bool {
 	if o != nil && o.IdToken != nil {
 		return true
 	}
@@ -140,12 +140,12 @@ func (o *OAuth2TokenResponse) HasIdToken() bool {
 }
 
 // SetIdToken gets a reference to the given int64 and assigns it to the IdToken field.
-func (o *OAuth2TokenResponse) SetIdToken(v int64) {
+func (o *OAuth2TokenExchange) SetIdToken(v int64) {
 	o.IdToken = &v
 }
 
 // GetRefreshToken returns the RefreshToken field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetRefreshToken() string {
+func (o *OAuth2TokenExchange) GetRefreshToken() string {
 	if o == nil || o.RefreshToken == nil {
 		var ret string
 		return ret
@@ -155,7 +155,7 @@ func (o *OAuth2TokenResponse) GetRefreshToken() string {
 
 // GetRefreshTokenOk returns a tuple with the RefreshToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetRefreshTokenOk() (*string, bool) {
+func (o *OAuth2TokenExchange) GetRefreshTokenOk() (*string, bool) {
 	if o == nil || o.RefreshToken == nil {
 		return nil, false
 	}
@@ -163,7 +163,7 @@ func (o *OAuth2TokenResponse) GetRefreshTokenOk() (*string, bool) {
 }
 
 // HasRefreshToken returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasRefreshToken() bool {
+func (o *OAuth2TokenExchange) HasRefreshToken() bool {
 	if o != nil && o.RefreshToken != nil {
 		return true
 	}
@@ -172,12 +172,12 @@ func (o *OAuth2TokenResponse) HasRefreshToken() bool {
 }
 
 // SetRefreshToken gets a reference to the given string and assigns it to the RefreshToken field.
-func (o *OAuth2TokenResponse) SetRefreshToken(v string) {
+func (o *OAuth2TokenExchange) SetRefreshToken(v string) {
 	o.RefreshToken = &v
 }
 
 // GetScope returns the Scope field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetScope() int64 {
+func (o *OAuth2TokenExchange) GetScope() int64 {
 	if o == nil || o.Scope == nil {
 		var ret int64
 		return ret
@@ -187,7 +187,7 @@ func (o *OAuth2TokenResponse) GetScope() int64 {
 
 // GetScopeOk returns a tuple with the Scope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetScopeOk() (*int64, bool) {
+func (o *OAuth2TokenExchange) GetScopeOk() (*int64, bool) {
 	if o == nil || o.Scope == nil {
 		return nil, false
 	}
@@ -195,7 +195,7 @@ func (o *OAuth2TokenResponse) GetScopeOk() (*int64, bool) {
 }
 
 // HasScope returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasScope() bool {
+func (o *OAuth2TokenExchange) HasScope() bool {
 	if o != nil && o.Scope != nil {
 		return true
 	}
@@ -204,12 +204,12 @@ func (o *OAuth2TokenResponse) HasScope() bool {
 }
 
 // SetScope gets a reference to the given int64 and assigns it to the Scope field.
-func (o *OAuth2TokenResponse) SetScope(v int64) {
+func (o *OAuth2TokenExchange) SetScope(v int64) {
 	o.Scope = &v
 }
 
 // GetTokenType returns the TokenType field value if set, zero value otherwise.
-func (o *OAuth2TokenResponse) GetTokenType() string {
+func (o *OAuth2TokenExchange) GetTokenType() string {
 	if o == nil || o.TokenType == nil {
 		var ret string
 		return ret
@@ -219,7 +219,7 @@ func (o *OAuth2TokenResponse) GetTokenType() string {
 
 // GetTokenTypeOk returns a tuple with the TokenType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenResponse) GetTokenTypeOk() (*string, bool) {
+func (o *OAuth2TokenExchange) GetTokenTypeOk() (*string, bool) {
 	if o == nil || o.TokenType == nil {
 		return nil, false
 	}
@@ -227,7 +227,7 @@ func (o *OAuth2TokenResponse) GetTokenTypeOk() (*string, bool) {
 }
 
 // HasTokenType returns a boolean if a field has been set.
-func (o *OAuth2TokenResponse) HasTokenType() bool {
+func (o *OAuth2TokenExchange) HasTokenType() bool {
 	if o != nil && o.TokenType != nil {
 		return true
 	}
@@ -236,11 +236,11 @@ func (o *OAuth2TokenResponse) HasTokenType() bool {
 }
 
 // SetTokenType gets a reference to the given string and assigns it to the TokenType field.
-func (o *OAuth2TokenResponse) SetTokenType(v string) {
+func (o *OAuth2TokenExchange) SetTokenType(v string) {
 	o.TokenType = &v
 }
 
-func (o OAuth2TokenResponse) MarshalJSON() ([]byte, error) {
+func (o OAuth2TokenExchange) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AccessToken != nil {
 		toSerialize["access_token"] = o.AccessToken
@@ -263,38 +263,38 @@ func (o OAuth2TokenResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableOAuth2TokenResponse struct {
-	value *OAuth2TokenResponse
+type NullableOAuth2TokenExchange struct {
+	value *OAuth2TokenExchange
 	isSet bool
 }
 
-func (v NullableOAuth2TokenResponse) Get() *OAuth2TokenResponse {
+func (v NullableOAuth2TokenExchange) Get() *OAuth2TokenExchange {
 	return v.value
 }
 
-func (v *NullableOAuth2TokenResponse) Set(val *OAuth2TokenResponse) {
+func (v *NullableOAuth2TokenExchange) Set(val *OAuth2TokenExchange) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableOAuth2TokenResponse) IsSet() bool {
+func (v NullableOAuth2TokenExchange) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableOAuth2TokenResponse) Unset() {
+func (v *NullableOAuth2TokenExchange) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableOAuth2TokenResponse(val *OAuth2TokenResponse) *NullableOAuth2TokenResponse {
-	return &NullableOAuth2TokenResponse{value: val, isSet: true}
+func NewNullableOAuth2TokenExchange(val *OAuth2TokenExchange) *NullableOAuth2TokenExchange {
+	return &NullableOAuth2TokenExchange{value: val, isSet: true}
 }
 
-func (v NullableOAuth2TokenResponse) MarshalJSON() ([]byte, error) {
+func (v NullableOAuth2TokenExchange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableOAuth2TokenResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableOAuth2TokenExchange) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

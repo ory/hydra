@@ -55,7 +55,7 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 			}
 
 			token := args[0]
-			_, err = client.V0alpha2Api.RevokeOAuth2Token(
+			_, err = client.OAuth2Api.RevokeOAuth2Token(
 				context.WithValue(cmd.Context(), hydra.ContextBasicAuth, hydra.BasicAuth{
 					UserName: clientID,
 					Password: clientSecret,

@@ -165,10 +165,8 @@ func TestIntrospectorSDK(t *testing.T) {
 					client.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
 				}
 
-				ctx, _, err := client.V0alpha2Api.AdminIntrospectOAuth2Token(context.Background()).
-					Token(c.token).
-					Scope(strings.Join(c.scopes, " ")).
-					Execute()
+				ctx, _, err := client.OAuth2Api.IntrospectOAuth2Token(context.Background()).
+					Token(c.token).Scope(strings.Join(c.scopes, " ")).Execute()
 				require.NoError(t, err)
 
 				if c.expectInactive {

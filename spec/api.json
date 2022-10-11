@@ -1059,15 +1059,15 @@
         "title": "OAuth 2.0 Redirect Browser To",
         "type": "object"
       },
-      "oAuth2TokenResponse": {
-        "description": "OAuth2 Token Response",
+      "oAuth2TokenExchange": {
+        "description": "OAuth2 Token Exchange Result",
         "properties": {
           "access_token": {
             "description": "The access token issued by the authorization server.",
             "type": "string"
           },
           "expires_in": {
-            "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
+            "description": "The lifetime in seconds of the access token. For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
             "format": "int64",
             "type": "integer"
           },
@@ -1093,163 +1093,163 @@
         "type": "object"
       },
       "oidcConfiguration": {
-        "description": "It includes links to several endpoints (for example `/oauth2/token`) and exposes information on supported signature algorithms\namong others.",
+        "description": "Includes links to several endpoints (for example `/oauth2/token`) and exposes information on supported signature algorithms\namong others.",
         "properties": {
           "authorization_endpoint": {
-            "description": "URL of the OP's OAuth 2.0 Authorization Endpoint.",
+            "description": "OAuth 2.0 Authorization Endpoint URL",
             "example": "https://playground.ory.sh/ory-hydra/public/oauth2/auth",
             "type": "string"
           },
           "backchannel_logout_session_supported": {
-            "description": "Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP\nsession with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP",
+            "description": "OpenID Connect Back-Channel Logout Session Required\n\nBoolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP\nsession with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP",
             "type": "boolean"
           },
           "backchannel_logout_supported": {
-            "description": "Boolean value specifying whether the OP supports back-channel logout, with true indicating support.",
+            "description": "OpenID Connect Back-Channel Logout Supported\n\nBoolean value specifying whether the OP supports back-channel logout, with true indicating support.",
             "type": "boolean"
           },
           "claims_parameter_supported": {
-            "description": "Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.",
+            "description": "OpenID Connect Claims Parameter Parameter Supported\n\nBoolean value specifying whether the OP supports use of the claims parameter, with true indicating support.",
             "type": "boolean"
           },
           "claims_supported": {
-            "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
+            "description": "OpenID Connect Supported Claims\n\nJSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "code_challenge_methods_supported": {
-            "description": "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
+            "description": "OAuth 2.0 PKCE Supported Code Challenge Methods\n\nJSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "end_session_endpoint": {
-            "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
+            "description": "OpenID Connect End-Session Endpoint\n\nURL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
             "type": "string"
           },
           "frontchannel_logout_session_supported": {
-            "description": "Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify\nthe RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also\nincluded in ID Tokens issued by the OP.",
+            "description": "OpenID Connect Front-Channel Logout Session Required\n\nBoolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify\nthe RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also\nincluded in ID Tokens issued by the OP.",
             "type": "boolean"
           },
           "frontchannel_logout_supported": {
-            "description": "Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.",
+            "description": "OpenID Connect Front-Channel Logout Supported\n\nBoolean value specifying whether the OP supports HTTP-based logout, with true indicating support.",
             "type": "boolean"
           },
           "grant_types_supported": {
-            "description": "JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.",
+            "description": "OAuth 2.0 Supported Grant Types\n\nJSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "id_token_signed_response_alg": {
-            "description": "Algorithm used to sign OpenID Connect ID Tokens.",
+            "description": "OpenID Connect Default ID Token Signing Algorithms\n\nAlgorithm used to sign OpenID Connect ID Tokens.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "id_token_signing_alg_values_supported": {
-            "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT.",
+            "description": "OpenID Connect Supported ID Token Signing Algorithms\n\nJSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "issuer": {
-            "description": "URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.\nIf IssuerURL discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.",
+            "description": "OpenID Connect Issuer URL\n\nAn URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.\nIf IssuerURL discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.",
             "example": "https://playground.ory.sh/ory-hydra/public/",
             "type": "string"
           },
           "jwks_uri": {
-            "description": "URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate\nsignatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs\nto encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)\nparameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.\nAlthough some algorithms allow the same key to be used for both signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of\nkeys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.",
-            "example": "https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json",
+            "description": "OpenID Connect Well-Known JSON Web Keys URL\n\nURL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate\nsignatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs\nto encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)\nparameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.\nAlthough some algorithms allow the same key to be used for both signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of\nkeys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.",
+            "example": "https://{slug}.projects.oryapis.com/.well-known/jwks.json",
             "type": "string"
           },
           "registration_endpoint": {
-            "description": "URL of the OP's Dynamic Client Registration Endpoint.",
+            "description": "OpenID Connect Dynamic Client Registration Endpoint URL",
             "example": "https://playground.ory.sh/ory-hydra/admin/client",
             "type": "string"
           },
           "request_object_signing_alg_values_supported": {
-            "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,\nwhich are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when\nthe Request Object is passed by value (using the request parameter) and when it is passed by reference\n(using the request_uri parameter).",
+            "description": "OpenID Connect Supported Request Object Signing Algorithms\n\nJSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,\nwhich are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when\nthe Request Object is passed by value (using the request parameter) and when it is passed by reference\n(using the request_uri parameter).",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "request_parameter_supported": {
-            "description": "Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.",
+            "description": "OpenID Connect Request Parameter Supported\n\nBoolean value specifying whether the OP supports use of the request parameter, with true indicating support.",
             "type": "boolean"
           },
           "request_uri_parameter_supported": {
-            "description": "Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.",
+            "description": "OpenID Connect Request URI Parameter Supported\n\nBoolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.",
             "type": "boolean"
           },
           "require_request_uri_registration": {
-            "description": "Boolean value specifying whether the OP requires any request_uri values used to be pre-registered\nusing the request_uris registration parameter.",
+            "description": "OpenID Connect Requires Request URI Registration\n\nBoolean value specifying whether the OP requires any request_uri values used to be pre-registered\nusing the request_uris registration parameter.",
             "type": "boolean"
           },
           "response_modes_supported": {
-            "description": "JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.",
+            "description": "OAuth 2.0 Supported Response Modes\n\nJSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "response_types_supported": {
-            "description": "JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID\nProviders MUST support the code, id_token, and the token id_token Response Type values.",
+            "description": "OAuth 2.0 Supported Response Types\n\nJSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID\nProviders MUST support the code, id_token, and the token id_token Response Type values.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "revocation_endpoint": {
-            "description": "URL of the authorization server's OAuth 2.0 revocation endpoint.",
+            "description": "OAuth 2.0 Token Revocation URL\n\nURL of the authorization server's OAuth 2.0 revocation endpoint.",
             "type": "string"
           },
           "scopes_supported": {
-            "description": "SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST\nsupport the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used",
+            "description": "OAuth 2.0 Supported Scope Values\n\nJSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST\nsupport the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "subject_types_supported": {
-            "description": "JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
+            "description": "OpenID Connect Supported Subject Types\n\nJSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "token_endpoint": {
-            "description": "URL of the OP's OAuth 2.0 Token Endpoint",
+            "description": "OAuth 2.0 Token Endpoint URL",
             "example": "https://playground.ory.sh/ory-hydra/public/oauth2/token",
             "type": "string"
           },
           "token_endpoint_auth_methods_supported": {
-            "description": "JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are\nclient_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0",
+            "description": "OAuth 2.0 Supported Client Authentication Methods\n\nJSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are\nclient_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "userinfo_endpoint": {
-            "description": "URL of the OP's UserInfo Endpoint.",
+            "description": "OpenID Connect Userinfo URL\n\nURL of the OP's UserInfo Endpoint.",
             "type": "string"
           },
           "userinfo_signed_response_alg": {
-            "description": "Algorithm used to sign OpenID Connect Userinfo Responses.",
+            "description": "OpenID Connect User Userinfo Signing Algorithm\n\nAlgorithm used to sign OpenID Connect Userinfo Responses.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
           "userinfo_signing_alg_values_supported": {
-            "description": "JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",
+            "description": "OpenID Connect Supported Userinfo Signing Algorithm\n\nJSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",
             "items": {
               "type": "string"
             },
@@ -1267,11 +1267,11 @@
           "id_token_signed_response_alg",
           "userinfo_signed_response_alg"
         ],
-        "title": "OpenID Connect Discovery ;etadata",
+        "title": "OpenID Connect Discovery Metadata",
         "type": "object"
       },
       "oidcUserInfo": {
-        "description": "The userinfo response",
+        "description": "OpenID Connect Userinfo",
         "properties": {
           "birthdate": {
             "description": "End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted. To represent only the year, YYYY format is allowed. Note that depending on the underlying platform's date related function, providing just year can result in varying month and day, so the implementers need to take this factor into account to correctly process the dates.",
@@ -1722,7 +1722,7 @@
     },
     "/.well-known/openid-configuration": {
       "get": {
-        "description": "The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll\nyour own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this\nflow at https://openid.net/specs/openid-connect-discovery-1_0.html .\n\nPopular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.\nFor a full list of clients go here: https://openid.net/developers/certified/",
+        "description": "A mechanism for an OpenID Connect Relying Party to discover the End-User's OpenID Provider and obtain information needed to interact with it, including its OAuth 2.0 endpoint locations.\n\nPopular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.\nFor a full list of clients go here: https://openid.net/developers/certified/",
         "operationId": "discoverOidcConfiguration",
         "responses": {
           "200": {
@@ -1748,7 +1748,7 @@
         },
         "summary": "OpenID Connect Discovery",
         "tags": [
-          "v0alpha2"
+          "oidc"
         ]
       }
     },
@@ -3008,8 +3008,8 @@
     },
     "/admin/oauth2/introspect": {
       "post": {
-        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",
-        "operationId": "adminIntrospectOAuth2Token",
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `session.access_token` during the consent flow.",
+        "operationId": "introspectOAuth2Token",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3059,18 +3059,19 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Introspect OAuth2 Access or Refresh Tokens",
+        "summary": "Introspect OAuth2 Access and Refresh Tokens",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/admin/oauth2/tokens": {
       "delete": {
-        "description": "This endpoint deletes OAuth2 access tokens issued for a client from the database",
-        "operationId": "adminDeleteOAuth2Token",
+        "description": "This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.",
+        "operationId": "deleteOAuth2Token",
         "parameters": [
           {
+            "description": "OAuth 2.0 Client ID",
             "in": "query",
             "name": "client_id",
             "required": true,
@@ -3094,9 +3095,9 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "Delete OAuth2 Access Tokens from a Client",
+        "summary": "Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
@@ -3356,8 +3357,8 @@
     },
     "/oauth2/auth": {
       "get": {
-        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
-        "operationId": "performOAuth2AuthorizationFlow",
+        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries at https://oauth.net/code/\n\nThe Ory SDK is not yet able to this endpoint properly.",
+        "operationId": "oAuth2Authorize",
         "responses": {
           "302": {
             "$ref": "#/components/responses/emptyResponse"
@@ -3373,9 +3374,9 @@
             "description": "errorOAuth2"
           }
         },
-        "summary": "The OAuth 2.0 Authorize Endpoint",
+        "summary": "OAuth 2.0 Authorize Endpoint",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
@@ -3601,31 +3602,31 @@
             "oauth2": []
           }
         ],
-        "summary": "Revoke an OAuth2 Access or Refresh Token",
+        "summary": "Revoke OAuth 2.0 Access or Refresh Token",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/oauth2/sessions/logout": {
       "get": {
-        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html\n\nBack-channel logout is performed asynchronously and does not affect logout flow.",
-        "operationId": "performOidcFrontOrBackChannelLogout",
+        "description": "This endpoint initiates and completes user logout at the Ory OAuth2 \u0026 OpenID provider and initiates OpenID Connect Front- / Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html\n\nBack-channel logout is performed asynchronously and does not affect logout flow.",
+        "operationId": "revokeOidcSession",
         "responses": {
           "302": {
             "$ref": "#/components/responses/emptyResponse"
           }
         },
-        "summary": "OpenID Connect Front- or Back-channel Enabled Logout",
+        "summary": "OpenID Connect Front- and Back-channel Enabled Logout",
         "tags": [
-          "v0alpha2"
+          "oidc"
         ]
       }
     },
     "/oauth2/token": {
       "post": {
-        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above",
-        "operationId": "performOAuth2TokenFlow",
+        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries here https://oauth.net/code/\n\nThe Ory SDK is not yet able to this endpoint properly.",
+        "operationId": "oauth2TokenExchange",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3668,11 +3669,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/oAuth2TokenResponse"
+                  "$ref": "#/components/schemas/oAuth2TokenExchange"
                 }
               }
             },
-            "description": "oAuth2TokenResponse"
+            "description": "oAuth2TokenExchange"
           },
           "default": {
             "content": {
@@ -3695,13 +3696,13 @@
         ],
         "summary": "The OAuth 2.0 Token Endpoint",
         "tags": [
-          "v0alpha2"
+          "oAuth2"
         ]
       }
     },
     "/userinfo": {
       "get": {
-        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).\n\nIn the case of authentication error, a WWW-Authenticate header might be set in the response\nwith more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)\nfor more details about header format.",
+        "description": "This endpoint returns the payload of the ID Token, including `session.id_token` values, of\nthe provided OAuth 2.0 Access Token's consent request.\n\nIn the case of authentication error, a WWW-Authenticate header might be set in the response\nwith more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)\nfor more details about header format.",
         "operationId": "getOidcUserInfo",
         "responses": {
           "200": {
@@ -3732,7 +3733,7 @@
         ],
         "summary": "OpenID Connect Userinfo",
         "tags": [
-          "v0alpha2"
+          "oidc"
         ]
       }
     },

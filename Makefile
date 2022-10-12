@@ -91,7 +91,8 @@ quicktest-hsm:
 
 # Formats the code
 .PHONY: format
-format: .bin/goimports node_modules
+format: .bin/goimports .bin/ory node_modules
+	.bin/ory dev headers license
 	.bin/goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 

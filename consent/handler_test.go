@@ -89,7 +89,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result HandledOAuth2ConsentRequest
+				var result OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
@@ -147,7 +147,7 @@ func TestGetLoginRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result HandledOAuth2ConsentRequest
+				var result OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
@@ -219,7 +219,7 @@ func TestGetConsentRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result HandledOAuth2ConsentRequest
+				var result OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
@@ -276,7 +276,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, resp.StatusCode)
 
-		var result RequestHandlerResponse
+		var result OAuth2RedirectTo
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.NotNil(t, result.RedirectTo)
 		require.Contains(t, result.RedirectTo, "login_verifier")
@@ -290,7 +290,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, resp2.StatusCode)
 
-		var result2 RequestHandlerResponse
+		var result2 OAuth2RedirectTo
 		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))
 		require.NotNil(t, result2.RedirectTo)
 		require.Contains(t, result2.RedirectTo, "login_verifier")

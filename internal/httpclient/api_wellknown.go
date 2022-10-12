@@ -17,72 +17,61 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
-// AdminApiService AdminApi service
-type AdminApiService service
+// WellknownApiService WellknownApi service
+type WellknownApiService service
 
-type ApiUpdateOAuth2ClientLifespansRequest struct {
-	ctx                         context.Context
-	ApiService                  *AdminApiService
-	id                          string
-	updateOAuth2ClientLifespans *UpdateOAuth2ClientLifespans
+type ApiDiscoverJsonWebKeysRequest struct {
+	ctx        context.Context
+	ApiService *WellknownApiService
 }
 
-func (r ApiUpdateOAuth2ClientLifespansRequest) UpdateOAuth2ClientLifespans(updateOAuth2ClientLifespans UpdateOAuth2ClientLifespans) ApiUpdateOAuth2ClientLifespansRequest {
-	r.updateOAuth2ClientLifespans = &updateOAuth2ClientLifespans
-	return r
-}
-
-func (r ApiUpdateOAuth2ClientLifespansRequest) Execute() (*OAuth2Client, *http.Response, error) {
-	return r.ApiService.UpdateOAuth2ClientLifespansExecute(r)
+func (r ApiDiscoverJsonWebKeysRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.DiscoverJsonWebKeysExecute(r)
 }
 
 /*
-UpdateOAuth2ClientLifespans Method for UpdateOAuth2ClientLifespans
+DiscoverJsonWebKeys Discover Well-Known JSON Web Keys
 
-UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
-client configuration takes precedence over the instance-wide token lifespan
-configuration.
+This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
+if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+[node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param id The id of the OAuth 2.0 Client.
-	@return ApiUpdateOAuth2ClientLifespansRequest
+	@return ApiDiscoverJsonWebKeysRequest
 */
-func (a *AdminApiService) UpdateOAuth2ClientLifespans(ctx context.Context, id string) ApiUpdateOAuth2ClientLifespansRequest {
-	return ApiUpdateOAuth2ClientLifespansRequest{
+func (a *WellknownApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonWebKeysRequest {
+	return ApiDiscoverJsonWebKeysRequest{
 		ApiService: a,
 		ctx:        ctx,
-		id:         id,
 	}
 }
 
 // Execute executes the request
 //
-//	@return OAuth2Client
-func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r ApiUpdateOAuth2ClientLifespansRequest) (*OAuth2Client, *http.Response, error) {
+//	@return JsonWebKeySet
+func (a *WellknownApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPut
+		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *OAuth2Client
+		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "AdminApiService.UpdateOAuth2ClientLifespans")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WellknownApiService.DiscoverJsonWebKeys")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/admin/clients/{id}/lifespans"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath := localBasePath + "/.well-known/jwks.json"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -98,8 +87,6 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r ApiUpdateOAuth2Cl
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.updateOAuth2ClientLifespans
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -122,7 +109,7 @@ func (a *AdminApiService) UpdateOAuth2ClientLifespansExecute(r ApiUpdateOAuth2Cl
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GenericError
+		var v ErrorOAuth2
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

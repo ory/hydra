@@ -5,24 +5,8 @@
   "Audience": [
     "autdience-2005_1"
   ],
-  "AuthorizationCodeGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "BackChannelLogoutSessionRequired": true,
   "BackChannelLogoutURI": "http://back_logout/2005",
-  "ClientCredentialsGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "ClientURI": "http://client/2005",
   "Contacts": [
     "contact-2005_1"
@@ -34,23 +18,61 @@
     "grant-2005_1"
   ],
   "ID": "00000000-0000-0000-0000-000000000000",
-  "ImplicitGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "ImplicitGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/2005",
-  "JwtBearerGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "LegacyClientID": "client-2005",
+  "Lifespans": {
+    "AuthorizationCodeGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ClientCredentialsGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "JwtBearerGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    }
+  },
   "LogoURI": "http://logo/2005",
   "Metadata": {
     "migration": "2005"
@@ -59,14 +81,6 @@
   "Name": "Client 2005",
   "Owner": "owner-2005",
   "PKDeprecated": 2005,
-  "PasswordGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "PasswordGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "PolicyURI": "http://policy/2005",
   "PostLogoutRedirectURIs": [
     "http://post_redirect/2005_1"
@@ -74,18 +88,6 @@
   "RedirectURIs": [
     "http://redirect/2005_1"
   ],
-  "RefreshTokenGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "RegistrationAccessToken": "",
   "RegistrationAccessTokenSignature": "",
   "RegistrationClientURI": "",

@@ -5,24 +5,8 @@
   "Audience": [
     "autdience-20_1"
   ],
-  "AuthorizationCodeGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "BackChannelLogoutSessionRequired": true,
   "BackChannelLogoutURI": "http://back_logout/20",
-  "ClientCredentialsGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "ClientURI": "http://client/20",
   "Contacts": [
     "contact-20_1"
@@ -34,23 +18,61 @@
     "grant-20_1"
   ],
   "ID": "00000000-0000-0000-0000-000000000000",
-  "ImplicitGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "ImplicitGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/20",
-  "JwtBearerGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "LegacyClientID": "client-20",
+  "Lifespans": {
+    "AuthorizationCodeGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ClientCredentialsGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "JwtBearerGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    }
+  },
   "LogoURI": "http://logo/20",
   "Metadata": {
     "migration": "20"
@@ -59,14 +81,6 @@
   "Name": "Client 20",
   "Owner": "owner-20",
   "PKDeprecated": 0,
-  "PasswordGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "PasswordGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "PolicyURI": "http://policy/20",
   "PostLogoutRedirectURIs": [
     "http://post_redirect/20_1"
@@ -74,18 +88,6 @@
   "RedirectURIs": [
     "http://redirect/20_1"
   ],
-  "RefreshTokenGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "RegistrationAccessToken": "",
   "RegistrationAccessTokenSignature": "",
   "RegistrationClientURI": "",

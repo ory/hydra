@@ -31,6 +31,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/pagination/tokenpagination"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/x/openapix"
@@ -67,36 +69,37 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
-	admin.GET(ClientsHandlerPath, h.adminListOAuth2Clients)
-	admin.POST(ClientsHandlerPath, h.adminCreateOAuth2Client)
+	admin.GET(ClientsHandlerPath, h.listOAuth2Clients)
+	admin.POST(ClientsHandlerPath, h.createOAuth2Client)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)
-	admin.PUT(ClientsHandlerPath+"/:id", h.adminUpdateOAuth2Client)
-	admin.PATCH(ClientsHandlerPath+"/:id", h.adminPatchOAuth2Client)
-	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
-	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.UpdateLifespans)
+	admin.PUT(ClientsHandlerPath+"/:id", h.setOAuth2Client)
+	admin.PATCH(ClientsHandlerPath+"/:id", h.patchOAuth2Client)
+	admin.DELETE(ClientsHandlerPath+"/:id", h.deleteOAuth2Client)
+	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.setOAuth2ClientLifespans)
 
-	public.POST(DynClientsHandlerPath, h.dynamicClientRegistrationCreateOAuth2Client)
-	public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
-	public.PUT(DynClientsHandlerPath+"/:id", h.dynamicClientRegistrationUpdateOAuth2Client)
-	public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
+	public.POST(DynClientsHandlerPath, h.createOidcDynamicClient)
+	public.GET(DynClientsHandlerPath+"/:id", h.getOidcDynamicClient)
+	public.PUT(DynClientsHandlerPath+"/:id", h.setOidcDynamicClient)
+	public.DELETE(DynClientsHandlerPath+"/:id", h.deleteOidcDynamicClient)
 }
 
-// swagger:parameters adminCreateOAuth2Client
-type adminCreateOAuth2Client struct {
+// OAuth 2.0 Client Creation Parameters
+//
+// swagger:parameters createOAuth2Client
+type createOAuth2Client struct {
+	// OAuth 2.0 Client Request Body
+	//
 	// in: body
 	// required: true
 	Body Client
 }
 
-// swagger:route POST /admin/clients v0alpha2 adminCreateOAuth2Client
+// swagger:route POST /admin/clients oAuth2 createOAuth2Client
 //
-// # Create an OAuth 2.0 Client
+// # Create OAuth 2.0 Client
 //
 // Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret
 // is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
-//
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //	Consumes:
 //	- application/json
@@ -108,8 +111,9 @@ type adminCreateOAuth2Client struct {
 //
 //	Responses:
 //	  201: oAuth2Client
-//	  default: genericError
-func (h *Handler) adminCreateOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//	  400: errorOAuth2BadRequest
+//	  default: errorOAuth2Default
+func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -119,16 +123,20 @@ func (h *Handler) adminCreateOAuth2Client(w http.ResponseWriter, r *http.Request
 	h.r.Writer().WriteCreated(w, r, "/admin"+ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:parameters dynamicClientRegistrationCreateOAuth2Client
-type dynamicClientRegistrationCreateOAuth2Client struct {
+// OpenID Connect Dynamic Client Registration Parameters
+//
+// swagger:parameters createOidcDynamicClient
+type createOidcDynamicClient struct {
+	// Dynamic Client Registration Request Body
+	//
 	// in: body
 	// required: true
 	Body Client
 }
 
-// swagger:route POST /oauth2/register v0alpha2 dynamicClientRegistrationCreateOAuth2Client
+// swagger:route POST /oauth2/register oidc createOidcDynamicClient
 //
-// Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+// # Register OAuth2 Client using OpenID Dynamic Client Registration
 //
 // This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
@@ -152,8 +160,9 @@ type dynamicClientRegistrationCreateOAuth2Client struct {
 //
 //	Responses:
 //	  201: oAuth2Client
-//	  default: genericError
-func (h *Handler) dynamicClientRegistrationCreateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  400: errorOAuth2BadRequest
+//	  default: errorOAuth2Default
+func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -221,27 +230,33 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 	return &c, nil
 }
 
-// swagger:parameters adminUpdateOAuth2Client
-type adminUpdateOAuth2Client struct {
-	// The id of the OAuth 2.0 Client.
+// Set OAuth 2.0 Client Parameters
+//
+// swagger:parameters setOAuth2Client
+type setOAuth2Client struct {
+	// OAuth 2.0 Client ID
 	//
 	// in: path
 	// required: true
 	ID string `json:"id"`
 
+	// OAuth 2.0 Client Request Body
+	//
 	// in: body
 	// required: true
 	Body Client
 }
 
-// swagger:route PUT /admin/clients/{id} v0alpha2 adminUpdateOAuth2Client
+// swagger:route PUT /admin/clients/{id} oAuth2 setOAuth2Client
 //
-// # Update an OAuth 2.0 Client
+// # Set OAuth 2.0 Client
 //
-// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret
-// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
+// Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,
+// otherwise the existing secret is used.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// If set, the secret is echoed in the response. It is not possible to retrieve it later on.
+//
+// OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //	Consumes:
@@ -254,8 +269,10 @@ type adminUpdateOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: genericError
-func (h *Handler) adminUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  400: errorOAuth2BadRequest
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
@@ -289,30 +306,35 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 	return nil
 }
 
-// swagger:parameters dynamicClientRegistrationUpdateOAuth2Client
-type dynamicClientRegistrationUpdateOAuth2Client struct {
-	// The id of the OAuth 2.0 Client.
+// Set Dynamic Client Parameters
+//
+// swagger:parameters setOidcDynamicClient
+type setOidcDynamicClient struct {
+	// OAuth 2.0 Client ID
 	//
 	// in: path
 	// required: true
 	ID string `json:"id"`
 
+	// OAuth 2.0 Client Request Body
+	//
 	// in: body
 	// required: true
 	Body Client
 }
 
-// swagger:route PUT /oauth2/register/{id} v0alpha2 dynamicClientRegistrationUpdateOAuth2Client
+// swagger:route PUT /oauth2/register/{id} oidc setOidcDynamicClient
 //
-// Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+// # Set OAuth2 Client using OpenID Dynamic Client Registration
 //
-// This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
-// public internet directly and can be used in self-service. It implements the OpenID Connect
-// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-// is disabled by default. It can be enabled by an administrator.
+// This endpoint behaves like the administrative counterpart (`setOAuth2Client`) but is capable of facing the
+// public internet directly to be used by third parties. It implements the OpenID Connect
+// Dynamic Client Registration Protocol.
 //
-// If you pass `client_secret` the secret is used, otherwise a random secret
-// is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
+// This feature is disabled per default. It can be enabled by a system administrator.
+//
+// If you pass `client_secret` the secret is used, otherwise the existing secret is used. If set, the secret is echoed in the response.
+// It is not possible to retrieve it later on.
 //
 // To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
 // uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
@@ -334,8 +356,9 @@ type dynamicClientRegistrationUpdateOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: genericError
-func (h *Handler) dynamicClientRegistrationUpdateOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -376,24 +399,28 @@ func (h *Handler) dynamicClientRegistrationUpdateOAuth2Client(w http.ResponseWri
 	h.r.Writer().Write(w, r, &c)
 }
 
-// swagger:parameters adminPatchOAuth2Client
-type adminPatchOAuth2Client struct {
+// Patch OAuth 2.0 Client Parameters
+//
+// swagger:parameters patchOAuth2Client
+type patchOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
 	// required: true
 	ID string `json:"id"`
 
+	// OAuth 2.0 Client JSON Patch Body
+	//
 	// in: body
 	// required: true
 	Body openapix.JSONPatchDocument
 }
 
-// swagger:route PATCH /admin/clients/{id} v0alpha2 adminPatchOAuth2Client
+// swagger:route PATCH /admin/clients/{id} oAuth2 patchOAuth2Client
 //
-// # Patch an OAuth 2.0 Client
+// # Patch OAuth 2.0 Client
 //
-// Patch an existing OAuth 2.0 Client. If you pass `client_secret`
+// Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`
 // the secret will be updated and returned via the API. This is the
 // only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
@@ -410,8 +437,9 @@ type adminPatchOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: genericError
-func (h *Handler) adminPatchOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -448,44 +476,41 @@ func (h *Handler) adminPatchOAuth2Client(w http.ResponseWriter, r *http.Request,
 	h.r.Writer().Write(w, r, c)
 }
 
-// The list of clients and pagination information.
+// Paginated OAuth2 Client List Response
 //
-// swagger:response adminListOAuth2ClientsResponse
-type adminListOAuth2ClientsResponse struct {
-	x.PaginationHeaders
+// swagger:response listOAuth2Clients
+type listOAuth2ClientsResponse struct {
+	tokenpagination.ResponseHeaders
 
+	// List of OAuth 2.0 Clients
+	//
 	// in:body
 	Body []Client
 }
 
-// swagger:parameters adminListOAuth2Clients
-type adminListOAuth2Clients struct {
-	x.PaginationParams
+// Paginated OAuth2 Client List Parameters
+//
+// swagger:parameters listOAuth2Clients
+type listOAuth2ClientsParameters struct {
+	tokenpagination.RequestParameters
 
 	// The name of the clients to filter by.
+	//
 	// in: query
 	Name string `json:"client_name"`
 
 	// The owner of the clients to filter by.
+	//
 	// in: query
 	Owner string `json:"owner"`
 }
 
-// swagger:route GET /admin/clients v0alpha2 adminListOAuth2Clients
+// swagger:route GET /admin/clients oAuth2 listOAuth2Clients
 //
 // # List OAuth 2.0 Clients
 //
 // This endpoint lists all clients in the database, and never returns client secrets.
-// As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
-// but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
-//
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-//
-// The "Link" header is also included in successful responses, which contains one or more links for pagination,
-// formatted like so: '<https://project-slug.projects.oryapis.com/admin/clients?limit={limit}&offset={offset}>; rel="{page}"',
-// where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can
-// be included in this header, and will be separated by a comma.
+// As a default it lists the first 100 clients.
 //
 //	Consumes:
 //	- application/json
@@ -496,9 +521,9 @@ type adminListOAuth2Clients struct {
 //	Schemes: http, https
 //
 //	Responses:
-//	  200: adminListOAuth2ClientsResponse
-//	  default: genericError
-func (h *Handler) adminListOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  200: listOAuth2Clients
+//	  default: errorOAuth2Default
+func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	page, itemsPerPage := x.ParsePagination(r)
 	filters := Filter{
 		Limit:  itemsPerPage,
@@ -531,7 +556,9 @@ func (h *Handler) adminListOAuth2Clients(w http.ResponseWriter, r *http.Request,
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:parameters adminGetOAuth2Client
+// Get OAuth2 Client Parameters
+//
+// swagger:parameters getOAuth2Client
 type adminGetOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
@@ -540,7 +567,7 @@ type adminGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /admin/clients/{id} v0alpha2 adminGetOAuth2Client
+// swagger:route GET /admin/clients/{id} oAuth2 getOAuth2Client
 //
 // # Get an OAuth 2.0 Client
 //
@@ -559,7 +586,7 @@ type adminGetOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: genericError
+//	  default: errorOAuth2Default
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -572,8 +599,10 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:parameters dynamicClientRegistrationGetOAuth2Client
-type dynamicClientRegistrationGetOAuth2Client struct {
+// Get OpenID Connect Dynamic Client Parameters
+//
+// swagger:parameters getOidcDynamicClient
+type getOidcDynamicClient struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -581,21 +610,17 @@ type dynamicClientRegistrationGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /oauth2/register/{id} v0alpha2 dynamicClientRegistrationGetOAuth2Client
+// swagger:route GET /oauth2/register/{id} oidc getOidcDynamicClient
 //
-// Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+// # Get OAuth2 Client using OpenID Dynamic Client Registration
 //
 // This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
-// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-// is disabled by default. It can be enabled by an administrator.
+// Dynamic Client Registration Protocol.
 //
 // To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
 // uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
 // If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-//
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //	Consumes:
 //	- application/json
@@ -610,8 +635,8 @@ type dynamicClientRegistrationGetOAuth2Client struct {
 //
 //	Responses:
 //	  200: oAuth2Client
-//	  default: genericError
-func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  default: errorOAuth2Default
+func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -635,8 +660,10 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:parameters adminDeleteOAuth2Client
-type adminDeleteOAuth2Client struct {
+// Delete OAuth2 Client Parameters
+//
+// swagger:parameters deleteOAuth2Client
+type deleteOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path
@@ -644,9 +671,9 @@ type adminDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /admin/clients/{id} v0alpha2 adminDeleteOAuth2Client
+// swagger:route DELETE /admin/clients/{id} oAuth2 deleteOAuth2Client
 //
-// # Deletes an OAuth 2.0 Client
+// # Delete OAuth 2.0 Client
 //
 // Delete an existing OAuth 2.0 Client by its ID.
 //
@@ -666,7 +693,7 @@ type adminDeleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
-func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -676,58 +703,25 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:parameters UpdateOAuth2ClientLifespans
-type swaggerUpdateOAuth2ClientLifespans struct {
-	// The id of the OAuth 2.0 Client.
+// Set OAuth 2.0 Client Token Lifespans
+//
+// swagger:parameters setOAuth2ClientLifespans
+type setOAuth2ClientLifespans struct {
+	// OAuth 2.0 Client ID
 	//
 	// in: path
 	// required: true
 	ID string `json:"id"`
 
 	// in: body
-	Body UpdateOAuth2ClientLifespans
+	Body Lifespans
 }
 
-// UpdateOAuth2ClientLifespans holds default lifespan configuration for the different
-// token types that may be issued for the client. This configuration takes
-// precedence over fosite's instance-wide default lifespan, but it may be
-// overridden by a session's expires_at claim.
+// swagger:route PUT /admin/clients/{id}/lifespans oAuth2 setOAuth2ClientLifespans
 //
-// The OIDC Hybrid grant type inherits token lifespan configuration from the implicit grant.
+// # Set OAuth2 Client Token Lifespans
 //
-// swagger:model UpdateOAuth2ClientLifespans
-type UpdateOAuth2ClientLifespans struct {
-	// AuthorizationCodeGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	AuthorizationCodeGrantAccessTokenLifespan x.NullDuration `json:"authorization_code_grant_access_token_lifespan"`
-	// AuthorizationCodeGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	AuthorizationCodeGrantIDTokenLifespan x.NullDuration `json:"authorization_code_grant_id_token_lifespan"`
-	// AuthorizationCodeGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	AuthorizationCodeGrantRefreshTokenLifespan x.NullDuration `json:"authorization_code_grant_refresh_token_lifespan"`
-	// ClientCredentialsGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	ClientCredentialsGrantAccessTokenLifespan x.NullDuration `json:"client_credentials_grant_access_token_lifespan"`
-	// ImplicitGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	ImplicitGrantAccessTokenLifespan x.NullDuration `json:"implicit_grant_access_token_lifespan"`
-	// ImplicitGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	ImplicitGrantIDTokenLifespan x.NullDuration `json:"implicit_grant_id_token_lifespan"`
-	// JwtBearerGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	JwtBearerGrantAccessTokenLifespan x.NullDuration `json:"jwt_bearer_grant_access_token_lifespan"`
-	// PasswordGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	PasswordGrantAccessTokenLifespan x.NullDuration `json:"password_grant_access_token_lifespan"`
-	// PasswordGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	PasswordGrantRefreshTokenLifespan x.NullDuration `json:"password_grant_refresh_token_lifespan"`
-	// RefreshTokenGrantIDTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	RefreshTokenGrantIDTokenLifespan x.NullDuration `json:"refresh_token_grant_id_token_lifespan"`
-	// RefreshTokenGrantAccessTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	RefreshTokenGrantAccessTokenLifespan x.NullDuration `json:"refresh_token_grant_access_token_lifespan"`
-	// RefreshTokenGrantRefreshTokenLifespan configures this client's lifespan and takes precedence over instance-wide configuration
-	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan"`
-}
-
-// swagger:route PUT /admin/clients/{id}/lifespans admin UpdateOAuth2ClientLifespans
-//
-// UpdateLifespans an existing OAuth 2.0 client's token lifespan configuration. This
-// client configuration takes precedence over the instance-wide token lifespan
-// configuration.
+// Set lifespans of different token types issued for this OAuth 2.0 client. Does not modify other fields.
 //
 //	Consumes:
 //	- application/json
@@ -737,7 +731,7 @@ type UpdateOAuth2ClientLifespans struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: genericError
-func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
@@ -745,24 +739,13 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	var ls UpdateOAuth2ClientLifespans
+	var ls Lifespans
 	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
-	c.AuthorizationCodeGrantAccessTokenLifespan = ls.AuthorizationCodeGrantAccessTokenLifespan
-	c.AuthorizationCodeGrantIDTokenLifespan = ls.AuthorizationCodeGrantIDTokenLifespan
-	c.AuthorizationCodeGrantRefreshTokenLifespan = ls.AuthorizationCodeGrantRefreshTokenLifespan
-	c.ClientCredentialsGrantAccessTokenLifespan = ls.ClientCredentialsGrantAccessTokenLifespan
-	c.ImplicitGrantAccessTokenLifespan = ls.ImplicitGrantAccessTokenLifespan
-	c.ImplicitGrantIDTokenLifespan = ls.ImplicitGrantIDTokenLifespan
-	c.JwtBearerGrantAccessTokenLifespan = ls.JwtBearerGrantAccessTokenLifespan
-	c.PasswordGrantAccessTokenLifespan = ls.PasswordGrantAccessTokenLifespan
-	c.PasswordGrantRefreshTokenLifespan = ls.PasswordGrantRefreshTokenLifespan
-	c.RefreshTokenGrantAccessTokenLifespan = ls.RefreshTokenGrantAccessTokenLifespan
-	c.RefreshTokenGrantIDTokenLifespan = ls.RefreshTokenGrantIDTokenLifespan
-	c.RefreshTokenGrantRefreshTokenLifespan = ls.RefreshTokenGrantRefreshTokenLifespan
+	c.Lifespans = ls
 	c.Secret = ""
 
 	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
@@ -773,7 +756,7 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:parameters dynamicClientRegistrationDeleteOAuth2Client
+// swagger:parameters deleteOidcDynamicClient
 type dynamicClientRegistrationDeleteOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
@@ -782,9 +765,9 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /oauth2/register/{id} v0alpha2 dynamicClientRegistrationDeleteOAuth2Client
+// swagger:route DELETE /oauth2/register/{id} v0alpha2 deleteOidcDynamicClient
 //
-// Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+// # Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
 //
 // This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
@@ -809,7 +792,7 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
-func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

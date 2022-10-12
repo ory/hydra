@@ -97,7 +97,9 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
 
-	_, err := c.V0alpha2Api.AdminDeleteOAuth2Token(context.Background()).ClientId("foobar").Execute()
+	_, err := c.
+		OAuth2Api.DeleteOAuth2Token(context.Background()).
+		ClientId("foobar").Execute()
 	require.NoError(t, err)
 
 	ds := new(oauth2.Session)
@@ -382,7 +384,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NoError(t, err)
 		defer res.Body.Close()
 
-		var wellKnownResp oauth2.OIDCConfiguration
+		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 		snapshotx.SnapshotT(t, wellKnownResp)

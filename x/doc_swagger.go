@@ -22,35 +22,60 @@
 
 package x
 
-// OAuth2 API Error
-//
-// An API error caused by Ory's OAuth 2.0 APIs.
-//
-// swagger:model oAuth2ApiError
-type oAuth2ApiError struct {
-	// Name is the error name.
-	//
-	// example: The requested resource could not be found
-	Name string `json:"error"`
-
-	// Description contains further information on the nature of the error.
-	//
-	// example: Object with ID 12345 does not exist
-	Description string `json:"error_description"`
-
-	// Code represents the error status code (404, 403, 401, ...).
-	//
-	// example: 404
-	Code int `json:"status_code"`
-
-	// Debug contains debug information. This is usually not available and has to be enabled.
-	//
-	// example: The database adapter was unable to find the element
-	Debug string `json:"error_debug"`
-}
-
 // Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 // typically 201.
 //
 // swagger:response emptyResponse
 type emptyResponse struct{}
+
+// Error
+//
+// swagger:model errorOAuth2
+type errorOAuth2 struct {
+	// Error
+	Name string `json:"error"`
+
+	// Error Description
+	Description string `json:"error_description"`
+
+	// Error Hint
+	//
+	// Helps the user identify the error cause.
+	//
+	// Example: The redirect URL is not allowed.
+	Hint string `json:"error_hint"`
+
+	// HTTP Status Code
+	//
+	// Example: 401
+	Code int `json:"status_code"`
+
+	// Error Debug Information
+	//
+	// Only available in dev mode.
+	Debug string `json:"error_debug,omitempty"`
+}
+
+// Default Error Response
+//
+// swagger:response errorOAuth2Default
+type errorOAuth2Default struct {
+	// in: body
+	Body errorOAuth2
+}
+
+// Bad Request Error Response
+//
+// swagger:response errorOAuth2BadRequest
+type errorOAuth2BadRequest struct {
+	// in: body
+	Body errorOAuth2
+}
+
+// Not Found Error Response
+//
+// swagger:response errorOAuth2NotFound
+type errorOAuth2NotFound struct {
+	// in: body
+	Body errorOAuth2
+}

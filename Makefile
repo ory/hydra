@@ -114,6 +114,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		-c github.com/ory/hydra/x \
 		-c github.com/ory/x/healthx \
 		-c github.com/ory/x/openapix \
+		-c github.com/ory/x/pagination \
 		-c github.com/ory/herodot
 	ory dev swagger sanitize ./spec/swagger.json
 	swagger validate ./spec/swagger.json

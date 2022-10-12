@@ -33,14 +33,16 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
-	admin.GET(grantJWTBearerPath+"/:id", h.adminGetTrustedOAuth2JwtGrantIssuer)
+	admin.GET(grantJWTBearerPath+"/:id", h.getTrustedOAuth2JwtGrantIssuer)
 	admin.GET(grantJWTBearerPath, h.adminListTrustedOAuth2JwtGrantIssuers)
-	admin.POST(grantJWTBearerPath, h.adminTrustOAuth2JwtGrantIssuer)
-	admin.DELETE(grantJWTBearerPath+"/:id", h.adminDeleteTrustedOAuth2JwtGrantIssuer)
+	admin.POST(grantJWTBearerPath, h.trustOAuth2JwtGrantIssuer)
+	admin.DELETE(grantJWTBearerPath+"/:id", h.deleteTrustedOAuth2JwtGrantIssuer)
 }
 
-// swagger:model adminTrustOAuth2JwtGrantIssuerBody
-type adminTrustOAuth2JwtGrantIssuerBody struct {
+// Trust OAuth2 JWT Bearer Grant Type Issuer Request Body
+//
+// swagger:model trustOAuth2JwtGrantIssuer
+type trustOAuth2JwtGrantIssuerBody struct {
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
 	//
 	// required: true
@@ -72,15 +74,17 @@ type adminTrustOAuth2JwtGrantIssuerBody struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-// swagger:parameters adminTrustOAuth2JwtGrantIssuer
-type adminTrustOAuth2JwtGrantIssuer struct {
+// Trust OAuth2 JWT Bearer Grant Type Issuer Request
+//
+// swagger:parameters trustOAuth2JwtGrantIssuer
+type trustOAuth2JwtGrantIssuer struct {
 	// in: body
-	Body adminTrustOAuth2JwtGrantIssuerBody
+	Body trustOAuth2JwtGrantIssuerBody
 }
 
-// swagger:route POST /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminTrustOAuth2JwtGrantIssuer
+// swagger:route POST /admin/trust/grants/jwt-bearer/issuers oAuth2 trustOAuth2JwtGrantIssuer
 //
-// # Trust an OAuth2 JWT Bearer Grant Type Issuer
+// # Trust OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to establish a trust relationship for a JWT issuer
 // to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
@@ -97,7 +101,7 @@ type adminTrustOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  201: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
-func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var grantRequest createGrantRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {
@@ -132,8 +136,10 @@ func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.
 	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
 }
 
-// swagger:parameters adminGetTrustedOAuth2JwtGrantIssuer
-type adminGetTrustedOAuth2JwtGrantIssuer struct {
+// Get Trusted OAuth2 JWT Bearer Grant Type Issuer Request
+//
+// swagger:parameters getTrustedOAuth2JwtGrantIssuer
+type getTrustedOAuth2JwtGrantIssuer struct {
 	// The id of the desired grant
 	//
 	// in: path
@@ -141,13 +147,12 @@ type adminGetTrustedOAuth2JwtGrantIssuer struct {
 	ID string `json:"id"`
 }
 
-// swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminGetTrustedOAuth2JwtGrantIssuer
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} oAuth2 getTrustedOAuth2JwtGrantIssuer
 //
-// # Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
+// # Get Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 // created the trust relationship.
-// /
 //
 //	Consumes:
 //	- application/json
@@ -160,7 +165,7 @@ type adminGetTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
-func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
 	grant, err := h.registry.GrantManager().GetConcreteGrant(r.Context(), id)
@@ -172,17 +177,19 @@ func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *
 	h.registry.Writer().Write(w, r, grant)
 }
 
-// swagger:parameters adminDeleteTrustedOAuth2JwtGrantIssuer
-type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
+// Delete Trusted OAuth2 JWT Bearer Grant Type Issuer Request
+//
+// swagger:parameters deleteTrustedOAuth2JwtGrantIssuer
+type deleteTrustedOAuth2JwtGrantIssuer struct {
 	// The id of the desired grant
 	// in: path
 	// required: true
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} v0alpha2 adminDeleteTrustedOAuth2JwtGrantIssuer
+// swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} oAuth2 deleteTrustedOAuth2JwtGrantIssuer
 //
-// # Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
+// # Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
 // Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
 // created the trust relationship.
@@ -201,7 +208,7 @@ type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
-func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
 	if err := h.registry.GrantManager().DeleteGrant(r.Context(), id); err != nil {
@@ -212,8 +219,10 @@ func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:parameters adminListTrustedOAuth2JwtGrantIssuers
-type adminListTrustedOAuth2JwtGrantIssuers struct {
+// List Trusted OAuth2 JWT Bearer Grant Type Issuers Request
+//
+// swagger:parameters listTrustedOAuth2JwtGrantIssuers
+type listTrustedOAuth2JwtGrantIssuers struct {
 	// If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
 	//
 	// in: query
@@ -221,17 +230,9 @@ type adminListTrustedOAuth2JwtGrantIssuers struct {
 	Issuer string `json:"issuer"`
 
 	tokenpagination.TokenPaginator
-
-	// The maximum amount of policies returned, upper bound is 500 policies
-	// in: query
-	Limit int `json:"limit"`
-
-	// The offset from where to start looking.
-	// in: query
-	Offset int `json:"offset"`
 }
 
-// swagger:route GET /admin/trust/grants/jwt-bearer/issuers v0alpha2 adminListTrustedOAuth2JwtGrantIssuers
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers oAuth2 listTrustedOAuth2JwtGrantIssuers
 //
 // # List Trusted OAuth2 JWT Bearer Grant Type Issuers
 //

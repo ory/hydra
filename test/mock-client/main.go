@@ -200,7 +200,7 @@ func checkTokenResponse(token oauth2token) {
 		}
 	}
 
-	intro, resp, err := sdk.V0alpha2Api.AdminIntrospectOAuth2Token(context.Background()).Token(token.AccessToken).Execute()
+	intro, resp, err := sdk.OAuth2Api.IntrospectOAuth2Token(context.Background()).Token(token.AccessToken).Execute()
 	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to introspect OAuth2 token: %s", err)

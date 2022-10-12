@@ -52,14 +52,12 @@ type Handler struct {
 	r InternalRegistry
 }
 
-// It is important that this model object is named JSONWebKeySet for
-// "swagger generate spec" to generate only on definition of a
-// JSONWebKeySet. Since one with the same name is previously defined as
-// client.Client.JSONWebKeys and this one is last, this one will be
-// effectively written in the swagger spec.
+// JSON Web Key Set
 //
 // swagger:model jsonWebKeySet
 type jsonWebKeySet struct {
+	// List of JSON Web Keys
+	//
 	// The value of the "keys" parameter is an array of JSON Web Key (JWK)
 	// values. By default, the order of the JWK values within the array does
 	// not imply an order of preference among them, although applications
@@ -76,21 +74,21 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
 
-	admin.GET(KeyHandlerPath+"/:set/:key", h.adminGetJsonWebKey)
-	admin.GET(KeyHandlerPath+"/:set", h.adminGetJsonWebKeySet)
+	admin.GET(KeyHandlerPath+"/:set/:key", h.getJsonWebKey)
+	admin.GET(KeyHandlerPath+"/:set", h.getJsonWebKeySet)
 
-	admin.POST(KeyHandlerPath+"/:set", h.Create)
+	admin.POST(KeyHandlerPath+"/:set", h.createJsonWebKeySet)
 
 	admin.PUT(KeyHandlerPath+"/:set/:key", h.adminUpdateJsonWebKey)
-	admin.PUT(KeyHandlerPath+"/:set", h.adminUpdateJsonWebKeySet)
+	admin.PUT(KeyHandlerPath+"/:set", h.setJsonWebKeySet)
 
-	admin.DELETE(KeyHandlerPath+"/:set/:key", h.adminDeleteJsonWebKey)
+	admin.DELETE(KeyHandlerPath+"/:set/:key", h.deleteJsonWebKey)
 	admin.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
 }
 
-// swagger:route GET /.well-known/jwks.json v0alpha2 discoverJsonWebKeys
+// swagger:route GET /.well-known/jwks.json wellknown discoverJsonWebKeys
 //
-// # Discover JSON Web Keys
+// # Discover Well-Known JSON Web Keys
 //
 // This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
 // if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
@@ -106,7 +104,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
@@ -132,25 +130,28 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &jwks)
 }
 
-// swagger:parameters adminGetJsonWebKey
-type adminGetJsonWebKey struct {
-	// The JSON Web Key Set
+// Get JSON Web Key Request
+//
+// swagger:parameters getJsonWebKey
+type getJsonWebKey struct {
+	// JSON Web Key Set ID
+	//
 	// in: path
 	// required: true
 	Set string `json:"set"`
 
-	// The JSON Web Key ID (kid)
+	// JSON Web Key ID
 	//
 	// in: path
 	// required: true
 	KID string `json:"kid"`
 }
 
-// swagger:route GET /admin/keys/{set}/{kid} v0alpha2 adminGetJsonWebKey
+// swagger:route GET /admin/keys/{set}/{kid} jwk getJsonWebKey
 //
-// # Fetch a JSON Web Key
+// # Get JSON Web Key
 //
-// This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
+// This endpoint returns a singular JSON Web Key contained in a set. It is identified by the set and the specific key ID (kid).
 //
 //	Consumes:
 //	- application/json
@@ -162,8 +163,8 @@ type adminGetJsonWebKey struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
-func (h *Handler) adminGetJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
@@ -177,15 +178,18 @@ func (h *Handler) adminGetJsonWebKey(w http.ResponseWriter, r *http.Request, ps 
 	h.r.Writer().Write(w, r, keys)
 }
 
-// swagger:parameters adminGetJsonWebKeySet
-type adminGetJsonWebKeySet struct {
-	// The JSON Web Key Set
+// Get JSON Web Key Set Parameters
+//
+// swagger:parameters getJsonWebKeySet
+type getJsonWebKeySet struct {
+	// JSON Web Key Set ID
+	//
 	// in: path
 	// required: true
 	Set string `json:"set"`
 }
 
-// swagger:route GET /admin/keys/{set} v0alpha2 adminGetJsonWebKeySet
+// swagger:route GET /admin/keys/{set} jwk getJsonWebKeySet
 //
 // # Retrieve a JSON Web Key Set
 //
@@ -203,8 +207,8 @@ type adminGetJsonWebKeySet struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
-func (h *Handler) adminGetJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
 	keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
@@ -217,25 +221,34 @@ func (h *Handler) adminGetJsonWebKeySet(w http.ResponseWriter, r *http.Request, 
 	h.r.Writer().Write(w, r, keys)
 }
 
-// swagger:parameters adminCreateJsonWebKeySet
+// Create JSON Web Key Set Request
+//
+// swagger:parameters createJsonWebKeySet
 type adminCreateJsonWebKeySet struct {
-	// The JSON Web Key Set
+	// The JSON Web Key Set ID
+	//
 	// in: path
 	// required: true
 	Set string `json:"set"`
 
 	// in: body
 	// required: true
-	Body adminCreateJsonWebKeySetBody
+	Body createJsonWebKeySetBody
 }
 
-// swagger:model adminCreateJsonWebKeySetBody
-type adminCreateJsonWebKeySetBody struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
+// Create JSON Web Key Set Request Body
+//
+// swagger:model createJsonWebKeySet
+type createJsonWebKeySetBody struct {
+	// JSON Web Key Algorithm
+	//
+	// The algorithm to be used for creating the key. Supports `RS256`, `ES256`, `ES512`, `HS512`, and `HS256`.
 	//
 	// required: true
 	Algorithm string `json:"alg"`
 
+	// JSON Web Key Use
+	//
 	// The "use" (public key use) parameter identifies the intended use of
 	// the public key. The "use" parameter is employed to indicate whether
 	// a public key is used for encrypting data or verifying the signature
@@ -243,15 +256,17 @@ type adminCreateJsonWebKeySetBody struct {
 	// required: true
 	Use string `json:"use"`
 
-	// The kid of the key to be created
+	// JSON Web Key ID
+	//
+	// The Key ID of the key to be created.
 	//
 	// required: true
 	KeyID string `json:"kid"`
 }
 
-// swagger:route POST /admin/keys/{set} v0alpha2 adminCreateJsonWebKeySet
+// swagger:route POST /admin/keys/{set} jwk createJsonWebKeySet
 //
-// # Generate a New JSON Web Key
+// # Create JSON Web Key
 //
 // This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 //
@@ -267,9 +282,9 @@ type adminCreateJsonWebKeySetBody struct {
 //
 //	Responses:
 //	  201: jsonWebKeySet
-//	  default: oAuth2ApiError
-func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var keyRequest adminCreateJsonWebKeySetBody
+//	  default: errorOAuth2
+func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var keyRequest createJsonWebKeySetBody
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
@@ -284,9 +299,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 }
 
-// swagger:parameters adminUpdateJsonWebKeySet
-type adminUpdateJsonWebKeySet struct {
-	// The JSON Web Key Set
+// Set JSON Web Key Set Request
+//
+// swagger:parameters setJsonWebKeySet
+type setJsonWebKeySet struct {
+	// The JSON Web Key Set ID
+	//
 	// in: path
 	// required: true
 	Set string `json:"set"`
@@ -295,7 +313,7 @@ type adminUpdateJsonWebKeySet struct {
 	Body jsonWebKeySet
 }
 
-// swagger:route PUT /admin/keys/{set} v0alpha2 adminUpdateJsonWebKeySet
+// swagger:route PUT /admin/keys/{set} jwk setJsonWebKeySet
 //
 // # Update a JSON Web Key Set
 //
@@ -313,8 +331,8 @@ type adminUpdateJsonWebKeySet struct {
 //
 //	Responses:
 //	  200: jsonWebKeySet
-//	  default: oAuth2ApiError
-func (h *Handler) adminUpdateJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
 
@@ -331,14 +349,17 @@ func (h *Handler) adminUpdateJsonWebKeySet(w http.ResponseWriter, r *http.Reques
 	h.r.Writer().Write(w, r, &keySet)
 }
 
-// swagger:parameters adminUpdateJsonWebKey
-type adminUpdateJsonWebKey struct {
-	// The JSON Web Key Set
+// Set JSON Web Key Request
+//
+// swagger:parameters setJsonWebKey
+type setJsonWebKey struct {
+	// The JSON Web Key Set ID
+	//
 	// in: path
 	// required: true
 	Set string `json:"set"`
 
-	// The JSON Web Key ID (kid)
+	// JSON Web Key ID
 	//
 	// in: path
 	// required: true
@@ -348,9 +369,9 @@ type adminUpdateJsonWebKey struct {
 	Body x.JSONWebKey
 }
 
-// swagger:route PUT /admin/keys/{set}/{kid} v0alpha2 adminUpdateJsonWebKey
+// swagger:route PUT /admin/keys/{set}/{kid} jwk setJsonWebKey
 //
-// # Update a JSON Web Key
+// # Set JSON Web Key
 //
 // Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 //
@@ -366,7 +387,7 @@ type adminUpdateJsonWebKey struct {
 //
 //	Responses:
 //	  200: jsonWebKey
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
@@ -384,17 +405,19 @@ func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, 
 	h.r.Writer().Write(w, r, key)
 }
 
-// swagger:parameters adminDeleteJsonWebKeySet
-type adminDeleteJsonWebKeySet struct {
+// Delete JSON Web Key Set Parameters
+//
+// swagger:parameters deleteJsonWebKeySet
+type deleteJsonWebKeySet struct {
 	// The JSON Web Key Set
 	// in: path
 	// required: true
 	Set string `json:"set"`
 }
 
-// swagger:route DELETE /admin/keys/{set} v0alpha2 adminDeleteJsonWebKeySet
+// swagger:route DELETE /admin/keys/{set} jwk deleteJsonWebKeySet
 //
-// # Delete a JSON Web Key Set
+// # Delete JSON Web Key Set
 //
 // Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
 //
@@ -410,7 +433,7 @@ type adminDeleteJsonWebKeySet struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -422,8 +445,10 @@ func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:parameters adminDeleteJsonWebKey
-type adminDeleteJsonWebKey struct {
+// Delete JSON Web Key Parameters
+//
+// swagger:parameters deleteJsonWebKey
+type deleteJsonWebKey struct {
 	// The JSON Web Key Set
 	// in: path
 	// required: true
@@ -436,13 +461,16 @@ type adminDeleteJsonWebKey struct {
 	KID string `json:"kid"`
 }
 
-// swagger:route DELETE /admin/keys/{set}/{kid} v0alpha2 adminDeleteJsonWebKey
+// swagger:route DELETE /admin/keys/{set}/{kid} jwk deleteJsonWebKey
 //
-// # Delete a JSON Web Key
+// # Delete JSON Web Key
 //
 // Use this endpoint to delete a single JSON Web Key.
 //
-// A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+// A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A
+// JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses
+// this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),
+// and allows storing user-defined keys as well.
 //
 //	Consumes:
 //	- application/json
@@ -454,8 +482,8 @@ type adminDeleteJsonWebKey struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
-func (h *Handler) adminDeleteJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 

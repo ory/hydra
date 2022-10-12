@@ -317,7 +317,7 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false WHERE request_id=? AND nid = ?", OAuth2RequestSQL{Table: table}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: table}.TableName()),
 				id,
 				p.NetworkID(ctx),
 			).

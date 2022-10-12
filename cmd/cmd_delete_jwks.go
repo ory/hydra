@@ -51,7 +51,7 @@ func NewDeleteJWKSCommand() *cobra.Command {
 			)
 
 			for _, c := range args {
-				_, err = m.V0alpha2Api.AdminDeleteJsonWebKeySet(context.Background(), c).Execute() //nolint:bodyclose
+				_, err = m.JwkApi.DeleteJsonWebKeySet(context.Background(), c).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}

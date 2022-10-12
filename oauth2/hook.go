@@ -23,7 +23,7 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 
 // Requester is a token endpoint's request context.
 //
-// swagger:model oAuth2AccessRequest
+// swagger:ignore
 type Requester struct {
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id"`
@@ -37,7 +37,7 @@ type Requester struct {
 
 // RefreshTokenHookRequest is the request body sent to the refresh token hook.
 //
-// swagger:model refreshTokenHookRequest
+// swagger:ignore
 type RefreshTokenHookRequest struct {
 	// Subject is the identifier of the authenticated end-user.
 	Subject string `json:"subject"`
@@ -55,7 +55,7 @@ type RefreshTokenHookRequest struct {
 
 // RefreshTokenHookResponse is the response body received from the refresh token hook.
 //
-// swagger:model refreshTokenHookResponse
+// swagger:ignore
 type RefreshTokenHookResponse struct {
 	// Session is the session data returned by the hook.
 	Session consent.AcceptOAuth2ConsentRequestSession `json:"session"`

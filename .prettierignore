@@ -3,3 +3,4 @@
 CHANGELOG.md
 spec
 fixtures
+internal/httpclient/

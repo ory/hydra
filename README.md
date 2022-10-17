@@ -52,7 +52,7 @@ The Ory Network provides the infrastructure for modern end-to-end security:
 
 It's fully managed, highly available, developer & compliance-friendly!
 
-- GDPR-compliant secure storage with data locality
+- GDPR-friendly secure storage with data locality
 - Cloud-native APIs, compatible with Ory's Open Source servers
 - Comprehensive admin tools with the web-based Ory Console and the Ory Command
   Line Interface (CLI)

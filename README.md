@@ -36,16 +36,19 @@ provided.
 ## Ory Hydra on the Ory Network
 
 The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
-worry-free way to use Ory's Services. **Ory OAuth2 & Open ID** is powered by the Ory
-Hydra open source identity server, and it's API-compatible.
+worry-free way to use Ory's Services. **Ory OAuth2 & Open ID** is powered by the
+Ory Hydra open source identity server, and it's API-compatible.
 
 The Ory Network provides the infrastructure for modern end-to-end security:
 
 - Identity & credential management scaling to billions of users and devices
-- Registration, Login and Account management flows for passkey, biometric, social, SSO and multi-factor authentication
+- Registration, Login and Account management flows for passkey, biometric,
+  social, SSO and multi-factor authentication
 - Pre-built login, registration and account management pages and components
-- **OAuth2 and OpenID provider for single sign on, API access and machine-to-machine authorization**
-- Low-latency permission checks based on Google's Zanzibar model and with built-in support for the Ory Permission Language
+- **OAuth2 and OpenID provider for single sign on, API access and
+  machine-to-machine authorization**
+- Low-latency permission checks based on Google's Zanzibar model and with
+  built-in support for the Ory Permission Language
 
 It's fully managed, highly available, developer & compliance-friendly!
 
@@ -55,6 +58,10 @@ It's fully managed, highly available, developer & compliance-friendly!
   Line Interface (CLI)
 - Extensive documentation, straightforward examples and easy-to-follow guides
 - Fair, usage-based [pricing](https://www.ory.sh/pricing)
+
+Sign up for a
+[**free developer account**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme)
+today!
 
 ## Get Started
 

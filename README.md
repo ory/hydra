@@ -33,15 +33,28 @@ exemplary consent apps ([Node](https://github.com/ory/hydra-login-consent-node))
 and [SDKs](https://www.ory.sh/docs/hydra/sdk/) for common languages are
 provided.
 
-## Ory Cloud
+## Ory Hydra on the Ory Network
 
-The easiest way to get started with Ory Software is in Ory Cloud! It is
-[**free for developers**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme),
-forever, no credit card required!
+The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
+worry-free way to use Ory's Services. **Ory OAuth2 & Open ID** is powered by the Ory
+Hydra open source identity server, and it's API-compatible.
 
-Ory Cloud has easy examples, administrative user interfaces, hosted pages (e.g.
-for login or registration), support for custom domains, collaborative features
-for your colleagues, and much more!
+The Ory Network provides the infrastructure for modern end-to-end security:
+
+- Identity & credential management scaling to billions of users and devices
+- Registration, Login and Account management flows for passkey, biometric, social, SSO and multi-factor authentication
+- Pre-built login, registration and account management pages and components
+- **OAuth2 and OpenID provider for single sign on, API access and machine-to-machine authorization**
+- Low-latency permission checks based on Google's Zanzibar model and with built-in support for the Ory Permission Language
+
+It's fully managed, highly available, developer & compliance-friendly!
+
+- GDPR-compliant secure storage with data locality
+- Cloud-native APIs, compatible with Ory's Open Source servers
+- Comprehensive admin tools with the web-based Ory Console and the Ory Command
+  Line Interface (CLI)
+- Extensive documentation, straightforward examples and easy-to-follow guides
+- Fair, usage-based [pricing](https://www.ory.sh/pricing)
 
 ## Get Started
 
@@ -70,12 +83,14 @@ about security.
 
 **Table of Contents**
 
+- [Ory Hydra on the Ory Network](#ory-hydra-on-the-ory-network)
+- [Get Started](#get-started)
 - [What is Ory Hydra?](#what-is-ory-hydra)
   - [Who's using it?](#whos-using-it)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
   - [OpenID Connect Certified](#openid-connect-certified)
 - [Quickstart](#quickstart)
-  - [5 minutes tutorial: Run your very own OAuth2 environment](#5-minutes-tutorial-run-your-very-own-oauth2-environment)
+  - [5 minutes tutorial: Host your own OAuth2 environment](#5-minutes-tutorial-host-your-own-oauth2-environment)
   - [Installation](#installation)
 - [Ecosystem](#ecosystem)
   - [Ory Kratos: Identity and User Infrastructure and Management](#ory-kratos-identity-and-user-infrastructure-and-management)
@@ -98,10 +113,11 @@ about security.
       - [Short Tests](#short-tests)
       - [Regular Tests](#regular-tests)
     - [E2E Tests](#e2e-tests)
+      - [OpenID Connect Conformity Tests](#openid-connect-conformity-tests)
     - [Build Docker](#build-docker)
     - [Run the Docker Compose quickstarts](#run-the-docker-compose-quickstarts)
+    - [Add a new migration](#add-a-new-migration)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
-- [Blog posts & articles](#blog-posts--articles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

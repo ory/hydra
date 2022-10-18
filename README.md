@@ -37,7 +37,7 @@ provided.
 
 The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
 worry-free way to use Ory's Services. **Ory OAuth2 & Open ID** is powered by the
-Ory Hydra open source identity server, and it's API-compatible.
+Ory Hydra open source OAuth2/OIDC server, and it's API-compatible.
 
 The Ory Network provides the infrastructure for modern end-to-end security:
 

@@ -95,7 +95,7 @@ body:
     id: operating-system
     type: dropdown
   - attributes:
-      label: "In which environment are you running/deploying?"
+      label: "In which environment are you deploying?"
       options:
         - Ory Network
         - Docker

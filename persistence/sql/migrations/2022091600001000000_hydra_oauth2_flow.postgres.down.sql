@@ -1,1 +1,0 @@
-DROP INDEX hydra_oauth2_flow_consent_error_state_subject_client_id_consent;

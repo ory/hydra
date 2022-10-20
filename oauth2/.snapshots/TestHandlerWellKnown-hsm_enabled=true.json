@@ -10,6 +10,7 @@
     "plain",
     "S256"
   ],
+  "device_authorization_endpoint": "http://hydra.localhost/oauth2/device/auth",
   "end_session_endpoint": "http://hydra.localhost/oauth2/sessions/logout",
   "frontchannel_logout_session_supported": true,
   "frontchannel_logout_supported": true,
@@ -59,7 +60,6 @@
     "pairwise",
     "public"
   ],
-  "device_authorization_endpoint": "http://hydra.localhost/oauth2/device/auth",
   "token_endpoint": "http://hydra.localhost/oauth2/token",
   "token_endpoint_auth_methods_supported": [
     "client_secret_post",

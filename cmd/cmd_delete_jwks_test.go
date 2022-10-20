@@ -11,7 +11,6 @@ import (
 
 	"github.com/ory/hydra/x"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/cmd"
@@ -21,7 +20,7 @@ import (
 
 func TestDeleteJwks(t *testing.T) {
 	ctx := context.Background()
-	c := cmd.NewDeleteJWKSCommand(new(cobra.Command))
+	c := cmd.NewDeleteJWKSCommand()
 	reg := setup(t, c)
 
 	t.Run("case=deletes jwks", func(t *testing.T) {

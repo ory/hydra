@@ -21,8 +21,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	hydra "github.com/ory/hydra-client-go"
@@ -30,16 +28,16 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
+func NewGetClientsCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:     "oauth2-client id-1 [id-2] [id-n]",
-		Aliases: []string{"client"},
+		Use:     "oauth2-client <id-1> [<id-2> ...]",
+		Aliases: []string{"client", "clients", "oauth2-clients"},
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Get one or more OAuth 2.0 Clients by their ID(s)",
 		Long:    `This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`,
-		Example: fmt.Sprintf(`To get the OAuth 2.0 Client's secret, run:
+		Example: `To get the OAuth 2.0 Client's secret, run:
 
-	%s get client <your-client-id> | jq -r '.client_secret'`, root.Use),
+	{{ .CommandPath }} <your-client-id> --json | jq -r '.client_secret'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
@@ -48,7 +46,7 @@ func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
 
 			clients := make([]hydra.OAuth2Client, 0, len(args))
 			for _, id := range args {
-				client, _, err := m.V0alpha2Api.AdminGetOAuth2Client(cmd.Context(), id).Execute() //nolint:bodyclose
+				client, _, err := m.OAuth2Api.GetOAuth2Client(cmd.Context(), id).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}

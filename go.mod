@@ -1,6 +1,6 @@
 module github.com/ory/hydra
 
-go 1.18
+go 1.19
 
 replace (
 	github.com/bradleyjkemp/cupaloy/v2 => github.com/aeneasr/cupaloy/v2 v2.6.1-0.20210924214125-3dfdd01210a3
@@ -22,7 +22,7 @@ require (
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
-	github.com/go-swagger/go-swagger v0.30.0
+	github.com/go-swagger/go-swagger v0.30.3
 	github.com/gobuffalo/pop/v6 v6.0.6
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
@@ -49,7 +49,7 @@ require (
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
 	github.com/ory/jsonschema/v3 v3.0.7
-	github.com/ory/x v0.0.474
+	github.com/ory/x v0.0.486
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
@@ -253,7 +253,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.9.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 // indirect
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect

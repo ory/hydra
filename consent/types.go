@@ -43,13 +43,16 @@ const (
 	loginRequestDeniedErrorName   = "login request denied"
 )
 
-// The response payload sent when accepting or rejecting a login, consent, or logout request.
+// OAuth 2.0 Redirect Browser To
 //
-// swagger:model successfulOAuth2RequestResponse
-type RequestHandlerResponse struct {
-	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
+// Contains a redirect URL used to complete a login, consent, or logout request.
+//
+// swagger:model oAuth2RedirectTo
+type OAuth2RedirectTo struct {
+	// RedirectURL is the URL which you should redirect the user's browser to once the authentication process is completed.
 	//
 	// required: true
+	// in: body
 	RedirectTo string `json:"redirect_to"`
 }
 
@@ -152,36 +155,6 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
-// The response payload sent when there is an attempt to access an already handled consent request.
-//
-// swagger:model handledOAuth2ConsentRequest
-type HandledOAuth2ConsentRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
-// The response payload sent when there is an attempt to access an already handled logout request.
-//
-// swagger:model handledOAuth2LogoutRequest
-type HandledOAuth2LogoutRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
-// The response payload sent when there is an attempt to access an already handled login request.
-//
-// swagger:model handledOAuth2LoginRequest
-type HandledOAuth2LoginRequest struct {
-	// Original request URL to which you should redirect the user if request was already handled.
-	//
-	// required: true
-	RedirectTo string `json:"redirect_to"`
-}
-
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptOAuth2ConsentRequest
@@ -228,34 +201,48 @@ func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-// swagger:model previousOAuth2ConsentSessions
-type previousOAuth2ConsentSessions []PreviousOAuth2ConsentSession
-
-// The response used to return used consent requests
-// same as HandledLoginRequest, just with consent_request exposed as json
+// List of OAuth 2.0 Consent Sessions
 //
-// swagger:model previousOAuth2ConsentSession
-type PreviousOAuth2ConsentSession struct {
-	// Named ID because of pop
+// swagger:model oAuth2ConsentSessions
+type oAuth2ConsentSessions []OAuth2ConsentSession
+
+// OAuth 2.0 Consent Session
+//
+// A completed OAuth 2.0 Consent Session.
+//
+// swagger:model oAuth2ConsentSession
+type OAuth2ConsentSession struct {
 	ID string `json:"-" db:"challenge"`
 
+	// Scope Granted
+	//
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope" db:"granted_scope"`
 
+	// Audience Granted
+	//
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
 	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
 
+	// Session Details
+	//
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *AcceptOAuth2ConsentRequestSession `json:"session" db:"-"`
 
+	// Remember Consent
+	//
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
 	Remember bool `json:"remember" db:"remember"`
 
+	// Remember Consent For
+	//
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for" db:"remember_for"`
 
+	// Consent Handled At
+	//
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
@@ -265,10 +252,14 @@ type PreviousOAuth2ConsentSession struct {
 	// the flow.
 	WasHandled bool `json:"-" db:"was_used"`
 
-	ConsentRequest  *OAuth2ConsentRequest `json:"consent_request" db:"-"`
-	Error           *RequestDeniedError   `json:"-" db:"error"`
-	RequestedAt     time.Time             `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime        `json:"-" db:"authenticated_at"`
+	// Consent Request
+	//
+	// The consent request that lead to this consent session.
+	ConsentRequest *OAuth2ConsentRequest `json:"consent_request" db:"-"`
+
+	Error           *RequestDeniedError `json:"-" db:"error"`
+	RequestedAt     time.Time           `json:"-" db:"requested_at"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`

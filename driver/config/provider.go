@@ -81,7 +81,7 @@ const (
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyDeviceInternalURL                         = "urls.self.device"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
-	KeyDbIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
+	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyDeviceAuthTokenPollingInterval            = "oauth2.device_authorization.token_polling_interval" // #nosec G101
@@ -451,7 +451,7 @@ func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) DbIgnoreUnknownTableColumns() bool {
-	return p.p.Bool(KeyDbIgnoreUnknownTableColumns)
+	return p.p.Bool(KeyDBIgnoreUnknownTableColumns)
 }
 
 func (p *DefaultProvider) SubjectIdentifierAlgorithmSalt(ctx context.Context) string {

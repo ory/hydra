@@ -142,7 +142,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because the request was redirected but the login endpoint rejected the request", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
-			vr, _, err := adminClient.V0alpha2Api.AdminRejectOAuth2LoginRequest(context.Background()).
+			vr, _, err := adminClient.OAuth2Api.RejectOAuth2LoginRequest(context.Background()).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				RejectOAuth2Request(hydra.RejectOAuth2Request{
 					Error:            pointerx.String(fosite.ErrInteractionRequired.ErrorField),
@@ -172,7 +172,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			func(w http.ResponseWriter, r *http.Request) {
-				vr, _, err := adminClient.V0alpha2Api.AdminRejectOAuth2ConsentRequest(context.Background()).
+				vr, _, err := adminClient.OAuth2Api.RejectOAuth2ConsentRequest(context.Background()).
 					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 					RejectOAuth2Request(hydra.RejectOAuth2Request{
 						Error:            pointerx.String(fosite.ErrInteractionRequired.ErrorField),
@@ -382,7 +382,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
-				_, res, err := adminClient.V0alpha2Api.AdminAcceptOAuth2LoginRequest(context.Background()).
+				_, res, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
 					LoginChallenge(r.URL.Query().Get("login_challenge")).
 					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
 						Subject: "not-aeneas-rekkas",

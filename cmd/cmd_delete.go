@@ -6,7 +6,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewDeleteCmd(root *cobra.Command) *cobra.Command {
+func NewDeleteCmd() *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:   "delete",
 		Short: "Delete resources",

@@ -6,7 +6,6 @@ import (
 
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -16,7 +15,7 @@ import (
 )
 
 func TestIntrospectToken(t *testing.T) {
-	c := cmd.NewIntrospectTokenCmd(new(cobra.Command))
+	c := cmd.NewIntrospectTokenCmd()
 	public, admin, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, admin.URL))
 

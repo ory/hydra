@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -33,7 +32,7 @@ func writeTempFile(t *testing.T, contents interface{}) string {
 
 func TestImportClient(t *testing.T) {
 	ctx := context.Background()
-	c := cmd.NewImportClientCmd(new(cobra.Command))
+	c := cmd.NewImportClientCmd()
 	reg := setup(t, c)
 
 	file1 := writeTempFile(t, []hydra.OAuth2Client{{Scope: pointerx.String("foo")}, {Scope: pointerx.String("bar"), ClientSecret: pointerx.String("some-secret")}})

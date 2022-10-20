@@ -6,8 +6,6 @@
   path: /components/schemas/acceptOAuth2ConsentRequestSession/properties/id_token/additionalProperties
 - op: remove
   path: /components/schemas/acceptOAuth2ConsentRequestSession/properties/id_token/type
-- op: remove
-  path: /components/schemas/DefaultSession
 - op: replace
   path: /components/schemas/oAuth2ConsentSession/properties/expires_at
   value:

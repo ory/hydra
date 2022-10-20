@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// TrustedOAuth2JwtGrantIssuer struct for TrustedOAuth2JwtGrantIssuer
+// TrustedOAuth2JwtGrantIssuer OAuth2 JWT Bearer Grant Type Issuer Trust Relationship
 type TrustedOAuth2JwtGrantIssuer struct {
 	// The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.
 	AllowAnySubject *bool `json:"allow_any_subject,omitempty"`

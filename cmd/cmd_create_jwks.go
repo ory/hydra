@@ -22,7 +22,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -32,16 +31,18 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-func NewCreateJWKSCmd(parent *cobra.Command) *cobra.Command {
+func NewCreateJWKSCmd() *cobra.Command {
 	const alg = "alg"
 	const use = "use"
 
 	cmd := &cobra.Command{
-		Use:     "jwks set-id [key-id]",
+		Use:     "jwk <set-id> [<key-id>]",
+		Aliases: []string{"jwks"},
 		Args:    cobra.RangeArgs(1, 2),
-		Example: fmt.Sprintf(`%[1]s createjwks my-jwk-set --alg RS256 --use sig`, parent.Use),
+		Example: `{{ .CommandPath }} <my-jwk-set> --alg RS256 --use sig`,
 		Short:   "Create a JSON Web Key Set with a JSON Web Key",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.CommandPath()
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
@@ -53,7 +54,7 @@ func NewCreateJWKSCmd(parent *cobra.Command) *cobra.Command {
 			}
 
 			//nolint:bodyclose
-			jwks, _, err := m.V0alpha2Api.AdminCreateJsonWebKeySet(context.Background(), args[0]).AdminCreateJsonWebKeySetBody(hydra.AdminCreateJsonWebKeySetBody{
+			jwks, _, err := m.JwkApi.CreateJsonWebKeySet(context.Background(), args[0]).CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: flagx.MustGetString(cmd, alg),
 				Kid: kid,
 				Use: flagx.MustGetString(cmd, use),
@@ -66,6 +67,7 @@ func NewCreateJWKSCmd(parent *cobra.Command) *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Root().Name()
 	cmd.Flags().String(alg, "RS256", "The algorithm to be used to generated they key. Supports: RS256, RS512, ES256, ES512, EdDSA")
 	cmd.Flags().String(use, "sig", "The intended use of this key. Supports: sig, enc")
 	return cmd

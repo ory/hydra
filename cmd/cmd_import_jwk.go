@@ -32,12 +32,12 @@ import (
 	"github.com/ory/x/josex"
 )
 
-func NewKeysImportCmd(parent *cobra.Command) *cobra.Command {
+func NewKeysImportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:  "jwk set-id file-1 [file-2] [file-n]",
 		Args: cobra.MinimumNArgs(1),
-		Example: fmt.Sprintf(`%[1]s import keys my-set ./path/to/jwk.json ./path/to/jwk-2.json --format json
-%[1]s import keys my-set ./path/to/rsa.key ./path/to/rsa.pub --use enc`, parent.Use),
+		Example: `{{ .CommandPath }} my-set ./path/to/jwk.json ./path/to/jwk-2.json --format json
+{{ .CommandPath }} my-set ./path/to/rsa.key ./path/to/rsa.pub --use enc`,
 		Short: "Imports JSON Web Keys from one or more JSON files.",
 		Long: `This command allows you to import JSON Web Keys from one or more JSON files or STDIN to the JSON Web Key Store.
 
@@ -125,7 +125,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 			failed := make(map[string]error)
 			for src, kk := range keys {
 				for _, k := range kk {
-					result, _, err := m.V0alpha2Api.AdminUpdateJsonWebKey(cmd.Context(), k.Kid, set).JsonWebKey(k).Execute() //nolint:bodyclose
+					result, _, err := m.JwkApi.SetJsonWebKey(cmd.Context(), k.Kid, set).JsonWebKey(k).Execute() //nolint:bodyclose
 					if err != nil {
 						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
 						continue

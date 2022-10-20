@@ -20,78 +20,60 @@
 
 package x
 
-// OAuth2 API Error
-//
-// An API error caused by Ory's OAuth 2.0 APIs.
-//
-// swagger:model oAuth2ApiError
-type oAuth2ApiError struct {
-	// Name is the error name.
-	//
-	// example: The requested resource could not be found
-	Name string `json:"error"`
-
-	// Description contains further information on the nature of the error.
-	//
-	// example: Object with ID 12345 does not exist
-	Description string `json:"error_description"`
-
-	// Code represents the error status code (404, 403, 401, ...).
-	//
-	// example: 404
-	Code int `json:"status_code"`
-
-	// Debug contains debug information. This is usually not available and has to be enabled.
-	//
-	// example: The database adapter was unable to find the element
-	Debug string `json:"error_debug"`
-}
-
 // Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 // typically 201.
 //
 // swagger:response emptyResponse
 type emptyResponse struct{}
 
-// OAuth2 Device Flow
+// Error
 //
-// # Ory's OAuth 2.0 Device Authorization API
+// swagger:model errorOAuth2
+type errorOAuth2 struct {
+	// Error
+	Name string `json:"error"`
+
+	// Error Description
+	Description string `json:"error_description"`
+
+	// Error Hint
+	//
+	// Helps the user identify the error cause.
+	//
+	// Example: The redirect URL is not allowed.
+	Hint string `json:"error_hint"`
+
+	// HTTP Status Code
+	//
+	// Example: 401
+	Code int `json:"status_code"`
+
+	// Error Debug Information
+	//
+	// Only available in dev mode.
+	Debug string `json:"error_debug,omitempty"`
+}
+
+// Default Error Response
 //
-// swagger:model oAuth2ApiDeviceAuthorizationResponse
-type oAuth2ApiDeviceAuthorizationResponse struct {
-	// The device verification code.
-	//
-	// example: ory_dc_smldfksmdfkl.mslkmlkmlk
-	DeviceCode string `json:"device_code"`
+// swagger:response errorOAuth2Default
+type errorOAuth2Default struct {
+	// in: body
+	Body errorOAuth2
+}
 
-	// The end-user verification code.
-	//
-	// example: AAAAAA
-	UserCode string `json:"user_code"`
+// Bad Request Error Response
+//
+// swagger:response errorOAuth2BadRequest
+type errorOAuth2BadRequest struct {
+	// in: body
+	Body errorOAuth2
+}
 
-	// The end-user verification URI on the authorization
-	// server.  The URI should be short and easy to remember as end users
-	// will be asked to manually type it into their user agent.
-	//
-	// example: https://auth.ory.sh/tv
-	VerificationUri string `json:"verification_uri"`
-
-	// A verification URI that includes the "user_code" (or
-	// other information with the same function as the "user_code"),
-	// which is designed for non-textual transmission.
-	//
-	// example: https://auth.ory.sh/tv?user_code=AAAAAA
-	VerificationUriComplete string `json:"verification_uri_complete"`
-
-	// The lifetime in seconds of the "device_code" and "user_code".
-	//
-	// example: 16830
-	ExpiresIn int `json:"expires_in"`
-
-	// The minimum amount of time in seconds that the client
-	// SHOULD wait between polling requests to the token endpoint.  If no
-	// value is provided, clients MUST use 5 as the default.
-	//
-	// example: 5
-	Interval int `json:"interval"`
+// Not Found Error Response
+//
+// swagger:response errorOAuth2NotFound
+type errorOAuth2NotFound struct {
+	// in: body
+	Body errorOAuth2
 }

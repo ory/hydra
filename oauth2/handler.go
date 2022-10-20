@@ -91,10 +91,10 @@ func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.performOAuth2TokenFlow)))
+	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
 
-	public.GET(AuthPath, h.performOAuth2AuthorizationFlow)
-	public.POST(AuthPath, h.performOAuth2AuthorizationFlow)
+	public.GET(AuthPath, h.oAuth2Authorize)
+	public.POST(AuthPath, h.oAuth2Authorize)
 	public.GET(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 	public.POST(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 
@@ -124,8 +124,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
 
-	admin.POST(IntrospectPath, h.adminIntrospectOAuth2Token)
-	admin.DELETE(DeleteTokensPath, h.adminDeleteOAuth2Token)
+	admin.POST(IntrospectPath, h.introspectOAuth2Token)
+	admin.DELETE(DeleteTokensPath, h.deleteOAuth2Token)
 
 	public.GET(DeviceAuthPath, h.performOAuth2DeviceAuthorizationFlow)
 	// This is only a shorthand to avoid people to type a long url;
@@ -133,6 +133,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.POST(DeviceAuthPath, h.performOAuth2DeviceFlow)
 }
 
+// FIXME: Add Doc
 func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -247,6 +248,49 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(ctx, w, authorizeRequest, response)
 }
 
+// OAuth2 Device Flow
+//
+// # Ory's OAuth 2.0 Device Authorization API
+//
+// swagger:model deviceAuthorization
+type deviceAuthorization struct {
+	// The device verification code.
+	//
+	// example: ory_dc_smldfksmdfkl.mslkmlkmlk
+	DeviceCode string `json:"device_code"`
+
+	// The end-user verification code.
+	//
+	// example: AAAAAA
+	UserCode string `json:"user_code"`
+
+	// The end-user verification URI on the authorization
+	// server.  The URI should be short and easy to remember as end users
+	// will be asked to manually type it into their user agent.
+	//
+	// example: https://auth.ory.sh/tv
+	VerificationUri string `json:"verification_uri"`
+
+	// A verification URI that includes the "user_code" (or
+	// other information with the same function as the "user_code"),
+	// which is designed for non-textual transmission.
+	//
+	// example: https://auth.ory.sh/tv?user_code=AAAAAA
+	VerificationUriComplete string `json:"verification_uri_complete"`
+
+	// The lifetime in seconds of the "device_code" and "user_code".
+	//
+	// example: 16830
+	ExpiresIn int `json:"expires_in"`
+
+	// The minimum amount of time in seconds that the client
+	// SHOULD wait between polling requests to the token endpoint.  If no
+	// value is provided, clients MUST use 5 as the default.
+	//
+	// example: 5
+	Interval int `json:"interval"`
+}
+
 // swagger:route GET /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
 //
 // # The OAuth 2.0 Device Authorize Endpoint
@@ -262,8 +306,8 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 //	Schemes: http, https
 //
 //	Responses:
-//	  200: oAuth2ApiDeviceAuthorizationResponse
-//	  default: oAuth2ApiError
+//	  200: deviceAuthorization
+//	  default: errorOAuth2
 func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
@@ -287,11 +331,11 @@ func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request
 	h.r.OAuth2Provider().WriteDeviceResponse(ctx, w, request, resp)
 }
 
-// swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout
+// swagger:route GET /oauth2/sessions/logout oidc revokeOidcSession
 //
-// # OpenID Connect Front- or Back-channel Enabled Logout
+// # OpenID Connect Front- and Back-channel Enabled Logout
 //
-// This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
+// This endpoint initiates and completes user logout at the Ory OAuth2 & OpenID provider and initiates OpenID Connect Front- / Back-channel logout:
 //
 // - https://openid.net/specs/openid-connect-frontchannel-1_0.html
 // - https://openid.net/specs/openid-connect-backchannel-1_0.html
@@ -383,14 +427,16 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
 	}
 }
 
-// OpenID Connect Discovery ;etadata
+// OpenID Connect Discovery Metadata
 //
-// It includes links to several endpoints (for example `/oauth2/token`) and exposes information on supported signature algorithms
+// Includes links to several endpoints (for example `/oauth2/token`) and exposes information on supported signature algorithms
 // among others.
 //
 // swagger:model oidcConfiguration
-type OIDCConfiguration struct {
-	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
+type oidcConfiguration struct {
+	// OpenID Connect Issuer URL
+	//
+	// An URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
 	// If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
 	//
@@ -398,17 +444,18 @@ type OIDCConfiguration struct {
 	// example: https://playground.ory.sh/ory-hydra/public/
 	Issuer string `json:"issuer"`
 
-	// URL of the OP's OAuth 2.0 Authorization Endpoint.
+	// OAuth 2.0 Authorization Endpoint URL
 	//
 	// required: true
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
 	AuthURL string `json:"authorization_endpoint"`
 
-	// URL of the OP's Dynamic Client Registration Endpoint.
+	// OpenID Connect Dynamic Client Registration Endpoint URL
+	//
 	// example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
-	// URL of the OP's OAuth 2.0 Token Endpoint
+	// OAuth 2.0 Token Endpoint URL
 	//
 	// required: true
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/token
@@ -417,6 +464,8 @@ type OIDCConfiguration struct {
 	// URL of the authorization server's device authorization endpoint
 	DeviceAuthorisationEndpoint string `json:"device_authorization_endpoint"`
 
+	// OpenID Connect Well-Known JSON Web Keys URL
+	//
 	// URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
 	// signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
 	// to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)
@@ -426,9 +475,11 @@ type OIDCConfiguration struct {
 	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	//
 	// required: true
-	// example: https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json
+	// example: https://{slug}.projects.oryapis.com/.well-known/jwks.json
 	JWKsURI string `json:"jwks_uri"`
 
+	// OpenID Connect Supported Subject Types
+	//
 	// JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include
 	// pairwise and public.
 	//
@@ -438,104 +489,148 @@ type OIDCConfiguration struct {
 	//   - pairwise
 	SubjectTypes []string `json:"subject_types_supported"`
 
+	// OAuth 2.0 Supported Response Types
+	//
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
 	// Providers MUST support the code, id_token, and the token id_token Response Type values.
 	//
 	// required: true
 	ResponseTypes []string `json:"response_types_supported"`
 
+	// OpenID Connect Supported Claims
+	//
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported"`
 
+	// OAuth 2.0 Supported Grant Types
+	//
 	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported"`
 
+	// OAuth 2.0 Supported Response Modes
+	//
 	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
 	ResponseModesSupported []string `json:"response_modes_supported"`
 
+	// OpenID Connect Userinfo URL
+	//
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint string `json:"userinfo_endpoint"`
 
-	// SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST
+	// OAuth 2.0 Supported Scope Values
+	//
+	// JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST
 	// support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
 	ScopesSupported []string `json:"scopes_supported"`
 
+	// OAuth 2.0 Supported Client Authentication Methods
+	//
 	// JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are
 	// client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
 	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 
+	// OpenID Connect Supported Userinfo Signing Algorithm
+	//
 	// 	JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
 	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
 
+	// OpenID Connect Supported ID Token Signing Algorithms
+	//
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
 	// to encode the Claims in a JWT.
 	//
 	// required: true
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 
+	// OpenID Connect Default ID Token Signing Algorithms
+	//
 	// Algorithm used to sign OpenID Connect ID Tokens.
 	//
 	// required: true
 	IDTokenSignedResponseAlg []string `json:"id_token_signed_response_alg"`
 
+	// OpenID Connect User Userinfo Signing Algorithm
+	//
 	// Algorithm used to sign OpenID Connect Userinfo Responses.
 	//
 	// required: true
 	UserinfoSignedResponseAlg []string `json:"userinfo_signed_response_alg"`
 
-	// 	Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
+	// OpenID Connect Request Parameter Supported
+	//
+	// Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
 	RequestParameterSupported bool `json:"request_parameter_supported"`
 
+	// OpenID Connect Request URI Parameter Supported
+	//
 	// Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
 	RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
 
+	// OpenID Connect Requires Request URI Registration
+	//
 	// Boolean value specifying whether the OP requires any request_uri values used to be pre-registered
 	// using the request_uris registration parameter.
 	RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
 
+	// OpenID Connect Claims Parameter Parameter Supported
+	//
 	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
 	ClaimsParameterSupported bool `json:"claims_parameter_supported"`
 
+	// OAuth 2.0 Token Revocation URL
+	//
 	// URL of the authorization server's OAuth 2.0 revocation endpoint.
 	RevocationEndpoint string `json:"revocation_endpoint"`
 
+	// OpenID Connect Back-Channel Logout Supported
+	//
 	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
 	BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
 
+	// OpenID Connect Back-Channel Logout Session Required
+	//
 	// Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
 	// session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
 	BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
 
+	// OpenID Connect Front-Channel Logout Supported
+	//
 	// Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
 	FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
 
+	// OpenID Connect Front-Channel Logout Session Required
+	//
 	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
 	// the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
 	// included in ID Tokens issued by the OP.
 	FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
 
+	// OpenID Connect End-Session Endpoint
+	//
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint string `json:"end_session_endpoint"`
 
+	// OpenID Connect Supported Request Object Signing Algorithms
+	//
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
 	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
 	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
 	// (using the request_uri parameter).
 	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
 
+	// OAuth 2.0 PKCE Supported Code Challenge Methods
+	//
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
 	// by this authorization server.
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
 }
 
-// swagger:route GET /.well-known/openid-configuration v0alpha2 discoverOidcConfiguration
+// swagger:route GET /.well-known/openid-configuration oidc discoverOidcConfiguration
 //
 // # OpenID Connect Discovery
 //
-// The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
-// your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
-// flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
+// A mechanism for an OpenID Connect Relying Party to discover the End-User's OpenID Provider and obtain information needed to interact with it, including its OAuth 2.0 endpoint locations.
 //
 // Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 // For a full list of clients go here: https://openid.net/developers/certified/
@@ -547,14 +642,14 @@ type OIDCConfiguration struct {
 //
 //	Responses:
 //	  200: oidcConfiguration
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	h.r.Writer().Write(w, r, &OIDCConfiguration{
+	h.r.Writer().Write(w, r, &oidcConfiguration{
 		Issuer:                                 h.c.IssuerURL(r.Context()).String(),
 		AuthURL:                                h.c.OAuth2AuthURL(r.Context()).String(),
 		TokenURL:                               h.c.OAuth2TokenURL(r.Context()).String(),
@@ -587,7 +682,8 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 	})
 }
 
-// The userinfo response
+// OpenID Connect Userinfo
+//
 // swagger:model oidcUserInfo
 type oidcUserInfo struct {
 	// Subject - Identifier for the End-User at the IssuerURL.
@@ -648,14 +744,12 @@ type oidcUserInfo struct {
 	UpdatedAt int `json:"updated_at,omitempty"`
 }
 
-// swagger:route GET /userinfo v0alpha2 getOidcUserInfo
+// swagger:route GET /userinfo oidc getOidcUserInfo
 //
 // # OpenID Connect Userinfo
 //
-// This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
-// the provided OAuth 2.0 Access Token.
-//
-// For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
+// This endpoint returns the payload of the ID Token, including `session.id_token` values, of
+// the provided OAuth 2.0 Access Token's consent request.
 //
 // In the case of authentication error, a WWW-Authenticate header might be set in the response
 // with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
@@ -671,7 +765,7 @@ type oidcUserInfo struct {
 //
 //	Responses:
 //	  200: oidcUserInfo
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -751,6 +845,8 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Revoke OAuth 2.0 Access or Refresh Token Request
+//
 // swagger:parameters revokeOAuth2Token
 type revokeOAuth2Token struct {
 	// in: formData
@@ -758,9 +854,9 @@ type revokeOAuth2Token struct {
 	Token string `json:"token"`
 }
 
-// swagger:route POST /oauth2/revoke v0alpha2 revokeOAuth2Token
+// swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token
 //
-// # Revoke an OAuth2 Access or Refresh Token
+// # Revoke OAuth 2.0 Access or Refresh Token
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
@@ -778,7 +874,7 @@ type revokeOAuth2Token struct {
 //
 //	Responses:
 //	  200: emptyResponse
-//	  default: oAuth2ApiError
+//	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -790,8 +886,10 @@ func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	h.r.OAuth2Provider().WriteRevocationResponse(ctx, w, err)
 }
 
-// swagger:parameters adminIntrospectOAuth2Token
-type adminIntrospectOAuth2Token struct {
+// Introspect OAuth 2.0 Access or Refresh Token Request
+//
+// swagger:parameters introspectOAuth2Token
+type introspectOAuth2Token struct {
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
 	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
@@ -808,15 +906,13 @@ type adminIntrospectOAuth2Token struct {
 	Scope string `json:"scope"`
 }
 
-// swagger:route POST /admin/oauth2/introspect v0alpha2 adminIntrospectOAuth2Token
+// swagger:route POST /admin/oauth2/introspect oAuth2 introspectOAuth2Token
 //
-// # Introspect OAuth2 Access or Refresh Tokens
+// # Introspect OAuth2 Access and Refresh Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
-// set additional data for a token by setting `accessTokenExtra` during the consent flow.
-//
-// For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
+// set additional data for a token by setting `session.access_token` during the consent flow.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -828,8 +924,8 @@ type adminIntrospectOAuth2Token struct {
 //
 //	Responses:
 //	  200: introspectedOAuth2Token
-//	  default: oAuth2ApiError
-func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
 
@@ -918,7 +1014,9 @@ func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-// swagger:parameters performOAuth2TokenFlow
+// OAuth 2.0 Token Exchange Parameters
+//
+// swagger:parameters oauth2TokenExchange
 type performOAuth2TokenFlow struct {
 	// in: formData
 	// required: true
@@ -937,11 +1035,12 @@ type performOAuth2TokenFlow struct {
 	ClientID string `json:"client_id"`
 }
 
-// OAuth2 Token Response
-// swagger:model oAuth2TokenResponse
-type oAuth2TokenResponse struct {
-	// The lifetime in seconds of the access token.  For
-	//  example, the value "3600" denotes that the access token will
+// OAuth2 Token Exchange Result
+//
+// swagger:model oAuth2TokenExchange
+type oAuth2TokenExchange struct {
+	// The lifetime in seconds of the access token. For
+	// example, the value "3600" denotes that the access token will
 	// expire in one hour from the time the response was generated.
 	ExpiresIn int `json:"expires_in"`
 
@@ -962,18 +1061,14 @@ type oAuth2TokenResponse struct {
 	TokenType string `json:"token_type"`
 }
 
-// swagger:route POST /oauth2/token v0alpha2 performOAuth2TokenFlow
+// swagger:route POST /oauth2/token oAuth2 oauth2TokenExchange
 //
 // # The OAuth 2.0 Token Endpoint
 //
-// The client makes a request to the token endpoint by sending the
-// following parameters using the "application/x-www-form-urlencoded" HTTP
-// request entity-body.
+// Use open source libraries to perform OAuth 2.0 and OpenID Connect
+// available for any programming language. You can find a list of libraries here https://oauth.net/code/
 //
-// > Do not implement a client for this endpoint yourself. Use a library. There are many libraries
-// > available for any programming language. You can find a list of libraries here: https://oauth.net/code/
-// >
-// > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
+// The Ory SDK is not yet able to this endpoint properly.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -988,9 +1083,9 @@ type oAuth2TokenResponse struct {
 //	  oauth2:
 //
 //	Responses:
-//	  200: oAuth2TokenResponse
-//	  default: oAuth2ApiError
-func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request) {
+//	  200: oAuth2TokenExchange
+//	  default: errorOAuth2
+func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
 
@@ -1061,14 +1156,14 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 	h.r.OAuth2Provider().WriteAccessResponse(ctx, w, accessRequest, accessResponse)
 }
 
-// swagger:route GET /oauth2/auth v0alpha2 performOAuth2AuthorizationFlow
+// swagger:route GET /oauth2/auth oAuth2 oAuth2Authorize
 //
-// # The OAuth 2.0 Authorize Endpoint
+// # OAuth 2.0 Authorize Endpoint
 //
-// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
-// OAuth2 is a very popular protocol and a library for your programming language will exists.
+// Use open source libraries to perform OAuth 2.0 and OpenID Connect
+// available for any programming language. You can find a list of libraries at https://oauth.net/code/
 //
-// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
+// The Ory SDK is not yet able to this endpoint properly.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -1077,8 +1172,8 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 //
 //	Responses:
 //	  302: emptyResponse
-//	  default: oAuth2ApiError
-func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
@@ -1185,18 +1280,22 @@ func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.
 	h.r.OAuth2Provider().WriteAuthorizeResponse(ctx, w, authorizeRequest, response)
 }
 
-// swagger:parameters adminDeleteOAuth2Token
-type adminDeleteOAuth2Token struct {
-	//required: true
+// Delete OAuth 2.0 Access Token Parameters
+//
+// swagger:parameters deleteOAuth2Token
+type deleteOAuth2Token struct {
+	// OAuth 2.0 Client ID
+	//
+	// required: true
 	// in: query
 	ClientID string `json:"client_id"`
 }
 
-// swagger:route DELETE /admin/oauth2/tokens v0alpha2 adminDeleteOAuth2Token
+// swagger:route DELETE /admin/oauth2/tokens oAuth2 deleteOAuth2Token
 //
-// # Delete OAuth2 Access Tokens from a Client
+// # Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
 //
-// This endpoint deletes OAuth2 access tokens issued for a client from the database
+// This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.
 //
 //	Consumes:
 //	- application/json
@@ -1205,8 +1304,8 @@ type adminDeleteOAuth2Token struct {
 //
 //	Responses:
 //	  204: emptyResponse
-//	  default: oAuth2ApiError
-func (h *Handler) adminDeleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//	  default: errorOAuth2
+func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))

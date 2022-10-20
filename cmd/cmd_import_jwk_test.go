@@ -11,7 +11,6 @@ import (
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/stringsx"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
@@ -25,7 +24,7 @@ import (
 var stubJsonWebKeySet []byte
 
 func TestImportJWKS(t *testing.T) {
-	c := cmd.NewKeysImportCmd(new(cobra.Command))
+	c := cmd.NewKeysImportCmd()
 	_ = setup(t, c)
 
 	t.Run("case=imports without alg fails", func(t *testing.T) {

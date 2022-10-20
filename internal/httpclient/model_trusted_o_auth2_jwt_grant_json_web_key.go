@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// TrustedOAuth2JwtGrantJsonWebKey struct for TrustedOAuth2JwtGrantJsonWebKey
+// TrustedOAuth2JwtGrantJsonWebKey OAuth2 JWT Bearer Grant Type Issuer Trusted JSON Web Key
 type TrustedOAuth2JwtGrantJsonWebKey struct {
 	// The \"key_id\" is key unique identifier (same as kid header in jws/jwt).
 	Kid *string `json:"kid,omitempty"`

@@ -162,6 +162,115 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiDeleteOidcDynamicClientRequest struct {
+	ctx        context.Context
+	ApiService *OidcApiService
+	id         string
+}
+
+func (r ApiDeleteOidcDynamicClientRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteOidcDynamicClientExecute(r)
+}
+
+/*
+DeleteOidcDynamicClient Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
+
+This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
+public internet directly and can be used in self-service. It implements the OpenID Connect
+Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+is disabled by default. It can be enabled by an administrator.
+
+To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Client.
+	@return ApiDeleteOidcDynamicClientRequest
+*/
+func (a *OidcApiService) DeleteOidcDynamicClient(ctx context.Context, id string) ApiDeleteOidcDynamicClientRequest {
+	return ApiDeleteOidcDynamicClientRequest{
+		ApiService: a,
+		ctx:        ctx,
+		id:         id,
+	}
+}
+
+// Execute executes the request
+func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicClientRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.DeleteOidcDynamicClient")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/register/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v GenericError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiDiscoverOidcConfigurationRequest struct {
 	ctx        context.Context
 	ApiService *OidcApiService

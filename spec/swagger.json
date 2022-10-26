@@ -1815,7 +1815,7 @@
           "https"
         ],
         "tags": [
-          "v0alpha2"
+          "oidc"
         ],
         "summary": "Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol",
         "operationId": "deleteOidcDynamicClient",

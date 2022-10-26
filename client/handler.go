@@ -763,7 +763,7 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:route DELETE /oauth2/register/{id} v0alpha2 deleteOidcDynamicClient
+// swagger:route DELETE /oauth2/register/{id} oidc deleteOidcDynamicClient
 //
 // # Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
 //

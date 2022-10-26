@@ -3314,7 +3314,7 @@
         ],
         "summary": "Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol",
         "tags": [
-          "v0alpha2"
+          "oidc"
         ]
       },
       "get": {

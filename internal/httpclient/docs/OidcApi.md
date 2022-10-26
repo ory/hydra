@@ -2,14 +2,15 @@
 
 All URIs are relative to _http://localhost_
 
-| Method                                                                | HTTP request                              | Description                                                     |
-| --------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
-| [**CreateOidcDynamicClient**](OidcApi.md#CreateOidcDynamicClient)     | **Post** /oauth2/register                 | Register OAuth2 Client using OpenID Dynamic Client Registration |
-| [**DiscoverOidcConfiguration**](OidcApi.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery                                        |
-| [**GetOidcDynamicClient**](OidcApi.md#GetOidcDynamicClient)           | **Get** /oauth2/register/{id}             | Get OAuth2 Client using OpenID Dynamic Client Registration      |
-| [**GetOidcUserInfo**](OidcApi.md#GetOidcUserInfo)                     | **Get** /userinfo                         | OpenID Connect Userinfo                                         |
-| [**RevokeOidcSession**](OidcApi.md#RevokeOidcSession)                 | **Get** /oauth2/sessions/logout           | OpenID Connect Front- and Back-channel Enabled Logout           |
-| [**SetOidcDynamicClient**](OidcApi.md#SetOidcDynamicClient)           | **Put** /oauth2/register/{id}             | Set OAuth2 Client using OpenID Dynamic Client Registration      |
+| Method                                                                | HTTP request                              | Description                                                                              |
+| --------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [**CreateOidcDynamicClient**](OidcApi.md#CreateOidcDynamicClient)     | **Post** /oauth2/register                 | Register OAuth2 Client using OpenID Dynamic Client Registration                          |
+| [**DeleteOidcDynamicClient**](OidcApi.md#DeleteOidcDynamicClient)     | **Delete** /oauth2/register/{id}          | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol |
+| [**DiscoverOidcConfiguration**](OidcApi.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery                                                                 |
+| [**GetOidcDynamicClient**](OidcApi.md#GetOidcDynamicClient)           | **Get** /oauth2/register/{id}             | Get OAuth2 Client using OpenID Dynamic Client Registration                               |
+| [**GetOidcUserInfo**](OidcApi.md#GetOidcUserInfo)                     | **Get** /userinfo                         | OpenID Connect Userinfo                                                                  |
+| [**RevokeOidcSession**](OidcApi.md#RevokeOidcSession)                 | **Get** /oauth2/sessions/logout           | OpenID Connect Front- and Back-channel Enabled Logout                                    |
+| [**SetOidcDynamicClient**](OidcApi.md#SetOidcDynamicClient)           | **Put** /oauth2/register/{id}             | Set OAuth2 Client using OpenID Dynamic Client Registration                               |
 
 ## CreateOidcDynamicClient
 
@@ -66,6 +67,71 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#)
+[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+## DeleteOidcDynamicClient
+
+> DeleteOidcDynamicClient(ctx, id).Execute()
+
+Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management
+Protocol
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    id := "id_example" // string | The id of the OAuth 2.0 Client.
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OidcApi.DeleteOidcDynamicClient(context.Background(), id).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.DeleteOidcDynamicClient``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+}
+```
+
+### Path Parameters
+
+| Name    | Type                | Description                                                                 | Notes |
+| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
+| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
+| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a
+apiDeleteOidcDynamicClientRequest struct via the builder pattern
+
+| Name | Type | Description | Notes |
+| ---- | ---- | ----------- | ----- |
+
+### Return type
+
+(empty response body)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#)

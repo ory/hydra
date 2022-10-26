@@ -142,7 +142,7 @@ func TestRevoke(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			_, err := client.V0alpha2Api.RevokeOAuth2Token(
+			_, err := client.OAuth2Api.RevokeOAuth2Token(
 				context.WithValue(
 					context.Background(),
 					hydra.ContextBasicAuth,

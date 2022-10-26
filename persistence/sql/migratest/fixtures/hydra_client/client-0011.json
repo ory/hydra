@@ -5,24 +5,8 @@
   "Audience": [
     "autdience-0011_1"
   ],
-  "AuthorizationCodeGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "AuthorizationCodeGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "BackChannelLogoutSessionRequired": false,
   "BackChannelLogoutURI": "",
-  "ClientCredentialsGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "ClientURI": "http://client/0011",
   "Contacts": [
     "contact-0011_1"
@@ -34,54 +18,72 @@
     "grant-0011_1"
   ],
   "ID": "00000000-0000-0000-0000-000000000000",
-  "ImplicitGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "ImplicitGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/0011",
-  "JwtBearerGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "LegacyClientID": "client-0011",
+  "Lifespans": {
+    "AuthorizationCodeGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "AuthorizationCodeGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ClientCredentialsGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "ImplicitGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "JwtBearerGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "PasswordGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "RefreshTokenGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    }
+  },
   "LogoURI": "http://logo/0011",
   "Metadata": {},
   "NID": "00000000-0000-0000-0000-000000000000",
   "Name": "Client 0011",
   "Owner": "owner-0011",
   "PKDeprecated": 11,
-  "PasswordGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "PasswordGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "PolicyURI": "http://policy/0011",
   "PostLogoutRedirectURIs": [],
   "RedirectURIs": [
     "http://redirect/0011_1"
   ],
-  "RefreshTokenGrantAccessTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantIDTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
-  "RefreshTokenGrantRefreshTokenLifespan": {
-    "Duration": 0,
-    "Valid": false
-  },
   "RegistrationAccessToken": "",
   "RegistrationAccessTokenSignature": "",
   "RegistrationClientURI": "",

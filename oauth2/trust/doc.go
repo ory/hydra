@@ -28,9 +28,13 @@ import (
 	"time"
 )
 
+// OAuth2 JWT Bearer Grant Type Issuer Trust Relationships
+//
 // swagger:model trustedOAuth2JwtGrantIssuers
 type trustedOAuth2JwtGrantIssuers []trustedOAuth2JwtGrantIssuer
 
+// OAuth2 JWT Bearer Grant Type Issuer Trust Relationship
+//
 // swagger:model trustedOAuth2JwtGrantIssuer
 type trustedOAuth2JwtGrantIssuer struct {
 	// example: 9edc811f-4e28-453c-9b46-4de65f00217f
@@ -61,6 +65,8 @@ type trustedOAuth2JwtGrantIssuer struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
+// OAuth2 JWT Bearer Grant Type Issuer Trusted JSON Web Key
+//
 // swagger:model trustedOAuth2JwtGrantJsonWebKey
 type trustedOAuth2JwtGrantJsonWebKey struct {
 	// The "set" is basically a name for a group(set) of keys. Will be the same as "issuer" in grant.

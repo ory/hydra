@@ -961,7 +961,7 @@ func (s *PersisterTestSuite) TestGetClient() {
 
 			actual, err := r.Persister().GetClient(s.t2, expected.LegacyClientID)
 			require.Error(t, err)
-			require.Equal(t, uuid.Nil.String(), actual.GetID())
+			require.Nil(t, actual)
 			actual, err = r.Persister().GetClient(s.t1, expected.LegacyClientID)
 			require.NoError(t, err)
 			require.Equal(t, expected.LegacyClientID, actual.GetID())
@@ -1014,7 +1014,7 @@ func (s *PersisterTestSuite) TestGetConcreteClient() {
 
 			actual, err := r.Persister().GetConcreteClient(s.t2, expected.LegacyClientID)
 			require.Error(t, err)
-			require.Equal(t, uuid.Nil.String(), actual.GetID())
+			require.Nil(t, actual)
 			actual, err = r.Persister().GetConcreteClient(s.t1, expected.LegacyClientID)
 			require.NoError(t, err)
 			require.Equal(t, expected.LegacyClientID, actual.GetID())

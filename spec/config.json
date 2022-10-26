@@ -251,6 +251,18 @@
     }
   },
   "properties": {
+    "db": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures the database connection",
+      "properties": {
+        "ignore_unknown_table_columns": {
+          "type": "boolean",
+          "description": "Ignore scan errors when columns in the SQL result have no fields in the destination struct",
+          "default": false
+        }
+      }
+    },
     "log": {
       "type": "object",
       "additionalProperties": false,

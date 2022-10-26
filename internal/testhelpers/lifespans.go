@@ -7,7 +7,7 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-var TestLifespans = client.UpdateOAuth2ClientLifespans{
+var TestLifespans = client.Lifespans{
 	AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Duration: 31 * time.Hour, Valid: true},
 	AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Duration: 32 * time.Hour, Valid: true},
 	AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Duration: 33 * time.Hour, Valid: true},

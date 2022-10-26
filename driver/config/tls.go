@@ -4,6 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 
+	"github.com/pkg/errors"
+
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/tlsx"
 )
 
@@ -26,8 +29,10 @@ const (
 type TLSConfig interface {
 	Enabled() bool
 	AllowTerminationFrom() []string
-	Certificate() ([]tls.Certificate, error)
+	GetCertificateFunc(stopReload <-chan struct{}, _ *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error)
 }
+
+var _ TLSConfig = (*tlsConfig)(nil)
 
 type tlsConfig struct {
 	enabled              bool
@@ -58,6 +63,33 @@ func (p *DefaultProvider) TLS(ctx context.Context, iface ServeInterface) TLSConf
 	}
 }
 
-func (c *tlsConfig) Certificate() ([]tls.Certificate, error) {
-	return tlsx.Certificate(c.certString, c.keyString, c.certPath, c.keyPath)
+func (c *tlsConfig) GetCertificateFunc(stopReload <-chan struct{}, log *logrusx.Logger) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+	if c.certPath != "" && c.keyPath != "" { // attempt to load from disk first (enables hot-reloading)
+		ctx, cancel := context.WithCancel(context.Background())
+		go func() {
+			<-stopReload
+			cancel()
+		}()
+		errs := make(chan error, 1)
+		getCert, err := tlsx.GetCertificate(ctx, c.certPath, c.keyPath, errs)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		go func() {
+			for err := range errs {
+				log.WithError(err).Error("Failed to reload TLS certificates. Using the previously loaded certificates.")
+			}
+		}()
+		return getCert, nil
+	}
+	if c.certString != "" && c.keyString != "" { // base64-encoded directly in config
+		cert, err := tlsx.CertificateFromBase64(c.certString, c.keyString)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+			return &cert, nil
+		}, nil
+	}
+	return nil, tlsx.ErrNoCertificatesConfigured
 }

@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-// AdminTrustOAuth2JwtGrantIssuerBody struct for AdminTrustOAuth2JwtGrantIssuerBody
-type AdminTrustOAuth2JwtGrantIssuerBody struct {
+// TrustOAuth2JwtGrantIssuer Trust OAuth2 JWT Bearer Grant Type Issuer Request Body
+type TrustOAuth2JwtGrantIssuer struct {
 	// The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.
 	AllowAnySubject *bool `json:"allow_any_subject,omitempty"`
 	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".
@@ -31,12 +31,12 @@ type AdminTrustOAuth2JwtGrantIssuerBody struct {
 	Subject *string `json:"subject,omitempty"`
 }
 
-// NewAdminTrustOAuth2JwtGrantIssuerBody instantiates a new AdminTrustOAuth2JwtGrantIssuerBody object
+// NewTrustOAuth2JwtGrantIssuer instantiates a new TrustOAuth2JwtGrantIssuer object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewAdminTrustOAuth2JwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JsonWebKey, scope []string) *AdminTrustOAuth2JwtGrantIssuerBody {
-	this := AdminTrustOAuth2JwtGrantIssuerBody{}
+func NewTrustOAuth2JwtGrantIssuer(expiresAt time.Time, issuer string, jwk JsonWebKey, scope []string) *TrustOAuth2JwtGrantIssuer {
+	this := TrustOAuth2JwtGrantIssuer{}
 	this.ExpiresAt = expiresAt
 	this.Issuer = issuer
 	this.Jwk = jwk
@@ -44,16 +44,16 @@ func NewAdminTrustOAuth2JwtGrantIssuerBody(expiresAt time.Time, issuer string, j
 	return &this
 }
 
-// NewAdminTrustOAuth2JwtGrantIssuerBodyWithDefaults instantiates a new AdminTrustOAuth2JwtGrantIssuerBody object
+// NewTrustOAuth2JwtGrantIssuerWithDefaults instantiates a new TrustOAuth2JwtGrantIssuer object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewAdminTrustOAuth2JwtGrantIssuerBodyWithDefaults() *AdminTrustOAuth2JwtGrantIssuerBody {
-	this := AdminTrustOAuth2JwtGrantIssuerBody{}
+func NewTrustOAuth2JwtGrantIssuerWithDefaults() *TrustOAuth2JwtGrantIssuer {
+	this := TrustOAuth2JwtGrantIssuer{}
 	return &this
 }
 
 // GetAllowAnySubject returns the AllowAnySubject field value if set, zero value otherwise.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetAllowAnySubject() bool {
+func (o *TrustOAuth2JwtGrantIssuer) GetAllowAnySubject() bool {
 	if o == nil || o.AllowAnySubject == nil {
 		var ret bool
 		return ret
@@ -63,7 +63,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetAllowAnySubject() bool {
 
 // GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetAllowAnySubjectOk() (*bool, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool) {
 	if o == nil || o.AllowAnySubject == nil {
 		return nil, false
 	}
@@ -71,7 +71,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetAllowAnySubjectOk() (*bool, bool
 }
 
 // HasAllowAnySubject returns a boolean if a field has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) HasAllowAnySubject() bool {
+func (o *TrustOAuth2JwtGrantIssuer) HasAllowAnySubject() bool {
 	if o != nil && o.AllowAnySubject != nil {
 		return true
 	}
@@ -80,12 +80,12 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) HasAllowAnySubject() bool {
 }
 
 // SetAllowAnySubject gets a reference to the given bool and assigns it to the AllowAnySubject field.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetAllowAnySubject(v bool) {
+func (o *TrustOAuth2JwtGrantIssuer) SetAllowAnySubject(v bool) {
 	o.AllowAnySubject = &v
 }
 
 // GetExpiresAt returns the ExpiresAt field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetExpiresAt() time.Time {
+func (o *TrustOAuth2JwtGrantIssuer) GetExpiresAt() time.Time {
 	if o == nil {
 		var ret time.Time
 		return ret
@@ -96,7 +96,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetExpiresAt() time.Time {
 
 // GetExpiresAtOk returns a tuple with the ExpiresAt field value
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetExpiresAtOk() (*time.Time, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetExpiresAtOk() (*time.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -104,12 +104,12 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetExpiresAtOk() (*time.Time, bool)
 }
 
 // SetExpiresAt sets field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetExpiresAt(v time.Time) {
+func (o *TrustOAuth2JwtGrantIssuer) SetExpiresAt(v time.Time) {
 	o.ExpiresAt = v
 }
 
 // GetIssuer returns the Issuer field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetIssuer() string {
+func (o *TrustOAuth2JwtGrantIssuer) GetIssuer() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -120,7 +120,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetIssuer() string {
 
 // GetIssuerOk returns a tuple with the Issuer field value
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetIssuerOk() (*string, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetIssuerOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -128,12 +128,12 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetIssuerOk() (*string, bool) {
 }
 
 // SetIssuer sets field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetIssuer(v string) {
+func (o *TrustOAuth2JwtGrantIssuer) SetIssuer(v string) {
 	o.Issuer = v
 }
 
 // GetJwk returns the Jwk field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetJwk() JsonWebKey {
+func (o *TrustOAuth2JwtGrantIssuer) GetJwk() JsonWebKey {
 	if o == nil {
 		var ret JsonWebKey
 		return ret
@@ -144,7 +144,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetJwk() JsonWebKey {
 
 // GetJwkOk returns a tuple with the Jwk field value
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetJwkOk() (*JsonWebKey, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetJwkOk() (*JsonWebKey, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -152,12 +152,12 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetJwkOk() (*JsonWebKey, bool) {
 }
 
 // SetJwk sets field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetJwk(v JsonWebKey) {
+func (o *TrustOAuth2JwtGrantIssuer) SetJwk(v JsonWebKey) {
 	o.Jwk = v
 }
 
 // GetScope returns the Scope field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetScope() []string {
+func (o *TrustOAuth2JwtGrantIssuer) GetScope() []string {
 	if o == nil {
 		var ret []string
 		return ret
@@ -168,7 +168,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetScope() []string {
 
 // GetScopeOk returns a tuple with the Scope field value
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetScopeOk() ([]string, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetScopeOk() ([]string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -176,12 +176,12 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetScopeOk() ([]string, bool) {
 }
 
 // SetScope sets field value
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetScope(v []string) {
+func (o *TrustOAuth2JwtGrantIssuer) SetScope(v []string) {
 	o.Scope = v
 }
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetSubject() string {
+func (o *TrustOAuth2JwtGrantIssuer) GetSubject() string {
 	if o == nil || o.Subject == nil {
 		var ret string
 		return ret
@@ -191,7 +191,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetSubject() string {
 
 // GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetSubjectOk() (*string, bool) {
+func (o *TrustOAuth2JwtGrantIssuer) GetSubjectOk() (*string, bool) {
 	if o == nil || o.Subject == nil {
 		return nil, false
 	}
@@ -199,7 +199,7 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) GetSubjectOk() (*string, bool) {
 }
 
 // HasSubject returns a boolean if a field has been set.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) HasSubject() bool {
+func (o *TrustOAuth2JwtGrantIssuer) HasSubject() bool {
 	if o != nil && o.Subject != nil {
 		return true
 	}
@@ -208,11 +208,11 @@ func (o *AdminTrustOAuth2JwtGrantIssuerBody) HasSubject() bool {
 }
 
 // SetSubject gets a reference to the given string and assigns it to the Subject field.
-func (o *AdminTrustOAuth2JwtGrantIssuerBody) SetSubject(v string) {
+func (o *TrustOAuth2JwtGrantIssuer) SetSubject(v string) {
 	o.Subject = &v
 }
 
-func (o AdminTrustOAuth2JwtGrantIssuerBody) MarshalJSON() ([]byte, error) {
+func (o TrustOAuth2JwtGrantIssuer) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AllowAnySubject != nil {
 		toSerialize["allow_any_subject"] = o.AllowAnySubject
@@ -235,38 +235,38 @@ func (o AdminTrustOAuth2JwtGrantIssuerBody) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableAdminTrustOAuth2JwtGrantIssuerBody struct {
-	value *AdminTrustOAuth2JwtGrantIssuerBody
+type NullableTrustOAuth2JwtGrantIssuer struct {
+	value *TrustOAuth2JwtGrantIssuer
 	isSet bool
 }
 
-func (v NullableAdminTrustOAuth2JwtGrantIssuerBody) Get() *AdminTrustOAuth2JwtGrantIssuerBody {
+func (v NullableTrustOAuth2JwtGrantIssuer) Get() *TrustOAuth2JwtGrantIssuer {
 	return v.value
 }
 
-func (v *NullableAdminTrustOAuth2JwtGrantIssuerBody) Set(val *AdminTrustOAuth2JwtGrantIssuerBody) {
+func (v *NullableTrustOAuth2JwtGrantIssuer) Set(val *TrustOAuth2JwtGrantIssuer) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableAdminTrustOAuth2JwtGrantIssuerBody) IsSet() bool {
+func (v NullableTrustOAuth2JwtGrantIssuer) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableAdminTrustOAuth2JwtGrantIssuerBody) Unset() {
+func (v *NullableTrustOAuth2JwtGrantIssuer) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableAdminTrustOAuth2JwtGrantIssuerBody(val *AdminTrustOAuth2JwtGrantIssuerBody) *NullableAdminTrustOAuth2JwtGrantIssuerBody {
-	return &NullableAdminTrustOAuth2JwtGrantIssuerBody{value: val, isSet: true}
+func NewNullableTrustOAuth2JwtGrantIssuer(val *TrustOAuth2JwtGrantIssuer) *NullableTrustOAuth2JwtGrantIssuer {
+	return &NullableTrustOAuth2JwtGrantIssuer{value: val, isSet: true}
 }
 
-func (v NullableAdminTrustOAuth2JwtGrantIssuerBody) MarshalJSON() ([]byte, error) {
+func (v NullableTrustOAuth2JwtGrantIssuer) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableAdminTrustOAuth2JwtGrantIssuerBody) UnmarshalJSON(src []byte) error {
+func (v *NullableTrustOAuth2JwtGrantIssuer) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

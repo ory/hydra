@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -20,7 +19,7 @@ import (
 
 func TestDeleteClient(t *testing.T) {
 	ctx := context.Background()
-	c := cmd.NewDeleteClientCmd(new(cobra.Command))
+	c := cmd.NewDeleteClientCmd()
 	reg := setup(t, c)
 
 	t.Run("case=deletes client", func(t *testing.T) {

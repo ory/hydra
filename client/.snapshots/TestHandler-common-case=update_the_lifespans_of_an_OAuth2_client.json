@@ -28,8 +28,6 @@
     "implicit_grant_access_token_lifespan": "35h0m0s",
     "implicit_grant_id_token_lifespan": "36h0m0s",
     "jwt_bearer_grant_access_token_lifespan": "37h0m0s",
-    "password_grant_access_token_lifespan": "38h0m0s",
-    "password_grant_refresh_token_lifespan": "39h0m0s",
     "refresh_token_grant_id_token_lifespan": "40h0m0s",
     "refresh_token_grant_access_token_lifespan": "41h0m0s",
     "refresh_token_grant_refresh_token_lifespan": "42h0m0s"

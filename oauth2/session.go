@@ -37,7 +37,7 @@ import (
 	"github.com/ory/x/stringslice"
 )
 
-// swagger:model oAuth2ConsentSession
+// swagger:ignore
 type Session struct {
 	*openid.DefaultSession `json:"id_token"`
 	Extra                  map[string]interface{} `json:"extra"`

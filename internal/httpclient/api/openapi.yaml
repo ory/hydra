@@ -1714,7 +1714,7 @@ paths:
         Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration
         Management Protocol
       tags:
-        - v0alpha2
+        - oidc
     get:
       description: "This endpoint behaves like the administrative counterpart
         (`getOAuth2Client`)\

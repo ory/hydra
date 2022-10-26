@@ -7,7 +7,6 @@ api_jwk.go
 api_metadata.go
 api_o_auth2.go
 api_oidc.go
-api_v0alpha2.go
 api_wellknown.go
 client.go
 configuration.go
@@ -52,7 +51,6 @@ docs/TokenPaginationResponseHeaders.md
 docs/TrustOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantJsonWebKey.md
-docs/V0alpha2Api.md
 docs/Version.md
 docs/WellknownApi.md
 git_push.sh

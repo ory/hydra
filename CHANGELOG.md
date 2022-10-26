@@ -666,6 +666,7 @@
 
 * High db cpu utilisation on query ([#3260](https://github.com/ory/hydra/issues/3260)) ([4bf995d](https://github.com/ory/hydra/commit/4bf995d2610414abc69380885afdf6dce46e4042))
 * Proper introspection output format ([#3312](https://github.com/ory/hydra/issues/3312)) ([8b77f5a](https://github.com/ory/hydra/commit/8b77f5ada22261fdcf87fc1a3b362a023a565abc))
+* Use correct sdk tag ([#3318](https://github.com/ory/hydra/issues/3318)) ([aea37d6](https://github.com/ory/hydra/commit/aea37d6a358f8c440ac2a3a138adec77d7544aab))
 
 ### Features
 

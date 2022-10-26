@@ -268,7 +268,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Sainsbury's</td>
@@ -301,7 +301,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Zero</td>
@@ -312,7 +312,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Padis</td>
@@ -345,7 +345,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Factly</td>
@@ -389,7 +389,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Sponsor</td>
             <td>Strivacity</td>
@@ -500,7 +500,7 @@ that your company deserves a spot here, reach out to
             </td>
             <td><a href="https://www.lunasec.io/">lunasec.io</a></td>
         </tr>
-                <tr>
+            <tr>
             <td>Adopter *</td>
             <td>Serlo</td>
             <td align="center">
@@ -510,6 +510,18 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://serlo.org/">serlo.org</a></td>
+        </tr>
+        </tr>
+            <tr>
+            <td>Adopter *</td>
+            <td>dyrector.io</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/dyrector_io.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/dyrector_io.svg" alt="dyrector.io">
+                </picture>
+            </td>
+            <td><a href="https://dyrector.io/">dyrector.io</a></td>
         </tr>
     </tbody>
 </table>

@@ -104,6 +104,7 @@ func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Op
 		updateCmd,
 		importCmd,
 		performCmd,
+		introspectCmd,
 		revokeCmd,
 		migrateCmd,
 		serveCmd,

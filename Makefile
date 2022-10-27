@@ -186,9 +186,9 @@ contributors:
 
 .PHONY: post-release
 post-release: .bin/yq
-	cat quickstart.yml | yq '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
-	cat quickstart.yml | yq '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
-	cat quickstart.yml | yq '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' | sponge quickstart.yml
+	yq e '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	yq e '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	yq e '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' -i quickstart.yml
 
 generate: .bin/mockgen
 	go generate ./...

@@ -33,71 +33,86 @@ exemplary consent apps ([Node](https://github.com/ory/hydra-login-consent-node))
 and [SDKs](https://www.ory.sh/docs/hydra/sdk/) for common languages are
 provided.
 
-## Ory Hydra on the Ory Network
-
-The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
-worry-free way to use Ory's Services. **Ory OAuth2 & Open ID** is powered by the
-Ory Hydra open source OAuth2/OIDC server, and it's API-compatible.
-
-The Ory Network provides the infrastructure for modern end-to-end security:
-
-- Identity & credential management scaling to billions of users and devices
-- Registration, Login and Account management flows for passkey, biometric,
-  social, SSO and multi-factor authentication
-- Pre-built login, registration and account management pages and components
-- **OAuth2 and OpenID provider for single sign on, API access and
-  machine-to-machine authorization**
-- Low-latency permission checks based on Google's Zanzibar model and with
-  built-in support for the Ory Permission Language
-
-It's fully managed, highly available, developer & compliance-friendly!
-
-- GDPR-friendly secure storage with data locality
-- Cloud-native APIs, compatible with Ory's Open Source servers
-- Comprehensive admin tools with the web-based Ory Console and the Ory Command
-  Line Interface (CLI)
-- Extensive documentation, straightforward examples and easy-to-follow guides
-- Fair, usage-based [pricing](https://www.ory.sh/pricing)
-
-Sign up for a
-[**free developer account**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme)
-today!
+Ory Hydra can use [Ory Kratos](https://github.com/ory/kratos) as its identity
+server.
 
 ## Get Started
 
-If you're looking to jump straight into it, go ahead:
+You can use
+[Docker to run Ory Hydra locally](https://www.ory.sh/docs/hydra/5min-tutorial)
+or use the Ory CLI to try out Ory Hydra:
 
-- **[Run your own OAuth 2.0 Server - step by step guide](https://www.ory.sh/run-oauth2-server-open-source-api-security/)**:
-  A in-depth look at setting up Ory Hydra and performing a variety of OAuth 2.0
-  Flows.
-- [Ory Hydra 5 Minute Tutorial](https://www.ory.sh/docs/hydra/5min-tutorial):
-  Set up and use Ory Hydra using Docker Compose in under 5 Minutes. Good for
-  hacking a Proof of Concept.
-- [Run Ory Hydra in Docker](https://www.ory.sh/docs/hydra/configure-deploy): An
-  advanced guide to a fully functional set up with Ory Hydra.
-- [Integrating your Login and Consent UI with Ory Hydra](https://www.ory.sh/docs/hydra/oauth2):
-  The go-to place if you wish to adopt Ory Hydra in your new or existing stack.
+```shell
+# This example works best in Bash
+bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -b . ory
+sudo mv ./ory /usr/local/bin/
 
-Besides mitigating various attack vectors, such as a compromised database and
-OAuth 2.0 weaknesses, Ory Hydra is also able to securely manage JSON Web Keys.
-[Click here](https://www.ory.sh/docs/hydra/security-architecture) to read more
-about security.
+# Or with Homebrew installed
+brew install ory/tap/cli
+```
+
+create a new project (you may also use
+[Docker](https://www.ory.sh/docs/hydra/5min-tutorial))
+
+```
+ory create project --name "Ory Hydra 2.0 Example"
+project_id="{set to the id from output}"
+```
+
+and follow the quick & easy steps below.
+
+### OAuth 2.0 Client Credentials / Machine-to-Machine
+
+Create an OAuth 2.0 Client, and run the OAuth 2.0 Client Credentials flow:
+
+```shell
+ory create oauth2-client --project $project_id \
+    --name "Client Credentials Demo" \
+    --grant-type client_credentials
+client_id="{set to client id from output}"
+client_secret="{set to client secret from output}"
+
+ory perform client-credentials --client-id=$client_id --client-secret=$client_secret --project $project_id
+access_token="{set to access token from output}"
+
+ory introspect token $access_token --project $project_id
+```
+
+### OAuth 2.0 Authorize Code + OpenID Connect
+
+Try out the OAuth 2.0 Authorize Code grant right away!
+
+By accepting permissions `openid` and `offline_access` at the consent screen,
+Ory refreshes and OpenID Connect ID token,
+
+```shell
+ory create oauth2-client --project $project_id \
+    --name "Authorize Code with OpenID Connect Demo" \
+    --grant-type authorization_code \
+    --response-type code \
+    --redirect-uri ttp://127.0.0.1:4446/callback
+code_client_id="{set to client id from output}"
+code_client_secret="{set to client secret from output}"
+
+ory perform authorization-code \
+    --project $project_id \
+    --client-id $code_client_id \
+    --client-secret $code_client_secret
+code_access_token="{set to access token from output}"
+
+ory introspect token $code_access_token --project $project_id
+```
 
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents**
-
-- [Ory Hydra on the Ory Network](#ory-hydra-on-the-ory-network)
-- [Get Started](#get-started)
 - [What is Ory Hydra?](#what-is-ory-hydra)
   - [Who's using it?](#whos-using-it)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
   - [OpenID Connect Certified](#openid-connect-certified)
 - [Quickstart](#quickstart)
-  - [5 minutes tutorial: Host your own OAuth2 environment](#5-minutes-tutorial-host-your-own-oauth2-environment)
   - [Installation](#installation)
 - [Ecosystem](#ecosystem)
   - [Ory Kratos: Identity and User Infrastructure and Management](#ory-kratos-identity-and-user-infrastructure-and-management)
@@ -597,17 +612,6 @@ available as well:
 - The documentation is available [here](https://www.ory.sh/docs/hydra).
 - The REST API documentation is available
   [here](https://www.ory.sh/docs/hydra/sdk/api).
-
-### 5 minutes tutorial: Host your own OAuth2 environment
-
-The **[tutorial](https://www.ory.sh/docs/hydra/5min-tutorial)** teaches you to
-set up Ory Hydra, a Postgres instance and an exemplary identity provider written
-in React using docker-compose. It will take you about 5 minutes to complete the
-**[tutorial](https://www.ory.sh/docs/hydra/5min-tutorial)**.
-
-<img src=".github/readme/oauth2-flow.gif" alt="OAuth2 Flow">
-
-<br clear="all">
 
 ### Installation
 

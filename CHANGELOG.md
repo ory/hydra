@@ -659,6 +659,7 @@
 
 ### Documentation
 
+* Add refresh token grant type ([c752125](https://github.com/ory/hydra/commit/c752125315e1450c10d7604610d974a60e7f556a))
 * Fix typo ([dcfd11f](https://github.com/ory/hydra/commit/dcfd11f026469347a5ae941ebd1aa6f127e65143))
 
 

@@ -90,7 +90,7 @@ ory create oauth2-client --project $project_id \
     --name "Authorize Code with OpenID Connect Demo" \
     --grant-type authorization_code \
     --response-type code \
-    --redirect-uri ttp://127.0.0.1:4446/callback
+    --redirect-uri http://127.0.0.1:4446/callback
 code_client_id="{set to client id from output}"
 code_client_secret="{set to client secret from output}"
 

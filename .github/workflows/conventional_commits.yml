@@ -1,3 +1,6 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/workflows/conventional_commits.yml
+
 name: Conventional commits
 
 # This GitHub CI Action enforces that pull request titles follow conventional commits.

@@ -1,3 +1,6 @@
+<!-- AUTO-GENERATED, DO NOT EDIT! -->
+<!-- Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/SECURITY.md -->
+
 <!--
 
 Thank you for contributing changes to this document! Because we use a central repository

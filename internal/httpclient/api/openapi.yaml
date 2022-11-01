@@ -1437,6 +1437,36 @@ paths:
       summary: OAuth 2.0 Authorize Endpoint
       tags:
       - oAuth2
+  /oauth2/auth/sessions/login/{id}:
+    delete:
+      description: "This endpoint invalidates an authentication session by session\
+        \ id. After revoking the authentication session, the\nsubject has to re-authenticate\
+        \ at ORY Hydra for this device/browser. This endpoint does not invalidate\
+        \ any tokens\nand does not work with OpenID Connect Front- or Back-channel\
+        \ logout."
+      operationId: revokeOAuth2LoginSession
+      parameters:
+      - description: The id of the OAuth 2.0 Login session.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: "Empty responses are sent when, for example, resources are\
+            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorOAuth2'
+          description: errorOAuth2
+      summary: Revokes OAuth 2.0 Login Sessions of by session id
+      tags:
+      - oAuth2
   /oauth2/register:
     post:
       description: |-

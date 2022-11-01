@@ -1323,46 +1323,6 @@
         }
       }
     },
-    "/oauth2/auth/sessions/login/{id}": {
-      "delete": {
-        "description": "This endpoint invalidates an authentication session by session id. After revoking the authentication session, the\nsubject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens\nand does not work with OpenID Connect Front- or Back-channel logout.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Revokes OAuth 2.0 Login Session by session id",
-        "operationId": "revokeOAuth2LoginSession",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The login session id",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "default": {
-            "description": "errorOAuth2",
-            "schema": {
-              "$ref": "#/definitions/errorOAuth2"
-            }
-          }
-        }
-      }
-    },
     "/admin/oauth2/introspect": {
       "post": {
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `session.access_token` during the consent flow.",
@@ -1696,6 +1656,43 @@
         "operationId": "oAuth2Authorize",
         "responses": {
           "302": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "default": {
+            "description": "errorOAuth2",
+            "schema": {
+              "$ref": "#/definitions/errorOAuth2"
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/auth/sessions/login/{id}": {
+      "delete": {
+        "description": "This endpoint invalidates an authentication session by session id. After revoking the authentication session, the\nsubject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens\nand does not work with OpenID Connect Front- or Back-channel logout.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Revokes OAuth 2.0 Login Sessions of by session id",
+        "operationId": "revokeOAuth2LoginSession",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the OAuth 2.0 Login session.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
             "$ref": "#/responses/emptyResponse"
           },
           "default": {

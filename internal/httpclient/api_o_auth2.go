@@ -2966,6 +2966,107 @@ func (a *OAuth2ApiService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 	return localVarHTTPResponse, nil
 }
 
+type ApiRevokeOAuth2LoginSessionRequest struct {
+	ctx        context.Context
+	ApiService *OAuth2ApiService
+	id         string
+}
+
+func (r ApiRevokeOAuth2LoginSessionRequest) Execute() (*http.Response, error) {
+	return r.ApiService.RevokeOAuth2LoginSessionExecute(r)
+}
+
+/*
+RevokeOAuth2LoginSession Revokes OAuth 2.0 Login Sessions of by session id
+
+This endpoint invalidates an authentication session by session id. After revoking the authentication session, the
+subject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens
+and does not work with OpenID Connect Front- or Back-channel logout.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id The id of the OAuth 2.0 Login session.
+	@return ApiRevokeOAuth2LoginSessionRequest
+*/
+func (a *OAuth2ApiService) RevokeOAuth2LoginSession(ctx context.Context, id string) ApiRevokeOAuth2LoginSessionRequest {
+	return ApiRevokeOAuth2LoginSessionRequest{
+		ApiService: a,
+		ctx:        ctx,
+		id:         id,
+	}
+}
+
+// Execute executes the request
+func (a *OAuth2ApiService) RevokeOAuth2LoginSessionExecute(r ApiRevokeOAuth2LoginSessionRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OAuth2ApiService.RevokeOAuth2LoginSession")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/oauth2/auth/sessions/login/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiRevokeOAuth2LoginSessionsRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService

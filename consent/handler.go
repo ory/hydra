@@ -292,6 +292,17 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// Revoke OAuth 2.0 Consent Login Sessions Parameters
+//
+// swagger:parameters revokeOAuth2LoginSession
+type revokeOAuth2LoginSession struct {
+	// The id of the OAuth 2.0 Login session.
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
 // swagger:route DELETE /oauth2/auth/sessions/login/{id} oAuth2 revokeOAuth2LoginSession
 //
 // # Revokes OAuth 2.0 Login Sessions of by session id
@@ -300,15 +311,14 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 // subject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens
 // and does not work with OpenID Connect Front- or Back-channel logout.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       400: jsonError
-//       500: jsonError
+//	Responses:
+//	  204: emptyResponse
+//	  default: errorOAuth2
 func (h *Handler) revokeOAuth2LoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var loginSessionId = ps.ByName("id")
 

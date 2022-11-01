@@ -152,13 +152,13 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot))
 
-	csGot, _, err = sdk.V0alpha2Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-3").Execute()
+	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-3").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot))
 	cs = csGot[0]
 	assert.Equal(t, makeID("challenge", network, "3"), cs.ConsentRequest.Challenge)
 
-	csGot, _, err = sdk.V0alpha2Api.AdminListOAuth2SubjectConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-X").Execute()
+	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-X").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot))
 

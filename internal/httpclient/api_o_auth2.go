@@ -1768,11 +1768,12 @@ func (a *OAuth2ApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 }
 
 type ApiListOAuth2ConsentSessionsRequest struct {
-	ctx        context.Context
-	ApiService *OAuth2ApiService
-	subject    *string
-	pageSize   *int64
-	pageToken  *string
+	ctx            context.Context
+	ApiService     *OAuth2ApiService
+	subject        *string
+	pageSize       *int64
+	pageToken      *string
+	loginSessionId *string
 }
 
 // The subject to list the consent sessions for.
@@ -1790,6 +1791,12 @@ func (r ApiListOAuth2ConsentSessionsRequest) PageSize(pageSize int64) ApiListOAu
 // Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 func (r ApiListOAuth2ConsentSessionsRequest) PageToken(pageToken string) ApiListOAuth2ConsentSessionsRequest {
 	r.pageToken = &pageToken
+	return r
+}
+
+// The login session id to list the consent sessions for.
+func (r ApiListOAuth2ConsentSessionsRequest) LoginSessionId(loginSessionId string) ApiListOAuth2ConsentSessionsRequest {
+	r.loginSessionId = &loginSessionId
 	return r
 }
 
@@ -1846,6 +1853,9 @@ func (a *OAuth2ApiService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
 	}
 	localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	if r.loginSessionId != nil {
+		localVarQueryParams.Add("login_session_id", parameterToString(*r.loginSessionId, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

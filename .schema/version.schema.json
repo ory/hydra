@@ -1,9 +1,24 @@
 {
     "$id": "https://github.com/ory/kratos/.schema/versions.config.schema.json",
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "All Versions of the ORY Hydra Configuration",
-    "type": "object",
     "oneOf": [
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
+                            "const": "v2.0.1"
+                        }
+                    },
+                    "required": [
+                        "version"
+                    ]
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v2.0.1/spec/config.json"
+                }
+            ]
+        },
         {
             "allOf": [
                 {
@@ -12,7 +27,9 @@
                             "const": "v1.11.7"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.11.7/spec/config.json"
@@ -27,7 +44,9 @@
                             "const": "v1.7.0"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.7.0/.schema/config.schema.json"
@@ -42,7 +61,9 @@
                             "const": "v1.7.4"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.7.4/.schema/config.schema.json"
@@ -57,7 +78,9 @@
                             "const": "v1.8.5"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.8.5/.schema/config.schema.json"
@@ -72,7 +95,9 @@
                             "const": "v1.9.0-alpha.1"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.1/.schema/config.schema.json"
@@ -87,7 +112,9 @@
                             "const": "v1.9.0-alpha.2"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.2/.schema/config.schema.json"
@@ -102,7 +129,9 @@
                             "const": "v1.9.0-alpha.3"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.3/.schema/config.schema.json"
@@ -117,7 +146,9 @@
                             "const": "v1.9.0-rc.0"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-rc.0/.schema/config.schema.json"
@@ -132,7 +163,9 @@
                             "const": "v1.9.0"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0/.schema/config.schema.json"
@@ -147,7 +180,9 @@
                             "const": "v1.9.1"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.1/.schema/config.schema.json"
@@ -162,7 +197,9 @@
                             "const": "v1.9.2"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.2/.schema/config.schema.json"
@@ -177,7 +214,9 @@
                             "const": "v1.10.1"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.1/spec/config.json"
@@ -192,7 +231,9 @@
                             "const": "v1.10.2"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.2/spec/config.json"
@@ -207,7 +248,9 @@
                             "const": "v1.10.3"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.3/spec/config.json"
@@ -222,7 +265,9 @@
                             "const": "v1.10.5"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.5/spec/config.json"
@@ -237,7 +282,9 @@
                             "const": "v1.10.6"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.6/spec/config.json"
@@ -252,7 +299,9 @@
                             "const": "v1.10.7"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.7/spec/config.json"
@@ -267,7 +316,9 @@
                             "const": "v1.11.0"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.11.0/spec/config.json"
@@ -282,7 +333,9 @@
                             "const": "v1.11.6"
                         }
                     },
-                    "required": ["version"]
+                    "required": [
+                        "version"
+                    ]
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.11.6/spec/config.json"
@@ -321,5 +374,7 @@
                 }
             ]
         }
-    ]
+    ],
+    "title": "All Versions of the ORY Hydra Configuration",
+    "type": "object"
 }

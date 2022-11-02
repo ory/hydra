@@ -37,6 +37,9 @@ docs/cli: .bin/clidoc
 .bin/goimports: go.sum Makefile
 	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
+.bin/licenses: Makefile
+	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+
 .bin/ory: Makefile
 	bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -d -b .bin ory v0.1.44
 	touch -a -m .bin/ory
@@ -187,9 +190,12 @@ contributors:
 
 .PHONY: post-release
 post-release: .bin/yq
-	cat quickstart.yml | yq '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
-	cat quickstart.yml | yq '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
-	cat quickstart.yml | yq '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' | sponge quickstart.yml
+	yq e '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	yq e '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	yq e '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' -i quickstart.yml
 
 generate: .bin/mockgen
 	go generate ./...
+
+licenses: .bin/licenses node_modules  # checks open-source licenses
+	.bin/licenses

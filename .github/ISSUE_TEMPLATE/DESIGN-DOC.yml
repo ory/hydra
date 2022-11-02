@@ -1,3 +1,6 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/ISSUE_TEMPLATE/DESIGN-DOC.yml
+
 description:
   "A design document is needed for non-trivial changes to the code base."
 labels:

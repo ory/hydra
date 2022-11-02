@@ -1,0 +1,21 @@
+name: Licenses
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.18"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+      - run: make licenses

@@ -37,6 +37,9 @@ docs/cli: .bin/clidoc
 .bin/goimports: go.sum Makefile
 	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
+.bin/licenses: Makefile
+	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+
 .bin/ory: Makefile
 	bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -d -b .bin ory v0.1.22
 	touch -a -m .bin/ory
@@ -192,3 +195,6 @@ post-release: .bin/yq
 
 generate: .bin/mockgen
 	go generate ./...
+
+licenses: .bin/licenses node_modules  # checks open-source licenses
+	.bin/licenses

@@ -1,16 +1,6 @@
 <!-- AUTO-GENERATED, DO NOT EDIT! -->
 <!-- Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/SECURITY.md -->
 
-<!--
-
-Thank you for contributing changes to this document! Because we use a central repository
-to synchronize this file across all our repositories, make sure to make your edits
-in the correct file, which you can find here:
-
-https://github.com/ory/meta/blob/master/templates/repository/SECURITY.md
-
--->
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 

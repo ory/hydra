@@ -41,8 +41,8 @@ docs/cli: .bin/clidoc
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 .bin/ory: Makefile
-	bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -d -b .bin ory v0.1.44
-	touch -a -m .bin/ory
+	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.45
+	touch .bin/ory
 
 .PHONY: lint
 lint: .bin/golangci-lint

@@ -2,10 +2,10 @@
 
 ## Properties
 
-| Name            | Type                  | Description                                                                                                                                                                                  | Notes      |
-| --------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **Link**        | Pointer to **string** | The link header contains pagination links. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). in: header | [optional] |
-| **XTotalCount** | Pointer to **string** | The total number of clients. in: header                                                                                                                                                      | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Link** | Pointer to **string** | The link header contains pagination links.  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).  in: header | [optional] 
+**XTotalCount** | Pointer to **string** | The total number of clients.  in: header | [optional] 
 
 ## Methods
 
@@ -13,18 +13,18 @@
 
 `func NewTokenPaginationHeaders() *TokenPaginationHeaders`
 
-NewTokenPaginationHeaders instantiates a new TokenPaginationHeaders object This
-constructor will assign default values to properties that have it defined, and
-makes sure properties required by API are set, but the set of arguments will
-change when the set of required properties is changed
+NewTokenPaginationHeaders instantiates a new TokenPaginationHeaders object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewTokenPaginationHeadersWithDefaults
 
 `func NewTokenPaginationHeadersWithDefaults() *TokenPaginationHeaders`
 
-NewTokenPaginationHeadersWithDefaults instantiates a new TokenPaginationHeaders
-object This constructor will only assign default values to properties that have
-it defined, but it doesn't guarantee that properties required by API are set
+NewTokenPaginationHeadersWithDefaults instantiates a new TokenPaginationHeaders object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetLink
 
@@ -36,8 +36,8 @@ GetLink returns the Link field if non-nil, zero value otherwise.
 
 `func (o *TokenPaginationHeaders) GetLinkOk() (*string, bool)`
 
-GetLinkOk returns a tuple with the Link field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetLinkOk returns a tuple with the Link field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetLink
 
@@ -61,8 +61,8 @@ GetXTotalCount returns the XTotalCount field if non-nil, zero value otherwise.
 
 `func (o *TokenPaginationHeaders) GetXTotalCountOk() (*string, bool)`
 
-GetXTotalCountOk returns a tuple with the XTotalCount field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetXTotalCountOk returns a tuple with the XTotalCount field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetXTotalCount
 
@@ -76,6 +76,7 @@ SetXTotalCount sets XTotalCount field to given value.
 
 HasXTotalCount returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

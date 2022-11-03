@@ -2,25 +2,25 @@
 
 ## Properties
 
-| Name    | Type                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Notes      |
-| ------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **Alg** | **string**              | The \&quot;alg\&quot; (algorithm) parameter identifies the algorithm intended for use with the key. The values used should either be registered in the IANA \&quot;JSON Web Signature and Encryption Algorithms\&quot; registry established by [JWA] or be a value that contains a Collision- Resistant Name.                                                                                                                                                                                                                                                                                                                                                          |
-| **Crv** | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **D**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Dp**  | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Dq**  | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **E**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **K**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Kid** | **string**              | The \&quot;kid\&quot; (key ID) parameter is used to match a specific key. This is used, for instance, to choose among a set of keys within a JWK Set during key rollover. The structure of the \&quot;kid\&quot; value is unspecified. When \&quot;kid\&quot; values are used within a JWK Set, different keys within the JWK Set SHOULD use distinct \&quot;kid\&quot; values. (One example in which different keys might use the same \&quot;kid\&quot; value is if they have different \&quot;kty\&quot; (key type) values but are considered to be equivalent alternatives by the application using them.) The \&quot;kid\&quot; value is a case-sensitive string. |
-| **Kty** | **string**              | The \&quot;kty\&quot; (key type) parameter identifies the cryptographic algorithm family used with the key, such as \&quot;RSA\&quot; or \&quot;EC\&quot;. \&quot;kty\&quot; values should either be registered in the IANA \&quot;JSON Web Key Types\&quot; registry established by [JWA] or be a value that contains a Collision- Resistant Name. The \&quot;kty\&quot; value is a case-sensitive string.                                                                                                                                                                                                                                                            |
-| **N**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **P**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Q**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Qi**  | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **Use** | **string**              | Use (\&quot;public key use\&quot;) identifies the intended use of the public key. The \&quot;use\&quot; parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Values are commonly \&quot;sig\&quot; (signature) or \&quot;enc\&quot; (encryption).                                                                                                                                                                                                                                                                                                                                                    |
-| **X**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **X5c** | Pointer to **[]string** | The \&quot;x5c\&quot; (X.509 certificate chain) parameter contains a chain of one or more PKIX certificates [RFC5280]. The certificate chain is represented as a JSON array of certificate value strings. Each string in the array is a base64-encoded (Section 4 of [RFC4648] -- not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value. The PKIX certificate containing the key value MUST be the first certificate.                                                                                                                                                                                                                                      | [optional] |
-| **Y**   | Pointer to **string**   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Alg** | **string** | The \&quot;alg\&quot; (algorithm) parameter identifies the algorithm intended for use with the key.  The values used should either be registered in the IANA \&quot;JSON Web Signature and Encryption Algorithms\&quot; registry established by [JWA] or be a value that contains a Collision- Resistant Name. | 
+**Crv** | Pointer to **string** |  | [optional] 
+**D** | Pointer to **string** |  | [optional] 
+**Dp** | Pointer to **string** |  | [optional] 
+**Dq** | Pointer to **string** |  | [optional] 
+**E** | Pointer to **string** |  | [optional] 
+**K** | Pointer to **string** |  | [optional] 
+**Kid** | **string** | The \&quot;kid\&quot; (key ID) parameter is used to match a specific key.  This is used, for instance, to choose among a set of keys within a JWK Set during key rollover.  The structure of the \&quot;kid\&quot; value is unspecified.  When \&quot;kid\&quot; values are used within a JWK Set, different keys within the JWK Set SHOULD use distinct \&quot;kid\&quot; values.  (One example in which different keys might use the same \&quot;kid\&quot; value is if they have different \&quot;kty\&quot; (key type) values but are considered to be equivalent alternatives by the application using them.)  The \&quot;kid\&quot; value is a case-sensitive string. | 
+**Kty** | **string** | The \&quot;kty\&quot; (key type) parameter identifies the cryptographic algorithm family used with the key, such as \&quot;RSA\&quot; or \&quot;EC\&quot;. \&quot;kty\&quot; values should either be registered in the IANA \&quot;JSON Web Key Types\&quot; registry established by [JWA] or be a value that contains a Collision- Resistant Name.  The \&quot;kty\&quot; value is a case-sensitive string. | 
+**N** | Pointer to **string** |  | [optional] 
+**P** | Pointer to **string** |  | [optional] 
+**Q** | Pointer to **string** |  | [optional] 
+**Qi** | Pointer to **string** |  | [optional] 
+**Use** | **string** | Use (\&quot;public key use\&quot;) identifies the intended use of the public key. The \&quot;use\&quot; parameter is employed to indicate whether a public key is used for encrypting data or verifying the signature on data. Values are commonly \&quot;sig\&quot; (signature) or \&quot;enc\&quot; (encryption). | 
+**X** | Pointer to **string** |  | [optional] 
+**X5c** | Pointer to **[]string** | The \&quot;x5c\&quot; (X.509 certificate chain) parameter contains a chain of one or more PKIX certificates [RFC5280].  The certificate chain is represented as a JSON array of certificate value strings.  Each string in the array is a base64-encoded (Section 4 of [RFC4648] -- not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value. The PKIX certificate containing the key value MUST be the first certificate. | [optional] 
+**Y** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -28,18 +28,18 @@
 
 `func NewJsonWebKey(alg string, kid string, kty string, use string, ) *JsonWebKey`
 
-NewJsonWebKey instantiates a new JsonWebKey object This constructor will assign
-default values to properties that have it defined, and makes sure properties
-required by API are set, but the set of arguments will change when the set of
-required properties is changed
+NewJsonWebKey instantiates a new JsonWebKey object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewJsonWebKeyWithDefaults
 
 `func NewJsonWebKeyWithDefaults() *JsonWebKey`
 
-NewJsonWebKeyWithDefaults instantiates a new JsonWebKey object This constructor
-will only assign default values to properties that have it defined, but it
-doesn't guarantee that properties required by API are set
+NewJsonWebKeyWithDefaults instantiates a new JsonWebKey object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetAlg
 
@@ -51,14 +51,15 @@ GetAlg returns the Alg field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetAlgOk() (*string, bool)`
 
-GetAlgOk returns a tuple with the Alg field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetAlgOk returns a tuple with the Alg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAlg
 
 `func (o *JsonWebKey) SetAlg(v string)`
 
 SetAlg sets Alg field to given value.
+
 
 ### GetCrv
 
@@ -70,8 +71,8 @@ GetCrv returns the Crv field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetCrvOk() (*string, bool)`
 
-GetCrvOk returns a tuple with the Crv field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetCrvOk returns a tuple with the Crv field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetCrv
 
@@ -220,14 +221,15 @@ GetKid returns the Kid field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetKidOk() (*string, bool)`
 
-GetKidOk returns a tuple with the Kid field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetKidOk returns a tuple with the Kid field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetKid
 
 `func (o *JsonWebKey) SetKid(v string)`
 
 SetKid sets Kid field to given value.
+
 
 ### GetKty
 
@@ -239,14 +241,15 @@ GetKty returns the Kty field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetKtyOk() (*string, bool)`
 
-GetKtyOk returns a tuple with the Kty field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetKtyOk returns a tuple with the Kty field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetKty
 
 `func (o *JsonWebKey) SetKty(v string)`
 
 SetKty sets Kty field to given value.
+
 
 ### GetN
 
@@ -358,14 +361,15 @@ GetUse returns the Use field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetUseOk() (*string, bool)`
 
-GetUseOk returns a tuple with the Use field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetUseOk returns a tuple with the Use field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetUse
 
 `func (o *JsonWebKey) SetUse(v string)`
 
 SetUse sets Use field to given value.
+
 
 ### GetX
 
@@ -402,8 +406,8 @@ GetX5c returns the X5c field if non-nil, zero value otherwise.
 
 `func (o *JsonWebKey) GetX5cOk() (*[]string, bool)`
 
-GetX5cOk returns a tuple with the X5c field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetX5cOk returns a tuple with the X5c field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetX5c
 
@@ -442,6 +446,7 @@ SetY sets Y field to given value.
 
 HasY returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

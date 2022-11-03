@@ -1,16 +1,20 @@
 # \WellknownApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                         | HTTP request                   | Description                       |
-| -------------------------------------------------------------- | ------------------------------ | --------------------------------- |
-| [**DiscoverJsonWebKeys**](WellknownApi.md#DiscoverJsonWebKeys) | **Get** /.well-known/jwks.json | Discover Well-Known JSON Web Keys |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**DiscoverJsonWebKeys**](WellknownApi.md#DiscoverJsonWebKeys) | **Get** /.well-known/jwks.json | Discover Well-Known JSON Web Keys
+
+
 
 ## DiscoverJsonWebKeys
 
 > JsonWebKeySet DiscoverJsonWebKeys(ctx).Execute()
 
 Discover Well-Known JSON Web Keys
+
+
 
 ### Example
 
@@ -44,8 +48,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDiscoverJsonWebKeysRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiDiscoverJsonWebKeysRequest struct via the builder pattern
+
 
 ### Return type
 
@@ -60,7 +64,7 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+

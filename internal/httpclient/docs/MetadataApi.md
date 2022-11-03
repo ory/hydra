@@ -1,18 +1,22 @@
 # \MetadataApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                      | HTTP request          | Description                           |
-| ------------------------------------------- | --------------------- | ------------------------------------- |
-| [**GetVersion**](MetadataApi.md#GetVersion) | **Get** /version      | Return Running Software Version.      |
-| [**IsAlive**](MetadataApi.md#IsAlive)       | **Get** /health/alive | Check HTTP Server Status              |
-| [**IsReady**](MetadataApi.md#IsReady)       | **Get** /health/ready | Check HTTP Server and Database Status |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**GetVersion**](MetadataApi.md#GetVersion) | **Get** /version | Return Running Software Version.
+[**IsAlive**](MetadataApi.md#IsAlive) | **Get** /health/alive | Check HTTP Server Status
+[**IsReady**](MetadataApi.md#IsReady) | **Get** /health/ready | Check HTTP Server and Database Status
+
+
 
 ## GetVersion
 
 > GetVersion200Response GetVersion(ctx).Execute()
 
 Return Running Software Version.
+
+
 
 ### Example
 
@@ -46,8 +50,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiGetVersionRequest struct
-via the builder pattern
+Other parameters are passed through a pointer to a apiGetVersionRequest struct via the builder pattern
+
 
 ### Return type
 
@@ -62,16 +66,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## IsAlive
 
 > HealthStatus IsAlive(ctx).Execute()
 
 Check HTTP Server Status
+
+
 
 ### Example
 
@@ -105,8 +111,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiIsAliveRequest struct via
-the builder pattern
+Other parameters are passed through a pointer to a apiIsAliveRequest struct via the builder pattern
+
 
 ### Return type
 
@@ -121,16 +127,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## IsReady
 
 > IsReady200Response IsReady(ctx).Execute()
 
 Check HTTP Server and Database Status
+
+
 
 ### Example
 
@@ -164,8 +172,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiIsReadyRequest struct via
-the builder pattern
+Other parameters are passed through a pointer to a apiIsReadyRequest struct via the builder pattern
+
 
 ### Return type
 
@@ -180,7 +188,7 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+

@@ -1,23 +1,26 @@
 # \JwkApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                   | HTTP request                       | Description                 |
-| -------------------------------------------------------- | ---------------------------------- | --------------------------- |
-| [**CreateJsonWebKeySet**](JwkApi.md#CreateJsonWebKeySet) | **Post** /admin/keys/{set}         | Create JSON Web Key         |
-| [**DeleteJsonWebKey**](JwkApi.md#DeleteJsonWebKey)       | **Delete** /admin/keys/{set}/{kid} | Delete JSON Web Key         |
-| [**DeleteJsonWebKeySet**](JwkApi.md#DeleteJsonWebKeySet) | **Delete** /admin/keys/{set}       | Delete JSON Web Key Set     |
-| [**GetJsonWebKey**](JwkApi.md#GetJsonWebKey)             | **Get** /admin/keys/{set}/{kid}    | Get JSON Web Key            |
-| [**GetJsonWebKeySet**](JwkApi.md#GetJsonWebKeySet)       | **Get** /admin/keys/{set}          | Retrieve a JSON Web Key Set |
-| [**SetJsonWebKey**](JwkApi.md#SetJsonWebKey)             | **Put** /admin/keys/{set}/{kid}    | Set JSON Web Key            |
-| [**SetJsonWebKeySet**](JwkApi.md#SetJsonWebKeySet)       | **Put** /admin/keys/{set}          | Update a JSON Web Key Set   |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**CreateJsonWebKeySet**](JwkApi.md#CreateJsonWebKeySet) | **Post** /admin/keys/{set} | Create JSON Web Key
+[**DeleteJsonWebKey**](JwkApi.md#DeleteJsonWebKey) | **Delete** /admin/keys/{set}/{kid} | Delete JSON Web Key
+[**DeleteJsonWebKeySet**](JwkApi.md#DeleteJsonWebKeySet) | **Delete** /admin/keys/{set} | Delete JSON Web Key Set
+[**GetJsonWebKey**](JwkApi.md#GetJsonWebKey) | **Get** /admin/keys/{set}/{kid} | Get JSON Web Key
+[**GetJsonWebKeySet**](JwkApi.md#GetJsonWebKeySet) | **Get** /admin/keys/{set} | Retrieve a JSON Web Key Set
+[**SetJsonWebKey**](JwkApi.md#SetJsonWebKey) | **Put** /admin/keys/{set}/{kid} | Set JSON Web Key
+[**SetJsonWebKeySet**](JwkApi.md#SetJsonWebKeySet) | **Put** /admin/keys/{set} | Update a JSON Web Key Set
+
+
 
 ## CreateJsonWebKeySet
 
-> JsonWebKeySet CreateJsonWebKeySet(ctx,
-> set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
+> JsonWebKeySet CreateJsonWebKeySet(ctx, set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
 
 Create JSON Web Key
+
+
 
 ### Example
 
@@ -33,7 +36,7 @@ import (
 
 func main() {
     set := "set_example" // string | The JSON Web Key Set ID
-    createJsonWebKeySet := *openapiclient.NewCreateJsonWebKeySet("Alg_example", "Kid_example", "Use_example") // CreateJsonWebKeySet |
+    createJsonWebKeySet := *openapiclient.NewCreateJsonWebKeySet("Alg_example", "Kid_example", "Use_example") // CreateJsonWebKeySet | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -49,20 +52,21 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | The JSON Web Key Set ID                                                     |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | The JSON Web Key Set ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiCreateJsonWebKeySetRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiCreateJsonWebKeySetRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**createJsonWebKeySet** | [**CreateJsonWebKeySet**](CreateJsonWebKeySet.md) | |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **createJsonWebKeySet** | [**CreateJsonWebKeySet**](CreateJsonWebKeySet.md) |  | 
 
 ### Return type
 
@@ -77,16 +81,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## DeleteJsonWebKey
 
 > DeleteJsonWebKey(ctx, set, kid).Execute()
 
 Delete JSON Web Key
+
+
 
 ### Example
 
@@ -116,23 +122,26 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | The JSON Web Key Set                                                        |
-| **kid** | **string**          | The JSON Web Key ID (kid)                                                   |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | The JSON Web Key Set | 
+**kid** | **string** | The JSON Web Key ID (kid) | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDeleteJsonWebKeyRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiDeleteJsonWebKeyRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -143,16 +152,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## DeleteJsonWebKeySet
 
 > DeleteJsonWebKeySet(ctx, set).Execute()
 
 Delete JSON Web Key Set
+
+
 
 ### Example
 
@@ -181,22 +192,24 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | The JSON Web Key Set                                                        |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | The JSON Web Key Set | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDeleteJsonWebKeySetRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiDeleteJsonWebKeySetRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -207,16 +220,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## GetJsonWebKey
 
 > JsonWebKeySet GetJsonWebKey(ctx, set, kid).Execute()
 
 Get JSON Web Key
+
+
 
 ### Example
 
@@ -248,19 +263,22 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | JSON Web Key Set ID                                                         |
-| **kid** | **string**          | JSON Web Key ID                                                             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | JSON Web Key Set ID | 
+**kid** | **string** | JSON Web Key ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiGetJsonWebKeyRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetJsonWebKeyRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
 
 ### Return type
 
@@ -275,16 +293,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## GetJsonWebKeySet
 
 > JsonWebKeySet GetJsonWebKeySet(ctx, set).Execute()
 
 Retrieve a JSON Web Key Set
+
+
 
 ### Example
 
@@ -315,18 +335,20 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | JSON Web Key Set ID                                                         |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | JSON Web Key Set ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiGetJsonWebKeySetRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetJsonWebKeySetRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
@@ -341,16 +363,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## SetJsonWebKey
 
 > JsonWebKey SetJsonWebKey(ctx, set, kid).JsonWebKey(jsonWebKey).Execute()
 
 Set JSON Web Key
+
+
 
 ### Example
 
@@ -383,21 +407,23 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | The JSON Web Key Set ID                                                     |
-| **kid** | **string**          | JSON Web Key ID                                                             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | The JSON Web Key Set ID | 
+**kid** | **string** | JSON Web Key ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiSetJsonWebKeyRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiSetJsonWebKeyRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**jsonWebKey** | [**JsonWebKey**](JsonWebKey.md) | |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **jsonWebKey** | [**JsonWebKey**](JsonWebKey.md) |  | 
 
 ### Return type
 
@@ -412,17 +438,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## SetJsonWebKeySet
 
-> JsonWebKeySet SetJsonWebKeySet(ctx,
-> set).JsonWebKeySet(jsonWebKeySet).Execute()
+> JsonWebKeySet SetJsonWebKeySet(ctx, set).JsonWebKeySet(jsonWebKeySet).Execute()
 
 Update a JSON Web Key Set
+
+
 
 ### Example
 
@@ -454,20 +481,21 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **set** | **string**          | The JSON Web Key Set ID                                                     |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**set** | **string** | The JSON Web Key Set ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiSetJsonWebKeySetRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiSetJsonWebKeySetRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**jsonWebKeySet** | [**JsonWebKeySet**](JsonWebKeySet.md) | |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **jsonWebKeySet** | [**JsonWebKeySet**](JsonWebKeySet.md) |  | 
 
 ### Return type
 
@@ -482,7 +510,7 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+

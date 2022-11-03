@@ -1,4 +1,5 @@
 // Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
 
 const express = require("express")
 const session = require("express-session")

@@ -1,4 +1,5 @@
 # Copyright © 2022 Ory Corp
+# SPDX-License-Identifier: Apache-2.0
 
 ## GitLab configuration settings
 ##! This file is generated during initial installation and **is not** modified

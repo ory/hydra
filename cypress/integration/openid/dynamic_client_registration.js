@@ -1,4 +1,5 @@
 // Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
 
 describe("OAuth2 / OpenID Connect Dynamic Client Registration", function () {
   it("should return same client_secret given in request for newly created clients with client_secret specified", function () {

@@ -670,6 +670,8 @@
 
 * Add refresh token grant type ([c752125](https://github.com/ory/hydra/commit/c752125315e1450c10d7604610d974a60e7f556a))
 * Fix typo ([dcfd11f](https://github.com/ory/hydra/commit/dcfd11f026469347a5ae941ebd1aa6f127e65143))
+* Standardize license headers ([#3216](https://github.com/ory/hydra/issues/3216)) ([d768cf6](https://github.com/ory/hydra/commit/d768cf6580b3410f7d0b3b9420760ce0818a5fe2))
+* Update README link ([6184b6a](https://github.com/ory/hydra/commit/6184b6a0ad028ecf90bb1212a7b1429fdc798a1b))
 
 ### Features
 

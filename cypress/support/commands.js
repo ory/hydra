@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite

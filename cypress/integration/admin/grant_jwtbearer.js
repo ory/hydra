@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 const dayjs = require("dayjs")
 const isBetween = require("dayjs/plugin/isBetween")
 const utc = require("dayjs/plugin/utc")

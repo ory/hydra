@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 import { prng } from "../../helpers"
 
 describe("The Clients Admin Interface", function () {

@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 import { createClient, prng } from "../../helpers"
 
 describe("OAuth 2.0 JSON Web Token Access Tokens", () => {

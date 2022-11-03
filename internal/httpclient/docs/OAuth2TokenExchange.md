@@ -8,7 +8,7 @@
 | **ExpiresIn**    | Pointer to **int64**  | The lifetime in seconds of the access token. For example, the value \&quot;3600\&quot; denotes that the access token will expire in one hour from the time the response was generated. | [optional] |
 | **IdToken**      | Pointer to **int64**  | To retrieve a refresh token request the id_token scope.                                                                                                                                | [optional] |
 | **RefreshToken** | Pointer to **string** | The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \&quot;offline\&quot; to your access token request.                                     | [optional] |
-| **Scope**        | Pointer to **int64**  | The scope of the access token                                                                                                                                                          | [optional] |
+| **Scope**        | Pointer to **string** | The scope of the access token                                                                                                                                                          | [optional] |
 | **TokenType**    | Pointer to **string** | The type of the token issued                                                                                                                                                           | [optional] |
 
 ## Methods
@@ -132,20 +132,20 @@ HasRefreshToken returns a boolean if a field has been set.
 
 ### GetScope
 
-`func (o *OAuth2TokenExchange) GetScope() int64`
+`func (o *OAuth2TokenExchange) GetScope() string`
 
 GetScope returns the Scope field if non-nil, zero value otherwise.
 
 ### GetScopeOk
 
-`func (o *OAuth2TokenExchange) GetScopeOk() (*int64, bool)`
+`func (o *OAuth2TokenExchange) GetScopeOk() (*string, bool)`
 
 GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetScope
 
-`func (o *OAuth2TokenExchange) SetScope(v int64)`
+`func (o *OAuth2TokenExchange) SetScope(v string)`
 
 SetScope sets Scope field to given value.
 

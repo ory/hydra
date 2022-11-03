@@ -982,8 +982,7 @@
           },
           "scope": {
             "description": "The scope of the access token",
-            "format": "int64",
-            "type": "integer"
+            "type": "string"
           },
           "token_type": {
             "description": "The type of the token issued",

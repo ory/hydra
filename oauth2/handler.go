@@ -824,7 +824,7 @@ type oAuth2TokenExchange struct {
 	ExpiresIn int `json:"expires_in"`
 
 	// The scope of the access token
-	Scope int `json:"scope"`
+	Scope string `json:"scope"`
 
 	// To retrieve a refresh token request the id_token scope.
 	IDToken int `json:"id_token"`

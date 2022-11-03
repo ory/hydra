@@ -30,7 +30,7 @@ password reset flow), but connects to your existing identity provider through a
 [login and consent app](https://www.ory.sh/docs/hydra/oauth2#authenticating-users-and-requesting-consent).
 Implementing the login and consent app in a different language is easy, and
 exemplary consent apps ([Node](https://github.com/ory/hydra-login-consent-node))
-and [SDKs](https://www.ory.sh/docs/hydra/sdk/) for common languages are
+and [SDKs](https://www.ory.sh/docs/kratos/sdk/index) for common languages are
 provided.
 
 Ory Hydra can use [Ory Kratos](https://github.com/ory/kratos) as its identity

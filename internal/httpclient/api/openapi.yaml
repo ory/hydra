@@ -1881,8 +1881,7 @@ components:
             \ set might fail."
           type: string
         refresh_remember_for:
-          description: "RefreshRememberFor, if set to true, session cookie
-            expiry\
+          description: "RefreshRememberFor, if set to true, session cookie expiry\
             \ time will be updated when session is\nrefreshed (login skip=true)."
           type: boolean
         remember:

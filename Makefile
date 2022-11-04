@@ -41,7 +41,7 @@ docs/cli: .bin/clidoc
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 .bin/ory: Makefile
-	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.47
+	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.48
 	touch .bin/ory
 
 .PHONY: lint
@@ -95,7 +95,7 @@ quicktest-hsm:
 # Formats the code
 .PHONY: format
 format: .bin/goimports .bin/ory node_modules
-	.bin/ory dev headers license --exclude=internal/httpclient
+	.bin/ory dev headers copyright --exclude=internal/httpclient
 	.bin/goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 

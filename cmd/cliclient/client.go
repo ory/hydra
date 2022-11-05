@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 )
 
 type ContextKey int

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/httprouterx"
 

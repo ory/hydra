@@ -11,13 +11,13 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
-replace github.com/ory/hydra-client-go => ./internal/httpclient
+replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/bxcodec/faker/v3 v3.7.0
-	github.com/cenkalti/backoff/v3 v3.0.0
+	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-swagger/go-swagger v0.30.3
@@ -45,7 +45,7 @@ require (
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
-	github.com/ory/hydra-client-go v1.11.8
+	github.com/ory/hydra-client-go/v2 v2.0.1
 	github.com/ory/jsonschema/v3 v3.0.7
 	github.com/ory/x v0.0.486
 	github.com/pborman/uuid v1.2.1

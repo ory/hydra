@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 )

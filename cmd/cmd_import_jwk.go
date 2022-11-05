@@ -13,7 +13,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"

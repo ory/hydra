@@ -9,7 +9,7 @@ import (
 
 	"github.com/ory/x/pointerx"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 )
 
 type (

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"golang.org/x/oauth2"
 

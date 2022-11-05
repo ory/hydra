@@ -32,7 +32,7 @@ import (
 
 	"github.com/ory/hydra/internal"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/client"
 )
 

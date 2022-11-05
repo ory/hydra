@@ -3625,7 +3625,7 @@
   "tags": [
     {
       "description": "OAuth 2.0",
-      "name": "oauth2"
+      "name": "oAuth2"
     },
     {
       "description": "OpenID Connect",
@@ -3636,8 +3636,12 @@
       "name": "jwk"
     },
     {
-      "description": "OAuth 2.0 Consent",
-      "name": "consent"
+      "description": "Well-Known Endpoints",
+      "name": "wellknown"
+    },
+    {
+      "description": "Service Metadata",
+      "name": "metadata"
     }
   ],
   "x-forwarded-proto": "string",

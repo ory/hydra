@@ -11,14 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/httprouterx"
-
 	"github.com/gobuffalo/pop/v6"
+
+	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/hydra/persistence/sql"
 	"github.com/ory/x/contextx"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/hydra/internal"
 

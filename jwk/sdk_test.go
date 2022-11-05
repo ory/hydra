@@ -11,7 +11,7 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"

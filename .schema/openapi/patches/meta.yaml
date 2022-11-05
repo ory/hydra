@@ -13,12 +13,13 @@
 - op: replace
   path: /tags
   value:
-    - name: oauth2
+    - name: oAuth2
       description: OAuth 2.0
     - name: oidc
       description: OpenID Connect
     - name: jwk
       description: JSON Web Keys
-    - name: consent
-      description: OAuth 2.0 Consent
-
+    - name: wellknown
+      description: Well-Known Endpoints
+    - name: metadata
+      description: Service Metadata

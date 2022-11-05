@@ -35,7 +35,7 @@ import (
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/uuidx"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"

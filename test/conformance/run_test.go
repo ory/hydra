@@ -20,9 +20,9 @@ import (
 	"testing"
 	"time"
 
-	hydrac "github.com/ory/hydra-client-go"
+	backoff "github.com/cenkalti/backoff/v3"
 
-	"github.com/cenkalti/backoff/v3"
+	hydrac "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/httpx"
 

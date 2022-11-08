@@ -97,6 +97,7 @@ quicktest-hsm:
 format: .bin/goimports .bin/ory node_modules
 	.bin/ory dev headers copyright --type=open-source --exclude=internal/httpclient
 	.bin/goimports -w --local github.com/ory .
+	curl https://raw.githubusercontent.com/ory/ci/kg-authors/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 	npm exec -- prettier --write .
 
 # Generates mocks

@@ -92,12 +92,14 @@ quicktest:
 quicktest-hsm:
 	docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm .
 
+authors:  # updates the AUTHORS file
+	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
+
 # Formats the code
 .PHONY: format
 format: .bin/goimports .bin/ory node_modules
 	.bin/ory dev headers copyright --type=open-source --exclude=internal/httpclient
 	.bin/goimports -w --local github.com/ory .
-	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 	npm exec -- prettier --write .
 
 # Generates mocks

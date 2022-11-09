@@ -1,0 +1,45 @@
+FROM golang:1.19-alpine3.16 AS builder
+
+RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
+
+WORKDIR /go/src/github.com/ory/hydra
+RUN mkdir -p ./internal/httpclient
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient
+
+ENV GO111MODULE on
+ENV CGO_ENABLED 1
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -tags sqlite,json1 -o /usr/bin/hydra
+
+FROM alpine:3.15
+
+RUN addgroup -S ory; \
+    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
+    chown -R ory:ory /home/ory
+
+COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+
+# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
+# is required for read/write of SQLite.
+RUN mkdir -p /var/lib/sqlite && \
+    chown ory:ory /var/lib/sqlite
+
+VOLUME /var/lib/sqlite
+
+# Exposing the ory home directory
+VOLUME /home/ory
+
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+
+USER ory
+
+ENTRYPOINT ["hydra"]
+CMD ["serve"]
+

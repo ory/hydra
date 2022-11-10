@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-11-08)](#000-2022-11-08)
+- [0.0.0 (2022-11-10)](#000-2022-11-10)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -656,12 +656,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.1...v0.0.0) (2022-11-08)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.1...v0.0.0) (2022-11-10)
 
 
 ### Bug Fixes
 
 * Add v2 suffix ([#3340](https://github.com/ory/hydra/issues/3340)) ([c54b9db](https://github.com/ory/hydra/commit/c54b9dbf9acf0cd066969b6c729605f1e52e943a))
+* Incorrect jwk import order ([#3344](https://github.com/ory/hydra/issues/3344)) ([729102f](https://github.com/ory/hydra/commit/729102ff0d87051f219cf88a1296ea3c8effc530)), closes [#3343](https://github.com/ory/hydra/issues/3343)
 * Scope type should be string instead of int ([#3337](https://github.com/ory/hydra/issues/3337)) ([f59f1c6](https://github.com/ory/hydra/commit/f59f1c68346f8083e3d4e1d47117e014e644c376)):
 
     Closes https://github.com/ory/sdk/pull/223

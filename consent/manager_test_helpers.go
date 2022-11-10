@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/assertx"
+
 	gofrsuuid "github.com/gofrs/uuid"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -472,7 +474,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					got1, err = m.HandleConsentRequest(context.Background(), h)
 					require.NoError(t, err)
-					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
+					assertx.TimeDifferenceLess(t, time.Now(), time.Time(h.HandledAt), 5)
 					compareConsentRequest(t, c, got1)
 
 					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}

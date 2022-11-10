@@ -55,8 +55,7 @@ func getClientID(body string) string {
 func TestHandler(t *testing.T) {
 	ctx := context.Background()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
-	conf := internal.NewConfigurationWithDefaults()
-	h := client.NewHandler(reg, conf)
+	h := client.NewHandler(reg, reg.Config())
 	reg.WithContextualizer(&contextx.TestContextualizer{})
 
 	t.Run("create client registration tokens", func(t *testing.T) {
@@ -131,8 +130,9 @@ func TestHandler(t *testing.T) {
 		})
 	})
 
-	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
+	newServer := func(t *testing.T, dynamicEnabled bool, allowSpecifyingClientId bool) (*httptest.Server, *http.Client) {
 		require.NoError(t, reg.Config().Set(ctx, config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
+		require.NoError(t, reg.Config().Set(ctx, config.KeyAllowSpecifyingChosenClientId, allowSpecifyingClientId))
 		router := httprouter.New()
 		h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router, "/admin", reg.Config().AdminURL), &httprouterx.RouterPublic{Router: router})
 		ts := httptest.NewServer(router)
@@ -183,7 +183,7 @@ func TestHandler(t *testing.T) {
 	}
 
 	t.Run("selfservice disabled", func(t *testing.T) {
-		ts, hc := newServer(t, false)
+		ts, hc := newServer(t, false, false)
 
 		trap := &client.Client{}
 		actual := createClient(t, trap, ts, client.ClientsHandlerPath)
@@ -210,7 +210,7 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("case=selfservice with incorrect or missing auth", func(t *testing.T) {
-		ts, hc := newServer(t, true)
+		ts, hc := newServer(t, true, false)
 		expectedFirst := createClient(t, &client.Client{
 			Secret:                  "averylongsecret",
 			RedirectURIs:            []string{"http://localhost:3000/cb"},
@@ -258,8 +258,53 @@ func TestHandler(t *testing.T) {
 		})
 	})
 
+	t.Run("case=createClient with AllowSpecifyingClientId configuration set", func(t *testing.T) {
+		ts, _ := newServer(t, true, true)
+		for k, tc := range []struct {
+			d          string
+			payload    *client.Client
+			path       string
+			statusCode int
+		}{
+			{
+				d: "non-uuid fails",
+				payload: &client.Client{
+					LegacyClientID: "not-a-uuid",
+					Secret:         "averylongsecret",
+					RedirectURIs:   []string{"http://localhost:3000/cb"},
+				},
+				path:       client.ClientsHandlerPath,
+				statusCode: http.StatusBadRequest,
+			},
+			{
+				d: "valid uuid succeeds",
+				payload: &client.Client{
+					LegacyClientID: "b04f1172-3252-4c21-84b7-64d5229d9f25",
+					Secret:         "averylongsecret",
+					RedirectURIs:   []string{"http://localhost:3000/cb"},
+				},
+				path:       client.ClientsHandlerPath,
+				statusCode: http.StatusCreated,
+			},
+			{
+				d: "empty ID succeeds",
+				payload: &client.Client{
+					Secret:       "averylongsecret",
+					RedirectURIs: []string{"http://localhost:3000/cb"},
+				},
+				path:       client.ClientsHandlerPath,
+				statusCode: http.StatusCreated,
+			},
+		} {
+			t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+				body, res := makeJSON(t, ts, "POST", tc.path, tc.payload)
+				require.Equal(t, tc.statusCode, res.StatusCode, body)
+			})
+		}
+	})
+
 	t.Run("common", func(t *testing.T) {
-		ts, _ := newServer(t, true)
+		ts, _ := newServer(t, true, false)
 		expected := createClient(t, &client.Client{
 			Secret:                  "averylongsecret",
 			RedirectURIs:            []string{"http://localhost:3000/cb"},

@@ -6,6 +6,7 @@ package oauth2_test
 import (
 	"context"
 	"encoding/json"
+	"math"
 	"net/url"
 	"strings"
 	"testing"
@@ -230,7 +231,7 @@ func TestClientCredentials(t *testing.T) {
 				token, err := getToken(t, conf)
 				require.NoError(t, err)
 
-				assert.EqualValues(t, time.Now().Add(duration).Round(time.Minute), token.Expiry.Round(time.Minute))
+				assert.True(t, math.Abs(float64(time.Now().Add(duration).Round(time.Minute).Unix())-float64(token.Expiry.Round(time.Minute).Unix())) < 5)
 
 				introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token.AccessToken, admin)
 				assert.EqualValues(t, time.Now().Add(duration).Round(time.Minute), time.Unix(introspection.Get("exp").Int(), 0).Round(time.Minute))

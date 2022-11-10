@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"encoding/json"
+	"github.com/ory/hydra/driver/config"
 	"io"
 	"net/http"
 	"strings"
@@ -30,12 +31,14 @@ import (
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/x"
 
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 )
 
 type Handler struct {
 	r InternalRegistry
+	c *config.DefaultProvider
 }
 
 const (
@@ -43,10 +46,8 @@ const (
 	DynClientsHandlerPath = "/oauth2/register"
 )
 
-func NewHandler(r InternalRegistry) *Handler {
-	return &Handler{
-		r: r,
-	}
+func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
+	return &Handler{r: r, c: c}
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
@@ -159,6 +160,7 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
+	var ctx = r.Context()
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		return nil, err
 	}
@@ -167,14 +169,25 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 		if c.Secret != "" {
 			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
+		if len(c.LegacyClientID) > 0 {
+			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReason("It is no longer possible to set an OAuth2 Client ID for dynamic clients as a user. The system will generate a unique ID for you."))
+		}
 	}
 
-	if len(c.LegacyClientID) > 0 {
+	allowSpecifyingClientId := h.c.AllowSpecifyingClientId(ctx)
+	if allowSpecifyingClientId && len(c.LegacyClientID) > 0 {
+		parsedId, err := uuid.FromString(c.LegacyClientID)
+		if err != nil {
+			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReason("OAuth2 Client ID has to be a valid UUID."))
+		}
+		c.ID = parsedId
+		c.LegacyClientID = c.ID.String()
+	} else if !allowSpecifyingClientId && len(c.LegacyClientID) > 0 {
 		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReason("It is no longer possible to set an OAuth2 Client ID as a user. The system will generate a unique ID for you."))
+	} else {
+		c.ID = uuidx.NewV4()
+		c.LegacyClientID = c.ID.String()
 	}
-
-	c.ID = uuidx.NewV4()
-	c.LegacyClientID = c.ID.String()
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
@@ -184,7 +197,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 		c.Secret = string(secretb)
 	}
 
-	if err := validator(r.Context(), &c); err != nil {
+	if err := validator(ctx, &c); err != nil {
 		return nil, err
 	}
 

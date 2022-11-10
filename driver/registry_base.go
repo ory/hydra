@@ -231,7 +231,7 @@ func (m *RegistryBase) ClientHasher() fosite.Hasher {
 
 func (m *RegistryBase) ClientHandler() *client.Handler {
 	if m.ch == nil {
-		m.ch = client.NewHandler(m.r)
+		m.ch = client.NewHandler(m.r, m.Config())
 	}
 	return m.ch
 }

@@ -55,7 +55,8 @@ func getClientID(body string) string {
 func TestHandler(t *testing.T) {
 	ctx := context.Background()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
-	h := client.NewHandler(reg)
+	conf := internal.NewConfigurationWithDefaults()
+	h := client.NewHandler(reg, conf)
 	reg.WithContextualizer(&contextx.TestContextualizer{})
 
 	t.Run("create client registration tokens", func(t *testing.T) {

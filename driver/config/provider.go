@@ -32,6 +32,7 @@ import (
 
 const (
 	KeyRoot                                      = ""
+	KeyAllowSpecifyingChosenClientId             = "allow_specifying_client_id"
 	HSMEnabled                                   = "hsm.enabled"
 	HSMLibraryPath                               = "hsm.library"
 	HSMPin                                       = "hsm.pin"
@@ -268,6 +269,10 @@ func (p *DefaultProvider) EncryptSessionData(ctx context.Context) bool {
 
 func (p *DefaultProvider) ExcludeNotBeforeClaim(ctx context.Context) bool {
 	return p.getProvider(ctx).BoolF(KeyExcludeNotBeforeClaim, false)
+}
+
+func (p *DefaultProvider) AllowSpecifyingClientId(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyAllowSpecifyingChosenClientId, false)
 }
 
 func (p *DefaultProvider) CookieSecure(ctx context.Context) bool {

@@ -7,11 +7,12 @@ import (
 	"context"
 	"crypto/subtle"
 	"encoding/json"
-	"github.com/ory/hydra/driver/config"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/ory/x/pagination/tokenpagination"
 

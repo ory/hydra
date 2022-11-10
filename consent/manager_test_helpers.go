@@ -886,6 +886,57 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				}
 			})
 		})
+
+		t.Run("case=foreign key regression", func(t *testing.T) {
+			cl := &client.Client{LegacyClientID: uuid.New().String()}
+			require.NoError(t, clientManager.CreateClient(context.Background(), cl))
+
+			subject := uuid.New().String()
+			s := LoginSession{
+				ID:              uuid.New().String(),
+				AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
+				Subject:         subject,
+			}
+
+			err := m.CreateLoginSession(context.Background(), &s)
+			require.NoError(t, err)
+
+			lr := &LoginRequest{
+				ID:              uuid.New().String(),
+				Subject:         uuid.New().String(),
+				Verifier:        uuid.New().String(),
+				Client:          cl,
+				AuthenticatedAt: sqlxx.NullTime(time.Now()),
+				RequestedAt:     time.Now(),
+				SessionID:       sqlxx.NullString(s.ID),
+			}
+
+			require.NoError(t, m.CreateLoginRequest(context.Background(), lr))
+			expected := &OAuth2ConsentRequest{
+				ID:                   uuid.New().String(),
+				Skip:                 true,
+				Subject:              subject,
+				OpenIDConnectContext: nil,
+				Client:               cl,
+				ClientID:             cl.LegacyClientID,
+				RequestURL:           "",
+				LoginChallenge:       sqlxx.NullString(lr.ID),
+				LoginSessionID:       sqlxx.NullString(s.ID),
+				Verifier:             uuid.New().String(),
+				CSRF:                 uuid.New().String(),
+			}
+			require.NoError(t, m.CreateConsentRequest(context.Background(), expected))
+
+			result, err := m.GetConsentRequest(context.Background(), expected.ID)
+			require.NoError(t, err)
+			assert.EqualValues(t, expected.ID, result.ID)
+
+			require.NoError(t, m.DeleteLoginSession(context.Background(), s.ID))
+
+			result, err = m.GetConsentRequest(context.Background(), expected.ID)
+			require.NoError(t, err)
+			assert.EqualValues(t, expected.ID, result.ID)
+		})
 	}
 }
 

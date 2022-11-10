@@ -259,7 +259,7 @@ CREATE TABLE "_hydra_oauth2_flow_tmp" (
     client_id                 VARCHAR(255) NOT NULL,
     requested_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     oidc_context              TEXT         NOT NULL,
-    login_session_id          VARCHAR(40)  NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE CASCADE DEFAULT '',
+    login_session_id          VARCHAR(40)  NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE SET NULL,
     requested_at_audience     TEXT         NULL DEFAULT '',
     login_initialized_at      TIMESTAMP    NULL,
 

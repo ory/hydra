@@ -164,7 +164,7 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
 		// In case replace failed try href
 		setAndRegisterTimeout(function () {
 			window.location.href = redir;
-		}, 250); // Show message after http-equiv="refresh"
+		}, 250);
 	}
 
     function done() {
@@ -174,7 +174,7 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
         }
     }
 
-	setAndRegisterTimeout(redirect, 7000); // redirect after 5 seconds if e.g. an iframe doesn't load
+	setAndRegisterTimeout(redirect, 7000); // redirect after 7 seconds if e.g. an iframe doesn't load
 
 	// If the redirect takes unusually long, show a message
 	setTimeout(function () {

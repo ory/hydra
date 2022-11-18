@@ -2,13 +2,13 @@
 
 ## Properties
 
-| Name              | Type                     | Description | Notes      |
-| ----------------- | ------------------------ | ----------- | ---------- |
-| **AccessToken**   | Pointer to **time.Time** |             | [optional] |
-| **AuthorizeCode** | Pointer to **time.Time** |             | [optional] |
-| **IdToken**       | Pointer to **time.Time** |             | [optional] |
-| **ParContext**    | Pointer to **time.Time** |             | [optional] |
-| **RefreshToken**  | Pointer to **time.Time** |             | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**AccessToken** | Pointer to **time.Time** |  | [optional] 
+**AuthorizeCode** | Pointer to **time.Time** |  | [optional] 
+**IdToken** | Pointer to **time.Time** |  | [optional] 
+**ParContext** | Pointer to **time.Time** |  | [optional] 
+**RefreshToken** | Pointer to **time.Time** |  | [optional] 
 
 ## Methods
 
@@ -16,20 +16,18 @@
 
 `func NewOAuth2ConsentSessionExpiresAt() *OAuth2ConsentSessionExpiresAt`
 
-NewOAuth2ConsentSessionExpiresAt instantiates a new
-OAuth2ConsentSessionExpiresAt object This constructor will assign default values
-to properties that have it defined, and makes sure properties required by API
-are set, but the set of arguments will change when the set of required
-properties is changed
+NewOAuth2ConsentSessionExpiresAt instantiates a new OAuth2ConsentSessionExpiresAt object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewOAuth2ConsentSessionExpiresAtWithDefaults
 
 `func NewOAuth2ConsentSessionExpiresAtWithDefaults() *OAuth2ConsentSessionExpiresAt`
 
-NewOAuth2ConsentSessionExpiresAtWithDefaults instantiates a new
-OAuth2ConsentSessionExpiresAt object This constructor will only assign default
-values to properties that have it defined, but it doesn't guarantee that
-properties required by API are set
+NewOAuth2ConsentSessionExpiresAtWithDefaults instantiates a new OAuth2ConsentSessionExpiresAt object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetAccessToken
 
@@ -41,8 +39,8 @@ GetAccessToken returns the AccessToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetAccessTokenOk() (*time.Time, bool)`
 
-GetAccessTokenOk returns a tuple with the AccessToken field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetAccessTokenOk returns a tuple with the AccessToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAccessToken
 
@@ -60,15 +58,14 @@ HasAccessToken returns a boolean if a field has been set.
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetAuthorizeCode() time.Time`
 
-GetAuthorizeCode returns the AuthorizeCode field if non-nil, zero value
-otherwise.
+GetAuthorizeCode returns the AuthorizeCode field if non-nil, zero value otherwise.
 
 ### GetAuthorizeCodeOk
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetAuthorizeCodeOk() (*time.Time, bool)`
 
-GetAuthorizeCodeOk returns a tuple with the AuthorizeCode field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetAuthorizeCodeOk returns a tuple with the AuthorizeCode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAuthorizeCode
 
@@ -92,8 +89,8 @@ GetIdToken returns the IdToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetIdTokenOk() (*time.Time, bool)`
 
-GetIdTokenOk returns a tuple with the IdToken field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetIdTokenOk returns a tuple with the IdToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetIdToken
 
@@ -117,8 +114,8 @@ GetParContext returns the ParContext field if non-nil, zero value otherwise.
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetParContextOk() (*time.Time, bool)`
 
-GetParContextOk returns a tuple with the ParContext field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetParContextOk returns a tuple with the ParContext field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetParContext
 
@@ -142,8 +139,8 @@ GetRefreshToken returns the RefreshToken field if non-nil, zero value otherwise.
 
 `func (o *OAuth2ConsentSessionExpiresAt) GetRefreshTokenOk() (*time.Time, bool)`
 
-GetRefreshTokenOk returns a tuple with the RefreshToken field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetRefreshTokenOk returns a tuple with the RefreshToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRefreshToken
 
@@ -157,6 +154,7 @@ SetRefreshToken sets RefreshToken field to given value.
 
 HasRefreshToken returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

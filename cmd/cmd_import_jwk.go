@@ -1,16 +1,5 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
@@ -24,7 +13,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
@@ -125,7 +114,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 			failed := make(map[string]error)
 			for src, kk := range keys {
 				for _, k := range kk {
-					result, _, err := m.JwkApi.SetJsonWebKey(cmd.Context(), k.Kid, set).JsonWebKey(k).Execute() //nolint:bodyclose
+					result, _, err := m.JwkApi.SetJsonWebKey(cmd.Context(), set, k.Kid).JsonWebKey(k).Execute() //nolint:bodyclose
 					if err != nil {
 						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
 						continue

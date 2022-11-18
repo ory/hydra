@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package sql
 
 import (
@@ -276,13 +279,13 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, f))
 }
 
-func (p *Persister) GetFlow(ctx context.Context, login_challenge string) (*flow.Flow, error) {
+func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (*flow.Flow, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlow")
 	defer span.End()
 
 	var f flow.Flow
 	return &f, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", login_challenge).First(&f); err != nil {
+		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
 			}
@@ -293,14 +296,14 @@ func (p *Persister) GetFlow(ctx context.Context, login_challenge string) (*flow.
 	})
 }
 
-func (p *Persister) GetLoginRequest(ctx context.Context, login_challenge string) (*consent.LoginRequest, error) {
+func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) (*consent.LoginRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
 	var lr *consent.LoginRequest
 	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		var f flow.Flow
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", login_challenge).First(&f); err != nil {
+		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
 			}

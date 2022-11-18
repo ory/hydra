@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd_test
 
 import (
@@ -11,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/cmd"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/pointerx"

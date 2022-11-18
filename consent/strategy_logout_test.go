@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package consent_test
 
 import (
@@ -21,7 +24,7 @@ import (
 
 	jwtgo "github.com/ory/fosite/token/jwt"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"

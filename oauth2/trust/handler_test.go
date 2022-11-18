@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package trust_test
 
 import (
@@ -11,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/x/pointerx"
 
 	"github.com/stretchr/testify/assert"
@@ -20,12 +25,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/jwk"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"

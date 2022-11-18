@@ -1,9 +1,12 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
 	"fmt"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 )
 
 type (

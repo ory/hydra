@@ -2,16 +2,16 @@
 
 ## Properties
 
-| Name        | Type                       | Description                                                                                                                            | Notes      |
-| ----------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **Code**    | Pointer to **int64**       | The status code                                                                                                                        | [optional] |
-| **Debug**   | Pointer to **string**      | Debug information This field is often not exposed to protect against leaking sensitive information.                                    | [optional] |
-| **Details** | Pointer to **interface{}** | Further error details                                                                                                                  | [optional] |
-| **Id**      | Pointer to **string**      | The error ID Useful when trying to identify various errors in application logic.                                                       | [optional] |
-| **Message** | **string**                 | Error message The error&#39;s message.                                                                                                 |
-| **Reason**  | Pointer to **string**      | A human-readable reason for the error                                                                                                  | [optional] |
-| **Request** | Pointer to **string**      | The request ID The request ID is often exposed internally in order to trace errors across service architectures. This is often a UUID. | [optional] |
-| **Status**  | Pointer to **string**      | The status description                                                                                                                 | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Code** | Pointer to **int64** | The status code | [optional] 
+**Debug** | Pointer to **string** | Debug information  This field is often not exposed to protect against leaking sensitive information. | [optional] 
+**Details** | Pointer to **interface{}** | Further error details | [optional] 
+**Id** | Pointer to **string** | The error ID  Useful when trying to identify various errors in application logic. | [optional] 
+**Message** | **string** | Error message  The error&#39;s message. | 
+**Reason** | Pointer to **string** | A human-readable reason for the error | [optional] 
+**Request** | Pointer to **string** | The request ID  The request ID is often exposed internally in order to trace errors across service architectures. This is often a UUID. | [optional] 
+**Status** | Pointer to **string** | The status description | [optional] 
 
 ## Methods
 
@@ -19,17 +19,17 @@
 
 `func NewGenericError(message string, ) *GenericError`
 
-NewGenericError instantiates a new GenericError object This constructor will
-assign default values to properties that have it defined, and makes sure
-properties required by API are set, but the set of arguments will change when
-the set of required properties is changed
+NewGenericError instantiates a new GenericError object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewGenericErrorWithDefaults
 
 `func NewGenericErrorWithDefaults() *GenericError`
 
-NewGenericErrorWithDefaults instantiates a new GenericError object This
-constructor will only assign default values to properties that have it defined,
+NewGenericErrorWithDefaults instantiates a new GenericError object
+This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetCode
@@ -42,8 +42,8 @@ GetCode returns the Code field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetCodeOk() (*int64, bool)`
 
-GetCodeOk returns a tuple with the Code field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetCodeOk returns a tuple with the Code field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetCode
 
@@ -67,8 +67,8 @@ GetDebug returns the Debug field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetDebugOk() (*string, bool)`
 
-GetDebugOk returns a tuple with the Debug field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetDebugOk returns a tuple with the Debug field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetDebug
 
@@ -92,8 +92,8 @@ GetDetails returns the Details field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetDetailsOk() (*interface{}, bool)`
 
-GetDetailsOk returns a tuple with the Details field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetDetailsOk returns a tuple with the Details field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetDetails
 
@@ -111,15 +111,12 @@ HasDetails returns a boolean if a field has been set.
 
 `func (o *GenericError) SetDetailsNil(b bool)`
 
-SetDetailsNil sets the value for Details to be an explicit nil
+ SetDetailsNil sets the value for Details to be an explicit nil
 
 ### UnsetDetails
-
 `func (o *GenericError) UnsetDetails()`
 
-UnsetDetails ensures that no value is present for Details, not even an explicit
-nil
-
+UnsetDetails ensures that no value is present for Details, not even an explicit nil
 ### GetId
 
 `func (o *GenericError) GetId() string`
@@ -155,14 +152,15 @@ GetMessage returns the Message field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetMessageOk() (*string, bool)`
 
-GetMessageOk returns a tuple with the Message field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetMessageOk returns a tuple with the Message field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetMessage
 
 `func (o *GenericError) SetMessage(v string)`
 
 SetMessage sets Message field to given value.
+
 
 ### GetReason
 
@@ -174,8 +172,8 @@ GetReason returns the Reason field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetReasonOk() (*string, bool)`
 
-GetReasonOk returns a tuple with the Reason field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetReasonOk returns a tuple with the Reason field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetReason
 
@@ -199,8 +197,8 @@ GetRequest returns the Request field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetRequestOk() (*string, bool)`
 
-GetRequestOk returns a tuple with the Request field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetRequestOk returns a tuple with the Request field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRequest
 
@@ -224,8 +222,8 @@ GetStatus returns the Status field if non-nil, zero value otherwise.
 
 `func (o *GenericError) GetStatusOk() (*string, bool)`
 
-GetStatusOk returns a tuple with the Status field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetStatusOk returns a tuple with the Status field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetStatus
 
@@ -239,6 +237,7 @@ SetStatus sets Status field to given value.
 
 HasStatus returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package health
 
 // Alive returns an ok status if the instance is ready to handle HTTP requests.

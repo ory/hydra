@@ -2,13 +2,13 @@
 
 ## Properties
 
-| Name                 | Type                  | Description                                         | Notes      |
-| -------------------- | --------------------- | --------------------------------------------------- | ---------- |
-| **Error**            | Pointer to **string** | Error                                               | [optional] |
-| **ErrorDebug**       | Pointer to **string** | Error Debug Information Only available in dev mode. | [optional] |
-| **ErrorDescription** | Pointer to **string** | Error Description                                   | [optional] |
-| **ErrorHint**        | Pointer to **string** | Error Hint Helps the user identify the error cause. | [optional] |
-| **StatusCode**       | Pointer to **int64**  | HTTP Status Code                                    | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Error** | Pointer to **string** | Error | [optional] 
+**ErrorDebug** | Pointer to **string** | Error Debug Information  Only available in dev mode. | [optional] 
+**ErrorDescription** | Pointer to **string** | Error Description | [optional] 
+**ErrorHint** | Pointer to **string** | Error Hint  Helps the user identify the error cause. | [optional] 
+**StatusCode** | Pointer to **int64** | HTTP Status Code | [optional] 
 
 ## Methods
 
@@ -16,17 +16,17 @@
 
 `func NewErrorOAuth2() *ErrorOAuth2`
 
-NewErrorOAuth2 instantiates a new ErrorOAuth2 object This constructor will
-assign default values to properties that have it defined, and makes sure
-properties required by API are set, but the set of arguments will change when
-the set of required properties is changed
+NewErrorOAuth2 instantiates a new ErrorOAuth2 object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewErrorOAuth2WithDefaults
 
 `func NewErrorOAuth2WithDefaults() *ErrorOAuth2`
 
-NewErrorOAuth2WithDefaults instantiates a new ErrorOAuth2 object This
-constructor will only assign default values to properties that have it defined,
+NewErrorOAuth2WithDefaults instantiates a new ErrorOAuth2 object
+This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetError
@@ -39,8 +39,8 @@ GetError returns the Error field if non-nil, zero value otherwise.
 
 `func (o *ErrorOAuth2) GetErrorOk() (*string, bool)`
 
-GetErrorOk returns a tuple with the Error field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetErrorOk returns a tuple with the Error field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetError
 
@@ -64,8 +64,8 @@ GetErrorDebug returns the ErrorDebug field if non-nil, zero value otherwise.
 
 `func (o *ErrorOAuth2) GetErrorDebugOk() (*string, bool)`
 
-GetErrorDebugOk returns a tuple with the ErrorDebug field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetErrorDebugOk returns a tuple with the ErrorDebug field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetErrorDebug
 
@@ -83,15 +83,14 @@ HasErrorDebug returns a boolean if a field has been set.
 
 `func (o *ErrorOAuth2) GetErrorDescription() string`
 
-GetErrorDescription returns the ErrorDescription field if non-nil, zero value
-otherwise.
+GetErrorDescription returns the ErrorDescription field if non-nil, zero value otherwise.
 
 ### GetErrorDescriptionOk
 
 `func (o *ErrorOAuth2) GetErrorDescriptionOk() (*string, bool)`
 
-GetErrorDescriptionOk returns a tuple with the ErrorDescription field if it's
-non-nil, zero value otherwise and a boolean to check if the value has been set.
+GetErrorDescriptionOk returns a tuple with the ErrorDescription field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetErrorDescription
 
@@ -115,8 +114,8 @@ GetErrorHint returns the ErrorHint field if non-nil, zero value otherwise.
 
 `func (o *ErrorOAuth2) GetErrorHintOk() (*string, bool)`
 
-GetErrorHintOk returns a tuple with the ErrorHint field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetErrorHintOk returns a tuple with the ErrorHint field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetErrorHint
 
@@ -140,8 +139,8 @@ GetStatusCode returns the StatusCode field if non-nil, zero value otherwise.
 
 `func (o *ErrorOAuth2) GetStatusCodeOk() (*int64, bool)`
 
-GetStatusCodeOk returns a tuple with the StatusCode field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetStatusCodeOk returns a tuple with the StatusCode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetStatusCode
 
@@ -155,6 +154,7 @@ SetStatusCode sets StatusCode field to given value.
 
 HasStatusCode returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

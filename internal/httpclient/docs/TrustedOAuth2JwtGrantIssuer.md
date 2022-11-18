@@ -2,16 +2,16 @@
 
 ## Properties
 
-| Name                | Type                                                                                 | Description                                                                                                                                            | Notes      |
-| ------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| **AllowAnySubject** | Pointer to **bool**                                                                  | The \&quot;allow_any_subject\&quot; indicates that the issuer is allowed to have any principal as the subject of the JWT.                              | [optional] |
-| **CreatedAt**       | Pointer to **time.Time**                                                             | The \&quot;created_at\&quot; indicates, when grant was created.                                                                                        | [optional] |
-| **ExpiresAt**       | Pointer to **time.Time**                                                             | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. | [optional] |
-| **Id**              | Pointer to **string**                                                                |                                                                                                                                                        | [optional] |
-| **Issuer**          | Pointer to **string**                                                                | The \&quot;issuer\&quot; identifies the principal that issued the JWT assertion (same as \&quot;iss\&quot; claim in JWT).                              | [optional] |
-| **PublicKey**       | Pointer to [**TrustedOAuth2JwtGrantJsonWebKey**](TrustedOAuth2JwtGrantJsonWebKey.md) |                                                                                                                                                        | [optional] |
-| **Scope**           | Pointer to **[]string**                                                              | The \&quot;scope\&quot; contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])                                             | [optional] |
-| **Subject**         | Pointer to **string**                                                                | The \&quot;subject\&quot; identifies the principal that is the subject of the JWT.                                                                     | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**AllowAnySubject** | Pointer to **bool** | The \&quot;allow_any_subject\&quot; indicates that the issuer is allowed to have any principal as the subject of the JWT. | [optional] 
+**CreatedAt** | Pointer to **time.Time** | The \&quot;created_at\&quot; indicates, when grant was created. | [optional] 
+**ExpiresAt** | Pointer to **time.Time** | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. | [optional] 
+**Id** | Pointer to **string** |  | [optional] 
+**Issuer** | Pointer to **string** | The \&quot;issuer\&quot; identifies the principal that issued the JWT assertion (same as \&quot;iss\&quot; claim in JWT). | [optional] 
+**PublicKey** | Pointer to [**TrustedOAuth2JwtGrantJsonWebKey**](TrustedOAuth2JwtGrantJsonWebKey.md) |  | [optional] 
+**Scope** | Pointer to **[]string** | The \&quot;scope\&quot; contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) | [optional] 
+**Subject** | Pointer to **string** | The \&quot;subject\&quot; identifies the principal that is the subject of the JWT. | [optional] 
 
 ## Methods
 
@@ -19,33 +19,31 @@
 
 `func NewTrustedOAuth2JwtGrantIssuer() *TrustedOAuth2JwtGrantIssuer`
 
-NewTrustedOAuth2JwtGrantIssuer instantiates a new TrustedOAuth2JwtGrantIssuer
-object This constructor will assign default values to properties that have it
-defined, and makes sure properties required by API are set, but the set of
-arguments will change when the set of required properties is changed
+NewTrustedOAuth2JwtGrantIssuer instantiates a new TrustedOAuth2JwtGrantIssuer object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewTrustedOAuth2JwtGrantIssuerWithDefaults
 
 `func NewTrustedOAuth2JwtGrantIssuerWithDefaults() *TrustedOAuth2JwtGrantIssuer`
 
-NewTrustedOAuth2JwtGrantIssuerWithDefaults instantiates a new
-TrustedOAuth2JwtGrantIssuer object This constructor will only assign default
-values to properties that have it defined, but it doesn't guarantee that
-properties required by API are set
+NewTrustedOAuth2JwtGrantIssuerWithDefaults instantiates a new TrustedOAuth2JwtGrantIssuer object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetAllowAnySubject
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubject() bool`
 
-GetAllowAnySubject returns the AllowAnySubject field if non-nil, zero value
-otherwise.
+GetAllowAnySubject returns the AllowAnySubject field if non-nil, zero value otherwise.
 
 ### GetAllowAnySubjectOk
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool)`
 
-GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field if it's
-non-nil, zero value otherwise and a boolean to check if the value has been set.
+GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAllowAnySubject
 
@@ -69,8 +67,8 @@ GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetCreatedAtOk() (*time.Time, bool)`
 
-GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
@@ -94,8 +92,8 @@ GetExpiresAt returns the ExpiresAt field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetExpiresAtOk() (*time.Time, bool)`
 
-GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetExpiresAt
 
@@ -144,8 +142,8 @@ GetIssuer returns the Issuer field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetIssuerOk() (*string, bool)`
 
-GetIssuerOk returns a tuple with the Issuer field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetIssuerOk returns a tuple with the Issuer field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetIssuer
 
@@ -169,8 +167,8 @@ GetPublicKey returns the PublicKey field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetPublicKeyOk() (*TrustedOAuth2JwtGrantJsonWebKey, bool)`
 
-GetPublicKeyOk returns a tuple with the PublicKey field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetPublicKeyOk returns a tuple with the PublicKey field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetPublicKey
 
@@ -194,8 +192,8 @@ GetScope returns the Scope field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetScopeOk() (*[]string, bool)`
 
-GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetScope
 
@@ -219,8 +217,8 @@ GetSubject returns the Subject field if non-nil, zero value otherwise.
 
 `func (o *TrustedOAuth2JwtGrantIssuer) GetSubjectOk() (*string, bool)`
 
-GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetSubjectOk returns a tuple with the Subject field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetSubject
 
@@ -234,6 +232,7 @@ SetSubject sets Subject field to given value.
 
 HasSubject returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

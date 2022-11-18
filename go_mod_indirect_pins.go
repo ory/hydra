@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 //go:build go_mod_indirect_pins
 // +build go_mod_indirect_pins
 

@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -6,7 +9,7 @@ import (
 
 	"github.com/ory/x/pointerx"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 )
 
 type (

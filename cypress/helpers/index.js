@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 import { v4 as uuidv4 } from "uuid"
 
 export const prng = () => uuidv4()

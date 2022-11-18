@@ -26,7 +26,7 @@ type OAuth2TokenExchange struct {
 	// The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \"offline\" to your access token request.
 	RefreshToken *string `json:"refresh_token,omitempty"`
 	// The scope of the access token
-	Scope *int64 `json:"scope,omitempty"`
+	Scope *string `json:"scope,omitempty"`
 	// The type of the token issued
 	TokenType *string `json:"token_type,omitempty"`
 }
@@ -177,9 +177,9 @@ func (o *OAuth2TokenExchange) SetRefreshToken(v string) {
 }
 
 // GetScope returns the Scope field value if set, zero value otherwise.
-func (o *OAuth2TokenExchange) GetScope() int64 {
+func (o *OAuth2TokenExchange) GetScope() string {
 	if o == nil || o.Scope == nil {
-		var ret int64
+		var ret string
 		return ret
 	}
 	return *o.Scope
@@ -187,7 +187,7 @@ func (o *OAuth2TokenExchange) GetScope() int64 {
 
 // GetScopeOk returns a tuple with the Scope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenExchange) GetScopeOk() (*int64, bool) {
+func (o *OAuth2TokenExchange) GetScopeOk() (*string, bool) {
 	if o == nil || o.Scope == nil {
 		return nil, false
 	}
@@ -203,8 +203,8 @@ func (o *OAuth2TokenExchange) HasScope() bool {
 	return false
 }
 
-// SetScope gets a reference to the given int64 and assigns it to the Scope field.
-func (o *OAuth2TokenExchange) SetScope(v int64) {
+// SetScope gets a reference to the given string and assigns it to the Scope field.
+func (o *OAuth2TokenExchange) SetScope(v string) {
 	o.Scope = &v
 }
 

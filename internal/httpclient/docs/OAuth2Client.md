@@ -2,53 +2,53 @@
 
 ## Properties
 
-| Name                                           | Type                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Notes      |
-| ---------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **AllowedCorsOrigins**                         | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **Audience**                                   | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **AuthorizationCodeGrantAccessTokenLifespan**  | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **AuthorizationCodeGrantIdTokenLifespan**      | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **BackchannelLogoutSessionRequired**           | Pointer to **bool**        | OpenID Connect Back-Channel Logout Session Required Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | [optional] |
-| **BackchannelLogoutUri**                       | Pointer to **string**      | OpenID Connect Back-Channel Logout URI RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | [optional] |
-| **ClientCredentialsGrantAccessTokenLifespan**  | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **ClientId**                                   | Pointer to **string**      | OAuth 2.0 Client ID The ID is autogenerated and immutable.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | [optional] |
-| **ClientName**                                 | Pointer to **string**      | OAuth 2.0 Client Name The human-readable name of the client to be presented to the end-user during authorization.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **ClientSecret**                               | Pointer to **string**      | OAuth 2.0 Client Secret The secret will be included in the create request as cleartext, and then never again. The secret is kept in hashed format and is not recoverable once lost.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | [optional] |
-| **ClientSecretExpiresAt**                      | Pointer to **int64**       | OAuth 2.0 Client Secret Expires At The field is currently not supported and its value is always 0.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | [optional] |
-| **ClientUri**                                  | Pointer to **string**      | OAuth 2.0 Client URI ClientURI is a URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | [optional] |
-| **Contacts**                                   | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **CreatedAt**                                  | Pointer to **time.Time**   | OAuth 2.0 Client Creation Date CreatedAt returns the timestamp of the client&#39;s creation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | [optional] |
-| **FrontchannelLogoutSessionRequired**          | Pointer to **bool**        | OpenID Connect Front-Channel Logout Session Required Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | [optional] |
-| **FrontchannelLogoutUri**                      | Pointer to **string**      | OpenID Connect Front-Channel Logout URI RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | [optional] |
-| **GrantTypes**                                 | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **ImplicitGrantAccessTokenLifespan**           | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **ImplicitGrantIdTokenLifespan**               | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **Jwks**                                       | Pointer to **interface{}** | OAuth 2.0 Client JSON Web Key Set Client&#39;s JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks parameters MUST NOT be used together.                                                                                                                    | [optional] |
-| **JwksUri**                                    | Pointer to **string**      | OAuth 2.0 Client JSON Web Key Set URL URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] |
-| **JwtBearerGrantAccessTokenLifespan**          | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **LogoUri**                                    | Pointer to **string**      | OAuth 2.0 Client Logo URI A URL string referencing the client&#39;s logo.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | [optional] |
-| **Metadata**                                   | Pointer to **interface{}** |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **Owner**                                      | Pointer to **string**      | OAuth 2.0 Client Owner Owner is a string identifying the owner of the OAuth 2.0 Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | [optional] |
-| **PolicyUri**                                  | Pointer to **string**      | OAuth 2.0 Client Policy URI PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | [optional] |
-| **PostLogoutRedirectUris**                     | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **RedirectUris**                               | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **RefreshTokenGrantAccessTokenLifespan**       | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **RefreshTokenGrantIdTokenLifespan**           | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **RefreshTokenGrantRefreshTokenLifespan**      | Pointer to **string**      | Specify a time duration in milliseconds, seconds, minutes, hours.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **RegistrationAccessToken**                    | Pointer to **string**      | OpenID Connect Dynamic Client Registration Access Token RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client. It is sent when creating a client using Dynamic Client Registration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | [optional] |
-| **RegistrationClientUri**                      | Pointer to **string**      | OpenID Connect Dynamic Client Registration URL RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | [optional] |
-| **RequestObjectSigningAlg**                    | Pointer to **string**      | OpenID Connect Request Object Signing Algorithm JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | [optional] |
-| **RequestUris**                                | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **ResponseTypes**                              | Pointer to **[]string**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | [optional] |
-| **Scope**                                      | Pointer to **string**      | OAuth 2.0 Client Scope Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | [optional] |
-| **SectorIdentifierUri**                        | Pointer to **string**      | OpenID Connect Sector Identifier URI URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | [optional] |
-| **SubjectType**                                | Pointer to **string**      | OpenID Connect Subject Type The &#x60;subject_types_supported&#x60; Discovery parameter contains a list of the supported subject_type values for this server. Valid types include &#x60;pairwise&#x60; and &#x60;public&#x60;.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | [optional] |
-| **TokenEndpointAuthMethod**                    | Pointer to **string**      | OAuth 2.0 Token Endpoint Authentication Method Requested Client Authentication method for the Token Endpoint. The options are: &#x60;client_secret_post&#x60;: (default) Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; in the HTTP body. &#x60;client_secret_basic&#x60;: Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; encoded in the HTTP Authorization header. &#x60;private_key_jwt&#x60;: Use JSON Web Tokens to authenticate the client. &#x60;none&#x60;: Used for public clients (native apps, mobile apps) which can not have secrets.                                                                                                                                                                                                                        | [optional] |
-| **TokenEndpointAuthSigningAlg**                | Pointer to **string**      | OAuth 2.0 Token Endpoint Signing Algorithm Requested Client Authentication signing algorithm for the Token Endpoint.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | [optional] |
-| **TosUri**                                     | Pointer to **string**      | OAuth 2.0 Client Terms of Service URI A URL string pointing to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | [optional] |
-| **UpdatedAt**                                  | Pointer to **time.Time**   | OAuth 2.0 Client Last Update Date UpdatedAt returns the timestamp of the last update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | [optional] |
-| **UserinfoSignedResponseAlg**                  | Pointer to **string**      | OpenID Connect Request Userinfo Signed Response Algorithm JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**AllowedCorsOrigins** | Pointer to **[]string** |  | [optional] 
+**Audience** | Pointer to **[]string** |  | [optional] 
+**AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**AuthorizationCodeGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**BackchannelLogoutSessionRequired** | Pointer to **bool** | OpenID Connect Back-Channel Logout Session Required  Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false. | [optional] 
+**BackchannelLogoutUri** | Pointer to **string** | OpenID Connect Back-Channel Logout URI  RP URL that will cause the RP to log itself out when sent a Logout Token by the OP. | [optional] 
+**ClientCredentialsGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**ClientId** | Pointer to **string** | OAuth 2.0 Client ID  The ID is autogenerated and immutable. | [optional] 
+**ClientName** | Pointer to **string** | OAuth 2.0 Client Name  The human-readable name of the client to be presented to the end-user during authorization. | [optional] 
+**ClientSecret** | Pointer to **string** | OAuth 2.0 Client Secret  The secret will be included in the create request as cleartext, and then never again. The secret is kept in hashed format and is not recoverable once lost. | [optional] 
+**ClientSecretExpiresAt** | Pointer to **int64** | OAuth 2.0 Client Secret Expires At  The field is currently not supported and its value is always 0. | [optional] 
+**ClientUri** | Pointer to **string** | OAuth 2.0 Client URI  ClientURI is a URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion. | [optional] 
+**Contacts** | Pointer to **[]string** |  | [optional] 
+**CreatedAt** | Pointer to **time.Time** | OAuth 2.0 Client Creation Date  CreatedAt returns the timestamp of the client&#39;s creation. | [optional] 
+**FrontchannelLogoutSessionRequired** | Pointer to **bool** | OpenID Connect Front-Channel Logout Session Required  Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false. | [optional] 
+**FrontchannelLogoutUri** | Pointer to **string** | OpenID Connect Front-Channel Logout URI  RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be. | [optional] 
+**GrantTypes** | Pointer to **[]string** |  | [optional] 
+**ImplicitGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**ImplicitGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**Jwks** | Pointer to **interface{}** | OAuth 2.0 Client JSON Web Key Set  Client&#39;s JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks parameters MUST NOT be used together. | [optional] 
+**JwksUri** | Pointer to **string** | OAuth 2.0 Client JSON Web Key Set URL  URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
+**JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**LogoUri** | Pointer to **string** | OAuth 2.0 Client Logo URI  A URL string referencing the client&#39;s logo. | [optional] 
+**Metadata** | Pointer to **interface{}** |  | [optional] 
+**Owner** | Pointer to **string** | OAuth 2.0 Client Owner  Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] 
+**PolicyUri** | Pointer to **string** | OAuth 2.0 Client Policy URI  PolicyURI is a URL string that points to a human-readable privacy policy document that describes how the deployment organization collects, uses, retains, and discloses personal data. | [optional] 
+**PostLogoutRedirectUris** | Pointer to **[]string** |  | [optional] 
+**RedirectUris** | Pointer to **[]string** |  | [optional] 
+**RefreshTokenGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**RefreshTokenGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**RefreshTokenGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**RegistrationAccessToken** | Pointer to **string** | OpenID Connect Dynamic Client Registration Access Token  RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client. It is sent when creating a client using Dynamic Client Registration. | [optional] 
+**RegistrationClientUri** | Pointer to **string** | OpenID Connect Dynamic Client Registration URL  RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client. | [optional] 
+**RequestObjectSigningAlg** | Pointer to **string** | OpenID Connect Request Object Signing Algorithm  JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects from this Client MUST be rejected, if not signed with this algorithm. | [optional] 
+**RequestUris** | Pointer to **[]string** |  | [optional] 
+**ResponseTypes** | Pointer to **[]string** |  | [optional] 
+**Scope** | Pointer to **string** | OAuth 2.0 Client Scope  Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens. | [optional] 
+**SectorIdentifierUri** | Pointer to **string** | OpenID Connect Sector Identifier URI  URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values. | [optional] 
+**SubjectType** | Pointer to **string** | OpenID Connect Subject Type  The &#x60;subject_types_supported&#x60; Discovery parameter contains a list of the supported subject_type values for this server. Valid types include &#x60;pairwise&#x60; and &#x60;public&#x60;. | [optional] 
+**TokenEndpointAuthMethod** | Pointer to **string** | OAuth 2.0 Token Endpoint Authentication Method  Requested Client Authentication method for the Token Endpoint. The options are:  &#x60;client_secret_post&#x60;: (default) Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; in the HTTP body. &#x60;client_secret_basic&#x60;: Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; encoded in the HTTP Authorization header. &#x60;private_key_jwt&#x60;: Use JSON Web Tokens to authenticate the client. &#x60;none&#x60;: Used for public clients (native apps, mobile apps) which can not have secrets. | [optional] 
+**TokenEndpointAuthSigningAlg** | Pointer to **string** | OAuth 2.0 Token Endpoint Signing Algorithm  Requested Client Authentication signing algorithm for the Token Endpoint. | [optional] 
+**TosUri** | Pointer to **string** | OAuth 2.0 Client Terms of Service URI  A URL string pointing to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client. | [optional] 
+**UpdatedAt** | Pointer to **time.Time** | OAuth 2.0 Client Last Update Date  UpdatedAt returns the timestamp of the last update. | [optional] 
+**UserinfoSignedResponseAlg** | Pointer to **string** | OpenID Connect Request Userinfo Signed Response Algorithm  JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type. | [optional] 
 
 ## Methods
 
@@ -56,33 +56,31 @@
 
 `func NewOAuth2Client() *OAuth2Client`
 
-NewOAuth2Client instantiates a new OAuth2Client object This constructor will
-assign default values to properties that have it defined, and makes sure
-properties required by API are set, but the set of arguments will change when
-the set of required properties is changed
+NewOAuth2Client instantiates a new OAuth2Client object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewOAuth2ClientWithDefaults
 
 `func NewOAuth2ClientWithDefaults() *OAuth2Client`
 
-NewOAuth2ClientWithDefaults instantiates a new OAuth2Client object This
-constructor will only assign default values to properties that have it defined,
+NewOAuth2ClientWithDefaults instantiates a new OAuth2Client object
+This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetAllowedCorsOrigins
 
 `func (o *OAuth2Client) GetAllowedCorsOrigins() []string`
 
-GetAllowedCorsOrigins returns the AllowedCorsOrigins field if non-nil, zero
-value otherwise.
+GetAllowedCorsOrigins returns the AllowedCorsOrigins field if non-nil, zero value otherwise.
 
 ### GetAllowedCorsOriginsOk
 
 `func (o *OAuth2Client) GetAllowedCorsOriginsOk() (*[]string, bool)`
 
-GetAllowedCorsOriginsOk returns a tuple with the AllowedCorsOrigins field if
-it's non-nil, zero value otherwise and a boolean to check if the value has been
-set.
+GetAllowedCorsOriginsOk returns a tuple with the AllowedCorsOrigins field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAllowedCorsOrigins
 
@@ -106,8 +104,8 @@ GetAudience returns the Audience field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetAudienceOk() (*[]string, bool)`
 
-GetAudienceOk returns a tuple with the Audience field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetAudienceOk returns a tuple with the Audience field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAudience
 
@@ -125,112 +123,95 @@ HasAudience returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespan() string`
 
-GetAuthorizationCodeGrantAccessTokenLifespan returns the
-AuthorizationCodeGrantAccessTokenLifespan field if non-nil, zero value
-otherwise.
+GetAuthorizationCodeGrantAccessTokenLifespan returns the AuthorizationCodeGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetAuthorizationCodeGrantAccessTokenLifespanOk
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string, bool)`
 
-GetAuthorizationCodeGrantAccessTokenLifespanOk returns a tuple with the
-AuthorizationCodeGrantAccessTokenLifespan field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetAuthorizationCodeGrantAccessTokenLifespanOk returns a tuple with the AuthorizationCodeGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) SetAuthorizationCodeGrantAccessTokenLifespan(v string)`
 
-SetAuthorizationCodeGrantAccessTokenLifespan sets
-AuthorizationCodeGrantAccessTokenLifespan field to given value.
+SetAuthorizationCodeGrantAccessTokenLifespan sets AuthorizationCodeGrantAccessTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) HasAuthorizationCodeGrantAccessTokenLifespan() bool`
 
-HasAuthorizationCodeGrantAccessTokenLifespan returns a boolean if a field has
-been set.
+HasAuthorizationCodeGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetAuthorizationCodeGrantIdTokenLifespan
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespan() string`
 
-GetAuthorizationCodeGrantIdTokenLifespan returns the
-AuthorizationCodeGrantIdTokenLifespan field if non-nil, zero value otherwise.
+GetAuthorizationCodeGrantIdTokenLifespan returns the AuthorizationCodeGrantIdTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetAuthorizationCodeGrantIdTokenLifespanOk
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bool)`
 
-GetAuthorizationCodeGrantIdTokenLifespanOk returns a tuple with the
-AuthorizationCodeGrantIdTokenLifespan field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetAuthorizationCodeGrantIdTokenLifespanOk returns a tuple with the AuthorizationCodeGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantIdTokenLifespan
 
 `func (o *OAuth2Client) SetAuthorizationCodeGrantIdTokenLifespan(v string)`
 
-SetAuthorizationCodeGrantIdTokenLifespan sets
-AuthorizationCodeGrantIdTokenLifespan field to given value.
+SetAuthorizationCodeGrantIdTokenLifespan sets AuthorizationCodeGrantIdTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantIdTokenLifespan
 
 `func (o *OAuth2Client) HasAuthorizationCodeGrantIdTokenLifespan() bool`
 
-HasAuthorizationCodeGrantIdTokenLifespan returns a boolean if a field has been
-set.
+HasAuthorizationCodeGrantIdTokenLifespan returns a boolean if a field has been set.
 
 ### GetAuthorizationCodeGrantRefreshTokenLifespan
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespan() string`
 
-GetAuthorizationCodeGrantRefreshTokenLifespan returns the
-AuthorizationCodeGrantRefreshTokenLifespan field if non-nil, zero value
-otherwise.
+GetAuthorizationCodeGrantRefreshTokenLifespan returns the AuthorizationCodeGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetAuthorizationCodeGrantRefreshTokenLifespanOk
 
 `func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*string, bool)`
 
-GetAuthorizationCodeGrantRefreshTokenLifespanOk returns a tuple with the
-AuthorizationCodeGrantRefreshTokenLifespan field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetAuthorizationCodeGrantRefreshTokenLifespanOk returns a tuple with the AuthorizationCodeGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetAuthorizationCodeGrantRefreshTokenLifespan
 
 `func (o *OAuth2Client) SetAuthorizationCodeGrantRefreshTokenLifespan(v string)`
 
-SetAuthorizationCodeGrantRefreshTokenLifespan sets
-AuthorizationCodeGrantRefreshTokenLifespan field to given value.
+SetAuthorizationCodeGrantRefreshTokenLifespan sets AuthorizationCodeGrantRefreshTokenLifespan field to given value.
 
 ### HasAuthorizationCodeGrantRefreshTokenLifespan
 
 `func (o *OAuth2Client) HasAuthorizationCodeGrantRefreshTokenLifespan() bool`
 
-HasAuthorizationCodeGrantRefreshTokenLifespan returns a boolean if a field has
-been set.
+HasAuthorizationCodeGrantRefreshTokenLifespan returns a boolean if a field has been set.
 
 ### GetBackchannelLogoutSessionRequired
 
 `func (o *OAuth2Client) GetBackchannelLogoutSessionRequired() bool`
 
-GetBackchannelLogoutSessionRequired returns the BackchannelLogoutSessionRequired
-field if non-nil, zero value otherwise.
+GetBackchannelLogoutSessionRequired returns the BackchannelLogoutSessionRequired field if non-nil, zero value otherwise.
 
 ### GetBackchannelLogoutSessionRequiredOk
 
 `func (o *OAuth2Client) GetBackchannelLogoutSessionRequiredOk() (*bool, bool)`
 
-GetBackchannelLogoutSessionRequiredOk returns a tuple with the
-BackchannelLogoutSessionRequired field if it's non-nil, zero value otherwise and
-a boolean to check if the value has been set.
+GetBackchannelLogoutSessionRequiredOk returns a tuple with the BackchannelLogoutSessionRequired field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetBackchannelLogoutSessionRequired
 
 `func (o *OAuth2Client) SetBackchannelLogoutSessionRequired(v bool)`
 
-SetBackchannelLogoutSessionRequired sets BackchannelLogoutSessionRequired field
-to given value.
+SetBackchannelLogoutSessionRequired sets BackchannelLogoutSessionRequired field to given value.
 
 ### HasBackchannelLogoutSessionRequired
 
@@ -242,16 +223,14 @@ HasBackchannelLogoutSessionRequired returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetBackchannelLogoutUri() string`
 
-GetBackchannelLogoutUri returns the BackchannelLogoutUri field if non-nil, zero
-value otherwise.
+GetBackchannelLogoutUri returns the BackchannelLogoutUri field if non-nil, zero value otherwise.
 
 ### GetBackchannelLogoutUriOk
 
 `func (o *OAuth2Client) GetBackchannelLogoutUriOk() (*string, bool)`
 
-GetBackchannelLogoutUriOk returns a tuple with the BackchannelLogoutUri field if
-it's non-nil, zero value otherwise and a boolean to check if the value has been
-set.
+GetBackchannelLogoutUriOk returns a tuple with the BackchannelLogoutUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetBackchannelLogoutUri
 
@@ -269,31 +248,26 @@ HasBackchannelLogoutUri returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespan() string`
 
-GetClientCredentialsGrantAccessTokenLifespan returns the
-ClientCredentialsGrantAccessTokenLifespan field if non-nil, zero value
-otherwise.
+GetClientCredentialsGrantAccessTokenLifespan returns the ClientCredentialsGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetClientCredentialsGrantAccessTokenLifespanOk
 
 `func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespanOk() (*string, bool)`
 
-GetClientCredentialsGrantAccessTokenLifespanOk returns a tuple with the
-ClientCredentialsGrantAccessTokenLifespan field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetClientCredentialsGrantAccessTokenLifespanOk returns a tuple with the ClientCredentialsGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientCredentialsGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) SetClientCredentialsGrantAccessTokenLifespan(v string)`
 
-SetClientCredentialsGrantAccessTokenLifespan sets
-ClientCredentialsGrantAccessTokenLifespan field to given value.
+SetClientCredentialsGrantAccessTokenLifespan sets ClientCredentialsGrantAccessTokenLifespan field to given value.
 
 ### HasClientCredentialsGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) HasClientCredentialsGrantAccessTokenLifespan() bool`
 
-HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has
-been set.
+HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetClientId
 
@@ -305,8 +279,8 @@ GetClientId returns the ClientId field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetClientIdOk() (*string, bool)`
 
-GetClientIdOk returns a tuple with the ClientId field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetClientIdOk returns a tuple with the ClientId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientId
 
@@ -330,8 +304,8 @@ GetClientName returns the ClientName field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetClientNameOk() (*string, bool)`
 
-GetClientNameOk returns a tuple with the ClientName field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetClientNameOk returns a tuple with the ClientName field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientName
 
@@ -355,8 +329,8 @@ GetClientSecret returns the ClientSecret field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetClientSecretOk() (*string, bool)`
 
-GetClientSecretOk returns a tuple with the ClientSecret field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetClientSecretOk returns a tuple with the ClientSecret field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientSecret
 
@@ -374,16 +348,14 @@ HasClientSecret returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetClientSecretExpiresAt() int64`
 
-GetClientSecretExpiresAt returns the ClientSecretExpiresAt field if non-nil,
-zero value otherwise.
+GetClientSecretExpiresAt returns the ClientSecretExpiresAt field if non-nil, zero value otherwise.
 
 ### GetClientSecretExpiresAtOk
 
 `func (o *OAuth2Client) GetClientSecretExpiresAtOk() (*int64, bool)`
 
-GetClientSecretExpiresAtOk returns a tuple with the ClientSecretExpiresAt field
-if it's non-nil, zero value otherwise and a boolean to check if the value has
-been set.
+GetClientSecretExpiresAtOk returns a tuple with the ClientSecretExpiresAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientSecretExpiresAt
 
@@ -407,8 +379,8 @@ GetClientUri returns the ClientUri field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetClientUriOk() (*string, bool)`
 
-GetClientUriOk returns a tuple with the ClientUri field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetClientUriOk returns a tuple with the ClientUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetClientUri
 
@@ -432,8 +404,8 @@ GetContacts returns the Contacts field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetContactsOk() (*[]string, bool)`
 
-GetContactsOk returns a tuple with the Contacts field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetContactsOk returns a tuple with the Contacts field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetContacts
 
@@ -457,8 +429,8 @@ GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetCreatedAtOk() (*time.Time, bool)`
 
-GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
@@ -476,23 +448,20 @@ HasCreatedAt returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetFrontchannelLogoutSessionRequired() bool`
 
-GetFrontchannelLogoutSessionRequired returns the
-FrontchannelLogoutSessionRequired field if non-nil, zero value otherwise.
+GetFrontchannelLogoutSessionRequired returns the FrontchannelLogoutSessionRequired field if non-nil, zero value otherwise.
 
 ### GetFrontchannelLogoutSessionRequiredOk
 
 `func (o *OAuth2Client) GetFrontchannelLogoutSessionRequiredOk() (*bool, bool)`
 
-GetFrontchannelLogoutSessionRequiredOk returns a tuple with the
-FrontchannelLogoutSessionRequired field if it's non-nil, zero value otherwise
+GetFrontchannelLogoutSessionRequiredOk returns a tuple with the FrontchannelLogoutSessionRequired field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetFrontchannelLogoutSessionRequired
 
 `func (o *OAuth2Client) SetFrontchannelLogoutSessionRequired(v bool)`
 
-SetFrontchannelLogoutSessionRequired sets FrontchannelLogoutSessionRequired
-field to given value.
+SetFrontchannelLogoutSessionRequired sets FrontchannelLogoutSessionRequired field to given value.
 
 ### HasFrontchannelLogoutSessionRequired
 
@@ -504,16 +473,14 @@ HasFrontchannelLogoutSessionRequired returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetFrontchannelLogoutUri() string`
 
-GetFrontchannelLogoutUri returns the FrontchannelLogoutUri field if non-nil,
-zero value otherwise.
+GetFrontchannelLogoutUri returns the FrontchannelLogoutUri field if non-nil, zero value otherwise.
 
 ### GetFrontchannelLogoutUriOk
 
 `func (o *OAuth2Client) GetFrontchannelLogoutUriOk() (*string, bool)`
 
-GetFrontchannelLogoutUriOk returns a tuple with the FrontchannelLogoutUri field
-if it's non-nil, zero value otherwise and a boolean to check if the value has
-been set.
+GetFrontchannelLogoutUriOk returns a tuple with the FrontchannelLogoutUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetFrontchannelLogoutUri
 
@@ -537,8 +504,8 @@ GetGrantTypes returns the GrantTypes field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetGrantTypesOk() (*[]string, bool)`
 
-GetGrantTypesOk returns a tuple with the GrantTypes field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetGrantTypesOk returns a tuple with the GrantTypes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetGrantTypes
 
@@ -556,23 +523,20 @@ HasGrantTypes returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespan() string`
 
-GetImplicitGrantAccessTokenLifespan returns the ImplicitGrantAccessTokenLifespan
-field if non-nil, zero value otherwise.
+GetImplicitGrantAccessTokenLifespan returns the ImplicitGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetImplicitGrantAccessTokenLifespanOk
 
 `func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespanOk() (*string, bool)`
 
-GetImplicitGrantAccessTokenLifespanOk returns a tuple with the
-ImplicitGrantAccessTokenLifespan field if it's non-nil, zero value otherwise and
-a boolean to check if the value has been set.
+GetImplicitGrantAccessTokenLifespanOk returns a tuple with the ImplicitGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetImplicitGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) SetImplicitGrantAccessTokenLifespan(v string)`
 
-SetImplicitGrantAccessTokenLifespan sets ImplicitGrantAccessTokenLifespan field
-to given value.
+SetImplicitGrantAccessTokenLifespan sets ImplicitGrantAccessTokenLifespan field to given value.
 
 ### HasImplicitGrantAccessTokenLifespan
 
@@ -584,23 +548,20 @@ HasImplicitGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetImplicitGrantIdTokenLifespan() string`
 
-GetImplicitGrantIdTokenLifespan returns the ImplicitGrantIdTokenLifespan field
-if non-nil, zero value otherwise.
+GetImplicitGrantIdTokenLifespan returns the ImplicitGrantIdTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetImplicitGrantIdTokenLifespanOk
 
 `func (o *OAuth2Client) GetImplicitGrantIdTokenLifespanOk() (*string, bool)`
 
-GetImplicitGrantIdTokenLifespanOk returns a tuple with the
-ImplicitGrantIdTokenLifespan field if it's non-nil, zero value otherwise and a
-boolean to check if the value has been set.
+GetImplicitGrantIdTokenLifespanOk returns a tuple with the ImplicitGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetImplicitGrantIdTokenLifespan
 
 `func (o *OAuth2Client) SetImplicitGrantIdTokenLifespan(v string)`
 
-SetImplicitGrantIdTokenLifespan sets ImplicitGrantIdTokenLifespan field to given
-value.
+SetImplicitGrantIdTokenLifespan sets ImplicitGrantIdTokenLifespan field to given value.
 
 ### HasImplicitGrantIdTokenLifespan
 
@@ -618,8 +579,8 @@ GetJwks returns the Jwks field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetJwksOk() (*interface{}, bool)`
 
-GetJwksOk returns a tuple with the Jwks field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetJwksOk returns a tuple with the Jwks field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetJwks
 
@@ -637,14 +598,12 @@ HasJwks returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) SetJwksNil(b bool)`
 
-SetJwksNil sets the value for Jwks to be an explicit nil
+ SetJwksNil sets the value for Jwks to be an explicit nil
 
 ### UnsetJwks
-
 `func (o *OAuth2Client) UnsetJwks()`
 
 UnsetJwks ensures that no value is present for Jwks, not even an explicit nil
-
 ### GetJwksUri
 
 `func (o *OAuth2Client) GetJwksUri() string`
@@ -655,8 +614,8 @@ GetJwksUri returns the JwksUri field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetJwksUriOk() (*string, bool)`
 
-GetJwksUriOk returns a tuple with the JwksUri field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetJwksUriOk returns a tuple with the JwksUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetJwksUri
 
@@ -674,23 +633,20 @@ HasJwksUri returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespan() string`
 
-GetJwtBearerGrantAccessTokenLifespan returns the
-JwtBearerGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+GetJwtBearerGrantAccessTokenLifespan returns the JwtBearerGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetJwtBearerGrantAccessTokenLifespanOk
 
 `func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool)`
 
-GetJwtBearerGrantAccessTokenLifespanOk returns a tuple with the
-JwtBearerGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+GetJwtBearerGrantAccessTokenLifespanOk returns a tuple with the JwtBearerGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetJwtBearerGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) SetJwtBearerGrantAccessTokenLifespan(v string)`
 
-SetJwtBearerGrantAccessTokenLifespan sets JwtBearerGrantAccessTokenLifespan
-field to given value.
+SetJwtBearerGrantAccessTokenLifespan sets JwtBearerGrantAccessTokenLifespan field to given value.
 
 ### HasJwtBearerGrantAccessTokenLifespan
 
@@ -708,8 +664,8 @@ GetLogoUri returns the LogoUri field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetLogoUriOk() (*string, bool)`
 
-GetLogoUriOk returns a tuple with the LogoUri field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetLogoUriOk returns a tuple with the LogoUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetLogoUri
 
@@ -733,8 +689,8 @@ GetMetadata returns the Metadata field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetMetadataOk() (*interface{}, bool)`
 
-GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetMetadataOk returns a tuple with the Metadata field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetMetadata
 
@@ -752,15 +708,12 @@ HasMetadata returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) SetMetadataNil(b bool)`
 
-SetMetadataNil sets the value for Metadata to be an explicit nil
+ SetMetadataNil sets the value for Metadata to be an explicit nil
 
 ### UnsetMetadata
-
 `func (o *OAuth2Client) UnsetMetadata()`
 
-UnsetMetadata ensures that no value is present for Metadata, not even an
-explicit nil
-
+UnsetMetadata ensures that no value is present for Metadata, not even an explicit nil
 ### GetOwner
 
 `func (o *OAuth2Client) GetOwner() string`
@@ -771,8 +724,8 @@ GetOwner returns the Owner field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetOwnerOk() (*string, bool)`
 
-GetOwnerOk returns a tuple with the Owner field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetOwnerOk returns a tuple with the Owner field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetOwner
 
@@ -796,8 +749,8 @@ GetPolicyUri returns the PolicyUri field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetPolicyUriOk() (*string, bool)`
 
-GetPolicyUriOk returns a tuple with the PolicyUri field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetPolicyUriOk returns a tuple with the PolicyUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetPolicyUri
 
@@ -815,16 +768,14 @@ HasPolicyUri returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetPostLogoutRedirectUris() []string`
 
-GetPostLogoutRedirectUris returns the PostLogoutRedirectUris field if non-nil,
-zero value otherwise.
+GetPostLogoutRedirectUris returns the PostLogoutRedirectUris field if non-nil, zero value otherwise.
 
 ### GetPostLogoutRedirectUrisOk
 
 `func (o *OAuth2Client) GetPostLogoutRedirectUrisOk() (*[]string, bool)`
 
-GetPostLogoutRedirectUrisOk returns a tuple with the PostLogoutRedirectUris
-field if it's non-nil, zero value otherwise and a boolean to check if the value
-has been set.
+GetPostLogoutRedirectUrisOk returns a tuple with the PostLogoutRedirectUris field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetPostLogoutRedirectUris
 
@@ -848,8 +799,8 @@ GetRedirectUris returns the RedirectUris field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetRedirectUrisOk() (*[]string, bool)`
 
-GetRedirectUrisOk returns a tuple with the RedirectUris field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetRedirectUrisOk returns a tuple with the RedirectUris field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRedirectUris
 
@@ -867,52 +818,45 @@ HasRedirectUris returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespan() string`
 
-GetRefreshTokenGrantAccessTokenLifespan returns the
-RefreshTokenGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+GetRefreshTokenGrantAccessTokenLifespan returns the RefreshTokenGrantAccessTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantAccessTokenLifespanOk
 
 `func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, bool)`
 
-GetRefreshTokenGrantAccessTokenLifespanOk returns a tuple with the
-RefreshTokenGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+GetRefreshTokenGrantAccessTokenLifespanOk returns a tuple with the RefreshTokenGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) SetRefreshTokenGrantAccessTokenLifespan(v string)`
 
-SetRefreshTokenGrantAccessTokenLifespan sets
-RefreshTokenGrantAccessTokenLifespan field to given value.
+SetRefreshTokenGrantAccessTokenLifespan sets RefreshTokenGrantAccessTokenLifespan field to given value.
 
 ### HasRefreshTokenGrantAccessTokenLifespan
 
 `func (o *OAuth2Client) HasRefreshTokenGrantAccessTokenLifespan() bool`
 
-HasRefreshTokenGrantAccessTokenLifespan returns a boolean if a field has been
-set.
+HasRefreshTokenGrantAccessTokenLifespan returns a boolean if a field has been set.
 
 ### GetRefreshTokenGrantIdTokenLifespan
 
 `func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespan() string`
 
-GetRefreshTokenGrantIdTokenLifespan returns the RefreshTokenGrantIdTokenLifespan
-field if non-nil, zero value otherwise.
+GetRefreshTokenGrantIdTokenLifespan returns the RefreshTokenGrantIdTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantIdTokenLifespanOk
 
 `func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool)`
 
-GetRefreshTokenGrantIdTokenLifespanOk returns a tuple with the
-RefreshTokenGrantIdTokenLifespan field if it's non-nil, zero value otherwise and
-a boolean to check if the value has been set.
+GetRefreshTokenGrantIdTokenLifespanOk returns a tuple with the RefreshTokenGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantIdTokenLifespan
 
 `func (o *OAuth2Client) SetRefreshTokenGrantIdTokenLifespan(v string)`
 
-SetRefreshTokenGrantIdTokenLifespan sets RefreshTokenGrantIdTokenLifespan field
-to given value.
+SetRefreshTokenGrantIdTokenLifespan sets RefreshTokenGrantIdTokenLifespan field to given value.
 
 ### HasRefreshTokenGrantIdTokenLifespan
 
@@ -924,45 +868,39 @@ HasRefreshTokenGrantIdTokenLifespan returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespan() string`
 
-GetRefreshTokenGrantRefreshTokenLifespan returns the
-RefreshTokenGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
+GetRefreshTokenGrantRefreshTokenLifespan returns the RefreshTokenGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
 
 ### GetRefreshTokenGrantRefreshTokenLifespanOk
 
 `func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bool)`
 
-GetRefreshTokenGrantRefreshTokenLifespanOk returns a tuple with the
-RefreshTokenGrantRefreshTokenLifespan field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetRefreshTokenGrantRefreshTokenLifespanOk returns a tuple with the RefreshTokenGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRefreshTokenGrantRefreshTokenLifespan
 
 `func (o *OAuth2Client) SetRefreshTokenGrantRefreshTokenLifespan(v string)`
 
-SetRefreshTokenGrantRefreshTokenLifespan sets
-RefreshTokenGrantRefreshTokenLifespan field to given value.
+SetRefreshTokenGrantRefreshTokenLifespan sets RefreshTokenGrantRefreshTokenLifespan field to given value.
 
 ### HasRefreshTokenGrantRefreshTokenLifespan
 
 `func (o *OAuth2Client) HasRefreshTokenGrantRefreshTokenLifespan() bool`
 
-HasRefreshTokenGrantRefreshTokenLifespan returns a boolean if a field has been
-set.
+HasRefreshTokenGrantRefreshTokenLifespan returns a boolean if a field has been set.
 
 ### GetRegistrationAccessToken
 
 `func (o *OAuth2Client) GetRegistrationAccessToken() string`
 
-GetRegistrationAccessToken returns the RegistrationAccessToken field if non-nil,
-zero value otherwise.
+GetRegistrationAccessToken returns the RegistrationAccessToken field if non-nil, zero value otherwise.
 
 ### GetRegistrationAccessTokenOk
 
 `func (o *OAuth2Client) GetRegistrationAccessTokenOk() (*string, bool)`
 
-GetRegistrationAccessTokenOk returns a tuple with the RegistrationAccessToken
-field if it's non-nil, zero value otherwise and a boolean to check if the value
-has been set.
+GetRegistrationAccessTokenOk returns a tuple with the RegistrationAccessToken field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRegistrationAccessToken
 
@@ -980,16 +918,14 @@ HasRegistrationAccessToken returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetRegistrationClientUri() string`
 
-GetRegistrationClientUri returns the RegistrationClientUri field if non-nil,
-zero value otherwise.
+GetRegistrationClientUri returns the RegistrationClientUri field if non-nil, zero value otherwise.
 
 ### GetRegistrationClientUriOk
 
 `func (o *OAuth2Client) GetRegistrationClientUriOk() (*string, bool)`
 
-GetRegistrationClientUriOk returns a tuple with the RegistrationClientUri field
-if it's non-nil, zero value otherwise and a boolean to check if the value has
-been set.
+GetRegistrationClientUriOk returns a tuple with the RegistrationClientUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRegistrationClientUri
 
@@ -1007,16 +943,14 @@ HasRegistrationClientUri returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetRequestObjectSigningAlg() string`
 
-GetRequestObjectSigningAlg returns the RequestObjectSigningAlg field if non-nil,
-zero value otherwise.
+GetRequestObjectSigningAlg returns the RequestObjectSigningAlg field if non-nil, zero value otherwise.
 
 ### GetRequestObjectSigningAlgOk
 
 `func (o *OAuth2Client) GetRequestObjectSigningAlgOk() (*string, bool)`
 
-GetRequestObjectSigningAlgOk returns a tuple with the RequestObjectSigningAlg
-field if it's non-nil, zero value otherwise and a boolean to check if the value
-has been set.
+GetRequestObjectSigningAlgOk returns a tuple with the RequestObjectSigningAlg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRequestObjectSigningAlg
 
@@ -1040,8 +974,8 @@ GetRequestUris returns the RequestUris field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetRequestUrisOk() (*[]string, bool)`
 
-GetRequestUrisOk returns a tuple with the RequestUris field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetRequestUrisOk returns a tuple with the RequestUris field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetRequestUris
 
@@ -1059,15 +993,14 @@ HasRequestUris returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetResponseTypes() []string`
 
-GetResponseTypes returns the ResponseTypes field if non-nil, zero value
-otherwise.
+GetResponseTypes returns the ResponseTypes field if non-nil, zero value otherwise.
 
 ### GetResponseTypesOk
 
 `func (o *OAuth2Client) GetResponseTypesOk() (*[]string, bool)`
 
-GetResponseTypesOk returns a tuple with the ResponseTypes field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetResponseTypesOk returns a tuple with the ResponseTypes field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetResponseTypes
 
@@ -1091,8 +1024,8 @@ GetScope returns the Scope field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetScopeOk() (*string, bool)`
 
-GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetScopeOk returns a tuple with the Scope field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetScope
 
@@ -1110,16 +1043,14 @@ HasScope returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetSectorIdentifierUri() string`
 
-GetSectorIdentifierUri returns the SectorIdentifierUri field if non-nil, zero
-value otherwise.
+GetSectorIdentifierUri returns the SectorIdentifierUri field if non-nil, zero value otherwise.
 
 ### GetSectorIdentifierUriOk
 
 `func (o *OAuth2Client) GetSectorIdentifierUriOk() (*string, bool)`
 
-GetSectorIdentifierUriOk returns a tuple with the SectorIdentifierUri field if
-it's non-nil, zero value otherwise and a boolean to check if the value has been
-set.
+GetSectorIdentifierUriOk returns a tuple with the SectorIdentifierUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetSectorIdentifierUri
 
@@ -1143,8 +1074,8 @@ GetSubjectType returns the SubjectType field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetSubjectTypeOk() (*string, bool)`
 
-GetSubjectTypeOk returns a tuple with the SubjectType field if it's non-nil,
-zero value otherwise and a boolean to check if the value has been set.
+GetSubjectTypeOk returns a tuple with the SubjectType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetSubjectType
 
@@ -1162,16 +1093,14 @@ HasSubjectType returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetTokenEndpointAuthMethod() string`
 
-GetTokenEndpointAuthMethod returns the TokenEndpointAuthMethod field if non-nil,
-zero value otherwise.
+GetTokenEndpointAuthMethod returns the TokenEndpointAuthMethod field if non-nil, zero value otherwise.
 
 ### GetTokenEndpointAuthMethodOk
 
 `func (o *OAuth2Client) GetTokenEndpointAuthMethodOk() (*string, bool)`
 
-GetTokenEndpointAuthMethodOk returns a tuple with the TokenEndpointAuthMethod
-field if it's non-nil, zero value otherwise and a boolean to check if the value
-has been set.
+GetTokenEndpointAuthMethodOk returns a tuple with the TokenEndpointAuthMethod field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetTokenEndpointAuthMethod
 
@@ -1189,23 +1118,20 @@ HasTokenEndpointAuthMethod returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetTokenEndpointAuthSigningAlg() string`
 
-GetTokenEndpointAuthSigningAlg returns the TokenEndpointAuthSigningAlg field if
-non-nil, zero value otherwise.
+GetTokenEndpointAuthSigningAlg returns the TokenEndpointAuthSigningAlg field if non-nil, zero value otherwise.
 
 ### GetTokenEndpointAuthSigningAlgOk
 
 `func (o *OAuth2Client) GetTokenEndpointAuthSigningAlgOk() (*string, bool)`
 
-GetTokenEndpointAuthSigningAlgOk returns a tuple with the
-TokenEndpointAuthSigningAlg field if it's non-nil, zero value otherwise and a
-boolean to check if the value has been set.
+GetTokenEndpointAuthSigningAlgOk returns a tuple with the TokenEndpointAuthSigningAlg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetTokenEndpointAuthSigningAlg
 
 `func (o *OAuth2Client) SetTokenEndpointAuthSigningAlg(v string)`
 
-SetTokenEndpointAuthSigningAlg sets TokenEndpointAuthSigningAlg field to given
-value.
+SetTokenEndpointAuthSigningAlg sets TokenEndpointAuthSigningAlg field to given value.
 
 ### HasTokenEndpointAuthSigningAlg
 
@@ -1223,8 +1149,8 @@ GetTosUri returns the TosUri field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetTosUriOk() (*string, bool)`
 
-GetTosUriOk returns a tuple with the TosUri field if it's non-nil, zero value
-otherwise and a boolean to check if the value has been set.
+GetTosUriOk returns a tuple with the TosUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetTosUri
 
@@ -1248,8 +1174,8 @@ GetUpdatedAt returns the UpdatedAt field if non-nil, zero value otherwise.
 
 `func (o *OAuth2Client) GetUpdatedAtOk() (*time.Time, bool)`
 
-GetUpdatedAtOk returns a tuple with the UpdatedAt field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetUpdatedAtOk returns a tuple with the UpdatedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetUpdatedAt
 
@@ -1267,23 +1193,20 @@ HasUpdatedAt returns a boolean if a field has been set.
 
 `func (o *OAuth2Client) GetUserinfoSignedResponseAlg() string`
 
-GetUserinfoSignedResponseAlg returns the UserinfoSignedResponseAlg field if
-non-nil, zero value otherwise.
+GetUserinfoSignedResponseAlg returns the UserinfoSignedResponseAlg field if non-nil, zero value otherwise.
 
 ### GetUserinfoSignedResponseAlgOk
 
 `func (o *OAuth2Client) GetUserinfoSignedResponseAlgOk() (*string, bool)`
 
-GetUserinfoSignedResponseAlgOk returns a tuple with the
-UserinfoSignedResponseAlg field if it's non-nil, zero value otherwise and a
-boolean to check if the value has been set.
+GetUserinfoSignedResponseAlgOk returns a tuple with the UserinfoSignedResponseAlg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetUserinfoSignedResponseAlg
 
 `func (o *OAuth2Client) SetUserinfoSignedResponseAlg(v string)`
 
-SetUserinfoSignedResponseAlg sets UserinfoSignedResponseAlg field to given
-value.
+SetUserinfoSignedResponseAlg sets UserinfoSignedResponseAlg field to given value.
 
 ### HasUserinfoSignedResponseAlg
 
@@ -1291,6 +1214,7 @@ value.
 
 HasUserinfoSignedResponseAlg returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

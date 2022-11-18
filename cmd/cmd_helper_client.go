@@ -1,3 +1,6 @@
+// Copyright © 2022 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
@@ -7,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	hydra "github.com/ory/hydra-client-go"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"

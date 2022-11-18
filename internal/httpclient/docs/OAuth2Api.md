@@ -1,45 +1,48 @@
 # \OAuth2Api
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                                                  | HTTP request                                           | Description                                                   |
-| --------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------- |
-| [**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/accept     | Accept OAuth 2.0 Consent Request                              |
-| [**AcceptOAuth2LoginRequest**](OAuth2Api.md#AcceptOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/accept       | Accept OAuth 2.0 Login Request                                |
-| [**AcceptOAuth2LogoutRequest**](OAuth2Api.md#AcceptOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/accept      | Accept OAuth 2.0 Session Logout Request                       |
-| [**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client)                               | **Post** /admin/clients                                | Create OAuth 2.0 Client                                       |
-| [**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client)                               | **Delete** /admin/clients/{id}                         | Delete OAuth 2.0 Client                                       |
-| [**DeleteOAuth2Token**](OAuth2Api.md#DeleteOAuth2Token)                                 | **Delete** /admin/oauth2/tokens                        | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client |
-| [**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer            |
-| [**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client)                                     | **Get** /admin/clients/{id}                            | Get an OAuth 2.0 Client                                       |
-| [**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest)                     | **Get** /admin/oauth2/auth/requests/consent            | Get OAuth 2.0 Consent Request                                 |
-| [**GetOAuth2LoginRequest**](OAuth2Api.md#GetOAuth2LoginRequest)                         | **Get** /admin/oauth2/auth/requests/login              | Get OAuth 2.0 Login Request                                   |
-| [**GetOAuth2LogoutRequest**](OAuth2Api.md#GetOAuth2LogoutRequest)                       | **Get** /admin/oauth2/auth/requests/logout             | Get OAuth 2.0 Session Logout Request                          |
-| [**GetTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#GetTrustedOAuth2JwtGrantIssuer)       | **Get** /admin/trust/grants/jwt-bearer/issuers/{id}    | Get Trusted OAuth2 JWT Bearer Grant Type Issuer               |
-| [**IntrospectOAuth2Token**](OAuth2Api.md#IntrospectOAuth2Token)                         | **Post** /admin/oauth2/introspect                      | Introspect OAuth2 Access and Refresh Tokens                   |
-| [**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients)                                 | **Get** /admin/clients                                 | List OAuth 2.0 Clients                                        |
-| [**ListOAuth2ConsentSessions**](OAuth2Api.md#ListOAuth2ConsentSessions)                 | **Get** /admin/oauth2/auth/sessions/consent            | List OAuth 2.0 Consent Sessions of a Subject                  |
-| [**ListTrustedOAuth2JwtGrantIssuers**](OAuth2Api.md#ListTrustedOAuth2JwtGrantIssuers)   | **Get** /admin/trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers             |
-| [**OAuth2Authorize**](OAuth2Api.md#OAuth2Authorize)                                     | **Get** /oauth2/auth                                   | OAuth 2.0 Authorize Endpoint                                  |
-| [**Oauth2TokenExchange**](OAuth2Api.md#Oauth2TokenExchange)                             | **Post** /oauth2/token                                 | The OAuth 2.0 Token Endpoint                                  |
-| [**PatchOAuth2Client**](OAuth2Api.md#PatchOAuth2Client)                                 | **Patch** /admin/clients/{id}                          | Patch OAuth 2.0 Client                                        |
-| [**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest)               | **Put** /admin/oauth2/auth/requests/consent/reject     | Reject OAuth 2.0 Consent Request                              |
-| [**RejectOAuth2LoginRequest**](OAuth2Api.md#RejectOAuth2LoginRequest)                   | **Put** /admin/oauth2/auth/requests/login/reject       | Reject OAuth 2.0 Login Request                                |
-| [**RejectOAuth2LogoutRequest**](OAuth2Api.md#RejectOAuth2LogoutRequest)                 | **Put** /admin/oauth2/auth/requests/logout/reject      | Reject OAuth 2.0 Session Logout Request                       |
-| [**RevokeOAuth2ConsentSessions**](OAuth2Api.md#RevokeOAuth2ConsentSessions)             | **Delete** /admin/oauth2/auth/sessions/consent         | Revoke OAuth 2.0 Consent Sessions of a Subject                |
-| [**RevokeOAuth2LoginSessions**](OAuth2Api.md#RevokeOAuth2LoginSessions)                 | **Delete** /admin/oauth2/auth/sessions/login           | Revokes All OAuth 2.0 Login Sessions of a Subject             |
-| [**RevokeOAuth2Token**](OAuth2Api.md#RevokeOAuth2Token)                                 | **Post** /oauth2/revoke                                | Revoke OAuth 2.0 Access or Refresh Token                      |
-| [**SetOAuth2Client**](OAuth2Api.md#SetOAuth2Client)                                     | **Put** /admin/clients/{id}                            | Set OAuth 2.0 Client                                          |
-| [**SetOAuth2ClientLifespans**](OAuth2Api.md#SetOAuth2ClientLifespans)                   | **Put** /admin/clients/{id}/lifespans                  | Set OAuth2 Client Token Lifespans                             |
-| [**TrustOAuth2JwtGrantIssuer**](OAuth2Api.md#TrustOAuth2JwtGrantIssuer)                 | **Post** /admin/trust/grants/jwt-bearer/issuers        | Trust OAuth2 JWT Bearer Grant Type Issuer                     |
-| [**VerifyUserCodeRequest**](OAuth2Api.md#VerifyUserCodeRequest)                         | **Put** /admin/oauth2/auth/requests/device/verify      | Verifies a device grant request                               |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/accept | Accept OAuth 2.0 Consent Request
+[**AcceptOAuth2LoginRequest**](OAuth2Api.md#AcceptOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/accept | Accept OAuth 2.0 Login Request
+[**AcceptOAuth2LogoutRequest**](OAuth2Api.md#AcceptOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/accept | Accept OAuth 2.0 Session Logout Request
+[**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client) | **Post** /admin/clients | Create OAuth 2.0 Client
+[**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
+[**DeleteOAuth2Token**](OAuth2Api.md#DeleteOAuth2Token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+[**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
+[**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request
+[**GetOAuth2LoginRequest**](OAuth2Api.md#GetOAuth2LoginRequest) | **Get** /admin/oauth2/auth/requests/login | Get OAuth 2.0 Login Request
+[**GetOAuth2LogoutRequest**](OAuth2Api.md#GetOAuth2LogoutRequest) | **Get** /admin/oauth2/auth/requests/logout | Get OAuth 2.0 Session Logout Request
+[**GetTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#GetTrustedOAuth2JwtGrantIssuer) | **Get** /admin/trust/grants/jwt-bearer/issuers/{id} | Get Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**IntrospectOAuth2Token**](OAuth2Api.md#IntrospectOAuth2Token) | **Post** /admin/oauth2/introspect | Introspect OAuth2 Access and Refresh Tokens
+[**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients) | **Get** /admin/clients | List OAuth 2.0 Clients
+[**ListOAuth2ConsentSessions**](OAuth2Api.md#ListOAuth2ConsentSessions) | **Get** /admin/oauth2/auth/sessions/consent | List OAuth 2.0 Consent Sessions of a Subject
+[**ListTrustedOAuth2JwtGrantIssuers**](OAuth2Api.md#ListTrustedOAuth2JwtGrantIssuers) | **Get** /admin/trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
+[**OAuth2Authorize**](OAuth2Api.md#OAuth2Authorize) | **Get** /oauth2/auth | OAuth 2.0 Authorize Endpoint
+[**Oauth2TokenExchange**](OAuth2Api.md#Oauth2TokenExchange) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
+[**PatchOAuth2Client**](OAuth2Api.md#PatchOAuth2Client) | **Patch** /admin/clients/{id} | Patch OAuth 2.0 Client
+[**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/reject | Reject OAuth 2.0 Consent Request
+[**RejectOAuth2LoginRequest**](OAuth2Api.md#RejectOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject OAuth 2.0 Login Request
+[**RejectOAuth2LogoutRequest**](OAuth2Api.md#RejectOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject OAuth 2.0 Session Logout Request
+[**RevokeOAuth2ConsentSessions**](OAuth2Api.md#RevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
+[**RevokeOAuth2LoginSessions**](OAuth2Api.md#RevokeOAuth2LoginSessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes All OAuth 2.0 Login Sessions of a Subject
+[**RevokeOAuth2Token**](OAuth2Api.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
+[**SetOAuth2Client**](OAuth2Api.md#SetOAuth2Client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
+[**SetOAuth2ClientLifespans**](OAuth2Api.md#SetOAuth2ClientLifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans
+[**TrustOAuth2JwtGrantIssuer**](OAuth2Api.md#TrustOAuth2JwtGrantIssuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer
+[**VerifyUserCodeRequest**](OAuth2Api.md#VerifyUserCodeRequest) | **Put** /admin/oauth2/auth/requests/device/verify | Verifies a device grant request
+
+
 
 ## AcceptOAuth2ConsentRequest
 
-> OAuth2RedirectTo
-> AcceptOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
+> OAuth2RedirectTo AcceptOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
 
 Accept OAuth 2.0 Consent Request
+
+
 
 ### Example
 
@@ -71,15 +74,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiAcceptOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiAcceptOAuth2ConsentRequestRequest struct via the builder pattern
 
-| Name                           | Type                                                            | Description                         | Notes |
-| ------------------------------ | --------------------------------------------------------------- | ----------------------------------- | ----- |
-| **consentChallenge**           | **string**                                                      | OAuth 2.0 Consent Request Challenge |
-| **acceptOAuth2ConsentRequest** | [**AcceptOAuth2ConsentRequest**](AcceptOAuth2ConsentRequest.md) |                                     |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **consentChallenge** | **string** | OAuth 2.0 Consent Request Challenge | 
+ **acceptOAuth2ConsentRequest** | [**AcceptOAuth2ConsentRequest**](AcceptOAuth2ConsentRequest.md) |  | 
 
 ### Return type
 
@@ -94,17 +99,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## AcceptOAuth2LoginRequest
 
-> OAuth2RedirectTo
-> AcceptOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
+> OAuth2RedirectTo AcceptOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
 
 Accept OAuth 2.0 Login Request
+
+
 
 ### Example
 
@@ -136,15 +142,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiAcceptOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiAcceptOAuth2LoginRequestRequest struct via the builder pattern
 
-| Name                         | Type                                                        | Description                       | Notes |
-| ---------------------------- | ----------------------------------------------------------- | --------------------------------- | ----- |
-| **loginChallenge**           | **string**                                                  | OAuth 2.0 Login Request Challenge |
-| **acceptOAuth2LoginRequest** | [**AcceptOAuth2LoginRequest**](AcceptOAuth2LoginRequest.md) |                                   |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginChallenge** | **string** | OAuth 2.0 Login Request Challenge | 
+ **acceptOAuth2LoginRequest** | [**AcceptOAuth2LoginRequest**](AcceptOAuth2LoginRequest.md) |  | 
 
 ### Return type
 
@@ -159,17 +167,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## AcceptOAuth2LogoutRequest
 
-> OAuth2RedirectTo
-> AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
+> OAuth2RedirectTo AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 
 Accept OAuth 2.0 Session Logout Request
+
+
 
 ### Example
 
@@ -200,14 +209,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiAcceptOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiAcceptOAuth2LogoutRequestRequest struct via the builder pattern
 
-| Name                | Type       | Description                        | Notes |
-| ------------------- | ---------- | ---------------------------------- | ----- |
-| **logoutChallenge** | **string** | OAuth 2.0 Logout Request Challenge |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **string** | OAuth 2.0 Logout Request Challenge | 
 
 ### Return type
 
@@ -222,16 +233,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## CreateOAuth2Client
 
 > OAuth2Client CreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
 
 Create OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -262,14 +275,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiCreateOAuth2ClientRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiCreateOAuth2ClientRequest struct via the builder pattern
 
-| Name             | Type                                | Description                   | Notes |
-| ---------------- | ----------------------------------- | ----------------------------- | ----- |
-| **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | OAuth 2.0 Client Request Body |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | OAuth 2.0 Client Request Body | 
 
 ### Return type
 
@@ -284,16 +299,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## DeleteOAuth2Client
 
 > DeleteOAuth2Client(ctx, id).Execute()
 
 Delete OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -322,22 +339,24 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the OAuth 2.0 Client. | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDeleteOAuth2ClientRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiDeleteOAuth2ClientRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -348,16 +367,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## DeleteOAuth2Token
 
 > DeleteOAuth2Token(ctx).ClientId(clientId).Execute()
 
 Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -386,18 +407,20 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiDeleteOAuth2TokenRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiDeleteOAuth2TokenRequest struct via the builder pattern
 
-| Name         | Type       | Description         | Notes |
-| ------------ | ---------- | ------------------- | ----- |
-| **clientId** | **string** | OAuth 2.0 Client ID |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **clientId** | **string** | OAuth 2.0 Client ID | 
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -408,16 +431,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## DeleteTrustedOAuth2JwtGrantIssuer
 
 > DeleteTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
 
 Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+
 
 ### Example
 
@@ -446,22 +471,24 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the desired grant                                                 |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the desired grant | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiDeleteTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiDeleteTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -472,16 +499,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## GetOAuth2Client
 
 > OAuth2Client GetOAuth2Client(ctx, id).Execute()
 
 Get an OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -512,18 +541,20 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the OAuth 2.0 Client. | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiGetOAuth2ClientRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetOAuth2ClientRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
@@ -538,17 +569,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## GetOAuth2ConsentRequest
 
-> OAuth2ConsentRequest
-> GetOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).Execute()
+> OAuth2ConsentRequest GetOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).Execute()
 
 Get OAuth 2.0 Consent Request
+
+
 
 ### Example
 
@@ -579,14 +611,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiGetOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetOAuth2ConsentRequestRequest struct via the builder pattern
 
-| Name                 | Type       | Description                         | Notes |
-| -------------------- | ---------- | ----------------------------------- | ----- |
-| **consentChallenge** | **string** | OAuth 2.0 Consent Request Challenge |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **consentChallenge** | **string** | OAuth 2.0 Consent Request Challenge | 
 
 ### Return type
 
@@ -601,17 +635,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## GetOAuth2LoginRequest
 
-> OAuth2LoginRequest
-> GetOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).Execute()
+> OAuth2LoginRequest GetOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).Execute()
 
 Get OAuth 2.0 Login Request
+
+
 
 ### Example
 
@@ -642,14 +677,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiGetOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetOAuth2LoginRequestRequest struct via the builder pattern
 
-| Name               | Type       | Description                       | Notes |
-| ------------------ | ---------- | --------------------------------- | ----- |
-| **loginChallenge** | **string** | OAuth 2.0 Login Request Challenge |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginChallenge** | **string** | OAuth 2.0 Login Request Challenge | 
 
 ### Return type
 
@@ -664,17 +701,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## GetOAuth2LogoutRequest
 
-> OAuth2LogoutRequest
-> GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
+> OAuth2LogoutRequest GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 
 Get OAuth 2.0 Session Logout Request
+
+
 
 ### Example
 
@@ -689,7 +727,7 @@ import (
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string |
+    logoutChallenge := "logoutChallenge_example" // string | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -705,14 +743,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiGetOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetOAuth2LogoutRequestRequest struct via the builder pattern
 
-| Name                | Type       | Description | Notes |
-| ------------------- | ---------- | ----------- | ----- |
-| **logoutChallenge** | **string** |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **string** |  | 
 
 ### Return type
 
@@ -727,16 +767,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## GetTrustedOAuth2JwtGrantIssuer
 
 > TrustedOAuth2JwtGrantIssuer GetTrustedOAuth2JwtGrantIssuer(ctx, id).Execute()
 
 Get Trusted OAuth2 JWT Bearer Grant Type Issuer
+
+
 
 ### Example
 
@@ -767,18 +809,20 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the desired grant                                                 |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the desired grant | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiGetTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetTrustedOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
 
 ### Return type
 
@@ -793,17 +837,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## IntrospectOAuth2Token
 
-> IntrospectedOAuth2Token
-> IntrospectOAuth2Token(ctx).Token(token).Scope(scope).Execute()
+> IntrospectedOAuth2Token IntrospectOAuth2Token(ctx).Token(token).Scope(scope).Execute()
 
 Introspect OAuth2 Access and Refresh Tokens
+
+
 
 ### Example
 
@@ -835,15 +880,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiIntrospectOAuth2TokenRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiIntrospectOAuth2TokenRequest struct via the builder pattern
 
-| Name      | Type       | Description                                                                                                                                                                                                                               | Notes |
-| --------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **token** | **string** | The string value of the token. For access tokens, this is the \\\&quot;access_token\\\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\&quot;refresh_token\\\&quot; value returned. |
-| **scope** | **string** | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.                                                                                          |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **token** | **string** | The string value of the token. For access tokens, this is the \\\&quot;access_token\\\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\&quot;refresh_token\\\&quot; value returned. | 
+ **scope** | **string** | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. | 
 
 ### Return type
 
@@ -858,17 +905,18 @@ No authorization required
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## ListOAuth2Clients
 
-> []OAuth2Client
-> ListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
+> []OAuth2Client ListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
 
 List OAuth 2.0 Clients
+
+
 
 ### Example
 
@@ -902,17 +950,19 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiListOAuth2ClientsRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiListOAuth2ClientsRequest struct via the builder pattern
 
-| Name           | Type       | Description                                                                                                                                                                                           | Notes                      |
-| -------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| **pageSize**   | **int64**  | Items per Page This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]           |
-| **pageToken**  | **string** | Next Page Token The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).                           | [default to &quot;1&quot;] |
-| **clientName** | **string** | The name of the clients to filter by.                                                                                                                                                                 |
-| **owner**      | **string** | The owner of the clients to filter by.                                                                                                                                                                |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
+ **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
+ **clientName** | **string** | The name of the clients to filter by. | 
+ **owner** | **string** | The owner of the clients to filter by. | 
 
 ### Return type
 
@@ -927,17 +977,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## ListOAuth2ConsentSessions
 
-> []OAuth2ConsentSession
-> ListOAuth2ConsentSessions(ctx).Subject(subject).PageSize(pageSize).PageToken(pageToken).Execute()
+> []OAuth2ConsentSession ListOAuth2ConsentSessions(ctx).Subject(subject).PageSize(pageSize).PageToken(pageToken).Execute()
 
 List OAuth 2.0 Consent Sessions of a Subject
+
+
 
 ### Example
 
@@ -970,16 +1021,18 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiListOAuth2ConsentSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiListOAuth2ConsentSessionsRequest struct via the builder pattern
 
-| Name          | Type       | Description                                                                                                                                                                                           | Notes                      |
-| ------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| **subject**   | **string** | The subject to list the consent sessions for.                                                                                                                                                         |
-| **pageSize**  | **int64**  | Items per Page This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]           |
-| **pageToken** | **string** | Next Page Token The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).                           | [default to &quot;1&quot;] |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject** | **string** | The subject to list the consent sessions for. | 
+ **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
+ **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
 
 ### Return type
 
@@ -994,17 +1047,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## ListTrustedOAuth2JwtGrantIssuers
 
-> []TrustedOAuth2JwtGrantIssuer
-> ListTrustedOAuth2JwtGrantIssuers(ctx).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
+> []TrustedOAuth2JwtGrantIssuer ListTrustedOAuth2JwtGrantIssuers(ctx).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
 
 List Trusted OAuth2 JWT Bearer Grant Type Issuers
+
+
 
 ### Example
 
@@ -1037,16 +1091,18 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiListTrustedOAuth2JwtGrantIssuersRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiListTrustedOAuth2JwtGrantIssuersRequest struct via the builder pattern
 
-| Name             | Type       | Description                                                                                             | Notes |
-| ---------------- | ---------- | ------------------------------------------------------------------------------------------------------- | ----- |
-| **maxItems**     | **int64**  |                                                                                                         |
-| **defaultItems** | **int64**  |                                                                                                         |
-| **issuer**       | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **maxItems** | **int64** |  | 
+ **defaultItems** | **int64** |  | 
+ **issuer** | **string** | If optional \&quot;issuer\&quot; is supplied, only jwt-bearer grants with this issuer will be returned. | 
 
 ### Return type
 
@@ -1061,16 +1117,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## OAuth2Authorize
 
 > ErrorOAuth2 OAuth2Authorize(ctx).Execute()
 
 OAuth 2.0 Authorize Endpoint
+
+
 
 ### Example
 
@@ -1104,8 +1162,8 @@ This endpoint does not need any parameter.
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiOAuth2AuthorizeRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiOAuth2AuthorizeRequest struct via the builder pattern
+
 
 ### Return type
 
@@ -1120,17 +1178,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## Oauth2TokenExchange
 
-> OAuth2TokenExchange
-> Oauth2TokenExchange(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+> OAuth2TokenExchange Oauth2TokenExchange(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 
 The OAuth 2.0 Token Endpoint
+
+
 
 ### Example
 
@@ -1145,7 +1204,7 @@ import (
 )
 
 func main() {
-    grantType := "grantType_example" // string |
+    grantType := "grantType_example" // string | 
     clientId := "clientId_example" // string |  (optional)
     code := "code_example" // string |  (optional)
     redirectUri := "redirectUri_example" // string |  (optional)
@@ -1165,18 +1224,20 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiOauth2TokenExchangeRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiOauth2TokenExchangeRequest struct via the builder pattern
 
-| Name             | Type       | Description | Notes |
-| ---------------- | ---------- | ----------- | ----- |
-| **grantType**    | **string** |             |
-| **clientId**     | **string** |             |
-| **code**         | **string** |             |
-| **redirectUri**  | **string** |             |
-| **refreshToken** | **string** |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **grantType** | **string** |  | 
+ **clientId** | **string** |  | 
+ **code** | **string** |  | 
+ **redirectUri** | **string** |  | 
+ **refreshToken** | **string** |  | 
 
 ### Return type
 
@@ -1191,16 +1252,18 @@ struct via the builder pattern
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## PatchOAuth2Client
 
 > OAuth2Client PatchOAuth2Client(ctx, id).JsonPatch(jsonPatch).Execute()
 
 Patch OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -1232,21 +1295,21 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | The id of the OAuth 2.0 Client.                                             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of the OAuth 2.0 Client. | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiPatchOAuth2ClientRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiPatchOAuth2ClientRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**jsonPatch** | [**[]JsonPatch**](JsonPatch.md) | OAuth 2.0 Client JSON Patch
-Body |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **jsonPatch** | [**[]JsonPatch**](JsonPatch.md) | OAuth 2.0 Client JSON Patch Body | 
 
 ### Return type
 
@@ -1261,17 +1324,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## RejectOAuth2ConsentRequest
 
-> OAuth2RedirectTo
-> RejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+> OAuth2RedirectTo RejectOAuth2ConsentRequest(ctx).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject OAuth 2.0 Consent Request
+
+
 
 ### Example
 
@@ -1303,15 +1367,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiRejectOAuth2ConsentRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRejectOAuth2ConsentRequestRequest struct via the builder pattern
 
-| Name                    | Type                                              | Description                         | Notes |
-| ----------------------- | ------------------------------------------------- | ----------------------------------- | ----- |
-| **consentChallenge**    | **string**                                        | OAuth 2.0 Consent Request Challenge |
-| **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |                                     |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **consentChallenge** | **string** | OAuth 2.0 Consent Request Challenge | 
+ **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |  | 
 
 ### Return type
 
@@ -1326,17 +1392,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## RejectOAuth2LoginRequest
 
-> OAuth2RedirectTo
-> RejectOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+> OAuth2RedirectTo RejectOAuth2LoginRequest(ctx).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 
 Reject OAuth 2.0 Login Request
+
+
 
 ### Example
 
@@ -1368,15 +1435,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiRejectOAuth2LoginRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRejectOAuth2LoginRequestRequest struct via the builder pattern
 
-| Name                    | Type                                              | Description                       | Notes |
-| ----------------------- | ------------------------------------------------- | --------------------------------- | ----- |
-| **loginChallenge**      | **string**                                        | OAuth 2.0 Login Request Challenge |
-| **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |                                   |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginChallenge** | **string** | OAuth 2.0 Login Request Challenge | 
+ **rejectOAuth2Request** | [**RejectOAuth2Request**](RejectOAuth2Request.md) |  | 
 
 ### Return type
 
@@ -1391,16 +1460,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## RejectOAuth2LogoutRequest
 
 > RejectOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 
 Reject OAuth 2.0 Session Logout Request
+
+
 
 ### Example
 
@@ -1415,7 +1486,7 @@ import (
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string |
+    logoutChallenge := "logoutChallenge_example" // string | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -1429,18 +1500,20 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiRejectOAuth2LogoutRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRejectOAuth2LogoutRequestRequest struct via the builder pattern
 
-| Name                | Type       | Description | Notes |
-| ------------------- | ---------- | ----------- | ----- |
-| **logoutChallenge** | **string** |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **string** |  | 
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -1451,16 +1524,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## RevokeOAuth2ConsentSessions
 
 > RevokeOAuth2ConsentSessions(ctx).Subject(subject).Client(client).All(all).Execute()
 
 Revoke OAuth 2.0 Consent Sessions of a Subject
+
+
 
 ### Example
 
@@ -1491,20 +1566,22 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiRevokeOAuth2ConsentSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRevokeOAuth2ConsentSessionsRequest struct via the builder pattern
 
-| Name        | Type       | Description                                                                                                                  | Notes |
-| ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | ----- |
-| **subject** | **string** | OAuth 2.0 Consent Subject The subject whose consent sessions should be deleted.                                              |
-| **client**  | **string** | OAuth 2.0 Client ID If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. |
-| **all**     | **bool**   | Revoke All Consent Sessions If set to &#x60;true&#x60; deletes all consent sessions by the Subject that have been granted.   |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject** | **string** | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted. | 
+ **client** | **string** | OAuth 2.0 Client ID  If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. | 
+ **all** | **bool** | Revoke All Consent Sessions  If set to &#x60;true&#x60; deletes all consent sessions by the Subject that have been granted. | 
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -1515,16 +1592,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## RevokeOAuth2LoginSessions
 
 > RevokeOAuth2LoginSessions(ctx).Subject(subject).Execute()
 
 Revokes All OAuth 2.0 Login Sessions of a Subject
+
+
 
 ### Example
 
@@ -1553,18 +1632,20 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiRevokeOAuth2LoginSessionsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiRevokeOAuth2LoginSessionsRequest struct via the builder pattern
 
-| Name        | Type       | Description                                                          | Notes |
-| ----------- | ---------- | -------------------------------------------------------------------- | ----- |
-| **subject** | **string** | OAuth 2.0 Subject The subject to revoke authentication sessions for. |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **subject** | **string** | OAuth 2.0 Subject  The subject to revoke authentication sessions for. | 
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -1575,16 +1656,18 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## RevokeOAuth2Token
 
 > RevokeOAuth2Token(ctx).Token(token).Execute()
 
 Revoke OAuth 2.0 Access or Refresh Token
+
+
 
 ### Example
 
@@ -1599,7 +1682,7 @@ import (
 )
 
 func main() {
-    token := "token_example" // string |
+    token := "token_example" // string | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
@@ -1613,18 +1696,20 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest struct via the builder pattern
 
-| Name      | Type       | Description | Notes |
-| --------- | ---------- | ----------- | ----- |
-| **token** | **string** |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **token** | **string** |  | 
 
 ### Return type
 
-(empty response body)
+ (empty response body)
 
 ### Authorization
 
@@ -1635,16 +1720,18 @@ struct via the builder pattern
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+
 
 ## SetOAuth2Client
 
 > OAuth2Client SetOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
 
 Set OAuth 2.0 Client
+
+
 
 ### Example
 
@@ -1676,21 +1763,21 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | OAuth 2.0 Client ID                                                         |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | OAuth 2.0 Client ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiSetOAuth2ClientRequest
-struct via the builder pattern
+Other parameters are passed through a pointer to a apiSetOAuth2ClientRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | OAuth 2.0 Client
-Request Body |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) | OAuth 2.0 Client Request Body | 
 
 ### Return type
 
@@ -1705,17 +1792,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## SetOAuth2ClientLifespans
 
-> OAuth2Client SetOAuth2ClientLifespans(ctx,
-> id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
+> OAuth2Client SetOAuth2ClientLifespans(ctx, id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
 
 Set OAuth2 Client Token Lifespans
+
+
 
 ### Example
 
@@ -1747,21 +1835,21 @@ func main() {
 
 ### Path Parameters
 
-| Name    | Type                | Description                                                                 | Notes |
-| ------- | ------------------- | --------------------------------------------------------------------------- | ----- |
-| **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc. |
-| **id**  | **string**          | OAuth 2.0 Client ID                                                         |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | OAuth 2.0 Client ID | 
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiSetOAuth2ClientLifespansRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiSetOAuth2ClientLifespansRequest struct via the builder pattern
 
-| Name | Type | Description | Notes |
-| ---- | ---- | ----------- | ----- |
 
-**oAuth2ClientTokenLifespans** |
-[**OAuth2ClientTokenLifespans**](OAuth2ClientTokenLifespans.md) | |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **oAuth2ClientTokenLifespans** | [**OAuth2ClientTokenLifespans**](OAuth2ClientTokenLifespans.md) |  | 
 
 ### Return type
 
@@ -1776,17 +1864,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## TrustOAuth2JwtGrantIssuer
 
-> TrustedOAuth2JwtGrantIssuer
-> TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
+> TrustedOAuth2JwtGrantIssuer TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
 
 Trust OAuth2 JWT Bearer Grant Type Issuer
+
+
 
 ### Example
 
@@ -1818,14 +1907,16 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiTrustOAuth2JwtGrantIssuerRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiTrustOAuth2JwtGrantIssuerRequest struct via the builder pattern
 
-| Name                          | Type                                                          | Description | Notes |
-| ----------------------------- | ------------------------------------------------------------- | ----------- | ----- |
-| **trustOAuth2JwtGrantIssuer** | [**TrustOAuth2JwtGrantIssuer**](TrustOAuth2JwtGrantIssuer.md) |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **trustOAuth2JwtGrantIssuer** | [**TrustOAuth2JwtGrantIssuer**](TrustOAuth2JwtGrantIssuer.md) |  | 
 
 ### Return type
 
@@ -1840,17 +1931,18 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
+
 ## VerifyUserCodeRequest
 
-> OAuth2RedirectTo
-> VerifyUserCodeRequest(ctx).DeviceChallenge(deviceChallenge).VerifyUserCodeRequest(verifyUserCodeRequest).Execute()
+> OAuth2RedirectTo VerifyUserCodeRequest(ctx).DeviceChallenge(deviceChallenge).VerifyUserCodeRequest(verifyUserCodeRequest).Execute()
 
 Verifies a device grant request
+
+
 
 ### Example
 
@@ -1865,7 +1957,7 @@ import (
 )
 
 func main() {
-    deviceChallenge := "deviceChallenge_example" // string |
+    deviceChallenge := "deviceChallenge_example" // string | 
     verifyUserCodeRequest := *openapiclient.NewVerifyUserCodeRequest() // VerifyUserCodeRequest |  (optional)
 
     configuration := openapiclient.NewConfiguration()
@@ -1882,15 +1974,17 @@ func main() {
 
 ### Path Parameters
 
+
+
 ### Other Parameters
 
-Other parameters are passed through a pointer to a
-apiVerifyUserCodeRequestRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiVerifyUserCodeRequestRequest struct via the builder pattern
 
-| Name                      | Type                                                  | Description | Notes |
-| ------------------------- | ----------------------------------------------------- | ----------- | ----- |
-| **deviceChallenge**       | **string**                                            |             |
-| **verifyUserCodeRequest** | [**VerifyUserCodeRequest**](VerifyUserCodeRequest.md) |             |
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **deviceChallenge** | **string** |  | 
+ **verifyUserCodeRequest** | [**VerifyUserCodeRequest**](VerifyUserCodeRequest.md) |  | 
 
 ### Return type
 
@@ -1905,7 +1999,7 @@ No authorization required
 - **Content-Type**: application/json
 - **Accept**: application/json
 
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
+

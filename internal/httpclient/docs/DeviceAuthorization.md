@@ -2,14 +2,14 @@
 
 ## Properties
 
-| Name                        | Type                  | Description                                                                                                                                                                                | Notes      |
-| --------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| **DeviceCode**              | Pointer to **string** | The device verification code.                                                                                                                                                              | [optional] |
-| **ExpiresIn**               | Pointer to **int64**  | The lifetime in seconds of the \&quot;device_code\&quot; and \&quot;user_code\&quot;.                                                                                                      | [optional] |
-| **Interval**                | Pointer to **int64**  | The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint. If no value is provided, clients MUST use 5 as the default.              | [optional] |
-| **UserCode**                | Pointer to **string** | The end-user verification code.                                                                                                                                                            | [optional] |
-| **VerificationUri**         | Pointer to **string** | The end-user verification URI on the authorization server. The URI should be short and easy to remember as end users will be asked to manually type it into their user agent.              | [optional] |
-| **VerificationUriComplete** | Pointer to **string** | A verification URI that includes the \&quot;user_code\&quot; (or other information with the same function as the \&quot;user_code\&quot;), which is designed for non-textual transmission. | [optional] |
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**DeviceCode** | Pointer to **string** | The device verification code. | [optional] 
+**ExpiresIn** | Pointer to **int64** | The lifetime in seconds of the \&quot;device_code\&quot; and \&quot;user_code\&quot;. | [optional] 
+**Interval** | Pointer to **int64** | The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.  If no value is provided, clients MUST use 5 as the default. | [optional] 
+**UserCode** | Pointer to **string** | The end-user verification code. | [optional] 
+**VerificationUri** | Pointer to **string** | The end-user verification URI on the authorization server.  The URI should be short and easy to remember as end users will be asked to manually type it into their user agent. | [optional] 
+**VerificationUriComplete** | Pointer to **string** | A verification URI that includes the \&quot;user_code\&quot; (or other information with the same function as the \&quot;user_code\&quot;), which is designed for non-textual transmission. | [optional] 
 
 ## Methods
 
@@ -17,18 +17,18 @@
 
 `func NewDeviceAuthorization() *DeviceAuthorization`
 
-NewDeviceAuthorization instantiates a new DeviceAuthorization object This
-constructor will assign default values to properties that have it defined, and
-makes sure properties required by API are set, but the set of arguments will
-change when the set of required properties is changed
+NewDeviceAuthorization instantiates a new DeviceAuthorization object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
 ### NewDeviceAuthorizationWithDefaults
 
 `func NewDeviceAuthorizationWithDefaults() *DeviceAuthorization`
 
 NewDeviceAuthorizationWithDefaults instantiates a new DeviceAuthorization object
-This constructor will only assign default values to properties that have it
-defined, but it doesn't guarantee that properties required by API are set
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetDeviceCode
 
@@ -40,8 +40,8 @@ GetDeviceCode returns the DeviceCode field if non-nil, zero value otherwise.
 
 `func (o *DeviceAuthorization) GetDeviceCodeOk() (*string, bool)`
 
-GetDeviceCodeOk returns a tuple with the DeviceCode field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetDeviceCodeOk returns a tuple with the DeviceCode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetDeviceCode
 
@@ -65,8 +65,8 @@ GetExpiresIn returns the ExpiresIn field if non-nil, zero value otherwise.
 
 `func (o *DeviceAuthorization) GetExpiresInOk() (*int64, bool)`
 
-GetExpiresInOk returns a tuple with the ExpiresIn field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetExpiresInOk returns a tuple with the ExpiresIn field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetExpiresIn
 
@@ -90,8 +90,8 @@ GetInterval returns the Interval field if non-nil, zero value otherwise.
 
 `func (o *DeviceAuthorization) GetIntervalOk() (*int64, bool)`
 
-GetIntervalOk returns a tuple with the Interval field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetIntervalOk returns a tuple with the Interval field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetInterval
 
@@ -115,8 +115,8 @@ GetUserCode returns the UserCode field if non-nil, zero value otherwise.
 
 `func (o *DeviceAuthorization) GetUserCodeOk() (*string, bool)`
 
-GetUserCodeOk returns a tuple with the UserCode field if it's non-nil, zero
-value otherwise and a boolean to check if the value has been set.
+GetUserCodeOk returns a tuple with the UserCode field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetUserCode
 
@@ -134,15 +134,14 @@ HasUserCode returns a boolean if a field has been set.
 
 `func (o *DeviceAuthorization) GetVerificationUri() string`
 
-GetVerificationUri returns the VerificationUri field if non-nil, zero value
-otherwise.
+GetVerificationUri returns the VerificationUri field if non-nil, zero value otherwise.
 
 ### GetVerificationUriOk
 
 `func (o *DeviceAuthorization) GetVerificationUriOk() (*string, bool)`
 
-GetVerificationUriOk returns a tuple with the VerificationUri field if it's
-non-nil, zero value otherwise and a boolean to check if the value has been set.
+GetVerificationUriOk returns a tuple with the VerificationUri field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetVerificationUri
 
@@ -160,16 +159,14 @@ HasVerificationUri returns a boolean if a field has been set.
 
 `func (o *DeviceAuthorization) GetVerificationUriComplete() string`
 
-GetVerificationUriComplete returns the VerificationUriComplete field if non-nil,
-zero value otherwise.
+GetVerificationUriComplete returns the VerificationUriComplete field if non-nil, zero value otherwise.
 
 ### GetVerificationUriCompleteOk
 
 `func (o *DeviceAuthorization) GetVerificationUriCompleteOk() (*string, bool)`
 
-GetVerificationUriCompleteOk returns a tuple with the VerificationUriComplete
-field if it's non-nil, zero value otherwise and a boolean to check if the value
-has been set.
+GetVerificationUriCompleteOk returns a tuple with the VerificationUriComplete field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
 
 ### SetVerificationUriComplete
 
@@ -183,6 +180,7 @@ SetVerificationUriComplete sets VerificationUriComplete field to given value.
 
 HasVerificationUriComplete returns a boolean if a field has been set.
 
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to README]](../README.md)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

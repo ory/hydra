@@ -113,6 +113,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.GET(DeviceAuthPath, h.performOAuth2DeviceAuthorizationFlow)
 	// This is only a shorthand to avoid people to type a long url;
 	public.GET(h.c.DeviceInternalURL(context.Background()).Path, h.performOAuth2DeviceAuthorizationFlow)
+	// This endpoint should be call on the device side
 	public.POST(DeviceAuthPath, h.performOAuth2DeviceFlow)
 }
 

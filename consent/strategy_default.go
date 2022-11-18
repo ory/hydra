@@ -236,7 +236,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 	}
 
 	// Set the session
-	cl := sanitizeClientFromRequest(ar)
+	cl := sanitizeClientFromRequest(req)
 	if err := s.r.ConsentManager().CreateLoginRequest(
 		r.Context(),
 		&LoginRequest{
@@ -548,7 +548,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 	challenge := strings.Replace(uuid.New(), "-", "", -1)
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
-	cl := sanitizeClientFromRequest(ar)
+	cl := sanitizeClientFromRequest(req)
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		r.Context(),
 		&OAuth2ConsentRequest{
@@ -1006,6 +1006,7 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	iu := s.c.OAuth2DeviceAuthorisationURL(ctx)
 	iu.RawQuery = r.URL.RawQuery
 
+	cl := sanitizeClientFromRequest(req)
 	if err := s.r.ConsentManager().CreateDeviceGrantRequest(
 		r.Context(),
 		&DeviceGrantRequest{
@@ -1018,7 +1019,8 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameDeviceVerifyCSRF(ctx), csrf); err != nil {
+	clientSpecificCookieNameDeviceCSRF := fmt.Sprintf("%s_%d", s.r.Config().CookieNameConsentCSRF(ctx), murmur3.Sum32(cl.ID.Bytes()))
+	if err := createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(ctx), clientSpecificCookieNameDeviceCSRF, csrf, s.c.ConsentRequestMaxAge(ctx)); err != nil {
 		return errorsx.WithStack(err)
 	}
 

@@ -614,6 +614,10 @@ type revokeOAuth2Token struct {
 	// in: formData
 	// required: true
 	Token string `json:"token"`
+	// in: formData
+	ClientID string `json:"client_id"`
+	// in: formData
+	ClientSecret string `json:"client_secret"`
 }
 
 // swagger:route POST /oauth2/revoke oAuth2 revokeOAuth2Token

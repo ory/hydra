@@ -1870,6 +1870,16 @@
             "name": "token",
             "in": "formData",
             "required": true
+          },
+          {
+            "type": "string",
+            "name": "client_id",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "name": "client_secret",
+            "in": "formData"
           }
         ],
         "responses": {

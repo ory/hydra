@@ -1662,7 +1662,7 @@ No authorization required
 
 ## RevokeOAuth2Token
 
-> RevokeOAuth2Token(ctx).Token(token).Execute()
+> RevokeOAuth2Token(ctx).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
 
 Revoke OAuth 2.0 Access or Refresh Token
 
@@ -1682,10 +1682,12 @@ import (
 
 func main() {
     token := "token_example" // string | 
+    clientId := "clientId_example" // string |  (optional)
+    clientSecret := "clientSecret_example" // string |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).Execute()
+    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2Token``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1705,6 +1707,8 @@ Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **token** | **string** |  | 
+ **clientId** | **string** |  | 
+ **clientSecret** | **string** |  | 
 
 ### Return type
 

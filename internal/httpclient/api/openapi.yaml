@@ -4136,6 +4136,12 @@ components:
       type: object
     revokeOAuth2Token_request:
       properties:
+        client_id:
+          type: string
+          x-formData-name: client_id
+        client_secret:
+          type: string
+          x-formData-name: client_secret
         token:
           required:
           - token

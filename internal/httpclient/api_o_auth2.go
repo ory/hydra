@@ -3065,13 +3065,25 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 }
 
 type ApiRevokeOAuth2TokenRequest struct {
-	ctx        context.Context
-	ApiService *OAuth2ApiService
-	token      *string
+	ctx          context.Context
+	ApiService   *OAuth2ApiService
+	token        *string
+	clientId     *string
+	clientSecret *string
 }
 
 func (r ApiRevokeOAuth2TokenRequest) Token(token string) ApiRevokeOAuth2TokenRequest {
 	r.token = &token
+	return r
+}
+
+func (r ApiRevokeOAuth2TokenRequest) ClientId(clientId string) ApiRevokeOAuth2TokenRequest {
+	r.clientId = &clientId
+	return r
+}
+
+func (r ApiRevokeOAuth2TokenRequest) ClientSecret(clientSecret string) ApiRevokeOAuth2TokenRequest {
+	r.clientSecret = &clientSecret
 	return r
 }
 
@@ -3135,6 +3147,12 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.clientId != nil {
+		localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
+	}
+	if r.clientSecret != nil {
+		localVarFormParams.Add("client_secret", parameterToString(*r.clientSecret, ""))
 	}
 	localVarFormParams.Add("token", parameterToString(*r.token, ""))
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)

@@ -141,23 +141,40 @@ func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *
     var total = {{ len .FrontChannelLogoutURLs }};
     var redir = {{ .RedirectTo }};
 
+	var timeouts = [];
+	var redirected = false;
+	// Cancel all pending timeouts to avoid to call the frontchannel multiple times.
+	window.onbeforeunload = () => {
+		redirected = true;
+		for (var i=0; i<timeouts.length; i++) {
+			clearTimeout(timeouts[i]);
+		}
+		timeouts = [];
+	};
+	function setAndRegisterTimeout(fct, duration) {
+		if (redirected) {
+			return;
+		}
+		timeouts.push(setTimeout(fct, duration));
+	}
+
 	function redirect() {
 		window.location.replace(redir);
 
 		// In case replace failed try href
-		setTimeout(function () {
+		setAndRegisterTimeout(function () {
 			window.location.href = redir;
-		}, 250); // Show message after http-equiv="refresh"
+		}, 250);
 	}
 
     function done() {
         total--;
         if (total < 1) {
-			setTimeout(redirect, 500);
+			setAndRegisterTimeout(redirect, 500);
         }
     }
 
-	setTimeout(redirect, 7000); // redirect after 5 seconds if e.g. an iframe doesn't load
+	setAndRegisterTimeout(redirect, 7000); // redirect after 7 seconds if e.g. an iframe doesn't load
 
 	// If the redirect takes unusually long, show a message
 	setTimeout(function () {

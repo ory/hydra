@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-12-01)](#000-2022-12-01)
+- [0.0.0 (2022-12-05)](#000-2022-12-05)
     - [Bug Fixes](#bug-fixes)
 - [2.0.2 (2022-11-10)](#202-2022-11-10)
     - [Bug Fixes](#bug-fixes-1)
@@ -660,13 +660,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.2...v0.0.0) (2022-12-01)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.2...v0.0.0) (2022-12-05)
 
 
 ### Bug Fixes
 
 * Add `client_id` and `client_secret` to `revokeOAuth2Token` ([#3373](https://github.com/ory/hydra/issues/3373)) ([93bac07](https://github.com/ory/hydra/commit/93bac074b3f7bd347c329377bf8c14aed7f43c00))
 * Introspect command CLI example ([#3353](https://github.com/ory/hydra/issues/3353)) ([4ee4456](https://github.com/ory/hydra/commit/4ee4456d884ef6925a74c26768537e9a1ca8a9a6))
+* Prevent multiple redirections to post logout url ([#3366](https://github.com/ory/hydra/issues/3366)) ([50666b9](https://github.com/ory/hydra/commit/50666b96ef28a019f5dfd9758f50c0023ad4ae05)), closes [#3342](https://github.com/ory/hydra/issues/3342)
 * Strip `public` from schema ([#3374](https://github.com/ory/hydra/issues/3374)) ([3831b44](https://github.com/ory/hydra/commit/3831b4482a525cf67b519064bfefd45fe9f3cbd3)), closes [#3367](https://github.com/ory/hydra/issues/3367)
 
 

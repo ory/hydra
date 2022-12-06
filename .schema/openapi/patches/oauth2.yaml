@@ -27,17 +27,7 @@
         format: date-time
         type: string
 
-- op: replace
-  path: /components/schemas/nullDuration
-  value:
-    title: "Time duration"
-    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
-    type: string
-    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-- op: replace
+- op: remove
   path: /components/schemas/NullDuration
-  value:
-    title: "Time duration"
-    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
-    type: string
-    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+- op: remove
+  path: /components/schemas/Duration

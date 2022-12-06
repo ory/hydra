@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**AuthorizationCodeGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**ClientCredentialsGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**ImplicitGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**ImplicitGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**RefreshTokenGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**RefreshTokenGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**RefreshTokenGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | OAuth2 Authorization Code Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client. | [optional] 
+**AuthorizationCodeGrantIdTokenLifespan** | Pointer to **string** | OAuth2 Authorization Code Grant Access ID Lifespan  The lifespan of an ID token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client. | [optional] 
+**AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string** | OAuth2 Authorization Code Grant Access Refresh Lifespan  The lifespan of a refresh token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client. | [optional] 
+**ClientCredentialsGrantAccessTokenLifespan** | Pointer to **string** | OAuth2 Client Credentials Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth 2.0 Client Credentials Grant for this OAuth 2.0 Client. | [optional] 
+**ImplicitGrantAccessTokenLifespan** | Pointer to **string** | OpenID Connect Implicit Grant Access Token Lifespan  The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client. | [optional] 
+**ImplicitGrantIdTokenLifespan** | Pointer to **string** | OpenID Connect Implicit Grant ID Token Lifespan  The lifespan of an ID token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client. | [optional] 
+**JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | OpenID Connect Implicit Grant Access Token Lifespan  The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client. | [optional] 
+**RefreshTokenGrantAccessTokenLifespan** | Pointer to **string** | OAuth2 2.0 Refresh Token Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client. | [optional] 
+**RefreshTokenGrantIdTokenLifespan** | Pointer to **string** | OAuth2 2.0 Refresh Token Grant ID Token Lifespan  The lifespan of an ID token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client. | [optional] 
+**RefreshTokenGrantRefreshTokenLifespan** | Pointer to **string** | OAuth2 2.0 Refresh Token Grant Refresh Token Lifespan  The lifespan of a refresh token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client. | [optional] 
 
 ## Methods
 

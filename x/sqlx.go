@@ -70,15 +70,11 @@ func (ns *Duration) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// swagger:model NullDuration
-type swaggerNullDuration string
-
 // NullDuration represents a nullable JSON and SQL compatible time.Duration.
 //
-// TODO delete this type and replace it with ory/x/sqlxx/NullDuration when applying the custom client token TTL patch to Hydra 2.x
-//
-// swagger:ignore
+// swagger:strfmt duration
 type NullDuration struct {
+	// TODO delete this type and replace with ory/x/sqlxx.NullDuration
 	Duration time.Duration
 	Valid    bool
 }

@@ -17,25 +17,25 @@ import (
 
 // OAuth2ClientTokenLifespans Lifespans of different token types issued for this OAuth 2.0 Client.
 type OAuth2ClientTokenLifespans struct {
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 Authorization Code Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
 	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 Authorization Code Grant Access ID Lifespan  The lifespan of an ID token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
 	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 Authorization Code Grant Access Refresh Lifespan  The lifespan of a refresh token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
 	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 Client Credentials Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth 2.0 Client Credentials Grant for this OAuth 2.0 Client.
 	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OpenID Connect Implicit Grant Access Token Lifespan  The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
 	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OpenID Connect Implicit Grant ID Token Lifespan  The lifespan of an ID token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
 	ImplicitGrantIdTokenLifespan *string `json:"implicit_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OpenID Connect Implicit Grant Access Token Lifespan  The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
 	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 2.0 Refresh Token Grant Access Token Lifespan  The lifespan of an access token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
 	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 2.0 Refresh Token Grant ID Token Lifespan  The lifespan of an ID token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
 	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// OAuth2 2.0 Refresh Token Grant Refresh Token Lifespan  The lifespan of a refresh token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
 	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
 }
 

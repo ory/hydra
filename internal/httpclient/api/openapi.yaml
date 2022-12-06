@@ -1753,11 +1753,6 @@ components:
     NullBool:
       nullable: true
       type: boolean
-    NullDuration:
-      description: "Specify a time duration in milliseconds, seconds, minutes, hours."
-      pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-      title: Time duration
-      type: string
     NullInt:
       nullable: true
       type: integer
@@ -2400,22 +2395,25 @@ components:
             \ JSON for SQL storage."
           type: array
         authorization_code_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         authorization_code_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access ID Lifespan
+
+            The lifespan of an ID token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         authorization_code_grant_refresh_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access Refresh Lifespan
+
+            The lifespan of a refresh token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         backchannel_logout_session_required:
           description: "OpenID Connect Back-Channel Logout Session Required\n\nBoolean\
@@ -2431,10 +2429,11 @@ components:
             RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
           type: string
         client_credentials_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Client Credentials Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth 2.0 Client Credentials Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         client_id:
           description: |-
@@ -2501,16 +2500,18 @@ components:
             \ JSON for SQL storage."
           type: array
         implicit_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         implicit_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant ID Token Lifespan
+
+            The lifespan of an ID token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         jwks:
           description: "OAuth 2.0 Client JSON Web Key Set\n\nClient's JSON Web Key\
@@ -2540,10 +2541,11 @@ components:
             \ certificate."
           type: string
         jwt_bearer_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         logo_uri:
           description: |-
@@ -2579,22 +2581,25 @@ components:
             \ JSON for SQL storage."
           type: array
         refresh_token_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         refresh_token_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant ID Token Lifespan
+
+            The lifespan of an ID token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         refresh_token_grant_refresh_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant Refresh Token Lifespan
+
+            The lifespan of a refresh token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         registration_access_token:
           description: "OpenID Connect Dynamic Client Registration Access Token\n\n\
@@ -2689,64 +2694,74 @@ components:
       description: Lifespans of different token types issued for this OAuth 2.0 Client.
       properties:
         authorization_code_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         authorization_code_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access ID Lifespan
+
+            The lifespan of an ID token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         authorization_code_grant_refresh_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Authorization Code Grant Access Refresh Lifespan
+
+            The lifespan of a refresh token issued by the OAuth 2.0 Authorization Code Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         client_credentials_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 Client Credentials Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth 2.0 Client Credentials Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         implicit_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         implicit_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant ID Token Lifespan
+
+            The lifespan of an ID token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         jwt_bearer_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OpenID Connect Implicit Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OpenID Connect Implicit Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         refresh_token_grant_access_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant Access Token Lifespan
+
+            The lifespan of an access token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         refresh_token_grant_id_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant ID Token Lifespan
+
+            The lifespan of an ID token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
         refresh_token_grant_refresh_token_lifespan:
-          description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
-          title: Time duration
+          description: |-
+            OAuth2 2.0 Refresh Token Grant Refresh Token Lifespan
+
+            The lifespan of a refresh token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
+          format: duration
           type: string
       title: OAuth 2.0 Client Token Lifespans
       type: object

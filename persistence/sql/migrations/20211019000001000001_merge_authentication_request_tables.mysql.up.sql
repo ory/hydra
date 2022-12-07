@@ -97,3 +97,28 @@ LEFT JOIN hydra_oauth2_consent_request
 ON hydra_oauth2_authentication_request.challenge = hydra_oauth2_consent_request.login_challenge
 LEFT JOIN hydra_oauth2_consent_request_handled
 ON hydra_oauth2_consent_request.challenge = hydra_oauth2_consent_request_handled.challenge;
+
+UPDATE hydra_oauth2_access AS t1
+SET challenge_id = NULL
+WHERE challenge_id IS NOT NULL
+  AND NOT exists(SELECT NULL FROM hydra_oauth2_flow t2 WHERE t1.challenge_id = t2.consent_challenge_id);
+
+UPDATE hydra_oauth2_code AS t1
+SET challenge_id = NULL
+WHERE challenge_id IS NOT NULL
+  AND NOT exists(SELECT NULL FROM hydra_oauth2_flow t2 WHERE t1.challenge_id = t2.consent_challenge_id);
+
+UPDATE hydra_oauth2_oidc AS t1
+SET challenge_id = NULL
+WHERE challenge_id IS NOT NULL
+  AND NOT exists(SELECT NULL FROM hydra_oauth2_flow t2 WHERE t1.challenge_id = t2.consent_challenge_id);
+
+UPDATE hydra_oauth2_refresh AS t1
+SET challenge_id = NULL
+WHERE challenge_id IS NOT NULL
+  AND NOT exists(SELECT NULL FROM hydra_oauth2_flow t2 WHERE t1.challenge_id = t2.consent_challenge_id);
+
+UPDATE hydra_oauth2_pkce AS t1
+SET challenge_id = NULL
+WHERE challenge_id IS NOT NULL
+  AND NOT exists(SELECT NULL FROM hydra_oauth2_flow t2 WHERE t1.challenge_id = t2.consent_challenge_id);

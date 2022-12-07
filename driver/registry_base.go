@@ -309,9 +309,14 @@ func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	return m.kc
 }
 
-func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
+func (m *RegistryBase) CookieStore(ctx context.Context) (sessions.Store, error) {
 	var keys [][]byte
-	for _, k := range m.conf.GetCookieSecrets(ctx) {
+	secrets, err := m.conf.GetCookieSecrets(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, k := range secrets {
 		encrypt := sha256.Sum256(k)
 		keys = append(keys, k, encrypt[:])
 	}
@@ -335,7 +340,7 @@ func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
 		cs.Options.SameSite = sameSite
 	}
 
-	return cs
+	return cs, nil
 }
 
 func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {

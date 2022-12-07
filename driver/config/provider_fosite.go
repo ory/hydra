@@ -8,48 +8,38 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/cmdx"
 )
 
 var _ fosite.GlobalSecretProvider = (*DefaultProvider)(nil)
 
-func (p *DefaultProvider) GetGlobalSecret(ctx context.Context) []byte {
+func (p *DefaultProvider) GetGlobalSecret(ctx context.Context) ([]byte, error) {
 	secrets := p.getProvider(ctx).Strings(KeyGetSystemSecret)
 
 	if len(secrets) == 0 {
-		if p.generatedSecret != nil {
-			return p.generatedSecret
-		}
-
-		p.l.Warnf("Configuration secrets.system is not set, generating a temporary, random secret...")
-		secret, err := x.GenerateSecret(32)
-		cmdx.Must(err, "Could not generate secret: %s", err)
-
-		p.l.Warnf("Generated secret: %s", secret)
-		p.generatedSecret = x.HashByteSecret(secret)
-
-		p.l.Warnln("Do not use generate secrets in production. The secret will be leaked to the logs.")
-		return x.HashByteSecret(secret)
+		p.l.Error("The system secret is not configured. Please provide one in the configuration file or environment variables.")
+		return nil, errors.New("global secret is not configured")
 	}
 
 	secret := secrets[0]
-	if len(secret) >= 16 {
-		return x.HashStringSecret(secret)
+	if len(secret) < 16 {
+		p.l.Errorf("System secret must be undefined or have at least 16 characters but only has %d characters.", len(secret))
+		return nil, errors.New("global secret is too short")
 	}
 
-	p.l.Fatalf("System secret must be undefined or have at least 16 characters but only has %d characters.", len(secret))
-	return nil
+	return x.HashStringSecret(secret), nil
 }
 
 var _ fosite.RotatedGlobalSecretsProvider = (*DefaultProvider)(nil)
 
-func (p *DefaultProvider) GetRotatedGlobalSecrets(ctx context.Context) [][]byte {
+func (p *DefaultProvider) GetRotatedGlobalSecrets(ctx context.Context) ([][]byte, error) {
 	secrets := p.getProvider(ctx).Strings(KeyGetSystemSecret)
 
 	if len(secrets) < 2 {
-		return nil
+		return nil, nil
 	}
 
 	var rotated [][]byte
@@ -57,7 +47,7 @@ func (p *DefaultProvider) GetRotatedGlobalSecrets(ctx context.Context) [][]byte 
 		rotated = append(rotated, x.HashStringSecret(secret))
 	}
 
-	return rotated
+	return rotated, nil
 }
 
 var _ fosite.BCryptCostProvider = (*DefaultProvider)(nil)

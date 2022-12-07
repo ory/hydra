@@ -313,17 +313,21 @@ func (p *DefaultProvider) Tracing() *otelx.Config {
 	return p.getProvider(contextx.RootContext).TracingConfig("Ory Hydra")
 }
 
-func (p *DefaultProvider) GetCookieSecrets(ctx context.Context) [][]byte {
+func (p *DefaultProvider) GetCookieSecrets(ctx context.Context) ([][]byte, error) {
 	secrets := p.getProvider(ctx).Strings(KeyGetCookieSecrets)
 	if len(secrets) == 0 {
-		return [][]byte{p.GetGlobalSecret(ctx)}
+		secret, err := p.GetGlobalSecret(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return [][]byte{secret}, nil
 	}
 
 	bs := make([][]byte, len(secrets))
 	for k := range secrets {
 		bs[k] = []byte(secrets[k])
 	}
-	return bs
+	return bs, nil
 }
 
 func (p *DefaultProvider) LogoutRedirectURL(ctx context.Context) *url.URL {

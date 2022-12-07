@@ -30,7 +30,17 @@ func aeadKey(key []byte) *[32]byte {
 }
 
 func (c *AEAD) Encrypt(ctx context.Context, plaintext []byte) (string, error) {
-	keys := append([][]byte{c.c.GetGlobalSecret(ctx)}, c.c.GetRotatedGlobalSecrets(ctx)...)
+	global, err := c.c.GetGlobalSecret(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	rotated, err := c.c.GetRotatedGlobalSecrets(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	keys := append([][]byte{global}, rotated...)
 	if len(keys) == 0 {
 		return "", errors.Errorf("at least one encryption key must be defined but none were")
 	}
@@ -48,7 +58,17 @@ func (c *AEAD) Encrypt(ctx context.Context, plaintext []byte) (string, error) {
 }
 
 func (c *AEAD) Decrypt(ctx context.Context, ciphertext string) (p []byte, err error) {
-	keys := append([][]byte{c.c.GetGlobalSecret(ctx)}, c.c.GetRotatedGlobalSecrets(ctx)...)
+	global, err := c.c.GetGlobalSecret(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	rotated, err := c.c.GetRotatedGlobalSecrets(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	keys := append([][]byte{global}, rotated...)
 	if len(keys) == 0 {
 		return nil, errors.Errorf("at least one decryption key must be defined but none were")
 	}

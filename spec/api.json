@@ -2796,6 +2796,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "The login session id to list the consent sessions for.",
+            "in": "query",
+            "name": "login_session_id",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

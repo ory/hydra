@@ -149,6 +149,11 @@ type listOAuth2ConsentSessions struct {
 	// in: query
 	// required: true
 	Subject string `json:"subject"`
+	// The login session id to list the consent sessions for.
+	//
+	// in: query
+	// required: false
+	LoginSessionId string `json:"login_session_id"`
 }
 
 // swagger:route GET /admin/oauth2/auth/sessions/consent oAuth2 listOAuth2ConsentSessions
@@ -176,9 +181,17 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
 		return
 	}
+	loginSessionId := r.URL.Query().Get("login_session_id")
 
 	page, itemsPerPage := x.ParsePagination(r)
-	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, itemsPerPage, itemsPerPage*page)
+
+	var s []AcceptOAuth2ConsentRequest
+	var err error
+	if len(loginSessionId) == 0 {
+		s, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, itemsPerPage, itemsPerPage*page)
+	} else {
+		s, err = h.r.ConsentManager().FindSubjectsSessionGrantedConsentRequests(r.Context(), subject, loginSessionId, itemsPerPage, itemsPerPage*page)
+	}
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		h.r.Writer().Write(w, r, []OAuth2ConsentSession{})
 		return

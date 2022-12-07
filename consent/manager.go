@@ -33,6 +33,7 @@ type Manager interface {
 	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*AcceptOAuth2ConsentRequest, error)
 	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]AcceptOAuth2ConsentRequest, error)
 	FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]AcceptOAuth2ConsentRequest, error)
+	FindSubjectsSessionGrantedConsentRequests(ctx context.Context, user, sid string, limit, offset int) ([]AcceptOAuth2ConsentRequest, error)
 	CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 	// Cookie management

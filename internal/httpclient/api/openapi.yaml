@@ -1104,6 +1104,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: The login session id to list the consent sessions for.
+        explode: true
+        in: query
+        name: login_session_id
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:

@@ -667,7 +667,20 @@
 ### Bug Fixes
 
 * Add `client_id` and `client_secret` to `revokeOAuth2Token` ([#3373](https://github.com/ory/hydra/issues/3373)) ([93bac07](https://github.com/ory/hydra/commit/93bac074b3f7bd347c329377bf8c14aed7f43c00))
+* Docker build ([48217bd](https://github.com/ory/hydra/commit/48217bd203af9467eae570b2c47c777a6c1e929b))
 * Introspect command CLI example ([#3353](https://github.com/ory/hydra/issues/3353)) ([4ee4456](https://github.com/ory/hydra/commit/4ee4456d884ef6925a74c26768537e9a1ca8a9a6))
+* Invalidate tokens with inconsistent state ([#3385](https://github.com/ory/hydra/issues/3385)) ([542ea77](https://github.com/ory/hydra/commit/542ea771c9740a1ebf5bc0006cb59e9eaff688d2)), closes [#3346](https://github.com/ory/hydra/issues/3346):
+
+    This patch includes SQL migrations targeting environments which have not yet migrated to Ory Hydra 2.0. It removes inconsistent records which resolves issues during the migrations process. Please be aware that some users might be affected by this change. They might need to re-authorize certain apps. However, most active records should not be affected by this.
+    
+    Installations already on Ory Hydra 2.0 will not be affected by this change.
+
+* No longer auto-generate system secret ([c5fe043](https://github.com/ory/hydra/commit/c5fe0433be88dc3cbcd09b8c85c3a90819109681)):
+
+    This patch changes Ory Hydra's behavior to no longer auto-generate a temporary secret when no global secret was set. The APIs now return an error instead.
+    
+    See https://github.com/ory/network/issues/185
+
 * Prevent multiple redirections to post logout url ([#3366](https://github.com/ory/hydra/issues/3366)) ([50666b9](https://github.com/ory/hydra/commit/50666b96ef28a019f5dfd9758f50c0023ad4ae05)), closes [#3342](https://github.com/ory/hydra/issues/3342)
 * Strip `public` from schema ([#3374](https://github.com/ory/hydra/issues/3374)) ([3831b44](https://github.com/ory/hydra/commit/3831b4482a525cf67b519064bfefd45fe9f3cbd3)), closes [#3367](https://github.com/ory/hydra/issues/3367)
 

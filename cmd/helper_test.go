@@ -33,5 +33,5 @@ func TestGetPageToken(t *testing.T) {
 	u, _ := url.Parse("https://example.com/foobar")
 	rec := httptest.NewRecorder()
 	tokenpagination.PaginationHeader(rec, u, 100, 3, 10)
-	assert.Equal(t, `eyJwYWdlIjoiNDAiLCJ2IjoxfQ`, getPageToken(rec.Result()), rec.Result().Header.Get("Link"))
+	assert.Equal(t, `eyJvZmZzZXQiOiI0MCIsInYiOjJ9`, getPageToken(rec.Result()), rec.Result().Header.Get("Link"))
 }

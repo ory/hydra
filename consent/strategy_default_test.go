@@ -94,7 +94,9 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	require.NoError(t, err)
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	cookie, _ := reg.CookieStore(ctx).Get(hr, reg.Config().SessionCookieName(ctx))
+	s, err := reg.CookieStore(ctx)
+	require.NoError(t, err)
+	cookie, _ := s.Get(hr, reg.Config().SessionCookieName(ctx))
 
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.HttpOnly = true

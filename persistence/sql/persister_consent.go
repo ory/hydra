@@ -519,6 +519,41 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 	return p.filterExpiredConsentRequests(ctx, rs)
 }
 
+func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, limit, offset int) ([]consent.AcceptOAuth2ConsentRequest, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests")
+	defer span.End()
+
+	var fs []flow.Flow
+	c := p.Connection(ctx)
+
+	if err := c.
+		Where(
+			strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+login_session_id = ? AND
+consent_skip=FALSE AND
+consent_error='{}' AND
+nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+			)),
+			subject, sid, p.NetworkID(ctx)).
+		Order("requested_at DESC").
+		Paginate(offset/limit+1, limit).
+		All(&fs); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	var rs []consent.AcceptOAuth2ConsentRequest
+	for _, f := range fs {
+		rs = append(rs, *f.GetHandledConsentRequest())
+	}
+
+	return p.filterExpiredConsentRequests(ctx, rs)
+}
+
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountSubjectsGrantedConsentRequests")
 	defer span.End()

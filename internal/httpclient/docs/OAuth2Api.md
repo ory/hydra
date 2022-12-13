@@ -984,7 +984,7 @@ No authorization required
 
 ## ListOAuth2ConsentSessions
 
-> []OAuth2ConsentSession ListOAuth2ConsentSessions(ctx).Subject(subject).PageSize(pageSize).PageToken(pageToken).Execute()
+> []OAuth2ConsentSession ListOAuth2ConsentSessions(ctx).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
 
 List OAuth 2.0 Consent Sessions of a Subject
 
@@ -1006,10 +1006,11 @@ func main() {
     subject := "subject_example" // string | The subject to list the consent sessions for.
     pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
     pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
+    loginSessionId := "loginSessionId_example" // string | The login session id to list the consent sessions for. (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).Execute()
+    resp, r, err := apiClient.OAuth2Api.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2ConsentSessions``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1033,6 +1034,7 @@ Name | Type | Description  | Notes
  **subject** | **string** | The subject to list the consent sessions for. | 
  **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
  **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
+ **loginSessionId** | **string** | The login session id to list the consent sessions for. | 
 
 ### Return type
 
@@ -1663,7 +1665,7 @@ No authorization required
 
 ## RevokeOAuth2Token
 
-> RevokeOAuth2Token(ctx).Token(token).Execute()
+> RevokeOAuth2Token(ctx).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
 
 Revoke OAuth 2.0 Access or Refresh Token
 
@@ -1683,10 +1685,12 @@ import (
 
 func main() {
     token := "token_example" // string | 
+    clientId := "clientId_example" // string |  (optional)
+    clientSecret := "clientSecret_example" // string |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).Execute()
+    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2Token``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1706,6 +1710,8 @@ Other parameters are passed through a pointer to a apiRevokeOAuth2TokenRequest s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **token** | **string** |  | 
+ **clientId** | **string** |  | 
+ **clientSecret** | **string** |  | 
 
 ### Return type
 

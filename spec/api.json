@@ -2939,6 +2939,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "The login session id to list the consent sessions for.",
+            "in": "query",
+            "name": "login_session_id",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3594,6 +3602,14 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "x-formData-name": "client_id"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "x-formData-name": "client_secret"
+                  },
                   "token": {
                     "required": [
                       "token"

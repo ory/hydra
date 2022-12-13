@@ -1138,6 +1138,14 @@ paths:
         schema:
           type: string
         style: form
+      - description: The login session id to list the consent sessions for.
+        explode: true
+        in: query
+        name: login_session_id
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
@@ -4288,6 +4296,12 @@ components:
       type: object
     revokeOAuth2Token_request:
       properties:
+        client_id:
+          type: string
+          x-formData-name: client_id
+        client_secret:
+          type: string
+          x-formData-name: client_secret
         token:
           required:
           - token

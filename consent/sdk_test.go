@@ -77,10 +77,10 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Subject: cr1.Subject, Client: cr1.Client, Verifier: cr1.ID}))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Subject: cr2.Subject, Client: cr2.Client, Verifier: cr2.ID}))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Subject: cr3.Subject, Client: cr3.Client, Verifier: cr3.ID, RequestedAt: hcr3.RequestedAt}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr3.LoginSessionID.String()}))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Subject: cr3.Subject, Client: cr3.Client, Verifier: cr3.ID, RequestedAt: hcr3.RequestedAt, SessionID: cr3.LoginSessionID}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr4.LoginSessionID.String()}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID, SessionID: cr4.LoginSessionID}))
 	require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 	require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
 	require.NoError(t, m.CreateConsentRequest(context.Background(), cr3))
@@ -149,6 +149,16 @@ func TestSDK(t *testing.T) {
 	assert.Equal(t, makeID("challenge", network, "3"), cs.ConsentRequest.Challenge)
 
 	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject2").Execute()
+	require.NoError(t, err)
+	assert.Equal(t, 0, len(csGot))
+
+	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-3").Execute()
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(csGot))
+	cs = csGot[0]
+	assert.Equal(t, makeID("challenge", network, "3"), cs.ConsentRequest.Challenge)
+
+	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-X").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot))
 

@@ -27,7 +27,7 @@ type RegistryWriter interface {
 }
 
 type RegistryCookieStore interface {
-	CookieStore(ctx context.Context) sessions.Store
+	CookieStore(ctx context.Context) (sessions.Store, error)
 }
 
 type TracingProvider interface {

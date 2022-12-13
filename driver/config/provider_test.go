@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -320,8 +319,13 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, 2*time.Hour, c.GetDeviceAuthTokenPollingInterval(ctx))
 
 	// secrets
-	assert.Equal(t, []byte{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}, c.GetGlobalSecret(ctx))
-	assert.Equal(t, [][]uint8{[]byte("some-random-cookie-secret")}, c.GetCookieSecrets(ctx))
+	secret, err := c.GetGlobalSecret(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, []byte{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}, secret)
+
+	cookieSecret, err := c.GetCookieSecrets(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, [][]uint8{[]byte("some-random-cookie-secret")}, cookieSecret)
 
 	// profiling
 	assert.Equal(t, "cpu", c.Source(ctx).String("profiling"))
@@ -417,7 +421,7 @@ func TestCookieSecure(t *testing.T) {
 func TestTokenRefreshHookURL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
-	l.Logrus().SetOutput(ioutil.Discard)
+	l.Logrus().SetOutput(io.Discard)
 	c := MustNew(context.Background(), l, configx.SkipValidation())
 
 	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL(ctx))

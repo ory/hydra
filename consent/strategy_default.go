@@ -1041,7 +1041,6 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	iu := s.c.OAuth2DeviceAuthorisationURL(ctx)
 	iu.RawQuery = r.URL.RawQuery
 
-	cl := sanitizeClientFromRequest(req)
 	if err := s.r.ConsentManager().CreateDeviceGrantRequest(
 		r.Context(),
 		&DeviceGrantRequest{
@@ -1054,8 +1053,12 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 		return errorsx.WithStack(err)
 	}
 
-	clientSpecificCookieNameDeviceCSRF := fmt.Sprintf("%s_%d", s.r.Config().CookieNameConsentCSRF(ctx), murmur3.Sum32(cl.ID.Bytes()))
-	if err := createCsrfSession(w, r, s.r.Config(), s.r.CookieStore(ctx), clientSpecificCookieNameDeviceCSRF, csrf, s.c.ConsentRequestMaxAge(ctx)); err != nil {
+	store, err := s.r.CookieStore(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := createCsrfSession(w, r, s.r.Config(), store, s.r.Config().CookieNameDeviceVerifyCSRF(ctx), csrf, s.c.ConsentRequestMaxAge(ctx)); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -1086,7 +1089,12 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, w http.ResponseWrite
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired. Please try again."))
 	}
 
-	if err = validateCsrfSession(r, s.r.Config(), s.r.CookieStore(ctx), s.r.Config().CookieNameDeviceVerifyCSRF(ctx), session.CSRF); err != nil {
+	store, err := s.r.CookieStore(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = validateCsrfSession(r, s.r.Config(), store, s.r.Config().CookieNameDeviceVerifyCSRF(ctx), session.CSRF); err != nil {
 		return nil, err
 	}
 

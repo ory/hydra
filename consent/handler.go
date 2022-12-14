@@ -968,7 +968,11 @@ func (h *Handler) verifyUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	userCodeSignature := h.r.OAuth2HMACStrategy().UserCodeSignature(r.Context(), p.UserCode)
+	userCodeSignature, err := h.r.RFC8628HMACStrategy().UserCodeSignature(r.Context(), p.UserCode)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHint(`'user_code' signature could not be computed`)))
+		return
+	}
 	userCodeRequest, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeSignature, &fosite.DefaultSession{})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithWrap(err).WithHint(`'user_code' session not found`)))

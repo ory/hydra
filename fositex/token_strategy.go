@@ -8,6 +8,7 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/hydra/driver/config"
 )
 
@@ -15,9 +16,10 @@ var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)
 
 // TokenStrategy uses the correct token strategy (jwt, opaque) depending on the configuration.
 type TokenStrategy struct {
-	c    *config.DefaultProvider
-	hmac *foauth2.HMACSHAStrategy
-	jwt  *foauth2.DefaultJWTStrategy
+	c       *config.DefaultProvider
+	hmac    *foauth2.HMACSHAStrategy
+	devHmac *rfc8628.DefaultDeviceStrategy
+	jwt     *foauth2.DefaultJWTStrategy
 }
 
 // NewTokenStrategy returns a new TokenStrategy.
@@ -70,26 +72,26 @@ func (t TokenStrategy) ValidateAuthorizeCode(ctx context.Context, requester fosi
 	return t.gs(ctx).ValidateAuthorizeCode(ctx, requester, token)
 }
 
-func (t TokenStrategy) DeviceCodeSignature(ctx context.Context, token string) string {
-	return t.hmac.DeviceCodeSignature(ctx, token)
+func (t TokenStrategy) DeviceCodeSignature(ctx context.Context, token string) (signature string, err error) {
+	return t.devHmac.DeviceCodeSignature(ctx, token)
 }
 
 func (t *TokenStrategy) GenerateDeviceCode(ctx context.Context) (token string, signature string, err error) {
-	return t.hmac.GenerateDeviceCode(ctx)
+	return t.devHmac.GenerateDeviceCode(ctx)
 }
 
 func (t *TokenStrategy) ValidateDeviceCode(ctx context.Context, r fosite.Requester, code string) (err error) {
-	return t.hmac.ValidateDeviceCode(ctx, r, code)
+	return t.devHmac.ValidateDeviceCode(ctx, r, code)
 }
 
-func (t TokenStrategy) UserCodeSignature(ctx context.Context, token string) string {
-	return t.hmac.UserCodeSignature(ctx, token)
+func (t TokenStrategy) UserCodeSignature(ctx context.Context, token string) (signature string, err error) {
+	return t.devHmac.UserCodeSignature(ctx, token)
 }
 
 func (t *TokenStrategy) GenerateUserCode(ctx context.Context) (token string, signature string, err error) {
-	return t.hmac.GenerateUserCode(ctx)
+	return t.devHmac.GenerateUserCode(ctx)
 }
 
 func (t *TokenStrategy) ValidateUserCode(context context.Context, r fosite.Requester, code string) (err error) {
-	return t.hmac.ValidateUserCode(context, r, code)
+	return t.devHmac.ValidateUserCode(context, r, code)
 }

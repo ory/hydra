@@ -8,6 +8,7 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 )
@@ -23,5 +24,6 @@ type Registry interface {
 	ClientHasher() fosite.Hasher
 	OpenIDJWTStrategy() jwk.JWTSigner
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
+	RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy
 	config.Provider
 }

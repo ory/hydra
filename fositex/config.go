@@ -48,11 +48,11 @@ type Config struct {
 
 var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
 var defaultFactories = []factory{
+	compose.RFC8628DeviceFactory,
 	compose.OAuth2AuthorizeExplicitFactory,
 	compose.OAuth2AuthorizeImplicitFactory,
 	compose.OAuth2ClientCredentialsGrantFactory,
 	compose.OAuth2RefreshTokenGrantFactory,
-	compose.OAuth2DeviceFactory,
 	compose.OpenIDConnectExplicitFactory,
 	compose.OpenIDConnectHybridFactory,
 	compose.OpenIDConnectImplicitFactory,
@@ -61,7 +61,6 @@ var defaultFactories = []factory{
 	compose.OAuth2TokenRevocationFactory,
 	compose.OAuth2TokenIntrospectionFactory,
 	compose.OAuth2PKCEFactory,
-	compose.OAuth2DevicePKCEFactory,
 	compose.RFC7523AssertionGrantFactory,
 }
 

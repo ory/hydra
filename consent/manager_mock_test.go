@@ -206,6 +206,21 @@ func (mr *MockManagerMockRecorder) FindSubjectsGrantedConsentRequests(ctx, user,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSubjectsGrantedConsentRequests", reflect.TypeOf((*MockManager)(nil).FindSubjectsGrantedConsentRequests), ctx, user, limit, offset)
 }
 
+// FindSubjectsSessionGrantedConsentRequests mocks base method.
+func (m *MockManager) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, user, sid string, limit, offset int) ([]consent.AcceptOAuth2ConsentRequest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSubjectsSessionGrantedConsentRequests", ctx, user, sid, limit, offset)
+	ret0, _ := ret[0].([]consent.AcceptOAuth2ConsentRequest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSubjectsSessionGrantedConsentRequests indicates an expected call of FindSubjectsSessionGrantedConsentRequests.
+func (mr *MockManagerMockRecorder) FindSubjectsSessionGrantedConsentRequests(ctx, user, sid, limit, offset interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSubjectsSessionGrantedConsentRequests", reflect.TypeOf((*MockManager)(nil).FindSubjectsSessionGrantedConsentRequests), ctx, user, sid, limit, offset)
+}
+
 // GetConsentRequest mocks base method.
 func (m *MockManager) GetConsentRequest(ctx context.Context, challenge string) (*consent.OAuth2ConsentRequest, error) {
 	m.ctrl.T.Helper()

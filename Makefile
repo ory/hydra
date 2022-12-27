@@ -4,6 +4,8 @@ export GO111MODULE := on
 export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
+GOLANGCI_LINT_VERSION = 1.46.2
+
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
@@ -15,8 +17,9 @@ define make-go-dependency
 		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
-.bin/golangci-lint: Makefile
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v1.46.2
+.bin/golangci-lint-$(GOLANGCI_LINT_VERSION):
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v$(GOLANGCI_LINT_VERSION)
+	mv .bin/golangci-lint .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
@@ -45,8 +48,8 @@ docs/cli: .bin/clidoc
 	touch .bin/ory
 
 .PHONY: lint
-lint: .bin/golangci-lint
-	golangci-lint run -v ./...
+lint: .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
+	.bin/golangci-lint-$(GOLANGCI_LINT_VERSION) run -v ./...
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test

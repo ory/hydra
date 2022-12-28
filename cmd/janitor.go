@@ -71,9 +71,10 @@ Janitor can be used in several ways.
 	cmd.Flags().Duration(cli.AccessLifespan, 0, "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.RefreshLifespan, 0, "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.ConsentRequestLifespan, 0, "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
-	cmd.Flags().Bool(cli.OnlyRequests, false, "This will only run the cleanup on requests and will skip token and trust relationships cleanup.")
-	cmd.Flags().Bool(cli.OnlyTokens, false, "This will only run the cleanup on tokens and will skip requests and trust relationships cleanup.")
-	cmd.Flags().Bool(cli.OnlyGrants, false, "This will only run the cleanup on trust relationships and will skip requests and token cleanup.")
+	cmd.Flags().Bool(cli.OnlyRequests, false, "This will only run the cleanup on requests and will skip token, login sessions and trust relationships cleanup.")
+	cmd.Flags().Bool(cli.OnlyTokens, false, "This will only run the cleanup on tokens and will skip requests, login sessions and trust relationships cleanup.")
+	cmd.Flags().Bool(cli.OnlyGrants, false, "This will only run the cleanup on trust relationships and will skip requests, login sessions and token cleanup.")
+	cmd.Flags().Bool(cli.OnlyLoginSessions, false, "This will only run the cleanup on login sessions and will skip requests, trust relationship and token cleanup.")
 	cmd.Flags().BoolP(cli.ReadFromEnv, "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	configx.RegisterFlags(cmd.PersistentFlags())
 	return cmd

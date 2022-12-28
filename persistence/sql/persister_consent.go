@@ -11,11 +11,6 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
-
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/x/errorsx"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -23,7 +18,9 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/flow"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 var _ consent.Manager = &Persister{}
@@ -643,6 +640,44 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 		}
 
 		return nil
+	})
+}
+
+func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time, limit, _ int) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		// "hydra_oauth2_authentication_request"
+		var lr consent.LoginRequest
+
+		// "hydra_oauth2_consent_request"
+		var cr consent.ConsentRequest
+
+		// "hydra_oauth2_authentication_session"
+		var ls consent.LoginSession
+		query := fmt.Sprintf(`
+			DELETE FROM %[1]s WHERE id in
+			(SELECT id
+			FROM %[1]s
+			WHERE NOT EXISTS
+			    (
+			    SELECT NULL
+			    FROM %[2]s
+			    WHERE %[2]s.login_session_id = %[1]s.id
+			    )
+			AND NOT EXISTS
+			    (
+			    SELECT NULL
+			    FROM %[3]s
+			    WHERE %[3]s.login_session_id = %[1]s.id
+			    )
+			LIMIT %[4]d)
+			`,
+			(&ls).TableName(),
+			(&lr).TableName(),
+			(&cr).TableName(),
+			limit,
+		)
+
+		return p.Connection(ctx).RawQuery(query).Exec()
 	})
 }
 

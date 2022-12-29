@@ -119,9 +119,11 @@ func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 
 func ExcludeOpaquePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
-	for _, k := range set.Keys {
-		if _, opaque := k.Key.(jose.OpaqueSigner); !opaque {
-			keys.Keys = append(keys.Keys, k)
+	for i := range set.Keys {
+		if _, opaque := set.Keys[i].Key.(jose.OpaqueSigner); opaque {
+			keys.Keys = append(keys.Keys, josex.ToPublicKey(&set.Keys[i]))
+		} else {
+			keys.Keys = append(keys.Keys, set.Keys[i])
 		}
 	}
 	return keys

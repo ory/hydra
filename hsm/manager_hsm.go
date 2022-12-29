@@ -187,7 +187,7 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 }
 
 func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKey")
 	defer span.End()
 	attrs := map[string]string{
 		"set": set,
@@ -217,7 +217,7 @@ func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 }
 
 func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) error {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKeySet")
 	defer span.End()
 	attrs := map[string]string{
 		"set": set,
@@ -357,14 +357,6 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 		Algorithm:                   alg,
 		Use:                         use,
 		Key:                         cryptosigner.Opaque(key),
-		KeyID:                       kid,
-		Certificates:                []*x509.Certificate{},
-		CertificateThumbprintSHA1:   []uint8{},
-		CertificateThumbprintSHA256: []uint8{},
-	}, {
-		Algorithm:                   alg,
-		Use:                         use,
-		Key:                         key.Public(),
 		KeyID:                       kid,
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},

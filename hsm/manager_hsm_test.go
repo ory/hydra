@@ -883,13 +883,5 @@ func createJSONWebKeys(keyPair *MockSignerDecrypter, kid string, alg string, use
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},
-	}, {
-		Algorithm:                   alg,
-		Use:                         use,
-		Key:                         keyPair.Public(),
-		KeyID:                       kid,
-		Certificates:                []*x509.Certificate{},
-		CertificateThumbprintSHA1:   []uint8{},
-		CertificateThumbprintSHA256: []uint8{},
 	}}
 }

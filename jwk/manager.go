@@ -26,6 +26,12 @@ var ErrUnsupportedEllipticCurve = &fosite.RFC6749Error{
 	DescriptionField: "Unsupported elliptic curve",
 }
 
+var ErrMinimalRsaKeyLength = &fosite.RFC6749Error{
+	CodeField:        http.StatusBadRequest,
+	ErrorField:       http.StatusText(http.StatusBadRequest),
+	DescriptionField: "Unsupported RSA key length",
+}
+
 type (
 	Manager interface {
 		GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error)

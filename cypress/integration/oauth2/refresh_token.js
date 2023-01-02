@@ -90,7 +90,7 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
     })
   })
 
-  it("should narrow Refresh Token scopes correctly", function () {
+  it("should narrow and broaded Refresh Token scope correctly", function () {
     const referrer = `${Cypress.env("client_url")}/empty`
     cy.visit(referrer, {
       failOnStatusCode: false,
@@ -109,23 +109,21 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
       }).then((originalResponse) => {
         expect(originalResponse.status).to.eq(200)
         expect(originalResponse.body.refresh_token).to.not.be.empty
-        expect(originalResponse.body.scope).to.eq("offline_access openid foo bar baz")
+        expect(originalResponse.body.scope).to.deep.equal(["offline_access", "openid", "foo", "bar", "baz"])
 
         const originalToken = originalResponse.body.refresh_token
 
-        cy.refreshTokenBrowserScope(client, originalToken, "offline_access openid foo").then(
-          (refreshedResponse) => {
+        cy.refreshTokenBrowserScope(client, originalToken, "offline_access openid foo").then((refreshedResponse) => {
             expect(refreshedResponse.status).to.eq(200)
             expect(refreshedResponse.body.refresh_token).to.not.be.empty
-            expect(refreshedResponse.body.scope).to.eq("offline_access openid foo")
+            expect(refreshedResponse.body.scope).to.deep.equal(["offline_access", "openid", "foo"])
 
             const refreshedToken = refreshedResponse.body.refresh_token
 
-            cy.refreshTokenBrowserScope(client, refreshedToken, "offline_access openid foo bar baz").then(
-              (finalRefreshedResponse) => {
+            cy.refreshTokenBrowserScope(client, refreshedToken, "offline_access openid foo bar").then((finalRefreshedResponse) => {
                 expect(finalRefreshedResponse.status).to.eq(200)
                 expect(finalRefreshedResponse.body.refresh_token).to.not.be.empty
-                expect(finalRefreshedResponse.body.scope).to.eq("offline_access openid foo bar baz")
+                expect(finalRefreshedResponse.body.scope).to.deep.equal(["offline_access", "openid", "foo", "bar"])
               },
             )
           },

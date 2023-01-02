@@ -271,3 +271,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
 )
+
+replace github.com/ory/fosite => github.com/james-d-elliott/fosite v0.42.2-0.20230102000600-1b13725b7055

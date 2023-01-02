@@ -216,3 +216,18 @@ Cypress.Commands.add("refreshTokenBrowser", (client, token) =>
     failOnStatusCode: false,
   }),
 )
+
+Cypress.Commands.add("refreshTokenBrowserScope", (client, token, scope) =>
+  cy.request({
+    url: `${Cypress.env("public_url")}/oauth2/token`,
+    method: "POST",
+    form: true,
+    body: {
+      grant_type: "refresh_token",
+      client_id: client.client_id,
+      refresh_token: token,
+      scope: scope,
+    },
+    failOnStatusCode: false,
+  }),
+)

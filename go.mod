@@ -9,6 +9,7 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+	github.com/ory/fosite => github.com/mattslocum/fosite v0.0.0-20230104213057-70d11837908d
 )
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient

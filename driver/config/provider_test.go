@@ -406,6 +406,17 @@ func TestCookieSecure(t *testing.T) {
 	assert.True(t, c.CookieSecure(ctx))
 }
 
+func TestTokenPrefix(t *testing.T) {
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(io.Discard)
+	c := MustNew(context.Background(), l, configx.SkipValidation())
+
+	assert.EqualValues(t, "ory", c.GetTokenPrefix(ctx)) // default when not set
+	c.MustSet(ctx, KeyOAuth2TokenPrefix, "sabre")
+	assert.EqualValues(t, "sabre", c.GetTokenPrefix(ctx))
+}
+
 func TestTokenRefreshHookURL(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")

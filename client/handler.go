@@ -805,7 +805,8 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("The OAuth2 Client does not have a registration access token."))
 	}
 
-	token := strings.TrimPrefix(fosite.AccessTokenFromRequest(r), "ory_at_")
+	prefix := h.r.Config().GetTokenPrefix(r.Context()) + "_at_"
+	token := strings.TrimPrefix(fosite.AccessTokenFromRequest(r), prefix)
 	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(r.Context(), token); err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).

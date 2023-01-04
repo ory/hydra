@@ -89,6 +89,10 @@ func (p *DefaultProvider) GetScopeStrategy(ctx context.Context) fosite.ScopeStra
 	return fosite.ExactScopeStrategy
 }
 
+func (p *DefaultProvider) GetTokenPrefixProvider(ctx context.Context) string {
+	return p.getProvider(ctx).StringF(KeyOAuth2TokenPrefix, "ory")
+}
+
 func (p *DefaultProvider) GetUseLegacyErrorFormat(context.Context) bool {
 	return false
 }

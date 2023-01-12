@@ -8,41 +8,27 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/ory/hydra/hsm"
-	"github.com/ory/x/contextx"
-
 	"github.com/gobuffalo/pop/v6"
-
-	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/x/errorsx"
-	"github.com/ory/x/networkx"
-	"github.com/ory/x/popx"
-
-	"github.com/luna-duclos/instrumentedsql"
-
-	"github.com/ory/x/resilience"
-
 	_ "github.com/jackc/pgx/v4/stdlib"
-
-	"github.com/ory/hydra/persistence/sql"
-
-	"github.com/jmoiron/sqlx"
-
-	"github.com/ory/x/dbal"
-	otelsql "github.com/ory/x/otelx/sql"
-	"github.com/ory/x/sqlcon"
+	"github.com/luna-duclos/instrumentedsql"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/hsm"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/errorsx"
+	otelsql "github.com/ory/x/otelx/sql"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/sqlcon"
 )
 
 type RegistrySQL struct {
 	*RegistryBase
-	db                *sqlx.DB
 	defaultKeyManager jwk.Manager
 	initialPing       func(r *RegistrySQL) error
 }
@@ -75,22 +61,6 @@ func NewRegistrySQL() *RegistrySQL {
 	}
 	r.RegistryBase.with(r)
 	return r
-}
-
-func (m *RegistrySQL) determineNetwork(c *pop.Connection, ctx context.Context) (*networkx.Network, error) {
-	mb, err := popx.NewMigrationBox(networkx.Migrations, popx.NewMigrator(c, m.Logger(), m.Tracer(ctx), 0))
-	if err != nil {
-		return nil, err
-	}
-	s, err := mb.Status(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if s.HasPending() {
-		return nil, errors.WithStack(errors.New("some migrations are pending"))
-	}
-
-	return networkx.NewManager(c, m.Logger(), m.Tracer(ctx)).Determine(ctx)
 }
 
 func (m *RegistrySQL) Init(

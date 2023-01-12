@@ -19,6 +19,6 @@ func TestToAccessTokenStrategyType(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, AccessTokenJWTStrategy, actual)
 
-	actual, err = ToAccessTokenStrategyType("invalid")
+	_, err = ToAccessTokenStrategyType("invalid")
 	require.Error(t, err)
 }

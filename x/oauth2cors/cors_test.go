@@ -28,7 +28,7 @@ import (
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.Default{})
-	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
+	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(context.Background(), nil)
 	for k, tc := range []struct {
 		prep         func(*testing.T, driver.Registry)
 		d            string

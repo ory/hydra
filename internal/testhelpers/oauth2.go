@@ -16,8 +16,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	djwt "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite/token/jwt"
 
 	"github.com/julienschmidt/httprouter"
@@ -51,7 +49,7 @@ func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp
 	return token
 }
 
-func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClaims) string {
+func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaims) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token

@@ -88,14 +88,6 @@ func TestMigrations(t *testing.T) {
 		return func(t *testing.T) {
 			ctx := context.Background()
 			x.CleanSQLPop(t, c)
-			url := c.URL()
-
-			// workaround for https://github.com/gobuffalo/pop/issues/538
-			if db == "mysql" {
-				url = "mysql://" + url
-			} else if db == "sqlite" {
-				url = "sqlite://" + url
-			}
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
@@ -103,7 +95,6 @@ func TestMigrations(t *testing.T) {
 				os.DirFS("../migrations"),
 				popx.NewMigrator(c, l, nil, 1*time.Minute),
 				popx.WithTestdata(t, os.DirFS("./testdata")))
-			//tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), l)
 			require.NoError(t, err)
 			require.NoError(t, tm.Up(ctx))
 

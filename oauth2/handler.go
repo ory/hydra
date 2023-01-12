@@ -23,8 +23,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
-	jwt2 "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -606,7 +604,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, jwt2.MapClaims(interim), &jwt.Headers{
+		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, jwt.MapClaims(interim), &jwt.Headers{
 			Extra: map[string]interface{}{"kid": keyID},
 		})
 		if err != nil {

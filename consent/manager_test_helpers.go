@@ -247,7 +247,7 @@ func makeID(base string, network string, key string) string {
 }
 
 func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
-	testClient := client.Client{LegacyClientID: fmt.Sprintf("2022-03-11-client-nid-test-1")}
+	testClient := client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"}
 	testLS := LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
@@ -257,7 +257,7 @@ func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2Invalid
 		Subject:     "2022-03-11-test-1-sub",
 		Verifier:    "2022-03-11-test-1-ver",
 		RequestedAt: time.Now(),
-		Client:      &client.Client{LegacyClientID: fmt.Sprintf("2022-03-11-client-nid-test-1")},
+		Client:      &client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"},
 	}
 	testHLR := HandledLoginRequest{
 		LoginRequest:           &testLR,

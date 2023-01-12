@@ -102,9 +102,7 @@ var _ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
 var _ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
 
 type DefaultProvider struct {
-	generatedSecret []byte
-	l               *logrusx.Logger
-
+	l *logrusx.Logger
 	p *configx.Provider
 	c contextx.Contextualizer
 }

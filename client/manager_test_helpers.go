@@ -56,7 +56,8 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 		}))
 
 		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
-		require.NotNil(t, err)
+		require.Error(t, err)
+		require.Nil(t, c)
 
 		c, err = m.Authenticate(ctx, "1234321", []byte("secret"))
 		require.NoError(t, err)
@@ -298,6 +299,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 
 		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 100})
 		assert.NoError(t, err)
+		assert.Empty(t, ds)
 
 		// get by name
 		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "name"})

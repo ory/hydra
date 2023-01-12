@@ -348,6 +348,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		defer loginChallengeRes.Body.Close()
 
 		loginVerifierRedirect, err := loginChallengeRes.Location()
+		require.NoError(t, err)
 		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 		require.NoError(t, err)
 		defer loginVerifierRes.Body.Close()

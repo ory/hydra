@@ -34,8 +34,6 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 
-	jwt2 "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -305,11 +303,11 @@ func TestUserinfo(t *testing.T) {
 			},
 			expectStatusCode: http.StatusOK,
 			checkForSuccess: func(t *testing.T, body []byte) {
-				claims, err := jwt2.Parse(string(body), func(token *jwt2.Token) (interface{}, error) {
+				claims, err := jwt.Parse(string(body), func(token *jwt.Token) (interface{}, error) {
 					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
-					key, err := jwk.FindPublicKey(keys)
+					key, _ := jwk.FindPublicKey(keys)
 					return key.Key, nil
 				})
 				require.NoError(t, err)

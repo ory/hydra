@@ -1166,6 +1166,29 @@
                   "server_url": "http://localhost:9411/api/v2/spans"
                 }
               ]
+            },
+            "otlp": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures the Open Telemetry tracing backend.",
+              "properties": {
+                "server_url": {
+                  "type": "string",
+                  "description": ""
+                },
+                "insecure": {
+                  "type": "boolean"
+                },
+                "sampling": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sampling_ratio": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
             }
           }
         }

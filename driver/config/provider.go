@@ -82,7 +82,7 @@ const (
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
-	KeyDeviceInternalURL                         = "urls.self.device"
+	KeyDeviceVerificationURL                     = "urls.self.device"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
@@ -409,8 +409,8 @@ func (p *DefaultProvider) AdminURL(ctx context.Context) *url.URL {
 	)
 }
 
-func (p *DefaultProvider) DeviceInternalURL(ctx context.Context) *url.URL {
-	return urlRoot(p.getProvider(ctx).RequestURIF(KeyDeviceInternalURL, urlx.AppendPaths(p.PublicURL(ctx), "/device")))
+func (p *DefaultProvider) DeviceVerificationURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyDeviceVerificationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth")))
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {

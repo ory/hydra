@@ -289,15 +289,15 @@ func (mr *MockOAuth2ProviderMockRecorder) WriteAuthorizeResponse(arg0, arg1, arg
 }
 
 // WriteDeviceAuthorizeResponse mocks base method.
-func (m *MockOAuth2Provider) WriteDeviceAuthorizeResponse(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.DeviceAuthorizeRequester, arg3 fosite.DeviceAuthorizeResponder) {
+func (m *MockOAuth2Provider) WriteDeviceAuthorizeResponse(arg0 context.Context, arg1 *http.Request, arg2 http.ResponseWriter, arg3 fosite.DeviceAuthorizeRequester, arg4 fosite.DeviceAuthorizeResponder) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "WriteDeviceAuthorizeResponse", arg0, arg1, arg2, arg3)
+	m.ctrl.Call(m, "WriteDeviceAuthorizeResponse", arg0, arg1, arg2, arg3, arg4)
 }
 
 // WriteDeviceAuthorizeResponse indicates an expected call of WriteDeviceAuthorizeResponse.
-func (mr *MockOAuth2ProviderMockRecorder) WriteDeviceAuthorizeResponse(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) WriteDeviceAuthorizeResponse(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteDeviceAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteDeviceAuthorizeResponse), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteDeviceAuthorizeResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).WriteDeviceAuthorizeResponse), arg0, arg1, arg2, arg3, arg4)
 }
 
 // WriteDeviceResponse mocks base method.

@@ -4,7 +4,7 @@
 package cli
 
 import (
-	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/servicelocatorx"
 )

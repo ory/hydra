@@ -13,8 +13,8 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	herodot "github.com/ory/herodot"
-	config "github.com/ory/hydra/driver/config"
-	jwk "github.com/ory/hydra/jwk"
+	config "github.com/ory/hydra/v2/driver/config"
+	jwk "github.com/ory/hydra/v2/jwk"
 	logrusx "github.com/ory/x/logrusx"
 )
 

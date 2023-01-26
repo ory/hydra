@@ -14,8 +14,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/sqlcon"
 )
 

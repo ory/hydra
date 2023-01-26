@@ -19,21 +19,21 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2/trust"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
-	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 )
 
 func TestJWTBearer(t *testing.T) {

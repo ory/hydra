@@ -12,16 +12,16 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/contextx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 )
 
 func TestHandlerWellKnown(t *testing.T) {

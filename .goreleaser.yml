@@ -5,9 +5,9 @@ includes:
 variables:
   brew_name: hydra
   brew_description: "The Ory OAuth2 and OpenID Connect Platform (Ory Hydra)"
-  buildinfo_hash: "github.com/ory/hydra/driver/config.Commit"
-  buildinfo_tag: "github.com/ory/hydra/driver/config.Version"
-  buildinfo_date: "github.com/ory/hydra/driver/config.Date"
+  buildinfo_hash: "github.com/ory/hydra/v2/driver/config.Commit"
+  buildinfo_tag: "github.com/ory/hydra/v2/driver/config.Version"
+  buildinfo_date: "github.com/ory/hydra/v2/driver/config.Date"
   dockerfile: ".docker/Dockerfile-alpine"
 
 project_name: hydra

@@ -8,12 +8,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/v2/client"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/cmdx"
 )
 

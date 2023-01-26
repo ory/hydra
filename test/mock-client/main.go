@@ -22,7 +22,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/urlx"
 )

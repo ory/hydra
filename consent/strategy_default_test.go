@@ -22,10 +22,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/client"
-	. "github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/client"
+	. "github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/ioutilx"
 )
 

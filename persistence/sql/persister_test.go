@@ -16,18 +16,18 @@ import (
 	"github.com/instana/testify/require"
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/internal"
 )
 
 func init() {

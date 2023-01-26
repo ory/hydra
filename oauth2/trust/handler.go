@@ -10,7 +10,7 @@ import (
 
 	"github.com/ory/x/pagination/tokenpagination"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/x/httprouterx"
 

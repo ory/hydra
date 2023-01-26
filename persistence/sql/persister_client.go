@@ -13,7 +13,7 @@ import (
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/v2/client"
 	"github.com/ory/x/sqlcon"
 )
 

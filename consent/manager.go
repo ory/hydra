@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/v2/client"
 )
 
 type ForcedObfuscatedLoginSession struct {

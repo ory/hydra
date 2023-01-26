@@ -13,9 +13,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"

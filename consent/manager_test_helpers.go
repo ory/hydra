@@ -21,8 +21,8 @@ import (
 
 	"github.com/ory/fosite"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/x"
 )
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *OAuth2ConsentRequest, h *AcceptOAuth2ConsentRequest) {

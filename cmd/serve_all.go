@@ -6,11 +6,11 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/servicelocatorx"
 
-	"github.com/ory/hydra/cmd/server"
+	"github.com/ory/hydra/v2/cmd/server"
 )
 
 // allCmd represents the all command

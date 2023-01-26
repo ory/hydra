@@ -10,9 +10,9 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	. "github.com/ory/hydra/v2/jwk"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"

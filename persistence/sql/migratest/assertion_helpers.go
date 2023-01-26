@@ -10,8 +10,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/require"
 
-	"github.com/ory/hydra/flow"
-	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
+	"github.com/ory/hydra/v2/flow"
+	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/x/sqlxx"
 )
 

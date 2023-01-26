@@ -24,8 +24,8 @@ import (
 
 	"github.com/ory/fosite"
 
-	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
-	"github.com/ory/hydra/x"
+	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
+	"github.com/ory/hydra/v2/x"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {

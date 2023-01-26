@@ -30,8 +30,8 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
@@ -41,11 +41,11 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/fosite"
-	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	hydraoauth2 "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
 )

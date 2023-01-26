@@ -6,7 +6,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/spf13/cobra"
 )

@@ -11,9 +11,9 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )

@@ -12,11 +12,11 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/cmdx"
 )

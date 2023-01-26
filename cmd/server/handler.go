@@ -34,13 +34,13 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 	prometheus "github.com/ory/x/prometheusx"
 )
 

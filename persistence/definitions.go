@@ -8,11 +8,11 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/popx"
 )
 

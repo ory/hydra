@@ -10,11 +10,11 @@ import (
 	"go.opentelemetry.io/otel"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/otelx"
 )
 
-const tracingComponent = "github.com/ory/hydra/jwk"
+const tracingComponent = "github.com/ory/hydra/v2/jwk"
 
 type ManagerStrategy struct {
 	hardwareKeyManager Manager

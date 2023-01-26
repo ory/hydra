@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 
-	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/httpx"
 
 	"github.com/gofrs/uuid"
@@ -21,10 +21,10 @@ import (
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	. "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 )
 

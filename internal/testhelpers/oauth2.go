@@ -28,11 +28,11 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {

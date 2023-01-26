@@ -28,10 +28,10 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/urlx"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/x"
 )
 
 const (

@@ -1,4 +1,4 @@
-module github.com/ory/hydra
+module github.com/ory/hydra/v2
 
 go 1.19
 
@@ -65,7 +65,7 @@ require (
 	go.opentelemetry.io/otel v1.11.1
 	go.step.sm/crypto v0.16.2
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
+	golang.org/x/oauth2 v0.4.0
 	golang.org/x/tools v0.2.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.43.0
 	gopkg.in/square/go-jose.v2 v2.6.0
@@ -229,10 +229,10 @@ require (
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20221025140454-527a21cfbd71 // indirect

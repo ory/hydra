@@ -23,22 +23,22 @@ import (
 
 	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/oauth2"
 )
 
 var lifespan = time.Hour

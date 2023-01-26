@@ -17,12 +17,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 
@@ -36,8 +36,8 @@ import (
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/cryptosigner"
 
-	"github.com/ory/hydra/hsm"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/x"
 )
 
 func TestDefaultKeyManager_HSMEnabled(t *testing.T) {

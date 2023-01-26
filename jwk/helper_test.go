@@ -20,9 +20,9 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 
 	"gopkg.in/square/go-jose.v2/cryptosigner"

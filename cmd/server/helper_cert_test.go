@@ -22,11 +22,11 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/tlsx"
 
-	"github.com/ory/hydra/cmd/server"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/cmd/server"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 )
 
 func TestGetOrCreateTLSCertificate(t *testing.T) {

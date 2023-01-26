@@ -15,9 +15,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/healthx"
 )
 

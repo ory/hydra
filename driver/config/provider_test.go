@@ -25,7 +25,7 @@ import (
 
 	"github.com/ory/x/logrusx"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 )
 
 func newProvider() *DefaultProvider {

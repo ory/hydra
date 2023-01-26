@@ -14,8 +14,8 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/internal"
-	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/internal"
+	. "github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/contextx"
 )
 

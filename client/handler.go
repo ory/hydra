@@ -28,7 +28,7 @@ import (
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"

@@ -116,12 +116,12 @@ mocks: .bin/mockgen
 .PHONY: sdk
 sdk: .bin/swagger .bin/ory node_modules
 	swagger generate spec -m -o spec/swagger.json \
-		-c github.com/ory/hydra/client \
-		-c github.com/ory/hydra/consent \
-		-c github.com/ory/hydra/health \
-		-c github.com/ory/hydra/jwk \
-		-c github.com/ory/hydra/oauth2 \
-		-c github.com/ory/hydra/x \
+		-c github.com/ory/hydra/v2/client \
+		-c github.com/ory/hydra/v2/consent \
+		-c github.com/ory/hydra/v2/health \
+		-c github.com/ory/hydra/v2/jwk \
+		-c github.com/ory/hydra/v2/oauth2 \
+		-c github.com/ory/hydra/v2/x \
 		-c github.com/ory/x/healthx \
 		-c github.com/ory/x/openapix \
 		-c github.com/ory/x/pagination \
@@ -147,6 +147,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		--git-user-id ory \
 		--git-repo-id hydra-client-go \
 		--git-host github.com
+	(cd internal/httpclient && go mod edit -module github.com/ory/hydra-client-go/v2)
 
 	make format
 
@@ -177,7 +178,7 @@ install-stable:
 	git checkout $$HYDRA_LATEST
 	GO111MODULE=on go install \
 		-tags sqlite,json1 \
-		-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
+		-ldflags "-X github.com/ory/hydra/v2/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/v2/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/v2/driver/config.Commit=`git rev-parse HEAD`" \
 		.
 	git checkout master
 

@@ -16,7 +16,7 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"

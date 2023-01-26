@@ -20,9 +20,9 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
@@ -32,8 +32,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/internal"
 )
 
 type responseSnapshot struct {

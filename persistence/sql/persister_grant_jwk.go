@@ -13,7 +13,7 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/x/stringsx"
 
 	"github.com/ory/x/sqlcon"

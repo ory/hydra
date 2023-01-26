@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/cmd/cliclient"
+	"github.com/ory/hydra/v2/cmd/cliclient"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"

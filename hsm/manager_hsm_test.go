@@ -69,6 +69,7 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
 
 	rsaKey3072, err := rsa.GenerateKey(rand.Reader, 3072)
+	require.NoError(t, err)
 	rsaKey4096, err := rsa.GenerateKey(rand.Reader, 4096)
 	require.NoError(t, err)
 

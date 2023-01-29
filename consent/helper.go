@@ -9,7 +9,7 @@ import (
 
 	"time"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/x/errorsx"
 
@@ -18,7 +18,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/x/mapx"
 
-	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/v2/client"
 )
 
 func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {

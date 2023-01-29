@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"

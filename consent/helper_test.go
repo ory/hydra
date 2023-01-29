@@ -12,14 +12,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/ory/hydra/internal/mock"
+	"github.com/ory/hydra/v2/internal/mock"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/v2/client"
 )
 
 func TestSanitizeClient(t *testing.T) {

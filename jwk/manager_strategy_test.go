@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
 )
 
 func TestKeyManagerStrategy(t *testing.T) {

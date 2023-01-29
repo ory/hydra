@@ -36,9 +36,9 @@ func TestLogError(t *testing.T) {
 	l.Logger.Out = buf
 	LogError(r, errors.New("asdf"), l)
 
-	t.Logf("%s", string(buf.Bytes()))
+	t.Logf("%s", buf.String())
 
-	assert.True(t, strings.Contains(string(buf.Bytes()), "trace"))
+	assert.True(t, strings.Contains(buf.String(), "trace"))
 
 	LogError(r, errors.Wrap(new(errStackTracer), ""), l)
 }

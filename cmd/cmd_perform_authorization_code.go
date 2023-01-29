@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/cmd/cliclient"
+	"github.com/ory/hydra/v2/cmd/cliclient"
 
 	"github.com/pkg/errors"
 

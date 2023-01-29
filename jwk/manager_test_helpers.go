@@ -223,6 +223,7 @@ func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) fun
 			keys.Keys[i].Use = "enc"
 		}
 		err = t1.UpdateKeySet(context.TODO(), "foo", keys)
+		require.Error(t, err)
 		for i := range keys.Keys {
 			keys.Keys[i].Use = "err"
 		}

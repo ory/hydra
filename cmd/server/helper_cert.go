@@ -16,14 +16,14 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/tlsx"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 )
 
 const (

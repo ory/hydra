@@ -8,10 +8,10 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"github.com/ory/hydra/hsm"
+	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/v2/oauth2/trust"
 
 	"github.com/pkg/errors"
 
@@ -22,19 +22,19 @@ import (
 
 	"github.com/ory/x/logrusx"
 
-	"github.com/ory/hydra/persistence"
+	"github.com/ory/hydra/v2/persistence"
 
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/healthx"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 )
 
 type Registry interface {

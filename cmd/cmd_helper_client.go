@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/pflag"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
 )

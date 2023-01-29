@@ -10,7 +10,7 @@ import (
 
 	"github.com/ory/x/servicelocatorx"
 
-	"github.com/ory/hydra/persistence"
+	"github.com/ory/hydra/v2/persistence"
 
 	"github.com/pkg/errors"
 
@@ -18,8 +18,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/errorsx"
 )

@@ -25,7 +25,7 @@ import (
 
 	"github.com/ory/x/logrusx"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 )
 
 func newProvider() *DefaultProvider {
@@ -330,7 +330,8 @@ func TestViperProviderValidates(t *testing.T) {
 			Jaeger: otelx.JaegerConfig{
 				LocalAgentAddress: "127.0.0.1:6831",
 				Sampling: otelx.JaegerSampling{
-					ServerURL: "http://sampling",
+					ServerURL:    "http://sampling",
+					TraceIdRatio: 1,
 				},
 			},
 			Zipkin: otelx.ZipkinConfig{

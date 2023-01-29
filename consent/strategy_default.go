@@ -12,33 +12,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/twmb/murmur3"
-
-	"github.com/ory/hydra/driver/config"
-
-	"github.com/ory/x/errorsx"
-
-	"github.com/ory/x/sqlcon"
-
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
-	jwtgo "github.com/ory/fosite/token/jwt"
-
-	"github.com/ory/x/sqlxx"
+	"github.com/twmb/murmur3"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
+	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
-
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
 )
 
 const (
@@ -168,9 +160,9 @@ func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.Resp
 	return s.forwardAuthenticationRequest(ctx, w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
 }
 
-func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwtgo.MapClaims, error) {
+func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwt.MapClaims, error) {
 	token, err := s.r.OpenIDJWTStrategy().Decode(ctx, idTokenHint)
-	if ve := new(jwtgo.ValidationError); errors.As(err, &ve) && ve.Errors == jwtgo.ValidationErrorExpired {
+	if ve := new(jwt.ValidationError); errors.As(err, &ve) && ve.Errors == jwt.ValidationErrorExpired {
 		// Expired is ok
 	} else if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
@@ -217,7 +209,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 	iu := s.c.OAuth2AuthURL(ctx)
 	iu.RawQuery = r.URL.RawQuery
 
-	var idTokenHintClaims jwtgo.MapClaims
+	var idTokenHintClaims jwt.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
 		claims, err := s.getIDTokenHintClaims(r.Context(), idTokenHint)
 		if err != nil {
@@ -674,7 +666,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
 		// sub := s.obfuscateSubjectIdentifier(c, subject, )
 
-		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
+		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwt.MapClaims{
 			"iss":    s.c.IssuerURL(ctx).String(),
 			"aud":    []string{c.LegacyClientID},
 			"iat":    time.Now().UTC().Unix(),

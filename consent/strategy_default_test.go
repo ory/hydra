@@ -14,8 +14,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	jwtgo "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/urlx"
 
@@ -24,10 +22,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/client"
-	. "github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/client"
+	. "github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/ioutilx"
 )
 
@@ -108,7 +106,7 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	return cj
 }
 
-func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.MapClaims) string {
+func genIDToken(t *testing.T, reg driver.Registry, c jwt.MapClaims) string {
 	r, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r

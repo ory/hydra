@@ -20,10 +20,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
-	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/oauth2"
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
@@ -91,7 +91,8 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		require.NoError(t, dbRegistry.Persister().Connection(context.Background()).First(net))
 		dbRegistry.WithContextualizer(&contextx.Static{NID: net.ID, C: internal.NewConfigurationWithDefaults().Source(context.Background())})
 
-		ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+		ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+		t.Cleanup(cancel)
 		require.NoError(t, dbRegistry.OAuth2Storage().(clientCreator).CreateClient(ctx, &testClient))
 		require.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
 		_, err := dbRegistry.OAuth2Storage().GetRefreshTokenSession(ctx, tokenSignature, nil)
@@ -109,7 +110,8 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 					wg.Add(1)
 					go func(run, worker int) {
 						defer wg.Done()
-						ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(5*time.Second))
+						ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+						defer cancel()
 						time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 						// all workers will block here until the for loop above has launched all the worker go-routines
 						// this is to ensure we fire all the workers off at the same

@@ -14,8 +14,8 @@ import (
 	"github.com/spf13/cobra"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/cmd/cli"
-	"github.com/ory/hydra/cmd/cliclient"
+	"github.com/ory/hydra/v2/cmd/cli"
+	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/josex"

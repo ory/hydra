@@ -15,19 +15,19 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/contextx"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/internal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 )
 
 func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {

@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
 	"github.com/ory/fosite"
@@ -36,9 +36,9 @@ import (
 	"github.com/ory/x/uuidx"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
 )
 
 func TestStrategyLoginConsentNext(t *testing.T) {
@@ -348,6 +348,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		defer loginChallengeRes.Body.Close()
 
 		loginVerifierRedirect, err := loginChallengeRes.Location()
+		require.NoError(t, err)
 		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 		require.NoError(t, err)
 		defer loginVerifierRes.Body.Close()

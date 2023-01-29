@@ -235,7 +235,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, i.Get("active").Bool(), "%s", i)
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
+		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		return i
 	}
 
@@ -260,7 +260,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
 		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
-		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
+		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		assert.EqualValues(t, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
 		return i
 	}
@@ -682,6 +682,197 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			assert.Empty(t, uiClaims.Get(f).Raw, "%s: %s", f, uiClaims)
 		}
 	})
+
+	t.Run("case=add ext claims from hook if configured", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
+					var hookReq hydraoauth2.TokenHookRequest
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+					require.ElementsMatch(t, hookReq.GrantedAudience, []string{})
+					require.NotEmpty(t, hookReq.Session)
+					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{"foo": "bar"})
+					require.NotEmpty(t, hookReq.Requester)
+					require.Equal(t, hookReq.Requester.Payload, map[string][]string{})
+
+					claims := map[string]interface{}{
+						"hooked": true,
+					}
+
+					hookResp := hydraoauth2.TokenHookResponse{
+						Session: consent.AcceptOAuth2ConsentRequestSession{
+							AccessToken: claims,
+							IDToken:     claims,
+						},
+					}
+
+					w.WriteHeader(http.StatusOK)
+					require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				token, err := conf.Exchange(context.Background(), code)
+				require.NoError(t, err)
+
+				assertJWTAccessToken(t, strategy, conf, token, subject, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)))
+
+				// NOTE: using introspect to cover both jwt and opaque strategies
+				accessTokenClaims := introspectAccessToken(t, conf, token, subject)
+				require.True(t, accessTokenClaims.Get("ext.hooked").Bool())
+
+				idTokenClaims := assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
+				require.True(t, idTokenClaims.Get("hooked").Bool())
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook fails", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook denies the request", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusForbidden)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook response is malformed", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyAuthorizationCodeHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
 }
 
 // TestAuthCodeWithMockStrategy runs the authorization_code flow against various ConsentStrategy scenarios.
@@ -1024,7 +1215,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 							expectedGrantedScopes := []string{"openid", "offline", "hydra.*"}
 							expectedSubject := "foo"
-							expectedPayload := map[string][]string(map[string][]string{"grant_type": {"refresh_token"}, "refresh_token": {refreshedToken.RefreshToken}})
 
 							var hookReq hydraoauth2.TokenHookRequest
 							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
@@ -1039,7 +1229,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							require.NotEmpty(t, hookReq.Requester)
 							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
 							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
-							require.Equal(t, hookReq.Requester.Payload, expectedPayload)
+							require.Equal(t, hookReq.Requester.Payload, map[string][]string{})
 
 							except := []string{
 								"session.kid",
@@ -1049,7 +1239,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								"session.id_token.id_token_claims.exp",
 								"session.id_token.id_token_claims.rat",
 								"session.id_token.id_token_claims.auth_time",
-								"requester.payload.refresh_token",
 							}
 							snapshotx.SnapshotTExcept(t, hookReq, except)
 

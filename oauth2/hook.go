@@ -127,7 +127,6 @@ func JWTBearerHook(reg interface {
 }
 
 func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.AccessRequester, hookType string, hookURL *url.URL) error {
-
 	if !requester.GetGrantTypes().ExactOne(hookType) {
 		return nil
 	}
@@ -137,12 +136,18 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 		return nil
 	}
 
+	payload := map[string][]string{}
+
+	if requester.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") || requester.GetGrantTypes().ExactOne("client_credentials") {
+		payload = requester.GetRequestForm()
+	}
+
 	requesterInfo := Requester{
 		ClientID:        requester.GetClient().GetID(),
 		GrantedScopes:   requester.GetGrantedScopes(),
 		GrantedAudience: requester.GetGrantedAudience(),
 		GrantTypes:      requester.GetGrantTypes(),
-		Payload:         requester.GetRequestForm(),
+		Payload:         payload,
 	}
 
 	reqBody := TokenHookRequest{

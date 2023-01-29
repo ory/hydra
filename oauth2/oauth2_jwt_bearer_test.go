@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -19,7 +20,9 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
+	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 
 	"github.com/stretchr/testify/assert"
@@ -65,7 +68,7 @@ func TestJWTBearer(t *testing.T) {
 		return conf.Token(context.Background())
 	}
 
-	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, grant trust.Grant) {
+	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, grant trust.Grant, checkExtraClaims bool) {
 		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
@@ -77,6 +80,10 @@ func TestJWTBearer(t *testing.T) {
 			assert.True(t, res.Get("exp").Int() >= res.Get("iat").Int()+int64(reg.Config().GetAccessTokenLifespan(ctx).Seconds()), "%s", res.Raw)
 
 			assert.EqualValues(t, fmt.Sprintf(`["%s"]`, reg.Config().OAuth2TokenURL(ctx).String()), res.Get("aud").Raw, "%s", res.Raw)
+
+			if checkExtraClaims {
+				require.True(t, res.Get("ext.hooked").Bool())
+			}
 		}
 
 		check(introspection)
@@ -248,7 +255,7 @@ func TestJWTBearer(t *testing.T) {
 				result, err := getToken(t, conf)
 				require.NoError(t, err)
 
-				inspectToken(t, result, client, strategy, trustGrant)
+				inspectToken(t, result, client, strategy, trustGrant, false)
 			}
 		}
 
@@ -288,7 +295,180 @@ func TestJWTBearer(t *testing.T) {
 				require.NoError(t, json.Unmarshal(body, &result))
 				assert.NotEmpty(t, result.AccessToken, "%s", body)
 
-				inspectToken(t, &result, client, strategy, trustGrant)
+				inspectToken(t, &result, client, strategy, trustGrant, false)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should call token hook if configured", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				audience := reg.Config().OAuth2TokenURL(ctx).String()
+				grantType := "urn:ietf:params:oauth:grant-type:jwt-bearer"
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.NewString(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": audience,
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
+					expectedGrantedScopes := []string{client.Scope}
+					expectedGrantedAudience := []string{audience}
+					expectedPayload := map[string][]string(map[string][]string{"grant_type": {grantType}, "assertion": {token}, "scope": {client.Scope}})
+
+					var hookReq hydraoauth2.TokenHookRequest
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+					require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
+					require.ElementsMatch(t, hookReq.GrantedAudience, expectedGrantedAudience)
+					require.NotEmpty(t, hookReq.Session)
+					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
+					require.NotEmpty(t, hookReq.Requester)
+					require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
+					require.Equal(t, hookReq.Requester.Payload, expectedPayload)
+
+					claims := map[string]interface{}{
+						"hooked": true,
+					}
+
+					hookResp := hydraoauth2.TokenHookResponse{
+						Session: consent.AcceptOAuth2ConsentRequestSession{
+							AccessToken: claims,
+							IDToken:     claims,
+						},
+					}
+
+					w.WriteHeader(http.StatusOK)
+					require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {grantType}, "assertion": {token}}
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				inspectToken(t, result, client, strategy, trustGrant, true)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should fail token if hook fails", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.NewString(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": reg.Config().OAuth2TokenURL(ctx).String(),
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"}, "assertion": {token}}
+
+				_, tokenError := getToken(t, conf)
+				require.Error(t, tokenError)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should fail token if hook denied the request", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusForbidden)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.NewString(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": reg.Config().OAuth2TokenURL(ctx).String(),
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"}, "assertion": {token}}
+
+				_, tokenError := getToken(t, conf)
+				require.Error(t, tokenError)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should fail token if hook response is malformed", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.NewString(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": reg.Config().OAuth2TokenURL(ctx).String(),
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"}, "assertion": {token}}
+
+				_, tokenError := getToken(t, conf)
+				require.Error(t, tokenError)
 			}
 		}
 

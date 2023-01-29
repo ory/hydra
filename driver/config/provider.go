@@ -92,7 +92,10 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
-	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
+	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook"      // #nosec G101
+	KeyAuthorizationCodeHookURL                  = "oauth2.authorization_code_hook" // #nosec G101
+	KeyClientCredentialsHookURL                  = "oauth2.client_credentials_hook" // #nosec G101
+	KeyJWTBearerHookURL                          = "oauth2.jwt_bearer_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
 )
 
@@ -420,12 +423,36 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
+func (p *DefaultProvider) AuthorizationCodeHookURL(ctx context.Context) *url.URL {
+	if len(p.getProvider(ctx).String(KeyAuthorizationCodeHookURL)) == 0 {
+		return nil
+	}
+
+	return p.getProvider(ctx).RequestURIF(KeyAuthorizationCodeHookURL, nil)
+}
+
+func (p *DefaultProvider) ClientCredentialsHookURL(ctx context.Context) *url.URL {
+	if len(p.getProvider(ctx).String(KeyClientCredentialsHookURL)) == 0 {
+		return nil
+	}
+
+	return p.getProvider(ctx).RequestURIF(KeyClientCredentialsHookURL, nil)
+}
+
 func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
 	if len(p.getProvider(ctx).String(KeyRefreshTokenHookURL)) == 0 {
 		return nil
 	}
 
 	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
+}
+
+func (p *DefaultProvider) JWTBearerRefreshHookURL(ctx context.Context) *url.URL {
+	if len(p.getProvider(ctx).String(KeyJWTBearerHookURL)) == 0 {
+		return nil
+	}
+
+	return p.getProvider(ctx).RequestURIF(KeyJWTBearerHookURL, nil)
 }
 
 func (p *DefaultProvider) DbIgnoreUnknownTableColumns() bool {

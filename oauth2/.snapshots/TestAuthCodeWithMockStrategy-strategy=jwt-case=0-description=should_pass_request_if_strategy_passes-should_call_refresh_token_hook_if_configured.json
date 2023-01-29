@@ -41,7 +41,12 @@
     "granted_audience": [],
     "grant_types": [
       "refresh_token"
-    ]
+    ],
+    "payload": {
+      "grant_type": [
+        "refresh_token"
+      ]
+    }
   },
   "client_id": "app-client",
   "granted_scopes": [

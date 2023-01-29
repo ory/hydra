@@ -1024,8 +1024,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 							expectedGrantedScopes := []string{"openid", "offline", "hydra.*"}
 							expectedSubject := "foo"
+							expectedPayload := map[string][]string(map[string][]string{"grant_type": {"refresh_token"}, "refresh_token": {refreshedToken.RefreshToken}})
 
-							var hookReq hydraoauth2.RefreshTokenHookRequest
+							var hookReq hydraoauth2.TokenHookRequest
 							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
 							require.Equal(t, hookReq.Subject, expectedSubject)
 							require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
@@ -1038,6 +1039,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							require.NotEmpty(t, hookReq.Requester)
 							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
 							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
+							require.Equal(t, hookReq.Requester.Payload, expectedPayload)
 
 							except := []string{
 								"session.kid",
@@ -1047,6 +1049,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								"session.id_token.id_token_claims.exp",
 								"session.id_token.id_token_claims.rat",
 								"session.id_token.id_token_claims.auth_time",
+								"requester.payload.refresh_token",
 							}
 							snapshotx.SnapshotTExcept(t, hookReq, except)
 
@@ -1054,7 +1057,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								"hooked": true,
 							}
 
-							hookResp := hydraoauth2.RefreshTokenHookResponse{
+							hookResp := hydraoauth2.TokenHookResponse{
 								Session: consent.AcceptOAuth2ConsentRequestSession{
 									AccessToken: claims,
 									IDToken:     claims,
@@ -1131,7 +1134,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, "An error occurred while executing the refresh token hook.", errBody.Description)
+						require.Equal(t, "An error occurred while executing the refresh_token hook.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `access_denied` if hook denied the request", func(t *testing.T) {
@@ -1150,7 +1153,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
-						require.Equal(t, "The refresh token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
+						require.Equal(t, "The refresh_token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook response is malformed", func(t *testing.T) {
@@ -1169,7 +1172,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
 						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, "The refresh token hook target responded with an error.", errBody.Description)
+						require.Equal(t, "The refresh_token hook target responded with an error.", errBody.Description)
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {

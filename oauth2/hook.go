@@ -36,7 +36,7 @@ type Requester struct {
 	GrantedAudience []string `json:"granted_audience"`
 	// GrantTypes is the requests grant types.
 	GrantTypes []string `json:"grant_types"`
-	// RequestBody is the requests payload.
+	// Payload is the requests payload.
 	Payload map[string][]string `json:"payload"`
 }
 

@@ -9,18 +9,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
-
-	"github.com/ory/hydra/internal"
-	"github.com/ory/x/contextx"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	jwt2 "github.com/ory/fosite/token/jwt"
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite/token/jwt"
-	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/internal"
+	. "github.com/ory/hydra/v2/jwk"
+	"github.com/ory/x/contextx"
 )
 
 func TestJWTStrategy(t *testing.T) {
@@ -34,7 +30,7 @@ func TestJWTStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			s := NewDefaultJWTSigner(conf, reg, "foo-set")
-			a, b, err := s.Generate(context.Background(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
+			a, b, err := s.Generate(context.Background(), jwt.MapClaims{"foo": "bar"}, &jwt.Headers{})
 			require.NoError(t, err)
 			assert.NotEmpty(t, a)
 			assert.NotEmpty(t, b)
@@ -52,7 +48,7 @@ func TestJWTStrategy(t *testing.T) {
 			_, err = m.GenerateAndPersistKeySet(context.Background(), "foo-set", "bar", alg, "sig")
 			require.NoError(t, err)
 
-			a, b, err = s.Generate(context.Background(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
+			a, b, err = s.Generate(context.Background(), jwt.MapClaims{"foo": "bar"}, &jwt.Headers{})
 			require.NoError(t, err)
 			assert.NotEmpty(t, a)
 			assert.NotEmpty(t, b)

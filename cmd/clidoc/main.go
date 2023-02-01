@@ -9,7 +9,7 @@ import (
 
 	"github.com/ory/x/clidoc"
 
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 )
 
 func main() {

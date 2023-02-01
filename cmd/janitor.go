@@ -6,10 +6,10 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/servicelocatorx"
 
-	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/x/configx"
 )
 

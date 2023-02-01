@@ -16,10 +16,10 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/i18n"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/persistence"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/persistence"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/urlx"
 )
 

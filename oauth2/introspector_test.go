@@ -16,11 +16,11 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

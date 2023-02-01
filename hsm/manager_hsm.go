@@ -16,7 +16,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/otelx"
 
 	"github.com/pkg/errors"
@@ -24,11 +24,11 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 
 	"github.com/miekg/pkcs11"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/ThalesIgnite/crypto11"
 	"go.opentelemetry.io/otel"

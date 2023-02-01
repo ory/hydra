@@ -13,8 +13,8 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
 )
 
 var _ consent.Strategy = new(consentMock)

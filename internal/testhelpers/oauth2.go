@@ -16,8 +16,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	djwt "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/fosite/token/jwt"
 
 	"github.com/julienschmidt/httprouter"
@@ -30,11 +28,11 @@ import (
 
 	"net/http/httptest"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
@@ -51,7 +49,7 @@ func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp
 	return token
 }
 
-func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClaims) string {
+func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaims) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token

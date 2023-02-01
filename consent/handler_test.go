@@ -15,18 +15,17 @@ import (
 
 	"github.com/ory/x/pointerx"
 
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/internal"
 
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/client"
-	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/v2/client"
+	. "github.com/ory/hydra/v2/consent"
 )
 
 func TestGetLogoutRequest(t *testing.T) {
@@ -165,7 +164,7 @@ func TestGetConsentRequest(t *testing.T) {
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), lr))
-				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), lr.ID, &consent.HandledLoginRequest{
+				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), lr.ID, &HandledLoginRequest{
 					ID: lr.ID,
 				})
 				require.NoError(t, err)

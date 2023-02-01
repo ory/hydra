@@ -6,22 +6,18 @@ package driver
 import (
 	"context"
 
-	"github.com/ory/x/servicelocatorx"
-
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/configx"
-
-	"github.com/ory/x/logrusx"
-
-	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/servicelocatorx"
 )
 
 type options struct {
-	forcedValues map[string]interface{}
-	preload      bool
-	validate     bool
-	opts         []configx.OptionModifier
-	config       *config.DefaultProvider
+	preload  bool
+	validate bool
+	opts     []configx.OptionModifier
+	config   *config.DefaultProvider
 	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
 	skipNetworkInit bool
 }

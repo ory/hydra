@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/cmdx"
 )
 

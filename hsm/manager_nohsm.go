@@ -10,12 +10,12 @@ import (
 	"context"
 	"sync"
 
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/logrusx"
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 
 	"gopkg.in/square/go-jose.v2"
 )

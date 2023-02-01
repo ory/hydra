@@ -8,8 +8,8 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/hydra/driver/config"
+	fdevice "github.com/ory/fosite/handler/rfc8628"
+	"github.com/ory/hydra/v2/driver/config"
 )
 
 var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)
@@ -18,7 +18,7 @@ var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)
 type TokenStrategy struct {
 	c       *config.DefaultProvider
 	hmac    *foauth2.HMACSHAStrategy
-	devHmac *rfc8628.DefaultDeviceStrategy
+	devHmac *fdevice.DefaultDeviceStrategy
 	jwt     *foauth2.DefaultJWTStrategy
 }
 

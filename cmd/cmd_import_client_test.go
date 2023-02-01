@@ -15,7 +15,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/cmd"
+	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/snapshotx"

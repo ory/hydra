@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/jwk"
 )
 
 func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {

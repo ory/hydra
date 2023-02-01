@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/x/contextx"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
@@ -27,20 +27,20 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/hydra/flow"
-	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
-	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/v2/flow"
+	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/popx"
 
 	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 )
 
 func snapshotFor(paths ...string) *cupaloy.Config {
@@ -88,14 +88,6 @@ func TestMigrations(t *testing.T) {
 		return func(t *testing.T) {
 			ctx := context.Background()
 			x.CleanSQLPop(t, c)
-			url := c.URL()
-
-			// workaround for https://github.com/gobuffalo/pop/issues/538
-			if db == "mysql" {
-				url = "mysql://" + url
-			} else if db == "sqlite" {
-				url = "sqlite://" + url
-			}
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
@@ -103,7 +95,6 @@ func TestMigrations(t *testing.T) {
 				os.DirFS("../migrations"),
 				popx.NewMigrator(c, l, nil, 1*time.Minute),
 				popx.WithTestdata(t, os.DirFS("./testdata")))
-			//tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), l)
 			require.NoError(t, err)
 			require.NoError(t, tm.Up(ctx))
 

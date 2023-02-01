@@ -6,8 +6,8 @@ package testhelpers
 import (
 	"time"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/x"
 )
 
 var TestLifespans = client.Lifespans{

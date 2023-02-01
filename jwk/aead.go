@@ -9,7 +9,7 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/gtank/cryptopasta"
 	"github.com/pkg/errors"

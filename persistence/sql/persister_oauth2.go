@@ -27,7 +27,7 @@ import (
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
 
-	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/v2/oauth2"
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}

@@ -30,24 +30,22 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
-	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/fosite"
-	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	hydraoauth2 "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
 )
@@ -123,7 +121,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return q.Get("code"), resp
 	}
 
-	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(t *testing.T, c *hc.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
@@ -160,7 +158,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 	}
 
-	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
+	acceptConsentHandler := func(t *testing.T, c *hc.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
@@ -395,7 +393,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
-		run := func(t *testing.T, strategy string, c *hc.Client, conf *oauth2.Config, expectedLifespans client.Lifespans) {
+		run := func(t *testing.T, strategy string, c *hc.Client, conf *oauth2.Config, expectedLifespans hc.Lifespans) {
 			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				acceptLoginHandler(t, c, subject, nil),
 				acceptConsentHandler(t, c, subject, nil),
@@ -449,7 +447,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				&oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
 				c.GetID(),
 				ls, adminTS,
 			)
@@ -463,7 +461,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
 				t,
-				&goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
+				&oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret},
 				c.GetID(),
 				ls, adminTS,
 			)
@@ -473,11 +471,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
 			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
-			testhelpers.UpdateClientTokenLifespans(t, &goauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.Lifespans{}, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), hc.Lifespans{}, adminTS)
 			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
-			expectedLifespans := client.Lifespans{
+			expectedLifespans := hc.Lifespans{
 				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
 				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
 				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},

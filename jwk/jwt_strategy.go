@@ -13,7 +13,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/pkg/errors"
 

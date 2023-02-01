@@ -17,14 +17,14 @@ import (
 
 	"github.com/ory/x/otelx"
 
-	"github.com/ory/hydra/spec"
+	"github.com/ory/hydra/v2/spec"
 	"github.com/ory/x/dbal"
 
 	"github.com/ory/x/configx"
 
 	"github.com/ory/x/logrusx"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
@@ -109,9 +109,7 @@ var _ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
 var _ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
 
 type DefaultProvider struct {
-	generatedSecret []byte
-	l               *logrusx.Logger
-
+	l *logrusx.Logger
 	p *configx.Provider
 	c contextx.Contextualizer
 }

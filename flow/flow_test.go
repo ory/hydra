@@ -13,7 +13,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 
-	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/x/sqlxx"
 )
 

@@ -18,7 +18,7 @@ import (
 
 	"github.com/ory/x/stringslice"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/julienschmidt/httprouter"
 	jose "gopkg.in/square/go-jose.v2"

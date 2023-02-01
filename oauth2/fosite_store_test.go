@@ -10,11 +10,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	. "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	. "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlcon/dockertest"

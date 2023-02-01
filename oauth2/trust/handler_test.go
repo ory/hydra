@@ -20,19 +20,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/x/contextx"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/jwk"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
 )
 
 // Define the suite, and absorb the built-in basic suite

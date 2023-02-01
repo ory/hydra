@@ -10,36 +10,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory/x/popx"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/rs/cors"
-
-	"github.com/hashicorp/go-retryablehttp"
-
-	"github.com/ory/hydra/fositex"
-	ctxx "github.com/ory/x/contextx"
-	"github.com/ory/x/httpx"
-	"github.com/ory/x/otelx"
-
-	"github.com/ory/hydra/hsm"
-
-	prometheus "github.com/ory/x/prometheusx"
-
-	"github.com/pkg/errors"
-
-	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/hydra/x/oauth2cors"
-	"github.com/ory/x/contextx"
-
-	"github.com/ory/hydra/persistence"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"github.com/ory/x/logrusx"
-
 	"github.com/gorilla/sessions"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/cors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -47,14 +22,25 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/herodot"
-
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fositex"
+	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/hydra/v2/persistence"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/hydra/v2/x/oauth2cors"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
+	"github.com/ory/x/popx"
+	prometheus "github.com/ory/x/prometheusx"
 )
 
 var (
@@ -77,11 +63,7 @@ type RegistryBase struct {
 	kc              *jwk.AEAD
 	cos             consent.Strategy
 	writer          herodot.Writer
-	fsc             fosite.ScopeStrategy
-	atjs            jwk.JWTSigner
-	idtjs           jwk.JWTSigner
 	hsm             hsm.Context
-	fscPrev         string
 	forv            *openid.OpenIDConnectRequestValidator
 	fop             fosite.OAuth2Provider
 	coh             *consent.Handler
@@ -90,8 +72,6 @@ type RegistryBase struct {
 	trc             *otelx.Tracer
 	pmm             *prometheus.MetricsManager
 	oa2mw           func(h http.Handler) http.Handler
-	o2mc            *foauth2.HMACSHAStrategy
-	o2jwt           *foauth2.DefaultJWTStrategy
 	arhs            []oauth2.AccessRequestHook
 	buildVersion    string
 	buildHash       string
@@ -219,7 +199,7 @@ func (m *RegistryBase) Logger() *logrusx.Logger {
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
 		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
-		m.al.UseConfig(m.Config().Source(ctxx.RootContext))
+		m.al.UseConfig(m.Config().Source(contextx.RootContext))
 	}
 	return m.al
 }

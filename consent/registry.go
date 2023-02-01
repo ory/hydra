@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/x"
 )
 
 type InternalRegistry interface {

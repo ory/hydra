@@ -4,6 +4,8 @@ export GO111MODULE := on
 export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
+GOLANGCI_LINT_VERSION = 1.46.2
+
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
@@ -15,8 +17,9 @@ define make-go-dependency
 		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
-.bin/golangci-lint: Makefile
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v1.46.2
+.bin/golangci-lint-$(GOLANGCI_LINT_VERSION):
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v$(GOLANGCI_LINT_VERSION)
+	mv .bin/golangci-lint .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
@@ -41,12 +44,12 @@ docs/cli: .bin/clidoc
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 .bin/ory: Makefile
-	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.1.48
+	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.2.2
 	touch .bin/ory
 
 .PHONY: lint
-lint: .bin/golangci-lint
-	golangci-lint run -v ./...
+lint: .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
+	.bin/golangci-lint-$(GOLANGCI_LINT_VERSION) run -v ./...
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
@@ -113,12 +116,12 @@ mocks: .bin/mockgen
 .PHONY: sdk
 sdk: .bin/swagger .bin/ory node_modules
 	swagger generate spec -m -o spec/swagger.json \
-		-c github.com/ory/hydra/client \
-		-c github.com/ory/hydra/consent \
-		-c github.com/ory/hydra/health \
-		-c github.com/ory/hydra/jwk \
-		-c github.com/ory/hydra/oauth2 \
-		-c github.com/ory/hydra/x \
+		-c github.com/ory/hydra/v2/client \
+		-c github.com/ory/hydra/v2/consent \
+		-c github.com/ory/hydra/v2/health \
+		-c github.com/ory/hydra/v2/jwk \
+		-c github.com/ory/hydra/v2/oauth2 \
+		-c github.com/ory/hydra/v2/x \
 		-c github.com/ory/x/healthx \
 		-c github.com/ory/x/openapix \
 		-c github.com/ory/x/pagination \
@@ -144,6 +147,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		--git-user-id ory \
 		--git-repo-id hydra-client-go \
 		--git-host github.com
+	(cd internal/httpclient && go mod edit -module github.com/ory/hydra-client-go/v2)
 
 	make format
 
@@ -174,7 +178,7 @@ install-stable:
 	git checkout $$HYDRA_LATEST
 	GO111MODULE=on go install \
 		-tags sqlite,json1 \
-		-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
+		-ldflags "-X github.com/ory/hydra/v2/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/v2/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/v2/driver/config.Commit=`git rev-parse HEAD`" \
 		.
 	git checkout master
 

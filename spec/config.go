@@ -13,7 +13,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/x/logrusx"
-	"github.com/ory/x/tracing"
+	"github.com/ory/x/otelx"
 )
 
 //go:embed config.json
@@ -32,7 +32,7 @@ func init() {
 func AddConfigSchema(compiler interface {
 	AddResource(url string, r io.Reader) error
 }) error {
-	if err := tracing.AddConfigSchema(compiler); err != nil {
+	if err := otelx.AddConfigSchema(compiler); err != nil {
 		return err
 	}
 	if err := logrusx.AddConfigSchema(compiler); err != nil {

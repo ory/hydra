@@ -11,11 +11,11 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 
-	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/errorsx"
 )
 

@@ -6,7 +6,7 @@ WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
-COPY internal/httpclient/go.* ./internal/httpclient
+COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
@@ -42,5 +42,3 @@ USER ory
 
 ENTRYPOINT ["hydra"]
 CMD ["serve"]
-
-

@@ -141,3 +141,8 @@ tracing:
         server_url: http://sampling
     zipkin:
       server_url: http://zipkin/api/v2/spans
+    otlp:
+      insecure: true
+      server_url: localhost:4318
+      sampling:
+        sampling_ratio: 1.0

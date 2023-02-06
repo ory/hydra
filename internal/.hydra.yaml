@@ -136,11 +136,13 @@ tracing:
   providers:
     jaeger:
       local_agent_address: 127.0.0.1:6831
-      propagation: jaeger
-      max_tag_value_length: 1024
       sampling:
-        type: const
-        value: 1
+        trace_id_ratio: 1
         server_url: http://sampling
     zipkin:
       server_url: http://zipkin/api/v2/spans
+    otlp:
+      insecure: true
+      server_url: localhost:4318
+      sampling:
+        sampling_ratio: 1.0

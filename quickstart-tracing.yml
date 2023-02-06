@@ -22,18 +22,19 @@ services:
       # - TRACING_SERVICE_NAME="Ory Hydra"
       - TRACING_PROVIDER=jaeger
       # - TRACING_PROVIDER=zipkin
-      # - TRACING_PROVIDER=datadog
+      # - TRACING_PROVIDER=otel # datadog
       # - TRACING_PROVIDER=elastic-apm
       ### Jaeger ###
       - TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
       - TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
-      - TRACING_PROVIDERS_JAEGER_SAMPLING_TYPE=const
-      - TRACING_PROVIDERS_JAEGER_SAMPLING_VALUE=1
+      - TRACING_PROVIDERS_JAEGER_SAMPLING_TRACE_ID_RATIO=1
       ### Zipkin ###
       # - TRACING_PROVIDERS_ZIPKIN_SERVER_URL=http://zipkin:9411/api/v2/spans
       ### DataDog ###
       ### See env vars here: https://docs.datadoghq.com/tracing/setup/go/#configuration) ###
-      # - DD_SERVICE=Hydra
+      # - TRACING_PROVIDERS_OTLP_INSECURE=true
+      # - TRACING_PROVIDERS_OTLP_SAMPLING_SAMPLING_RATIO=1.0
+      # - TRACING_PROVIDERS_OTLP_SERVER_URL=localhost:4318
       ### Elastic APM ###
       ### See env vars here: https://www.elastic.co/guide/en/apm/agent/go/1.x/configuration.html) ###
       # - ELASTIC_APM_SERVER_URL="http://apm-server:8200"
@@ -61,3 +62,4 @@ services:
 #      - DD_API_KEY=<YOUR_API_KEY> # Replace it with your DataDog API key
 #      - DD_APM_ENABLED=true
 #      - DD_APM_NON_LOCAL_TRAFFIC=true
+#      - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT=0.0.0.0:4318

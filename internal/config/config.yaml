@@ -443,21 +443,12 @@ tracing:
     jaeger:
       # The address of the jaeger-agent where spans should be sent to
       local_agent_address: 127.0.0.1:6831
-      # The tracing header format
-      propagation: jaeger
-      # The maximum length of jaeger tag value
-      max_tag_value_length: 1024
       sampling:
-        # The type of the sampler you want to use. Supports:
-        # - const
-        # - probabilistic
-        # - ratelimiting
-        type: const
         # The value passed to the sampler type that has been configured.
         # Supported values: This is dependant on the sampling strategy used:
         # - const: 0 or 1 (all or nothing)
         # - rateLimiting: a constant rate (e.g. setting this to 3 will sample requests with the rate of 3 traces per second)
         # - probabilistic: a value between 0..1
-        value: 1.0
+        trace_id_ratio: 1.0
         # The address of jaeger-agent's HTTP sampling server
         server_url: http://localhost:5778/sampling

@@ -256,7 +256,7 @@ jobs:
     steps:
       - uses: ory/ci/releaser/render-version-schema@master
         with:
-          schema-path: spec/config.json
+          schema-path: .schema/config.schema.json
           token: ${{ secrets.ORY_BOT_PAT }}
 
   newsletter-draft:

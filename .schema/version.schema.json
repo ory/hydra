@@ -1,5 +1,5 @@
 {
-    "$id": "https://github.com/ory/kratos/.schema/versions.config.schema.json",
+    "$id": "https://github.com/ory/hydra/.schema/versions.config.schema.json",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "oneOf": [
         {

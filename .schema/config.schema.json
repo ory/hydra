@@ -1022,7 +1022,7 @@
       "examples": ["cpu"]
     },
     "tracing": {
-      "$ref": "ory://tracing-config"
+      "$ref": "https://raw.githubusercontent.com/ory/x/v0.0.533/otelx/config.schema.json"
     },
     "sqa": {
       "type": "object",

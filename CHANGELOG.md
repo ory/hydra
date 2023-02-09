@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-02-06)](#000-2023-02-06)
+- [0.0.0 (2023-02-09)](#000-2023-02-09)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
@@ -665,7 +665,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-02-06)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-02-09)
 
 
 ### Bug Fixes
@@ -675,6 +675,12 @@
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
 
 ### Features
+
+* Render complete config schema during CI ([#3433](https://github.com/ory/hydra/issues/3433)) ([ae3e781](https://github.com/ory/hydra/commit/ae3e7811ae2ba031fc4f1569a889d8b4ba0c96fd)):
+
+    * chore: bump ory/x
+    
+    * chore: script to render the complete config
 
 * Support datadog tracing ([#3431](https://github.com/ory/hydra/issues/3431)) ([3ea014f](https://github.com/ory/hydra/commit/3ea014f98f72b1456909838e8f7c40ceade7b2f6))
 

@@ -268,6 +268,7 @@ CREATE TABLE hydra_oauth2_trusted_jwt_bearer_issuer
     key_id     varchar(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    allowed_audiences TEXT,
     UNIQUE (issuer, subject, key_id),
     FOREIGN KEY (key_set, key_id) REFERENCES hydra_jwk (sid, kid) ON DELETE CASCADE
 );

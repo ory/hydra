@@ -4,9 +4,11 @@ RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
 WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient
+RUN mkdir -p ./internal/fosite
 
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient
+COPY internal/fosite/go.* ./internal/fosite
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1

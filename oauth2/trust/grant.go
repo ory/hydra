@@ -27,6 +27,9 @@ type Grant struct {
 
 	// ExpiresAt indicates, when grant will expire, so we will reject assertion from Issuer targeting Subject.
 	ExpiresAt time.Time `json:"expires_at"`
+
+	// The "allowed_audiences" contains a list of audiences that this issuer can issue tokens for
+	AllowedAudiences []string `json:"allowed_audiences"`
 }
 
 type PublicKey struct {

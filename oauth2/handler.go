@@ -116,7 +116,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 
 // swagger:route GET /oauth2/sessions/logout v0alpha2 performOidcFrontOrBackChannelLogout
 //
-// OpenID Connect Front- or Back-channel Enabled Logout
+// # OpenID Connect Front- or Back-channel Enabled Logout
 //
 // This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
 //
@@ -125,10 +125,10 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //
 // Back-channel logout is performed asynchronously and does not affect logout flow.
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       302: emptyResponse
+//	Responses:
+//	  302: emptyResponse
 func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
@@ -355,7 +355,7 @@ type OIDCConfiguration struct {
 
 // swagger:route GET /.well-known/openid-configuration v0alpha2 discoverOidcConfiguration
 //
-// OpenID Connect Discovery
+// # OpenID Connect Discovery
 //
 // The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 // your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
@@ -364,14 +364,14 @@ type OIDCConfiguration struct {
 // Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 // For a full list of clients go here: https://openid.net/developers/certified/
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: oidcConfiguration
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oidcConfiguration
+//	  default: oAuth2ApiError
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -473,7 +473,7 @@ type oidcUserInfo struct {
 
 // swagger:route GET /userinfo v0alpha2 getOidcUserInfo
 //
-// OpenID Connect Userinfo
+// # OpenID Connect Userinfo
 //
 // This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
 // the provided OAuth 2.0 Access Token.
@@ -484,17 +484,17 @@ type oidcUserInfo struct {
 // with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 // for more details about header format.
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       oauth2:
+//	Security:
+//	  oauth2:
 //
-//     Responses:
-//       200: oidcUserInfo
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oidcUserInfo
+//	  default: oAuth2ApiError
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -583,25 +583,25 @@ type revokeOAuth2Token struct {
 
 // swagger:route POST /oauth2/revoke v0alpha2 revokeOAuth2Token
 //
-// Revoke an OAuth2 Access or Refresh Token
+// # Revoke an OAuth2 Access or Refresh Token
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
 // Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 // the client the token was generated for.
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2:
+//	Security:
+//	  basic:
+//	  oauth2:
 //
-//     Responses:
-//       200: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -633,7 +633,7 @@ type adminIntrospectOAuth2Token struct {
 
 // swagger:route POST /admin/oauth2/introspect v0alpha2 adminIntrospectOAuth2Token
 //
-// Introspect OAuth2 Access or Refresh Tokens
+// # Introspect OAuth2 Access or Refresh Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -641,17 +641,17 @@ type adminIntrospectOAuth2Token struct {
 //
 // For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       200: introspectedOAuth2Token
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: introspectedOAuth2Token
+//	  default: oAuth2ApiError
 func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -787,7 +787,7 @@ type oAuth2TokenResponse struct {
 
 // swagger:route POST /oauth2/token v0alpha2 performOAuth2TokenFlow
 //
-// The OAuth 2.0 Token Endpoint
+// # The OAuth 2.0 Token Endpoint
 //
 // The client makes a request to the token endpoint by sending the
 // following parameters using the "application/x-www-form-urlencoded" HTTP
@@ -798,21 +798,21 @@ type oAuth2TokenResponse struct {
 // >
 // > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Produces:
-//     - application/json
+//	Produces:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2:
+//	Security:
+//	  basic:
+//	  oauth2:
 //
-//     Responses:
-//       200: oAuth2TokenResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  200: oAuth2TokenResponse
+//	  default: oAuth2ApiError
 func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -827,6 +827,7 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 	if accessRequest.GetGrantTypes().ExactOne("client_credentials") || accessRequest.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx) == "jwt" {
+			println("SETTING ACCESS TOKEN KEY ID")
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 			if err != nil {
 				x.LogError(r, err, h.r.Logger())
@@ -839,6 +840,10 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 		if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
 			session.Subject = accessRequest.GetClient().GetID()
 		}
+
+		println("ACCESS TOKEN STRATEGY!")
+		println(h.c.AccessTokenStrategy(ctx))
+
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
 		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
@@ -859,11 +864,42 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 			}
 		}
 
+		/*x.LogAudit(r, "TESTING LOGGING!", h.r.Logger())
+		println("TEST TEST TEST TEST TETST TEST")
+		err := r.ParseForm()
+		if err != nil {
+			println("ERROR PARSING FORM")
+			x.LogError(r, err, h.r.Logger())
+			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+			return
+		}
+		assertionToken := r.PostForm.Get("assertion")
+		if assertionToken == "" {
+			println("EMPTY TOKEN ASSERTION!")
+		}
+		token, err := h.r.AccessTokenJWTStrategy(). (ctx, assertionToken)
+		if err != nil {
+			println("FAILED WITH SOMETHING")
+			x.LogError(r, err, h.r.Logger())
+			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+			return
+		}
+
+		issuer := token.Claims["iss"].(string)*/
+		//keyId, err := h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+
+		for k, v := range accessRequest.GetRequestedAudience() {
+			fmt.Println(k, "value in requested is", v)
+		}
+		for k, v := range accessRequest.GetClient().GetAudience() {
+			fmt.Println(k, "value in client is", v)
+		}
 		for _, audience := range accessRequest.GetRequestedAudience() {
 			if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
 				accessRequest.GrantAudience(audience)
 			}
 		}
+		accessRequest.SetRequestedAudience(accessRequest.GetClient().GetAudience())
 	}
 
 	for _, hook := range h.r.AccessRequestHooks() {
@@ -886,21 +922,21 @@ func (h *Handler) performOAuth2TokenFlow(w http.ResponseWriter, r *http.Request)
 
 // swagger:route GET /oauth2/auth v0alpha2 performOAuth2AuthorizationFlow
 //
-// The OAuth 2.0 Authorize Endpoint
+// # The OAuth 2.0 Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 // OAuth2 is a very popular protocol and a library for your programming language will exists.
 //
 // To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 //
-//     Consumes:
-//     - application/x-www-form-urlencoded
+//	Consumes:
+//	- application/x-www-form-urlencoded
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       302: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  302: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) performOAuth2AuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -1017,18 +1053,18 @@ type adminDeleteOAuth2Token struct {
 
 // swagger:route DELETE /admin/oauth2/tokens v0alpha2 adminDeleteOAuth2Token
 //
-// Delete OAuth2 Access Tokens from a Client
+// # Delete OAuth2 Access Tokens from a Client
 //
 // This endpoint deletes OAuth2 access tokens issued for a client from the database
 //
-//     Consumes:
-//     - application/json
+//	Consumes:
+//	- application/json
 //
-//     Schemes: http, https
+//	Schemes: http, https
 //
-//     Responses:
-//       204: emptyResponse
-//       default: oAuth2ApiError
+//	Responses:
+//	  204: emptyResponse
+//	  default: oAuth2ApiError
 func (h *Handler) adminDeleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {

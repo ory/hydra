@@ -178,6 +178,24 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	return p.jwtGrantFromSQlData(data).Scope, nil
 }
 
+func (p *Persister) GetPublicKeyAudiences(ctx context.Context, issuer string, subject string, keyId string) ([]string, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeyAudiences")
+	defer span.End()
+
+	var data trust.SQLData
+	query := p.QueryWithNetwork(ctx).
+		Where("issuer = ?", issuer).
+		Where("subject = ? OR allow_any_subject IS TRUE", subject).
+		Where("key_id = ?", keyId).
+		Where("nid = ?", p.NetworkID(ctx))
+
+	if err := query.First(&data); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return p.jwtGrantFromSQlData(data).AllowedAudiences, nil
+}
+
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.IsJWTUsed")
 	defer span.End()
@@ -199,15 +217,16 @@ func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time
 
 func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
 	return trust.SQLData{
-		ID:              g.ID,
-		Issuer:          g.Issuer,
-		Subject:         g.Subject,
-		AllowAnySubject: g.AllowAnySubject,
-		Scope:           strings.Join(g.Scope, "|"),
-		KeySet:          g.PublicKey.Set,
-		KeyID:           g.PublicKey.KeyID,
-		CreatedAt:       g.CreatedAt,
-		ExpiresAt:       g.ExpiresAt,
+		ID:               g.ID,
+		Issuer:           g.Issuer,
+		Subject:          g.Subject,
+		AllowAnySubject:  g.AllowAnySubject,
+		Scope:            strings.Join(g.Scope, "|"),
+		KeySet:           g.PublicKey.Set,
+		KeyID:            g.PublicKey.KeyID,
+		CreatedAt:        g.CreatedAt,
+		ExpiresAt:        g.ExpiresAt,
+		AllowedAudiences: strings.Join(g.AllowedAudiences, "|"),
 	}
 }
 
@@ -222,8 +241,9 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 			Set:   data.KeySet,
 			KeyID: data.KeyID,
 		},
-		CreatedAt: data.CreatedAt,
-		ExpiresAt: data.ExpiresAt,
+		CreatedAt:        data.CreatedAt,
+		ExpiresAt:        data.ExpiresAt,
+		AllowedAudiences: stringsx.Splitx(data.AllowedAudiences, "|"),
 	}
 }
 

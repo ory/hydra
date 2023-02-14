@@ -31,17 +31,6 @@ jobs:
       - name: Run tests
         run: ./test/conformance/test.sh -v -short -parallel 16
 
-  sdk-generate:
-    name: Generate SDKs
-    runs-on: ubuntu-latest
-    outputs:
-      sdk-cache-key: ${{ steps.sdk-generate.outputs.sdk-cache-key }}
-    steps:
-      - uses: ory/ci/sdk/generate@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-        id: sdk-generate
-
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
@@ -189,114 +178,24 @@ jobs:
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - run: ./test/e2e/circle-ci.bash ${{ matrix.database }} ${{ matrix.args }}
 
-  docs-cli:
-    runs-on: ubuntu-latest
-    name: Build CLI docs
-    needs:
-      - test
-    steps:
-      - uses: ory/ci/docs/cli-next@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-          output-dir: docs/hydra/cli
+  # Login to Docker
+  - name: Login to GitHub Container Registry
+    uses: docker/login-action@v1
+    with:
+      registry: ghcr.io
+      username: ${{ github.actor }}
+      password: ${{ secrets.GITHUB_TOKEN }}
+  
+  # Build docker images
+  - name: Build docker image
+    run: docker
+    with:
+      context: .
+      file: .docker/Dockerfile-alpine
+      push: true
+      tags: |
+        ghcr.io/sb1finans/hydra:latest-alpine
+        ghcr.io/sb1finans/hydra:${{ github.sha }}
 
-  changelog:
-    name: Generate changelog
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' || github.ref_name == 'master' }}
-    needs:
-      - test
-      - test-hsm
-      - test-e2e
-    steps:
-      - uses: ory/ci/changelog@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
 
-  sdk-release:
-    name: Release SDKs
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - test
-      - test-hsm
-      - sdk-generate
-      - release
-    steps:
-      - uses: ory/ci/sdk/release@master
-        with:
-          swag-spec-location: spec/api.json
-          token: ${{ secrets.ORY_BOT_PAT }}
 
-  release:
-    name: Generate release
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - oidc-conformity
-      - test
-      - test-hsm
-      - test-e2e
-      - changelog
-    steps:
-      - uses: ory/ci/releaser@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-          goreleaser_key: ${{ secrets.GORELEASER_KEY }}
-          cosign_pwd: ${{ secrets.COSIGN_PWD }}
-          docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
-          docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  render-version-schema:
-    name: Render version schema
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - release
-    steps:
-      - uses: ory/ci/releaser/render-version-schema@master
-        with:
-          schema-path: spec/config.json
-          token: ${{ secrets.ORY_BOT_PAT }}
-
-  newsletter-draft:
-    name: Draft newsletter
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - release
-    steps:
-      - uses: ory/ci/newsletter@master
-        with:
-          mailchimp_list_id: f605a41b53
-          mailchmip_segment_id: 6479481
-          mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
-          draft: "true"
-          ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}
-
-  slack-approval-notification:
-    name: Pending approval Slack notification
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - newsletter-draft
-    steps:
-      - uses: ory/ci/newsletter/slack-notify@master
-        with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  newsletter-send:
-    name: Send newsletter
-    runs-on: ubuntu-latest
-    needs:
-      - newsletter-draft
-    if: ${{ github.ref_type == 'tag' }}
-    environment: production
-    steps:
-      - uses: ory/ci/newsletter@master
-        with:
-          mailchimp_list_id: f605a41b53
-          mailchmip_segment_id: 6479481
-          mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
-          draft: "false"
-          ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}

@@ -983,6 +983,37 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 	return s.completeLogout(ctx, w, r)
 }
 
+func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
+	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
+
+	// This is ok (session probably already revoked), do nothing!
+	if lsErr != nil {
+		return nil
+	}
+
+	if err := s.executeBackChannelLogout(r.Context(), r, loginSession.Subject, sid); err != nil {
+		return err
+	}
+
+	// We delete the session after back channel log out has worked as the session is otherwise removed
+	// from the store which will break the query for finding all the channels.
+	//
+	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
+	// even if an upstream URL fails!
+	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), sid); errors.Is(err, sqlcon.ErrNoRows) {
+		// This is ok (session probably already revoked), do nothing!
+	} else if err != nil {
+		return err
+	}
+
+	s.r.AuditLogger().
+		WithRequest(r).
+		WithField("subject", loginSession.Subject).
+		Info("User logout completed!")
+
+	return nil
+}
+
 func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*AcceptOAuth2ConsentRequest, error) {
 	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))

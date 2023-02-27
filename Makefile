@@ -94,6 +94,10 @@ quicktest:
 quicktest-hsm:
 	docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm .
 
+.PHONY: refresh
+refresh:
+	UPDATE_SNAPSHOTS=true go test -failfast -short -tags sqlite,json1 ./...
+
 authors:  # updates the AUTHORS file
 	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 

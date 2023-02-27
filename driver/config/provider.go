@@ -186,16 +186,8 @@ func (p *DefaultProvider) IsDevelopmentMode(ctx context.Context) bool {
 }
 
 func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) []string {
-	if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
-		include = append(include, x.OAuth2JWTKeyName)
-	}
-
-	include = append(include, x.OpenIDConnectKeyName)
+	include = append(include, x.OAuth2JWTKeyName, x.OpenIDConnectKeyName)
 	return stringslice.Unique(append(p.getProvider(ctx).Strings(KeyWellKnownKeys), include...))
-}
-
-func (p *DefaultProvider) IsUsingJWTAsAccessTokens(ctx context.Context) bool {
-	return p.AccessTokenStrategy(ctx) != "opaque"
 }
 
 func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges() bool {
@@ -206,7 +198,7 @@ func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
 	return stringslice.Unique(p.getProvider(ctx).Strings(KeyAllowedTopLevelClaims))
 }
 
-func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context) []string {
+func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalSources ...AccessTokenStrategySource) []string {
 	types := stringslice.Filter(
 		p.getProvider(ctx).StringsF(KeySubjectTypesSupported, []string{"public"}),
 		func(s string) bool {
@@ -219,7 +211,7 @@ func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context) []string {
 	}
 
 	if stringslice.Has(types, "pairwise") {
-		if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
+		if p.AccessTokenStrategy(ctx, additionalSources...) == AccessTokenJWTStrategy {
 			p.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.supported_types" (e.g. oidc.subject_identifiers.supported_types=public) or set strategies.access_token to "opaque".`)
 			types = stringslice.Filter(
 				types,
@@ -406,7 +398,19 @@ func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(ctx), "/.well-known/jwks.json"))
 }
 
-func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context) AccessTokenStrategyType {
+type AccessTokenStrategySource interface {
+	GetAccessTokenStrategy() AccessTokenStrategyType
+}
+
+func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSources ...AccessTokenStrategySource) AccessTokenStrategyType {
+	for _, src := range additionalSources {
+		if src == nil {
+			continue
+		}
+		if strategy := src.GetAccessTokenStrategy(); strategy != "" {
+			return strategy
+		}
+	}
 	s, err := ToAccessTokenStrategyType(p.getProvider(ctx).String(KeyAccessTokenStrategy))
 	if err != nil {
 		p.l.WithError(err).Warn("Key `strategies.access_token` contains an invalid value, falling back to `opaque` strategy.")

@@ -267,7 +267,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Contains(t, c.DSN(), "sqlite://")
 
 	// webfinger
-	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys(ctx))
+	assert.Equal(t, []string{"hydra.openid.id-token", "hydra.jwt.access-token"}, c.WellKnownKeys(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OAuth2ClientRegistrationURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/jwks.json"), c.JWKSURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/auth"), c.OAuth2AuthURL(ctx))
@@ -433,24 +433,24 @@ func TestJWTBearer(t *testing.T) {
 	p := MustNew(context.Background(), l)
 
 	ctx := context.Background()
-	//p.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, false)
+	// p.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, false)
 	p.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "1h")
 	p.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, false)
 	p.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, false)
 
-	//assert.Equal(t, false, p.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
+	// assert.Equal(t, false, p.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
 	assert.Equal(t, 1.0, p.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIDOptional(ctx))
 
 	p2 := MustNew(context.Background(), l)
 
-	//p2.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, true)
+	// p2.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, true)
 	p2.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "24h")
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, true)
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, true)
 
-	//assert.Equal(t, true, p2.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
+	// assert.Equal(t, true, p2.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
 	assert.Equal(t, 24.0, p2.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIDOptional(ctx))

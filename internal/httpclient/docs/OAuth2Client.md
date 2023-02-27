@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**AccessTokenStrategy** | Pointer to **string** | OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are &#x60;jwt&#x60; and &#x60;opaque&#x60;. &#x60;jwt&#x60; is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens Setting the stragegy here overrides the global setting in &#x60;strategies.access_token&#x60;. | [optional] 
 **AllowedCorsOrigins** | Pointer to **[]string** |  | [optional] 
 **Audience** | Pointer to **[]string** |  | [optional] 
 **AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
@@ -69,6 +70,31 @@ will change when the set of required properties is changed
 NewOAuth2ClientWithDefaults instantiates a new OAuth2Client object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetAccessTokenStrategy
+
+`func (o *OAuth2Client) GetAccessTokenStrategy() string`
+
+GetAccessTokenStrategy returns the AccessTokenStrategy field if non-nil, zero value otherwise.
+
+### GetAccessTokenStrategyOk
+
+`func (o *OAuth2Client) GetAccessTokenStrategyOk() (*string, bool)`
+
+GetAccessTokenStrategyOk returns a tuple with the AccessTokenStrategy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAccessTokenStrategy
+
+`func (o *OAuth2Client) SetAccessTokenStrategy(v string)`
+
+SetAccessTokenStrategy sets AccessTokenStrategy field to given value.
+
+### HasAccessTokenStrategy
+
+`func (o *OAuth2Client) HasAccessTokenStrategy() bool`
+
+HasAccessTokenStrategy returns a boolean if a field has been set.
 
 ### GetAllowedCorsOrigins
 

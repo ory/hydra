@@ -18,8 +18,10 @@ import (
 
 // OAuth2Client OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 type OAuth2Client struct {
-	AllowedCorsOrigins []string `json:"allowed_cors_origins,omitempty"`
-	Audience           []string `json:"audience,omitempty"`
+	// OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens Setting the stragegy here overrides the global setting in `strategies.access_token`.
+	AccessTokenStrategy *string  `json:"access_token_strategy,omitempty"`
+	AllowedCorsOrigins  []string `json:"allowed_cors_origins,omitempty"`
+	Audience            []string `json:"audience,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
 	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
@@ -118,6 +120,38 @@ func NewOAuth2Client() *OAuth2Client {
 func NewOAuth2ClientWithDefaults() *OAuth2Client {
 	this := OAuth2Client{}
 	return &this
+}
+
+// GetAccessTokenStrategy returns the AccessTokenStrategy field value if set, zero value otherwise.
+func (o *OAuth2Client) GetAccessTokenStrategy() string {
+	if o == nil || o.AccessTokenStrategy == nil {
+		var ret string
+		return ret
+	}
+	return *o.AccessTokenStrategy
+}
+
+// GetAccessTokenStrategyOk returns a tuple with the AccessTokenStrategy field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2Client) GetAccessTokenStrategyOk() (*string, bool) {
+	if o == nil || o.AccessTokenStrategy == nil {
+		return nil, false
+	}
+	return o.AccessTokenStrategy, true
+}
+
+// HasAccessTokenStrategy returns a boolean if a field has been set.
+func (o *OAuth2Client) HasAccessTokenStrategy() bool {
+	if o != nil && o.AccessTokenStrategy != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAccessTokenStrategy gets a reference to the given string and assigns it to the AccessTokenStrategy field.
+func (o *OAuth2Client) SetAccessTokenStrategy(v string) {
+	o.AccessTokenStrategy = &v
 }
 
 // GetAllowedCorsOrigins returns the AllowedCorsOrigins field value if set, zero value otherwise.
@@ -1596,6 +1630,9 @@ func (o *OAuth2Client) SetUserinfoSignedResponseAlg(v string) {
 
 func (o OAuth2Client) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.AccessTokenStrategy != nil {
+		toSerialize["access_token_strategy"] = o.AccessTokenStrategy
+	}
 	if o.AllowedCorsOrigins != nil {
 		toSerialize["allowed_cors_origins"] = o.AllowedCorsOrigins
 	}

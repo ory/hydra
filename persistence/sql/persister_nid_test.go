@@ -314,7 +314,7 @@ func (s *PersisterTestSuite) TestCreateAccessTokenSession() {
 			fr.Client = &fosite.DefaultClient{ID: c1.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
 	}
@@ -576,11 +576,11 @@ func (s *PersisterTestSuite) TestDeleteAccessTokens() {
 			require.NoError(t, r.Persister().DeleteAccessTokens(s.t2, client.LegacyClientID))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 			require.Equal(t, s.t1NID, actual.NID)
 
 			require.NoError(t, r.Persister().DeleteAccessTokens(s.t1, client.LegacyClientID))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 		})
 	}
 }
@@ -820,9 +820,9 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
 
 			require.NoError(t, r.Persister().FlushInactiveAccessTokens(s.t2, time.Now().Add(time.Hour), 100, 100))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 			require.NoError(t, r.Persister().FlushInactiveAccessTokens(s.t1, time.Now().Add(time.Hour), 100, 100))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 		})
 	}
 }
@@ -1657,11 +1657,11 @@ func (s *PersisterTestSuite) TestRevokeAccessToken() {
 			require.NoError(t, r.Persister().RevokeAccessToken(s.t2, fr.ID))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 			require.Equal(t, s.t1NID, actual.NID)
 
 			require.NoError(t, r.Persister().RevokeAccessToken(s.t1, fr.ID))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 		})
 	}
 }

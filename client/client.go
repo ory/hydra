@@ -7,12 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/stringsx"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
-	"gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/x"
@@ -291,6 +292,13 @@ type Client struct {
 	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
 	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
 
+	// OAuth 2.0 Access Token Strategy
+	//
+	// AccessTokenStrategy is the strategy used to generate access tokens.
+	// Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+	// Setting the stragegy here overrides the global setting in `strategies.access_token`.
+	AccessTokenStrategy string `json:"access_token_strategy,omitempty" db:"access_token_strategy" faker:"-"`
+
 	// SkipConsent skips the consent screen for this client. This field can only
 	// be set from the admin API.
 	SkipConsent bool `json:"skip_consent" db:"skip_consent" faker:"-"`
@@ -535,4 +543,18 @@ func (c *Client) GetEffectiveLifespan(gt fosite.GrantType, tt fosite.TokenType, 
 		return fallback
 	}
 	return *cl
+}
+
+func (c *Client) GetAccessTokenStrategy() config.AccessTokenStrategyType {
+	// We ignore the error here, because the empty string will default to
+	// the global access token strategy.
+	s, _ := config.ToAccessTokenStrategyType(c.AccessTokenStrategy)
+	return s
+}
+
+func AccessTokenStrategySource(client fosite.Client) config.AccessTokenStrategySource {
+	if source, ok := client.(config.AccessTokenStrategySource); ok {
+		return source
+	}
+	return nil
 }

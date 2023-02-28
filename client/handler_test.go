@@ -329,6 +329,25 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
+					d: "setting skip_consent fails for dynamic registration",
+					payload: &client.Client{
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						SkipConsent:  true,
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+				{
+					d: "setting skip_consent suceeds for admin registration",
+					payload: &client.Client{
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						SkipConsent:  true,
+						Secret:       "2SKZkBf2P5g4toAXXnCrr~_sDM",
+					},
+					path:       client.ClientsHandlerPath,
+					statusCode: http.StatusCreated,
+				},
+				{
 					d: "basic dynamic client registration",
 					payload: &client.Client{
 						LegacyClientID: "ead800c5-a316-4d0c-bf00-d25666ba72cf",

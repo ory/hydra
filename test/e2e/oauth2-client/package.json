@@ -4,7 +4,7 @@
   "private": true,
   "main": "./src/index.js",
   "scripts": {
-    "consent": "hydra-login-consent-logout",
+    "consent": "node node_modules/hydra-login-consent-logout/lib/app.js",
     "start": "node ./src/index.js",
     "watch": "nodemon ./src/index.js"
   },
@@ -14,7 +14,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.0",
     "express-winston": "^3.4.0",
-    "hydra-login-consent-logout": "1.4.3",
+    "hydra-login-consent-logout": "2.0.4-pre.2",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^2.1.4",
     "node-fetch": "^2.6.0",

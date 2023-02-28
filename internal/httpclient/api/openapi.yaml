@@ -2363,6 +2363,7 @@ components:
         client_name: client_name
         policy_uri: policy_uri
         owner: owner
+        skip_consent: true
         audience:
         - audience
         - audience
@@ -2644,6 +2645,11 @@ components:
             URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
             file with a single JSON array of redirect_uri values.
           type: string
+        skip_consent:
+          description: |-
+            SkipConsent skips the consent screen for this client. This field can only
+            be set from the admin API.
+          type: boolean
         subject_type:
           description: |-
             OpenID Connect Subject Type
@@ -2815,6 +2821,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience
@@ -3052,6 +3059,7 @@ components:
             client_name: client_name
             policy_uri: policy_uri
             owner: owner
+            skip_consent: true
             audience:
             - audience
             - audience
@@ -3194,6 +3202,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience
@@ -3326,6 +3335,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience

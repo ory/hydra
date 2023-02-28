@@ -94,6 +94,7 @@
   "Secret": "secret-0005",
   "SecretExpiresAt": 0,
   "SectorIdentifierURI": "http://sector_id/0005",
+  "SkipConsent": false,
   "SubjectType": "",
   "TermsOfServiceURI": "http://tos/0005",
   "TokenEndpointAuthMethod": "token_auth-0005",

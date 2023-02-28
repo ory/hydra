@@ -112,8 +112,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //	  302: emptyResponse
 func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
-	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
 
+	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		return
 	} else if err != nil {

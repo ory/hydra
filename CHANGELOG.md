@@ -671,6 +671,7 @@
 ### Bug Fixes
 
 * Append /v2 to module path ([f56e5fa](https://github.com/ory/hydra/commit/f56e5fad74632c1f0c5f3768a0de8465f351a533))
+* Broken OIDC compliance images ([#3454](https://github.com/ory/hydra/issues/3454)) ([50bc1b4](https://github.com/ory/hydra/commit/50bc1b4267045a19845816af295b638179be9c2c))
 * Clean up unused code ([488f930](https://github.com/ory/hydra/commit/488f930e4f2c39386b1c1ff68dd60d1aaf968cb9))
 * Migration typo ([#3453](https://github.com/ory/hydra/issues/3453)) ([ed27c10](https://github.com/ory/hydra/commit/ed27c1016fe8f8fea5a99a0e2203552c3bdc0ab3))
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))

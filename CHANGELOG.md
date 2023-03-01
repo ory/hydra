@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-02-09)](#000-2023-02-09)
+- [0.0.0 (2023-03-01)](#000-2023-03-01)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
@@ -665,13 +665,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-02-09)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-01)
 
 
 ### Bug Fixes
 
 * Append /v2 to module path ([f56e5fa](https://github.com/ory/hydra/commit/f56e5fad74632c1f0c5f3768a0de8465f351a533))
 * Clean up unused code ([488f930](https://github.com/ory/hydra/commit/488f930e4f2c39386b1c1ff68dd60d1aaf968cb9))
+* Migration typo ([#3453](https://github.com/ory/hydra/issues/3453)) ([ed27c10](https://github.com/ory/hydra/commit/ed27c1016fe8f8fea5a99a0e2203552c3bdc0ab3))
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
 
 ### Features

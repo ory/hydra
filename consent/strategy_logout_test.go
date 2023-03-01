@@ -99,6 +99,23 @@ func TestLogoutFlows(t *testing.T) {
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
+	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (body string, resp *http.Response) {
+		var err error
+		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/oauth2/auth/sessions/login?"+values.Encode(), nil)
+		require.NoError(t, err)
+
+		resp, err = hc.Do(req)
+
+		require.NoError(t, err)
+		defer resp.Body.Close()
+		return string(ioutilx.MustReadAll(resp.Body)), resp
+	}
+
+	logoutViaHeadlessAndExpectNoContent := func(t *testing.T, browser *http.Client, values url.Values) {
+		_, res := makeHeadlessLogoutRequest(t, browser, values)
+		assert.EqualValues(t, http.StatusNoContent, res.StatusCode)
+	}
+
 	logoutAndExpectErrorPage := func(t *testing.T, browser *http.Client, method string, values url.Values, expectedErrorMessage string) {
 		body, res := makeLogoutRequest(t, browser, method, values)
 		assert.EqualValues(t, http.StatusInternalServerError, res.StatusCode)
@@ -489,5 +506,21 @@ func TestLogoutFlows(t *testing.T) {
 		assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
 
 		wg.Wait()
+	})
+
+	t.Run("case=should execute backchannel logout in headless flow with sid", func(t *testing.T) {
+		sid := make(chan string)
+		acceptLoginAsAndWatchSid(t, subject, sid)
+
+		backChannelWG := newWg(1)
+		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
+			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
+			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
+			assert.Empty(t, logoutToken.Get("nonce").String(), logoutToken.Raw)
+		})
+
+		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+
+		backChannelWG.Wait() // we want to ensure that all back channels have been called!
 	})
 }

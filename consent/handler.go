@@ -230,7 +230,6 @@ type revokeOAuth2LoginSessions struct {
 	// The subject to revoke authentication sessions for.
 	//
 	// in: query
-	// required: true
 	Subject string `json:"subject"`
 
 	// OAuth 2.0 Subject

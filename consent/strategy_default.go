@@ -899,8 +899,8 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, r *http.Request, subject string, sessionID string) error {
-	if err := s.executeBackChannelLogout(r.Context(), r, subject, sessionID); err != nil {
+func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, r *http.Request, subject string, sid string) error {
+	if err := s.executeBackChannelLogout(r.Context(), r, subject, sid); err != nil {
 		return err
 	}
 
@@ -909,7 +909,7 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.C
 	//
 	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
 	// even if an upstream URL fails!
-	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), sessionID); errors.Is(err, sqlcon.ErrNoRows) {
+	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), sid); errors.Is(err, sqlcon.ErrNoRows) {
 		// This is ok (session probably already revoked), do nothing!
 	} else if err != nil {
 		return err
@@ -991,15 +991,15 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 	return s.completeLogout(ctx, w, r)
 }
 
-func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sessionId string) error {
-	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionId)
+func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
+	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
 
 	// This is ok (session probably already revoked), do nothing!
 	if lsErr != nil {
 		return nil
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, loginSession.Subject, sessionId); err != nil {
+	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, loginSession.Subject, sid); err != nil {
 		return err
 	}
 

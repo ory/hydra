@@ -101,7 +101,7 @@ func TestLogoutFlows(t *testing.T) {
 
 	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (body string, resp *http.Response) {
 		var err error
-		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/oauth2/auth/sessions/login?"+values.Encode(), nil)
+		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/admin/oauth2/auth/sessions/login?"+values.Encode(), nil)
 		require.NoError(t, err)
 
 		resp, err = hc.Do(req)

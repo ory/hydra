@@ -679,6 +679,10 @@
 
 ### Features
 
+* Allow setting access token type in client ([#3446](https://github.com/ory/hydra/issues/3446)) ([a6beed4](https://github.com/ory/hydra/commit/a6beed4659febd0917379d6da1e51d8ef75bc859)):
+
+    The access token type (`jwt` or `opaque`) can now be set in the client configuration. The value set here will overwrite the global value for all flows concerning that client.
+
 * Allow skipping consent for trusted clients ([#3451](https://github.com/ory/hydra/issues/3451)) ([4f65365](https://github.com/ory/hydra/commit/4f65365f14ea28f979ebab7eb9c3396cbb25d619)):
 
     This adds a new boolean parameter `skip_consent` to the admin APIs of

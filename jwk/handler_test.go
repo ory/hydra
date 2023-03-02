@@ -83,11 +83,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
-		if conf.HSMEnabled() {
-			require.Len(t, known.Keys, 2)
-		} else {
-			require.Len(t, known.Keys, 1)
-		}
+		require.Len(t, known.Keys, 1)
 
 		knownKey := known.Key("test-id-2")[0]
 		require.NotNil(t, knownKey, "Could not find key public")

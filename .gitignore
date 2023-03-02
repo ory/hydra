@@ -1,5 +1,6 @@
 .bin/
 .idea/
+.vscode/
 node_modules/
 *.iml
 *.exe

@@ -2386,6 +2386,7 @@ components:
         implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
         client_secret_expires_at: 0
         implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+        access_token_strategy: access_token_strategy
         jwks_uri: jwks_uri
         request_object_signing_alg: request_object_signing_alg
         tos_uri: tos_uri
@@ -2396,6 +2397,12 @@ components:
         - response_types
         - response_types
       properties:
+        access_token_strategy:
+          description: "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is\
+            \ the strategy used to generate access tokens.\nValid options are `jwt`\
+            \ and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens\n\
+            Setting the stragegy here overrides the global setting in `strategies.access_token`."
+          type: string
         allowed_cors_origins:
           items:
             type: string
@@ -2844,6 +2851,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
@@ -3082,6 +3090,7 @@ components:
             implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
             client_secret_expires_at: 0
             implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+            access_token_strategy: access_token_strategy
             jwks_uri: jwks_uri
             request_object_signing_alg: request_object_signing_alg
             tos_uri: tos_uri
@@ -3225,6 +3234,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
@@ -3358,6 +3368,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri

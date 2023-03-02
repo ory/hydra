@@ -480,7 +480,8 @@ func testHelperFlushTokensWithLimitAndBatchSize(x InternalRegistry, limit int, b
 
 		// create five expired requests
 		id := uuid.New()
-		for i := 0; i < 5; i++ {
+		totalCount := 5
+		for i := 0; i < totalCount; i++ {
 			r := createTestRequest(fmt.Sprintf("%s-%d", id, i+1))
 			r.RequestedAt = time.Now().Add(-2 * time.Hour)
 			mockRequestForeignKey(t, r.ID, x, false)
@@ -491,14 +492,17 @@ func testHelperFlushTokensWithLimitAndBatchSize(x InternalRegistry, limit int, b
 		}
 
 		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now(), limit, batchSize))
+		var notFoundCount, foundCount int
 		for i := range requests {
-			_, err := m.GetAccessTokenSession(ctx, requests[i].ID, ds)
-			if i >= limit {
-				require.NoError(t, err)
+			if _, err := m.GetAccessTokenSession(ctx, requests[i].ID, ds); err == nil {
+				foundCount++
 			} else {
-				require.Error(t, err)
+				require.ErrorIs(t, err, fosite.ErrNotFound)
+				notFoundCount++
 			}
 		}
+		assert.Equal(t, limit, notFoundCount, "should have deleted %d tokens", limit)
+		assert.Equal(t, totalCount-limit, foundCount, "should have found %d tokens", totalCount-limit)
 	}
 }
 

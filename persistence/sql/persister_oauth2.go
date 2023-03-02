@@ -159,10 +159,16 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	}, nil
 }
 
+// SignatureHash hashes the signature to prevent errors where the signature is
+// longer than 128 characters (and thus doesn't fit into the pk).
+func SignatureHash(signature string) string {
+	return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
+}
+
 // hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
-func (p *Persister) hashSignature(ctx context.Context, signature string, table tableName) string {
-	if table == sqlTableAccess && p.config.IsUsingJWTAsAccessTokens(ctx) {
-		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
+func (p *Persister) hashSignature(_ context.Context, signature string, table tableName) string {
+	if table == sqlTableAccess {
+		return SignatureHash(signature)
 	}
 	return signature
 }
@@ -248,7 +254,13 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	var fr fosite.Requester
 
 	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := p.QueryWithNetwork(ctx).Where("signature = ?", rawSignature).First(&r)
+		// We look for the signature as well as the hash of the signature here.
+		// This is because we now always store the hash of the signature in the database,
+		// regardless of the type of the signature. In previous versions, we only stored
+		// the hash of the signature for JWT tokens.
+		//
+		// This code will be removed in a future version.
+		err := p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
@@ -275,9 +287,15 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 
 	signature = p.hashSignature(ctx, signature, table)
 
+	// We look for the signature as well as the hash of the signature here.
+	// This is because we now always store the hash of the signature in the database,
+	// regardless of the type of the signature. In previous versions, we only stored
+	// the hash of the signature for JWT tokens.
+	//
+	// This code will be removed in a future version.
 	err := sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
-			Where("signature=?", signature).
+			Where("signature IN (?, ?)", signature, SignatureHash(signature)).
 			Delete(&OAuth2RequestSQL{Table: table}))
 
 	if errors.Is(err, sqlcon.ErrNoRows) {

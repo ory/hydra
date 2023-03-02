@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-03-01)](#000-2023-03-01)
+- [0.0.0 (2023-03-02)](#000-2023-03-02)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
@@ -665,7 +665,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-01)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-02)
 
 
 ### Bug Fixes
@@ -677,6 +677,16 @@
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
 
 ### Features
+
+* Allow skipping consent for trusted clients ([#3451](https://github.com/ory/hydra/issues/3451)) ([4f65365](https://github.com/ory/hydra/commit/4f65365f14ea28f979ebab7eb9c3396cbb25d619)):
+
+    This adds a new boolean parameter `skip_consent` to the admin APIs of
+    the OAuth clients. This parameter will be forwarded to the consent app
+    as `client.skip_consent`.
+    
+    It is up to the consent app to act on this parameter, but the canonical
+    implementation accepts the consent on the user's behalf, similar to
+    when `skip` is set.
 
 * Render complete config schema during CI ([#3433](https://github.com/ory/hydra/issues/3433)) ([ae3e781](https://github.com/ory/hydra/commit/ae3e7811ae2ba031fc4f1569a889d8b4ba0c96fd)):
 

@@ -12,7 +12,7 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
-	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
+	"gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/x"
@@ -290,6 +290,10 @@ type Client struct {
 	//
 	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
 	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
+
+	// SkipConsent skips the consent screen for this client. This field can only
+	// be set from the admin API.
+	SkipConsent bool `json:"skip_consent" db:"skip_consent" faker:"-"`
 
 	Lifespans
 }

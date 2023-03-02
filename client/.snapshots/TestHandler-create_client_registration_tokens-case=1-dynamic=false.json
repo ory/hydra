@@ -16,6 +16,7 @@
   "subject_type": "",
   "jwks": {},
   "metadata": {},
+  "skip_consent": false,
   "authorization_code_grant_access_token_lifespan": null,
   "authorization_code_grant_id_token_lifespan": null,
   "authorization_code_grant_refresh_token_lifespan": null,

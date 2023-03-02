@@ -8,6 +8,7 @@
   "owner": "",
   "policy_uri": "",
   "scope": "",
+  "skip_consent": false,
   "subject_type": "",
   "token_endpoint_auth_method": "client_secret_post",
   "tos_uri": ""

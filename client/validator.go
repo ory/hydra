@@ -179,8 +179,11 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) error {
 	if c.Metadata != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.
-			WithHint(`metadata cannot be set for dynamic client registration'`),
+			WithHint(`"metadata" cannot be set for dynamic client registration`),
 		)
+	}
+	if c.SkipConsent {
+		return errorsx.WithStack(ErrInvalidRequest.WithDescription(`"skip_consent" cannot be set for dynamic client registration`))
 	}
 
 	return v.Validate(ctx, c)

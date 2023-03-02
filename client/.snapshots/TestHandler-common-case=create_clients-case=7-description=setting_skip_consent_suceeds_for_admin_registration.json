@@ -1,6 +1,6 @@
 {
   "client_name": "",
-  "client_secret": "averylongsecret",
+  "client_secret": "2SKZkBf2P5g4toAXXnCrr~_sDM",
   "redirect_uris": [
     "http://localhost:3000/cb"
   ],
@@ -21,6 +21,7 @@
   "token_endpoint_auth_method": "client_secret_basic",
   "userinfo_signed_response_alg": "none",
   "metadata": {},
+  "skip_consent": true,
   "authorization_code_grant_access_token_lifespan": null,
   "authorization_code_grant_id_token_lifespan": null,
   "authorization_code_grant_refresh_token_lifespan": null,

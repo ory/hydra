@@ -1006,6 +1006,7 @@ func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.Respo
 	s.r.AuditLogger().
 		WithRequest(r).
 		WithField("subject", loginSession.Subject).
+		WithField("sid", sid).
 		Info("User logout completed via headless flow!")
 
 	return nil

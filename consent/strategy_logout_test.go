@@ -99,7 +99,7 @@ func TestLogoutFlows(t *testing.T) {
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
-	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (body string, resp *http.Response) {
+	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (resp *http.Response) {
 		var err error
 		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/admin/oauth2/auth/sessions/login?"+values.Encode(), nil)
 		require.NoError(t, err)
@@ -108,11 +108,11 @@ func TestLogoutFlows(t *testing.T) {
 
 		require.NoError(t, err)
 		defer resp.Body.Close()
-		return string(ioutilx.MustReadAll(resp.Body)), resp
+		return resp
 	}
 
 	logoutViaHeadlessAndExpectNoContent := func(t *testing.T, browser *http.Client, values url.Values) {
-		_, res := makeHeadlessLogoutRequest(t, browser, values)
+		res := makeHeadlessLogoutRequest(t, browser, values)
 		assert.EqualValues(t, http.StatusNoContent, res.StatusCode)
 	}
 
@@ -170,7 +170,7 @@ func TestLogoutFlows(t *testing.T) {
 		reg.Config().MustSet(ctx, config.KeyLogoutURL, server.URL)
 	}
 
-	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
+	acceptLoginAsAndWatchSidForConsumers := func(t *testing.T, subject string, sid chan string, numSidConsumers int) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
@@ -181,7 +181,9 @@ func TestLogoutFlows(t *testing.T) {
 				require.NoError(t, err)
 				if sid != nil {
 					go func() {
-						sid <- *res.LoginSessionId
+						for i := 0; i < numSidConsumers; i++ {
+							sid <- *res.LoginSessionId
+						}
 					}()
 				}
 				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(true)}
@@ -189,8 +191,12 @@ func TestLogoutFlows(t *testing.T) {
 
 	}
 
+	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, 1)
+	}
+
 	acceptLoginAs := func(t *testing.T, subject string) {
-		acceptLoginAsAndWatchSid(t, subject, nil)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, nil, 0)
 	}
 
 	subject := "aeneas-rekkas"
@@ -416,7 +422,7 @@ func TestLogoutFlows(t *testing.T) {
 
 	t.Run("case=should pass rp-inititated flow without any action because SID is unknown", func(t *testing.T) {
 		c := createSampleClient(t)
-		acceptLoginAsAndWatchSid(t, subject, nil)
+		acceptLoginAs(t, subject)
 
 		checkAndAcceptLogout(t, nil, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
 			t.Fatalf("Logout should not have been called")
@@ -509,8 +515,8 @@ func TestLogoutFlows(t *testing.T) {
 	})
 
 	t.Run("case=should execute backchannel logout in headless flow with sid", func(t *testing.T) {
-		sid := make(chan string)
-		acceptLoginAsAndWatchSid(t, subject, sid)
+		sid := make(chan string, 2)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, 2)
 
 		backChannelWG := newWg(1)
 		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
@@ -522,5 +528,9 @@ func TestLogoutFlows(t *testing.T) {
 		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
 
 		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+	})
+
+	t.Run("case=should logout in headless flow with non-existing sid", func(t *testing.T) {
+		logoutViaHeadlessAndExpectNoContent(t, browserWithoutSession, url.Values{"sid": {"non-existing-sid"}})
 	})
 }

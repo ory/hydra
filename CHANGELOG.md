@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-03-02)](#000-2023-03-02)
+- [0.0.0 (2023-03-03)](#000-2023-03-03)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
@@ -665,7 +665,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-02)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-03)
 
 
 ### Bug Fixes
@@ -676,6 +676,7 @@
 * Migration typo ([#3453](https://github.com/ory/hydra/issues/3453)) ([ed27c10](https://github.com/ory/hydra/commit/ed27c1016fe8f8fea5a99a0e2203552c3bdc0ab3))
 * No longer use separate public and private keys in HSM key manager ([#3401](https://github.com/ory/hydra/issues/3401)) ([375bd5a](https://github.com/ory/hydra/commit/375bd5a69c0ece3aea0714ab7374ff8d09672c10))
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
+* Support allowed_cors_origins with client_secret_post ([#3457](https://github.com/ory/hydra/issues/3457)) ([ffe4943](https://github.com/ory/hydra/commit/ffe49430e31eee98ace65e829be5db3188c8fd4b)), closes [#3456](https://github.com/ory/hydra/issues/3456)
 
 ### Features
 

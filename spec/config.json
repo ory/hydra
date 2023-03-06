@@ -210,7 +210,7 @@
     },
     "duration": {
       "type": "string",
-      "pattern": "^(\\d+(ns|us|ms|s|m|h))+$",
+      "pattern": "^(\\d+(ns|us|ms|s|m|h|d))+$",
       "examples": [
         "1h",
         "1h5m1s"

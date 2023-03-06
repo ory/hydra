@@ -1762,8 +1762,9 @@ components:
       nullable: true
       type: boolean
     NullDuration:
-      description: "Specify a time duration in milliseconds, seconds, minutes, hours."
-      pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+      description: "Specify a time duration in milliseconds, seconds, minutes, hours,\
+        \ days."
+      pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
       title: Time duration
       type: string
     NullInt:
@@ -2319,7 +2320,7 @@ components:
       type: object
     nullDuration:
       nullable: true
-      pattern: "^[0-9]+(ns|us|ms|s|m|h)$"
+      pattern: "^[0-9]+(ns|us|ms|s|m|h|d)$"
       type: string
     nullInt64:
       nullable: true
@@ -2417,20 +2418,20 @@ components:
           type: array
         authorization_code_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         authorization_code_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         authorization_code_grant_refresh_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         backchannel_logout_session_required:
@@ -2448,8 +2449,8 @@ components:
           type: string
         client_credentials_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         client_id:
@@ -2518,14 +2519,14 @@ components:
           type: array
         implicit_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         implicit_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         jwks:
@@ -2557,8 +2558,8 @@ components:
           type: string
         jwt_bearer_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         logo_uri:
@@ -2596,20 +2597,20 @@ components:
           type: array
         refresh_token_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         refresh_token_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         refresh_token_grant_refresh_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         registration_access_token:
@@ -2711,62 +2712,62 @@ components:
       properties:
         authorization_code_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         authorization_code_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         authorization_code_grant_refresh_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         client_credentials_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         implicit_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         implicit_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         jwt_bearer_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         refresh_token_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         refresh_token_grant_id_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
         refresh_token_grant_refresh_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
-            \ hours."
-          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+            \ hours, days."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
           title: Time duration
           type: string
       title: OAuth 2.0 Client Token Lifespans

@@ -17,25 +17,25 @@ import (
 
 // OAuth2ClientTokenLifespans Lifespans of different token types issued for this OAuth 2.0 Client.
 type OAuth2ClientTokenLifespans struct {
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	ImplicitGrantIdTokenLifespan *string `json:"implicit_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty"`
-	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	// Specify a time duration in milliseconds, seconds, minutes, hours, days.
 	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
 }
 

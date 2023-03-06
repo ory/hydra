@@ -31,13 +31,13 @@
   path: /components/schemas/nullDuration
   value:
     title: "Time duration"
-    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
+    description: "Specify a time duration in milliseconds, seconds, minutes, hours, days."
     type: string
-    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+    pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"
 - op: replace
   path: /components/schemas/NullDuration
   value:
     title: "Time duration"
-    description: "Specify a time duration in milliseconds, seconds, minutes, hours."
+    description: "Specify a time duration in milliseconds, seconds, minutes, hours, days."
     type: string
-    pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+    pattern: "^([0-9]+(ns|us|ms|s|m|h|d))*$"

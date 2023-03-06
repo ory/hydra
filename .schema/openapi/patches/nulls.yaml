@@ -40,4 +40,4 @@
   value:
     type: string
     nullable: true
-    pattern: ^[0-9]+(ns|us|ms|s|m|h)$
+    pattern: ^[0-9]+(ns|us|ms|s|m|h|d)$

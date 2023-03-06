@@ -57,8 +57,8 @@
         "type": "boolean"
       },
       "NullDuration": {
-        "description": "Specify a time duration in milliseconds, seconds, minutes, hours.",
-        "pattern": "^([0-9]+(ns|us|ms|s|m|h))*$",
+        "description": "Specify a time duration in milliseconds, seconds, minutes, hours, days.",
+        "pattern": "^([0-9]+(ns|us|ms|s|m|h|d))*$",
         "title": "Time duration",
         "type": "string"
       },
@@ -498,7 +498,7 @@
       },
       "nullDuration": {
         "nullable": true,
-        "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+        "pattern": "^[0-9]+(ns|us|ms|s|m|h|d)$",
         "type": "string"
       },
       "nullInt64": {

@@ -266,6 +266,13 @@ type revokeOAuth2LoginSessions struct {
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sid := r.URL.Query().Get("sid")
+	subject := r.URL.Query().Get("subject")
+
+	if sid == "" && subject == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Either 'subject' or 'sid' query parameters need to be defined.`)))
+		return
+	}
+
 	if sid != "" {
 		if err := h.r.ConsentStrategy().HandleHeadlessLogout(r.Context(), w, r, sid); err != nil {
 			h.r.Writer().WriteError(w, r, err)
@@ -273,12 +280,6 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 		}
 
 		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	subject := r.URL.Query().Get("subject")
-	if subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
 		return
 	}
 

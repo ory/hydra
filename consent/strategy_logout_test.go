@@ -170,7 +170,7 @@ func TestLogoutFlows(t *testing.T) {
 		reg.Config().MustSet(ctx, config.KeyLogoutURL, server.URL)
 	}
 
-	acceptLoginAsAndWatchSidForConsumers := func(t *testing.T, subject string, sid chan string, numSidConsumers int) {
+	acceptLoginAsAndWatchSidForConsumers := func(t *testing.T, subject string, sid chan string, remember bool, numSidConsumers int) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
@@ -186,17 +186,17 @@ func TestLogoutFlows(t *testing.T) {
 						}
 					}()
 				}
-				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(true)}
+				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(remember)}
 			}))
 
 	}
 
 	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
-		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, 1)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, 1)
 	}
 
 	acceptLoginAs := func(t *testing.T, subject string) {
-		acceptLoginAsAndWatchSidForConsumers(t, subject, nil, 0)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, nil, true, 0)
 	}
 
 	subject := "aeneas-rekkas"
@@ -515,8 +515,9 @@ func TestLogoutFlows(t *testing.T) {
 	})
 
 	t.Run("case=should execute backchannel logout in headless flow with sid", func(t *testing.T) {
-		sid := make(chan string, 2)
-		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, 2)
+		numSidConsumers := 2
+		sid := make(chan string, numSidConsumers)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, numSidConsumers)
 
 		backChannelWG := newWg(1)
 		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
@@ -532,5 +533,14 @@ func TestLogoutFlows(t *testing.T) {
 
 	t.Run("case=should logout in headless flow with non-existing sid", func(t *testing.T) {
 		logoutViaHeadlessAndExpectNoContent(t, browserWithoutSession, url.Values{"sid": {"non-existing-sid"}})
+	})
+
+	t.Run("case=should logout in headless flow with session that has remember=false", func(t *testing.T) {
+		sid := make(chan string)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, false, 1)
+
+		c := createSampleClient(t)
+
+		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
 	})
 }

@@ -994,9 +994,13 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
 	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
 
-	// This is ok (session probably already revoked), do nothing!
-	if lsErr != nil {
+	if errors.Is(lsErr, x.ErrNotFound) {
+		// This is ok (session probably already revoked), do nothing!
+		// Not triggering the back-channel logout because subject is not available
+		// See https://github.com/ory/hydra/pull/3450#discussion_r1127798485
 		return nil
+	} else if lsErr != nil {
+		return lsErr
 	}
 
 	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, loginSession.Subject, sid); err != nil {

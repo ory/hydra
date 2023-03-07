@@ -424,34 +424,18 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 }
 
 func (p *DefaultProvider) AuthorizationCodeHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyAuthorizationCodeHookURL)) == 0 {
-		return nil
-	}
-
 	return p.getProvider(ctx).RequestURIF(KeyAuthorizationCodeHookURL, nil)
 }
 
 func (p *DefaultProvider) ClientCredentialsHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyClientCredentialsHookURL)) == 0 {
-		return nil
-	}
-
 	return p.getProvider(ctx).RequestURIF(KeyClientCredentialsHookURL, nil)
 }
 
 func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyRefreshTokenHookURL)) == 0 {
-		return nil
-	}
-
 	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
 }
 
 func (p *DefaultProvider) JWTBearerRefreshHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyJWTBearerHookURL)) == 0 {
-		return nil
-	}
-
 	return p.getProvider(ctx).RequestURIF(KeyJWTBearerHookURL, nil)
 }
 

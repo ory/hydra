@@ -126,8 +126,8 @@ func JWTBearerHook(reg interface {
 	}
 }
 
-func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.AccessRequester, hookType string, hookURL *url.URL) error {
-	if !requester.GetGrantTypes().ExactOne(hookType) {
+func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.AccessRequester, grantType string, hookURL *url.URL) error {
+	if !requester.GetGrantTypes().ExactOne(grantType) {
 		return nil
 	}
 
@@ -138,7 +138,7 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 
 	payload := map[string][]string{}
 
-	if requester.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") || requester.GetGrantTypes().ExactOne("client_credentials") {
+	if grantType == "urn:ietf:params:oauth:grant-type:jwt-bearer" || grantType == "client_credentials" {
 		payload = requester.GetRequestForm()
 	}
 
@@ -163,8 +163,8 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 		return errorsx.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
-				WithDescription(fmt.Sprintf("An error occurred while encoding the %s hook.", hookType)).
-				WithDebugf("Unable to encode the %v hook body: %s", hookType, err),
+				WithDescription(fmt.Sprintf("An error occurred while encoding the %s hook.", grantType)).
+				WithDebugf("Unable to encode the %v hook body: %s", grantType, err),
 		)
 	}
 
@@ -173,7 +173,7 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 		return errorsx.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
-				WithDescription(fmt.Sprintf("An error occurred while preparing the %s hook.", hookType)).
+				WithDescription(fmt.Sprintf("An error occurred while preparing the %s hook.", grantType)).
 				WithDebugf("Unable to prepare the HTTP Request: %s", err),
 		)
 	}
@@ -184,7 +184,7 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 		return errorsx.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
-				WithDescription(fmt.Sprintf("An error occurred while executing the %s hook.", hookType)).
+				WithDescription(fmt.Sprintf("An error occurred while executing the %s hook.", grantType)).
 				WithDebugf("Unable to execute HTTP Request: %s", err),
 		)
 	}
@@ -199,14 +199,14 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 	case http.StatusForbidden:
 		return errorsx.WithStack(
 			fosite.ErrAccessDenied.
-				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", hookType)).
-				WithDebugf(fmt.Sprintf("%s hook responded with HTTP status code: %s", hookType, resp.Status)),
+				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", grantType)).
+				WithDebugf(fmt.Sprintf("%s hook responded with HTTP status code: %s", grantType, resp.Status)),
 		)
 	default:
 		return errorsx.WithStack(
 			fosite.ErrServerError.
-				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", hookType)).
-				WithDebugf(fmt.Sprintf("%s hook responded with HTTP status code: %s", hookType, resp.Status)),
+				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", grantType)).
+				WithDebugf(fmt.Sprintf("%s hook responded with HTTP status code: %s", grantType, resp.Status)),
 		)
 	}
 
@@ -215,8 +215,8 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 		return errorsx.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
-				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", hookType)).
-				WithDebugf(fmt.Sprintf("Response from %s hook could not be decoded: %s", hookType, err)),
+				WithDescription(fmt.Sprintf("The %s hook target responded with an error.", grantType)).
+				WithDebugf(fmt.Sprintf("Response from %s hook could not be decoded: %s", grantType, err)),
 		)
 	}
 

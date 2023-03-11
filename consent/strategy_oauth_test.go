@@ -383,7 +383,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		hc := testhelpers.NewEmptyJarClient(t)
 
-		followUpHandler := func(refreshRememberFor bool) {
+		followUpHandler := func(extendSessionLifespan bool) {
 			rememberFor := int64(12345)
 			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				checkAndAcceptLoginHandler(t, adminClient, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
@@ -392,11 +392,11 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 					assert.Equal(t, subject, res.Subject)
 					assert.Empty(t, res.Client.ClientSecret)
 					return hydra.AcceptOAuth2LoginRequest{
-						Subject:            subject,
-						Remember:           pointerx.Bool(true),
-						RememberFor:        pointerx.Int64(rememberFor),
-						RefreshRememberFor: pointerx.Bool(refreshRememberFor),
-						Context:            map[string]interface{}{"foo": "bar"},
+						Subject:               subject,
+						Remember:              pointerx.Bool(true),
+						RememberFor:           pointerx.Int64(rememberFor),
+						ExtendSessionLifespan: pointerx.Bool(extendSessionLifespan),
+						Context:               map[string]interface{}{"foo": "bar"},
 					}
 				}),
 				checkAndAcceptConsentHandler(t, adminClient, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
@@ -439,7 +439,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 			setCookieHeader := loginVerifierRes.Header.Get("set-cookie")
 			assert.NotNil(t, setCookieHeader)
-			if refreshRememberFor {
+			if extendSessionLifespan {
 				assert.Regexp(t, fmt.Sprintf("ory_hydra_session_dev=.*; Path=/; Expires=.*Max-Age=%d; HttpOnly; SameSite=Lax", rememberFor), setCookieHeader)
 			} else {
 				assert.NotContains(t, setCookieHeader, "ory_hydra_session_dev")
@@ -451,11 +451,11 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				"scope": {"openid"}})
 		})
 
-		t.Run("perform follow up flow with refresh_remember_for=false", func(t *testing.T) {
+		t.Run("perform follow up flow with extend_session_lifespan=false", func(t *testing.T) {
 			followUpHandler(false)
 		})
 
-		t.Run("perform follow up flow with refresh_remember_for=true", func(t *testing.T) {
+		t.Run("perform follow up flow with extend_session_lifespan=true", func(t *testing.T) {
 			followUpHandler(true)
 		})
 	})

@@ -1876,6 +1876,10 @@ components:
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
+        extend_session_lifespan:
+          description: "ExtendSessionLifespan, if set to true, session cookie expiry\
+            \ time will be updated when session is\nrefreshed (login skip=true)."
+          type: boolean
         force_subject_identifier:
           description: "ForceSubjectIdentifier forces the \"pairwise\" user ID of\
             \ the end-user that authenticated. The \"pairwise\" user ID refers to\
@@ -1896,10 +1900,6 @@ components:
             \ the proper value, then authentication processes which have id_token_hint\
             \ set might fail."
           type: string
-        refresh_remember_for:
-          description: "RefreshRememberFor, if set to true, session cookie expiry\
-            \ time will be updated when session is\nrefreshed (login skip=true)."
-          type: boolean
         remember:
           description: "Remember, if set to true, tells ORY Hydra to remember this\
             \ user by telling the user agent (browser) to store\na cookie with authentication\

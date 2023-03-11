@@ -25,7 +25,7 @@
   "State": 128,
   "LoginRemember": true,
   "LoginRememberFor": 15,
-  "LoginRefreshRememberFor": false,
+  "LoginExtendSessionLifespan": false,
   "ACR": "acr-0015",
   "AMR": [
     "amr-0015-1",

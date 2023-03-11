@@ -425,7 +425,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	if !session.Remember || session.LoginRequest.Skip && !session.RefreshRememberFor {
+	if !session.Remember || session.LoginRequest.Skip && !session.ExtendSessionLifespan {
 		// If the user doesn't want to remember the session, we do not store a cookie.
 		// If login was skipped, it means an authentication cookie was present and
 		// we don't want to touch it (in order to preserve its original expiry date)

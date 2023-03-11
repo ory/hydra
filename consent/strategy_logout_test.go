@@ -99,7 +99,7 @@ func TestLogoutFlows(t *testing.T) {
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
-	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (resp *http.Response) {
+	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (body string, resp *http.Response) {
 		var err error
 		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/admin/oauth2/auth/sessions/login?"+values.Encode(), nil)
 		require.NoError(t, err)
@@ -108,12 +108,18 @@ func TestLogoutFlows(t *testing.T) {
 
 		require.NoError(t, err)
 		defer resp.Body.Close()
-		return resp
+		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
 	logoutViaHeadlessAndExpectNoContent := func(t *testing.T, browser *http.Client, values url.Values) {
-		res := makeHeadlessLogoutRequest(t, browser, values)
+		_, res := makeHeadlessLogoutRequest(t, browser, values)
 		assert.EqualValues(t, http.StatusNoContent, res.StatusCode)
+	}
+
+	logoutViaHeadlessAndExpectError := func(t *testing.T, browser *http.Client, values url.Values, expectedErrorMessage string) {
+		body, res := makeHeadlessLogoutRequest(t, browser, values)
+		assert.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+		assert.Contains(t, body, expectedErrorMessage)
 	}
 
 	logoutAndExpectErrorPage := func(t *testing.T, browser *http.Client, method string, values url.Values, expectedErrorMessage string) {
@@ -542,5 +548,9 @@ func TestLogoutFlows(t *testing.T) {
 		c := createSampleClient(t)
 
 		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+	})
+
+	t.Run("case=should fail headless logout because neither sid nor subject were provided", func(t *testing.T) {
+		logoutViaHeadlessAndExpectError(t, browserWithoutSession, url.Values{}, `Either 'subject' or 'sid' query parameters need to be defined.`)
 	})
 }

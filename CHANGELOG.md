@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-03-03)](#000-2023-03-03)
+- [0.0.0 (2023-03-13)](#000-2023-03-13)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
@@ -665,7 +665,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-03)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-13)
 
 
 ### Bug Fixes
@@ -679,6 +679,10 @@
 * Support allowed_cors_origins with client_secret_post ([#3457](https://github.com/ory/hydra/issues/3457)) ([ffe4943](https://github.com/ory/hydra/commit/ffe49430e31eee98ace65e829be5db3188c8fd4b)), closes [#3456](https://github.com/ory/hydra/issues/3456)
 
 ### Features
+
+* Add ability to revoke login sessions by SessionID ([#3450](https://github.com/ory/hydra/issues/3450)) ([b42482b](https://github.com/ory/hydra/commit/b42482b7260d4e1771d01fc719e8216f5961ce65)), closes [#3448](https://github.com/ory/hydra/issues/3448):
+
+    API `revokeOAuth2LoginSessions` can now revoke a single session by a SessionID (`sid` claim in the id_token) and execute an OpenID Connect Back-channel logout.
 
 * Allow setting access token type in client ([#3446](https://github.com/ory/hydra/issues/3446)) ([a6beed4](https://github.com/ory/hydra/commit/a6beed4659febd0917379d6da1e51d8ef75bc859)):
 

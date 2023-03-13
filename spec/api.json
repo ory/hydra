@@ -147,7 +147,7 @@
             "$ref": "#/components/schemas/JSONRawMessage"
           },
           "extend_session_lifespan": {
-            "description": "ExtendSessionLifespan, if set to true, session cookie expiry time will be updated when session is\nrefreshed (login skip=true).",
+            "description": "Extend OAuth2 authentication session lifespan\n\nIf set to `true`, the OAuth2 authentication cookie lifespan is extended. This is for example useful if you want the user to be able to use `prompt=none` continuously.\n\nThis value can only be set to `true` if the user has an authentication, which is the case if the `skip` value is `true`.",
             "type": "boolean"
           },
           "force_subject_identifier": {

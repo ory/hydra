@@ -265,8 +265,13 @@ type HandledLoginRequest struct {
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
 	RememberFor int `json:"remember_for"`
 
-	// ExtendSessionLifespan, if set to true, session cookie expiry time will be updated when session is
-	// refreshed (login skip=true).
+	// Extend OAuth2 authentication session lifespan
+	//
+	// If set to `true`, the OAuth2 authentication cookie lifespan is extended. This is for example useful if you want the user to be able to use `prompt=none` continuously.
+	//
+	// This value can only be set to `true` if the user has an authentication, which is the case if the `skip` value is `true`.
+	//
+	// required: false
 	ExtendSessionLifespan bool `json:"extend_session_lifespan"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it

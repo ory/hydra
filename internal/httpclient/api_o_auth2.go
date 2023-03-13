@@ -2970,6 +2970,7 @@ type ApiRevokeOAuth2LoginSessionsRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2ApiService
 	subject    *string
+	sid        *string
 }
 
 // OAuth 2.0 Subject  The subject to revoke authentication sessions for.
@@ -2978,16 +2979,27 @@ func (r ApiRevokeOAuth2LoginSessionsRequest) Subject(subject string) ApiRevokeOA
 	return r
 }
 
+// OAuth 2.0 Subject  The subject to revoke authentication sessions for.
+func (r ApiRevokeOAuth2LoginSessionsRequest) Sid(sid string) ApiRevokeOAuth2LoginSessionsRequest {
+	r.sid = &sid
+	return r
+}
+
 func (r ApiRevokeOAuth2LoginSessionsRequest) Execute() (*http.Response, error) {
 	return r.ApiService.RevokeOAuth2LoginSessionsExecute(r)
 }
 
 /*
-RevokeOAuth2LoginSessions Revokes All OAuth 2.0 Login Sessions of a Subject
+RevokeOAuth2LoginSessions Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 
-This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-has to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens and
-does not work with OpenID Connect Front- or Back-channel logout.
+This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject
+has to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.
+
+If you send the subject in a query param, all authentication sessions that belong to that subject are revoked.
+No OpennID Connect Front- or Back-channel logout is performed in this case.
+
+Alternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected
+to that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiRevokeOAuth2LoginSessionsRequest
@@ -3017,11 +3029,13 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.subject == nil {
-		return nil, reportError("subject is required and must be specified")
-	}
 
-	localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	if r.subject != nil {
+		localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	}
+	if r.sid != nil {
+		localVarQueryParams.Add("sid", parameterToString(*r.sid, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

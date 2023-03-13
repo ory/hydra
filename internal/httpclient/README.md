@@ -112,7 +112,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**RejectOAuth2LoginRequest**](docs/OAuth2Api.md#rejectoauth2loginrequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject OAuth 2.0 Login Request
 *OAuth2Api* | [**RejectOAuth2LogoutRequest**](docs/OAuth2Api.md#rejectoauth2logoutrequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject OAuth 2.0 Session Logout Request
 *OAuth2Api* | [**RevokeOAuth2ConsentSessions**](docs/OAuth2Api.md#revokeoauth2consentsessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
-*OAuth2Api* | [**RevokeOAuth2LoginSessions**](docs/OAuth2Api.md#revokeoauth2loginsessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes All OAuth 2.0 Login Sessions of a Subject
+*OAuth2Api* | [**RevokeOAuth2LoginSessions**](docs/OAuth2Api.md#revokeoauth2loginsessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 *OAuth2Api* | [**RevokeOAuth2Token**](docs/OAuth2Api.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
 *OAuth2Api* | [**SetOAuth2Client**](docs/OAuth2Api.md#setoauth2client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
 *OAuth2Api* | [**SetOAuth2ClientLifespans**](docs/OAuth2Api.md#setoauth2clientlifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans

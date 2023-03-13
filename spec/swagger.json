@@ -1280,7 +1280,7 @@
     },
     "/admin/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens and\ndoes not work with OpenID Connect Front- or Back-channel logout.",
+        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.",
         "consumes": [
           "application/json"
         ],
@@ -1294,15 +1294,20 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Revokes All OAuth 2.0 Login Sessions of a Subject",
+        "summary": "Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID",
         "operationId": "revokeOAuth2LoginSessions",
         "parameters": [
           {
             "type": "string",
             "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
             "name": "subject",
-            "in": "query",
-            "required": true
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
+            "name": "sid",
+            "in": "query"
           }
         ],
         "responses": {

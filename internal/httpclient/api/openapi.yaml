@@ -1130,10 +1130,15 @@ paths:
       - oAuth2
   /admin/oauth2/auth/sessions/login:
     delete:
-      description: "This endpoint invalidates a subject's authentication session.\
-        \ After revoking the authentication session, the subject\nhas to re-authenticate\
-        \ at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens\
-        \ and\ndoes not work with OpenID Connect Front- or Back-channel logout."
+      description: "This endpoint invalidates authentication sessions. After revoking\
+        \ the authentication session(s), the subject\nhas to re-authenticate at the\
+        \ Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf\
+        \ you send the subject in a query param, all authentication sessions that\
+        \ belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel\
+        \ logout is performed in this case.\n\nAlternatively, you can send a SessionID\
+        \ via `sid` query param, in which case, only the session that is connected\n\
+        to that SessionID is revoked. OpenID Connect Back-channel logout is performed\
+        \ in this case."
       operationId: revokeOAuth2LoginSessions
       parameters:
       - description: |-
@@ -1143,7 +1148,18 @@ paths:
         explode: true
         in: query
         name: subject
-        required: true
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          OAuth 2.0 Subject
+
+          The subject to revoke authentication sessions for.
+        explode: true
+        in: query
+        name: sid
+        required: false
         schema:
           type: string
         style: form
@@ -1157,7 +1173,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorOAuth2'
           description: errorOAuth2
-      summary: Revokes All OAuth 2.0 Login Sessions of a Subject
+      summary: Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
       tags:
       - oAuth2
   /admin/oauth2/introspect:

@@ -49,6 +49,10 @@ func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.Resp
 	panic("not implemented")
 }
 
+func (c *consentMock) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
+	panic("not implemented")
+}
+
 func (c *consentMock) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
 		panic("not implemented")

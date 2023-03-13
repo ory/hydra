@@ -99,6 +99,29 @@ func TestLogoutFlows(t *testing.T) {
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
+	makeHeadlessLogoutRequest := func(t *testing.T, hc *http.Client, values url.Values) (body string, resp *http.Response) {
+		var err error
+		req, err := http.NewRequest(http.MethodDelete, adminTS.URL+"/admin/oauth2/auth/sessions/login?"+values.Encode(), nil)
+		require.NoError(t, err)
+
+		resp, err = hc.Do(req)
+
+		require.NoError(t, err)
+		defer resp.Body.Close()
+		return string(ioutilx.MustReadAll(resp.Body)), resp
+	}
+
+	logoutViaHeadlessAndExpectNoContent := func(t *testing.T, browser *http.Client, values url.Values) {
+		_, res := makeHeadlessLogoutRequest(t, browser, values)
+		assert.EqualValues(t, http.StatusNoContent, res.StatusCode)
+	}
+
+	logoutViaHeadlessAndExpectError := func(t *testing.T, browser *http.Client, values url.Values, expectedErrorMessage string) {
+		body, res := makeHeadlessLogoutRequest(t, browser, values)
+		assert.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+		assert.Contains(t, body, expectedErrorMessage)
+	}
+
 	logoutAndExpectErrorPage := func(t *testing.T, browser *http.Client, method string, values url.Values, expectedErrorMessage string) {
 		body, res := makeLogoutRequest(t, browser, method, values)
 		assert.EqualValues(t, http.StatusInternalServerError, res.StatusCode)
@@ -153,7 +176,7 @@ func TestLogoutFlows(t *testing.T) {
 		reg.Config().MustSet(ctx, config.KeyLogoutURL, server.URL)
 	}
 
-	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
+	acceptLoginAsAndWatchSidForConsumers := func(t *testing.T, subject string, sid chan string, remember bool, numSidConsumers int) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
@@ -164,16 +187,22 @@ func TestLogoutFlows(t *testing.T) {
 				require.NoError(t, err)
 				if sid != nil {
 					go func() {
-						sid <- *res.LoginSessionId
+						for i := 0; i < numSidConsumers; i++ {
+							sid <- *res.LoginSessionId
+						}
 					}()
 				}
-				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(true)}
+				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(remember)}
 			}))
 
 	}
 
+	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, 1)
+	}
+
 	acceptLoginAs := func(t *testing.T, subject string) {
-		acceptLoginAsAndWatchSid(t, subject, nil)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, nil, true, 0)
 	}
 
 	subject := "aeneas-rekkas"
@@ -399,7 +428,7 @@ func TestLogoutFlows(t *testing.T) {
 
 	t.Run("case=should pass rp-inititated flow without any action because SID is unknown", func(t *testing.T) {
 		c := createSampleClient(t)
-		acceptLoginAsAndWatchSid(t, subject, nil)
+		acceptLoginAs(t, subject)
 
 		checkAndAcceptLogout(t, nil, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
 			t.Fatalf("Logout should not have been called")
@@ -489,5 +518,39 @@ func TestLogoutFlows(t *testing.T) {
 		assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
 
 		wg.Wait()
+	})
+
+	t.Run("case=should execute backchannel logout in headless flow with sid", func(t *testing.T) {
+		numSidConsumers := 2
+		sid := make(chan string, numSidConsumers)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, numSidConsumers)
+
+		backChannelWG := newWg(1)
+		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
+			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
+			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
+			assert.Empty(t, logoutToken.Get("nonce").String(), logoutToken.Raw)
+		})
+
+		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+
+		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+	})
+
+	t.Run("case=should logout in headless flow with non-existing sid", func(t *testing.T) {
+		logoutViaHeadlessAndExpectNoContent(t, browserWithoutSession, url.Values{"sid": {"non-existing-sid"}})
+	})
+
+	t.Run("case=should logout in headless flow with session that has remember=false", func(t *testing.T) {
+		sid := make(chan string)
+		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, false, 1)
+
+		c := createSampleClient(t)
+
+		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+	})
+
+	t.Run("case=should fail headless logout because neither sid nor subject were provided", func(t *testing.T) {
+		logoutViaHeadlessAndExpectError(t, browserWithoutSession, url.Values{}, `Either 'subject' or 'sid' query parameters need to be defined.`)
 	})
 }

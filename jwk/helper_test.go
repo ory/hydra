@@ -189,8 +189,13 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 	assert.NoError(t, err)
 	require.Len(t, opaqueKeys.Keys, 1)
 	opaqueKeys.Keys[0].Key = cryptosigner.Opaque(opaqueKeys.Keys[0].Key.(*rsa.PrivateKey))
+
 	keys := jwk.ExcludeOpaquePrivateKeys(opaqueKeys)
-	require.Len(t, keys.Keys, 0)
+
+	require.Len(t, keys.Keys, 1)
+	k := keys.Keys[0]
+	_, isPublic := k.Key.(*rsa.PublicKey)
+	assert.True(t, isPublic)
 }
 
 func TestGetOrGenerateKeys(t *testing.T) {

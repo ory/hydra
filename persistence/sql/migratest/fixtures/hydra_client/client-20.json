@@ -1,4 +1,5 @@
 {
+  "AccessTokenStrategy": "",
   "AllowedCORSOrigins": [
     "http://cors/20_1"
   ],
@@ -102,6 +103,7 @@
   "Secret": "secret-20",
   "SecretExpiresAt": 0,
   "SectorIdentifierURI": "http://sector_id/20",
+  "SkipConsent": false,
   "SubjectType": "subject-20",
   "TermsOfServiceURI": "http://tos/20",
   "TokenEndpointAuthMethod": "token_auth-20",

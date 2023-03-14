@@ -109,7 +109,7 @@ func TestHandler(t *testing.T) {
 
 		t.Run("valid auth", func(t *testing.T) {
 			actual, err := h.ValidDynamicAuth(&http.Request{Header: http.Header{"Authorization": {"Bearer " + expected.RegistrationAccessToken}}}, httprouter.Params{
-				httprouter.Param{Key: "id", Value: expected.GetID()},
+				{Key: "id", Value: expected.GetID()},
 			})
 			require.NoError(t, err, "authentication with registration access token works")
 			assert.EqualValues(t, expected.GetID(), actual.GetID())
@@ -117,14 +117,14 @@ func TestHandler(t *testing.T) {
 
 		t.Run("missing auth", func(t *testing.T) {
 			_, err := h.ValidDynamicAuth(&http.Request{}, httprouter.Params{
-				httprouter.Param{Key: "id", Value: expected.GetID()},
+				{Key: "id", Value: expected.GetID()},
 			})
 			require.Error(t, err, "authentication without registration access token fails")
 		})
 
 		t.Run("incorrect auth", func(t *testing.T) {
 			_, err := h.ValidDynamicAuth(&http.Request{Header: http.Header{"Authorization": {"Bearer invalid"}}}, httprouter.Params{
-				httprouter.Param{Key: "id", Value: expected.GetID()},
+				{Key: "id", Value: expected.GetID()},
 			})
 			require.Error(t, err, "authentication with invalid registration access token fails")
 		})
@@ -329,6 +329,34 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
+					d: "setting access token strategy fails",
+					payload: &client.Client{
+						RedirectURIs:        []string{"http://localhost:3000/cb"},
+						AccessTokenStrategy: "jwt",
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+				{
+					d: "setting skip_consent fails for dynamic registration",
+					payload: &client.Client{
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						SkipConsent:  true,
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+				{
+					d: "setting skip_consent suceeds for admin registration",
+					payload: &client.Client{
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						SkipConsent:  true,
+						Secret:       "2SKZkBf2P5g4toAXXnCrr~_sDM",
+					},
+					path:       client.ClientsHandlerPath,
+					statusCode: http.StatusCreated,
+				},
+				{
 					d: "basic dynamic client registration",
 					payload: &client.Client{
 						LegacyClientID: "ead800c5-a316-4d0c-bf00-d25666ba72cf",
@@ -364,7 +392,7 @@ func TestHandler(t *testing.T) {
 							assert.NotEmpty(t, gjson.Get(body, key).String(), "%s in %s", key, body)
 						}
 					}
-					snapshotx.SnapshotTExcept(t, json.RawMessage(body), exclude)
+					snapshotx.SnapshotT(t, json.RawMessage(body), snapshotx.ExceptPaths(exclude...))
 				})
 			}
 		})

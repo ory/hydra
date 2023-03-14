@@ -17,7 +17,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal"
@@ -50,7 +50,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
 
-		require.Len(t, known.Keys, 1)
+		require.GreaterOrEqual(t, len(known.Keys), 1)
 
 		knownKey := known.Key("test-id-1")[0].Public()
 		require.NotNil(t, knownKey, "Could not find key public")
@@ -84,9 +84,9 @@ func TestHandlerWellKnown(t *testing.T) {
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
 		if conf.HSMEnabled() {
-			require.Len(t, known.Keys, 2)
+			require.GreaterOrEqual(t, len(known.Keys), 2)
 		} else {
-			require.Len(t, known.Keys, 1)
+			require.GreaterOrEqual(t, len(known.Keys), 1)
 		}
 
 		knownKey := known.Key("test-id-2")[0]

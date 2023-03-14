@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/ipx"
@@ -140,14 +141,14 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), c.SubjectType) {
-			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config().SubjectTypesSupported(ctx)))
+		if !stringslice.Has(v.r.Config().SubjectTypesSupported(ctx, c), c.SubjectType) {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config().SubjectTypesSupported(ctx, c)))
 		}
 	} else {
-		if stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), "public") {
+		if stringslice.Has(v.r.Config().SubjectTypesSupported(ctx, c), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.r.Config().SubjectTypesSupported(ctx)[0]
+			c.SubjectType = v.r.Config().SubjectTypesSupported(ctx, c)[0]
 		}
 	}
 
@@ -173,14 +174,30 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 		}
 	}
 
+	if c.AccessTokenStrategy != "" {
+		s, err := config.ToAccessTokenStrategyType(c.AccessTokenStrategy)
+		if err != nil {
+			return errorsx.WithStack(ErrInvalidClientMetadata.
+				WithHintf("invalid access token strategy: %v", err))
+		}
+		// Canonicalize, just in case.
+		c.AccessTokenStrategy = string(s)
+	}
+
 	return nil
 }
 
 func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) error {
 	if c.Metadata != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.
-			WithHint(`metadata cannot be set for dynamic client registration'`),
+			WithHint(`"metadata" cannot be set for dynamic client registration`),
 		)
+	}
+	if c.AccessTokenStrategy != "" {
+		return errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own access token strategy."))
+	}
+	if c.SkipConsent {
+		return errorsx.WithStack(ErrInvalidRequest.WithDescription(`"skip_consent" cannot be set for dynamic client registration`))
 	}
 
 	return v.Validate(ctx, c)

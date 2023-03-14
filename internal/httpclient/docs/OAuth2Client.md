@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**AccessTokenStrategy** | Pointer to **string** | OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are &#x60;jwt&#x60; and &#x60;opaque&#x60;. &#x60;jwt&#x60; is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens Setting the stragegy here overrides the global setting in &#x60;strategies.access_token&#x60;. | [optional] 
 **AllowedCorsOrigins** | Pointer to **[]string** |  | [optional] 
 **Audience** | Pointer to **[]string** |  | [optional] 
 **AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
@@ -43,6 +44,7 @@ Name | Type | Description | Notes
 **ResponseTypes** | Pointer to **[]string** |  | [optional] 
 **Scope** | Pointer to **string** | OAuth 2.0 Client Scope  Scope is a string containing a space-separated list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client can use when requesting access tokens. | [optional] 
 **SectorIdentifierUri** | Pointer to **string** | OpenID Connect Sector Identifier URI  URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values. | [optional] 
+**SkipConsent** | Pointer to **bool** | SkipConsent skips the consent screen for this client. This field can only be set from the admin API. | [optional] 
 **SubjectType** | Pointer to **string** | OpenID Connect Subject Type  The &#x60;subject_types_supported&#x60; Discovery parameter contains a list of the supported subject_type values for this server. Valid types include &#x60;pairwise&#x60; and &#x60;public&#x60;. | [optional] 
 **TokenEndpointAuthMethod** | Pointer to **string** | OAuth 2.0 Token Endpoint Authentication Method  Requested Client Authentication method for the Token Endpoint. The options are:  &#x60;client_secret_post&#x60;: (default) Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; in the HTTP body. &#x60;client_secret_basic&#x60;: Send &#x60;client_id&#x60; and &#x60;client_secret&#x60; as &#x60;application/x-www-form-urlencoded&#x60; encoded in the HTTP Authorization header. &#x60;private_key_jwt&#x60;: Use JSON Web Tokens to authenticate the client. &#x60;none&#x60;: Used for public clients (native apps, mobile apps) which can not have secrets. | [optional] 
 **TokenEndpointAuthSigningAlg** | Pointer to **string** | OAuth 2.0 Token Endpoint Signing Algorithm  Requested Client Authentication signing algorithm for the Token Endpoint. | [optional] 
@@ -68,6 +70,31 @@ will change when the set of required properties is changed
 NewOAuth2ClientWithDefaults instantiates a new OAuth2Client object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetAccessTokenStrategy
+
+`func (o *OAuth2Client) GetAccessTokenStrategy() string`
+
+GetAccessTokenStrategy returns the AccessTokenStrategy field if non-nil, zero value otherwise.
+
+### GetAccessTokenStrategyOk
+
+`func (o *OAuth2Client) GetAccessTokenStrategyOk() (*string, bool)`
+
+GetAccessTokenStrategyOk returns a tuple with the AccessTokenStrategy field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAccessTokenStrategy
+
+`func (o *OAuth2Client) SetAccessTokenStrategy(v string)`
+
+SetAccessTokenStrategy sets AccessTokenStrategy field to given value.
+
+### HasAccessTokenStrategy
+
+`func (o *OAuth2Client) HasAccessTokenStrategy() bool`
+
+HasAccessTokenStrategy returns a boolean if a field has been set.
 
 ### GetAllowedCorsOrigins
 
@@ -1063,6 +1090,31 @@ SetSectorIdentifierUri sets SectorIdentifierUri field to given value.
 `func (o *OAuth2Client) HasSectorIdentifierUri() bool`
 
 HasSectorIdentifierUri returns a boolean if a field has been set.
+
+### GetSkipConsent
+
+`func (o *OAuth2Client) GetSkipConsent() bool`
+
+GetSkipConsent returns the SkipConsent field if non-nil, zero value otherwise.
+
+### GetSkipConsentOk
+
+`func (o *OAuth2Client) GetSkipConsentOk() (*bool, bool)`
+
+GetSkipConsentOk returns a tuple with the SkipConsent field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetSkipConsent
+
+`func (o *OAuth2Client) SetSkipConsent(v bool)`
+
+SetSkipConsent sets SkipConsent field to given value.
+
+### HasSkipConsent
+
+`func (o *OAuth2Client) HasSkipConsent() bool`
+
+HasSkipConsent returns a boolean if a field has been set.
 
 ### GetSubjectType
 

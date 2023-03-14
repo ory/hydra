@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine3.16 AS builder
+FROM golang:1.19-alpine3.17 AS builder
 
 RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
@@ -6,7 +6,7 @@ WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
-COPY internal/httpclient/go.* ./internal/httpclient
+COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
@@ -42,5 +42,3 @@ USER ory
 
 ENTRYPOINT ["hydra"]
 CMD ["serve"]
-
-

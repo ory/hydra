@@ -4,17 +4,18 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-01-28)](#000-2023-01-28)
+- [0.0.0 (2023-03-13)](#000-2023-03-13)
     - [Bug Fixes](#bug-fixes)
+    - [Features](#features)
 - [2.0.3 (2022-12-08)](#203-2022-12-08)
     - [Bug Fixes](#bug-fixes-1)
     - [Code Generation](#code-generation)
-    - [Features](#features)
+    - [Features](#features-1)
 - [2.0.2 (2022-11-10)](#202-2022-11-10)
     - [Bug Fixes](#bug-fixes-2)
     - [Code Generation](#code-generation-1)
     - [Documentation](#documentation)
-    - [Features](#features-1)
+    - [Features](#features-2)
     - [Tests](#tests)
 - [2.0.1 (2022-10-27)](#201-2022-10-27)
     - [Bug Fixes](#bug-fixes-3)
@@ -26,7 +27,7 @@
     - [Code Generation](#code-generation-3)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-2)
-    - [Features](#features-2)
+    - [Features](#features-3)
     - [Tests](#tests-1)
     - [Unclassified](#unclassified)
 - [1.11.10 (2022-08-25)](#11110-2022-08-25)
@@ -36,12 +37,12 @@
     - [Bug Fixes](#bug-fixes-6)
     - [Code Generation](#code-generation-5)
     - [Documentation](#documentation-3)
-    - [Features](#features-3)
+    - [Features](#features-4)
 - [1.11.8 (2022-05-04)](#1118-2022-05-04)
     - [Bug Fixes](#bug-fixes-7)
     - [Code Generation](#code-generation-6)
     - [Documentation](#documentation-4)
-    - [Features](#features-4)
+    - [Features](#features-5)
     - [Tests](#tests-2)
 - [1.11.7 (2022-02-23)](#1117-2022-02-23)
     - [Code Generation](#code-generation-7)
@@ -69,14 +70,14 @@
     - [Bug Fixes](#bug-fixes-13)
     - [Code Generation](#code-generation-14)
     - [Documentation](#documentation-6)
-    - [Features](#features-5)
+    - [Features](#features-6)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-2)
     - [Bug Fixes](#bug-fixes-14)
     - [Code Generation](#code-generation-15)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-7)
-    - [Features](#features-6)
+    - [Features](#features-7)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
     - [Bug Fixes](#bug-fixes-15)
     - [Code Generation](#code-generation-16)
@@ -85,30 +86,30 @@
     - [Bug Fixes](#bug-fixes-16)
     - [Code Generation](#code-generation-17)
     - [Documentation](#documentation-9)
-    - [Features](#features-7)
+    - [Features](#features-8)
 - [1.10.3 (2021-07-14)](#1103-2021-07-14)
     - [Bug Fixes](#bug-fixes-17)
     - [Code Generation](#code-generation-18)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-10)
-    - [Features](#features-8)
+    - [Features](#features-9)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-3)
     - [Bug Fixes](#bug-fixes-18)
     - [Code Generation](#code-generation-19)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-11)
-    - [Features](#features-9)
+    - [Features](#features-10)
 - [1.10.1 (2021-03-25)](#1101-2021-03-25)
     - [Bug Fixes](#bug-fixes-19)
     - [Code Generation](#code-generation-20)
     - [Documentation](#documentation-12)
-    - [Features](#features-10)
+    - [Features](#features-11)
     - [Tests](#tests-3)
     - [Unclassified](#unclassified-1)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
     - [Code Generation](#code-generation-21)
-    - [Features](#features-11)
+    - [Features](#features-12)
 - [1.9.1 (2021-01-27)](#191-2021-01-27)
     - [Code Generation](#code-generation-22)
     - [Documentation](#documentation-13)
@@ -126,34 +127,34 @@
     - [Code Generation](#code-generation-26)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-15)
-    - [Features](#features-12)
+    - [Features](#features-13)
     - [Tests](#tests-4)
     - [Unclassified](#unclassified-2)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
     - [Bug Fixes](#bug-fixes-22)
     - [Code Generation](#code-generation-27)
     - [Documentation](#documentation-16)
-    - [Features](#features-13)
+    - [Features](#features-14)
     - [Tests](#tests-5)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
     - [Bug Fixes](#bug-fixes-23)
     - [Code Generation](#code-generation-28)
     - [Code Refactoring](#code-refactoring-6)
     - [Documentation](#documentation-17)
-    - [Features](#features-14)
+    - [Features](#features-15)
     - [Tests](#tests-6)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
     - [Code Generation](#code-generation-29)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
     - [Bug Fixes](#bug-fixes-24)
     - [Code Generation](#code-generation-30)
-    - [Features](#features-15)
+    - [Features](#features-16)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-5)
     - [Bug Fixes](#bug-fixes-25)
     - [Code Generation](#code-generation-31)
     - [Documentation](#documentation-18)
-    - [Features](#features-16)
+    - [Features](#features-17)
 - [1.7.4 (2020-08-31)](#174-2020-08-31)
     - [Bug Fixes](#bug-fixes-26)
     - [Code Generation](#code-generation-32)
@@ -165,7 +166,7 @@
     - [Code Generation](#code-generation-34)
     - [Code Refactoring](#code-refactoring-7)
     - [Documentation](#documentation-19)
-    - [Features](#features-17)
+    - [Features](#features-18)
     - [Unclassified](#unclassified-3)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-7)
@@ -173,7 +174,7 @@
     - [Code Generation](#code-generation-35)
     - [Code Refactoring](#code-refactoring-8)
     - [Documentation](#documentation-20)
-    - [Features](#features-18)
+    - [Features](#features-19)
     - [Unclassified](#unclassified-4)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
     - [Bug Fixes](#bug-fixes-29)
@@ -183,20 +184,20 @@
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
     - [Bug Fixes](#bug-fixes-30)
     - [Code Generation](#code-generation-37)
-    - [Features](#features-19)
+    - [Features](#features-20)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
     - [Code Generation](#code-generation-38)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
     - [Bug Fixes](#bug-fixes-31)
     - [Chores](#chores)
     - [Documentation](#documentation-22)
-    - [Features](#features-20)
+    - [Features](#features-21)
     - [Unclassified](#unclassified-6)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
     - [Bug Fixes](#bug-fixes-32)
     - [Chores](#chores-1)
     - [Documentation](#documentation-23)
-    - [Features](#features-21)
+    - [Features](#features-22)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
     - [Chores](#chores-2)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
@@ -220,7 +221,7 @@
     - [Bug Fixes](#bug-fixes-36)
     - [Chores](#chores-7)
     - [Documentation](#documentation-26)
-    - [Features](#features-22)
+    - [Features](#features-23)
 - [1.4.7 (2020-04-24)](#147-2020-04-24)
     - [Bug Fixes](#bug-fixes-37)
     - [Chores](#chores-8)
@@ -235,7 +236,7 @@
     - [Bug Fixes](#bug-fixes-40)
     - [Code Refactoring](#code-refactoring-11)
     - [Documentation](#documentation-30)
-    - [Features](#features-23)
+    - [Features](#features-24)
 - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Chores](#chores-9)
     - [Documentation](#documentation-31)
@@ -260,7 +261,7 @@
     - [Bug Fixes](#bug-fixes-42)
     - [Code Refactoring](#code-refactoring-12)
     - [Documentation](#documentation-32)
-    - [Features](#features-24)
+    - [Features](#features-25)
     - [Unclassified](#unclassified-8)
 - [1.3.2 (2020-02-17)](#132-2020-02-17)
     - [Bug Fixes](#bug-fixes-43)
@@ -271,7 +272,7 @@
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
     - [Bug Fixes](#bug-fixes-44)
     - [Documentation](#documentation-34)
-    - [Features](#features-25)
+    - [Features](#features-26)
     - [Unclassified](#unclassified-9)
 - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-10)
@@ -664,14 +665,46 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-01-28)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-13)
 
 
 ### Bug Fixes
 
 * Append /v2 to module path ([f56e5fa](https://github.com/ory/hydra/commit/f56e5fad74632c1f0c5f3768a0de8465f351a533))
+* Broken OIDC compliance images ([#3454](https://github.com/ory/hydra/issues/3454)) ([50bc1b4](https://github.com/ory/hydra/commit/50bc1b4267045a19845816af295b638179be9c2c))
 * Clean up unused code ([488f930](https://github.com/ory/hydra/commit/488f930e4f2c39386b1c1ff68dd60d1aaf968cb9))
+* Migration typo ([#3453](https://github.com/ory/hydra/issues/3453)) ([ed27c10](https://github.com/ory/hydra/commit/ed27c1016fe8f8fea5a99a0e2203552c3bdc0ab3))
+* No longer use separate public and private keys in HSM key manager ([#3401](https://github.com/ory/hydra/issues/3401)) ([375bd5a](https://github.com/ory/hydra/commit/375bd5a69c0ece3aea0714ab7374ff8d09672c10))
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
+* Support allowed_cors_origins with client_secret_post ([#3457](https://github.com/ory/hydra/issues/3457)) ([ffe4943](https://github.com/ory/hydra/commit/ffe49430e31eee98ace65e829be5db3188c8fd4b)), closes [#3456](https://github.com/ory/hydra/issues/3456)
+
+### Features
+
+* Add ability to revoke login sessions by SessionID ([#3450](https://github.com/ory/hydra/issues/3450)) ([b42482b](https://github.com/ory/hydra/commit/b42482b7260d4e1771d01fc719e8216f5961ce65)), closes [#3448](https://github.com/ory/hydra/issues/3448):
+
+    API `revokeOAuth2LoginSessions` can now revoke a single session by a SessionID (`sid` claim in the id_token) and execute an OpenID Connect Back-channel logout.
+
+* Allow setting access token type in client ([#3446](https://github.com/ory/hydra/issues/3446)) ([a6beed4](https://github.com/ory/hydra/commit/a6beed4659febd0917379d6da1e51d8ef75bc859)):
+
+    The access token type (`jwt` or `opaque`) can now be set in the client configuration. The value set here will overwrite the global value for all flows concerning that client.
+
+* Allow skipping consent for trusted clients ([#3451](https://github.com/ory/hydra/issues/3451)) ([4f65365](https://github.com/ory/hydra/commit/4f65365f14ea28f979ebab7eb9c3396cbb25d619)):
+
+    This adds a new boolean parameter `skip_consent` to the admin APIs of
+    the OAuth clients. This parameter will be forwarded to the consent app
+    as `client.skip_consent`.
+    
+    It is up to the consent app to act on this parameter, but the canonical
+    implementation accepts the consent on the user's behalf, similar to
+    when `skip` is set.
+
+* Render complete config schema during CI ([#3433](https://github.com/ory/hydra/issues/3433)) ([ae3e781](https://github.com/ory/hydra/commit/ae3e7811ae2ba031fc4f1569a889d8b4ba0c96fd)):
+
+    * chore: bump ory/x
+    
+    * chore: script to render the complete config
+
+* Support datadog tracing ([#3431](https://github.com/ory/hydra/issues/3431)) ([3ea014f](https://github.com/ory/hydra/commit/3ea014f98f72b1456909838e8f7c40ceade7b2f6))
 
 
 # [2.0.3](https://github.com/ory/hydra/compare/v2.0.2...v2.0.3) (2022-12-08)

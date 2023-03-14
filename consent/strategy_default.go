@@ -935,6 +935,25 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
+func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, r *http.Request, subject string, sid string) error {
+	if err := s.executeBackChannelLogout(r.Context(), r, subject, sid); err != nil {
+		return err
+	}
+
+	// We delete the session after back channel log out has worked as the session is otherwise removed
+	// from the store which will break the query for finding all the channels.
+	//
+	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
+	// even if an upstream URL fails!
+	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), sid); errors.Is(err, sqlcon.ErrNoRows) {
+		// This is ok (session probably already revoked), do nothing!
+	} else if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 
@@ -984,18 +1003,7 @@ func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 		return nil, err
 	}
 
-	if err := s.executeBackChannelLogout(r.Context(), r, lr.Subject, lr.SessionID); err != nil {
-		return nil, err
-	}
-
-	// We delete the session after back channel log out has worked as the session is otherwise removed
-	// from the store which will break the query for finding all the channels.
-	//
-	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
-	// even if an upstream URL fails!
-	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), lr.SessionID); errors.Is(err, sqlcon.ErrNoRows) {
-		// This is ok (session probably already revoked), do nothing!
-	} else if err != nil {
+	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, lr.Subject, lr.SessionID); err != nil {
 		return nil, err
 	}
 
@@ -1017,6 +1025,31 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 	}
 
 	return s.completeLogout(ctx, w, r)
+}
+
+func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
+	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
+
+	if errors.Is(lsErr, x.ErrNotFound) {
+		// This is ok (session probably already revoked), do nothing!
+		// Not triggering the back-channel logout because subject is not available
+		// See https://github.com/ory/hydra/pull/3450#discussion_r1127798485
+		return nil
+	} else if lsErr != nil {
+		return lsErr
+	}
+
+	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, loginSession.Subject, sid); err != nil {
+		return err
+	}
+
+	s.r.AuditLogger().
+		WithRequest(r).
+		WithField("subject", loginSession.Subject).
+		WithField("sid", sid).
+		Info("User logout completed via headless flow!")
+
+	return nil
 }
 
 func (s *DefaultStrategy) requestDevice(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.Requester) error {

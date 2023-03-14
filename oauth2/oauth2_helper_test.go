@@ -49,6 +49,10 @@ func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.Resp
 	panic("not implemented")
 }
 
+func (c *consentMock) HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error {
+	panic("not implemented")
+}
+
 func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*consent.AcceptOAuth2ConsentRequest, error) {
 	if c.deny {
 		return nil, fosite.ErrRequestForbidden

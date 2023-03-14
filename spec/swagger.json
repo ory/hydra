@@ -1329,7 +1329,7 @@
     },
     "/admin/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens and\ndoes not work with OpenID Connect Front- or Back-channel logout.",
+        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.",
         "consumes": [
           "application/json"
         ],
@@ -1343,15 +1343,20 @@
         "tags": [
           "oAuth2"
         ],
-        "summary": "Revokes All OAuth 2.0 Login Sessions of a Subject",
+        "summary": "Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID",
         "operationId": "revokeOAuth2LoginSessions",
         "parameters": [
           {
             "type": "string",
             "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
             "name": "subject",
-            "in": "query",
-            "required": true
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
+            "name": "sid",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2640,6 +2645,10 @@
       "type": "object",
       "title": "OAuth 2.0 Client",
       "properties": {
+        "access_token_strategy": {
+          "description": "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is the strategy used to generate access tokens.\nValid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens\nSetting the stragegy here overrides the global setting in `strategies.access_token`.",
+          "type": "string"
+        },
         "allowed_cors_origins": {
           "$ref": "#/definitions/StringSliceJSONFormat"
         },
@@ -2778,6 +2787,10 @@
         "sector_identifier_uri": {
           "description": "OpenID Connect Sector Identifier URI\n\nURL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a\nfile with a single JSON array of redirect_uri values.",
           "type": "string"
+        },
+        "skip_consent": {
+          "description": "SkipConsent skips the consent screen for this client. This field can only\nbe set from the admin API.",
+          "type": "boolean"
         },
         "subject_type": {
           "description": "OpenID Connect Subject Type\n\nThe `subject_types_supported` Discovery parameter contains a\nlist of the supported subject_type values for this server. Valid types include `pairwise` and `public`.",

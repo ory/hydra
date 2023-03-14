@@ -8,8 +8,7 @@ GOLANGCI_LINT_VERSION = 1.46.2
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
-				  github.com/go-swagger/go-swagger/cmd/swagger \
-				  github.com/go-bindata/go-bindata/go-bindata
+				  github.com/go-swagger/go-swagger/cmd/swagger
 
 define make-go-dependency
   # go install is responsible for not re-building when the code hasn't changed
@@ -94,6 +93,10 @@ quicktest:
 .PHONY: quicktest-hsm
 quicktest-hsm:
 	docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm .
+
+.PHONY: refresh
+refresh:
+	UPDATE_SNAPSHOTS=true go test -failfast -short -tags sqlite,json1 ./...
 
 authors:  # updates the AUTHORS file
 	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash

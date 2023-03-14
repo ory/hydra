@@ -1164,10 +1164,15 @@ paths:
       - oAuth2
   /admin/oauth2/auth/sessions/login:
     delete:
-      description: "This endpoint invalidates a subject's authentication session.\
-        \ After revoking the authentication session, the subject\nhas to re-authenticate\
-        \ at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens\
-        \ and\ndoes not work with OpenID Connect Front- or Back-channel logout."
+      description: "This endpoint invalidates authentication sessions. After revoking\
+        \ the authentication session(s), the subject\nhas to re-authenticate at the\
+        \ Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf\
+        \ you send the subject in a query param, all authentication sessions that\
+        \ belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel\
+        \ logout is performed in this case.\n\nAlternatively, you can send a SessionID\
+        \ via `sid` query param, in which case, only the session that is connected\n\
+        to that SessionID is revoked. OpenID Connect Back-channel logout is performed\
+        \ in this case."
       operationId: revokeOAuth2LoginSessions
       parameters:
       - description: |-
@@ -1177,7 +1182,18 @@ paths:
         explode: true
         in: query
         name: subject
-        required: true
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          OAuth 2.0 Subject
+
+          The subject to revoke authentication sessions for.
+        explode: true
+        in: query
+        name: sid
+        required: false
         schema:
           type: string
         style: form
@@ -1191,7 +1207,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/errorOAuth2'
           description: errorOAuth2
-      summary: Revokes All OAuth 2.0 Login Sessions of a Subject
+      summary: Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
       tags:
       - oAuth2
   /admin/oauth2/introspect:
@@ -2505,6 +2521,7 @@ components:
         client_name: client_name
         policy_uri: policy_uri
         owner: owner
+        skip_consent: true
         audience:
         - audience
         - audience
@@ -2527,6 +2544,7 @@ components:
         implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
         client_secret_expires_at: 0
         implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+        access_token_strategy: access_token_strategy
         jwks_uri: jwks_uri
         request_object_signing_alg: request_object_signing_alg
         tos_uri: tos_uri
@@ -2537,6 +2555,12 @@ components:
         - response_types
         - response_types
       properties:
+        access_token_strategy:
+          description: "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is\
+            \ the strategy used to generate access tokens.\nValid options are `jwt`\
+            \ and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens\n\
+            Setting the stragegy here overrides the global setting in `strategies.access_token`."
+          type: string
         allowed_cors_origins:
           items:
             type: string
@@ -2786,6 +2810,11 @@ components:
             URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
             file with a single JSON array of redirect_uri values.
           type: string
+        skip_consent:
+          description: |-
+            SkipConsent skips the consent screen for this client. This field can only
+            be set from the admin API.
+          type: boolean
         subject_type:
           description: |-
             OpenID Connect Subject Type
@@ -2957,6 +2986,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience
@@ -2979,6 +3009,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
@@ -3194,6 +3225,7 @@ components:
             client_name: client_name
             policy_uri: policy_uri
             owner: owner
+            skip_consent: true
             audience:
             - audience
             - audience
@@ -3216,6 +3248,7 @@ components:
             implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
             client_secret_expires_at: 0
             implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+            access_token_strategy: access_token_strategy
             jwks_uri: jwks_uri
             request_object_signing_alg: request_object_signing_alg
             tos_uri: tos_uri
@@ -3336,6 +3369,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience
@@ -3358,6 +3392,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
@@ -3468,6 +3503,7 @@ components:
           client_name: client_name
           policy_uri: policy_uri
           owner: owner
+          skip_consent: true
           audience:
           - audience
           - audience
@@ -3490,6 +3526,7 @@ components:
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
           implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          access_token_strategy: access_token_strategy
           jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri

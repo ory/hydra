@@ -630,8 +630,10 @@ type revokeOAuth2Token struct {
 	// required: true
 	Token string `json:"token"`
 	// in: formData
+	// required: true
 	ClientID string `json:"client_id"`
 	// in: formData
+	// required: true
 	ClientSecret string `json:"client_secret"`
 }
 

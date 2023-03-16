@@ -3077,14 +3077,9 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 type ApiRevokeOAuth2TokenRequest struct {
 	ctx          context.Context
 	ApiService   *OAuth2ApiService
-	token        *string
 	clientId     *string
 	clientSecret *string
-}
-
-func (r ApiRevokeOAuth2TokenRequest) Token(token string) ApiRevokeOAuth2TokenRequest {
-	r.token = &token
-	return r
+	token        *string
 }
 
 func (r ApiRevokeOAuth2TokenRequest) ClientId(clientId string) ApiRevokeOAuth2TokenRequest {
@@ -3094,6 +3089,11 @@ func (r ApiRevokeOAuth2TokenRequest) ClientId(clientId string) ApiRevokeOAuth2To
 
 func (r ApiRevokeOAuth2TokenRequest) ClientSecret(clientSecret string) ApiRevokeOAuth2TokenRequest {
 	r.clientSecret = &clientSecret
+	return r
+}
+
+func (r ApiRevokeOAuth2TokenRequest) Token(token string) ApiRevokeOAuth2TokenRequest {
+	r.token = &token
 	return r
 }
 
@@ -3137,6 +3137,12 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
+	if r.clientId == nil {
+		return nil, reportError("clientId is required and must be specified")
+	}
+	if r.clientSecret == nil {
+		return nil, reportError("clientSecret is required and must be specified")
+	}
 	if r.token == nil {
 		return nil, reportError("token is required and must be specified")
 	}
@@ -3158,12 +3164,8 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if r.clientId != nil {
-		localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
-	}
-	if r.clientSecret != nil {
-		localVarFormParams.Add("client_secret", parameterToString(*r.clientSecret, ""))
-	}
+	localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
+	localVarFormParams.Add("client_secret", parameterToString(*r.clientSecret, ""))
 	localVarFormParams.Add("token", parameterToString(*r.token, ""))
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {

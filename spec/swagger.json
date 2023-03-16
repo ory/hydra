@@ -1880,12 +1880,14 @@
           {
             "type": "string",
             "name": "client_id",
-            "in": "formData"
+            "in": "formData",
+            "required": true
           },
           {
             "type": "string",
             "name": "client_secret",
-            "in": "formData"
+            "in": "formData",
+            "required": true
           }
         ],
         "responses": {

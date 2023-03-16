@@ -4155,9 +4155,13 @@ components:
     revokeOAuth2Token_request:
       properties:
         client_id:
+          required:
+          - client_id
           type: string
           x-formData-name: client_id
         client_secret:
+          required:
+          - client_secret
           type: string
           x-formData-name: client_secret
         token:
@@ -4166,6 +4170,8 @@ components:
           type: string
           x-formData-name: token
       required:
+      - client_id
+      - client_secret
       - token
       type: object
     oauth2TokenExchange_request:

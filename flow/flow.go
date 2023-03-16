@@ -152,6 +152,10 @@ type Flow struct {
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
 	LoginRememberFor int `db:"login_remember_for"`
 
+	// LoginExtendSessionLifespan, if set to true, session cookie expiry time will be updated when session is
+	// refreshed (login skip=true).
+	LoginExtendSessionLifespan bool `db:"login_extend_session_lifespan"`
+
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	ACR string `db:"acr"`
@@ -288,6 +292,7 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 
 	f.LoginRemember = h.Remember
 	f.LoginRememberFor = h.RememberFor
+	f.LoginExtendSessionLifespan = h.ExtendSessionLifespan
 	f.ACR = h.ACR
 	f.AMR = h.AMR
 	f.Context = h.Context
@@ -301,6 +306,7 @@ func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
 		ID:                     f.ID,
 		Remember:               f.LoginRemember,
 		RememberFor:            f.LoginRememberFor,
+		ExtendSessionLifespan:  f.LoginExtendSessionLifespan,
 		ACR:                    f.ACR,
 		AMR:                    f.AMR,
 		Subject:                f.Subject,

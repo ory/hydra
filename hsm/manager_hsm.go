@@ -42,8 +42,7 @@ type KeyManager struct {
 	jwk.Manager
 	sync.RWMutex
 	Context
-	ctx context.Context
-	c   config.DefaultProvider
+	c config.DefaultProvider
 }
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
@@ -52,10 +51,9 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context, ctx context.Context, config *config.DefaultProvider) *KeyManager {
+func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	return &KeyManager{
 		Context: hsm,
-		ctx:     ctx,
 		c:       *config,
 	}
 }
@@ -144,7 +142,7 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
-	id, alg, use, err := m.getKeySetAttributes(keyPair, []byte(kid))
+	id, alg, use, err := m.getKeySetAttributes(ctx, keyPair, []byte(kid))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +174,7 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 
 	var keys []jose.JSONWebKey
 	for _, keyPair := range keyPairs {
-		kid, alg, use, err := m.getKeySetAttributes(keyPair, nil)
+		kid, alg, use, err := m.getKeySetAttributes(ctx, keyPair, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -265,7 +263,7 @@ func (m *KeyManager) UpdateKeySet(_ context.Context, _ string, _ *jose.JSONWebKe
 	return errors.WithStack(ErrPreGeneratedKeys)
 }
 
-func (m *KeyManager) getKeySetAttributes(key crypto11.Signer, kid []byte) (string, string, string, error) {
+func (m *KeyManager) getKeySetAttributes(ctx context.Context, key crypto11.Signer, kid []byte) (string, string, string, error) {
 	if kid == nil {
 		ckaId, err := m.GetAttribute(key, crypto11.CkaId)
 		if err != nil {
@@ -278,7 +276,7 @@ func (m *KeyManager) getKeySetAttributes(key crypto11.Signer, kid []byte) (strin
 	switch k := key.Public().(type) {
 	case *rsa.PublicKey:
 		alg = "RS256"
-		if k.N.BitLen() < 4096 && !m.c.IsDevelopmentMode(m.ctx) {
+		if k.N.BitLen() < 4096 && !m.c.IsDevelopmentMode(ctx) {
 			return "", "", "", errors.WithStack(jwk.ErrMinimalRsaKeyLength)
 		}
 	case *ecdsa.PublicKey:

@@ -66,7 +66,7 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	keySetPrefix := "application_specific_prefix."
 	c.MustSet(context.Background(), config.HSMKeySetPrefix, keySetPrefix)
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey3072, err := rsa.GenerateKey(rand.Reader, 3072)
 	require.NoError(t, err)
@@ -166,7 +166,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	require.NoError(t, err)
@@ -347,7 +347,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	require.NoError(t, err)
@@ -537,7 +537,7 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	require.NoError(t, err)
@@ -685,7 +685,7 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKeyPair := NewMockSignerDecrypter(ctrl)
 
@@ -768,7 +768,7 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	m := hsm.NewKeyManager(hsmContext, context.TODO(), c)
+	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKeyPair1 := NewMockSignerDecrypter(ctrl)
 	rsaKeyPair2 := NewMockSignerDecrypter(ctrl)

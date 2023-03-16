@@ -678,6 +678,7 @@
 * No longer use separate public and private keys in HSM key manager ([#3401](https://github.com/ory/hydra/issues/3401)) ([375bd5a](https://github.com/ory/hydra/commit/375bd5a69c0ece3aea0714ab7374ff8d09672c10))
 * Pin nancy ([0156556](https://github.com/ory/hydra/commit/0156556bb35278fcbc416b02504bc04511c468a7))
 * Support allowed_cors_origins with client_secret_post ([#3457](https://github.com/ory/hydra/issues/3457)) ([ffe4943](https://github.com/ory/hydra/commit/ffe49430e31eee98ace65e829be5db3188c8fd4b)), closes [#3456](https://github.com/ory/hydra/issues/3456)
+* Use correct default value ([#3469](https://github.com/ory/hydra/issues/3469)) ([2796d53](https://github.com/ory/hydra/commit/2796d53798c3a2fa36738fe40d287f93480f08d7)), closes [#3420](https://github.com/ory/hydra/issues/3420)
 
 ### Documentation
 

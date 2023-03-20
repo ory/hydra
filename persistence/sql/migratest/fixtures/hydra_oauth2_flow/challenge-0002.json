@@ -21,6 +21,7 @@
   "State": 128,
   "LoginRemember": true,
   "LoginRememberFor": 2,
+  "LoginExtendSessionLifespan": false,
   "ACR": "acr-0002",
   "AMR": [],
   "ForceSubjectIdentifier": "force_subject_id-0002",

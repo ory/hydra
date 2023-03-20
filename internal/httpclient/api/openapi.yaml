@@ -1938,6 +1938,13 @@ components:
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
+        extend_session_lifespan:
+          description: "Extend OAuth2 authentication session lifespan\n\nIf set to\
+            \ `true`, the OAuth2 authentication cookie lifespan is extended. This\
+            \ is for example useful if you want the user to be able to use `prompt=none`\
+            \ continuously.\n\nThis value can only be set to `true` if the user has\
+            \ an authentication, which is the case if the `skip` value is `true`."
+          type: boolean
         force_subject_identifier:
           description: "ForceSubjectIdentifier forces the \"pairwise\" user ID of\
             \ the end-user that authenticated. The \"pairwise\" user ID refers to\
@@ -2505,7 +2512,7 @@ components:
         refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
         registration_access_token: registration_access_token
         client_id: client_id
-        token_endpoint_auth_method: token_endpoint_auth_method
+        token_endpoint_auth_method: client_secret_basic
         userinfo_signed_response_alg: userinfo_signed_response_alg
         authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
         authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
@@ -2823,14 +2830,15 @@ components:
             list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
           type: string
         token_endpoint_auth_method:
+          default: client_secret_basic
           description: "OAuth 2.0 Token Endpoint Authentication Method\n\nRequested\
             \ Client Authentication method for the Token Endpoint. The options are:\n\
-            \n`client_secret_post`: (default) Send `client_id` and `client_secret`\
-            \ as `application/x-www-form-urlencoded` in the HTTP body.\n`client_secret_basic`:\
-            \ Send `client_id` and `client_secret` as `application/x-www-form-urlencoded`\
-            \ encoded in the HTTP Authorization header.\n`private_key_jwt`: Use JSON\
-            \ Web Tokens to authenticate the client.\n`none`: Used for public clients\
-            \ (native apps, mobile apps) which can not have secrets."
+            \n`client_secret_basic`: (default) Send `client_id` and `client_secret`\
+            \ as `application/x-www-form-urlencoded` encoded in the HTTP Authorization\
+            \ header.\n`client_secret_post`: Send `client_id` and `client_secret`\
+            \ as `application/x-www-form-urlencoded` in the HTTP body.\n`private_key_jwt`:\
+            \ Use JSON Web Tokens to authenticate the client.\n`none`: Used for public\
+            \ clients (native apps, mobile apps) which can not have secrets."
           type: string
         token_endpoint_auth_signing_alg:
           description: |-
@@ -2970,7 +2978,7 @@ components:
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: token_endpoint_auth_method
+          token_endpoint_auth_method: client_secret_basic
           userinfo_signed_response_alg: userinfo_signed_response_alg
           authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
@@ -3209,7 +3217,7 @@ components:
             refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
             registration_access_token: registration_access_token
             client_id: client_id
-            token_endpoint_auth_method: token_endpoint_auth_method
+            token_endpoint_auth_method: client_secret_basic
             userinfo_signed_response_alg: userinfo_signed_response_alg
             authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
             authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
@@ -3353,7 +3361,7 @@ components:
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: token_endpoint_auth_method
+          token_endpoint_auth_method: client_secret_basic
           userinfo_signed_response_alg: userinfo_signed_response_alg
           authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
@@ -3487,7 +3495,7 @@ components:
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
           registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: token_endpoint_auth_method
+          token_endpoint_auth_method: client_secret_basic
           userinfo_signed_response_alg: userinfo_signed_response_alg
           authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan

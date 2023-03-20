@@ -93,7 +93,7 @@ type OAuth2Client struct {
 	SkipConsent *bool `json:"skip_consent,omitempty"`
 	// OpenID Connect Subject Type  The `subject_types_supported` Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
 	SubjectType *string `json:"subject_type,omitempty"`
-	// OAuth 2.0 Token Endpoint Authentication Method  Requested Client Authentication method for the Token Endpoint. The options are:  `client_secret_post`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body. `client_secret_basic`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header. `private_key_jwt`: Use JSON Web Tokens to authenticate the client. `none`: Used for public clients (native apps, mobile apps) which can not have secrets.
+	// OAuth 2.0 Token Endpoint Authentication Method  Requested Client Authentication method for the Token Endpoint. The options are:  `client_secret_basic`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header. `client_secret_post`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body. `private_key_jwt`: Use JSON Web Tokens to authenticate the client. `none`: Used for public clients (native apps, mobile apps) which can not have secrets.
 	TokenEndpointAuthMethod *string `json:"token_endpoint_auth_method,omitempty"`
 	// OAuth 2.0 Token Endpoint Signing Algorithm  Requested Client Authentication signing algorithm for the Token Endpoint.
 	TokenEndpointAuthSigningAlg *string `json:"token_endpoint_auth_signing_alg,omitempty"`
@@ -111,6 +111,8 @@ type OAuth2Client struct {
 // will change when the set of required properties is changed
 func NewOAuth2Client() *OAuth2Client {
 	this := OAuth2Client{}
+	var tokenEndpointAuthMethod string = "client_secret_basic"
+	this.TokenEndpointAuthMethod = &tokenEndpointAuthMethod
 	return &this
 }
 
@@ -119,6 +121,8 @@ func NewOAuth2Client() *OAuth2Client {
 // but it doesn't guarantee that properties required by API are set
 func NewOAuth2ClientWithDefaults() *OAuth2Client {
 	this := OAuth2Client{}
+	var tokenEndpointAuthMethod string = "client_secret_basic"
+	this.TokenEndpointAuthMethod = &tokenEndpointAuthMethod
 	return &this
 }
 

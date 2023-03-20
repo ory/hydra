@@ -196,10 +196,12 @@ type Client struct {
 	//
 	// Requested Client Authentication method for the Token Endpoint. The options are:
 	//
-	// - `client_secret_post`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body.
-	// - `client_secret_basic`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header.
+	// - `client_secret_basic`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header.
+	// - `client_secret_post`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body.
 	// - `private_key_jwt`: Use JSON Web Tokens to authenticate the client.
 	// - `none`: Used for public clients (native apps, mobile apps) which can not have secrets.
+	//
+	// default: client_secret_basic
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty" db:"token_endpoint_auth_method" faker:"len=25"`
 
 	// OAuth 2.0 Token Endpoint Signing Algorithm

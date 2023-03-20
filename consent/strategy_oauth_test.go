@@ -364,6 +364,102 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		})
 	})
 
+	t.Run("case=should pass if both login and consent are granted and check remember flows with refresh session cookie", func(t *testing.T) {
+
+		subject := "subject-1"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			acceptLoginHandler(t, subject, &hydra.AcceptOAuth2LoginRequest{
+				Remember: pointerx.Bool(true),
+			}),
+			acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{
+				Remember:   pointerx.Bool(true),
+				GrantScope: []string{"openid"},
+				Session: &hydra.AcceptOAuth2ConsentRequestSession{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IdToken:     map[string]interface{}{"bar": "baz"},
+				},
+			}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		followUpHandler := func(extendSessionLifespan bool) {
+			rememberFor := int64(12345)
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
+				checkAndAcceptLoginHandler(t, adminClient, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
+					require.NoError(t, err)
+					assert.True(t, res.Skip)
+					assert.Equal(t, subject, res.Subject)
+					assert.Empty(t, res.Client.ClientSecret)
+					return hydra.AcceptOAuth2LoginRequest{
+						Subject:               subject,
+						Remember:              pointerx.Bool(true),
+						RememberFor:           pointerx.Int64(rememberFor),
+						ExtendSessionLifespan: pointerx.Bool(extendSessionLifespan),
+						Context:               map[string]interface{}{"foo": "bar"},
+					}
+				}),
+				checkAndAcceptConsentHandler(t, adminClient, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
+					require.NoError(t, err)
+					assert.True(t, *res.Skip)
+					assert.Equal(t, subject, res.Subject)
+					assert.Empty(t, res.Client.ClientSecret)
+					return hydra.AcceptOAuth2ConsentRequest{
+						Remember:   pointerx.Bool(true),
+						GrantScope: []string{"openid"},
+						Session: &hydra.AcceptOAuth2ConsentRequestSession{
+							AccessToken: map[string]interface{}{"foo": "bar"},
+							IdToken:     map[string]interface{}{"bar": "baz"},
+						},
+					}
+				}))
+
+			hc := &http.Client{
+				Jar:       hc.Jar,
+				Transport: &http.Transport{},
+				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+					return http.ErrUseLastResponse
+				},
+			}
+
+			_, oauthRes := makeOAuth2Request(t, reg, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}, "scope": {"openid"}})
+			assert.EqualValues(t, http.StatusFound, oauthRes.StatusCode)
+			loginChallengeRedirect, err := oauthRes.Location()
+			require.NoError(t, err)
+			defer oauthRes.Body.Close()
+
+			loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
+			require.NoError(t, err)
+			defer loginChallengeRes.Body.Close()
+			loginVerifierRedirect, err := loginChallengeRes.Location()
+
+			loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
+			require.NoError(t, err)
+			defer loginVerifierRes.Body.Close()
+
+			setCookieHeader := loginVerifierRes.Header.Get("set-cookie")
+			assert.NotNil(t, setCookieHeader)
+			if extendSessionLifespan {
+				assert.Regexp(t, fmt.Sprintf("ory_hydra_session_dev=.*; Path=/; Expires=.*Max-Age=%d; HttpOnly; SameSite=Lax", rememberFor), setCookieHeader)
+			} else {
+				assert.NotContains(t, setCookieHeader, "ory_hydra_session_dev")
+			}
+		}
+
+		t.Run("perform first flow", func(t *testing.T) {
+			makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]},
+				"scope": {"openid"}})
+		})
+
+		t.Run("perform follow up flow with extend_session_lifespan=false", func(t *testing.T) {
+			followUpHandler(false)
+		})
+
+		t.Run("perform follow up flow with extend_session_lifespan=true", func(t *testing.T) {
+			followUpHandler(true)
+		})
+	})
+
 	t.Run("case=should pass and check if login context is set properly", func(t *testing.T) {
 		// This should pass because login was remembered and session id should be set and session context should also work
 		subject := "aeneas-rekkas"

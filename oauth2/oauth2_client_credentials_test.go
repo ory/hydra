@@ -261,7 +261,6 @@ func TestClientCredentials(t *testing.T) {
 
 					expectedGrantedScopes := []string{"foobar"}
 					expectedGrantedAudience := []string{"https://api.ory.sh/"}
-					expectedPayload := map[string][]string(map[string][]string{"audience": audience, "grant_type": {"client_credentials"}, "scope": {scope}})
 
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
@@ -270,8 +269,7 @@ func TestClientCredentials(t *testing.T) {
 					require.NotEmpty(t, hookReq.Session)
 					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
 					require.NotEmpty(t, hookReq.Requester)
-					require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
-					require.Equal(t, hookReq.Requester.Payload, expectedPayload)
+					require.Equal(t, hookReq.Requester.Payload, map[string][]string{})
 
 					claims := map[string]interface{}{
 						"hooked": true,

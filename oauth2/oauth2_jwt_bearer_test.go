@@ -64,7 +64,9 @@ func TestJWTBearer(t *testing.T) {
 	}
 
 	var getToken = func(t *testing.T, conf *clientcredentials.Config) (*goauth2.Token, error) {
-		conf.AuthStyle = goauth2.AuthStyleInHeader
+		if conf.AuthStyle == goauth2.AuthStyleAutoDetect {
+			conf.AuthStyle = goauth2.AuthStyleInHeader
+		}
 		return conf.Token(context.Background())
 	}
 
@@ -333,7 +335,6 @@ func TestJWTBearer(t *testing.T) {
 					require.NotEmpty(t, hookReq.Session)
 					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
 					require.NotEmpty(t, hookReq.Requester)
-					require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
 					require.Equal(t, hookReq.Requester.Payload, expectedPayload)
 
 					claims := map[string]interface{}{
@@ -358,6 +359,82 @@ func TestJWTBearer(t *testing.T) {
 				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
 
 				conf := newConf(client)
+				conf.EndpointParams = url.Values{"grant_type": {grantType}, "assertion": {token}}
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				inspectToken(t, result, client, strategy, trustGrant, true)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should call token hook if configured and omit client_secret from payload", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				audience := reg.Config().OAuth2TokenURL(ctx).String()
+				grantType := "urn:ietf:params:oauth:grant-type:jwt-bearer"
+
+				token, _, err := signer.Generate(ctx, jwt.MapClaims{
+					"jti": uuid.NewString(),
+					"iss": trustGrant.Issuer,
+					"sub": trustGrant.Subject,
+					"aud": audience,
+					"exp": time.Now().Add(time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Minute).Unix(),
+				}, &jwt.Headers{Extra: map[string]interface{}{"kid": kid}})
+				require.NoError(t, err)
+
+				client := &hc.Client{
+					Secret:                  secret,
+					GrantTypes:              []string{"urn:ietf:params:oauth:grant-type:jwt-bearer"},
+					Scope:                   "offline_access",
+					TokenEndpointAuthMethod: "client_secret_post",
+				}
+				require.NoError(t, reg.ClientManager().CreateClient(ctx, client))
+
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
+					expectedGrantedScopes := []string{client.Scope}
+					expectedGrantedAudience := []string{audience}
+					expectedPayload := map[string][]string(map[string][]string{"client_id": {client.GetID()}, "grant_type": {grantType}, "assertion": {token}, "scope": {client.Scope}})
+
+					var hookReq hydraoauth2.TokenHookRequest
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+					require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
+					require.ElementsMatch(t, hookReq.GrantedAudience, expectedGrantedAudience)
+					require.NotEmpty(t, hookReq.Session)
+					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
+					require.NotEmpty(t, hookReq.Requester)
+					require.Equal(t, hookReq.Requester.Payload, expectedPayload)
+
+					claims := map[string]interface{}{
+						"hooked": true,
+					}
+
+					hookResp := hydraoauth2.TokenHookResponse{
+						Session: consent.AcceptOAuth2ConsentRequestSession{
+							AccessToken: claims,
+							IDToken:     claims,
+						},
+					}
+
+					w.WriteHeader(http.StatusOK)
+					require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyJWTBearerHookURL, nil)
+
+				conf := newConf(client)
+				conf.AuthStyle = goauth2.AuthStyleInParams
 				conf.EndpointParams = url.Values{"grant_type": {grantType}, "assertion": {token}}
 
 				result, err := getToken(t, conf)

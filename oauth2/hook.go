@@ -28,12 +28,6 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 //
 // swagger:ignore
 type Requester struct {
-	// ClientID is the identifier of the OAuth 2.0 client.
-	ClientID string `json:"client_id"`
-	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
-	GrantedScopes []string `json:"granted_scopes"`
-	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
-	GrantedAudience []string `json:"granted_audience"`
 	// GrantTypes is the requests grant types.
 	GrantTypes []string `json:"grant_types"`
 	// Payload is the requests payload.
@@ -126,6 +120,13 @@ func JWTBearerHook(reg interface {
 	}
 }
 
+func getSafePayload(requester fosite.AccessRequester) url.Values {
+	payload := requester.GetRequestForm()
+	payload.Del("client_secret")
+
+	return payload
+}
+
 func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.AccessRequester, grantType string, hookURL *url.URL) error {
 	if !requester.GetGrantTypes().ExactOne(grantType) {
 		return nil
@@ -138,16 +139,13 @@ func callHook(ctx context.Context, reg x.HTTPClientProvider, requester fosite.Ac
 
 	payload := map[string][]string{}
 
-	if grantType == "urn:ietf:params:oauth:grant-type:jwt-bearer" || grantType == "client_credentials" {
-		payload = requester.GetRequestForm()
+	if grantType == "urn:ietf:params:oauth:grant-type:jwt-bearer" {
+		payload = getSafePayload(requester)
 	}
 
 	requesterInfo := Requester{
-		ClientID:        requester.GetClient().GetID(),
-		GrantedScopes:   requester.GetGrantedScopes(),
-		GrantedAudience: requester.GetGrantedAudience(),
-		GrantTypes:      requester.GetGrantTypes(),
-		Payload:         payload,
+		GrantTypes: requester.GetGrantTypes(),
+		Payload:    payload,
 	}
 
 	reqBody := TokenHookRequest{

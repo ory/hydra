@@ -1227,8 +1227,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							require.Equal(t, hookReq.Session.ClientID, oauthConfig.ClientID)
 							require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
 							require.NotEmpty(t, hookReq.Requester)
-							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
-							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
 							require.Equal(t, hookReq.Requester.Payload, map[string][]string{})
 
 							except := []string{

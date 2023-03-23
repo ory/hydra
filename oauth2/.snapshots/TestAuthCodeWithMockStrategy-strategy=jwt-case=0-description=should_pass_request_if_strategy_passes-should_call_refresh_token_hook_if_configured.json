@@ -32,13 +32,6 @@
     "allowed_top_level_claims": []
   },
   "requester": {
-    "client_id": "app-client",
-    "granted_scopes": [
-      "offline",
-      "openid",
-      "hydra.*"
-    ],
-    "granted_audience": [],
     "grant_types": [
       "refresh_token"
     ],

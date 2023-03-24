@@ -976,23 +976,11 @@
           "format": "uri",
           "examples": ["https://my-example.app/token-refresh-hook"]
         },
-        "authorization_code_hook": {
+        "token_hook": {
           "type": "string",
-          "description": "Sets the authorization code hook endpoint. If set it will be called while providing token to customize claims.",
+          "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",
           "format": "uri",
-          "examples": ["https://my-example.app/token-authorization-code-hook"]
-        },
-        "client_credentials_hook": {
-          "type": "string",
-          "description": "Sets the client credentials hook endpoint. If set it will be called while providing token to customize claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-client-credentials-hook"]
-        },
-        "jwt_bearer_hook": {
-          "type": "string",
-          "description": "Sets the jwt bearer hook endpoint. If set it will be called while providing token to customize claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-jwt-bearer-hook"]
+          "examples": ["https://my-example.app/token-hook"]
         }
       }
     },

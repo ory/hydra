@@ -1,5 +1,4 @@
 {
-  "subject": "foo",
   "session": {
     "id_token": {
       "id_token_claims": {
@@ -15,7 +14,7 @@
         "amr": null,
         "c_hash": "",
         "ext": {
-          "sid": ""
+          "hooked": "legacy"
         }
       },
       "headers": {
@@ -25,23 +24,25 @@
       "username": "",
       "subject": "foo"
     },
-    "extra": {},
+    "extra": {
+      "hooked": "legacy"
+    },
     "client_id": "app-client",
     "consent_challenge": "",
     "exclude_not_before_claim": false,
     "allowed_top_level_claims": []
   },
-  "requester": {
+  "request": {
+    "client_id": "app-client",
+    "granted_scopes": [
+      "offline",
+      "openid",
+      "hydra.*"
+    ],
+    "granted_audience": [],
     "grant_types": [
       "refresh_token"
     ],
     "payload": {}
-  },
-  "client_id": "app-client",
-  "granted_scopes": [
-    "offline",
-    "openid",
-    "hydra.*"
-  ],
-  "granted_audience": []
+  }
 }

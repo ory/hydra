@@ -460,6 +460,78 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		})
 	})
 
+	t.Run("case=should set session cookie with correct configuration", func(t *testing.T) {
+		cookiePath := "/foo"
+		reg.Config().MustSet(ctx, config.KeyCookieSessionPath, cookiePath)
+		defer reg.Config().MustSet(ctx, config.KeyCookieSessionPath, "/")
+
+		subject := "subject-1"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			acceptLoginHandler(t, subject, &hydra.AcceptOAuth2LoginRequest{
+				Remember: pointerx.Bool(true),
+			}),
+			acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{
+				Remember:   pointerx.Bool(true),
+				GrantScope: []string{"openid"},
+				Session: &hydra.AcceptOAuth2ConsentRequestSession{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IdToken:     map[string]interface{}{"bar": "baz"},
+				},
+			}))
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			checkAndAcceptLoginHandler(t, adminClient, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
+				require.NoError(t, err)
+				assert.Empty(t, res.Subject)
+				assert.Empty(t, pointerx.StringR(res.Client.ClientSecret))
+				return hydra.AcceptOAuth2LoginRequest{
+					Subject: subject,
+					Context: map[string]interface{}{"foo": "bar"},
+				}
+			}),
+			checkAndAcceptConsentHandler(t, adminClient, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
+				require.NoError(t, err)
+				assert.Equal(t, subject, *res.Subject)
+				assert.Empty(t, pointerx.StringR(res.Client.ClientSecret))
+				return hydra.AcceptOAuth2ConsentRequest{
+					Remember:   pointerx.Bool(true),
+					GrantScope: []string{"openid"},
+					Session: &hydra.AcceptOAuth2ConsentRequestSession{
+						AccessToken: map[string]interface{}{"foo": "bar"},
+						IdToken:     map[string]interface{}{"bar": "baz"},
+					},
+				}
+			}))
+		hc := &http.Client{
+			Jar:       testhelpers.NewEmptyCookieJar(t),
+			Transport: &http.Transport{},
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
+
+		_, oauthRes := makeOAuth2Request(t, reg, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}, "scope": {"openid"}})
+		assert.EqualValues(t, http.StatusFound, oauthRes.StatusCode)
+		loginChallengeRedirect, err := oauthRes.Location()
+		require.NoError(t, err)
+		defer oauthRes.Body.Close()
+
+		loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
+		require.NoError(t, err)
+		defer loginChallengeRes.Body.Close()
+
+		loginVerifierRedirect, err := loginChallengeRes.Location()
+		require.NoError(t, err)
+		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
+		require.NoError(t, err)
+		defer loginVerifierRes.Body.Close()
+
+		setCookieHeader := loginVerifierRes.Header.Get("set-cookie")
+		assert.NotNil(t, setCookieHeader)
+
+		assert.Regexp(t, fmt.Sprintf("ory_hydra_session_dev=.*; Path=%s; Expires=.*; Max-Age=0; HttpOnly; SameSite=Lax", cookiePath), setCookieHeader)
+	})
+
 	t.Run("case=should pass and check if login context is set properly", func(t *testing.T) {
 		// This should pass because login was remembered and session id should be set and session context should also work
 		subject := "aeneas-rekkas"

@@ -93,6 +93,7 @@ const (
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
+	KeyTokenHookURL                              = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
 )
 
@@ -420,11 +421,11 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
-func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyRefreshTokenHookURL)) == 0 {
-		return nil
-	}
+func (p *DefaultProvider) TokenHookURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyTokenHookURL, nil)
+}
 
+func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
 }
 

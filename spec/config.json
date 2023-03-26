@@ -975,6 +975,12 @@
           "description": "Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.",
           "format": "uri",
           "examples": ["https://my-example.app/token-refresh-hook"]
+        },
+        "token_hook": {
+          "type": "string",
+          "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",
+          "format": "uri",
+          "examples": ["https://my-example.app/token-hook"]
         }
       }
     },

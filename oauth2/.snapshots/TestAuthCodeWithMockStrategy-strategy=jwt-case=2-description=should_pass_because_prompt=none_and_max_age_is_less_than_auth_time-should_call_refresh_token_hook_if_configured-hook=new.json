@@ -1,0 +1,48 @@
+{
+  "session": {
+    "id_token": {
+      "id_token_claims": {
+        "jti": "",
+        "iss": "http://localhost:4444/",
+        "sub": "foo",
+        "aud": [
+          "app-client"
+        ],
+        "nonce": "",
+        "at_hash": "",
+        "acr": "1",
+        "amr": null,
+        "c_hash": "",
+        "ext": {
+          "hooked": "legacy"
+        }
+      },
+      "headers": {
+        "extra": {
+        }
+      },
+      "username": "",
+      "subject": "foo"
+    },
+    "extra": {
+      "hooked": "legacy"
+    },
+    "client_id": "app-client",
+    "consent_challenge": "",
+    "exclude_not_before_claim": false,
+    "allowed_top_level_claims": []
+  },
+  "request": {
+    "client_id": "app-client",
+    "granted_scopes": [
+      "offline",
+      "openid",
+      "hydra.*"
+    ],
+    "granted_audience": [],
+    "grant_types": [
+      "refresh_token"
+    ],
+    "payload": {}
+  }
+}

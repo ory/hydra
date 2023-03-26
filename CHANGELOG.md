@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-03-16)](#000-2023-03-16)
+- [0.0.0 (2023-03-26)](#000-2023-03-26)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -666,7 +666,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-16)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-26)
 
 
 ### Bug Fixes
@@ -690,6 +690,12 @@
 * Add ability to revoke login sessions by SessionID ([#3450](https://github.com/ory/hydra/issues/3450)) ([b42482b](https://github.com/ory/hydra/commit/b42482b7260d4e1771d01fc719e8216f5961ce65)), closes [#3448](https://github.com/ory/hydra/issues/3448):
 
     API `revokeOAuth2LoginSessions` can now revoke a single session by a SessionID (`sid` claim in the id_token) and execute an OpenID Connect Back-channel logout.
+
+* Add token request hooks for all grant types ([#3427](https://github.com/ory/hydra/issues/3427)) ([9bdf225](https://github.com/ory/hydra/commit/9bdf225d8f04c0b16dcdc4bbcc2d7bebc7534b4d)), closes [#3244](https://github.com/ory/hydra/issues/3244):
+
+    Added a generic token hook that is called for all grant types and includes `payload` with a single allowed value - `assertion` to cover the `jwt-bearer` grant type customization.
+    
+    The existing `refresh token hook` is left unchanged and is considered to be deprecated in favor of the new hook logic. The `refresh token hook` will at some point be removed.
 
 * Allow setting access token type in client ([#3446](https://github.com/ory/hydra/issues/3446)) ([a6beed4](https://github.com/ory/hydra/commit/a6beed4659febd0917379d6da1e51d8ef75bc859)):
 

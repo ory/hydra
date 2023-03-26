@@ -439,6 +439,18 @@
                   "default": "ory_hydra_session"
                 }
               }
+            },
+            "paths": {
+              "title": "Cookie Paths",
+              "description": "Sets the path for which session cookie is scoped. Use with care!",
+              "type": "object",
+              "properties": {
+                "session": {
+                  "type": "string",
+                  "title": "Session Cookie Path",
+                  "default": "/"
+                }
+              }
             }
           }
         }

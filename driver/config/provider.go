@@ -61,7 +61,7 @@ const (
 	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
-	KeyCookieSessionPath                         = "serve.cookies.path.session"
+	KeyCookieSessionPath                         = "serve.cookies.paths.session"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
 	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-03-26)](#000-2023-03-26)
+- [0.0.0 (2023-03-27)](#000-2023-03-27)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -666,7 +666,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-26)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.0.3...v0.0.0) (2023-03-27)
 
 
 ### Bug Fixes
@@ -691,6 +691,7 @@
 
     API `revokeOAuth2LoginSessions` can now revoke a single session by a SessionID (`sid` claim in the id_token) and execute an OpenID Connect Back-channel logout.
 
+* Add session cookie path configuration ([#3475](https://github.com/ory/hydra/issues/3475)) ([af9fa81](https://github.com/ory/hydra/commit/af9fa81ac0b3a877fe1a67505b6ae54d4ef58c00)), closes [#3473](https://github.com/ory/hydra/issues/3473)
 * Add token request hooks for all grant types ([#3427](https://github.com/ory/hydra/issues/3427)) ([9bdf225](https://github.com/ory/hydra/commit/9bdf225d8f04c0b16dcdc4bbcc2d7bebc7534b4d)), closes [#3244](https://github.com/ory/hydra/issues/3244):
 
     Added a generic token hook that is called for all grant types and includes `payload` with a single allowed value - `assertion` to cover the `jwt-bearer` grant type customization.

@@ -72,6 +72,8 @@ func (m *RegistrySQL) Init(
 		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
 				instrumentedsql.WithTracer(otelsql.NewTracer()),
+				instrumentedsql.WithOmitArgs(), // don't risk leaking PII or secrets
+				instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
 			}
 		}
 

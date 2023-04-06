@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/v2/driver"
 
 	"github.com/ory/x/pointerx"
 

@@ -14,8 +14,6 @@ import (
 
 	"github.com/ory/x/httpx"
 
-	"github.com/ory/hydra/driver/config"
-
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"

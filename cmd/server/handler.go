@@ -283,8 +283,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 				Endpoint:             "https://sqa.ory.sh",
 				GzipCompressionLevel: 6,
 				BatchMaxSize:         500 * 1000,
-				BatchSize:            250,
-				Interval:             time.Hour * 24,
+				BatchSize:            1000,
+				Interval:             time.Hour * 6,
 			},
 		},
 	)

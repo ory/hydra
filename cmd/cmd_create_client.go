@@ -38,6 +38,7 @@ const (
 	flagClientResponseType                      = "response-type"
 	flagClientScope                             = "scope"
 	flagClientSectorIdentifierURI               = "sector-identifier-uri"
+	flagClientSkipConsent                       = "skip-consent"
 	flagClientSubjectType                       = "subject-type"
 	flagClientTokenEndpointAuthMethod           = "token-endpoint-auth-method"
 	flagClientSecret                            = "secret"

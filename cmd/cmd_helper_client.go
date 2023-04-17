@@ -40,6 +40,7 @@ func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 		RequestUris:                       flagx.MustGetStringSlice(cmd, flagClientRequestURI),
 		ResponseTypes:                     flagx.MustGetStringSlice(cmd, flagClientResponseType),
 		Scope:                             pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
+		SkipConsent:                       pointerx.Bool(flagx.MustGetBool(cmd, flagClientSkipConsent)),
 		SectorIdentifierUri:               pointerx.String(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
 		SubjectType:                       pointerx.String(flagx.MustGetString(cmd, flagClientSubjectType)),
 		TokenEndpointAuthMethod:           pointerx.String(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
@@ -77,6 +78,7 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.String(flagClientSecret, "", "Provide the client's secret.")
 	flags.String(flagClientName, "", "The client's name.")
 	flags.StringSlice(flagClientPostLogoutCallback, []string{}, "List of allowed URLs to be redirected to after a logout.")
+	flags.Bool(flagClientSkipConsent, false, "Boolean flag specifying whether to skip the consent screen for this client. If omitted, the default value is false.")
 
 	// back-channel logout options
 	flags.Bool(flagClientBackChannelLogoutSessionRequired, false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the backchannel-logout-callback is used. If omitted, the default value is false.")

@@ -1043,7 +1043,7 @@
               "examples": ["5s", "15s", "1m"]
             }
           }
-        }
+        },
         "token_hook": {
           "type": "string",
           "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",

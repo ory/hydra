@@ -63,6 +63,7 @@ const (
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieDeviceVerifyCSRFName                = "serve.cookies.names.consent_device_verify"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
+	KeyCookieSessionPath                         = "serve.cookies.paths.session"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
 	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
@@ -100,6 +101,7 @@ const (
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
+	KeyTokenHookURL                              = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
 )
 
@@ -447,11 +449,11 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
-func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	if len(p.getProvider(ctx).String(KeyRefreshTokenHookURL)) == 0 {
-		return nil
-	}
+func (p *DefaultProvider) TokenHookURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyTokenHookURL, nil)
+}
 
+func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
 }
 
@@ -546,6 +548,10 @@ func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {
 
 func (p *DefaultProvider) CookieDomain(ctx context.Context) string {
 	return p.getProvider(ctx).String(KeyCookieDomain)
+}
+
+func (p *DefaultProvider) SessionCookiePath(ctx context.Context) string {
+	return p.getProvider(ctx).StringF(KeyCookieSessionPath, "/")
 }
 
 func (p *DefaultProvider) CookieNameLoginCSRF(ctx context.Context) string {

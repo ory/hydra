@@ -519,6 +519,7 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {
 		m.arhs = []oauth2.AccessRequestHook{
 			oauth2.RefreshTokenHook(m),
+			oauth2.TokenHook(m),
 		}
 	}
 	return m.arhs

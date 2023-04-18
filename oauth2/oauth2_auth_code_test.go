@@ -235,7 +235,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, i.Get("active").Bool(), "%s", i)
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
+		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		return i
 	}
 
@@ -260,7 +260,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
 		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
-		assert.EqualValues(t, `{"foo":"bar"}`, i.Get("ext").Raw, "%s", i)
+		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		assert.EqualValues(t, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
 		return i
 	}
@@ -682,6 +682,197 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			assert.Empty(t, uiClaims.Get(f).Raw, "%s: %s", f, uiClaims)
 		}
 	})
+
+	t.Run("case=add ext claims from hook if configured", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
+					var hookReq hydraoauth2.TokenHookRequest
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+					require.NotEmpty(t, hookReq.Session)
+					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{"foo": "bar"})
+					require.NotEmpty(t, hookReq.Request)
+					require.ElementsMatch(t, hookReq.Request.GrantedAudience, []string{})
+					require.Equal(t, hookReq.Request.Payload, map[string][]string{})
+
+					claims := map[string]interface{}{
+						"hooked": true,
+					}
+
+					hookResp := hydraoauth2.TokenHookResponse{
+						Session: consent.AcceptOAuth2ConsentRequestSession{
+							AccessToken: claims,
+							IDToken:     claims,
+						},
+					}
+
+					w.WriteHeader(http.StatusOK)
+					require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				token, err := conf.Exchange(context.Background(), code)
+				require.NoError(t, err)
+
+				assertJWTAccessToken(t, strategy, conf, token, subject, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)))
+
+				// NOTE: using introspect to cover both jwt and opaque strategies
+				accessTokenClaims := introspectAccessToken(t, conf, token, subject)
+				require.True(t, accessTokenClaims.Get("ext.hooked").Bool())
+
+				idTokenClaims := assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
+				require.True(t, idTokenClaims.Get("hooked").Bool())
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook fails", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook denies the request", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusForbidden)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("case=fail token exchange if hook response is malformed", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+
+				expectAud := "https://api.ory.sh/"
+				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+						assert.False(t, r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+						return nil
+					}),
+					acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+						assert.False(t, *r.Skip)
+						assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
+					}))
+
+				code, _ := getAuthorizeCode(t, conf, nil,
+					oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"),
+					oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				_, err := conf.Exchange(context.Background(), code)
+				require.Error(t, err)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
 }
 
 // TestAuthCodeWithMockStrategy runs the authorization_code flow against various ConsentStrategy scenarios.
@@ -1019,157 +1210,227 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("should call refresh token hook if configured", func(t *testing.T) {
-						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-							assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+						run := func(hookType string) func(t *testing.T) {
+							return func(t *testing.T) {
+								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
 
-							expectedGrantedScopes := []string{"openid", "offline", "hydra.*"}
-							expectedSubject := "foo"
+									expectedGrantedScopes := []string{"openid", "offline", "hydra.*"}
+									expectedSubject := "foo"
 
-							var hookReq hydraoauth2.RefreshTokenHookRequest
-							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
-							require.Equal(t, hookReq.Subject, expectedSubject)
-							require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
-							require.ElementsMatch(t, hookReq.GrantedAudience, []string{})
-							require.Equal(t, hookReq.ClientID, oauthConfig.ClientID)
-							require.NotEmpty(t, hookReq.Session)
-							require.Equal(t, hookReq.Session.Subject, expectedSubject)
-							require.Equal(t, hookReq.Session.ClientID, oauthConfig.ClientID)
-							require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
-							require.NotEmpty(t, hookReq.Requester)
-							require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
-							require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
+									exceptKeys := []string{
+										"session.kid",
+										"session.id_token.expires_at",
+										"session.id_token.headers.extra.kid",
+										"session.id_token.id_token_claims.iat",
+										"session.id_token.id_token_claims.exp",
+										"session.id_token.id_token_claims.rat",
+										"session.id_token.id_token_claims.auth_time",
+									}
 
-							except := []string{
-								"session.kid",
-								"session.id_token.expires_at",
-								"session.id_token.headers.extra.kid",
-								"session.id_token.id_token_claims.iat",
-								"session.id_token.id_token_claims.exp",
-								"session.id_token.id_token_claims.rat",
-								"session.id_token.id_token_claims.auth_time",
+									if hookType == "legacy" {
+										var hookReq hydraoauth2.RefreshTokenHookRequest
+										require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+										require.Equal(t, hookReq.Subject, expectedSubject)
+										require.ElementsMatch(t, hookReq.GrantedScopes, expectedGrantedScopes)
+										require.ElementsMatch(t, hookReq.GrantedAudience, []string{})
+										require.Equal(t, hookReq.ClientID, oauthConfig.ClientID)
+										require.NotEmpty(t, hookReq.Session)
+										require.Equal(t, hookReq.Session.Subject, expectedSubject)
+										require.Equal(t, hookReq.Session.ClientID, oauthConfig.ClientID)
+										require.NotEmpty(t, hookReq.Requester)
+										require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
+										require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
+
+										snapshotx.SnapshotTExcept(t, hookReq, exceptKeys)
+									} else {
+										var hookReq hydraoauth2.TokenHookRequest
+										require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+										require.NotEmpty(t, hookReq.Session)
+										require.Equal(t, hookReq.Session.Subject, expectedSubject)
+										require.Equal(t, hookReq.Session.ClientID, oauthConfig.ClientID)
+										require.NotEmpty(t, hookReq.Request)
+										require.Equal(t, hookReq.Request.ClientID, oauthConfig.ClientID)
+										require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
+										require.ElementsMatch(t, hookReq.Request.GrantedAudience, []string{})
+										require.Equal(t, hookReq.Request.Payload, map[string][]string{})
+
+										snapshotx.SnapshotTExcept(t, hookReq, exceptKeys)
+									}
+
+									claims := map[string]interface{}{
+										"hooked": hookType,
+									}
+
+									hookResp := hydraoauth2.TokenHookResponse{
+										Session: consent.AcceptOAuth2ConsentRequestSession{
+											AccessToken: claims,
+											IDToken:     claims,
+										},
+									}
+
+									w.WriteHeader(http.StatusOK)
+									require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+								}))
+								defer hs.Close()
+
+								if hookType == "legacy" {
+									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								} else {
+									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+								}
+
+								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+								require.NoError(t, err)
+								assert.Equal(t, http.StatusOK, res.StatusCode)
+
+								body, err := io.ReadAll(res.Body)
+								require.NoError(t, err)
+								require.NoError(t, json.Unmarshal(body, &refreshedToken))
+
+								accessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								require.Equal(t, accessTokenClaims.Get("ext.hooked").String(), hookType)
+
+								idTokenBody, err := x.DecodeSegment(
+									strings.Split(
+										gjson.GetBytes(body, "id_token").String(),
+										".",
+									)[1],
+								)
+								require.NoError(t, err)
+
+								require.Equal(t, gjson.GetBytes(idTokenBody, "hooked").String(), hookType)
 							}
-							snapshotx.SnapshotTExcept(t, hookReq, except)
-
-							claims := map[string]interface{}{
-								"hooked": true,
-							}
-
-							hookResp := hydraoauth2.RefreshTokenHookResponse{
-								Session: consent.AcceptOAuth2ConsentRequestSession{
-									AccessToken: claims,
-									IDToken:     claims,
-								},
-							}
-
-							w.WriteHeader(http.StatusOK)
-							require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
-						}))
-						defer hs.Close()
-
-						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
-
-						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusOK, res.StatusCode)
-
-						body, err := io.ReadAll(res.Body)
-						require.NoError(t, err)
-						require.NoError(t, json.Unmarshal(body, &refreshedToken))
-
-						accessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
-						require.True(t, accessTokenClaims.Get("ext.hooked").Bool())
-
-						idTokenBody, err := x.DecodeSegment(
-							strings.Split(
-								gjson.GetBytes(body, "id_token").String(),
-								".",
-							)[1],
-						)
-						require.NoError(t, err)
-
-						require.True(t, gjson.GetBytes(idTokenBody, "hooked").Bool())
+						}
+						t.Run("hook=legacy", run("legacy"))
+						t.Run("hook=new", run("new"))
 					})
 
 					t.Run("should not override session data if token refresh hook returns no content", func(t *testing.T) {
-						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-							w.WriteHeader(http.StatusNoContent)
-						}))
-						defer hs.Close()
+						run := func(hookType string) func(t *testing.T) {
+							return func(t *testing.T) {
+								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									w.WriteHeader(http.StatusNoContent)
+								}))
+								defer hs.Close()
 
-						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								if hookType == "legacy" {
+									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								} else {
+									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+								}
 
-						origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
 
-						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusOK, res.StatusCode)
+								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+								require.NoError(t, err)
+								assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err = io.ReadAll(res.Body)
-						require.NoError(t, err)
+								body, err = io.ReadAll(res.Body)
+								require.NoError(t, err)
 
-						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+								require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
-						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
-						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
+								refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
+							}
+						}
+						t.Run("hook=legacy", run("legacy"))
+						t.Run("hook=new", run("new"))
 					})
 
-					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {
-						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-							w.WriteHeader(http.StatusInternalServerError)
-						}))
-						defer hs.Close()
+					t.Run("should fail token refresh with `server_error` if refresh hook fails", func(t *testing.T) {
+						run := func(hookType string) func(t *testing.T) {
+							return func(t *testing.T) {
+								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									w.WriteHeader(http.StatusInternalServerError)
+								}))
+								defer hs.Close()
 
-						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								if hookType == "legacy" {
+									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								} else {
+									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+								}
 
-						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+								require.NoError(t, err)
+								assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 
-						var errBody fosite.RFC6749ErrorJson
-						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
-						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, "An error occurred while executing the refresh token hook.", errBody.Description)
+								var errBody fosite.RFC6749ErrorJson
+								require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+								require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
+								require.Equal(t, "An error occurred while executing the token hook.", errBody.Description)
+							}
+						}
+						t.Run("hook=legacy", run("legacy"))
+						t.Run("hook=new", run("new"))
 					})
 
-					t.Run("should fail token refresh with `access_denied` if hook denied the request", func(t *testing.T) {
-						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-							w.WriteHeader(http.StatusForbidden)
-						}))
-						defer hs.Close()
+					t.Run("should fail token refresh with `access_denied` if legacy refresh hook denied the request", func(t *testing.T) {
+						run := func(hookType string) func(t *testing.T) {
+							return func(t *testing.T) {
+								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									w.WriteHeader(http.StatusForbidden)
+								}))
+								defer hs.Close()
 
-						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								if hookType == "legacy" {
+									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								} else {
+									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+								}
 
-						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusForbidden, res.StatusCode)
+								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+								require.NoError(t, err)
+								assert.Equal(t, http.StatusForbidden, res.StatusCode)
 
-						var errBody fosite.RFC6749ErrorJson
-						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
-						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
-						require.Equal(t, "The refresh token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
+								var errBody fosite.RFC6749ErrorJson
+								require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+								require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
+								require.Equal(t, "The token hook target responded with an error. Make sure that the request you are making is valid. Maybe the credential or request parameters you are using are limited in scope or otherwise restricted.", errBody.Description)
+							}
+						}
+						t.Run("hook=legacy", run("legacy"))
+						t.Run("hook=new", run("new"))
 					})
 
-					t.Run("should fail token refresh with `server_error` if hook response is malformed", func(t *testing.T) {
-						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-							w.WriteHeader(http.StatusOK)
-						}))
-						defer hs.Close()
+					t.Run("should fail token refresh with `server_error` if refresh hook response is malformed", func(t *testing.T) {
+						run := func(hookType string) func(t *testing.T) {
+							return func(t *testing.T) {
+								hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+									w.WriteHeader(http.StatusOK)
+								}))
+								defer hs.Close()
 
-						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								if hookType == "legacy" {
+									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+								} else {
+									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+								}
 
-						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+								require.NoError(t, err)
+								assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 
-						var errBody fosite.RFC6749ErrorJson
-						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
-						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
-						require.Equal(t, "The refresh token hook target responded with an error.", errBody.Description)
+								var errBody fosite.RFC6749ErrorJson
+								require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+								require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
+								require.Equal(t, "The token hook target responded with an error.", errBody.Description)
+							}
+						}
+						t.Run("hook=legacy", run("legacy"))
+						t.Run("hook=new", run("new"))
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {

@@ -272,8 +272,6 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.findSessionBySignature")
 	defer span.End()
 
-	rawSignature = p.hashSignature(ctx, rawSignature, table)
-
 	r := OAuth2RequestSQL{Table: table}
 	var fr fosite.Requester
 

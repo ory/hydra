@@ -302,7 +302,7 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 
 	cookie.Values[CookieAuthenticationSIDName] = ""
 	cookie.Options.HttpOnly = true
-	cookie.Options.Path = "/"
+	cookie.Options.Path = s.c.SessionCookiePath(ctx)
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
 	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	cookie.Options.Domain = s.c.CookieDomain(ctx)
@@ -473,7 +473,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true
-	cookie.Options.Path = "/"
+	cookie.Options.Path = s.c.SessionCookiePath(ctx)
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
 	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	if err := cookie.Save(r, w); err != nil {

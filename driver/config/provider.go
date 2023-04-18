@@ -409,10 +409,6 @@ func (p *DefaultProvider) AdminURL(ctx context.Context) *url.URL {
 	)
 }
 
-func (p *DefaultProvider) DeviceVerificationURL(ctx context.Context) *url.URL {
-	return urlRoot(p.getProvider(ctx).RequestURIF(KeyDeviceVerificationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth")))
-}
-
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(
 		KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)),

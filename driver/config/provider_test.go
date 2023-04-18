@@ -294,9 +294,6 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://post_logout/"), c.LogoutRedirectURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://post_device/"), c.DeviceDoneURL(ctx))
 
-	// self
-	assert.Equal(t, urlx.ParseOrPanic("https://public/device"), c.DeviceVerificationURL(ctx))
-
 	// strategies
 	assert.True(t, c.GetScopeStrategy(ctx)([]string{"openid"}, "openid"), "should us fosite.ExactScopeStrategy")
 	assert.False(t, c.GetScopeStrategy(ctx)([]string{"openid.*"}, "openid.email"), "should us fosite.ExactScopeStrategy")

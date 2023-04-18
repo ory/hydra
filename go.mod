@@ -62,7 +62,6 @@ require (
 	github.com/twmb/murmur3 v1.1.6
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v1.11.1
-	go.step.sm/crypto v0.16.2
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/tools v0.5.0
@@ -72,7 +71,6 @@ require (
 require github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 
 require (
-	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect

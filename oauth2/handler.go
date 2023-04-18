@@ -12,8 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"go.step.sm/crypto/jose"
-
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -454,7 +452,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		FrontChannelLogoutSupported:            true,
 		FrontChannelLogoutSessionSupported:     true,
 		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(r.Context()), LogoutPath).String(),
-		RequestObjectSigningAlgValuesSupported: []string{"none", string(jose.RS256), string(jose.ES256)},
+		RequestObjectSigningAlgValuesSupported: []string{"none", "RS256", "ES256"},
 		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	})
 }

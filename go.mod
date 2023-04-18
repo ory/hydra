@@ -13,7 +13,7 @@ replace (
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
-replace github.com/ory/fosite => github.com/BuzzBumbleBee/fosite v0.0.0-20230201095510-1b306bbb0e4e
+replace github.com/ory/fosite => github.com/BuzzBumbleBee/fosite v0.0.0-20230418073244-8a2cf5c8eb98
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -228,7 +228,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect

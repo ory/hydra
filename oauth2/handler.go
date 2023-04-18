@@ -56,8 +56,7 @@ const (
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 
 	// Device Grant Handler
-	DeviceAuthPath  = "/oauth2/device/auth"
-	DeviceGrantPath = "/device"
+	DeviceAuthPath = "/oauth2/device/auth"
 )
 
 type Handler struct {

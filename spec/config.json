@@ -714,14 +714,6 @@
               "examples": [
                 "https://localhost:4445/"
               ]
-            },
-            "device": {
-              "type": "string",
-              "description": "This is the device location endpoint of your Ory Hydra installation.",
-              "format": "uri",
-              "examples": [
-                "https://localhost:4445/device"
-              ]
             }
           }
         },

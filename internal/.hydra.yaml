@@ -96,7 +96,6 @@ urls:
   self:
     issuer: https://issuer
     public: https://public
-    device: https://public/device
     admin: https://admin
   login: https://login
   consent: https://consent

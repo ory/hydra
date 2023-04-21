@@ -113,7 +113,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	var data trust.SQLData
 	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ? OR allow_any_subject IS TRUE", subject).
+		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
 		Where("key_id = ?", keyId).
 		Where("nid = ?", p.NetworkID(ctx))
 	if err := query.First(&data); err != nil {
@@ -135,7 +135,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	grantsData := make([]trust.SQLData, 0)
 	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ? OR allow_any_subject IS TRUE", subject).
+		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
 		Where("nid = ?", p.NetworkID(ctx))
 
 	if err := query.All(&grantsData); err != nil {
@@ -170,7 +170,7 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	var data trust.SQLData
 	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ? OR allow_any_subject IS TRUE", subject).
+		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
 		Where("key_id = ?", keyId).
 		Where("nid = ?", p.NetworkID(ctx))
 

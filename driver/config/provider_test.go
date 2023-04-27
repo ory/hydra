@@ -206,11 +206,20 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	p.MustSet(ctx, KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode(ctx))
 
+	p.MustSet(ctx, KeyCookieSameSiteMode, "lax")
+	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode(ctx))
+
+	p.MustSet(ctx, KeyCookieSameSiteMode, "strict")
+	assert.Equal(t, http.SameSiteStrictMode, p.CookieSameSiteMode(ctx))
+
 	p = MustNew(context.Background(), l, configx.SkipValidation())
 	p.MustSet(ctx, "dev", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode(ctx))
 	p.MustSet(ctx, KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode(ctx))
+
+	p.MustSet(ctx, KeyIssuerURL, "https://example.com")
+	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode(ctx))
 }
 
 func TestViperProviderValidates(t *testing.T) {

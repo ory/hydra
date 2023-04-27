@@ -277,7 +277,8 @@ func (p *DefaultProvider) CookieSameSiteMode(ctx context.Context) http.SameSite 
 	case "strict":
 		return http.SameSiteStrictMode
 	case "none":
-		if p.IsDevelopmentMode(ctx) {
+		if p.IssuerURL(ctx).Scheme != "https" {
+			// SameSite=None can only be set for HTTPS issuers.
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteNoneMode

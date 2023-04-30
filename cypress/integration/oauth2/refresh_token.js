@@ -102,4 +102,46 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
       })
     })
   })
+
+  it("should narrow and broaden Refresh Token scope correctly", function () {
+    const referrer = `${Cypress.env("client_url")}/empty`
+    cy.visit(referrer, {
+      failOnStatusCode: false,
+    })
+
+    createClient({
+      scope: "offline_access openid foo bar baz",
+      redirect_uris: [referrer],
+      grant_types: ["authorization_code", "refresh_token"],
+      response_types: ["code"],
+      token_endpoint_auth_method: "none",
+    }).then((client) => {
+      cy.authCodeFlowBrowser(client, {
+        consent: { scope: ["offline_access", "openid", "foo", "bar", "baz"] },
+        createClient: false,
+      }).then((originalResponse) => {
+        expect(originalResponse.status).to.eq(200)
+        expect(originalResponse.body.refresh_token).to.not.be.empty
+        expect(originalResponse.body.scope).to.equal("offline_access openid foo bar baz")
+
+        const originalToken = originalResponse.body.refresh_token
+
+        cy.refreshTokenBrowserScope(client, originalToken, "offline_access openid foo").then((refreshedResponse) => {
+            expect(refreshedResponse.status).to.eq(200)
+            expect(refreshedResponse.body.refresh_token).to.not.be.empty
+            expect(refreshedResponse.body.scope).to.equal("offline_access openid foo")
+
+            const refreshedToken = refreshedResponse.body.refresh_token
+
+            cy.refreshTokenBrowserScope(client, refreshedToken, "offline_access openid foo bar").then((finalRefreshedResponse) => {
+                expect(finalRefreshedResponse.status).to.eq(200)
+                expect(finalRefreshedResponse.body.refresh_token).to.not.be.empty
+                expect(finalRefreshedResponse.body.scope).to.equal("offline_access openid foo bar")
+              },
+            )
+          },
+        )
+      })
+    })
+  })
 })

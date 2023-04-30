@@ -93,6 +93,7 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
+	KeyOAuth2TokenPrefix                         = "oauth2.token_prefix"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 	KeyTokenHookURL                              = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
@@ -518,6 +519,10 @@ func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Co
 
 func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {
 	return p.getProvider(ctx).DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+}
+
+func (p *DefaultProvider) GetTokenPrefix(ctx context.Context) string {
+	return p.getProvider(ctx).StringF(KeyOAuth2TokenPrefix, "ory")
 }
 
 func (p *DefaultProvider) CookieDomain(ctx context.Context) string {

@@ -729,6 +729,8 @@ github.com/mattn/go-sqlite3 v1.14.13 h1:1tj15ngiFfcZzii7yd82foL+ks+ouQcj8j/TPq3f
 github.com/mattn/go-sqlite3 v1.14.13/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
 github.com/mattn/goveralls v0.0.11 h1:eJXea6R6IFlL1QMKNMzDvvHv/hwGrnvyig4N+0+XiMM=
 github.com/mattn/goveralls v0.0.11/go.mod h1:gU8SyhNswsJKchEV93xRQxX6X3Ei4PJdQk/6ZHvrvRk=
+github.com/mattslocum/fosite v0.0.0-20230104213057-70d11837908d h1:0yn96ItzZRMyrYXNLjqFZFoJvv57ZJSI2Nd6e2OkOl0=
+github.com/mattslocum/fosite v0.0.0-20230104213057-70d11837908d/go.mod h1:o/G4kAeNn65l6MCod2+KmFfU6JQBSojS7eXys6lKGzM=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zkfA9PSy5pEvNWRP0ET0TIVo=
 github.com/matttproud/golang_protobuf_extensions v1.0.4/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
@@ -813,8 +815,6 @@ github.com/ory/analytics-go/v4 v4.0.3 h1:2zNBQLlm3UiD8U7DdUGLLUBm62ZA5GtbEJ3S5U+
 github.com/ory/analytics-go/v4 v4.0.3/go.mod h1:A3Chm/3TmM8jw4nqRss+gFhAYHRI5j/HFYH3C1FRahU=
 github.com/ory/dockertest/v3 v3.9.1 h1:v4dkG+dlu76goxMiTT2j8zV7s4oPPEppKT8K8p2f1kY=
 github.com/ory/dockertest/v3 v3.9.1/go.mod h1:42Ir9hmvaAPm0Mgibk6mBPi7SFvTXxEcnztDYOJ//uM=
-github.com/ory/fosite v0.44.0 h1:Z3UjyO11/wlIoa3BotOqcTkfm7kUNA8F7dd8mOMfx0o=
-github.com/ory/fosite v0.44.0/go.mod h1:o/G4kAeNn65l6MCod2+KmFfU6JQBSojS7eXys6lKGzM=
 github.com/ory/go-acc v0.2.6/go.mod h1:4Kb/UnPcT8qRAk3IAxta+hvVapdxTLWtrr7bFLlEgpw=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe h1:rvu4obdvqR0fkSIJ8IfgzKOWwZ5kOT2UNfLq81Qk7rc=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe/go.mod h1:z4n3u6as84LbV4YmgjHhnwtccQqzf4cZlSk9f1FhygI=

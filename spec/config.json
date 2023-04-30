@@ -982,6 +982,12 @@
             }
           }
         },
+        "token_prefix": {
+          "type": "string",
+          "description": "Sets the prefix for access, refresh, and code tokens. This allows detection of tokens in source code and databases. An additional '_at_', '_rt_', '_ac_' is added after the token_prefix, respectively.",
+          "examples": ["sabre"],
+          "default": "ory"
+        },
         "refresh_token_hook": {
           "type": "string",
           "description": "Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.",

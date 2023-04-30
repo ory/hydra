@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/httpx"
+
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -38,17 +40,30 @@ const (
 )
 
 type DefaultStrategy struct {
-	c *config.DefaultProvider
-	r InternalRegistry
+	c                 *config.DefaultProvider
+	r                 InternalRegistry
+	httpClientOptions httpx.ResilientOptions
 }
 
 func NewStrategy(
 	r InternalRegistry,
 	c *config.DefaultProvider,
 ) *DefaultStrategy {
+	httpClientTlsConfig, err := c.TLSClientConfigWithDefaultFallback(config.KeyPrefixClientBackChannelLogout)
+	if err != nil {
+		r.Logger().WithError(err).Fatalf("Unable to setup back-channel logout http client TLS configuration.")
+	}
+	httpClientOptions := httpx.ResilientClientWithClient(&http.Client{
+		Timeout: time.Minute,
+		Transport: &http.Transport{
+			Proxy:           http.ProxyFromEnvironment,
+			TLSClientConfig: httpClientTlsConfig,
+		},
+	})
 	return &DefaultStrategy{
-		c: c,
-		r: r,
+		c:                 c,
+		r:                 r,
+		httpClientOptions: httpClientOptions,
 	}
 }
 
@@ -688,7 +703,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
-		res, err := s.r.HTTPClient(ctx).PostForm(t.url, url.Values{"logout_token": {t.token}})
+		res, err := s.r.HTTPClient(ctx, s.httpClientOptions).PostForm(t.url, url.Values{"logout_token": {t.token}})
 		if err != nil {
 			log.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return

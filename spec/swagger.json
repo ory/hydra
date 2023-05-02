@@ -2054,6 +2054,7 @@
     }
   },
   "definitions": {
+    "DefaultError": {},
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -3455,6 +3456,9 @@
           "example": "https://jwt-idp.example.com"
         }
       }
+    },
+    "unexpectedError": {
+      "type": "string"
     },
     "version": {
       "type": "object",

@@ -139,13 +139,13 @@ func HTTPServerNotImplementedHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
+func HTTPServerNoExpectedCallHandler(t testing.TB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("This should not have been called")
 	}
 }
 
-func NewLoginConsentUI(t *testing.T, c *config.DefaultProvider, login, consent http.HandlerFunc) {
+func NewLoginConsentUI(t testing.TB, c *config.DefaultProvider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}
@@ -164,7 +164,7 @@ func NewLoginConsentUI(t *testing.T, c *config.DefaultProvider, login, consent h
 	c.MustSet(context.Background(), config.KeyConsentURL, ct.URL)
 }
 
-func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
+func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 	if h == nil {
 		h = HTTPServerNotImplementedHandler
 	}
@@ -179,13 +179,13 @@ func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
 	return ts.URL + "/" + prefix
 }
 
-func NewEmptyCookieJar(t *testing.T) *cookiejar.Jar {
+func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
 	c, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
 	return c
 }
 
-func NewEmptyJarClient(t *testing.T) *http.Client {
+func NewEmptyJarClient(t testing.TB) *http.Client {
 	return &http.Client{
 		Jar: NewEmptyCookieJar(t),
 	}

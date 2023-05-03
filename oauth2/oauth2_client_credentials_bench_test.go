@@ -28,13 +28,14 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-func BenchmarkAuthCode(b *testing.B) {
+func BenchmarkClientCredentials(b *testing.B) {
 	ctx := context.Background()
 
 	spans := tracetest.NewSpanRecorder()
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
-	reg := internal.NewRegistrySQLFromURL(b, "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable", true, new(contextx.Default)).WithTracer(tracer)
+	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
+	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 
@@ -120,35 +121,33 @@ func BenchmarkAuthCode(b *testing.B) {
 		inspectToken(b, token, cl, conf, strategy, expectedExp, checkExtraClaims)
 	}
 
-	b.Run("case=authorization code grant with client credentials", func(b *testing.B) {
-		run := func(strategy string) func(b *testing.B) {
-			return func(t *testing.B) {
-				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+	run := func(strategy string) func(b *testing.B) {
+		return func(t *testing.B) {
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 
-				cl, conf := newClient(b)
-				getAndInspectToken(b, cl, conf, strategy, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)), false)
-			}
+			cl, conf := newClient(b)
+			getAndInspectToken(b, cl, conf, strategy, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)), false)
 		}
+	}
 
-		b.Run("strategy=jwt", func(b *testing.B) {
-			initialDBSpans := dbSpans(spans)
-			for i := 0; i < b.N; i++ {
-				run("jwt")(b)
-			}
-			b.ReportMetric(0, "ns/op")
-			b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
-			b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
-		})
+	b.Run("strategy=jwt", func(b *testing.B) {
+		initialDBSpans := dbSpans(spans)
+		for i := 0; i < b.N; i++ {
+			run("jwt")(b)
+		}
+		b.ReportMetric(0, "ns/op")
+		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
+		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
+	})
 
-		b.Run("strategy=opaque", func(b *testing.B) {
-			initialDBSpans := dbSpans(spans)
-			for i := 0; i < b.N; i++ {
-				run("opaque")(b)
-			}
-			b.ReportMetric(0, "ns/op")
-			b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
-			b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
-		})
+	b.Run("strategy=opaque", func(b *testing.B) {
+		initialDBSpans := dbSpans(spans)
+		for i := 0; i < b.N; i++ {
+			run("opaque")(b)
+		}
+		b.ReportMetric(0, "ns/op")
+		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
+		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
 	})
 }
 

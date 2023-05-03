@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -184,6 +185,11 @@ func (m *RegistryBase) Writer() herodot.Writer {
 
 func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 	m.l = l
+	return m.r
+}
+
+func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
+	m.trc = new(otelx.Tracer).WithOTLP(t)
 	return m.r
 }
 

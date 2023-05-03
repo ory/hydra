@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -25,8 +26,6 @@ import (
 
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
-
-	"net/http/httptest"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
@@ -55,7 +54,7 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 	return token
 }
 
-func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
@@ -93,7 +92,7 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 	return gjson.ParseBytes(body)
 }
 
-func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
+func IntrospectToken(t testing.TB, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
 	require.NotEmpty(t, token)
 
 	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",

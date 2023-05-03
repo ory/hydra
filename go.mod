@@ -62,6 +62,7 @@ require (
 	github.com/twmb/murmur3 v1.1.6
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v1.11.1
+	go.opentelemetry.io/otel/trace v1.11.1
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/tools v0.7.0
@@ -221,7 +222,6 @@ require (
 	go.opentelemetry.io/otel/exporters/zipkin v1.11.1 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.1 // indirect
-	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.10.0 // indirect

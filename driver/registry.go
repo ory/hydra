@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/ory/x/httprouterx"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/x/contextx"
@@ -46,6 +47,7 @@ type Registry interface {
 	WithConfig(c *config.DefaultProvider) Registry
 	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
+	WithTracer(t trace.Tracer) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 

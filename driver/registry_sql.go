@@ -5,6 +5,9 @@ package driver
 
 import (
 	"context"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/redis/go-redis/v9"
+	"os"
 	"strings"
 	"time"
 
@@ -177,7 +180,12 @@ func (m *RegistrySQL) ConsentManager() consent.Manager {
 }
 
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
-	return m.Persister()
+	return oauth2.FositeRedisStore{
+		DB: redis.NewClient(&redis.Options{
+			Addr: os.Getenv("REDIS_URL"),
+		}),
+		KeyPrefix: "hydra:oauth2:",
+	}
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {

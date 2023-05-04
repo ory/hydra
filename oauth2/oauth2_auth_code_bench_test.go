@@ -5,11 +5,22 @@ package oauth2_test
 
 import (
 	"context"
+	"flag"
 	"net/http"
+	"os"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
+	"go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"golang.org/x/oauth2"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	hc "github.com/ory/hydra/v2/client"
@@ -20,16 +31,27 @@ import (
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/requirex"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/tidwall/gjson"
-	"go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/sdk/trace/tracetest"
-	"golang.org/x/oauth2"
 )
 
+var prof = flag.String("profile", "", "write a CPU profile to this filename")
+
+func profile(t testing.TB) (stop func()) {
+	if *prof == "" {
+		return func() {} // noop
+	}
+	f, err := os.Create(*prof)
+	require.NoError(t, err)
+	require.NoError(t, pprof.StartCPUProfile(f))
+	return func() {
+		pprof.StopCPUProfile()
+		require.NoError(t, f.Close())
+		t.Log("Wrote profile to ", f.Name())
+	}
+}
+
 func BenchmarkAuthCode(b *testing.B) {
+	flag.Parse()
+
 	ctx := context.Background()
 
 	spans := tracetest.NewSpanRecorder()
@@ -252,23 +274,36 @@ func BenchmarkAuthCode(b *testing.B) {
 	b.Run("strategy=jwt", func(b *testing.B) {
 		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 		initialDBSpans := dbSpans(spans)
-		for i := 0; i < b.N; i++ {
-			run(b, "jwt")
-		}
+
+		b.RunParallel(func(p *testing.PB) {
+			for p.Next() {
+				run(b, "jwt")
+			}
+		})
+
 		b.ReportMetric(0, "ns/op")
 		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
+		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
 
 	b.Run("strategy=opaque", func(b *testing.B) {
 		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 		initialDBSpans := dbSpans(spans)
-		for i := 0; i < b.N; i++ {
-			run(b, "opaque")
-		}
+
+		stop := profile(b)
+		defer stop()
+
+		b.RunParallel(func(p *testing.PB) {
+			for p.Next() {
+				run(b, "opaque")
+			}
+		})
+
 		b.ReportMetric(0, "ns/op")
 		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
+		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
 
 }

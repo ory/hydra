@@ -63,6 +63,13 @@ func BenchmarkAuthCode(b *testing.B) {
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
 	_, adminTS := testhelpers.NewOAuth2Server(ctx, b, reg)
+	var (
+		authURL   = reg.Config().OAuth2AuthURL(ctx).String()
+		tokenURL  = reg.Config().OAuth2TokenURL(ctx).String()
+		issuerURL = reg.Config().IssuerURL(ctx).String()
+		subject   = "aeneas-rekkas"
+		nonce     = uuid.New()
+	)
 
 	newOAuth2Client := func(b *testing.B, cb string) (*hc.Client, *oauth2.Config) {
 		secret := uuid.New()
@@ -79,8 +86,8 @@ func BenchmarkAuthCode(b *testing.B) {
 			ClientID:     c.GetID(),
 			ClientSecret: secret,
 			Endpoint: oauth2.Endpoint{
-				AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
-				TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
+				AuthURL:   authURL,
+				TokenURL:  tokenURL,
 				AuthStyle: oauth2.AuthStyleInHeader,
 			},
 			Scopes: strings.Split(c.Scope, " "),
@@ -117,7 +124,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			assert.EqualValues(b, c.RedirectURIs, rr.Client.RedirectUris)
 			assert.EqualValues(b, r.URL.Query().Get("login_challenge"), rr.Challenge)
 			assert.EqualValues(b, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
-			assert.Contains(b, rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
+			assert.Contains(b, rr.RequestUrl, authURL)
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  subject,
@@ -155,7 +162,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			assert.EqualValues(b, subject, pointerx.StringR(rr.Subject))
 			assert.EqualValues(b, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 			assert.EqualValues(b, r.URL.Query().Get("consent_challenge"), rr.Challenge)
-			assert.Contains(b, *rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
+			assert.Contains(b, *rr.RequestUrl, authURL)
 			if checkRequestPayload != nil {
 				checkRequestPayload(rr)
 			}
@@ -198,7 +205,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		assert.True(b, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
 		requirex.EqualTime(b, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
 		assert.NotEmpty(b, claims.Get("jti").String(), "%s", claims)
-		assert.EqualValues(b, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
+		assert.EqualValues(b, issuerURL, claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(b, claims.Get("sid").String(), "%s", claims)
 		assert.Equal(b, "1", claims.Get("acr").String(), "%s", claims)
 		require.Len(b, claims.Get("amr").Array(), 1, "%s", claims)
@@ -239,7 +246,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		assert.NotEmpty(b, i.Get("jti").String())
 		assert.EqualValues(b, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(b, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(b, reg.Config().IssuerURL(ctx).String(), i.Get("iss").String(), "%s", i)
+		assert.EqualValues(b, issuerURL, i.Get("iss").String(), "%s", i)
 		assert.True(b, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 		assert.True(b, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(b, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
@@ -249,35 +256,41 @@ func BenchmarkAuthCode(b *testing.B) {
 		return i
 	}
 
-	subject := "aeneas-rekkas"
-	nonce := uuid.New()
+	var (
+		accessTTL  = reg.Config().GetAccessTokenLifespan(ctx)
+		idTTL      = reg.Config().GetIDTokenLifespan(ctx)
+		refreshTTL = reg.Config().GetRefreshTokenLifespan(ctx)
+	)
 
-	run := func(b *testing.B, strategy string) {
+	run := func(b *testing.B, strategy string) func(*testing.B) {
+		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 		c, conf := newOAuth2Client(b, testhelpers.NewCallbackURL(b, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(b, reg.Config(),
 			acceptLoginHandler(b, c, subject, nil),
 			acceptConsentHandler(b, c, subject, nil),
 		)
 
-		code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
-		require.NotEmpty(b, code)
-		token, err := conf.Exchange(context.Background(), code)
-		iat := time.Now()
-		require.NoError(b, err)
+		return func(b *testing.B) {
+			code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+			require.NotEmpty(b, code)
+			token, err := conf.Exchange(context.Background(), code)
+			iat := time.Now()
+			require.NoError(b, err)
 
-		introspectAccessToken(b, conf, token, subject)
-		assertJWTAccessToken(b, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
-		assertIDToken(b, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
-		assertRefreshToken(b, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+			introspectAccessToken(b, conf, token, subject)
+			assertJWTAccessToken(b, strategy, conf, token, subject, iat.Add(accessTTL))
+			assertIDToken(b, token, conf, subject, nonce, iat.Add(idTTL))
+			assertRefreshToken(b, token, conf, iat.Add(refreshTTL))
+		}
 	}
 
 	b.Run("strategy=jwt", func(b *testing.B) {
-		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 		initialDBSpans := dbSpans(spans)
+		B := run(b, "jwt")
 
 		b.RunParallel(func(p *testing.PB) {
 			for p.Next() {
-				run(b, "jwt")
+				B(b)
 			}
 		})
 
@@ -288,15 +301,15 @@ func BenchmarkAuthCode(b *testing.B) {
 	})
 
 	b.Run("strategy=opaque", func(b *testing.B) {
-		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 		initialDBSpans := dbSpans(spans)
+		B := run(b, "opaque")
 
 		stop := profile(b)
 		defer stop()
 
 		b.RunParallel(func(p *testing.PB) {
 			for p.Next() {
-				run(b, "opaque")
+				B(b)
 			}
 		})
 

@@ -22,12 +22,14 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"golang.org/x/oauth2"
+	"gopkg.in/square/go-jose.v2"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
@@ -47,11 +49,19 @@ func BenchmarkAuthCode(b *testing.B) {
 	spans := tracetest.NewSpanRecorder()
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
-	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
+	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=10&max_idle_conns=10"
+	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
+	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
 	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
 	reg.Config().MustSet(ctx, config.KeyLogLevel, "error")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
+	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
+	require.NoError(b, err)
+	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")
+	require.NoError(b, err)
+	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OAuth2JWTKeyName, oauth2Keys))
+	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OpenIDConnectKeyName, oidcKeys))
 	_, adminTS := testhelpers.NewOAuth2Server(ctx, b, reg)
 	var (
 		authURL   = reg.Config().OAuth2AuthURL(ctx).String()

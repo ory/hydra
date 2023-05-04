@@ -8,6 +8,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"strconv"
 	"strings"
@@ -33,21 +34,10 @@ import (
 	"github.com/ory/x/requirex"
 )
 
-var prof = flag.String("profile", "", "write a CPU profile to this filename")
-
-func profile(t testing.TB) (stop func()) {
-	if *prof == "" {
-		return func() {} // noop
-	}
-	f, err := os.Create(*prof)
-	require.NoError(t, err)
-	require.NoError(t, pprof.StartCPUProfile(f))
-	return func() {
-		pprof.StopCPUProfile()
-		require.NoError(t, f.Close())
-		t.Log("Wrote profile to ", f.Name())
-	}
-}
+var (
+	prof = flag.String("profile", "", "write a CPU profile to this filename")
+	conc = flag.Int("conc", 100, "dispatch this many requests concurrently")
+)
 
 func BenchmarkAuthCode(b *testing.B) {
 	flag.Parse()
@@ -284,9 +274,14 @@ func BenchmarkAuthCode(b *testing.B) {
 		}
 	}
 
+	b.SetParallelism(*conc / runtime.GOMAXPROCS(0))
+
 	b.Run("strategy=jwt", func(b *testing.B) {
 		initialDBSpans := dbSpans(spans)
 		B := run(b, "jwt")
+
+		stop := profile(b)
+		defer stop()
 
 		b.RunParallel(func(p *testing.PB) {
 			for p.Next() {
@@ -319,4 +314,18 @@ func BenchmarkAuthCode(b *testing.B) {
 		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
 
+}
+
+func profile(t testing.TB) (stop func()) {
+	if *prof == "" {
+		return func() {} // noop
+	}
+	f, err := os.Create(*prof)
+	require.NoError(t, err)
+	require.NoError(t, pprof.StartCPUProfile(f))
+	return func() {
+		pprof.StopCPUProfile()
+		require.NoError(t, f.Close())
+		t.Log("Wrote profile to", f.Name())
+	}
 }

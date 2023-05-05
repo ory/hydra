@@ -9,12 +9,13 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/sqlcon"
+
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -474,7 +475,11 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 // order to avoid accessing the database twice.
 func (f *Flow) AfterFind(c *pop.Connection) error {
 	f.AfterSave(c)
+	if f.Client != nil {
+		return nil // NOP, client was already loaded by a JOIN query
+	}
 	f.Client = &client.Client{}
+
 	return sqlcon.HandleError(c.Where("id = ? AND nid = ?", f.ClientID, f.NID).First(f.Client))
 }
 

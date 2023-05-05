@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/x/configx"
 
 	"github.com/stretchr/testify/require"
@@ -134,7 +136,7 @@ func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer)
 }
 
 func MustEnsureRegistryKeys(r driver.Registry, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, "RS256", key); err != nil {
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, string(jose.ES256), key); err != nil {
 		panic(err)
 	}
 }

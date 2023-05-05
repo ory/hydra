@@ -229,36 +229,65 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (*flow.F
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlow")
 	defer span.End()
 
-	var f flow.Flow
-	return &f, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-			return sqlcon.HandleError(err)
-		}
+	f, err := p.getFlow(ctx, loginChallenge)
+	if err != nil {
+		return nil, err
+	}
 
-		return nil
-	})
+	return f, nil
 }
 
-func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) (*consent.LoginRequest, error) {
+func (p *Persister) getFlow(ctx context.Context, loginChallenge string) (f *flow.Flow, err error) {
+	var (
+		res = struct {
+			Flow   flow.Flow     `db:"flow"`
+			Client client.Client `db:"client"`
+		}{}
+	)
+
+	//err = p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	rows, err := p.Connection(ctx).Store.NamedQueryContext(ctx, p.queries.getFlow, getFlowArgs{
+		NID:            p.NetworkID(ctx),
+		LoginChallenge: loginChallenge,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+	if !rows.Next() {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+
+	err = rows.StructScan(&res)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+	rows.Close()
+
+	//return nil
+	//})
+	if err != nil {
+		return nil, err
+	}
+
+	res.Flow.Client = &res.Client
+	f = &res.Flow
+
+	return f, nil
+}
+
+func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) (lr *consent.LoginRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
-	var lr *consent.LoginRequest
-	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var f flow.Flow
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-			return sqlcon.HandleError(err)
-		}
-		lr = f.GetLoginRequest()
+	f, err := p.getFlow(ctx, loginChallenge)
 
-		return nil
-	})
+	return f.GetLoginRequest(), err
 }
 
 func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptOAuth2ConsentRequest) (*consent.OAuth2ConsentRequest, error) {

@@ -1002,6 +1002,26 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		}
 	}
 
+	// Alternative:
+	//var batchSigner jwk.BatchJWTSigner
+	//var accessTokenJWTStrategy jwk.JWTSigner
+	//
+	//accessTokenIsJWT := h.c.AccessTokenStrategy(r.Context(), client.AccessTokenStrategySource(authorizeRequest.GetClient())) == "jwt"
+	//openIDJWTStrategy := batchSigner.Add(h.r.OpenIDJWTStrategy())
+	//
+	//if accessTokenIsJWT {
+	//	accessTokenJWTStrategy = batchSigner.Add(h.r.AccessTokenJWTStrategy())
+	//}
+	//
+	//err = batchSigner.Load(ctx)
+	//if err != nil {
+	//	x.LogError(r, err, h.r.Logger())
+	//	h.writeAuthorizeError(w, r, authorizeRequest, err)
+	//	return
+	//}
+	//
+	//openIDKeyID, err := openIDJWTStrategy.GetPublicKeyID(ctx)
+
 	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())

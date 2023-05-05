@@ -2,7 +2,13 @@ goos: darwin
 goarch: arm64
 pkg: github.com/ory/hydra/v2/oauth2
 BenchmarkAuthCode
-[36mINFO[0m[2023-05-04T15:02:25+02:00] No tracer configured - skipping tracing setup  [36maudience[0m=application [36mservice_name[0m=test_hydra [36mservice_version[0m=master
-BenchmarkAuthCode/strategy=jwt
-BenchmarkAuthCode/strategy=jwt-10         	       1	       200.0 ms/op	        37.00 queries/op
-PASS
+[36mINFO[0m[2023-05-08T08:24:54+02:00] No tracer configured - skipping tracing setup  [36maudience[0m=application [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:54+02:00] Retrying in 0.100000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:55+02:00] Retrying in 0.200000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:55+02:00] Retrying in 0.400000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:55+02:00] Retrying in 0.800000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:56+02:00] Retrying in 1.600000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:24:58+02:00] Retrying in 3.200000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:25:01+02:00] Retrying in 5.000000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-08T08:25:06+02:00] Retrying in 5.000000 seconds...               [36maudience[0m=application [36merror[0m=map[message:failed to connect to `host=127.0.0.1 user=postgres database=postgres`: dial error (dial tcp 127.0.0.1:3445: connect: connection refused)] [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+^C

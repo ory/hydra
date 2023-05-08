@@ -286,8 +286,11 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	defer span.End()
 
 	f, err := p.getFlow(ctx, loginChallenge)
+	if err != nil {
+		return nil, err
+	}
 
-	return f.GetLoginRequest(), err
+	return f.GetLoginRequest(), nil
 }
 
 func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptOAuth2ConsentRequest) (*consent.OAuth2ConsentRequest, error) {

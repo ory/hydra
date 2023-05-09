@@ -154,7 +154,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 
 func dbSpans(spans *tracetest.SpanRecorder) (count int) {
 	for _, s := range spans.Started() {
-		if strings.HasPrefix(s.Name(), "sql-conn-query") {
+		if strings.HasPrefix(s.Name(), "sql-") {
 			count++
 		}
 	}

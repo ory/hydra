@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid"
+	"github.com/ory/hydra/v2/oauth2/flowcache"
 
 	"github.com/gobuffalo/pop/v6"
 
@@ -17,14 +18,24 @@ import (
 	"github.com/ory/x/sqlcon"
 )
 
-func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
+func (p *Persister) GetConcreteClient(ctx context.Context, id string) (c *client.Client, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteClient")
 	defer span.End()
+
+	// Cache
+	if entry := flowcache.FromContext(ctx); entry.Client() != nil {
+		return entry.Client(), nil
+	} else {
+		defer func() {
+			entry.Set(c)
+		}()
+	}
 
 	var cl client.Client
 	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
+
 	return &cl, nil
 }
 

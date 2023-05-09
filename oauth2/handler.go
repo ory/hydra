@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/oauth2/flowcache"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -954,6 +955,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 //	  default: errorOAuth2
 func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
+	ctx, _ = flowcache.FromRequest(ctx, r)
 
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
 	if err != nil {

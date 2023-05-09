@@ -189,12 +189,12 @@ func BenchmarkAuthCode(b *testing.B) {
 		)
 
 		return func(b *testing.B) {
-			//pop.Debug = true
 			code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
-			//pop.Debug = false
 			require.NotEmpty(b, code)
 
+			//pop.Debug = true
 			_, err := conf.Exchange(context.Background(), code)
+			//pop.Debug = false
 			require.NoError(b, err)
 		}
 	}

@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
 	"github.com/ory/fosite/token/jwt"
 
@@ -65,19 +66,22 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (pu
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
-	publicTS = httptest.NewServer(public)
-	t.Cleanup(publicTS.Close)
-
-	adminTS = httptest.NewServer(admin)
-	t.Cleanup(adminTS.Close)
-
-	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
-	// SendDebugMessagesToClients: true,
-
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
 	reg.RegisterRoutes(ctx, admin, public)
+
+	publicTS = httptest.NewServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+		return r.URL.Path
+	})))
+	t.Cleanup(publicTS.Close)
+
+	adminTS = httptest.NewServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+		return r.URL.Path
+	})))
+	t.Cleanup(adminTS.Close)
+
+	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
 	return publicTS, adminTS
 }
 
@@ -187,6 +191,7 @@ func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
 
 func NewEmptyJarClient(t testing.TB) *http.Client {
 	return &http.Client{
-		Jar: NewEmptyCookieJar(t),
+		Transport: otelhttp.DefaultClient.Transport,
+		Jar:       NewEmptyCookieJar(t),
 	}
 }

@@ -16,6 +16,9 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"golang.org/x/oauth2"
@@ -42,8 +45,17 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	ctx := context.Background()
 
+	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithInsecure(), otlptracehttp.WithEndpoint("localhost:4318"))
+	require.NoError(b, err)
+	jaeger := trace.NewSimpleSpanProcessor(exporter)
+	_ = jaeger
 	spans := tracetest.NewSpanRecorder()
-	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
+	provider := trace.NewTracerProvider(trace.WithSpanProcessor(spans)) //, trace.WithSpanProcessor(jaeger))
+	tracer := provider.Tracer("BenchmarkAuthCode")
+	otel.SetTracerProvider(provider)
+
+	ctx, span := tracer.Start(ctx, "BenchmarkAuthCode")
+	defer span.End()
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=10&max_idle_conns=10"
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
@@ -76,7 +88,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			Scope:         "hydra offline openid",
 			Audience:      []string{"https://api.ory.sh/"},
 		}
-		require.NoError(b, reg.ClientManager().CreateClient(context.TODO(), c))
+		require.NoError(b, reg.ClientManager().CreateClient(ctx, c))
 		return c, &oauth2.Config{
 			ClientID:     c.GetID(),
 			ClientSecret: secret,
@@ -89,7 +101,9 @@ func BenchmarkAuthCode(b *testing.B) {
 		}
 	}
 
-	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
+	cfg := hydra.NewConfiguration()
+	cfg.HTTPClient = otelhttp.DefaultClient
+	adminClient := hydra.NewAPIClient(cfg)
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
 	getAuthorizeCode := func(b *testing.B, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
@@ -98,7 +112,10 @@ func BenchmarkAuthCode(b *testing.B) {
 		}
 
 		state := uuid.New()
-		resp, err := c.Get(conf.AuthCodeURL(state, params...))
+
+		req, err := http.NewRequestWithContext(ctx, "GET", conf.AuthCodeURL(state, params...), nil)
+		require.NoError(b, err)
+		resp, err := c.Do(req)
 		require.NoError(b, err)
 		defer resp.Body.Close()
 
@@ -109,7 +126,7 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	acceptLoginHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(b, err)
 
 			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
@@ -134,7 +151,7 @@ func BenchmarkAuthCode(b *testing.B) {
 				}
 			}
 
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				AcceptOAuth2LoginRequest(acceptBody).
 				Execute()
@@ -146,7 +163,7 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	acceptConsentHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(b, err)
 
 			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
@@ -163,7 +180,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			}
 
 			assert.Equal(b, map[string]interface{}{"context": "bar"}, rr.Context)
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
@@ -193,7 +210,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			require.NotEmpty(b, code)
 
 			//pop.Debug = true
-			_, err := conf.Exchange(context.Background(), code)
+			_, err := conf.Exchange(ctx, code)
 			//pop.Debug = false
 			require.NoError(b, err)
 		}

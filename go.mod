@@ -18,6 +18,7 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.2.2
+	github.com/dgraph-io/ristretto v0.1.1
 	github.com/fatih/structs v1.1.0
 	github.com/go-swagger/go-swagger v0.30.3
 	github.com/gobuffalo/pop/v6 v6.1.2-0.20230318123913-c85387acc9a0
@@ -30,6 +31,7 @@ require (
 	github.com/gorilla/sessions v1.2.1
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/go-retryablehttp v0.7.2
+	github.com/hashicorp/golang-lru/v2 v2.0.2
 	github.com/instana/testify v1.6.2-0.20200721153833-94b1851f4d65
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/julienschmidt/httprouter v1.3.0
@@ -61,7 +63,9 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/twmb/murmur3 v1.1.6
 	github.com/urfave/negroni v1.0.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4
 	go.opentelemetry.io/otel v1.11.1
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.9.0
 	go.opentelemetry.io/otel/sdk v1.11.1
 	go.opentelemetry.io/otel/trace v1.11.1
 	go.uber.org/automaxprocs v1.3.0
@@ -90,7 +94,6 @@ require (
 	github.com/cristalhq/jwt/v4 v4.0.2 // indirect
 	github.com/dave/jennifer v1.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/docker/cli v20.10.21+incompatible // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.24+incompatible // indirect
@@ -139,7 +142,6 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.12.0 // indirect
-	github.com/hashicorp/golang-lru/v2 v2.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
@@ -213,14 +215,12 @@ require (
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	go.mongodb.org/mongo-driver v1.10.3 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.36.4 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
 	go.opentelemetry.io/contrib/propagators/jaeger v1.11.1 // indirect
 	go.opentelemetry.io/contrib/samplers/jaegerremote v0.5.2 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.9.0 // indirect
 	go.opentelemetry.io/otel/exporters/zipkin v1.11.1 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect

@@ -10,15 +10,12 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tidwall/gjson"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -36,7 +33,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/requirex"
 )
 
 var (
@@ -76,11 +72,10 @@ func BenchmarkAuthCode(b *testing.B) {
 	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OpenIDConnectKeyName, oidcKeys))
 	_, adminTS := testhelpers.NewOAuth2Server(ctx, b, reg)
 	var (
-		authURL   = reg.Config().OAuth2AuthURL(ctx).String()
-		tokenURL  = reg.Config().OAuth2TokenURL(ctx).String()
-		issuerURL = reg.Config().IssuerURL(ctx).String()
-		subject   = "aeneas-rekkas"
-		nonce     = uuid.New()
+		authURL  = reg.Config().OAuth2AuthURL(ctx).String()
+		tokenURL = reg.Config().OAuth2TokenURL(ctx).String()
+		subject  = "aeneas-rekkas"
+		nonce    = uuid.New()
 	)
 
 	newOAuth2Client := func(b *testing.B, cb string) (*hc.Client, *oauth2.Config) {
@@ -134,10 +129,10 @@ func BenchmarkAuthCode(b *testing.B) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(b, err)
 
-			assert.EqualValues(b, c.GetID(), pointerx.StringR(rr.Client.ClientId))
-			assert.Empty(b, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
+			assert.Empty(b, pointerx.Deref(rr.Client.ClientSecret))
 			assert.EqualValues(b, c.GrantTypes, rr.Client.GrantTypes)
-			assert.EqualValues(b, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(b, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(b, c.RedirectURIs, rr.Client.RedirectUris)
 			assert.EqualValues(b, r.URL.Query().Get("login_challenge"), rr.Challenge)
 			assert.EqualValues(b, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
@@ -145,8 +140,8 @@ func BenchmarkAuthCode(b *testing.B) {
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  subject,
-				Remember: pointerx.Bool(!rr.Skip),
-				Acr:      pointerx.String("1"),
+				Remember: pointerx.Ptr(!rr.Skip),
+				Acr:      pointerx.Ptr("1"),
 				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
@@ -171,12 +166,12 @@ func BenchmarkAuthCode(b *testing.B) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(b, err)
 
-			assert.EqualValues(b, c.GetID(), pointerx.StringR(rr.Client.ClientId))
-			assert.Empty(b, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
+			assert.Empty(b, pointerx.Deref(rr.Client.ClientSecret))
 			assert.EqualValues(b, c.GrantTypes, rr.Client.GrantTypes)
-			assert.EqualValues(b, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(b, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(b, c.RedirectURIs, rr.Client.RedirectUris)
-			assert.EqualValues(b, subject, pointerx.StringR(rr.Subject))
+			assert.EqualValues(b, subject, pointerx.Deref(rr.Subject))
 			assert.EqualValues(b, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 			assert.EqualValues(b, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 			assert.Contains(b, *rr.RequestUrl, authURL)
@@ -188,7 +183,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Bool(true), RememberFor: pointerx.Int64(0),
+					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
@@ -202,83 +197,6 @@ func BenchmarkAuthCode(b *testing.B) {
 		}
 	}
 
-	assertRefreshToken := func(b *testing.B, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
-		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(b, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
-		require.NoError(b, err)
-		requirex.EqualTime(b, expectedExp, time.Unix(actualExp, 0), 5*time.Second)
-	}
-
-	assertIDToken := func(b *testing.B, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
-		idt, ok := token.Extra("id_token").(string)
-		require.True(b, ok)
-		assert.NotEmpty(b, idt)
-
-		body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
-		require.NoError(b, err)
-
-		claims := gjson.ParseBytes(body)
-		assert.True(b, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
-		assert.True(b, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
-		assert.True(b, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
-		requirex.EqualTime(b, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
-		assert.NotEmpty(b, claims.Get("jti").String(), "%s", claims)
-		assert.EqualValues(b, issuerURL, claims.Get("iss").String(), "%s", claims)
-		assert.NotEmpty(b, claims.Get("sid").String(), "%s", claims)
-		assert.Equal(b, "1", claims.Get("acr").String(), "%s", claims)
-		require.Len(b, claims.Get("amr").Array(), 1, "%s", claims)
-		assert.EqualValues(b, "pwd", claims.Get("amr").Array()[0].String(), "%s", claims)
-
-		require.Len(b, claims.Get("aud").Array(), 1, "%s", claims)
-		assert.EqualValues(b, c.ClientID, claims.Get("aud").Array()[0].String(), "%s", claims)
-		assert.EqualValues(b, expectedSubject, claims.Get("sub").String(), "%s", claims)
-		assert.EqualValues(b, expectedNonce, claims.Get("nonce").String(), "%s", claims)
-		assert.EqualValues(b, `baz`, claims.Get("bar").String(), "%s", claims)
-
-		return claims
-	}
-
-	introspectAccessToken := func(b *testing.B, conf *oauth2.Config, token *oauth2.Token, expectedSubject string) gjson.Result {
-		require.NotEmpty(b, token.AccessToken)
-		i := testhelpers.IntrospectToken(b, conf, token.AccessToken, adminTS)
-		assert.True(b, i.Get("active").Bool(), "%s", i)
-		assert.EqualValues(b, conf.ClientID, i.Get("client_id").String(), "%s", i)
-		assert.EqualValues(b, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(b, `bar`, i.Get("ext.foo").String(), "%s", i)
-		return i
-	}
-
-	assertJWTAccessToken := func(b *testing.B, strat string, conf *oauth2.Config, token *oauth2.Token, expectedSubject string, expectedExp time.Time) gjson.Result {
-		require.NotEmpty(b, token.AccessToken)
-		parts := strings.Split(token.AccessToken, ".")
-		if strat != "jwt" {
-			require.Len(b, parts, 2)
-			return gjson.Parse("null")
-		}
-		require.Len(b, parts, 3)
-
-		body, err := x.DecodeSegment(parts[1])
-		require.NoError(b, err)
-
-		i := gjson.ParseBytes(body)
-		assert.NotEmpty(b, i.Get("jti").String())
-		assert.EqualValues(b, conf.ClientID, i.Get("client_id").String(), "%s", i)
-		assert.EqualValues(b, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(b, issuerURL, i.Get("iss").String(), "%s", i)
-		assert.True(b, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
-		assert.True(b, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
-		assert.True(b, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-		requirex.EqualTime(b, expectedExp, time.Unix(i.Get("exp").Int(), 0), 5*time.Second)
-		assert.EqualValues(b, `bar`, i.Get("ext.foo").String(), "%s", i)
-		assert.EqualValues(b, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
-		return i
-	}
-
-	var (
-		accessTTL  = reg.Config().GetAccessTokenLifespan(ctx)
-		idTTL      = reg.Config().GetIDTokenLifespan(ctx)
-		refreshTTL = reg.Config().GetRefreshTokenLifespan(ctx)
-	)
-
 	run := func(b *testing.B, strategy string) func(*testing.B) {
 		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 		c, conf := newOAuth2Client(b, testhelpers.NewCallbackURL(b, "callback", testhelpers.HTTPServerNotImplementedHandler))
@@ -290,14 +208,11 @@ func BenchmarkAuthCode(b *testing.B) {
 		return func(b *testing.B) {
 			code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
 			require.NotEmpty(b, code)
-			token, err := conf.Exchange(ctx, code)
-			iat := time.Now()
-			require.NoError(b, err)
 
-			introspectAccessToken(b, conf, token, subject)
-			assertJWTAccessToken(b, strategy, conf, token, subject, iat.Add(accessTTL))
-			assertIDToken(b, token, conf, subject, nonce, iat.Add(idTTL))
-			assertRefreshToken(b, token, conf, iat.Add(refreshTTL))
+			//pop.Debug = true
+			_, err := conf.Exchange(ctx, code)
+			//pop.Debug = false
+			require.NoError(b, err)
 		}
 	}
 

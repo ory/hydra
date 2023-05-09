@@ -1,0 +1,17 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/ory/hydra/v2/oauth2
+BenchmarkAuthCode
+[36mINFO[0m[2023-05-09T09:24:07+02:00] No tracer configured - skipping tracing setup  [36maudience[0m=application [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+BenchmarkAuthCode/strategy=jwt
+BenchmarkAuthCode/strategy=jwt-10         	    1006	         5.739 ms/op	       174.1 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     974	         5.921 ms/op	       168.7 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     930	         6.480 ms/op	       154.1 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     792	         7.074 ms/op	       141.1 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     844	         6.687 ms/op	       149.1 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     802	         6.313 ms/op	       157.9 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     806	         8.012 ms/op	       124.4 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     921	         6.349 ms/op	       156.9 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     756	         6.931 ms/op	       143.6 ops/s	        29.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     799	         6.807 ms/op	       146.1 ops/s	        29.00 queries/op
+PASS

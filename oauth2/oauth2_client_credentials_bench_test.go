@@ -12,13 +12,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	hc "github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
-	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/requirex"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -26,6 +19,14 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/requirex"
 )
 
 func BenchmarkClientCredentials(b *testing.B) {
@@ -153,7 +154,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 
 func dbSpans(spans *tracetest.SpanRecorder) (count int) {
 	for _, s := range spans.Started() {
-		if strings.HasPrefix(s.Name(), "sql-conn-query") {
+		if strings.HasPrefix(s.Name(), "sql-") {
 			count++
 		}
 	}

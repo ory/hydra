@@ -224,7 +224,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		sessionID = session.ID
 	} else {
 		// Create a stub session so that we can later update it.
-		if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &LoginSession{ID: sessionID}); err != nil {
+		if err := s.r.ConsentManager().CreateLoginSession(ctx, &LoginSession{ID: sessionID}); err != nil {
 			return err
 		}
 	}
@@ -232,7 +232,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 	// Set the session
 	cl := sanitizeClientFromRequest(ar)
 	if err := s.r.ConsentManager().CreateLoginRequest(
-		r.Context(),
+		ctx,
 		&LoginRequest{
 			ID:                challenge,
 			Verifier:          verifier,
@@ -312,8 +312,7 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 	return sid, nil
 }
 
-func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
-	ctx := r.Context()
+func (s *DefaultStrategy) verifyAuthentication(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
@@ -412,7 +411,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
 		}
 
-		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}
 	}
@@ -494,7 +493,7 @@ func (s *DefaultStrategy) requestConsent(ctx context.Context, w http.ResponseWri
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
-	consentSessions, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
+	consentSessions, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequests(ctx, ar.GetClient().GetID(), authenticationSession.Subject)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		return s.forwardConsentRequest(ctx, w, r, ar, authenticationSession, nil)
 	} else if err != nil {
@@ -526,7 +525,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 
 	cl := sanitizeClientFromRequest(ar)
 	if err := s.r.ConsentManager().CreateConsentRequest(
-		r.Context(),
+		ctx,
 		&OAuth2ConsentRequest{
 			ID:                     challenge,
 			ACR:                    as.ACR,
@@ -572,7 +571,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 }
 
 func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*AcceptOAuth2ConsentRequest, error) {
-	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
+	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
@@ -1023,7 +1022,7 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(ctx context.Context, 
 		// ok, we need to process this request and redirect to auth endpoint
 		return nil, s.requestAuthentication(ctx, w, r, req)
 	} else if authenticationVerifier != "" {
-		authSession, err := s.verifyAuthentication(w, r, req, authenticationVerifier)
+		authSession, err := s.verifyAuthentication(ctx, w, r, req, authenticationVerifier)
 		if err != nil {
 			return nil, err
 		}

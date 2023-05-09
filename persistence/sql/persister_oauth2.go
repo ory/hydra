@@ -15,19 +15,15 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/x/errorsx"
-
-	"github.com/ory/fosite/storage"
-
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
-
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/oauth2/flowcache"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
-
-	"github.com/ory/hydra/v2/oauth2"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}
@@ -230,6 +226,10 @@ func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.Bl
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer span.End()
+
+	if err := flowcache.FromContext(ctx).PersistFlow(ctx, p); err != nil {
+		return err
+	}
 
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {

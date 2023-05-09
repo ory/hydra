@@ -6,11 +6,17 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"reflect"
+	"strings"
 
+	"github.com/dgraph-io/ristretto"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
+
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/flow"
 
 	"github.com/pkg/errors"
 
@@ -36,6 +42,10 @@ var (
 )
 
 type (
+	getFlowArgs struct {
+		NID            uuid.UUID
+		LoginChallenge string
+	}
 	Persister struct {
 		conn        *pop.Connection
 		mb          *popx.MigrationBox
@@ -45,6 +55,11 @@ type (
 		l           *logrusx.Logger
 		fallbackNID uuid.UUID
 		p           *networkx.Manager
+		queries     struct {
+			getFlow string
+		}
+
+		cache *ristretto.Cache
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -109,14 +124,43 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		return nil, errorsx.WithStack(err)
 	}
 
-	return &Persister{
-		conn:   c,
-		mb:     mb,
-		r:      r,
-		config: config,
-		l:      l,
-		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
-	}, nil
+	maxItems := int64(1000)
+	cache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: maxItems * 10,
+		MaxCost:     maxItems * 8, // approx 1000 items with 8 bytes each
+		BufferItems: 64,
+		Metrics:     true,
+	})
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
+	p := &Persister{
+		conn:    c,
+		mb:      mb,
+		r:       r,
+		config:  config,
+		l:       l,
+		p:       networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		cache:   cache,
+		queries: struct{ getFlow string }{getFlow: ""},
+	}
+
+	p.queries.getFlow = fmt.Sprintf(`
+SELECT %s, %s
+FROM hydra_oauth2_flow AS flow
+    JOIN hydra_client AS client ON
+        client.id = flow.client_id and
+        client.nid = flow.nid
+WHERE flow.login_challenge = :loginchallenge AND
+      flow.nid = :nid
+LIMIT 1
+`,
+		p.selectColumns(ctx, new(flow.Flow), func(s string) string { return fmt.Sprintf(`flow.%s AS "flow.%s"`, s, s) }),
+		p.selectColumns(ctx, new(client.Client), func(s string) string { return fmt.Sprintf(`client.%s AS "client.%s"`, s, s) }),
+	)
+
+	return p, nil
 }
 
 func (p *Persister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
@@ -179,4 +223,21 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.conn, f)
+}
+
+func (p *Persister) cacheKey(ctx context.Context, method string, args ...string) string {
+	parts := []string{p.NetworkID(ctx).String(), method}
+	parts = append(parts, args...)
+
+	return strings.Join(parts, "/")
+}
+
+func (p *Persister) selectColumns(ctx context.Context, model any, transform func(string) string) string {
+	m := pop.NewModel(model, ctx)
+	columns := make([]string, 0)
+	for _, col := range m.Columns().Cols {
+		columns = append(columns, transform(col.Name))
+	}
+
+	return strings.Join(columns, ", ")
 }

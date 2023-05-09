@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -191,7 +192,26 @@ func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
 
 func NewEmptyJarClient(t testing.TB) *http.Client {
 	return &http.Client{
-		Transport: otelhttp.DefaultClient.Transport,
 		Jar:       NewEmptyCookieJar(t),
+		Transport: &loggingTransport{t},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			//t.Logf("Redirect to %s", req.URL.String())
+
+			if len(via) >= 20 {
+				for k, v := range via {
+					t.Logf("Failed with redirect (%d): %s", k, v.URL.String())
+				}
+				return errors.New("stopped after 20 redirects")
+			}
+			return nil
+		},
 	}
+}
+
+type loggingTransport struct{ t testing.TB }
+
+func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	//s.t.Logf("%s %s", r.Method, r.URL.String())
+
+	return otelhttp.DefaultClient.Transport.RoundTrip(r)
 }

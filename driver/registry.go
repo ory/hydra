@@ -6,8 +6,9 @@ package driver
 import (
 	"context"
 
-	"github.com/ory/x/httprouterx"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/x/contextx"

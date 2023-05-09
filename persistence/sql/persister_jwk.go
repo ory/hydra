@@ -6,6 +6,8 @@ package sql
 import (
 	"context"
 	"encoding/json"
+	"time"
+	"unsafe"
 
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
@@ -148,9 +150,18 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 	}, nil
 }
 
-func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
+func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONWebKeySet, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet")
 	defer span.End()
+
+	// Caching
+	cacheKey := p.cacheKey(ctx, "GetKeySet", set)
+	if res, ok := p.cache.Get(cacheKey); ok {
+		return res.(*jose.JSONWebKeySet), nil
+	}
+	defer func() {
+		p.cache.SetWithTTL(cacheKey, keys, int64(unsafe.Sizeof(keys)), 5*time.Minute)
+	}()
 
 	var js []jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).
@@ -164,7 +175,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 		return nil, errors.Wrap(x.ErrNotFound, "")
 	}
 
-	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range js {
 		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key)
 		if err != nil {
@@ -183,6 +194,36 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 	}
 
 	return keys, nil
+}
+
+func (p *Persister) GetKeySetIDs(ctx context.Context, sets ...string) (map[string][]string, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySetIDs")
+	defer span.End()
+
+	var rows []jwk.SQLData
+	res := make(map[string][]string)
+	sIDs := make([]any, len(sets))
+	for i, set := range sets {
+		sIDs[i] = set
+		res[set] = []string{}
+	}
+	if err := p.QueryWithNetwork(ctx).
+		Select("kid", "sid").
+		Where("sid in (?)", sIDs...).
+		Order("created_at DESC").
+		All(&rows); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	if len(rows) < len(sets) {
+		return nil, errors.Wrap(x.ErrNotFound, "")
+	}
+
+	for _, row := range rows {
+		res[row.Set] = append(res[row.Set], row.KID)
+	}
+
+	return res, nil
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {

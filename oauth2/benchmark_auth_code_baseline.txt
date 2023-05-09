@@ -2,16 +2,16 @@ goos: darwin
 goarch: arm64
 pkg: github.com/ory/hydra/v2/oauth2
 BenchmarkAuthCode
-[36mINFO[0m[2023-05-04T13:43:12+02:00] No tracer configured - skipping tracing setup  [36maudience[0m=application [36mservice_name[0m=test_hydra [36mservice_version[0m=master
+[36mINFO[0m[2023-05-09T09:33:15+02:00] No tracer configured - skipping tracing setup  [36maudience[0m=application [36mservice_name[0m=test_hydra [36mservice_version[0m=master
 BenchmarkAuthCode/strategy=jwt
-BenchmarkAuthCode/strategy=jwt-10         	     100	        68.74 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        73.43 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        72.23 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        75.99 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        77.95 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        74.92 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        75.04 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        75.05 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        76.12 ms/op	        38.00 queries/op
-BenchmarkAuthCode/strategy=jwt-10         	     100	        76.75 ms/op	        38.00 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     399	        13.93 ms/op	        71.76 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     420	        14.31 ms/op	        69.83 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     394	        14.28 ms/op	        69.92 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     405	        16.00 ms/op	        62.42 ops/s	        80.99 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     350	        16.74 ms/op	        59.49 ops/s	        80.99 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     385	        14.35 ms/op	        69.54 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     374	        14.51 ms/op	        68.74 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     403	        14.63 ms/op	        68.17 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     388	        14.47 ms/op	        68.90 ops/s	        80.98 queries/op
+BenchmarkAuthCode/strategy=jwt-10         	     378	        14.63 ms/op	        68.13 ops/s	        80.98 queries/op
 PASS

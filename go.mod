@@ -1,6 +1,6 @@
 module github.com/ory/hydra/v2
 
-go 1.19
+go 1.20
 
 replace (
 	github.com/bradleyjkemp/cupaloy/v2 => github.com/aeneasr/cupaloy/v2 v2.6.1-0.20210924214125-3dfdd01210a3
@@ -47,7 +47,7 @@ require (
 	github.com/ory/herodot v0.10.2
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.554
+	github.com/ory/x v0.0.555
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0

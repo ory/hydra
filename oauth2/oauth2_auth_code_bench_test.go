@@ -11,7 +11,9 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -216,6 +218,8 @@ func BenchmarkAuthCode(b *testing.B) {
 		}
 	}
 
+	b.ResetTimer()
+
 	b.SetParallelism(*conc / runtime.GOMAXPROCS(0))
 
 	b.Run("strategy=jwt", func(b *testing.B) {
@@ -225,14 +229,18 @@ func BenchmarkAuthCode(b *testing.B) {
 		stop := profile(b)
 		defer stop()
 
+		var totalMS int64 = 0
 		b.RunParallel(func(p *testing.PB) {
+			defer func(t0 time.Time) {
+				atomic.AddInt64(&totalMS, int64(time.Since(t0).Milliseconds()))
+			}(time.Now())
 			for p.Next() {
 				B(b)
 			}
 		})
 
 		b.ReportMetric(0, "ns/op")
-		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
+		b.ReportMetric(float64(atomic.LoadInt64(&totalMS))/float64(b.N), "ms/op")
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
 		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
@@ -244,14 +252,18 @@ func BenchmarkAuthCode(b *testing.B) {
 		stop := profile(b)
 		defer stop()
 
+		var totalMS int64 = 0
 		b.RunParallel(func(p *testing.PB) {
+			defer func(t0 time.Time) {
+				atomic.AddInt64(&totalMS, int64(time.Since(t0).Milliseconds()))
+			}(time.Now())
 			for p.Next() {
 				B(b)
 			}
 		})
 
 		b.ReportMetric(0, "ns/op")
-		b.ReportMetric(float64(b.Elapsed().Milliseconds())/float64(b.N), "ms/op")
+		b.ReportMetric(float64(atomic.LoadInt64(&totalMS))/float64(b.N), "ms/op")
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
 		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
@@ -259,6 +271,7 @@ func BenchmarkAuthCode(b *testing.B) {
 }
 
 func profile(t testing.TB) (stop func()) {
+	t.Helper()
 	if *prof == "" {
 		return func() {} // noop
 	}

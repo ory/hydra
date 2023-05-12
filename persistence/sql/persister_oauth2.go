@@ -452,7 +452,7 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 		// The outer SELECT is necessary because our version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery
 		deletedRecords, err = p.Connection(ctx).RawQuery(
 			fmt.Sprintf(`DELETE FROM %s WHERE signature in (
-				SELECT signature FROM (SELECT signature FROM %s hoa WHERE requested_at < ? and nid = ? ORDER BY signature LIMIT %d )  as s
+				SELECT signature FROM (SELECT signature FROM %s hoa WHERE requested_at < ? and nid = ? ORDER BY requested_at LIMIT %d ) as s
 			)`, OAuth2RequestSQL{Table: table}.TableName(), OAuth2RequestSQL{Table: table}.TableName(), d),
 			notAfter,
 			p.NetworkID(ctx),

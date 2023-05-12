@@ -17,8 +17,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/oauth2/flowcache"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
@@ -227,7 +227,11 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer span.End()
 
-	if err := flowcache.FromContext(ctx).PersistFlow(ctx, p); err != nil {
+	f, err := flow.FromCtx(ctx, p)
+	if err != nil {
+		return err
+	}
+	if err = sqlcon.HandleError(p.Connection(ctx).Create(f)); err != nil {
 		return err
 	}
 

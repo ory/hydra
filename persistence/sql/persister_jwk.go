@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"time"
-	"unsafe"
 
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
@@ -159,9 +158,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	if res, ok := p.cache.Get(cacheKey); ok {
 		return res.(*jose.JSONWebKeySet), nil
 	}
-	defer func() {
-		p.cache.SetWithTTL(cacheKey, keys, int64(unsafe.Sizeof(keys)), 5*time.Minute)
-	}()
+	defer p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
 
 	var js []jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).

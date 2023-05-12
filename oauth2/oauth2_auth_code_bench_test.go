@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -208,12 +209,12 @@ func BenchmarkAuthCode(b *testing.B) {
 		)
 
 		return func(b *testing.B) {
+			pop.Debug = true
 			code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
 			require.NotEmpty(b, code)
 
-			//pop.Debug = true
 			_, err := conf.Exchange(ctx, code)
-			//pop.Debug = false
+			pop.Debug = false
 			require.NoError(b, err)
 		}
 	}

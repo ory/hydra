@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pagination/tokenpagination"
 
 	"github.com/ory/x/httprouterx"
@@ -48,13 +49,18 @@ func NewHandler(
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
+	mwHandle := flowctx.Chain(
+		flowctx.NewMiddleware(flowctx.FlowCookie, h.r),
+		flowctx.NewMiddleware(flowctx.LoginSessionCookie, h.r),
+	)
+
 	admin.GET(LoginPath, h.getOAuth2LoginRequest)
 	admin.PUT(LoginPath+"/accept", h.acceptOAuth2LoginRequest)
 	admin.PUT(LoginPath+"/reject", h.rejectOAuth2LoginRequest)
 
-	admin.GET(ConsentPath, h.getOAuth2ConsentRequest)
-	admin.PUT(ConsentPath+"/accept", h.acceptOAuth2ConsentRequest)
-	admin.PUT(ConsentPath+"/reject", h.rejectOAuth2ConsentRequest)
+	admin.GET(ConsentPath, mwHandle(h.getOAuth2ConsentRequest))
+	admin.PUT(ConsentPath+"/accept", mwHandle(h.acceptOAuth2ConsentRequest))
+	admin.PUT(ConsentPath+"/reject", mwHandle(h.rejectOAuth2ConsentRequest))
 
 	admin.DELETE(SessionsPath+"/login", h.revokeOAuth2LoginSessions)
 	admin.GET(SessionsPath+"/consent", h.listOAuth2ConsentSessions)

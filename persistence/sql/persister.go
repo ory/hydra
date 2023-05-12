@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
+	"unsafe"
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/gobuffalo/pop/v6"
@@ -33,8 +35,13 @@ import (
 	"github.com/ory/x/popx"
 )
 
-var _ persistence.Persister = new(Persister)
-var _ storage.Transactional = new(Persister)
+var (
+	_ persistence.Persister = new(Persister)
+	_ storage.Transactional = new(Persister)
+
+	ptrCost   = int64(unsafe.Sizeof(new(int)))
+	clientTTL = 5 * time.Minute
+)
 
 var (
 	ErrTransactionOpen   = errors.New("There is already a transaction in this context.")
@@ -127,7 +134,7 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 	maxItems := int64(1000)
 	cache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: maxItems * 10,
-		MaxCost:     maxItems * 8, // approx 1000 items with 8 bytes each
+		MaxCost:     maxItems * ptrCost, // approx 1000 items with 8 bytes each
 		BufferItems: 64,
 		Metrics:     true,
 	})
@@ -225,6 +232,7 @@ func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context,
 	return popx.Transaction(ctx, p.conn, f)
 }
 
+// cacheKey returns a network specific cache key for the given method and arguments.
 func (p *Persister) cacheKey(ctx context.Context, method string, args ...string) string {
 	parts := []string{p.NetworkID(ctx).String(), method}
 	parts = append(parts, args...)

@@ -11,7 +11,6 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/luna-duclos/instrumentedsql"
-
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/hsm"

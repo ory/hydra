@@ -1,5 +1,6 @@
 package flowcache
 
+/*
 import (
 	"context"
 	"fmt"
@@ -144,3 +145,4 @@ func FromContext(ctx context.Context) (entry Entry) {
 
 	return val.(*cacheEntry)
 }
+*/

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/v2/oauth2/flowcache"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -59,15 +59,19 @@ type Handler struct {
 }
 
 func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
-	return &Handler{r: r, c: c}
+	return &Handler{
+		r: r,
+		c: c,
+	}
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
 
-	public.GET(AuthPath, h.oAuth2Authorize)
-	public.POST(AuthPath, h.oAuth2Authorize)
+	mwHandle := flowctx.DefaultHandler(h.r)
+	public.GET(AuthPath, mwHandle(h.oAuth2Authorize))
+	public.POST(AuthPath, mwHandle(h.oAuth2Authorize))
 	public.GET(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 	public.POST(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 
@@ -955,7 +959,6 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 //	  default: errorOAuth2
 func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
-	ctx, _ = flowcache.FromRequest(ctx, r)
 
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
 	if err != nil {

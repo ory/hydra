@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/sqlxx"
 
@@ -162,8 +163,11 @@ func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.OAuth
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentRequest")
 	defer span.End()
 
-	f, err := flow.FromCtx(ctx, p)
-	if err == nil && f.ID == req.LoginChallenge.String() && f.NID == p.NetworkID(ctx) {
+	f, err := flow.FromCtx(ctx)
+	if err != nil {
+		return err
+	}
+	if f.ID == req.LoginChallenge.String() && f.NID == p.NetworkID(ctx) {
 		f.State = flow.FlowStateConsentInitialized
 		f.ConsentChallengeID = sqlxx.NullString(req.ID)
 		f.ConsentSkip = req.Skip
@@ -171,55 +175,54 @@ func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.OAuth
 		f.ConsentCSRF = sqlxx.NullString(req.CSRF)
 
 		return nil
-	}
-	if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-		return err
-	}
-
-	c, err := p.Connection(ctx).RawQuery(`
-UPDATE hydra_oauth2_flow
-SET
-	state = ?,
-	consent_challenge_id = ?,
-	consent_skip = ?,
-	consent_verifier = ?,
-	consent_csrf = ?
-WHERE login_challenge = ? AND nid = ?;
-`,
-		flow.FlowStateConsentInitialized,
-		sqlxx.NullString(req.ID),
-		req.Skip,
-		req.Verifier,
-		req.CSRF,
-		req.LoginChallenge.String(),
-		p.NetworkID(ctx),
-	).ExecWithCount()
-	if err != nil {
-		return sqlcon.HandleError(err)
-	}
-	if c != 1 {
+	} else {
 		return errorsx.WithStack(x.ErrNotFound)
 	}
-	return nil
+	//if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return err
+	//}
+	//
+	//c, err := p.Connection(ctx).RawQuery(`
+	//UPDATE hydra_oauth2_flow
+	//SET
+	//	state = ?,
+	//	consent_challenge_id = ?,
+	//	consent_skip = ?,
+	//	consent_verifier = ?,
+	//	consent_csrf = ?
+	//WHERE login_challenge = ? AND nid = ?;
+	//`,
+	//		flow.FlowStateConsentInitialized,
+	//		sqlxx.NullString(req.ID),
+	//		req.Skip,
+	//		req.Verifier,
+	//		req.CSRF,
+	//		req.LoginChallenge.String(),
+	//		p.NetworkID(ctx),
+	//	).ExecWithCount()
+	//	if err != nil {
+	//		return sqlcon.HandleError(err)
+	//	}
+	//	if c != 1 {
+	//		return errorsx.WithStack(x.ErrNotFound)
+	//	}
+	//	return nil
 }
 
 func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge string) (*flow.Flow, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlowByConsentChallenge")
 	defer span.End()
 
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		return f, nil
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-		return nil, err
-	}
+	// challenge contains the flow.
+	return flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
 
-	f := &flow.Flow{}
-
-	if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", challenge).First(f)); err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	//f := &flow.Flow{}
+	//
+	//if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", challenge).First(f)); err != nil {
+	//	return nil, err
+	//}
+	//
+	//return f, nil
 }
 
 func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*consent.OAuth2ConsentRequest, error) {
@@ -233,6 +236,9 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 		}
 		return nil, err
 	}
+
+	// TODO(hperl): We need to overwrite the ID with the encoded flow (challenge) so that the client is not confused.
+	f.ConsentChallengeID = sqlxx.NullString(challenge)
 
 	return f.GetConsentRequest(), nil
 }
@@ -271,162 +277,270 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		return f.GetLoginRequest(), nil
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	lr, err := flowctx.Decode[consent.LoginRequest](ctx, p.r.KeyCipher(), loginChallenge)
+	if err != nil {
 		return nil, err
 	}
+	lr.ID = loginChallenge
+	return lr, nil
 
-	var lr *consent.LoginRequest
-	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var f flow.Flow
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-			return sqlcon.HandleError(err)
-		}
-		lr = f.GetLoginRequest()
-
-		return nil
-	})
+	//if f, err := flow.FromCtx(ctx, p); err == nil {
+	//	return f.GetLoginRequest(), nil
+	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return nil, err
+	//}
+	//
+	//var lr *consent.LoginRequest
+	//return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	//	var f flow.Flow
+	//	if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
+	//		if errors.Is(err, sql.ErrNoRows) {
+	//			return errorsx.WithStack(x.ErrNotFound)
+	//		}
+	//		return sqlcon.HandleError(err)
+	//	}
+	//	lr = f.GetLoginRequest()
+	//
+	//	return nil
+	//})
 }
 
 func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptOAuth2ConsentRequest) (*consent.OAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer span.End()
 
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		if err := f.HandleConsentRequest(r); err != nil {
-			return nil, errorsx.WithStack(err)
-		}
-		return p.GetConsentRequest(ctx, r.ID)
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), r.ID)
+	if err != nil {
 		return nil, err
 	}
-
-	f := &flow.Flow{}
-
-	if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", r.ID).First(f)); errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, err
-	}
-
-	if err := f.HandleConsentRequest(r); err != nil {
+	// Restore the short challenge ID, which was previously sent to the encoded flow.
+	r.ID = f.ConsentChallengeID.String()
+	if err = f.HandleConsentRequest(r); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
-
-	_, err := p.UpdateWithNetwork(ctx, f)
-	if err != nil {
-		return nil, sqlcon.HandleError(err)
+	if err = flow.SetInCtx(ctx, f); err != nil {
+		return nil, errorsx.WithStack(err)
 	}
+	return f.GetConsentRequest(), nil
+	//return p.GetConsentRequest(ctx, r.ID)
 
-	return p.GetConsentRequest(ctx, r.ID)
+	//if f, err := flow.FromCtx(ctx); err == nil {
+	//	if err := f.HandleConsentRequest(r); err != nil {
+	//		return nil, errorsx.WithStack(err)
+	//	}
+	//	return p.GetConsentRequest(ctx, r.ID)
+	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return nil, err
+	//}
+	//
+	//f := &flow.Flow{}
+	//
+	//if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", r.ID).First(f)); errors.Is(err, sqlcon.ErrNoRows) {
+	//	return nil, err
+	//}
+	//
+	//if err := f.HandleConsentRequest(r); err != nil {
+	//	return nil, errorsx.WithStack(err)
+	//}
+	//
+	//_, err := p.UpdateWithNetwork(ctx, f)
+	//if err != nil {
+	//	return nil, sqlcon.HandleError(err)
+	//}
+	//
+	//return p.GetConsentRequest(ctx, r.ID)
 }
 
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()
 
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		if err := f.InvalidateConsentRequest(); err != nil {
-			return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-		}
-		return f.GetHandledConsentRequest(), nil
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	// f, err := flow.FromCtx(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//
+	// if updatedFlow.ID != f.ID {
+	// 	return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match login request."))
+	// }
+	//
+	// // Update flow from login request, but keep requested at.
+	// updatedFlow.NID = f.NID
+	// updatedFlow.RequestedAt = f.RequestedAt
+	// updatedFlow.LoginCSRF = f.LoginCSRF
+	// updatedFlow.LoginVerifier = f.LoginVerifier
+	// *f = *updatedFlow
+
+	f, err := flow.FromCtx(ctx)
+	if err != nil {
 		return nil, err
 	}
 
-	var r consent.AcceptOAuth2ConsentRequest
-	return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var f flow.Flow
-		if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).First(&f); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	if err != nil {
+		return nil, err
+	}
+	if updatedFlow.ID != f.ID {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
+	}
 
-		if err := f.InvalidateConsentRequest(); err != nil {
-			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-		}
+	// Update flow from login request, but keep requested at.
+	updatedFlow.NID = f.NID
+	updatedFlow.ConsentCSRF = f.ConsentCSRF
+	updatedFlow.ConsentVerifier = f.ConsentVerifier
+	*f = *updatedFlow
 
-		r = *f.GetHandledConsentRequest()
-		_, err := p.UpdateWithNetwork(ctx, &f)
-		return err
-	})
+	if err := f.InvalidateConsentRequest(); err != nil {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	}
+
+	if err = flow.SetInCtx(ctx, f); err != nil {
+		return nil, err
+	}
+
+	return f.GetHandledConsentRequest(), nil
+
+	//if f, err := flow.FromCtx(ctx); err == nil {
+	//	if err := f.InvalidateConsentRequest(); err != nil {
+	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	//	}
+	//	return f.GetHandledConsentRequest(), nil
+	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return nil, err
+	//}
+	//
+	//var r consent.AcceptOAuth2ConsentRequest
+	//return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	//	var f flow.Flow
+	//	if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).First(&f); err != nil {
+	//		return sqlcon.HandleError(err)
+	//	}
+	//
+	//	if err := f.InvalidateConsentRequest(); err != nil {
+	//		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	//	}
+	//
+	//	r = *f.GetHandledConsentRequest()
+	//	_, err := p.UpdateWithNetwork(ctx, &f)
+	//	return err
+	//})
 }
 
 func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r *consent.HandledLoginRequest) (lr *consent.LoginRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleLoginRequest")
 	defer span.End()
 
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		err = f.HandleLoginRequest(r)
-		if err != nil {
-			return nil, err
-		}
-
-		return f.GetLoginRequest(), nil
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	if lr, err = flowctx.Decode[consent.LoginRequest](ctx, p.r.KeyCipher(), challenge); err != nil {
+		return nil, err
+	}
+	if r.ID != challenge {
+		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("The challenge from the payload did not match the challenge from the url query parameter."))
+	}
+	r.ID = lr.ID
+	f := flow.NewFlow(lr)
+	if err = f.HandleLoginRequest(r); err != nil {
 		return nil, err
 	}
 
-	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		f, err := p.GetFlow(ctx, challenge)
-		if err != nil {
-			return sqlcon.HandleError(err)
-		}
-		err = f.HandleLoginRequest(r)
-		if err != nil {
-			return err
-		}
+	lr = f.GetLoginRequest()
+	if lr.Verifier, err = flowctx.Encode(ctx, p.r.KeyCipher(), f); err != nil {
+		return nil, err
+	}
 
-		_, err = p.UpdateWithNetwork(ctx, f)
-		if err != nil {
-			return sqlcon.HandleError(err)
-		}
+	return lr, nil
 
-		lr, err = p.GetLoginRequest(ctx, challenge)
-		return sqlcon.HandleError(err)
-	})
+	//return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	//	f, err := p.GetFlow(ctx, challenge)
+	//	if err != nil {
+	//		return sqlcon.HandleError(err)
+	//	}
+	//	err = f.HandleLoginRequest(r)
+	//	if err != nil {
+	//		return err
+	//	}
+	//
+	//	_, err = p.UpdateWithNetwork(ctx, f)
+	//	if err != nil {
+	//		return sqlcon.HandleError(err)
+	//	}
+	//
+	//	lr, err = p.GetLoginRequest(ctx, challenge)
+	//	return sqlcon.HandleError(err)
+	//})
 }
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*consent.HandledLoginRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
 	defer span.End()
 
-	updateFlow := func(f *flow.Flow) (*consent.HandledLoginRequest, error) {
-		if err := f.InvalidateLoginRequest(); err != nil {
-			return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-		}
-		d := f.GetHandledLoginRequest()
-		return &d, nil
-	}
-
-	if f, err := flow.FromCtx(ctx, p); err == nil {
-		if f.LoginVerifier != verifier {
-			return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match"))
-		}
-		return updateFlow(f)
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	f, err := flow.FromCtx(ctx)
+	if err != nil {
 		return nil, err
 	}
 
-	var d *consent.HandledLoginRequest
-	return d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var (
-			f   flow.Flow
-			err error
-		)
-		if err = p.QueryWithNetwork(ctx).Where("login_verifier = ?", verifier).First(&f); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	if err != nil {
+		return nil, err
+	}
 
-		d, err = updateFlow(&f)
-		if err != nil {
-			return err
-		}
-		_, err = p.UpdateWithNetwork(ctx, &f)
+	if updatedFlow.ID != f.ID {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match login request."))
+	}
 
-		return sqlcon.HandleError(err)
-	})
+	// Update flow from login request, but keep requested at.
+	updatedFlow.NID = f.NID
+	updatedFlow.RequestedAt = f.RequestedAt
+	updatedFlow.LoginCSRF = f.LoginCSRF
+	updatedFlow.LoginVerifier = f.LoginVerifier
+	*f = *updatedFlow
+
+	// TODO(hperl): We can't check the flow state because we no longer persist it to DB.
+	//if err := f.InvalidateLoginRequest(); err != nil {
+	//	return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	//}
+	d := f.GetHandledLoginRequest()
+	return &d, nil
+
+	//updateFlow := func(f *flow.Flow) (*consent.HandledLoginRequest, error) {
+	//	if err := f.InvalidateLoginRequest(); err != nil {
+	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	//	}
+	//	d := f.GetHandledLoginRequest()
+	//	return &d, nil
+	//}
+	//
+	//if f, err := flow.FromCtx(ctx, p); err == nil {
+	//	if f.LoginVerifier != verifier {
+	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match"))
+	//	}
+	//	return updateFlow(f)
+	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return nil, err
+	//}
+	//
+	//var d *consent.HandledLoginRequest
+	//return d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	//	var (
+	//		f   flow.Flow
+	//		err error
+	//	)
+	//	if err = p.QueryWithNetwork(ctx).Where("login_verifier = ?", verifier).First(&f); err != nil {
+	//		return sqlcon.HandleError(err)
+	//	}
+	//
+	//	d, err = updateFlow(&f)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	_, err = p.UpdateWithNetwork(ctx, &f)
+	//
+	//	return sqlcon.HandleError(err)
+	//})
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (*consent.LoginSession, error) {
@@ -493,7 +607,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequests")
 	defer span.End()
 
-	f, err := flow.FromCtx(ctx, p)
+	f, err := flow.FromCtx(ctx)
 	if err == nil {
 		if (f.State == flow.FlowStateConsentUsed || f.State == flow.FlowStateConsentUnused) &&
 			f.Subject == subject &&

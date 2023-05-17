@@ -19,6 +19,7 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
@@ -227,11 +228,15 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer span.End()
 
-	f, err := flow.FromCtx(ctx, p)
-	if err != nil {
-		return err
-	}
-	if err = sqlcon.HandleError(p.Connection(ctx).Create(f)); err != nil {
+	v, err := flowctx.ValueFromCtx(ctx, flowctx.FlowCookie)
+	if err == nil {
+		v.PersistOnce.Do(func() {
+			err = sqlcon.HandleError(p.Connection(ctx).Create(v.Ptr.(*flow.Flow)))
+		})
+		if err != nil {
+			return err
+		}
+	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
 		return err
 	}
 

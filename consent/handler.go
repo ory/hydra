@@ -669,6 +669,8 @@ type acceptOAuth2ConsentRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -686,7 +688,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
+	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -696,7 +698,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &p)
+	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -710,8 +712,14 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {hr.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
 }
 

@@ -870,8 +870,8 @@ type oAuth2TokenExchange struct {
 //	  200: oAuth2TokenExchange
 //	  default: errorOAuth2
 func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
-	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
-	var ctx = r.Context()
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
+	ctx := r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 	if err != nil {
@@ -900,7 +900,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
-		var scopes = accessRequest.GetRequestedScopes()
+		scopes := accessRequest.GetRequestedScopes()
 
 		// Added for compatibility with MITREid
 		if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
@@ -1006,26 +1006,6 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 			return
 		}
 	}
-
-	// Alternative:
-	//var batchSigner jwk.BatchJWTSigner
-	//var accessTokenJWTStrategy jwk.JWTSigner
-	//
-	//accessTokenIsJWT := h.c.AccessTokenStrategy(r.Context(), client.AccessTokenStrategySource(authorizeRequest.GetClient())) == "jwt"
-	//openIDJWTStrategy := batchSigner.Add(h.r.OpenIDJWTStrategy())
-	//
-	//if accessTokenIsJWT {
-	//	accessTokenJWTStrategy = batchSigner.Add(h.r.AccessTokenJWTStrategy())
-	//}
-	//
-	//err = batchSigner.Load(ctx)
-	//if err != nil {
-	//	x.LogError(r, err, h.r.Logger())
-	//	h.writeAuthorizeError(w, r, authorizeRequest, err)
-	//	return
-	//}
-	//
-	//openIDKeyID, err := openIDJWTStrategy.GetPublicKeyID(ctx)
 
 	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {

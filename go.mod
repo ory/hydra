@@ -31,7 +31,6 @@ require (
 	github.com/gorilla/sessions v1.2.1
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/go-retryablehttp v0.7.2
-	github.com/hashicorp/golang-lru/v2 v2.0.2
 	github.com/instana/testify v1.6.2-0.20200721153833-94b1851f4d65
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/julienschmidt/httprouter v1.3.0

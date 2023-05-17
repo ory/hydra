@@ -32,7 +32,7 @@ var (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	ID  uuid.UUID `json:"-" db:"pk"`
+	ID  uuid.UUID `json:"id" db:"pk"`
 	NID uuid.UUID `db:"nid" faker:"-" json:"-"`
 
 	// OAuth 2.0 Client ID

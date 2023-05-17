@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -227,35 +228,43 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		if err := s.r.ConsentManager().CreateLoginSession(ctx, &LoginSession{ID: sessionID}); err != nil {
 			return err
 		}
+		if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.LoginSessionCookie); err != nil {
+			return err
+		}
 	}
 
 	// Set the session
 	cl := sanitizeClientFromRequest(ar)
+	loginRequest := &LoginRequest{
+		ID:                challenge,
+		Verifier:          verifier,
+		CSRF:              csrf,
+		Skip:              skip,
+		RequestedScope:    []string(ar.GetRequestedScopes()),
+		RequestedAudience: []string(ar.GetRequestedAudience()),
+		Subject:           subject,
+		Client:            cl,
+		RequestURL:        iu.String(),
+		AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
+		RequestedAt:       time.Now().Truncate(time.Second).UTC(),
+		SessionID:         sqlxx.NullString(sessionID),
+		OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
+			IDTokenHintClaims: idTokenHintClaims,
+			ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
+			UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
+			Display:           ar.GetRequestForm().Get("display"),
+			LoginHint:         ar.GetRequestForm().Get("login_hint"),
+		},
+	}
 	if err := s.r.ConsentManager().CreateLoginRequest(
 		ctx,
-		&LoginRequest{
-			ID:                challenge,
-			Verifier:          verifier,
-			CSRF:              csrf,
-			Skip:              skip,
-			RequestedScope:    []string(ar.GetRequestedScopes()),
-			RequestedAudience: []string(ar.GetRequestedAudience()),
-			Subject:           subject,
-			Client:            cl,
-			RequestURL:        iu.String(),
-			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
-			RequestedAt:       time.Now().Truncate(time.Second).UTC(),
-			SessionID:         sqlxx.NullString(sessionID),
-			OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
-				IDTokenHintClaims: idTokenHintClaims,
-				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
-				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
-				Display:           ar.GetRequestForm().Get("display"),
-				LoginHint:         ar.GetRequestForm().Get("login_hint"),
-			},
-		},
+		loginRequest,
 	); err != nil {
 		return errorsx.WithStack(err)
+	}
+
+	if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
+		return err
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -268,7 +277,13 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {challenge}}).String(), http.StatusFound)
+	// TODO(hperl): Encode the whole flow here.
+	encodedLoginRequest, err := flowctx.Encode(ctx, s.r.KeyCipher(), loginRequest)
+	if err != nil {
+		return err
+	}
+
+	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {encodedLoginRequest}}).String(), http.StatusFound)
 
 	// generate the verifier
 	return errorsx.WithStack(ErrAbortOAuth2Request)
@@ -524,30 +539,39 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	cl := sanitizeClientFromRequest(ar)
+	consentRequest := &OAuth2ConsentRequest{
+		ID:                     challenge,
+		ACR:                    as.ACR,
+		AMR:                    as.AMR,
+		Verifier:               verifier,
+		CSRF:                   csrf,
+		Skip:                   skip,
+		RequestedScope:         []string(ar.GetRequestedScopes()),
+		RequestedAudience:      []string(ar.GetRequestedAudience()),
+		Subject:                as.Subject,
+		Client:                 cl,
+		RequestURL:             as.LoginRequest.RequestURL,
+		AuthenticatedAt:        as.AuthenticatedAt,
+		RequestedAt:            as.RequestedAt,
+		ForceSubjectIdentifier: as.ForceSubjectIdentifier,
+		OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
+		LoginSessionID:         as.LoginRequest.SessionID,
+		LoginChallenge:         sqlxx.NullString(as.LoginRequest.ID),
+		Context:                as.Context,
+	}
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		ctx,
-		&OAuth2ConsentRequest{
-			ID:                     challenge,
-			ACR:                    as.ACR,
-			AMR:                    as.AMR,
-			Verifier:               verifier,
-			CSRF:                   csrf,
-			Skip:                   skip,
-			RequestedScope:         []string(ar.GetRequestedScopes()),
-			RequestedAudience:      []string(ar.GetRequestedAudience()),
-			Subject:                as.Subject,
-			Client:                 cl,
-			RequestURL:             as.LoginRequest.RequestURL,
-			AuthenticatedAt:        as.AuthenticatedAt,
-			RequestedAt:            as.RequestedAt,
-			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
-			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
-			LoginSessionID:         as.LoginRequest.SessionID,
-			LoginChallenge:         sqlxx.NullString(as.LoginRequest.ID),
-			Context:                as.Context,
-		},
+		consentRequest,
 	); err != nil {
 		return errorsx.WithStack(err)
+	}
+
+	if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
+		return err
+	}
+	consentChallenge, err := flowctx.EncodeFromContext(ctx, s.r.KeyCipher(), flowctx.FlowCookie)
+	if err != nil {
+		return err
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -562,7 +586,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 
 	http.Redirect(
 		w, r,
-		urlx.SetQuery(s.c.ConsentURL(ctx), url.Values{"consent_challenge": {challenge}}).String(),
+		urlx.SetQuery(s.c.ConsentURL(ctx), url.Values{"consent_challenge": {consentChallenge}}).String(),
 		http.StatusFound,
 	)
 
@@ -598,6 +622,10 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 
 	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%d", s.r.Config().CookieNameConsentCSRF(ctx), murmur3.Sum32(session.ConsentRequest.Client.ID.Bytes()))
 	if err := validateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, session.ConsentRequest.CSRF); err != nil {
+		return nil, err
+	}
+
+	if err = flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
 		return nil, err
 	}
 

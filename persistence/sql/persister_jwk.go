@@ -155,10 +155,12 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 
 	// Caching
 	cacheKey := p.cacheKey(ctx, "GetKeySet", set)
-	if res, ok := p.cache.Get(cacheKey); ok {
+	if res, ok := p.cache.Get(cacheKey); ok && res != nil {
 		return res.(*jose.JSONWebKeySet), nil
 	}
-	defer p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
+	defer func() {
+		p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
+	}()
 
 	var js []jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).

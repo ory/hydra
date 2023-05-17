@@ -21,10 +21,14 @@ func (p *Persister) GetConcreteClient(ctx context.Context, id string) (c *client
 	defer span.End()
 
 	cacheKey := p.cacheKey(ctx, "GetConcreteClient", id)
-	if val, ok := p.cache.Get(cacheKey); ok {
+	if val, ok := p.cache.Get(cacheKey); ok && val != nil {
 		return val.(*client.Client), nil
 	}
-	defer p.cache.SetWithTTL(cacheKey, c, ptrCost, clientTTL)
+	defer func() {
+		if c != nil {
+			p.cache.SetWithTTL(cacheKey, c, ptrCost, clientTTL)
+		}
+	}()
 
 	var cl client.Client
 	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl); err != nil {

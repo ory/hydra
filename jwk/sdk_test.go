@@ -24,6 +24,7 @@ import (
 )
 
 func TestJWKSDK(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
@@ -41,6 +42,7 @@ func TestJWKSDK(t *testing.T) {
 
 	expectedKid := "key-bar"
 	t.Run("JSON Web Key", func(t *testing.T) {
+		t.Parallel()
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
 			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(context.Background(), "set-foo").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
@@ -93,6 +95,7 @@ func TestJWKSDK(t *testing.T) {
 	})
 
 	t.Run("JWK Set", func(t *testing.T) {
+		t.Parallel()
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: "RS256",

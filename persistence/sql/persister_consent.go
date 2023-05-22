@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
-	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/sqlxx"
 
@@ -277,11 +276,13 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
-	lr, err := flowctx.Decode[consent.LoginRequest](ctx, p.r.KeyCipher(), loginChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), loginChallenge)
 	if err != nil {
 		return nil, err
 	}
+	lr := f.GetLoginRequest()
 	lr.ID = loginChallenge
+
 	return lr, nil
 
 	//if f, err := flow.FromCtx(ctx, p); err == nil {
@@ -435,25 +436,38 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleLoginRequest")
 	defer span.End()
 
-	if lr, err = flowctx.Decode[consent.LoginRequest](ctx, p.r.KeyCipher(), challenge); err != nil {
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	if err != nil {
 		return nil, err
 	}
-	if r.ID != challenge {
-		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("The challenge from the payload did not match the challenge from the url query parameter."))
-	}
-	r.ID = lr.ID
-	f := flow.NewFlow(lr)
-	if err = f.HandleLoginRequest(r); err != nil {
+	r.ID = f.ID
+	err = f.HandleLoginRequest(r)
+	if err != nil {
 		return nil, err
 	}
-
-	lr = f.GetLoginRequest()
-	if lr.Verifier, err = flowctx.Encode(ctx, p.r.KeyCipher(), f); err != nil {
-		return nil, err
+	if err = flow.SetInCtx(ctx, f); err != nil {
+		return nil, errorsx.WithStack(err)
 	}
 
-	return lr, nil
+	return p.GetLoginRequest(ctx, challenge)
 
+	//if r.ID != challenge {
+	//	return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("The challenge from the payload did not match the challenge from the url query parameter."))
+	//}
+	//r.ID = lr.ID
+	//f := flow.NewFlow(lr)
+	//if err = f.HandleLoginRequest(r); err != nil {
+	//	return nil, err
+	//}
+	//
+	//lr = f.GetLoginRequest()
+	//if lr.Verifier, err = flowctx.Encode(ctx, p.r.KeyCipher(), f); err != nil {
+	//	return nil, err
+	//}
+	//
+	//return lr, nil
+
+	// OLD SQL Code:
 	//return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 	//	f, err := p.GetFlow(ctx, challenge)
 	//	if err != nil {

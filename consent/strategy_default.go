@@ -277,13 +277,12 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	// TODO(hperl): Encode the whole flow here.
-	encodedLoginRequest, err := flowctx.Encode(ctx, s.r.KeyCipher(), loginRequest)
+	encodedFlow, err := flowctx.EncodeFromContext(ctx, s.r.KeyCipher(), flowctx.FlowCookie)
 	if err != nil {
 		return err
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {encodedLoginRequest}}).String(), http.StatusFound)
+	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {encodedFlow}}).String(), http.StatusFound)
 
 	// generate the verifier
 	return errorsx.WithStack(ErrAbortOAuth2Request)

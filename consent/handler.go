@@ -54,9 +54,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 		flowctx.NewMiddleware(flowctx.LoginSessionCookie, h.r),
 	)
 
-	admin.GET(LoginPath, h.getOAuth2LoginRequest)
-	admin.PUT(LoginPath+"/accept", h.acceptOAuth2LoginRequest)
-	admin.PUT(LoginPath+"/reject", h.rejectOAuth2LoginRequest)
+	admin.GET(LoginPath, mwHandle(h.getOAuth2LoginRequest))
+	admin.PUT(LoginPath+"/accept", mwHandle(h.acceptOAuth2LoginRequest))
+	admin.PUT(LoginPath+"/reject", mwHandle(h.rejectOAuth2LoginRequest))
 
 	admin.GET(ConsentPath, mwHandle(h.getOAuth2ConsentRequest))
 	admin.PUT(ConsentPath+"/accept", mwHandle(h.acceptOAuth2ConsentRequest))
@@ -403,6 +403,8 @@ type acceptOAuth2LoginRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -426,7 +428,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	p.ID = challenge
-	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -446,7 +448,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &p)
+	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -458,8 +460,14 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
 }
 

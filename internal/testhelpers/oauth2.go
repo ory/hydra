@@ -195,7 +195,7 @@ func NewEmptyJarClient(t testing.TB) *http.Client {
 		Jar:       NewEmptyCookieJar(t),
 		Transport: &loggingTransport{t},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			t.Logf("Redirect to %s", req.URL.String())
+			//t.Logf("Redirect to %s", req.URL.String())
 
 			if len(via) >= 20 {
 				for k, v := range via {
@@ -211,7 +211,7 @@ func NewEmptyJarClient(t testing.TB) *http.Client {
 type loggingTransport struct{ t testing.TB }
 
 func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	s.t.Logf("%s %s", r.Method, r.URL.String())
+	//s.t.Logf("%s %s", r.Method, r.URL.String())
 	//s.t.Logf("%s %s\nWith Cookies: %v", r.Method, r.URL.String(), r.Cookies())
 
 	return otelhttp.DefaultClient.Transport.RoundTrip(r)

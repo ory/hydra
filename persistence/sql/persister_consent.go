@@ -214,15 +214,15 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	defer span.End()
 
 	// challenge contains the flow.
-	return flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	if err != nil {
+		return nil, err
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
 
-	//f := &flow.Flow{}
-	//
-	//if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", challenge).First(f)); err != nil {
-	//	return nil, err
-	//}
-	//
-	//return f, nil
+	return f, nil
 }
 
 func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*consent.OAuth2ConsentRequest, error) {
@@ -237,7 +237,7 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 		return nil, err
 	}
 
-	// TODO(hperl): We need to overwrite the ID with the encoded flow (challenge) so that the client is not confused.
+	// We need to overwrite the ID with the encoded flow (challenge) so that the client is not confused.
 	f.ConsentChallengeID = sqlxx.NullString(challenge)
 
 	return f.GetConsentRequest(), nil
@@ -251,9 +251,6 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 	f.NID = p.NetworkID(ctx)
 
 	return flow.SetInCtx(ctx, f)
-
-	//err := p.CreateWithNetwork(ctx, f)
-	//return sqlcon.HandleError(err)
 }
 
 func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (*flow.Flow, error) {
@@ -281,30 +278,13 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	if err != nil {
 		return nil, err
 	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
 	lr := f.GetLoginRequest()
 	lr.ID = loginChallenge
 
 	return lr, nil
-
-	//if f, err := flow.FromCtx(ctx, p); err == nil {
-	//	return f.GetLoginRequest(), nil
-	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return nil, err
-	//}
-	//
-	//var lr *consent.LoginRequest
-	//return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-	//	var f flow.Flow
-	//	if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-	//		if errors.Is(err, sql.ErrNoRows) {
-	//			return errorsx.WithStack(x.ErrNotFound)
-	//		}
-	//		return sqlcon.HandleError(err)
-	//	}
-	//	lr = f.GetLoginRequest()
-	//
-	//	return nil
-	//})
 }
 
 func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptOAuth2ConsentRequest) (*consent.OAuth2ConsentRequest, error) {
@@ -314,6 +294,9 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptO
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), r.ID)
 	if err != nil {
 		return nil, err
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 	// Restore the short challenge ID, which was previously sent to the encoded flow.
 	r.ID = f.ConsentChallengeID.String()
@@ -357,30 +340,12 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()
 
-	// f, err := flow.FromCtx(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// if updatedFlow.ID != f.ID {
-	// 	return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match login request."))
-	// }
-	//
-	// // Update flow from login request, but keep requested at.
-	// updatedFlow.NID = f.NID
-	// updatedFlow.RequestedAt = f.RequestedAt
-	// updatedFlow.LoginCSRF = f.LoginCSRF
-	// updatedFlow.LoginVerifier = f.LoginVerifier
-	// *f = *updatedFlow
-
 	f, err := flow.FromCtx(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
@@ -389,6 +354,9 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	}
 	if updatedFlow.ID != f.ID {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
+	}
+	if updatedFlow.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 
 	// Update flow from login request, but keep requested at.
@@ -406,31 +374,6 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	}
 
 	return f.GetHandledConsentRequest(), nil
-
-	//if f, err := flow.FromCtx(ctx); err == nil {
-	//	if err := f.InvalidateConsentRequest(); err != nil {
-	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	//	}
-	//	return f.GetHandledConsentRequest(), nil
-	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return nil, err
-	//}
-	//
-	//var r consent.AcceptOAuth2ConsentRequest
-	//return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-	//	var f flow.Flow
-	//	if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).First(&f); err != nil {
-	//		return sqlcon.HandleError(err)
-	//	}
-	//
-	//	if err := f.InvalidateConsentRequest(); err != nil {
-	//		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	//	}
-	//
-	//	r = *f.GetHandledConsentRequest()
-	//	_, err := p.UpdateWithNetwork(ctx, &f)
-	//	return err
-	//})
 }
 
 func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r *consent.HandledLoginRequest) (lr *consent.LoginRequest, err error) {
@@ -440,6 +383,9 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
 	if err != nil {
 		return nil, err
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 	r.ID = f.ID
 	err = f.HandleLoginRequest(r)
@@ -451,42 +397,6 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 	}
 
 	return p.GetLoginRequest(ctx, challenge)
-
-	//if r.ID != challenge {
-	//	return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("The challenge from the payload did not match the challenge from the url query parameter."))
-	//}
-	//r.ID = lr.ID
-	//f := flow.NewFlow(lr)
-	//if err = f.HandleLoginRequest(r); err != nil {
-	//	return nil, err
-	//}
-	//
-	//lr = f.GetLoginRequest()
-	//if lr.Verifier, err = flowctx.Encode(ctx, p.r.KeyCipher(), f); err != nil {
-	//	return nil, err
-	//}
-	//
-	//return lr, nil
-
-	// OLD SQL Code:
-	//return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-	//	f, err := p.GetFlow(ctx, challenge)
-	//	if err != nil {
-	//		return sqlcon.HandleError(err)
-	//	}
-	//	err = f.HandleLoginRequest(r)
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	_, err = p.UpdateWithNetwork(ctx, f)
-	//	if err != nil {
-	//		return sqlcon.HandleError(err)
-	//	}
-	//
-	//	lr, err = p.GetLoginRequest(ctx, challenge)
-	//	return sqlcon.HandleError(err)
-	//})
 }
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*consent.HandledLoginRequest, error) {
@@ -497,10 +407,16 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	if err != nil {
 		return nil, err
 	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
 	if err != nil {
 		return nil, err
+	}
+	if f.NID != updatedFlow.NID {
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 
 	if updatedFlow.ID != f.ID {
@@ -514,48 +430,12 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	updatedFlow.LoginVerifier = f.LoginVerifier
 	*f = *updatedFlow
 
-	// TODO(hperl): We can't check the flow state because we no longer persist it to DB.
-	//if err := f.InvalidateLoginRequest(); err != nil {
-	//	return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	//}
+	if err := f.InvalidateLoginRequest(); err != nil {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	}
 	d := f.GetHandledLoginRequest()
-	return &d, nil
 
-	//updateFlow := func(f *flow.Flow) (*consent.HandledLoginRequest, error) {
-	//	if err := f.InvalidateLoginRequest(); err != nil {
-	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	//	}
-	//	d := f.GetHandledLoginRequest()
-	//	return &d, nil
-	//}
-	//
-	//if f, err := flow.FromCtx(ctx, p); err == nil {
-	//	if f.LoginVerifier != verifier {
-	//		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match"))
-	//	}
-	//	return updateFlow(f)
-	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return nil, err
-	//}
-	//
-	//var d *consent.HandledLoginRequest
-	//return d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-	//	var (
-	//		f   flow.Flow
-	//		err error
-	//	)
-	//	if err = p.QueryWithNetwork(ctx).Where("login_verifier = ?", verifier).First(&f); err != nil {
-	//		return sqlcon.HandleError(err)
-	//	}
-	//
-	//	d, err = updateFlow(&f)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	_, err = p.UpdateWithNetwork(ctx, &f)
-	//
-	//	return sqlcon.HandleError(err)
-	//})
+	return &d, nil
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (*consent.LoginSession, error) {
@@ -602,8 +482,6 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *consent.Log
 
 	session.NID = p.NetworkID(ctx)
 	return consent.SetLoginSessionInCtx(ctx, session)
-
-	//return sqlcon.HandleError(p.CreateWithNetwork(ctx, session))
 }
 
 func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {

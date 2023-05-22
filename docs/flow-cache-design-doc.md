@@ -128,7 +128,6 @@ Step 17:
 - Encode into the redirect URL in `oAuth2RedirectTo` as the `CONSENT_VERIFIER`
   the handled `*consent.ConsentRequest`.
 
-
 Step 20
 
 - Check that the consent challenge in the `CONSENT_VERIFIER` matches the

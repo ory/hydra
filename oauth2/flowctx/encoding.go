@@ -1,3 +1,6 @@
+// Copyright © 2023 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package flowctx
 
 import (
@@ -7,8 +10,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/v2/jwk"
 )
 
 // Decode decodes the given string to a value.

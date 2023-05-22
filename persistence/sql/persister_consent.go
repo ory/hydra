@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/sqlxx"
 

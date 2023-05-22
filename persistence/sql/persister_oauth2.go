@@ -15,6 +15,9 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/flow"
@@ -23,8 +26,6 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}

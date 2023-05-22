@@ -13,11 +13,12 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/twmb/murmur3"
+
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"

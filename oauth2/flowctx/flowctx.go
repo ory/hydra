@@ -1,3 +1,6 @@
+// Copyright © 2023 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package flowctx
 
 import (
@@ -11,11 +14,12 @@ import (
 	"sync"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
-	"github.com/pkg/errors"
 )
 
 type (

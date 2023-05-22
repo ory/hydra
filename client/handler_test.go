@@ -80,7 +80,7 @@ func TestHandler(t *testing.T) {
 				require.NoError(t, err)
 				require.NotEqual(t, c.NID, uuid.Nil)
 
-				except := []string{"client_id", "registration_access_token", "updated_at", "created_at", "registration_client_uri"}
+				except := []string{"id", "client_id", "registration_access_token", "updated_at", "created_at", "registration_client_uri"}
 				require.NotEmpty(t, c.RegistrationAccessToken)
 				require.NotEqual(t, c.RegistrationAccessTokenSignature, c.RegistrationAccessToken)
 				if !hadSecret {
@@ -95,6 +95,7 @@ func TestHandler(t *testing.T) {
 				}
 
 				snapshotx.SnapshotTExcept(t, c, except)
+				snapshotx.SnapshotT(t, c, snapshotx.ExceptPaths(except...))
 			})
 		}
 	})
@@ -379,7 +380,7 @@ func TestHandler(t *testing.T) {
 				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 					body, res := makeJSON(t, ts, "POST", tc.path, tc.payload)
 					require.Equal(t, tc.statusCode, res.StatusCode, body)
-					exclude := []string{"updated_at", "created_at", "registration_access_token"}
+					exclude := []string{"id", "updated_at", "created_at", "registration_access_token"}
 					if tc.path == client.DynClientsHandlerPath {
 						exclude = append(exclude, "client_id", "client_secret", "registration_client_uri")
 					}
@@ -450,7 +451,7 @@ func TestHandler(t *testing.T) {
 				body, res := fetch(t, ts.URL+client.ClientsHandlerPath+"/"+id)
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Equal(t, id, gjson.Get(body, "client_id").String())
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.id", "body.client_id", "body.created_at", "body.updated_at"})
 			})
 
 			t.Run("endpoint=selfservice", func(t *testing.T) {
@@ -458,7 +459,7 @@ func TestHandler(t *testing.T) {
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Equal(t, id, gjson.Get(body, "client_id").String())
 				assert.False(t, gjson.Get(body, "metadata").Bool())
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.id", "body.client_id", "body.created_at", "body.updated_at"})
 			})
 		})
 
@@ -494,7 +495,7 @@ func TestHandler(t *testing.T) {
 				payload, _ := sjson.Set(expected, "redirect_uris", []string{"http://localhost:3000/cb", "https://foobar.com"})
 				body, res := makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+expectedID, json.RawMessage(payload))
 				assert.Equal(t, http.StatusOK, res.StatusCode)
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token"})
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.id", "body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token"})
 			})
 
 			t.Run("endpoint=dynamic client registration", func(t *testing.T) {
@@ -516,7 +517,7 @@ func TestHandler(t *testing.T) {
 				newToken := gjson.Get(body, "registration_access_token").String()
 				assert.NotEmpty(t, newToken)
 				require.NotEqual(t, originalRAT, newToken, "the new token should be different from the old token")
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at", "body.registration_access_token", "body.client_id", "body.registration_client_uri"})
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.id", "body.created_at", "body.updated_at", "body.registration_access_token", "body.client_id", "body.registration_client_uri"})
 
 				_, res = fetchWithBearerAuth(t, "GET", ts.URL+client.DynClientsHandlerPath+"/"+expectedID, originalRAT, bytes.NewBufferString(payload))
 				assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -564,7 +565,7 @@ func TestHandler(t *testing.T) {
 
 			body, res = makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+gjson.Get(body, "client_id").String()+"/lifespans", testhelpers.TestLifespans)
 			require.Equal(t, http.StatusOK, res.StatusCode, body)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.id", "body.client_id", "body.created_at", "body.updated_at"})
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

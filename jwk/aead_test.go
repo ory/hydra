@@ -92,4 +92,25 @@ func TestAEAD(t *testing.T) {
 		_, err = a.Decrypt(ctx, ct)
 		require.Error(t, err)
 	})
+
+	t.Run("suite=with additional data", func(t *testing.T) {
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+		a := NewAEAD(c)
+
+		plain := []byte(uuid.New())
+		ct, err := a.EncryptWithAdditionalData(ctx, plain, []byte("additional data"))
+		assert.NoError(t, err)
+
+		t.Run("case=additional data matches", func(t *testing.T) {
+			res, err := a.DecryptWithAdditionalData(ctx, ct, []byte("additional data"))
+			assert.NoError(t, err)
+			assert.Equal(t, plain, res)
+		})
+
+		t.Run("case=additional data does not match", func(t *testing.T) {
+			res, err := a.DecryptWithAdditionalData(ctx, ct, []byte("wrong data"))
+			assert.Error(t, err)
+			assert.Nil(t, res)
+		})
+	})
 }

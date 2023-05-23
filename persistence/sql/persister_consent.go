@@ -276,7 +276,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), loginChallenge)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)

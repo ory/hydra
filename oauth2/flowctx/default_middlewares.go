@@ -3,7 +3,11 @@
 
 package flowctx
 
-import "github.com/julienschmidt/httprouter"
+import (
+	"context"
+
+	"github.com/julienschmidt/httprouter"
+)
 
 const (
 	FlowCookie         = "ory_hydra_flow"
@@ -26,4 +30,14 @@ func DefaultHandler(d Dependencies) Handler {
 		NewMiddleware(FlowCookie, d),
 		NewMiddleware(LoginSessionCookie, d),
 	)
+}
+
+// WithDefaultValues returns a context with default values for the flow and login session cookies.
+func WithDefaultValues(ctx context.Context) context.Context {
+	return context.WithValue(
+		context.WithValue(
+			ctx,
+			contextKey(FlowCookie), &Value{},
+		),
+		contextKey(LoginSessionCookie), &Value{})
 }

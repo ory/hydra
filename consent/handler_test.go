@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pointerx"
 
 	"github.com/ory/hydra/v2/x"
@@ -92,25 +93,35 @@ func TestGetLoginRequest(t *testing.T) {
 		{true, false, http.StatusOK},
 		{true, true, http.StatusGone},
 	} {
-		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+		t.Run(fmt.Sprintf("exists=%v/handled=%v", tc.exists, tc.handled), func(t *testing.T) {
+			var err error
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
 					Client:     cl,
 					ID:         challenge,
 					RequestURL: requestURL,
 				}))
+				challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+				require.NoError(t, err)
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasHandled: true})
+					_, err := reg.ConsentManager().HandleLoginRequest(
+						ctx,
+						challenge,
+						&HandledLoginRequest{ID: challenge, WasHandled: true})
+					require.NoError(t, err)
+
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 				}
 			}

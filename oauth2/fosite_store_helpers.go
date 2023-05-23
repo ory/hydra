@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pborman/uuid"
@@ -132,18 +133,34 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 		RequestedAt:          time.Now(),
 	}
 
+	ctx := flowctx.WithDefaultValues(context.Background())
 	if createClient {
-		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
+		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
-	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
-	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.AcceptOAuth2ConsentRequest{
-		ConsentRequest: cr, Session: new(consent.AcceptOAuth2ConsentRequestSession), AuthenticatedAt: sqlxx.NullTime(time.Now()),
-		ID:          id,
-		RequestedAt: time.Now(),
-		HandledAt:   sqlxx.NullTime(time.Now()),
+	require.NoError(t, x.ConsentManager().CreateLoginRequest(
+		ctx, &consent.LoginRequest{
+			Client:               cl,
+			OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
+			ID:                   id,
+			Verifier:             id,
+			AuthenticatedAt:      sqlxx.NullTime(time.Now()),
+			RequestedAt:          time.Now(),
+		}))
+	require.NoError(t, x.ConsentManager().CreateConsentRequest(ctx, cr))
+
+	encodedFlow, err := flowctx.EncodeFromContext(ctx, x.KeyCipher(), flowctx.FlowCookie)
+	require.NoError(t, err)
+
+	_, err = x.ConsentManager().HandleConsentRequest(ctx, &consent.AcceptOAuth2ConsentRequest{
+		ConsentRequest:  cr,
+		Session:         new(consent.AcceptOAuth2ConsentRequestSession),
+		AuthenticatedAt: sqlxx.NullTime(time.Now()),
+		ID:              encodedFlow,
+		RequestedAt:     time.Now(),
+		HandledAt:       sqlxx.NullTime(time.Now()),
 	})
+
 	require.NoError(t, err)
 }
 
@@ -270,10 +287,18 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		mockRequestForeignKey(t, reqIdOne, x, false)
 		mockRequestForeignKey(t, reqIdTwo, x, false)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{
+			ID:          reqIdOne,
+			Client:      &client.Client{LegacyClientID: "foobar"},
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Session:     &Session{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{
+			ID:          reqIdTwo,
+			Client:      &client.Client{LegacyClientID: "foobar"},
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Session:     &Session{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})

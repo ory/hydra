@@ -46,11 +46,12 @@ func TestGetLogoutRequest(t *testing.T) {
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			ctx := context.Background()
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
-				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
+				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
+				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(ctx, &LogoutRequest{
 					Client:     cl,
 					ID:         challenge,
 					WasHandled: tc.handled,
@@ -234,19 +235,20 @@ func TestGetConsentRequest(t *testing.T) {
 
 func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 	t.Run("Test get login request with duplicate accept", func(t *testing.T) {
-		challenge := "challenge"
 		requestURL := "http://192.0.2.1"
 
 		conf := internal.NewConfigurationWithDefaults()
 		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		ctx := flowctx.WithDefaultValues(context.Background())
 
 		cl := &client.Client{LegacyClientID: "client"}
-		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
-		require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
+		require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
 			Client:     cl,
-			ID:         challenge,
 			RequestURL: requestURL,
 		}))
+		challenge, err := flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+		require.NoError(t, err)
 
 		h := NewHandler(reg, conf)
 		r := x.NewRouterAdmin(conf.AdminURL)

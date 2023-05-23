@@ -169,17 +169,21 @@ func TestGetConsentRequest(t *testing.T) {
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
 				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), lr))
-				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), lr.ID, &HandledLoginRequest{
-					ID: lr.ID,
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, lr))
+				var err error
+				challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+				require.NoError(t, err)
+				_, err = reg.ConsentManager().HandleLoginRequest(ctx, challenge, &HandledLoginRequest{
+					ID: challenge,
 				})
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &OAuth2ConsentRequest{
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, &OAuth2ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
 					Verifier:       challenge,
@@ -188,11 +192,15 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), &AcceptOAuth2ConsentRequest{
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+					require.NoError(t, err)
+					_, err = reg.ConsentManager().HandleConsentRequest(ctx, &AcceptOAuth2ConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
+					require.NoError(t, err)
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 				}
 			}

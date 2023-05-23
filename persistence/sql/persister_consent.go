@@ -216,7 +216,7 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	// challenge contains the flow.
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
@@ -249,7 +249,6 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 
 	f := flow.NewFlow(req)
 	f.NID = p.NetworkID(ctx)
-
 	return flow.SetInCtx(ctx, f)
 }
 

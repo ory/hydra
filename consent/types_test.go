@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
@@ -20,8 +19,7 @@ func TestToRFCError(t *testing.T) {
 	}{
 		{
 			input: &RequestDeniedError{
-				Name:  "not empty",
-				valid: true,
+				Name: "not empty",
 			},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "not empty",
@@ -34,7 +32,6 @@ func TestToRFCError(t *testing.T) {
 			input: &RequestDeniedError{
 				Name:        "",
 				Description: "not empty",
-				valid:       true,
 			},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "request_denied",
@@ -44,7 +41,7 @@ func TestToRFCError(t *testing.T) {
 			},
 		},
 		{
-			input: &RequestDeniedError{valid: true},
+			input: &RequestDeniedError{},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "request_denied",
 				DescriptionField: "",
@@ -58,11 +55,4 @@ func TestToRFCError(t *testing.T) {
 			require.EqualValues(t, tc.input.toRFCError(), tc.expect)
 		})
 	}
-}
-
-func TestRequestDeniedError(t *testing.T) {
-	var e *RequestDeniedError
-	v, err := e.Value()
-	require.NoError(t, err)
-	assert.EqualValues(t, "{}", fmt.Sprintf("%v", v))
 }

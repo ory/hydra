@@ -58,7 +58,6 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			Hint:        "error_hint,omitempty" + key,
 			Code:        100,
 			Debug:       "error_debug,omitempty" + key,
-			valid:       true,
 		}
 	}
 
@@ -130,7 +129,6 @@ func MockAuthRequest(key string, authAt bool, network string) (c *LoginRequest, 
 		Hint:        "error_hint,omitempty" + key,
 		Code:        100,
 		Debug:       "error_debug,omitempty" + key,
-		valid:       true,
 	}
 
 	var authenticatedAt time.Time
@@ -164,7 +162,6 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *OAuth2ConsentReque
 			Hint:        "error_hint",
 			Code:        100,
 			Debug:       "error_debug",
-			valid:       true,
 		}
 	}
 

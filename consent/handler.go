@@ -529,7 +529,6 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	p.valid = true
 	p.SetDefaults(loginRequestDeniedErrorName)
 	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
@@ -777,6 +776,8 @@ type adminRejectOAuth2ConsentRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -794,15 +795,14 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	p.valid = true
 	p.SetDefaults(consentRequestDeniedErrorName)
-	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
+	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &AcceptOAuth2ConsentRequest{
+	request, err := h.r.ConsentManager().HandleConsentRequest(ctx, &AcceptOAuth2ConsentRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: hr.RequestedAt,
@@ -819,8 +819,14 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
 }
 

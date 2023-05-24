@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"regexp"
 	"testing"
@@ -171,6 +172,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
 		hc := new(http.Client)
+		hc.Jar = DropCookieJar(regexp.MustCompile("ory_hydra_.*_csrf_.*"))
 		makeRequestAndExpectError(t, hc, c, url.Values{}, "No CSRF value available in the session cookie.")
 	})
 
@@ -1012,4 +1014,32 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		hc := testhelpers.NewEmptyJarClient(t)
 		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
 	})
+}
+
+func DropCookieJar(drop *regexp.Regexp) http.CookieJar {
+	jar, _ := cookiejar.New(nil)
+	return &dropCSRFCookieJar{
+		jar:  jar,
+		drop: drop,
+	}
+}
+
+type dropCSRFCookieJar struct {
+	jar  *cookiejar.Jar
+	drop *regexp.Regexp
+}
+
+var _ http.CookieJar = (*dropCSRFCookieJar)(nil)
+
+func (d *dropCSRFCookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
+	for _, c := range cookies {
+		if d.drop.MatchString(c.Name) {
+			continue
+		}
+		d.jar.SetCookies(u, []*http.Cookie{c})
+	}
+}
+
+func (d *dropCSRFCookieJar) Cookies(u *url.URL) []*http.Cookie {
+	return d.jar.Cookies(u)
 }

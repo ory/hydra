@@ -92,49 +92,38 @@ Step 2:
 - Set the whole flow as an AEAD encrypted cookie on the client
 - The cookie is keyed by the `state`, so that multiple flows can run in parallel
   from one cookie jar
-- Set the `LOGIN_CHALLENGE` to the AEAD-encrypted `oAuth2LoginRequest` for the
-  flow
-- Write a hash of the `LOGIN_CHALLENGE` to the database into a `single_uses`
-  table.
+- Set the `LOGIN_CHALLENGE` to the AEAD-encrypted flow
 
 Step 5:
 
-- Decrypt the `oAuth2LoginRequest` from the `LOGIN_CHALLENGE`
+- Decrypt the flow from the `LOGIN_CHALLENGE`, return the `oAuth2LoginRequest`
 
 Step 8:
 
-- Encode into the redirect URL in `oAuth2RedirectTo` as the `LOGIN_VERIFIER` the
-  handled `*consent.LoginRequest`.
+- Encode the flow into the redirect URL in `oAuth2RedirectTo` as the
+  `LOGIN_VERIFIER`
 
 Step 11
 
 - Check that the login challenge in the `LOGIN_VERIFIER` matches the challenge
   in the flow cookie.
-- Assert that the hash of the `LOGIN_CHALLENGE` is present in the `single_uses`
-  table and delete it in a transaction scoped to the current HTTP request.
 - Update the flow based on the request from the `LOGIN_VERIFIER`
 - Update the cookie
-- Set the `CONSENT_CHALLENGE` to the AEAD-encrypted `oAuth2ConsentRequest` for
-  the flow
-- Write a hash of the `CONSENT_CHALLENGE` to the database into a `single_uses`
-  table.
+- Set the `CONSENT_CHALLENGE` to the AEAD-encrypted flow
 
 Step 14:
 
-- Decrypt the `oAuth2ConsentRequest` from the `CONSENT_CHALLENGE`
+- Decrypt the flow from the `CONSENT_CHALLENGE`
 
 Step 17:
 
-- Encode into the redirect URL in `oAuth2RedirectTo` as the `CONSENT_VERIFIER`
-  the handled `*consent.ConsentRequest`.
+- Encode the flow into the redirect URL in `oAuth2RedirectTo` as the
+  `CONSENT_VERIFIER`
 
 Step 20
 
 - Check that the consent challenge in the `CONSENT_VERIFIER` matches the
   challenge in the flow cookie.
-- Assert that the hash of the `CONSENT_CHALLENGE` is present in the
-  `single_uses` table and delete it in a transaction scoped to the current HTTP
-  request.
 - Update the flow based on the request from the `CONSENT_VERIFIER`
 - Update the cookie
 - Write the flow to the database

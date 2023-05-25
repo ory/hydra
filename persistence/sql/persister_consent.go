@@ -500,20 +500,22 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 	defer span.End()
 
 	f, err := flow.FromCtx(ctx)
-	if err == nil {
-		if (f.State == flow.FlowStateConsentUsed || f.State == flow.FlowStateConsentUnused) &&
-			f.Subject == subject &&
-			f.ClientID == client &&
-			!f.ConsentSkip &&
-			f.ConsentError == nil &&
-			f.ConsentRemember &&
-			f.NID == p.NetworkID(ctx) {
+	if errors.Is(err, flowctx.ErrNoValueInCtx) {
+		return nil, err
+	}
+	if err == nil &&
+		(f.State == flow.FlowStateConsentUsed || f.State == flow.FlowStateConsentUnused) &&
+		f.Subject == subject &&
+		f.ClientID == client &&
+		!f.ConsentSkip &&
+		f.ConsentError == nil &&
+		f.ConsentRemember &&
+		f.NID == p.NetworkID(ctx) {
 
-			return p.filterExpiredConsentRequests(ctx, []consent.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
+		rs, _ = p.filterExpiredConsentRequests(ctx, []consent.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
+		if len(rs) > 0 {
+			return rs, nil
 		}
-		return rs, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-	} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-		return rs, err
 	}
 
 	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {

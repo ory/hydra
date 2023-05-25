@@ -512,6 +512,8 @@ type rejectOAuth2LoginRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -530,19 +532,25 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	p.SetDefaults(loginRequestDeniedErrorName)
-	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &HandledLoginRequest{
+	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, challenge, &HandledLoginRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: ar.RequestedAt,
 	})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -553,7 +561,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
 }
 

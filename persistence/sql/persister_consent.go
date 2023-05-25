@@ -287,7 +287,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 		return nil, err
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
@@ -298,7 +298,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
 	}
 	if updatedFlow.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
 	// Update flow from login request, but keep requested at.
@@ -350,7 +350,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 		return nil, err
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
@@ -358,7 +358,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 		return nil, err
 	}
 	if f.NID != updatedFlow.NID {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
 	if updatedFlow.ID != f.ID {

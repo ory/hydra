@@ -110,6 +110,32 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	}
 }
 
+func (e *RequestDeniedError) Scan(value interface{}) error {
+	v := fmt.Sprintf("%s", value)
+	if len(v) == 0 || v == "{}" {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(v), e); err != nil {
+		return errorsx.WithStack(err)
+	}
+
+	return nil
+}
+
+func (e *RequestDeniedError) Value() (driver.Value, error) {
+	if !e.IsError() {
+		return "{}", nil
+	}
+
+	value, err := json.Marshal(e)
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
+	return string(value), nil
+}
+
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptOAuth2ConsentRequest

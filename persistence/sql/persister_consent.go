@@ -167,46 +167,16 @@ func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.OAuth
 	if err != nil {
 		return err
 	}
-	if f.ID == req.LoginChallenge.String() && f.NID == p.NetworkID(ctx) {
-		f.State = flow.FlowStateConsentInitialized
-		f.ConsentChallengeID = sqlxx.NullString(req.ID)
-		f.ConsentSkip = req.Skip
-		f.ConsentVerifier = sqlxx.NullString(req.Verifier)
-		f.ConsentCSRF = sqlxx.NullString(req.CSRF)
-
-		return nil
-	} else {
+	if f.ID != req.LoginChallenge.String() || f.NID != p.NetworkID(ctx) {
 		return errorsx.WithStack(x.ErrNotFound)
 	}
-	//if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return err
-	//}
-	//
-	//c, err := p.Connection(ctx).RawQuery(`
-	//UPDATE hydra_oauth2_flow
-	//SET
-	//	state = ?,
-	//	consent_challenge_id = ?,
-	//	consent_skip = ?,
-	//	consent_verifier = ?,
-	//	consent_csrf = ?
-	//WHERE login_challenge = ? AND nid = ?;
-	//`,
-	//		flow.FlowStateConsentInitialized,
-	//		sqlxx.NullString(req.ID),
-	//		req.Skip,
-	//		req.Verifier,
-	//		req.CSRF,
-	//		req.LoginChallenge.String(),
-	//		p.NetworkID(ctx),
-	//	).ExecWithCount()
-	//	if err != nil {
-	//		return sqlcon.HandleError(err)
-	//	}
-	//	if c != 1 {
-	//		return errorsx.WithStack(x.ErrNotFound)
-	//	}
-	//	return nil
+	f.State = flow.FlowStateConsentInitialized
+	f.ConsentChallengeID = sqlxx.NullString(req.ID)
+	f.ConsentSkip = req.Skip
+	f.ConsentVerifier = sqlxx.NullString(req.Verifier)
+	f.ConsentCSRF = sqlxx.NullString(req.CSRF)
+
+	return nil
 }
 
 func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge string) (*flow.Flow, error) {
@@ -306,33 +276,6 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptO
 		return nil, errorsx.WithStack(err)
 	}
 	return f.GetConsentRequest(), nil
-	//return p.GetConsentRequest(ctx, r.ID)
-
-	//if f, err := flow.FromCtx(ctx); err == nil {
-	//	if err := f.HandleConsentRequest(r); err != nil {
-	//		return nil, errorsx.WithStack(err)
-	//	}
-	//	return p.GetConsentRequest(ctx, r.ID)
-	//} else if !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return nil, err
-	//}
-	//
-	//f := &flow.Flow{}
-	//
-	//if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", r.ID).First(f)); errors.Is(err, sqlcon.ErrNoRows) {
-	//	return nil, err
-	//}
-	//
-	//if err := f.HandleConsentRequest(r); err != nil {
-	//	return nil, errorsx.WithStack(err)
-	//}
-	//
-	//_, err := p.UpdateWithNetwork(ctx, f)
-	//if err != nil {
-	//	return nil, sqlcon.HandleError(err)
-	//}
-	//
-	//return p.GetConsentRequest(ctx, r.ID)
 }
 
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.AcceptOAuth2ConsentRequest, error) {
@@ -458,6 +401,9 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, id string, authenti
 
 	// If we previously cached the login session, we now want to persist it to db.
 	if session, err := consent.LoginSessionFromCtx(ctx); err == nil {
+		if session.NID != p.NetworkID(ctx) || session.ID != id {
+			return errorsx.WithStack(x.ErrNotFound)
+		}
 		session.AuthenticatedAt = sqlxx.NullTime(authenticatedAt)
 		session.Subject = subject
 		session.Remember = remember

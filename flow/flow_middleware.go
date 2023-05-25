@@ -9,11 +9,6 @@ import (
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 )
 
-// NewMiddleware returns a new flow-specific middleware.
-func NewMiddleware(dependencies flowctx.Dependencies) *flowctx.Middleware {
-	return flowctx.NewMiddleware(flowctx.FlowCookie, dependencies)
-}
-
 func FromCtx(ctx context.Context) (*Flow, error) {
 	return flowctx.FromCtx[Flow](ctx, flowctx.FlowCookie)
 }

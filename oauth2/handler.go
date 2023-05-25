@@ -400,6 +400,39 @@ type oidcConfiguration struct {
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
 	// by this authorization server.
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+
+	// OpenID Connect UserInfo Verifiable Credentials Endpoint
+	//
+	// A URL string to the location of the endpoint.
+	CredentialEndpoint string `json:"credential_endpoint"`
+
+	// OpenID Connect UserInfo Verifiable Credentials Supported
+	CredentialSupported bool `json:"credential_supported"`
+
+	// JSON array containing a list of cryptographic binding methods supported by this authorization server
+	CryptographicBindingMethodsSupported []OIDCVerifiableCredentialTypes `json:"cryptographic_binding_methods_supported"`
+
+	// JSON array containing a list of cryptographic suites supported by this authorization server
+	CryptographicSuitesSupported []string `json:"cryptographic_suites_supported"`
+}
+
+// Possible values for the OIDC Verifiable Credential Types
+// swagger:enum OIDCVerifiableCredentialTypes
+type OIDCVerifiableCredentialTypes string
+
+const (
+	OIDCVerifiableCredential OIDCVerifiableCredentialTypes = "VerifiableCredential"
+	OIDCUserInfoCredential   OIDCVerifiableCredentialTypes = "UserInfoCredential"
+)
+
+// swagger:model oidcConfigurationSupportedCryptographicBindingMethods
+type oidcConfigurationSupportedCryptographicBindingMethods struct {
+	// The format of the credential
+	//
+	// Typically `jwt_vc_json`
+	Format string `json:"format"`
+
+	Types []string `json:"types"`
 }
 
 // swagger:route GET /.well-known/openid-configuration oidc discoverOidcConfiguration

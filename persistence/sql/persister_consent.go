@@ -384,15 +384,27 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (*
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRememberedLoginSession")
 	defer span.End()
 
-	var s consent.LoginSession
+	fromDB := func() (*consent.LoginSession, error) {
+		var s consent.LoginSession
 
-	if err := p.QueryWithNetwork(ctx).Where("remember = TRUE").Find(&s, id); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	} else if err != nil {
-		return nil, sqlcon.HandleError(err)
+		if err := p.QueryWithNetwork(ctx).Where("remember = TRUE").Find(&s, id); errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
+			return nil, sqlcon.HandleError(err)
+		}
+
+		return &s, nil
 	}
 
-	return &s, nil
+	session, err := consent.LoginSessionFromCtx(ctx)
+	switch {
+	case err != nil || session.NID != p.NetworkID(ctx) || session.ID != id:
+		return fromDB()
+	case !session.Remember:
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+
+	return session, nil
 }
 
 func (p *Persister) ConfirmLoginSession(ctx context.Context, id string, authenticatedAt time.Time, subject string, remember bool) error {
@@ -433,6 +445,7 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
 	defer span.End()
 
+	_ = consent.SetLoginSessionInCtx(ctx, nil)
 	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid = ?", id, p.NetworkID(ctx)).ExecWithCount()
 	if count == 0 {
 		return errorsx.WithStack(x.ErrNotFound)
@@ -570,7 +583,7 @@ func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, sub
 (state = %d OR state = %d) AND
 subject = ? AND
 consent_skip=FALSE AND
-consent_error='{}' AND
+--consent_error='{}' AND
 nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 			)),
 			subject, p.NetworkID(ctx)).

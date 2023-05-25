@@ -76,10 +76,12 @@ type RequestDeniedError struct {
 	// Debug contains information to help resolve the problem as a developer. Usually not exposed
 	// to the public but only in the server logs.
 	Debug string `json:"error_debug"`
+
+	valid bool
 }
 
 func (e *RequestDeniedError) IsError() bool {
-	return e != nil
+	return e != nil && e.valid
 }
 
 func (e *RequestDeniedError) SetDefaults(name string) {
@@ -108,6 +110,33 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 		CodeField:        e.Code,
 		DebugField:       e.Debug,
 	}
+}
+
+func (e *RequestDeniedError) Scan(value any) error {
+	v := fmt.Sprintf("%s", value)
+	if len(v) == 0 || v == "{}" {
+		return nil
+	}
+
+	if err := json.Unmarshal([]byte(v), e); err != nil {
+		return errorsx.WithStack(err)
+	}
+
+	e.valid = true
+	return nil
+}
+
+func (e *RequestDeniedError) Value() (driver.Value, error) {
+	if !e.IsError() {
+		return "{}", nil
+	}
+
+	value, err := json.Marshal(e)
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
+	return string(value), nil
 }
 
 // The request payload used to accept a consent request.

@@ -109,6 +109,11 @@ func SetCtx[T any](ctx context.Context, cookieName string, val *T) error {
 		return errors.WithStack(ErrNoValueInCtx)
 	}
 
+	if val == nil {
+		v.Ptr = nil
+		return nil
+	}
+
 	prtType := reflect.TypeOf(*val)
 	if v.ptrType != nil && v.ptrType != prtType {
 		return errors.Errorf("expected type %q but got %q", v.ptrType.String(), prtType.String())

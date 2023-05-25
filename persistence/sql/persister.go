@@ -32,6 +32,7 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
 )
 
@@ -77,9 +78,9 @@ type (
 	}
 )
 
-func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
+func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
@@ -99,9 +100,9 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 	return popx.WithTransaction(ctx, c), err
 }
 
-func (p *Persister) Commit(ctx context.Context) error {
+func (p *Persister) Commit(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
@@ -112,9 +113,9 @@ func (p *Persister) Commit(ctx context.Context) error {
 	return errorsx.WithStack(tx.TX.Commit())
 }
 
-func (p *Persister) Rollback(ctx context.Context) error {
+func (p *Persister) Rollback(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)

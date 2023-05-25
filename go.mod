@@ -45,7 +45,7 @@ require (
 	github.com/ory/herodot v0.10.2
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.554
+	github.com/ory/x v0.0.555
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
@@ -94,7 +94,7 @@ require (
 	github.com/dave/jennifer v1.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.21+incompatible // indirect
-	github.com/docker/distribution v2.8.1+incompatible // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/docker v20.10.24+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect

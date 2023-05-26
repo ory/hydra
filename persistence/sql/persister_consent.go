@@ -185,7 +185,7 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	defer span.End()
 
 	// challenge contains the flow.
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge)
 	if err != nil {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
@@ -248,7 +248,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), loginChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge)
 	if err != nil {
 		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
 	}
@@ -265,7 +265,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptO
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer span.End()
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), r.ID)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), r.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,7 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleLoginRequest")
 	defer span.End()
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +358,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier)
 	if err != nil {
 		return nil, err
 	}

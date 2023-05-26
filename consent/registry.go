@@ -7,8 +7,8 @@ import (
 	"context"
 
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -20,7 +20,7 @@ type InternalRegistry interface {
 	Registry
 	client.Registry
 
-	KeyCipher() *jwk.AEAD
+	FlowCipher() *aead.XChaCha20Poly1305
 	OAuth2Storage() x.FositeStorer
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 }

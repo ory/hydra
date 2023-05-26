@@ -460,7 +460,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -548,7 +548,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -727,7 +727,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -827,7 +827,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	verifier, err := flowctx.EncodeFromContext(ctx, h.r.KeyCipher(), flowctx.FlowCookie)
+	verifier, err := flowctx.EncodeFromContext(ctx, h.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

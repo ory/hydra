@@ -229,7 +229,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		if err := s.r.ConsentManager().CreateLoginSession(ctx, &LoginSession{ID: sessionID}); err != nil {
 			return err
 		}
-		if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.LoginSessionCookie); err != nil {
+		if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.LoginSessionCookie); err != nil {
 			return err
 		}
 	}
@@ -264,7 +264,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie); err != nil {
 		return err
 	}
 
@@ -278,7 +278,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	encodedFlow, err := flowctx.EncodeFromContext(ctx, s.r.KeyCipher(), flowctx.FlowCookie)
+	encodedFlow, err := flowctx.EncodeFromContext(ctx, s.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		return err
 	}
@@ -566,10 +566,10 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie); err != nil {
 		return err
 	}
-	consentChallenge, err := flowctx.EncodeFromContext(ctx, s.r.KeyCipher(), flowctx.FlowCookie)
+	consentChallenge, err := flowctx.EncodeFromContext(ctx, s.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		return err
 	}
@@ -625,7 +625,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 		return nil, err
 	}
 
-	if err = flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie); err != nil {
+	if err = flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie); err != nil {
 		return nil, err
 	}
 

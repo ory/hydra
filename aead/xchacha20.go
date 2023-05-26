@@ -1,0 +1,105 @@
+// Copyright © 2023 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
+package aead
+
+import (
+	"context"
+	"crypto/cipher"
+	cryptorand "crypto/rand"
+	"fmt"
+
+	"golang.org/x/crypto/chacha20poly1305"
+
+	"github.com/pkg/errors"
+
+	"github.com/ory/x/errorsx"
+)
+
+var _ Cipher = (*XChaCha20Poly1305)(nil)
+
+type (
+	XChaCha20Poly1305 struct {
+		d Dependencies
+	}
+)
+
+func NewXChaCha20Poly1305(d Dependencies) *XChaCha20Poly1305 {
+	return &XChaCha20Poly1305{d}
+}
+
+func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalData []byte) (string, error) {
+	global, err := x.d.GetGlobalSecret(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	rotated, err := x.d.GetRotatedGlobalSecrets(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	keys := append([][]byte{global}, rotated...)
+	if len(keys) == 0 {
+		return "", fmt.Errorf("at least one encryption key must be defined but none were")
+	}
+
+	if len(keys[0]) != chacha20poly1305.KeySize {
+		return "", fmt.Errorf("key must be exactly %d bytes long, got %d bytes", chacha20poly1305.KeySize, len(keys[0]))
+	}
+
+	cipher, err := chacha20poly1305.NewX(keys[0])
+	if err != nil {
+		return "", errorsx.WithStack(err)
+	}
+
+	nonce := make([]byte, cipher.NonceSize(), cipher.NonceSize()+len(plaintext)+cipher.Overhead())
+	_, err = cryptorand.Read(nonce)
+	if err != nil {
+		return "", errorsx.WithStack(err)
+	}
+
+	ciphertext := cipher.Seal(nonce, nonce, plaintext, additionalData)
+	return encode(ciphertext, additionalData), nil
+}
+
+func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string) (plaintext []byte, additionalData []byte, err error) {
+	msg, additionalData, err := decode(ciphertext)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if len(msg) < chacha20poly1305.NonceSizeX {
+		return nil, nil, errorsx.WithStack(fmt.Errorf("malformed ciphertext: too short"))
+	}
+	nonce, ciphered := msg[:chacha20poly1305.NonceSizeX], msg[chacha20poly1305.NonceSizeX:]
+
+	global, err := x.d.GetGlobalSecret(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rotated, err := x.d.GetRotatedGlobalSecrets(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	keys := append([][]byte{global}, rotated...)
+	if len(keys) == 0 {
+		return nil, nil, errors.Errorf("at least one decryption key must be defined but none were")
+	}
+
+	var cipher cipher.AEAD
+	for _, key := range keys {
+		cipher, err = chacha20poly1305.NewX(key)
+		if err != nil {
+			continue
+		}
+		plaintext, err = cipher.Open(nil, nonce, ciphered, additionalData)
+		if err == nil {
+			return plaintext, additionalData, nil
+		}
+	}
+
+	return nil, nil, err
+}

@@ -12,12 +12,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/aead"
 )
 
 // Decode decodes the given string to a value.
-func Decode[T any](ctx context.Context, cipher *jwk.AEAD, encoded string) (*T, error) {
-	plaintext, err := cipher.Decrypt(ctx, encoded)
+func Decode[T any](ctx context.Context, cipher *aead.XChaCha20Poly1305, encoded string) (*T, error) {
+	plaintext, _, err := cipher.Decrypt(ctx, encoded)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func Decode[T any](ctx context.Context, cipher *jwk.AEAD, encoded string) (*T, e
 }
 
 // Encode encodes the given value to a string.
-func Encode(ctx context.Context, cipher *jwk.AEAD, val any) (s string, err error) {
+func Encode(ctx context.Context, cipher aead.Cipher, val any) (s string, err error) {
 	// Steps:
 	// 1. Encode to JSON
 	// 2. GZIP
@@ -53,11 +53,11 @@ func Encode(ctx context.Context, cipher *jwk.AEAD, val any) (s string, err error
 		return "", err
 	}
 
-	return cipher.Encrypt(ctx, b.Bytes())
+	return cipher.Encrypt(ctx, b.Bytes(), nil)
 }
 
 // EncodeFromContext encodes the value stored in the context under the given cookie name.
-func EncodeFromContext(ctx context.Context, cipher *jwk.AEAD, cookieName string) (s string, err error) {
+func EncodeFromContext(ctx context.Context, cipher aead.Cipher, cookieName string) (s string, err error) {
 	v, ok := ctx.Value(contextKey(cookieName)).(*Value)
 	if !ok || v == nil {
 		return "", errors.WithStack(ErrNoValueInCtx)
@@ -68,7 +68,7 @@ func EncodeFromContext(ctx context.Context, cipher *jwk.AEAD, cookieName string)
 
 // SetCookie looks up the value stored in the context under the given cookie name and sets it as a cookie on the
 // response writer.
-func SetCookie(ctx context.Context, w http.ResponseWriter, cipher *jwk.AEAD, cookieName string) error {
+func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, cookieName string) error {
 	v, ok := ctx.Value(contextKey(cookieName)).(*Value)
 	if !ok || v == nil {
 		return errors.WithStack(ErrNoValueInCtx)

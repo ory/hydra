@@ -112,7 +112,7 @@ func TestGetLoginRequest(t *testing.T) {
 					ID:         challenge,
 					RequestURL: requestURL,
 				}))
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 				require.NoError(t, err)
 
 				if tc.handled {
@@ -122,7 +122,7 @@ func TestGetLoginRequest(t *testing.T) {
 						&HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
 
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 				}
 			}
@@ -178,7 +178,7 @@ func TestGetConsentRequest(t *testing.T) {
 				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, lr))
 				var err error
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 				require.NoError(t, err)
 				_, err = reg.ConsentManager().HandleLoginRequest(ctx, challenge, &HandledLoginRequest{
 					ID: challenge,
@@ -193,7 +193,7 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 					_, err = reg.ConsentManager().HandleConsentRequest(ctx, &AcceptOAuth2ConsentRequest{
 						ID:         challenge,
@@ -201,7 +201,7 @@ func TestGetConsentRequest(t *testing.T) {
 						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
 					require.NoError(t, err)
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 				}
 			}
@@ -247,7 +247,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 			Client:     cl,
 			RequestURL: requestURL,
 		}))
-		challenge, err := flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
+		challenge, err := flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 		require.NoError(t, err)
 
 		h := NewHandler(reg, conf)

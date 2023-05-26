@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/assertx"
 
@@ -247,7 +247,7 @@ func makeID(base string, network string, key string) string {
 
 func TestHelperNID(r interface {
 	client.ManagerProvider
-	KeyCipher() *jwk.AEAD
+	FlowCipher() *aead.XChaCha20Poly1305
 }, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
 	testClient := client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"}
 	testLS := LoginSession{
@@ -282,7 +282,7 @@ func TestHelperNID(r interface {
 		require.NoError(t, t1ValidNID.CreateLoginSession(ctx, &testLS))
 		require.Error(t, t2InvalidNID.CreateLoginRequest(ctx, &testLR))
 		require.NoError(t, t1ValidNID.CreateLoginRequest(ctx, &testLR))
-		testLR.ID = x.Must(flowctx.EncodeFromContext(ctx, r.KeyCipher(), flowctx.FlowCookie))
+		testLR.ID = x.Must(flowctx.EncodeFromContext(ctx, r.FlowCipher(), flowctx.FlowCookie))
 		_, err := t2InvalidNID.GetLoginRequest(ctx, testLR.ID)
 		require.Error(t, err)
 		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)

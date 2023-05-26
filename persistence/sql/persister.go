@@ -16,8 +16,8 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
@@ -51,7 +51,8 @@ type (
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
-		KeyCipher() *jwk.AEAD
+		KeyCipher() *aead.AESGCM
+		FlowCipher() *aead.XChaCha20Poly1305
 		contextx.Provider
 		x.RegistryLogger
 		x.TracingProvider

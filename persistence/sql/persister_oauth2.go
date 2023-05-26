@@ -79,7 +79,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 	}
 
 	if p.config.EncryptSessionData(ctx) {
-		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session)
+		ciphertext, err := p.r.FlowCipher().Encrypt(ctx, session, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -121,7 +121,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
-		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess))
+		sess, _, err = p.r.FlowCipher().Decrypt(ctx, string(sess))
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}

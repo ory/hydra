@@ -17,7 +17,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
 )
@@ -33,7 +33,7 @@ type (
 	}
 
 	Dependencies interface {
-		KeyCipher() *jwk.AEAD
+		FlowCipher() *aead.XChaCha20Poly1305
 		x.RegistryWriter
 		x.RegistryLogger
 	}
@@ -156,7 +156,7 @@ func (m *Middleware) fromHTTP(ctx context.Context, r *http.Request) (context.Con
 }
 
 func (m *Middleware) decode(ctx context.Context, cookie string) ([]byte, error) {
-	plaintext, err := m.Dependencies.KeyCipher().Decrypt(ctx, cookie)
+	plaintext, _, err := m.Dependencies.FlowCipher().Decrypt(ctx, cookie)
 	if err != nil {
 		return nil, err
 	}
@@ -186,5 +186,5 @@ func (m *Middleware) encode(ctx context.Context, t any) (s string, err error) {
 		return "", err
 	}
 
-	return m.Dependencies.KeyCipher().Encrypt(ctx, b.Bytes())
+	return m.Dependencies.FlowCipher().Encrypt(ctx, b.Bytes(), nil)
 }

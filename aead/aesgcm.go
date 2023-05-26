@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package jwk
+package aead
 
 import (
 	"context"
@@ -13,16 +13,15 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/errorsx"
 )
 
-type AEAD struct {
-	c *config.DefaultProvider
+type AESGCM struct {
+	c Dependencies
 }
 
-func NewAEAD(c *config.DefaultProvider) *AEAD {
-	return &AEAD{c: c}
+func NewAESGCM(c Dependencies) *AESGCM {
+	return &AESGCM{c: c}
 }
 
 func aeadKey(key []byte) *[32]byte {
@@ -31,11 +30,7 @@ func aeadKey(key []byte) *[32]byte {
 	return &result
 }
 
-func (c *AEAD) Encrypt(ctx context.Context, plaintext []byte) (string, error) {
-	return c.EncryptWithAdditionalData(ctx, plaintext, nil)
-}
-
-func (c *AEAD) EncryptWithAdditionalData(ctx context.Context, plaintext, additionalData []byte) (string, error) {
+func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) (string, error) {
 	global, err := c.c.GetGlobalSecret(ctx)
 	if err != nil {
 		return "", err
@@ -60,14 +55,15 @@ func (c *AEAD) EncryptWithAdditionalData(ctx context.Context, plaintext, additio
 		return "", errorsx.WithStack(err)
 	}
 
-	return base64.URLEncoding.EncodeToString(ciphertext), nil
+	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (c *AEAD) Decrypt(ctx context.Context, ciphertext string) (p []byte, err error) {
-	return c.DecryptWithAdditionalData(ctx, ciphertext, nil)
-}
+func (c *AESGCM) Decrypt(ctx context.Context, s string, aad []byte) (plaintext []byte, err error) {
+	ciphertext, err := base64.RawURLEncoding.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
 
-func (c *AEAD) DecryptWithAdditionalData(ctx context.Context, ciphertext string, additionalData []byte) (p []byte, err error) {
 	global, err := c.c.GetGlobalSecret(ctx)
 	if err != nil {
 		return nil, err
@@ -84,25 +80,20 @@ func (c *AEAD) DecryptWithAdditionalData(ctx context.Context, ciphertext string,
 	}
 
 	for _, key := range keys {
-		if p, err = c.decrypt(ciphertext, key, additionalData); err == nil {
-			return p, nil
+		if plaintext, err = c.decrypt(ciphertext, key, aad); err == nil {
+			return plaintext, nil
 		}
 	}
 
 	return nil, err
 }
 
-func (c *AEAD) decrypt(ciphertext string, key, additionalData []byte) ([]byte, error) {
+func (c *AESGCM) decrypt(ciphertext []byte, key, additionalData []byte) ([]byte, error) {
 	if len(key) != 32 {
 		return nil, errors.Errorf("key must be exactly 32 long bytes, got %d bytes", len(key))
 	}
 
-	raw, err := base64.URLEncoding.DecodeString(ciphertext)
-	if err != nil {
-		return nil, errorsx.WithStack(err)
-	}
-
-	plaintext, err := aesGCMDecrypt(raw, aeadKey(key), additionalData)
+	plaintext, err := aesGCMDecrypt(ciphertext, aeadKey(key), additionalData)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}

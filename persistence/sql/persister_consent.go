@@ -184,7 +184,7 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	defer span.End()
 
 	// challenge contains the flow.
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge)
 	if err != nil {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
@@ -248,7 +248,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer span.End()
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), loginChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge)
 	if err != nil {
 		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
 	}
@@ -291,7 +291,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *fl
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +342,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, f *flow
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.KeyCipher(), verifier)
+	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier)
 	if err != nil {
 		return nil, err
 	}

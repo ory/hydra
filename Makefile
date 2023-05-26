@@ -8,6 +8,7 @@ GOLANGCI_LINT_VERSION = 1.46.2
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
+				  golang.org/x/tools/cmd/goimports \
 				  github.com/go-swagger/go-swagger/cmd/swagger
 
 define make-go-dependency
@@ -35,9 +36,6 @@ node_modules: package-lock.json
 
 docs/cli: .bin/clidoc
 	clidoc .
-
-.bin/goimports: go.sum Makefile
-	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
 
 .bin/licenses: Makefile
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh

@@ -47,7 +47,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 		return errorsx.WithStack(err)
 	}
 
-	encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
+	encrypted, err := p.r.FlowCipher().Encrypt(ctx, out, nil)
 	if err != nil {
 		return errorsx.WithStack(err)
 	}
@@ -71,7 +71,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 				return errorsx.WithStack(err)
 			}
 
-			encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
+			encrypted, err := p.r.KeyCipher().Encrypt(ctx, out, nil)
 			if err != nil {
 				return err
 			}
@@ -133,7 +133,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key)
+	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key, nil)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -175,7 +175,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 
 	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range js {
-		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key)
+		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}

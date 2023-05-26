@@ -12,12 +12,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/aead"
 )
 
 // Decode decodes the given string to a value.
-func Decode[T any](ctx context.Context, cipher *jwk.AEAD, encoded string) (*T, error) {
-	plaintext, err := cipher.Decrypt(ctx, encoded)
+func Decode[T any](ctx context.Context, cipher *aead.XChaCha20Poly1305, encoded string) (*T, error) {
+	plaintext, err := cipher.Decrypt(ctx, encoded, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func Decode[T any](ctx context.Context, cipher *jwk.AEAD, encoded string) (*T, e
 }
 
 // Encode encodes the given value to a string.
-func Encode(ctx context.Context, cipher *jwk.AEAD, val any) (s string, err error) {
+func Encode(ctx context.Context, cipher aead.Cipher, val any) (s string, err error) {
 	// Steps:
 	// 1. Encode to JSON
 	// 2. GZIP
@@ -53,11 +53,11 @@ func Encode(ctx context.Context, cipher *jwk.AEAD, val any) (s string, err error
 		return "", err
 	}
 
-	return cipher.Encrypt(ctx, b.Bytes())
+	return cipher.Encrypt(ctx, b.Bytes(), nil)
 }
 
 // SetCookie encrypts the given value and sets it in a cookie.
-func SetCookie(ctx context.Context, w http.ResponseWriter, cipher *jwk.AEAD, cookieName string, value any) error {
+func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, cookieName string, value any) error {
 	cookie, err := Encode(ctx, cipher, value)
 	if err != nil {
 		return err

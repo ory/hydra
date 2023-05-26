@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/assertx"
 
@@ -61,6 +61,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			Hint:        "error_hint,omitempty" + key,
 			Code:        100,
 			Debug:       "error_debug,omitempty" + key,
+			Valid:       true,
 		}
 	}
 
@@ -132,6 +133,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 		Hint:        "error_hint,omitempty" + key,
 		Code:        100,
 		Debug:       "error_debug,omitempty" + key,
+		Valid:       true,
 	}
 
 	var authenticatedAt time.Time
@@ -165,6 +167,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *flow.OAuth2Consent
 			Hint:        "error_hint",
 			Code:        100,
 			Debug:       "error_debug",
+			Valid:       true,
 		}
 	}
 
@@ -250,7 +253,7 @@ func makeID(base string, network string, key string) string {
 
 func TestHelperNID(r interface {
 	client.ManagerProvider
-	KeyCipher() *jwk.AEAD
+	FlowCipher() *aead.XChaCha20Poly1305
 }, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
 	testClient := client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"}
 	testLS := flow.LoginSession{
@@ -289,7 +292,7 @@ func TestHelperNID(r interface {
 		f, err := t1ValidNID.CreateLoginRequest(ctx, &testLR)
 		require.NoError(t, err)
 
-		testLR.ID = x.Must(flowctx.Encode(ctx, r.KeyCipher(), f))
+		testLR.ID = x.Must(flowctx.Encode(ctx, r.FlowCipher(), f))
 		_, err = t2InvalidNID.GetLoginRequest(ctx, testLR.ID)
 		require.Error(t, err)
 		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)

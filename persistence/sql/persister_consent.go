@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/sqlxx"
@@ -218,7 +219,11 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 	defer span.End()
 
 	f := flow.NewFlow(req)
-	f.NID = p.NetworkID(ctx)
+	nid := p.NetworkID(ctx)
+	if nid == uuid.Nil {
+		return errorsx.WithStack(x.ErrNotFound)
+	}
+	f.NID = nid
 	return flow.SetInCtx(ctx, f)
 }
 
@@ -437,7 +442,11 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *consent.Log
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginSession")
 	defer span.End()
 
-	session.NID = p.NetworkID(ctx)
+	nid := p.NetworkID(ctx)
+	if nid == uuid.Nil {
+		return errorsx.WithStack(x.ErrNotFound)
+	}
+	session.NID = nid
 	return consent.SetLoginSessionInCtx(ctx, session)
 }
 

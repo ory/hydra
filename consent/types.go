@@ -77,11 +77,12 @@ type RequestDeniedError struct {
 	// to the public but only in the server logs.
 	Debug string `json:"error_debug"`
 
-	valid bool
+	// swagger:ignore
+	Valid bool `json:"v"`
 }
 
 func (e *RequestDeniedError) IsError() bool {
-	return e != nil && e.valid
+	return e != nil && e.Valid
 }
 
 func (e *RequestDeniedError) SetDefaults(name string) {
@@ -122,7 +123,7 @@ func (e *RequestDeniedError) Scan(value any) error {
 		return errorsx.WithStack(err)
 	}
 
-	e.valid = true
+	e.Valid = true
 	return nil
 }
 

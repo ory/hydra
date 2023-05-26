@@ -18,6 +18,7 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 			Hint:        "some hint",
 			Code:        403,
 			Debug:       "some debug",
+			Valid:       true,
 		}
 	}
 
@@ -39,6 +40,7 @@ func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.
 			Hint:        "some hint",
 			Code:        403,
 			Debug:       "some debug",
+			Valid:       true,
 		}
 	}
 

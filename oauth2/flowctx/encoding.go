@@ -16,7 +16,7 @@ import (
 )
 
 // Decode decodes the given string to a value.
-func Decode[T any](ctx context.Context, cipher *aead.XChaCha20Poly1305, encoded string) (*T, error) {
+func Decode[T any](ctx context.Context, cipher aead.Cipher, encoded string) (*T, error) {
 	plaintext, err := cipher.Decrypt(ctx, encoded, nil)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, c
 }
 
 // FromCookie looks up the value stored in the cookie and decodes it.
-func FromCookie[T any](ctx context.Context, r *http.Request, cipher *jwk.AEAD, cookieName string) (*T, error) {
+func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string) (*T, error) {
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return nil, errors.WithStack(err)

@@ -105,7 +105,7 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 		return nil, errorsx.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.KeyCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, sessionID)
 	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().WithRequest(r).WithError(err).
@@ -338,7 +338,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	req fosite.AuthorizeRequester,
 	verifier string,
 ) (*flow.Flow, error) {
-	f, err := flowctx.FromCookie[flow.Flow](ctx, r, s.r.KeyCipher(), flowctx.FlowCookie)
+	f, err := flowctx.FromCookie[flow.Flow](ctx, r, s.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
 		return nil, err
 	}
@@ -484,7 +484,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
 
-	if err = flowctx.SetCookie(ctx, w, s.r.KeyCipher(), flowctx.FlowCookie, f); err != nil {
+	if err = flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
@@ -935,7 +935,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.KeyCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
@@ -1059,7 +1059,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.KeyCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
 	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionFromCookie, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
@@ -1127,8 +1127,8 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 }
 
 func (s *DefaultStrategy) flowFromCookie(r *http.Request) (*flow.Flow, error) {
-	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.KeyCipher(), flowctx.FlowCookie)
+	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.FlowCipher(), flowctx.FlowCookie)
 }
 func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) (*flow.LoginSession, error) {
-	return flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.KeyCipher(), flowctx.LoginSessionCookie)
+	return flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
 }

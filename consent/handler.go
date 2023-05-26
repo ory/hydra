@@ -444,7 +444,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -540,7 +540,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -720,7 +720,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.KeyCipher(), challenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -993,5 +993,5 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 }
 
 func (h *Handler) flowFromCookie(r *http.Request) (*flow.Flow, error) {
-	return flowctx.FromCookie[flow.Flow](r.Context(), r, h.r.KeyCipher(), flowctx.FlowCookie)
+	return flowctx.FromCookie[flow.Flow](r.Context(), r, h.r.FlowCipher(), flowctx.FlowCookie)
 }

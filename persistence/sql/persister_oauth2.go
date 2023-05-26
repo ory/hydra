@@ -121,7 +121,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
-		sess, _, err = p.r.FlowCipher().Decrypt(ctx, string(sess))
+		sess, err = p.r.FlowCipher().Decrypt(ctx, string(sess), nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}

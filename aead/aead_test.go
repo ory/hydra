@@ -44,9 +44,12 @@ func TestAEAD(t *testing.T) {
 			plain := []byte(uuid.New())
 			ct, err := a.Encrypt(ctx, plain, nil)
 			assert.NoError(t, err)
-			t.Log(ct)
 
-			res, _, err := a.Decrypt(ctx, ct)
+			ct2, err := a.Encrypt(ctx, plain, nil)
+			assert.NoError(t, err)
+			assert.NotEqual(t, ct, ct2, "ciphertexts for the same plaintext must be different each time")
+
+			res, err := a.Decrypt(ctx, ct, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, plain, res)
 		})
@@ -62,7 +65,7 @@ func TestAEAD(t *testing.T) {
 			require.NoError(t, err)
 
 			c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
-			_, _, err = a.Decrypt(ctx, ct)
+			_, err = a.Decrypt(ctx, ct, nil)
 			require.Error(t, err)
 		})
 
@@ -80,7 +83,7 @@ func TestAEAD(t *testing.T) {
 
 			// Sets the old secret as a rotated secret and creates a new one.
 			c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t), old})
-			res, _, err := a.Decrypt(ctx, ct)
+			res, err := a.Decrypt(ctx, ct, nil)
 			require.NoError(t, err)
 			assert.Equal(t, plain, res)
 
@@ -89,7 +92,7 @@ func TestAEAD(t *testing.T) {
 			require.NoError(t, err)
 			assert.NotEqual(t, ct2, ct)
 
-			res, _, err = a.Decrypt(ctx, ct)
+			res, err = a.Decrypt(ctx, ct, nil)
 			require.NoError(t, err)
 			assert.Equal(t, plain, res)
 		})
@@ -107,7 +110,7 @@ func TestAEAD(t *testing.T) {
 
 			// When the secrets do not match, an error should be thrown during decryption.
 			c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t), secret(t)})
-			_, _, err = a.Decrypt(ctx, ct)
+			_, err = a.Decrypt(ctx, ct, nil)
 			require.Error(t, err)
 		})
 
@@ -123,10 +126,21 @@ func TestAEAD(t *testing.T) {
 			assert.NoError(t, err)
 
 			t.Run("case=additional data matches", func(t *testing.T) {
-				res, aad, err := a.Decrypt(ctx, ct)
+				res, err := a.Decrypt(ctx, ct, []byte("additional data"))
 				assert.NoError(t, err)
 				assert.Equal(t, plain, res)
-				assert.Equal(t, []byte("additional data"), aad)
+			})
+
+			t.Run("case=additional data does not match", func(t *testing.T) {
+				res, err := a.Decrypt(ctx, ct, []byte("wrong data"))
+				assert.Error(t, err)
+				assert.Nil(t, res)
+			})
+
+			t.Run("case=missing additional data", func(t *testing.T) {
+				res, err := a.Decrypt(ctx, ct, nil)
+				assert.Error(t, err)
+				assert.Nil(t, res)
 			})
 		})
 	}

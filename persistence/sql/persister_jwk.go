@@ -133,7 +133,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, _, err := p.r.KeyCipher().Decrypt(ctx, j.Key)
+	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key, nil)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -175,7 +175,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 
 	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range js {
-		key, _, err := p.r.KeyCipher().Decrypt(ctx, d.Key)
+		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}

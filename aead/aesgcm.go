@@ -8,6 +8,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
 	"io"
 
 	"github.com/pkg/errors"
@@ -54,37 +55,37 @@ func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) 
 		return "", errorsx.WithStack(err)
 	}
 
-	return encode(ciphertext, additionalData), nil
+	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (c *AESGCM) Decrypt(ctx context.Context, s string) (plaintext, aad []byte, err error) {
-	ciphertext, aad, err := decode(s)
+func (c *AESGCM) Decrypt(ctx context.Context, s string, aad []byte) (plaintext []byte, err error) {
+	ciphertext, err := base64.RawURLEncoding.DecodeString(s)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	global, err := c.c.GetGlobalSecret(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	rotated, err := c.c.GetRotatedGlobalSecrets(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	keys := append([][]byte{global}, rotated...)
 	if len(keys) == 0 {
-		return nil, nil, errors.Errorf("at least one decryption key must be defined but none were")
+		return nil, errors.Errorf("at least one decryption key must be defined but none were")
 	}
 
 	for _, key := range keys {
 		if plaintext, err = c.decrypt(ciphertext, key, aad); err == nil {
-			return plaintext, aad, nil
+			return plaintext, nil
 		}
 	}
 
-	return nil, nil, err
+	return nil, err
 }
 
 func (c *AESGCM) decrypt(ciphertext []byte, key, additionalData []byte) ([]byte, error) {

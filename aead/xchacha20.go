@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/cipher"
 	cryptorand "crypto/rand"
+	"encoding/base64"
 	"fmt"
 
 	"golang.org/x/crypto/chacha20poly1305"
@@ -60,33 +61,33 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 	}
 
 	ciphertext := cipher.Seal(nonce, nonce, plaintext, additionalData)
-	return encode(ciphertext, additionalData), nil
+	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string) (plaintext []byte, additionalData []byte, err error) {
-	msg, additionalData, err := decode(ciphertext)
+func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
+	msg, err := base64.RawURLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if len(msg) < chacha20poly1305.NonceSizeX {
-		return nil, nil, errorsx.WithStack(fmt.Errorf("malformed ciphertext: too short"))
+		return nil, errorsx.WithStack(fmt.Errorf("malformed ciphertext: too short"))
 	}
 	nonce, ciphered := msg[:chacha20poly1305.NonceSizeX], msg[chacha20poly1305.NonceSizeX:]
 
 	global, err := x.d.GetGlobalSecret(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	rotated, err := x.d.GetRotatedGlobalSecrets(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	keys := append([][]byte{global}, rotated...)
 	if len(keys) == 0 {
-		return nil, nil, errors.Errorf("at least one decryption key must be defined but none were")
+		return nil, errors.Errorf("at least one decryption key must be defined but none were")
 	}
 
 	var cipher cipher.AEAD
@@ -95,11 +96,11 @@ func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string) (pla
 		if err != nil {
 			continue
 		}
-		plaintext, err = cipher.Open(nil, nonce, ciphered, additionalData)
+		plaintext, err = cipher.Open(nil, nonce, ciphered, aad)
 		if err == nil {
-			return plaintext, additionalData, nil
+			return plaintext, nil
 		}
 	}
 
-	return nil, nil, err
+	return nil, err
 }

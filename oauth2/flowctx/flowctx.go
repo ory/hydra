@@ -156,7 +156,7 @@ func (m *Middleware) fromHTTP(ctx context.Context, r *http.Request) (context.Con
 }
 
 func (m *Middleware) decode(ctx context.Context, cookie string) ([]byte, error) {
-	plaintext, _, err := m.Dependencies.FlowCipher().Decrypt(ctx, cookie)
+	plaintext, err := m.Dependencies.FlowCipher().Decrypt(ctx, cookie, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ import (
 
 // Decode decodes the given string to a value.
 func Decode[T any](ctx context.Context, cipher *aead.XChaCha20Poly1305, encoded string) (*T, error) {
-	plaintext, _, err := cipher.Decrypt(ctx, encoded)
+	plaintext, err := cipher.Decrypt(ctx, encoded, nil)
 	if err != nil {
 		return nil, err
 	}

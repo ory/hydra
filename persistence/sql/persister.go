@@ -6,19 +6,11 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"reflect"
-	"strings"
-	"time"
-	"unsafe"
 
-	"github.com/dgraph-io/ristretto"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/flow"
 
 	"github.com/pkg/errors"
 
@@ -32,15 +24,13 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
 )
 
 var (
 	_ persistence.Persister = new(Persister)
 	_ storage.Transactional = new(Persister)
-
-	ptrCost   = int64(unsafe.Sizeof(new(int)))
-	clientTTL = 5 * time.Minute
 )
 
 var (
@@ -49,10 +39,6 @@ var (
 )
 
 type (
-	getFlowArgs struct {
-		NID            uuid.UUID
-		LoginChallenge string
-	}
 	Persister struct {
 		conn        *pop.Connection
 		mb          *popx.MigrationBox
@@ -62,11 +48,6 @@ type (
 		l           *logrusx.Logger
 		fallbackNID uuid.UUID
 		p           *networkx.Manager
-		queries     struct {
-			getFlow string
-		}
-
-		cache *ristretto.Cache
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -77,9 +58,9 @@ type (
 	}
 )
 
-func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
+func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
@@ -99,9 +80,9 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 	return popx.WithTransaction(ctx, c), err
 }
 
-func (p *Persister) Commit(ctx context.Context) error {
+func (p *Persister) Commit(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
@@ -112,9 +93,9 @@ func (p *Persister) Commit(ctx context.Context) error {
 	return errorsx.WithStack(tx.TX.Commit())
 }
 
-func (p *Persister) Rollback(ctx context.Context) error {
+func (p *Persister) Rollback(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
@@ -131,41 +112,14 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		return nil, errorsx.WithStack(err)
 	}
 
-	maxItems := int64(1000)
-	cache, err := ristretto.NewCache(&ristretto.Config{
-		NumCounters: maxItems * 10,
-		MaxCost:     maxItems * ptrCost, // approx 1000 items with 8 bytes each
-		BufferItems: 64,
-		Metrics:     true,
-	})
-	if err != nil {
-		return nil, errorsx.WithStack(err)
-	}
-
 	p := &Persister{
-		conn:    c,
-		mb:      mb,
-		r:       r,
-		config:  config,
-		l:       l,
-		p:       networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
-		cache:   cache,
-		queries: struct{ getFlow string }{getFlow: ""},
+		conn:   c,
+		mb:     mb,
+		r:      r,
+		config: config,
+		l:      l,
+		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
 	}
-
-	p.queries.getFlow = fmt.Sprintf(`
-SELECT %s, %s
-FROM hydra_oauth2_flow AS flow
-    JOIN hydra_client AS client ON
-        client.id = flow.client_id and
-        client.nid = flow.nid
-WHERE flow.login_challenge = :loginchallenge AND
-      flow.nid = :nid
-LIMIT 1
-`,
-		p.selectColumns(ctx, new(flow.Flow), func(s string) string { return fmt.Sprintf(`flow.%s AS "flow.%s"`, s, s) }),
-		p.selectColumns(ctx, new(client.Client), func(s string) string { return fmt.Sprintf(`client.%s AS "client.%s"`, s, s) }),
-	)
 
 	return p, nil
 }
@@ -230,22 +184,4 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.conn, f)
-}
-
-// cacheKey returns a network specific cache key for the given method and arguments.
-func (p *Persister) cacheKey(ctx context.Context, method string, args ...string) string {
-	parts := []string{p.NetworkID(ctx).String(), method}
-	parts = append(parts, args...)
-
-	return strings.Join(parts, "/")
-}
-
-func (p *Persister) selectColumns(ctx context.Context, model any, transform func(string) string) string {
-	m := pop.NewModel(model, ctx)
-	columns := make([]string, 0)
-	for _, col := range m.Columns().Cols {
-		columns = append(columns, transform(col.Name))
-	}
-
-	return strings.Join(columns, ", ")
 }

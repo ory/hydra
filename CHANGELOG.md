@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-05-02)](#000-2023-05-02)
+- [0.0.0 (2023-05-24)](#000-2023-05-24)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -681,11 +681,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.1.1...v0.0.0) (2023-05-02)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.1.1...v0.0.0) (2023-05-24)
 
 
 ### Bug Fixes
 
+* Add index on requested_at for refresh tokens and use it in janitor ([#3516](https://github.com/ory/hydra/issues/3516)) ([5b8e712](https://github.com/ory/hydra/commit/5b8e7121c49a0dfed6312b599a617e692f324fdb))
+* Disable health check request logs ([#3496](https://github.com/ory/hydra/issues/3496)) ([eddf7f3](https://github.com/ory/hydra/commit/eddf7f3867e8977e58d09681c583e99bca503448))
 * Do not use prepared SQL statements and bump deps ([#3506](https://github.com/ory/hydra/issues/3506)) ([31b9e66](https://github.com/ory/hydra/commit/31b9e663b183f8244d86ddd1ae9f55267e190a69))
 * Proper SameSite=None in dev mode ([#3502](https://github.com/ory/hydra/issues/3502)) ([5751fae](https://github.com/ory/hydra/commit/5751fae7b37a2692ad484c785356e702928f1b9b))
 * Sqa config values unified across projects ([#3490](https://github.com/ory/hydra/issues/3490)) ([1b1899e](https://github.com/ory/hydra/commit/1b1899e9472fecfbdeb07f5e99c27713b82478e5))

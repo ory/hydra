@@ -410,7 +410,7 @@ func (f *Flow) InvalidateConsentRequest() error {
 }
 
 func (f *Flow) GetConsentRequest() *consent.OAuth2ConsentRequest {
-	return &consent.OAuth2ConsentRequest{
+	cs := consent.OAuth2ConsentRequest{
 		ID:                     f.ConsentChallengeID.String(),
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
@@ -432,6 +432,10 @@ func (f *Flow) GetConsentRequest() *consent.OAuth2ConsentRequest {
 		AuthenticatedAt:        f.LoginAuthenticatedAt,
 		RequestedAt:            f.RequestedAt,
 	}
+	if cs.AMR == nil {
+		cs.AMR = []string{}
+	}
+	return &cs
 }
 
 func (f *Flow) GetHandledConsentRequest() *consent.AcceptOAuth2ConsentRequest {

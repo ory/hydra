@@ -11,6 +11,7 @@ import (
 	"time"
 
 	hydra "github.com/ory/hydra-client-go/v2"
+	. "github.com/ory/hydra/v2/flow"
 
 	"github.com/ory/x/httprouterx"
 
@@ -81,17 +82,17 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Subject: cr3.Subject, Client: cr3.Client, Verifier: cr3.ID, RequestedAt: hcr3.RequestedAt, SessionID: cr3.LoginSessionID}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr4.LoginSessionID.String()}))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID, SessionID: cr4.LoginSessionID}))
-	require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
-	require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
-	require.NoError(t, m.CreateConsentRequest(context.Background(), cr3))
-	require.NoError(t, m.CreateConsentRequest(context.Background(), cr4))
-	_, err := m.HandleConsentRequest(context.Background(), hcr1)
+	require.NoError(t, m.CreateConsentRequest(context.Background(), nil, cr1))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), nil, cr2))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), nil, cr3))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), nil, cr4))
+	_, err := m.HandleConsentRequest(context.Background(), nil, hcr1)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest(context.Background(), hcr2)
+	_, err = m.HandleConsentRequest(context.Background(), nil, hcr2)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest(context.Background(), hcr3)
+	_, err = m.HandleConsentRequest(context.Background(), nil, hcr3)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest(context.Background(), hcr4)
+	_, err = m.HandleConsentRequest(context.Background(), nil, hcr4)
 	require.NoError(t, err)
 
 	lur1 := MockLogoutRequest("testsdk-1", true, network)

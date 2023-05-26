@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/requirex"
 
@@ -30,7 +31,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
@@ -702,7 +702,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					}
 
 					hookResp := hydraoauth2.TokenHookResponse{
-						Session: consent.AcceptOAuth2ConsentRequestSession{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
 							AccessToken: claims,
 							IDToken:     claims,
 						},
@@ -1263,7 +1263,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 									}
 
 									hookResp := hydraoauth2.TokenHookResponse{
-										Session: consent.AcceptOAuth2ConsentRequestSession{
+										Session: flow.AcceptOAuth2ConsentRequestSession{
 											AccessToken: claims,
 											IDToken:     claims,
 										},

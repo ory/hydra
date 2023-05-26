@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package consent
+package flow
 
 import (
 	"fmt"
@@ -52,7 +52,7 @@ func TestToRFCError(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			require.EqualValues(t, tc.input.toRFCError(), tc.expect)
+			require.EqualValues(t, tc.input.ToRFCError(), tc.expect)
 		})
 	}
 }

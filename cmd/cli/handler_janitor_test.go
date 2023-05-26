@@ -48,7 +48,7 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyTokens),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -80,7 +80,7 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -114,7 +114,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -136,7 +136,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -162,7 +162,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -183,7 +183,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -279,7 +279,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup test
-			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.ClientManager(), reg.GrantManager()))
+			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.GrantManager()))
 
 			// run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -287,7 +287,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s", cli.OnlyGrants),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 

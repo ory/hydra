@@ -20,9 +20,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
-	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
@@ -230,17 +228,17 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer otelx.End(span, &err)
 
-	v, err := flowctx.ValueFromCtx(ctx, flowctx.FlowCookie)
-	if err == nil && v.Ptr != nil {
-		v.PersistOnce.Do(func() {
-			err = sqlcon.HandleError(p.Connection(ctx).Create(v.Ptr.(*flow.Flow)))
-		})
-		if err != nil {
-			return err
-		}
-	} else if err != nil && !errors.Is(err, flowctx.ErrNoValueInCtx) {
-		return err
-	}
+	//v, err := flowctx.ValueFromCtx(ctx, flowctx.FlowCookie)
+	//if err == nil && v.Ptr != nil {
+	//	v.PersistOnce.Do(func() {
+	//		err = sqlcon.HandleError(p.Connection(ctx).Create(v.Ptr.(*flow.Flow)))
+	//	})
+	//	if err != nil {
+	//		return err
+	//	}
+	//} else if err != nil && !errors.Is(err, flowctx.ErrNoValueInCtx) {
+	//	return err
+	//}
 
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {

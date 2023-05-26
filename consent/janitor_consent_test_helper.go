@@ -6,13 +6,14 @@ package consent
 import (
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/sqlxx"
 )
 
-func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *HandledLoginRequest {
-	var deniedErr *RequestDeniedError
+func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *flow.HandledLoginRequest {
+	var deniedErr *flow.RequestDeniedError
 	if hasError {
-		deniedErr = &RequestDeniedError{
+		deniedErr = &flow.RequestDeniedError{
 			Name:        "consent request denied",
 			Description: "some description",
 			Hint:        "some hint",
@@ -21,7 +22,7 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 		}
 	}
 
-	return &HandledLoginRequest{
+	return &flow.HandledLoginRequest{
 		ID:              challenge,
 		Error:           deniedErr,
 		WasHandled:      true,
@@ -30,10 +31,10 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 	}
 }
 
-func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *AcceptOAuth2ConsentRequest {
-	var deniedErr *RequestDeniedError
+func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *flow.AcceptOAuth2ConsentRequest {
+	var deniedErr *flow.RequestDeniedError
 	if hasError {
-		deniedErr = &RequestDeniedError{
+		deniedErr = &flow.RequestDeniedError{
 			Name:        "consent request denied",
 			Description: "some description",
 			Hint:        "some hint",
@@ -42,7 +43,7 @@ func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.
 		}
 	}
 
-	return &AcceptOAuth2ConsentRequest{
+	return &flow.AcceptOAuth2ConsentRequest{
 		ID:              challenge,
 		HandledAt:       sqlxx.NullTime(time.Now().Round(time.Second)),
 		Error:           deniedErr,

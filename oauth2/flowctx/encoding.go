@@ -56,25 +56,9 @@ func Encode(ctx context.Context, cipher *jwk.AEAD, val any) (s string, err error
 	return cipher.Encrypt(ctx, b.Bytes())
 }
 
-// EncodeFromContext encodes the value stored in the context under the given cookie name.
-func EncodeFromContext(ctx context.Context, cipher *jwk.AEAD, cookieName string) (s string, err error) {
-	v, ok := ctx.Value(contextKey(cookieName)).(*Value)
-	if !ok || v == nil {
-		return "", errors.WithStack(ErrNoValueInCtx)
-	}
-
-	return Encode(ctx, cipher, v.Ptr)
-}
-
-// SetCookie looks up the value stored in the context under the given cookie name and sets it as a cookie on the
-// response writer.
-func SetCookie(ctx context.Context, w http.ResponseWriter, cipher *jwk.AEAD, cookieName string) error {
-	v, ok := ctx.Value(contextKey(cookieName)).(*Value)
-	if !ok || v == nil {
-		return errors.WithStack(ErrNoValueInCtx)
-	}
-
-	cookie, err := Encode(ctx, cipher, v.Ptr)
+// SetCookie encrypts the given value and sets it in a cookie.
+func SetCookie(ctx context.Context, w http.ResponseWriter, cipher *jwk.AEAD, cookieName string, value any) error {
+	cookie, err := Encode(ctx, cipher, value)
 	if err != nil {
 		return err
 	}
@@ -89,4 +73,14 @@ func SetCookie(ctx context.Context, w http.ResponseWriter, cipher *jwk.AEAD, coo
 	})
 
 	return nil
+}
+
+// FromCookie looks up the value stored in the cookie and decodes it.
+func FromCookie[T any](ctx context.Context, r *http.Request, cipher *jwk.AEAD, cookieName string) (*T, error) {
+	cookie, err := r.Cookie(cookieName)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return Decode[T](ctx, cipher, cookie.Value)
 }

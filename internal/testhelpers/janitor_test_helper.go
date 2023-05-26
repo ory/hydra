@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -32,8 +33,8 @@ import (
 
 type JanitorConsentTestHelper struct {
 	uniqueName           string
-	flushLoginRequests   []*consent.LoginRequest
-	flushConsentRequests []*consent.OAuth2ConsentRequest
+	flushLoginRequests   []*flow.LoginRequest
+	flushConsentRequests []*flow.OAuth2ConsentRequest
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest
@@ -69,7 +70,7 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 	}
 }
 
-func (j *JanitorConsentTestHelper) GetDSN(ctx context.Context) string {
+func (j *JanitorConsentTestHelper) GetDSN() string {
 	return j.conf.DSN()
 }
 
@@ -149,7 +150,7 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 	}
 }
 
-func (j *JanitorConsentTestHelper) GrantNotAfterSetup(ctx context.Context, cl client.Manager, gr trust.GrantManager) func(t *testing.T) {
+func (j *JanitorConsentTestHelper) GrantNotAfterSetup(ctx context.Context, gr trust.GrantManager) func(t *testing.T) {
 	return func(t *testing.T) {
 		for _, fg := range j.flushGrants {
 			require.NoError(t, gr.CreateGrant(ctx, fg.grant, fg.pk))
@@ -187,14 +188,15 @@ func (j *JanitorConsentTestHelper) LoginRejectionSetup(ctx context.Context, cm c
 		// Create login requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
 		}
 
 		// Explicit rejection
 		for _, r := range j.flushLoginRequests {
 			if r.ID == j.flushLoginRequests[0].ID {
 				// accept this one
-				_, err = cm.HandleLoginRequest(ctx, r.ID, consent.NewHandledLoginRequest(
+				_, err = cm.HandleLoginRequest(ctx, nil, "", consent.NewHandledLoginRequest(
 					r.ID, false, r.RequestedAt, r.AuthenticatedAt))
 
 				require.NoError(t, err)
@@ -202,7 +204,7 @@ func (j *JanitorConsentTestHelper) LoginRejectionSetup(ctx context.Context, cm c
 			}
 
 			// reject flush-login-2 and 3
-			_, err = cm.HandleLoginRequest(ctx, r.ID, consent.NewHandledLoginRequest(
+			_, err = cm.HandleLoginRequest(ctx, nil, "", consent.NewHandledLoginRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -231,12 +233,13 @@ func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Ma
 		// Create login requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
 		}
 
 		// Reject each request
 		for _, r := range j.flushLoginRequests {
-			_, err = cm.HandleLoginRequest(ctx, r.ID, consent.NewHandledLoginRequest(
+			_, err = cm.HandleLoginRequest(ctx, nil, "", consent.NewHandledLoginRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -265,24 +268,26 @@ func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, cm
 		// Create login requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
 		}
 
 		// Create consent requests
 		for _, r := range j.flushConsentRequests {
-			require.NoError(t, cm.CreateConsentRequest(ctx, r))
+			err := cm.CreateConsentRequest(ctx, nil, r)
+			require.NoError(t, err)
 		}
 
 		//Reject the consents
 		for _, r := range j.flushConsentRequests {
 			if r.ID == j.flushConsentRequests[0].ID {
 				// accept this one
-				_, err = cm.HandleConsentRequest(ctx, consent.NewHandledConsentRequest(
+				_, err = cm.HandleConsentRequest(ctx, nil, consent.NewHandledConsentRequest(
 					r.ID, false, r.RequestedAt, r.AuthenticatedAt))
 				require.NoError(t, err)
 				continue
 			}
-			_, err = cm.HandleConsentRequest(ctx, consent.NewHandledConsentRequest(
+			_, err = cm.HandleConsentRequest(ctx, nil, consent.NewHandledConsentRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -311,11 +316,12 @@ func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, cm con
 		// Create login requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
 		}
 
 		// Creating at least 1 that has not timed out
-		_, err = cm.HandleLoginRequest(ctx, j.flushLoginRequests[0].ID, &consent.HandledLoginRequest{
+		_, err = cm.HandleLoginRequest(ctx, nil, "", &flow.HandledLoginRequest{
 			ID:              j.flushLoginRequests[0].ID,
 			RequestedAt:     j.flushLoginRequests[0].RequestedAt,
 			AuthenticatedAt: j.flushLoginRequests[0].AuthenticatedAt,
@@ -349,8 +355,9 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 		// Let's reset and accept all login requests to test the consent requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
-			_, err = cm.HandleLoginRequest(ctx, r.ID, &consent.HandledLoginRequest{
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
+			_, err = cm.HandleLoginRequest(ctx, nil, "", &flow.HandledLoginRequest{
 				ID:              r.ID,
 				AuthenticatedAt: r.AuthenticatedAt,
 				RequestedAt:     r.RequestedAt,
@@ -361,11 +368,12 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 
 		// Create consent requests
 		for _, r := range j.flushConsentRequests {
-			require.NoError(t, cm.CreateConsentRequest(ctx, r))
+			err := cm.CreateConsentRequest(ctx, nil, r)
+			require.NoError(t, err)
 		}
 
 		// Create at least 1 consent request that has been accepted
-		_, err = cm.HandleConsentRequest(ctx, &consent.AcceptOAuth2ConsentRequest{
+		_, err = cm.HandleConsentRequest(ctx, nil, &flow.AcceptOAuth2ConsentRequest{
 			ID:              j.flushConsentRequests[0].ID,
 			WasHandled:      true,
 			HandledAt:       sqlxx.NullTime(time.Now()),
@@ -396,11 +404,13 @@ func (j *JanitorConsentTestHelper) LoginConsentNotAfterSetup(ctx context.Context
 	return func(t *testing.T) {
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+			_, err := cm.CreateLoginRequest(ctx, r)
+			require.NoError(t, err)
 		}
 
 		for _, r := range j.flushConsentRequests {
-			require.NoError(t, cm.CreateConsentRequest(ctx, r))
+			err := cm.CreateConsentRequest(ctx, nil, r)
+			require.NoError(t, err)
 		}
 	}
 }
@@ -680,8 +690,8 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 	}
 }
 
-func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.LoginRequest {
-	return []*consent.LoginRequest{
+func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRequest {
+	return []*flow.LoginRequest{
 		{
 			ID:             fmt.Sprintf("%s_flush-login-1", uniqueName),
 			RequestedScope: []string{"foo", "bar"},
@@ -724,8 +734,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*consent.Logi
 	}
 }
 
-func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.OAuth2ConsentRequest {
-	return []*consent.OAuth2ConsentRequest{
+func genConsentRequests(uniqueName string, lifespan time.Duration) []*flow.OAuth2ConsentRequest {
+	return []*flow.OAuth2ConsentRequest{
 		{
 			ID:                   fmt.Sprintf("%s_flush-consent-1", uniqueName),
 			RequestedScope:       []string{"foo", "bar"},

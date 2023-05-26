@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package consent
+package flow
 
 import (
 	"database/sql"
@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	consentRequestDeniedErrorName = "consent request denied"
-	loginRequestDeniedErrorName   = "login request denied"
+	ConsentRequestDeniedErrorName = "consent request denied"
+	LoginRequestDeniedErrorName   = "login request denied"
 )
 
 // OAuth 2.0 Redirect Browser To
@@ -94,7 +94,7 @@ func (e *RequestDeniedError) SetDefaults(name string) {
 	}
 }
 
-func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
+func (e *RequestDeniedError) ToRFCError() *fosite.RFC6749Error {
 	if e.Name == "" {
 		e.Name = "request_denied"
 	}

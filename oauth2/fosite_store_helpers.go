@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 
@@ -37,7 +38,6 @@ import (
 	"github.com/ory/x/sqlcon"
 
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/consent"
 )
 
 func signatureFromJTI(jti string) string {
@@ -122,9 +122,9 @@ var flushRequests = []*fosite.Request{
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{LegacyClientID: "foobar"}
-	cr := &consent.OAuth2ConsentRequest{
+	cr := &flow.OAuth2ConsentRequest{
 		Client:               cl,
-		OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
+		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
 		LoginChallenge:       sqlxx.NullString(id),
 		ID:                   id,
 		Verifier:             id,
@@ -133,28 +133,30 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 		RequestedAt:          time.Now(),
 	}
 
-	ctx := flowctx.WithDefaultValues(context.Background())
+	ctx := context.Background()
 	if createClient {
 		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(
-		ctx, &consent.LoginRequest{
+	f, err := x.ConsentManager().CreateLoginRequest(
+		ctx, &flow.LoginRequest{
 			Client:               cl,
-			OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
+			OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
 			ID:                   id,
 			Verifier:             id,
 			AuthenticatedAt:      sqlxx.NullTime(time.Now()),
 			RequestedAt:          time.Now(),
-		}))
-	require.NoError(t, x.ConsentManager().CreateConsentRequest(ctx, cr))
-
-	encodedFlow, err := flowctx.EncodeFromContext(ctx, x.KeyCipher(), flowctx.FlowCookie)
+		})
+	require.NoError(t, err)
+	err = x.ConsentManager().CreateConsentRequest(ctx, nil, cr)
 	require.NoError(t, err)
 
-	_, err = x.ConsentManager().HandleConsentRequest(ctx, &consent.AcceptOAuth2ConsentRequest{
+	encodedFlow, err := flowctx.Encode(ctx, x.KeyCipher(), f)
+	require.NoError(t, err)
+
+	_, err = x.ConsentManager().HandleConsentRequest(ctx, nil, &flow.AcceptOAuth2ConsentRequest{
 		ConsentRequest:  cr,
-		Session:         new(consent.AcceptOAuth2ConsentRequestSession),
+		Session:         new(flow.AcceptOAuth2ConsentRequestSession),
 		AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		ID:              encodedFlow,
 		RequestedAt:     time.Now(),

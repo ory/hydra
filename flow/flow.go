@@ -6,16 +6,13 @@ package flow
 import (
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/x/sqlcon"
-
-	"github.com/gobuffalo/pop/v6"
-
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -65,6 +62,7 @@ const (
 	// If the above is implemented, merge the LoginError and ConsentError fields
 	// and use the following FlowStates when converting to/from
 	// [Handled]{Login|Consent}Request:
+
 	FlowStateLoginError   = int16(128)
 	FlowStateConsentError = int16(129)
 )
@@ -114,7 +112,7 @@ type Flow struct {
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *consent.OAuth2ConsentRequestOpenIDConnectContext `db:"oidc_context"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
@@ -196,8 +194,8 @@ type Flow struct {
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
 	LoginWasUsed bool `db:"login_was_used"`
 
-	LoginError           *consent.RequestDeniedError `db:"login_error"`
-	LoginAuthenticatedAt sqlxx.NullTime              `db:"login_authenticated_at"`
+	LoginError           *RequestDeniedError `db:"login_error"`
+	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at"`
 
 	// ConsentChallengeID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
@@ -232,13 +230,13 @@ type Flow struct {
 	// ConsentWasHandled set to true means that the request was already handled.
 	// This can happen on form double-submit or other errors. If this is set we
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
-	ConsentWasHandled  bool                        `db:"consent_was_used"`
-	ConsentError       *consent.RequestDeniedError `db:"consent_error"`
-	SessionIDToken     sqlxx.MapStringInterface    `db:"session_id_token" faker:"-"`
-	SessionAccessToken sqlxx.MapStringInterface    `db:"session_access_token" faker:"-"`
+	ConsentWasHandled  bool                     `db:"consent_was_used"`
+	ConsentError       *RequestDeniedError      `db:"consent_error"`
+	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-"`
 }
 
-func NewFlow(r *consent.LoginRequest) *Flow {
+func NewFlow(r *LoginRequest) *Flow {
 	return &Flow{
 		ID:                     r.ID,
 		RequestedScope:         r.RequestedScope,
@@ -260,7 +258,7 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 	}
 }
 
-func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
+func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
 	if f.LoginWasUsed {
 		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
 	}
@@ -302,8 +300,8 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	return nil
 }
 
-func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
-	return consent.HandledLoginRequest{
+func (f *Flow) GetHandledLoginRequest() HandledLoginRequest {
+	return HandledLoginRequest{
 		ID:                     f.ID,
 		Remember:               f.LoginRemember,
 		RememberFor:            f.LoginRememberFor,
@@ -321,8 +319,8 @@ func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
 	}
 }
 
-func (f *Flow) GetLoginRequest() *consent.LoginRequest {
-	return &consent.LoginRequest{
+func (f *Flow) GetLoginRequest() *LoginRequest {
+	return &LoginRequest{
 		ID:                     f.ID,
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
@@ -356,7 +354,7 @@ func (f *Flow) InvalidateLoginRequest() error {
 	return nil
 }
 
-func (f *Flow) HandleConsentRequest(r *consent.AcceptOAuth2ConsentRequest) error {
+func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 	if time.Time(r.HandledAt).IsZero() {
 		return errors.New("refusing to handle a consent request with null HandledAt")
 	}
@@ -409,8 +407,8 @@ func (f *Flow) InvalidateConsentRequest() error {
 	return nil
 }
 
-func (f *Flow) GetConsentRequest() *consent.OAuth2ConsentRequest {
-	cs := consent.OAuth2ConsentRequest{
+func (f *Flow) GetConsentRequest() *OAuth2ConsentRequest {
+	cs := OAuth2ConsentRequest{
 		ID:                     f.ConsentChallengeID.String(),
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
@@ -438,16 +436,16 @@ func (f *Flow) GetConsentRequest() *consent.OAuth2ConsentRequest {
 	return &cs
 }
 
-func (f *Flow) GetHandledConsentRequest() *consent.AcceptOAuth2ConsentRequest {
+func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
 	crf := 0
 	if f.ConsentRememberFor != nil {
 		crf = *f.ConsentRememberFor
 	}
-	return &consent.AcceptOAuth2ConsentRequest{
+	return &AcceptOAuth2ConsentRequest{
 		ID:                 f.ConsentChallengeID.String(),
 		GrantedScope:       f.GrantedScope,
 		GrantedAudience:    f.GrantedAudience,
-		Session:            &consent.AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
+		Session:            &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
 		Remember:           f.ConsentRemember,
 		RememberFor:        crf,
 		HandledAt:          f.ConsentHandledAt,
@@ -475,9 +473,9 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
-// TODO Populate the client field in FindInDB and FindByConsentChallengeID in
-// order to avoid accessing the database twice.
 func (f *Flow) AfterFind(c *pop.Connection) error {
+	// TODO Populate the client field in FindInDB and FindByConsentChallengeID in
+	// order to avoid accessing the database twice.
 	f.AfterSave(c)
 	if f.Client != nil {
 		return nil // NOP, client was already loaded by a JOIN query
@@ -487,7 +485,7 @@ func (f *Flow) AfterFind(c *pop.Connection) error {
 	return sqlcon.HandleError(c.Where("id = ? AND nid = ?", f.ClientID, f.NID).First(f.Client))
 }
 
-func (f *Flow) AfterSave(c *pop.Connection) {
+func (f *Flow) AfterSave(_ *pop.Connection) {
 	if f.SessionAccessToken == nil {
 		f.SessionAccessToken = make(map[string]interface{})
 	}

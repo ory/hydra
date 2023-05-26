@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -69,9 +68,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
 
-	mwHandle := flowctx.DefaultHandler(h.r)
-	public.GET(AuthPath, mwHandle(h.oAuth2Authorize))
-	public.POST(AuthPath, mwHandle(h.oAuth2Authorize))
+	public.GET(AuthPath, h.oAuth2Authorize)
+	public.POST(AuthPath, h.oAuth2Authorize)
 	public.GET(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 	public.POST(LogoutPath, h.performOidcFrontOrBackChannelLogout)
 

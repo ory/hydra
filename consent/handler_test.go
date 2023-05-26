@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	. "github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pointerx"
 
@@ -116,10 +117,7 @@ func TestGetLoginRequest(t *testing.T) {
 				require.NoError(t, err)
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleLoginRequest(
-						ctx,
-						challenge,
-						&HandledLoginRequest{ID: challenge, WasHandled: true})
+					_, err := reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
 
 					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
@@ -180,11 +178,11 @@ func TestGetConsentRequest(t *testing.T) {
 				var err error
 				challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
 				require.NoError(t, err)
-				_, err = reg.ConsentManager().HandleLoginRequest(ctx, challenge, &HandledLoginRequest{
+				_, err = reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{
 					ID: challenge,
 				})
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, &OAuth2ConsentRequest{
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, nil, &OAuth2ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
 					Verifier:       challenge,
@@ -195,7 +193,7 @@ func TestGetConsentRequest(t *testing.T) {
 				if tc.handled {
 					challenge, err = flowctx.EncodeFromContext(ctx, reg.KeyCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
-					_, err = reg.ConsentManager().HandleConsentRequest(ctx, &AcceptOAuth2ConsentRequest{
+					_, err = reg.ConsentManager().HandleConsentRequest(ctx, nil, &AcceptOAuth2ConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),

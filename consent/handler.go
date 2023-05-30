@@ -461,7 +461,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	verifier, err := flowctx.Encode(ctx, h.r.FlowCipher(), f, flowctx.AsLoginVerifier)
+	verifier, err := f.ToLoginVerifier(ctx, h.r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -555,7 +555,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	verifier, err := flowctx.Encode(ctx, h.r.FlowCipher(), f, flowctx.AsLoginVerifier)
+	verifier, err := f.ToLoginVerifier(ctx, h.r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -739,7 +739,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	verifier, err := flowctx.Encode(ctx, h.r.FlowCipher(), f, flowctx.AsConsentVerifier)
+	verifier, err := f.ToConsentVerifier(ctx, h.r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -846,7 +846,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	verifier, err := flowctx.Encode(ctx, h.r.FlowCipher(), f, flowctx.AsConsentVerifier)
+	verifier, err := f.ToConsentVerifier(ctx, h.r)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

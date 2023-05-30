@@ -20,7 +20,7 @@ type ForcedObfuscatedLoginSession struct {
 	NID               uuid.UUID `db:"nid"`
 }
 
-func (_ ForcedObfuscatedLoginSession) TableName() string {
+func (ForcedObfuscatedLoginSession) TableName() string {
 	return "hydra_oauth2_obfuscated_authentication_session"
 }
 

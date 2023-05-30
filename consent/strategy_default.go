@@ -1128,6 +1128,3 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 func (s *DefaultStrategy) flowFromCookie(r *http.Request) (*flow.Flow, error) {
 	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.FlowCipher(), flowctx.FlowCookie)
 }
-func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) (*flow.LoginSession, error) {
-	return flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
-}

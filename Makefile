@@ -1,8 +1,9 @@
 SHELL=/bin/bash -o pipefail
 
-export GO111MODULE := on
-export PATH := .bin:${PATH}
-export PWD := $(shell pwd)
+export GO111MODULE 		:= on
+export PATH 					:= .bin:${PATH}
+export PWD 						:= $(shell pwd)
+export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest-sqlite)
 
 GOLANGCI_LINT_VERSION = 1.46.2
 
@@ -75,7 +76,7 @@ test-resetdb: node_modules
 # Build local docker images
 .PHONY: docker
 docker:
-	docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .
+	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:${IMAGE_TAG} .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb
@@ -92,7 +93,7 @@ quicktest:
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
-	docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm .
+	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm -t oryd/hydra:${IMAGE_TAG} --target test-hsm .
 
 .PHONY: refresh
 refresh:

@@ -7,7 +7,11 @@ import (
 	"context"
 	"database/sql"
 	"reflect"
+	"strings"
+	"time"
+	"unsafe"
 
+	"github.com/dgraph-io/ristretto"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
@@ -31,6 +35,9 @@ import (
 var (
 	_ persistence.Persister = new(Persister)
 	_ storage.Transactional = new(Persister)
+
+	ptrCost   = int64(unsafe.Sizeof(new(int)))
+	clientTTL = 5 * time.Minute
 )
 
 var (
@@ -48,6 +55,7 @@ type (
 		l           *logrusx.Logger
 		fallbackNID uuid.UUID
 		p           *networkx.Manager
+		cache       *ristretto.Cache
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -113,6 +121,17 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		return nil, errorsx.WithStack(err)
 	}
 
+	maxItems := int64(1000)
+	cache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: maxItems * 10,
+		MaxCost:     maxItems * ptrCost, // approx 1000 items with 8 bytes each
+		BufferItems: 64,
+		Metrics:     true,
+	})
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
 	p := &Persister{
 		conn:   c,
 		mb:     mb,
@@ -120,6 +139,7 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		config: config,
 		l:      l,
 		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		cache:  cache,
 	}
 
 	return p, nil
@@ -185,4 +205,12 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.conn, f)
+}
+
+// cacheKey returns a network specific cache key for the given method and arguments.
+func (p *Persister) cacheKey(ctx context.Context, method string, args ...string) string {
+	parts := []string{p.NetworkID(ctx).String(), method}
+	parts = append(parts, args...)
+
+	return strings.Join(parts, "/")
 }

@@ -12,7 +12,6 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/assertx"
 
 	gofrsuuid "github.com/gofrs/uuid"
@@ -300,7 +299,7 @@ func TestHelperNID(r interface {
 		f, err := t1ValidNID.CreateLoginRequest(ctx, &testLR)
 		require.NoError(t, err)
 
-		testLR.ID = x.Must(flowctx.Encode(ctx, r.FlowCipher(), f))
+		testLR.ID = x.Must(f.ToLoginChallenge(ctx, r))
 		_, err = t2InvalidNID.GetLoginRequest(ctx, testLR.ID)
 		require.Error(t, err)
 		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)

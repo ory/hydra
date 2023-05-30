@@ -21,6 +21,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"golang.org/x/oauth2"
@@ -54,7 +55,9 @@ func BenchmarkAuthCode(b *testing.B) {
 	spans := tracetest.NewSpanRecorder()
 	provider := trace.NewTracerProvider(trace.WithSpanProcessor(spans)) //, trace.WithSpanProcessor(jaeger))
 	tracer := provider.Tracer("BenchmarkAuthCode")
+	otel.SetTextMapPropagator(propagation.TraceContext{})
 	otel.SetTracerProvider(provider)
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
 
 	ctx, span := tracer.Start(ctx, "BenchmarkAuthCode")
 	defer span.End()
@@ -108,7 +111,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	adminClient := hydra.NewAPIClient(cfg)
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
-	getAuthorizeCode := func(b *testing.B, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
+	getAuthorizeCode := func(ctx context.Context, b *testing.B, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
 		if c == nil {
 			c = testhelpers.NewEmptyJarClient(b)
 		}
@@ -127,7 +130,8 @@ func BenchmarkAuthCode(b *testing.B) {
 	}
 
 	acceptLoginHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
+		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(b, err)
 
@@ -160,11 +164,12 @@ func BenchmarkAuthCode(b *testing.B) {
 			require.NoError(b, err)
 			require.NotEmpty(b, v.RedirectTo)
 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-		}
+		}), "acceptLoginHandler").ServeHTTP
 	}
 
 	acceptConsentHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
+		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(b, err)
 
@@ -196,7 +201,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			require.NoError(b, err)
 			require.NotEmpty(b, v.RedirectTo)
 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-		}
+		}), "acceptConsentHandler").ServeHTTP
 	}
 
 	run := func(b *testing.B, strategy string) func(*testing.B) {
@@ -209,7 +214,7 @@ func BenchmarkAuthCode(b *testing.B) {
 
 		return func(b *testing.B) {
 			//pop.Debug = true
-			code, _ := getAuthorizeCode(b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+			code, _ := getAuthorizeCode(ctx, b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
 			require.NotEmpty(b, code)
 
 			_, err := conf.Exchange(ctx, code)

@@ -35,7 +35,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	conf.MustSet(ctx, config.KeyIssuerURL, "https://foobariss")
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)

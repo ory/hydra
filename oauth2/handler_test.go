@@ -93,7 +93,7 @@ func TestUserinfo(t *testing.T) {
 	conf.MustSet(ctx, config.KeyAuthCodeLifespan, lifespan)
 	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)

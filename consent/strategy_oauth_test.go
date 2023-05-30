@@ -336,7 +336,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		defer oauthRes.Body.Close()
 
 		foundLoginCookie := slices.ContainsFunc(oauthRes.Header.Values("set-cookie"), func(sc string) bool {
-			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%d=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
+			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
 			require.NoError(t, err)
 			return ok
 		})

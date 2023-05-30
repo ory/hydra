@@ -281,7 +281,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	encodedFlow, err := flowctx.Encode(ctx, s.r.FlowCipher(), f, flowctx.AsLoginChallenge)
+	encodedFlow, err := f.ToLoginChallenge(ctx, s.r)
 	if err != nil {
 		return err
 	}
@@ -441,7 +441,12 @@ func (s *DefaultStrategy) verifyAuthentication(
 				"Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
 		}
 
-		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, nil, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+		loginSession, err := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}
 	}
@@ -602,7 +607,7 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
 		return err
 	}
-	consentChallenge, err := flowctx.Encode(ctx, s.r.FlowCipher(), f, flowctx.AsConsentChallenge)
+	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
 	if err != nil {
 		return err
 	}

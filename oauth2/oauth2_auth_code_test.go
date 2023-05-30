@@ -894,8 +894,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			conf.MustSet(ctx, config.KeyAccessTokenStrategy, strat.d)
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
-			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
+			internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+			internal.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
 			consentStrategy := &consentMock{}
 			router := x.NewRouterPublic()

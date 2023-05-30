@@ -13,7 +13,6 @@ import (
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pborman/uuid"
@@ -151,7 +150,7 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 	err = x.ConsentManager().CreateConsentRequest(ctx, nil, cr)
 	require.NoError(t, err)
 
-	encodedFlow, err := flowctx.Encode(ctx, x.KeyCipher(), f)
+	encodedFlow, err := f.ToConsentVerifier(ctx, x)
 	require.NoError(t, err)
 
 	_, err = x.ConsentManager().HandleConsentRequest(ctx, nil, &flow.AcceptOAuth2ConsentRequest{

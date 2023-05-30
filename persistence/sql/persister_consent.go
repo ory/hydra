@@ -232,16 +232,13 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (*flow.F
 	defer span.End()
 
 	var f flow.Flow
-	return &f, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-			return sqlcon.HandleError(err)
+	if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(x.ErrNotFound)
 		}
-
-		return nil
-	})
+		return nil, sqlcon.HandleError(err)
+	}
+	return &f, nil
 }
 
 func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) (*flow.LoginRequest, error) {
@@ -404,12 +401,18 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 		return p.CreateWithNetwork(ctx, session)
 	}
 
-	_, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&flow.LoginSession{
+	n, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&flow.LoginSession{
 		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 		Subject:         subject,
 		Remember:        remember,
 	}, "authenticated_at", "subject", "remember")
-	return sqlcon.HandleError(err)
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+	if n == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
+	}
+	return nil
 }
 
 func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginSession) error {
@@ -441,12 +444,10 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequests")
 	defer span.End()
 
-	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		f := &flow.Flow{}
-
-		if err = c.
-			Where(
-				strings.TrimSpace(fmt.Sprintf(`
+	var f flow.Flow
+	if err = p.conn.
+		Where(
+			strings.TrimSpace(fmt.Sprintf(`
 (state = %d OR state = %d) AND
 subject = ? AND
 client_id = ? AND
@@ -454,20 +455,18 @@ consent_skip=FALSE AND
 consent_error='{}' AND
 consent_remember=TRUE AND
 nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
-				)),
-				subject, client, p.NetworkID(ctx)).
-			Order("requested_at DESC").
-			Limit(1).
-			First(f); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-			}
-			return sqlcon.HandleError(err)
+			)),
+			subject, client, p.NetworkID(ctx)).
+		Order("requested_at DESC").
+		Limit(1).
+		First(&f); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
 		}
+		return nil, sqlcon.HandleError(err)
+	}
 
-		rs, err = p.filterExpiredConsentRequests(ctx, []flow.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
-		return err
-	})
+	return p.filterExpiredConsentRequests(ctx, []flow.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
 }
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]flow.AcceptOAuth2ConsentRequest, error) {
@@ -592,10 +591,9 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 	defer span.End()
 
 	var cs []client.Client
-	return cs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := c.RawQuery(
-			/* #nosec G201 - channel can either be "front" or "back" */
-			fmt.Sprintf(`
+	if err := p.conn.RawQuery(
+		/* #nosec G201 - channel can either be "front" or "back" */
+		fmt.Sprintf(`
 SELECT DISTINCT c.* FROM hydra_client as c
 JOIN hydra_oauth2_flow as f ON (c.id = f.client_id)
 WHERE
@@ -605,19 +603,18 @@ WHERE
 	f.login_session_id = ? AND
 	f.nid = ? AND
 	c.nid = ?`,
-				channel,
-				channel,
-			),
-			subject,
-			sid,
-			p.NetworkID(ctx),
-			p.NetworkID(ctx),
-		).All(&cs); err != nil {
-			return sqlcon.HandleError(err)
-		}
+			channel,
+			channel,
+		),
+		subject,
+		sid,
+		p.NetworkID(ctx),
+		p.NetworkID(ctx),
+	).All(&cs); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		return nil
-	})
+	return cs, nil
 }
 
 func (p *Persister) CreateLogoutRequest(ctx context.Context, request *flow.LogoutRequest) error {
@@ -665,24 +662,22 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	defer span.End()
 
 	var lr flow.LogoutRequest
-	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if count, err := c.RawQuery(
-			"UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE nid = ? AND verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE",
-			p.NetworkID(ctx),
-			verifier,
-		).ExecWithCount(); count == 0 && err == nil {
-			return errorsx.WithStack(x.ErrNotFound)
-		} else if err != nil {
-			return sqlcon.HandleError(err)
-		}
+	if count, err := p.conn.RawQuery(
+		"UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE nid = ? AND verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE",
+		p.NetworkID(ctx),
+		verifier,
+	).ExecWithCount(); count == 0 && err == nil {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier=?", verifier).First(&lr))
-		if err != nil {
-			return err
-		}
+	err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier=?", verifier).First(&lr))
+	if err != nil {
+		return nil, err
+	}
 
-		return nil
-	})
+	return &lr, nil
 }
 
 func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {

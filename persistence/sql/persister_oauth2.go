@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
@@ -77,7 +76,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 	}
 
 	if p.config.EncryptSessionData(ctx) {
-		ciphertext, err := p.r.FlowCipher().Encrypt(ctx, session, nil)
+		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -119,7 +118,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
-		sess, err = p.r.FlowCipher().Decrypt(ctx, string(sess), nil)
+		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess), nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -258,34 +257,29 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	defer otelx.End(span, &err)
 
 	r := OAuth2RequestSQL{Table: table}
-	var fr fosite.Requester
 
-	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		// We look for the signature as well as the hash of the signature here.
-		// This is because we now always store the hash of the signature in the database,
-		// regardless of the type of the signature. In previous versions, we only stored
-		// the hash of the signature for JWT tokens.
-		//
-		// This code will be removed in a future version.
-		err := p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
-		if errors.Is(err, sql.ErrNoRows) {
-			return errorsx.WithStack(fosite.ErrNotFound)
-		} else if err != nil {
-			return sqlcon.HandleError(err)
-		} else if !r.Active {
-			fr, err = r.toRequest(ctx, session, p)
-			if err != nil {
-				return err
-			} else if table == sqlTableCode {
-				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
-			}
-
-			return errorsx.WithStack(fosite.ErrInactiveToken)
+	// We look for the signature as well as the hash of the signature here.
+	// This is because we now always store the hash of the signature in the database,
+	// regardless of the type of the signature. In previous versions, we only stored
+	// the hash of the signature for JWT tokens.
+	//
+	// This code will be removed in a future version.
+	err = p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errorsx.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	} else if !r.Active {
+		fr, err := r.toRequest(ctx, session, p)
+		if err != nil {
+			return nil, err
+		} else if table == sqlTableCode {
+			return fr, errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 		}
+		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+	}
 
-		fr, err = r.toRequest(ctx, session, p)
-		return err
-	})
+	return r.toRequest(ctx, session, p)
 }
 
 func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) (err error) {

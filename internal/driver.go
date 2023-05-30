@@ -135,8 +135,8 @@ func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer)
 	return
 }
 
-func MustEnsureRegistryKeys(r driver.Registry, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, string(jose.ES256), key); err != nil {
+func MustEnsureRegistryKeys(ctx context.Context, r driver.Registry, key string) {
+	if err := jwk.EnsureAsymmetricKeypairExists(ctx, r, string(jose.ES256), key); err != nil {
 		panic(err)
 	}
 }

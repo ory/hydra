@@ -12,17 +12,17 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/sqlxx"
-	"github.com/ory/hydra/v2/internal"
-	"github.com/stretchr/testify/require"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/sqlxx"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetLogoutRequest(t *testing.T) {
@@ -108,13 +108,13 @@ func TestGetLoginRequest(t *testing.T) {
 					RequestURL: requestURL,
 				})
 				require.NoError(t, err)
-				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
-					challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+					challenge, err = f.ToLoginChallenge(ctx, reg)
 					require.NoError(t, err)
 				}
 			}
@@ -170,13 +170,13 @@ func TestGetConsentRequest(t *testing.T) {
 				lr := &flow.LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
 				f, err := reg.ConsentManager().CreateLoginRequest(ctx, lr)
 				require.NoError(t, err)
-				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
 				_, err = reg.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
 					ID: challenge,
 				})
 				require.NoError(t, err)
-				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+				challenge, err = f.ToConsentChallenge(ctx, reg)
 				require.NoError(t, err)
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, f, &flow.OAuth2ConsentRequest{
 					Client:         cl,
@@ -193,7 +193,7 @@ func TestGetConsentRequest(t *testing.T) {
 						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
 					require.NoError(t, err)
-					challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+					challenge, err = f.ToConsentChallenge(ctx, reg)
 					require.NoError(t, err)
 				}
 			}
@@ -242,7 +242,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 			RequestURL: requestURL,
 		})
 		require.NoError(t, err)
-		challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+		challenge, err = f.ToLoginChallenge(ctx, reg)
 		require.NoError(t, err)
 
 		h := NewHandler(reg, conf)

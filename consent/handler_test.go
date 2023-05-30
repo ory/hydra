@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pointerx"
 
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlxx"
@@ -41,18 +41,18 @@ func TestGetLogoutRequest(t *testing.T) {
 		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			ctx := context.Background()
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := context.Background()
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(ctx, &LogoutRequest{
+				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &flow.LogoutRequest{
 					Client:     cl,
 					ID:         challenge,
 					WasHandled: tc.handled,
@@ -72,11 +72,11 @@ func TestGetLogoutRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result OAuth2RedirectTo
+				var result flow.OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
-				var result LogoutRequest
+				var result flow.LogoutRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, challenge, result.ID)
 				require.Equal(t, requestURL, result.RequestURL)
@@ -95,32 +95,31 @@ func TestGetLoginRequest(t *testing.T) {
 		{true, false, http.StatusOK},
 		{true, true, http.StatusGone},
 	} {
-		t.Run(fmt.Sprintf("exists=%v/handled=%v", tc.exists, tc.handled), func(t *testing.T) {
-			var err error
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			ctx := context.Background()
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
+				f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{
 					Client:     cl,
 					ID:         challenge,
 					RequestURL: requestURL,
-				}))
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+				})
+				require.NoError(t, err)
+				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
 				require.NoError(t, err)
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{ID: challenge, WasHandled: true})
+					_, err := reg.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
-
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+					challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
 					require.NoError(t, err)
 				}
 			}
@@ -137,11 +136,11 @@ func TestGetLoginRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result OAuth2RedirectTo
+				var result flow.OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
-				var result LoginRequest
+				var result flow.LoginRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, challenge, result.ID)
 				require.Equal(t, requestURL, result.RequestURL)
@@ -162,27 +161,29 @@ func TestGetConsentRequest(t *testing.T) {
 		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			ctx := context.Background()
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, lr))
-				var err error
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+				lr := &flow.LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
+				f, err := reg.ConsentManager().CreateLoginRequest(ctx, lr)
 				require.NoError(t, err)
-				_, err = reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{
+				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+				require.NoError(t, err)
+				_, err = reg.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
 					ID: challenge,
 				})
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, nil, &OAuth2ConsentRequest{
+				challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
+				require.NoError(t, err)
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, f, &flow.OAuth2ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
 					Verifier:       challenge,
@@ -191,15 +192,13 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
-					require.NoError(t, err)
-					_, err = reg.ConsentManager().HandleConsentRequest(ctx, nil, &AcceptOAuth2ConsentRequest{
+					_, err := reg.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
 					require.NoError(t, err)
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+					challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
 					require.NoError(t, err)
 				}
 			}
@@ -217,11 +216,11 @@ func TestGetConsentRequest(t *testing.T) {
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
 			if tc.handled {
-				var result OAuth2RedirectTo
+				var result flow.OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
 			} else if tc.exists {
-				var result OAuth2ConsentRequest
+				var result flow.OAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, challenge, result.ID)
 				require.Equal(t, requestURL, result.RequestURL)
@@ -233,19 +232,22 @@ func TestGetConsentRequest(t *testing.T) {
 
 func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 	t.Run("Test get login request with duplicate accept", func(t *testing.T) {
+		ctx := context.Background()
+		challenge := "challenge"
 		requestURL := "http://192.0.2.1"
 
 		conf := internal.NewConfigurationWithDefaults()
 		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-		ctx := flowctx.WithDefaultValues(context.Background())
 
 		cl := &client.Client{LegacyClientID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-		require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
+		f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{
 			Client:     cl,
+			ID:         challenge,
 			RequestURL: requestURL,
-		}))
-		challenge, err := flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+		})
+		require.NoError(t, err)
+		challenge, err = flowctx.Encode(ctx, reg.FlowCipher(), f)
 		require.NoError(t, err)
 
 		h := NewHandler(reg, conf)
@@ -275,7 +277,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, resp.StatusCode)
 
-		var result OAuth2RedirectTo
+		var result flow.OAuth2RedirectTo
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.NotNil(t, result.RedirectTo)
 		require.Contains(t, result.RedirectTo, "login_verifier")
@@ -289,7 +291,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, http.StatusOK, resp2.StatusCode)
 
-		var result2 OAuth2RedirectTo
+		var result2 flow.OAuth2RedirectTo
 		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))
 		require.NotNil(t, result2.RedirectTo)
 		require.Contains(t, result2.RedirectTo, "login_verifier")

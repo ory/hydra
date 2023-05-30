@@ -4,8 +4,11 @@
 package client
 
 import (
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/twmb/murmur3"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/stringsx"
@@ -32,7 +35,7 @@ var (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	ID  uuid.UUID `json:"id" db:"pk"`
+	ID  uuid.UUID `json:"-" db:"pk"`
 	NID uuid.UUID `db:"nid" faker:"-" json:"-"`
 
 	// OAuth 2.0 Client ID
@@ -559,4 +562,8 @@ func AccessTokenStrategySource(client fosite.Client) config.AccessTokenStrategyS
 		return source
 	}
 	return nil
+}
+
+func (c *Client) CookieSuffix() string {
+	return strconv.Itoa(int(murmur3.Sum32([]byte(c.LegacyClientID))))
 }

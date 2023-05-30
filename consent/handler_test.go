@@ -14,7 +14,6 @@ import (
 	"time"
 
 	. "github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pointerx"
 
 	"github.com/ory/hydra/v2/x"
@@ -47,12 +46,11 @@ func TestGetLogoutRequest(t *testing.T) {
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := context.Background()
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(ctx, &LogoutRequest{
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
 					Client:     cl,
 					ID:         challenge,
 					WasHandled: tc.handled,
@@ -96,31 +94,25 @@ func TestGetLoginRequest(t *testing.T) {
 		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("exists=%v/handled=%v", tc.exists, tc.handled), func(t *testing.T) {
-			var err error
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				f, err := reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
 					Client:     cl,
 					ID:         challenge,
 					RequestURL: requestURL,
-				}))
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+				})
 				require.NoError(t, err)
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{ID: challenge, WasHandled: true})
-					require.NoError(t, err)
-
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), f, challenge, &HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
 				}
 			}
@@ -168,21 +160,18 @@ func TestGetConsentRequest(t *testing.T) {
 
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			ctx := flowctx.WithDefaultValues(context.Background())
 
 			if tc.exists {
 				cl := &client.Client{LegacyClientID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, lr))
-				var err error
-				challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+				f, err := reg.ConsentManager().CreateLoginRequest(context.Background(), lr)
 				require.NoError(t, err)
-				_, err = reg.ConsentManager().HandleLoginRequest(ctx, nil, "", &HandledLoginRequest{
-					ID: challenge,
+				_, err = reg.ConsentManager().HandleLoginRequest(context.Background(), f, lr.ID, &HandledLoginRequest{
+					ID: lr.ID,
 				})
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, nil, &OAuth2ConsentRequest{
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), f, &OAuth2ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
 					Verifier:       challenge,
@@ -191,15 +180,11 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
-					require.NoError(t, err)
-					_, err = reg.ConsentManager().HandleConsentRequest(ctx, nil, &AcceptOAuth2ConsentRequest{
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), f, &AcceptOAuth2ConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
-					require.NoError(t, err)
-					challenge, err = flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
 					require.NoError(t, err)
 				}
 			}
@@ -233,19 +218,19 @@ func TestGetConsentRequest(t *testing.T) {
 
 func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 	t.Run("Test get login request with duplicate accept", func(t *testing.T) {
+		challenge := "challenge"
 		requestURL := "http://192.0.2.1"
 
 		conf := internal.NewConfigurationWithDefaults()
 		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-		ctx := flowctx.WithDefaultValues(context.Background())
 
 		cl := &client.Client{LegacyClientID: "client"}
-		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-		require.NoError(t, reg.ConsentManager().CreateLoginRequest(ctx, &LoginRequest{
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+		_, err := reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
 			Client:     cl,
+			ID:         challenge,
 			RequestURL: requestURL,
-		}))
-		challenge, err := flowctx.EncodeFromContext(ctx, reg.FlowCipher(), flowctx.FlowCookie)
+		})
 		require.NoError(t, err)
 
 		h := NewHandler(reg, conf)
@@ -257,7 +242,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		c := &http.Client{}
 
 		sub := "sub123"
-		acceptLogin := &hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Bool(true), Subject: sub}
+		acceptLogin := &hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Ptr(true), Subject: sub}
 
 		// marshal User to json
 		acceptLoginJson, err := json.Marshal(acceptLogin)

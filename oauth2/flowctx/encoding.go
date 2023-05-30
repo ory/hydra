@@ -15,9 +15,46 @@ import (
 	"github.com/ory/hydra/v2/aead"
 )
 
+type (
+	data struct {
+		Purpose purpose `json:"p,omitempty"`
+	}
+	purpose     int
+	CodecOption func(ad *data)
+)
+
+const (
+	loginChallenge purpose = iota
+	loginVerifier
+	consentChallenge
+	consentVerifier
+)
+
+func withPurpose(purpose purpose) CodecOption { return func(ad *data) { ad.Purpose = purpose } }
+
+var (
+	AsLoginChallenge   = withPurpose(loginChallenge)
+	AsLoginVerifier    = withPurpose(loginVerifier)
+	AsConsentChallenge = withPurpose(consentChallenge)
+	AsConsentVerifier  = withPurpose(consentVerifier)
+)
+
+func additionalDataFromOpts(opts ...CodecOption) []byte {
+	if len(opts) == 0 {
+		return nil
+	}
+	ad := &data{}
+	for _, o := range opts {
+		o(ad)
+	}
+	b, _ := json.Marshal(ad)
+
+	return b
+}
+
 // Decode decodes the given string to a value.
-func Decode[T any](ctx context.Context, cipher aead.Cipher, encoded string) (*T, error) {
-	plaintext, err := cipher.Decrypt(ctx, encoded, nil)
+func Decode[T any](ctx context.Context, cipher aead.Cipher, encoded string, opts ...CodecOption) (*T, error) {
+	plaintext, err := cipher.Decrypt(ctx, encoded, additionalDataFromOpts(opts...))
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +74,7 @@ func Decode[T any](ctx context.Context, cipher aead.Cipher, encoded string) (*T,
 }
 
 // Encode encodes the given value to a string.
-func Encode(ctx context.Context, cipher aead.Cipher, val any) (s string, err error) {
+func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOption) (s string, err error) {
 	// Steps:
 	// 1. Encode to JSON
 	// 2. GZIP
@@ -53,12 +90,12 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any) (s string, err err
 		return "", err
 	}
 
-	return cipher.Encrypt(ctx, b.Bytes(), nil)
+	return cipher.Encrypt(ctx, b.Bytes(), additionalDataFromOpts(opts...))
 }
 
 // SetCookie encrypts the given value and sets it in a cookie.
-func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, cookieName string, value any) error {
-	cookie, err := Encode(ctx, cipher, value)
+func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, cookieName string, value any, opts ...CodecOption) error {
+	cookie, err := Encode(ctx, cipher, value, opts...)
 	if err != nil {
 		return err
 	}
@@ -76,11 +113,11 @@ func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, c
 }
 
 // FromCookie looks up the value stored in the cookie and decodes it.
-func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string) (*T, error) {
+func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string, opts ...CodecOption) (*T, error) {
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	return Decode[T](ctx, cipher, cookie.Value)
+	return Decode[T](ctx, cipher, cookie.Value, opts...)
 }

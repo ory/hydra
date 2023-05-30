@@ -18,8 +18,6 @@ import (
 
 	"github.com/ory/x/ioutilx"
 
-	"github.com/twmb/murmur3"
-
 	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 
@@ -338,7 +336,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		defer oauthRes.Body.Close()
 
 		foundLoginCookie := slices.ContainsFunc(oauthRes.Header.Values("set-cookie"), func(sc string) bool {
-			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%d=.*Max-Age=%.0f;.*", murmur3.Sum32(c.ID.Bytes()), consentRequestMaxAge), sc)
+			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%d=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
 			require.NoError(t, err)
 			return ok
 		})
@@ -355,7 +353,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		defer loginVerifierRes.Body.Close()
 
 		foundConsentCookie := slices.ContainsFunc(loginVerifierRes.Header.Values("set-cookie"), func(sc string) bool {
-			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_consent_csrf_dev_%d=.*Max-Age=%.0f;.*", murmur3.Sum32(c.ID.Bytes()), consentRequestMaxAge), sc)
+			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_consent_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
 			require.NoError(t, err)
 			return ok
 		})

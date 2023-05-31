@@ -449,7 +449,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 	defer span.End()
 
 	var f flow.Flow
-	if err = p.conn.
+	if err = p.Connection(ctx).
 		Where(
 			strings.TrimSpace(fmt.Sprintf(`
 (state = %d OR state = %d) AND
@@ -595,7 +595,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 	defer span.End()
 
 	var cs []client.Client
-	if err := p.conn.RawQuery(
+	if err := p.Connection(ctx).RawQuery(
 		/* #nosec G201 - channel can either be "front" or "back" */
 		fmt.Sprintf(`
 SELECT DISTINCT c.* FROM hydra_client as c
@@ -666,7 +666,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	defer span.End()
 
 	var lr flow.LogoutRequest
-	if count, err := p.conn.RawQuery(
+	if count, err := p.Connection(ctx).RawQuery(
 		"UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE nid = ? AND verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE",
 		p.NetworkID(ctx),
 		verifier,

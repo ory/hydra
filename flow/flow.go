@@ -240,7 +240,7 @@ type Flow struct {
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-"`
 
 	// swagger:ignore
-	PersistOnce *sync.Once `db:"-" json:"-" faker:"-"`
+	PersistOnce sync.Once `db:"-" json:"-" faker:"-"`
 }
 
 func NewFlow(r *LoginRequest) *Flow {

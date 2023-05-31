@@ -231,7 +231,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	if !ok && requester.GetSession() != nil {
 		return errors.Errorf("Expected request to be of type *Session, but got: %T", requester.GetSession())
 	} else if ok {
-		if rr.Flow != nil && rr.Flow.PersistOnce != nil {
+		if rr.Flow != nil {
 			rr.Flow.PersistOnce.Do(func() {
 				err = sqlcon.HandleError(p.Connection(ctx).Create(rr.Flow))
 			})

@@ -13,6 +13,7 @@ import (
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/assertx"
+	"github.com/ory/x/contextx"
 
 	gofrsuuid "github.com/gofrs/uuid"
 	"github.com/google/uuid"
@@ -53,11 +54,19 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	}
 
 	f = &flow.Flow{
-		State:              flow.FlowStateConsentInitialized,
-		ConsentChallengeID: sqlxx.NullString(c.ID),
-		ConsentSkip:        c.Skip,
-		ConsentVerifier:    sqlxx.NullString(c.Verifier),
-		ConsentCSRF:        sqlxx.NullString(c.CSRF),
+		ID:                   c.LoginChallenge.String(),
+		SessionID:            c.LoginSessionID,
+		Client:               c.Client,
+		State:                flow.FlowStateConsentInitialized,
+		ConsentChallengeID:   sqlxx.NullString(c.ID),
+		ConsentSkip:          c.Skip,
+		ConsentVerifier:      sqlxx.NullString(c.Verifier),
+		ConsentCSRF:          sqlxx.NullString(c.CSRF),
+		OpenIDConnectContext: c.OpenIDConnectContext,
+		Subject:              c.Subject,
+		RequestedScope:       c.RequestedScope,
+		RequestedAudience:    c.RequestedAudience,
+		RequestURL:           c.RequestURL,
 	}
 
 	var err *flow.RequestDeniedError
@@ -115,7 +124,7 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 	}
 }
 
-func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequest, h *flow.HandledLoginRequest) {
+func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequest, h *flow.HandledLoginRequest, f *flow.Flow) {
 	c = &flow.LoginRequest{
 		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
@@ -133,6 +142,8 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 		CSRF:           "csrf" + key,
 		SessionID:      sqlxx.NullString(makeID("fk-login-session", network, key)),
 	}
+
+	f = flow.NewFlow(c)
 
 	var err = &flow.RequestDeniedError{
 		Name:        "error_name" + key,
@@ -162,7 +173,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 		WasHandled:             false,
 	}
 
-	return c, h
+	return c, h, f
 }
 
 func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *flow.OAuth2ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *flow.AcceptOAuth2ConsentRequest {
@@ -317,6 +328,7 @@ func TestHelperNID(r interface {
 
 type Deps interface {
 	FlowCipher() *aead.XChaCha20Poly1305
+	contextx.Provider
 }
 
 func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
@@ -435,16 +447,17 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				{"7", true},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
-					c, h := MockAuthRequest(tc.key, tc.authAt, network)
+					c, h, f := MockAuthRequest(tc.key, tc.authAt, network)
 					_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
+					loginChallenge := x.Must(f.ToLoginChallenge(ctx, deps))
 
-					_, err := m.GetLoginRequest(ctx, makeID("challenge", network, tc.key))
+					_, err := m.GetLoginRequest(ctx, loginChallenge)
 					require.Error(t, err)
 
-					f, err := m.CreateLoginRequest(ctx, c)
+					f, err = m.CreateLoginRequest(ctx, c)
 					require.NoError(t, err)
 
-					loginChallenge := x.Must(f.ToLoginChallenge(ctx, deps))
+					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 
 					got1, err := m.GetLoginRequest(ctx, loginChallenge)
 					require.NoError(t, err)
@@ -490,35 +503,41 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				{"7", false, 0, false, false, false},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
-					c, h, f := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt, "challenge", network)
-					_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
+					consentRequest, h, f := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt, "challenge", network)
+					_ = clientManager.CreateClient(ctx, consentRequest.Client) // Ignore errors that are caused by duplication
+					f.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
 
 					consentChallenge := makeID("challenge", network, tc.key)
 
 					_, err := m.GetConsentRequest(ctx, consentChallenge)
 					require.Error(t, err)
 
-					err = m.CreateConsentRequest(ctx, f, c)
+					consentChallenge = x.Must(f.ToConsentChallenge(ctx, deps))
+					consentRequest.ID = consentChallenge
+
+					err = m.CreateConsentRequest(ctx, f, consentRequest)
 					require.NoError(t, err)
 
 					got1, err := m.GetConsentRequest(ctx, consentChallenge)
 					require.NoError(t, err)
-					compareConsentRequest(t, c, got1)
+					compareConsentRequest(t, consentRequest, got1)
 					assert.False(t, got1.WasHandled)
 
 					got1, err = m.HandleConsentRequest(ctx, f, h)
 					require.NoError(t, err)
 					assertx.TimeDifferenceLess(t, time.Now(), time.Time(h.HandledAt), 5)
-					compareConsentRequest(t, c, got1)
+					compareConsentRequest(t, consentRequest, got1)
 
 					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}
 					_, err = m.HandleConsentRequest(ctx, f, h)
 					require.NoError(t, err)
 
-					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, f, makeID("verifier", network, tc.key))
+					consentVerifier := x.Must(f.ToConsentVerifier(ctx, deps))
+
+					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, f, consentVerifier)
 					require.NoError(t, err)
-					compareConsentRequest(t, c, got2.ConsentRequest)
-					assert.Equal(t, c.ID, got2.ID)
+					compareConsentRequest(t, consentRequest, got2.ConsentRequest)
+					assert.Equal(t, consentRequest.ID, got2.ID)
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
 
 					// Trying to update this again should return an error because the consent request was used.
@@ -535,9 +554,11 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					_, err = m.VerifyAndInvalidateConsentRequest(ctx, f, makeID("verifier", network, tc.key))
 					require.Error(t, err)
 
-					got1, err = m.GetConsentRequest(ctx, consentChallenge)
-					require.NoError(t, err)
-					assert.True(t, got1.WasHandled)
+					// Because we don't persist the flow any more, we can't check for this.
+					//got1, err = m.GetConsentRequest(ctx, consentChallenge)
+					//require.NoError(t, err)
+					//assert.True(t, got1.WasHandled)
+
 				})
 			}
 
@@ -617,6 +638,8 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
 			cr1, hcr1, f1 := MockConsentRequest("rv1", false, 0, false, false, false, "fk-login-challenge", network)
 			cr2, hcr2, f2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
+			f1.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
+			f2.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
 
 			// Ignore duplication errors
 			_ = clientManager.CreateClient(ctx, cr1.Client)

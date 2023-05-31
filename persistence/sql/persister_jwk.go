@@ -6,7 +6,6 @@ package sql
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
@@ -154,15 +153,17 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	defer span.End()
 
 	// Caching
-	cacheKey := p.cacheKey(ctx, "GetKeySet", set)
-	if res, ok := p.cache.Get(cacheKey); ok && res != nil {
-		return res.(*jose.JSONWebKeySet), nil
-	}
-	defer func() {
-		if keys != nil {
-			p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
-		}
-	}()
+	// Important: Enabling this will break the tests!
+	//
+	//   cacheKey := p.cacheKey(ctx, "GetKeySet", set)
+	//   if res, ok := p.cache.Get(cacheKey); ok && res != nil {
+	//   	return res.(*jose.JSONWebKeySet), nil
+	//   }
+	//   defer func() {
+	//   	if keys != nil {
+	//   		p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
+	//   	}
+	//   }()
 
 	var js []jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).

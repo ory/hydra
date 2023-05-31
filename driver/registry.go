@@ -53,6 +53,7 @@ type Registry interface {
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 
+	contextx.Provider
 	config.Provider
 	persistence.Provider
 	x.RegistryLogger

@@ -53,8 +53,8 @@ func TestSDK(t *testing.T) {
 		Subject: "subject1",
 	}))
 
-	ar1, _ := MockAuthRequest("ar-1", false, network)
-	ar2, _ := MockAuthRequest("ar-2", false, network)
+	ar1, _, _ := MockAuthRequest("ar-1", false, network)
+	ar2, _, _ := MockAuthRequest("ar-2", false, network)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar1.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar2.Client))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
@@ -108,19 +108,26 @@ func TestSDK(t *testing.T) {
 	lur2 := MockLogoutRequest("testsdk-2", false, network)
 	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
 
-	crGot, _, err := sdk.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "1")).Execute()
+	consentChallenge := func(f *Flow) string { return x.Must(f.ToConsentChallenge(ctx, reg)) }
+	loginChallenge := func(f *Flow) string { return x.Must(f.ToLoginChallenge(ctx, reg)) }
+
+	cr1.ID = consentChallenge(cr1Flow)
+	crGot, _, err := sdk.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(cr1.ID).Execute()
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr1, *crGot)
 
-	crGot, _, err = sdk.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(makeID("challenge", network, "2")).Execute()
+	cr2.ID = consentChallenge(cr2Flow)
+	crGot, _, err = sdk.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(cr2.ID).Execute()
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot)
 
-	arGot, _, err := sdk.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-1")).Execute()
+	ar1.ID = loginChallenge(cr1Flow)
+	arGot, _, err := sdk.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(ar1.ID).Execute()
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar1, *arGot)
 
-	arGot, _, err = sdk.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(makeID("challenge", network, "ar-2")).Execute()
+	ar2.ID = loginChallenge(cr2Flow)
+	arGot, _, err = sdk.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(ar2.ID).Execute()
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar2, *arGot)
 

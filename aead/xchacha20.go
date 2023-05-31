@@ -67,7 +67,7 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
 	msg, err := base64.RawURLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(err)
 	}
 
 	if len(msg) < chacha20poly1305.NonceSizeX {
@@ -77,30 +77,30 @@ func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad 
 
 	global, err := x.d.GetGlobalSecret(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(err)
 	}
 
 	rotated, err := x.d.GetRotatedGlobalSecrets(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(err)
 	}
 
 	keys := append([][]byte{global}, rotated...)
 	if len(keys) == 0 {
-		return nil, errors.Errorf("at least one decryption key must be defined but none were")
+		return nil, errorsx.WithStack(errors.Errorf("at least one decryption key must be defined but none were"))
 	}
 
-	var cipher cipher.AEAD
+	var aead cipher.AEAD
 	for _, key := range keys {
-		cipher, err = chacha20poly1305.NewX(key)
+		aead, err = chacha20poly1305.NewX(key)
 		if err != nil {
 			continue
 		}
-		plaintext, err = cipher.Open(nil, nonce, ciphered, aad)
+		plaintext, err = aead.Open(nil, nonce, ciphered, aad)
 		if err == nil {
 			return plaintext, nil
 		}
 	}
 
-	return nil, err
+	return nil, errorsx.WithStack(err)
 }

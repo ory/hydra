@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/ory/x/httprouterx"
@@ -1048,7 +1047,6 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
 	// done
-	flow.PersistOnce = new(sync.Once)
 	response, err := h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: claims,

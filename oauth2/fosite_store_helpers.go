@@ -147,13 +147,13 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 			RequestedAt:          time.Now(),
 		})
 	require.NoError(t, err)
-	err = x.ConsentManager().CreateConsentRequest(ctx, nil, cr)
+	err = x.ConsentManager().CreateConsentRequest(ctx, f, cr)
 	require.NoError(t, err)
 
 	encodedFlow, err := f.ToConsentVerifier(ctx, x)
 	require.NoError(t, err)
 
-	_, err = x.ConsentManager().HandleConsentRequest(ctx, nil, &flow.AcceptOAuth2ConsentRequest{
+	_, err = x.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
 		ConsentRequest:  cr,
 		Session:         new(flow.AcceptOAuth2ConsentRequestSession),
 		AuthenticatedAt: sqlxx.NullTime(time.Now()),

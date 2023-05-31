@@ -4,6 +4,7 @@
 package fositex
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,7 +26,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		} {
 			t.Run("case="+tc.token, func(t *testing.T) {
 				assert.Equal(t,
-					strategy.AccessTokenSignature(nil, tc.token),
+					strategy.AccessTokenSignature(context.TODO(), tc.token),
 					genericSignature(tc.token))
 			})
 		}
@@ -41,7 +42,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		} {
 			t.Run("case="+tc.token, func(t *testing.T) {
 				assert.Equal(t,
-					strategy.AccessTokenSignature(nil, tc.token),
+					strategy.AccessTokenSignature(context.TODO(), tc.token),
 					genericSignature(tc.token))
 			})
 		}

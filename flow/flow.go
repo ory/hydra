@@ -462,7 +462,7 @@ func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
 	}
 }
 
-func (_ Flow) TableName() string {
+func (Flow) TableName() string {
 	return "hydra_oauth2_flow"
 }
 

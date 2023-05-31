@@ -147,8 +147,8 @@ func TestUserinfo(t *testing.T) {
 			setup: func(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
-					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, _ fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session := &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
 									Subject: "alice",
@@ -180,8 +180,8 @@ func TestUserinfo(t *testing.T) {
 			setup: func(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
-					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, _ fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session := &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
 									Subject:  "another-alice",
@@ -215,8 +215,8 @@ func TestUserinfo(t *testing.T) {
 			setup: func(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
-					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, _ fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session := &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
 									Subject:  "alice",
@@ -250,8 +250,8 @@ func TestUserinfo(t *testing.T) {
 			setup: func(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
-					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, _ fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session := &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
 									Subject: "alice",
@@ -278,8 +278,8 @@ func TestUserinfo(t *testing.T) {
 			setup: func(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
-					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, session fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
-						session = &oauth2.Session{
+					DoAndReturn(func(_ context.Context, _ string, _ fosite.TokenType, _ fosite.Session, _ ...string) (fosite.TokenType, fosite.AccessRequester, error) {
+						session := &oauth2.Session{
 							DefaultSession: &openid.DefaultSession{
 								Claims: &jwt.IDTokenClaims{
 									Subject: "alice",

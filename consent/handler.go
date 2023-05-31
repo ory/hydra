@@ -70,6 +70,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 // Revoke OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters revokeOAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type revokeOAuth2ConsentSessions struct {
 	// OAuth 2.0 Consent Subject
 	//
@@ -143,6 +145,8 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 // List OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters listOAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type listOAuth2ConsentSessions struct {
 	tokenpagination.RequestParameters
 
@@ -226,6 +230,8 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 // Revoke OAuth 2.0 Consent Login Sessions Parameters
 //
 // swagger:parameters revokeOAuth2LoginSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type revokeOAuth2LoginSessions struct {
 	// OAuth 2.0 Subject
 	//
@@ -296,6 +302,8 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Login Request
 //
 // swagger:parameters getOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -360,6 +368,8 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 // Accept OAuth 2.0 Login Request
 //
 // swagger:parameters acceptOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -475,6 +485,8 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 // Reject OAuth 2.0 Login Request
 //
 // swagger:parameters rejectOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type rejectOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -575,6 +587,8 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 // Get OAuth 2.0 Consent Request
 //
 // swagger:parameters getOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -647,6 +661,8 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 // Accept OAuth 2.0 Consent Request
 //
 // swagger:parameters acceptOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -753,6 +769,8 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 // Reject OAuth 2.0 Consent Request
 //
 // swagger:parameters rejectOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type adminRejectOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -860,6 +878,8 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 // Accept OAuth 2.0 Logout Request
 //
 // swagger:parameters acceptOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2LogoutRequest struct {
 	// OAuth 2.0 Logout Request Challenge
 	//
@@ -904,6 +924,8 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Reject OAuth 2.0 Logout Request
 //
 // swagger:parameters rejectOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type rejectOAuth2LogoutRequest struct {
 	// in: query
 	// required: true
@@ -944,6 +966,8 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Logout Request
 //
 // swagger:parameters getOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2LogoutRequest struct {
 	// in: query
 	// required: true

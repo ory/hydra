@@ -1102,7 +1102,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					require.NotEmpty(t, code)
 
-					token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+					token, err := oauthConfig.Exchange(context.TODO(), code)
 					if tc.expectOAuthTokenError {
 						require.Error(t, err)
 						return
@@ -1446,7 +1446,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("duplicate code exchange fails", func(t *testing.T) {
-						token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+						token, err := oauthConfig.Exchange(context.TODO(), code)
 						require.Error(t, err)
 						require.Nil(t, token)
 					})

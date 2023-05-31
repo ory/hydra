@@ -37,9 +37,7 @@ func NewListClientsCmd() *cobra.Command {
 			}
 
 			var collection outputOAuth2ClientCollection
-			for k := range list {
-				collection.clients = append(collection.clients, list[k])
-			}
+			collection.clients = append(collection.clients, list...)
 
 			interfaceList := make([]interface{}, len(list))
 			for k := range collection.clients {

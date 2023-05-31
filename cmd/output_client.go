@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func (_ outputOAuth2Client) Header() []string {
+func (outputOAuth2Client) Header() []string {
 	return []string{"CLIENT ID", "CLIENT SECRET", "GRANT TYPES", "RESPONSE TYPES", "SCOPE", "AUDIENCE", "REDIRECT URIS"}
 }
 
@@ -40,7 +40,7 @@ func (i outputOAuth2Client) Interface() interface{} {
 	return i
 }
 
-func (_ outputOAuth2ClientCollection) Header() []string {
+func (outputOAuth2ClientCollection) Header() []string {
 	return outputOAuth2Client{}.Header()
 }
 

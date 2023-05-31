@@ -49,7 +49,7 @@ type LoginSession struct {
 	Remember        bool           `db:"remember"`
 }
 
-func (_ LoginSession) TableName() string {
+func (LoginSession) TableName() string {
 	return "hydra_oauth2_authentication_session"
 }
 
@@ -189,6 +189,8 @@ func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 // List of OAuth 2.0 Consent Sessions
 //
 // swagger:model oAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type oAuth2ConsentSessions []OAuth2ConsentSession
 
 // OAuth 2.0 Consent Session
@@ -421,7 +423,7 @@ type LogoutRequest struct {
 	Client                *client.Client `json:"client" db:"-"`
 }
 
-func (_ LogoutRequest) TableName() string {
+func (LogoutRequest) TableName() string {
 	return "hydra_oauth2_logout_request"
 }
 

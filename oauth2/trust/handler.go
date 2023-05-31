@@ -43,6 +43,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 // Trust OAuth2 JWT Bearer Grant Type Issuer Request Body
 //
 // swagger:model trustOAuth2JwtGrantIssuer
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type trustOAuth2JwtGrantIssuerBody struct {
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
 	//
@@ -78,6 +80,8 @@ type trustOAuth2JwtGrantIssuerBody struct {
 // Trust OAuth2 JWT Bearer Grant Type Issuer Request
 //
 // swagger:parameters trustOAuth2JwtGrantIssuer
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type trustOAuth2JwtGrantIssuer struct {
 	// in: body
 	Body trustOAuth2JwtGrantIssuerBody
@@ -140,6 +144,8 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 // Get Trusted OAuth2 JWT Bearer Grant Type Issuer Request
 //
 // swagger:parameters getTrustedOAuth2JwtGrantIssuer
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getTrustedOAuth2JwtGrantIssuer struct {
 	// The id of the desired grant
 	//
@@ -181,6 +187,8 @@ func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.
 // Delete Trusted OAuth2 JWT Bearer Grant Type Issuer Request
 //
 // swagger:parameters deleteTrustedOAuth2JwtGrantIssuer
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type deleteTrustedOAuth2JwtGrantIssuer struct {
 	// The id of the desired grant
 	// in: path
@@ -223,6 +231,8 @@ func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *ht
 // List Trusted OAuth2 JWT Bearer Grant Type Issuers Request
 //
 // swagger:parameters listTrustedOAuth2JwtGrantIssuers
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type listTrustedOAuth2JwtGrantIssuers struct {
 	// If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
 	//

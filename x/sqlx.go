@@ -71,6 +71,8 @@ func (ns *Duration) UnmarshalJSON(data []byte) error {
 }
 
 // swagger:model NullDuration
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type swaggerNullDuration string
 
 // NullDuration represents a nullable JSON and SQL compatible time.Duration.

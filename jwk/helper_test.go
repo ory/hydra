@@ -6,7 +6,7 @@ package jwk_test
 import (
 	"context"
 	"crypto"
-	"crypto/dsa"
+	"crypto/dsa" //lint:ignore SA1019 used for testing invalid key types
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"

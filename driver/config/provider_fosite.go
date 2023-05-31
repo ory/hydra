@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -87,6 +88,19 @@ func (p *DefaultProvider) GetScopeStrategy(ctx context.Context) fosite.ScopeStra
 		return fosite.WildcardScopeStrategy
 	}
 	return fosite.ExactScopeStrategy
+}
+
+var _ fosite.JWTScopeFieldProvider = (*DefaultProvider)(nil)
+
+func (p *DefaultProvider) GetJWTScopeField(ctx context.Context) jwt.JWTScopeFieldEnum {
+	strategy := strings.ToLower(p.getProvider(ctx).String(KeyJWTScopeClaimStrategy))
+	if strategy == "string" {
+		return jwt.JWTScopeFieldString
+	}
+	if strategy == "both" {
+		return jwt.JWTScopeFieldBoth
+	}
+	return jwt.JWTScopeFieldList
 }
 
 func (p *DefaultProvider) GetUseLegacyErrorFormat(context.Context) bool {

@@ -79,6 +79,7 @@ const (
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
+	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"

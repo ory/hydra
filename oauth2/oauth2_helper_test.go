@@ -26,9 +26,9 @@ type consentMock struct {
 	requestTime time.Time
 }
 
-func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*flow.AcceptOAuth2ConsentRequest, error) {
+func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
 	if c.deny {
-		return nil, fosite.ErrRequestForbidden
+		return nil, nil, fosite.ErrRequestForbidden
 	}
 
 	return &flow.AcceptOAuth2ConsentRequest{
@@ -43,7 +43,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w ht
 			IDToken:     map[string]interface{}{},
 		},
 		RequestedAt: c.requestTime,
-	}, nil
+	}, nil, nil
 }
 
 func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error) {

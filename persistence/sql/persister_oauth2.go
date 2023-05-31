@@ -83,19 +83,19 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 		session = []byte(ciphertext)
 	}
 
-	//var challenge sql.NullString
-	//rr, ok := r.GetSession().(*oauth2.Session)
-	//if !ok && r.GetSession() != nil {
-	//	return nil, errors.Errorf("Expected request to be of type *Session, but got: %T", r.GetSession())
-	//} else if ok {
-	//	if len(rr.ConsentChallenge) > 0 {
-	//		challenge = sql.NullString{Valid: true, String: rr.ConsentChallenge}
-	//	}
-	//}
+	var challenge sql.NullString
+	rr, ok := r.GetSession().(*oauth2.Session)
+	if !ok && r.GetSession() != nil {
+		return nil, errors.Errorf("Expected request to be of type *Session, but got: %T", r.GetSession())
+	} else if ok {
+		if len(rr.ConsentChallenge) > 0 {
+			challenge = sql.NullString{Valid: true, String: rr.ConsentChallenge}
+		}
+	}
 
 	return &OAuth2RequestSQL{
-		Request: r.GetID(),
-		//ConsentChallenge:  challenge,
+		Request:           r.GetID(),
+		ConsentChallenge:  challenge,
 		ID:                p.hashSignature(ctx, rawSignature, table),
 		RequestedAt:       r.GetRequestedAt(),
 		Client:            r.GetClient().GetID(),
@@ -227,29 +227,30 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer otelx.End(span, &err)
 
-	//v, err := flowctx.ValueFromCtx(ctx, flowctx.FlowCookie)
-	//if err == nil && v.Ptr != nil {
-	//	v.PersistOnce.Do(func() {
-	//		err = sqlcon.HandleError(p.Connection(ctx).Create(v.Ptr.(*flow.Flow)))
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//} else if err != nil && !errors.Is(err, flowctx.ErrNoValueInCtx) {
-	//	return err
-	//}
+	rr, ok := requester.GetSession().(*oauth2.Session)
+	if !ok && requester.GetSession() != nil {
+		return errors.Errorf("Expected request to be of type *Session, but got: %T", requester.GetSession())
+	} else if ok {
+		if rr.Flow != nil && rr.Flow.PersistOnce != nil {
+			rr.Flow.PersistOnce.Do(func() {
+				err = sqlcon.HandleError(p.Connection(ctx).Create(rr.Flow))
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
 	}
 
-	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req))
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-	} else if err != nil {
-		return err
 	}
-	return nil
+	return err
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (_ fosite.Requester, err error) {

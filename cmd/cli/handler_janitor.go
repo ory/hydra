@@ -160,20 +160,20 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 		routineFlags = append(routineFlags, OnlyGrants)
 	}
 
-	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(p, routineFlags...)...)
+	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(cmd.OutOrStdout(), p, routineFlags...)...)
 }
 
-func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
+func addRoutine(out io.Writer, p persistence.Persister, names ...string) []cleanupRoutine {
 	var routines []cleanupRoutine
 	for _, n := range names {
 		switch n {
 		case OnlyTokens:
-			routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
-			routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
+			routines = append(routines, cleanup(out, p.FlushInactiveAccessTokens, "access tokens"))
+			routines = append(routines, cleanup(out, p.FlushInactiveRefreshTokens, "refresh tokens"))
 		case OnlyRequests:
-			routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
+			routines = append(routines, cleanup(out, p.FlushInactiveLoginConsentRequests, "login-consent requests"))
 		case OnlyGrants:
-			routines = append(routines, cleanup(p.FlushInactiveGrants, "grants"))
+			routines = append(routines, cleanup(out, p.FlushInactiveGrants, "grants"))
 		}
 	}
 	return routines
@@ -181,12 +181,12 @@ func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 
 type cleanupRoutine func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 
-func cleanup(cr cleanupRoutine, routineName string) cleanupRoutine {
+func cleanup(out io.Writer, cr cleanupRoutine, routineName string) cleanupRoutine {
 	return func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 		if err := cr(ctx, notAfter, limit, batchSize); err != nil {
 			return errors.Wrap(errorsx.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
 		}
-		fmt.Printf("Successfully completed Janitor run on %s\n", routineName)
+		fmt.Fprintf(out, "Successfully completed Janitor run on %s\n", routineName)
 		return nil
 	}
 }

@@ -13,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
@@ -22,7 +24,6 @@ import (
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/require"
 )
 
 func TestGetLogoutRequest(t *testing.T) {

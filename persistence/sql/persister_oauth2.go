@@ -227,30 +227,17 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
 	defer otelx.End(span, &err)
 
-	rr, ok := requester.GetSession().(*oauth2.Session)
-	if !ok && requester.GetSession() != nil {
-		return errors.Errorf("Expected request to be of type *Session, but got: %T", requester.GetSession())
-	} else if ok {
-		if rr.Flow != nil {
-			rr.Flow.PersistOnce.Do(func() {
-				err = sqlcon.HandleError(p.Connection(ctx).Create(rr.Flow))
-			})
-			if err != nil {
-				return err
-			}
-		}
-	}
-
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
 	}
 
-	err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req))
-	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if err != nil {
+		return err
 	}
-	return err
+	return nil
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (_ fosite.Requester, err error) {

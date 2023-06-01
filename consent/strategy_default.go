@@ -668,6 +668,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 		return nil, nil, err
 	}
 
+	// TODO(hperl): Is this still necessary? Should we remove the cookie here?
 	if err = flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
 		return nil, nil, err
 	}

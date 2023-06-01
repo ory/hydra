@@ -5,7 +5,6 @@ package flow
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
@@ -238,9 +237,6 @@ type Flow struct {
 	ConsentError       *RequestDeniedError      `db:"consent_error"`
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-"`
-
-	// swagger:ignore
-	PersistOnce sync.Once `db:"-" json:"-" faker:"-"`
 }
 
 func NewFlow(r *LoginRequest) *Flow {

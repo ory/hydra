@@ -262,6 +262,8 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer span.End()
 
+	// TODO(hperl): Persist flow here.
+
 	if f == nil {
 		return nil, errorsx.WithStack(x.ErrNotFound.WithDebug("The flow must not be nil"))
 	}
@@ -305,13 +307,13 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *fl
 	updatedFlow.ConsentVerifier = f.ConsentVerifier
 	*f = *updatedFlow
 
-	if err := f.InvalidateConsentRequest(); err != nil {
+	if err = f.InvalidateConsentRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 
-	//if err := p.Connection(ctx).Create(f); err != nil {
-	//	return nil, sqlcon.HandleError(err)
-	//}
+	if err = p.Connection(ctx).Create(f); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
 	return f.GetHandledConsentRequest(), nil
 }

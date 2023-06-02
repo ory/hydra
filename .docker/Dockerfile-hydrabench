@@ -1,0 +1,6 @@
+FROM alpine
+
+COPY ./hydrabench /usr/bin/hydrabench
+
+ENTRYPOINT ["hydrabench", "-test.bench=BenchmarkAuthCode/strategy=jwt", "-test.run=XXX"]
+# CMD ["-test.bench=BenchmarkAuthCode/strategy=jwt", "-test.run=XXX", "-test.benchtime=10x", "-conc=1000"]

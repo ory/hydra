@@ -66,14 +66,22 @@ test-resetdb: node_modules
 	docker rm -f hydra_test_database_mysql || true
 	docker rm -f hydra_test_database_postgres || true
 	docker rm -f hydra_test_database_cockroach || true
-	docker run --rm --name hydra_test_database_mysql  --platform linux/amd64 -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0.26
-	docker run --rm --name hydra_test_database_postgres --platform linux/amd64 -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:11.8
-	docker run --rm --name hydra_test_database_cockroach --platform linux/amd64 -p 3446:26257 -d cockroachdb/cockroach:v22.1.10 start-single-node --insecure
+	docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0
+	docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_USER=postgres -e PGUSER=postgres -e POSTGRES_DB=postgres -d postgres:15.2
+	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -p 8082:8080 -d cockroachdb/cockroach:v22.2.8 start-single-node --insecure
 
 # Build local docker images
 .PHONY: docker
 docker:
 	docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .
+
+.PHONY: bench
+bench:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -c ./oauth2/ -o hydrabench
+	# docker build -f .docker/Dockerfile-hydrabench --platform linux/amd64 -t orysh.azurecr.io/hydra:bench .
+	# docker push orysh.azurecr.io/hydra:bench
+	docker build -f .docker/Dockerfile-hydrabench --platform linux/amd64 -t eu.gcr.io/oasis-test-infra/hydra:cookiebench .
+	docker push eu.gcr.io/oasis-test-infra/hydra:cookiebench
 
 .PHONY: e2e
 e2e: node_modules test-resetdb

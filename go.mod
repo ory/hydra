@@ -38,14 +38,14 @@ require (
 	github.com/mikefarah/yq/v4 v4.16.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
-	github.com/ory/analytics-go/v4 v4.0.3
+	github.com/ory/analytics-go/v5 v5.0.1
 	github.com/ory/fosite v0.44.0
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.2
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.555
+	github.com/ory/x v0.0.556
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0

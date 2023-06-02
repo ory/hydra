@@ -17,7 +17,7 @@ import (
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/httprouterx"
 
-	analytics "github.com/ory/analytics-go/v4"
+	"github.com/ory/analytics-go/v5"
 	"github.com/ory/x/configx"
 
 	"github.com/ory/x/reqlog"
@@ -223,8 +223,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		d.Logger(),
 		d.Config().Source(ctx),
 		&metricsx.Options{
-			Service: "ory-hydra",
-			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
+			Service: "hydra",
+			DeploymentId: metricsx.Hash(fmt.Sprintf("%s|%s",
 				d.Config().IssuerURL(ctx).String(),
 				d.Config().DSN(),
 			)),

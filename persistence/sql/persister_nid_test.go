@@ -16,7 +16,7 @@ import (
 	"github.com/ory/x/assertx"
 
 	"github.com/gofrs/uuid"
-	"github.com/instana/testify/require"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/square/go-jose.v2"
 

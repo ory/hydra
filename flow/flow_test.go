@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/instana/testify/require"
 	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/bxcodec/faker/v3"
 

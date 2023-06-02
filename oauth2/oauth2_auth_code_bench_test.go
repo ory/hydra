@@ -20,10 +20,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"golang.org/x/oauth2"
 	"gopkg.in/square/go-jose.v2"
 
@@ -36,11 +39,13 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/stringsx"
 )
 
 var (
-	prof = flag.String("profile", "", "write a CPU profile to this filename")
-	conc = flag.Int("conc", 100, "dispatch this many requests concurrently")
+	prof    = flag.String("profile", "", "write a CPU profile to this filename")
+	conc    = flag.Int("conc", 100, "dispatch this many requests concurrently")
+	tracing = flag.Bool("tracing", false, "send OpenTelemetry traces to localhost:4318")
 )
 
 func BenchmarkAuthCode(b *testing.B) {
@@ -48,21 +53,30 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	ctx := context.Background()
 
-	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithInsecure(), otlptracehttp.WithEndpoint("localhost:4318"))
-	require.NoError(b, err)
-	jaeger := trace.NewSimpleSpanProcessor(exporter)
-	_ = jaeger
 	spans := tracetest.NewSpanRecorder()
-	provider := trace.NewTracerProvider(trace.WithSpanProcessor(spans)) //, trace.WithSpanProcessor(jaeger))
+	opts := []trace.TracerProviderOption{
+		trace.WithSpanProcessor(spans),
+		trace.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL, attribute.String(string(semconv.ServiceNameKey), "BenchmarkAuthCode"),
+		)),
+	}
+	if *tracing {
+		exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithInsecure(), otlptracehttp.WithEndpoint("localhost:4318"))
+		require.NoError(b, err)
+		opts = append(opts, trace.WithSpanProcessor(trace.NewSimpleSpanProcessor(exporter)))
+	}
+	provider := trace.NewTracerProvider(opts...)
+
 	tracer := provider.Tracer("BenchmarkAuthCode")
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 	otel.SetTracerProvider(provider)
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
 
 	ctx, span := tracer.Start(ctx, "BenchmarkAuthCode")
 	defer span.End()
 
-	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=10&max_idle_conns=10"
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
+
+	dsn := stringsx.Coalesce(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
 	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
 	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
@@ -73,13 +87,13 @@ func BenchmarkAuthCode(b *testing.B) {
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")
 	require.NoError(b, err)
+	_, _ = oauth2Keys, oidcKeys
 	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OAuth2JWTKeyName, oauth2Keys))
 	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OpenIDConnectKeyName, oidcKeys))
 	_, adminTS := testhelpers.NewOAuth2Server(ctx, b, reg)
 	var (
 		authURL  = reg.Config().OAuth2AuthURL(ctx).String()
 		tokenURL = reg.Config().OAuth2TokenURL(ctx).String()
-		subject  = "aeneas-rekkas"
 		nonce    = uuid.New()
 	)
 
@@ -129,7 +143,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		return q.Get("code"), resp
 	}
 
-	acceptLoginHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(b *testing.B, c *hc.Client, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
@@ -145,7 +159,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			assert.Contains(b, rr.RequestUrl, authURL)
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
-				Subject:  subject,
+				Subject:  uuid.New(),
 				Remember: pointerx.Ptr(!rr.Skip),
 				Acr:      pointerx.Ptr("1"),
 				Amr:      []string{"pwd"},
@@ -167,7 +181,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		}), "acceptLoginHandler").ServeHTTP
 	}
 
-	acceptConsentHandler := func(b *testing.B, c *hc.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
+	acceptConsentHandler := func(b *testing.B, c *hc.Client, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
@@ -178,7 +192,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			assert.EqualValues(b, c.GrantTypes, rr.Client.GrantTypes)
 			assert.EqualValues(b, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(b, c.RedirectURIs, rr.Client.RedirectUris)
-			assert.EqualValues(b, subject, pointerx.Deref(rr.Subject))
+			// assert.EqualValues(b, subject, pointerx.Deref(rr.Subject))
 			assert.EqualValues(b, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 			assert.EqualValues(b, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 			assert.Contains(b, *rr.RequestUrl, authURL)
@@ -208,8 +222,8 @@ func BenchmarkAuthCode(b *testing.B) {
 		reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 		c, conf := newOAuth2Client(b, testhelpers.NewCallbackURL(b, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(b, reg.Config(),
-			acceptLoginHandler(b, c, subject, nil),
-			acceptConsentHandler(b, c, subject, nil),
+			acceptLoginHandler(b, c, nil),
+			acceptConsentHandler(b, c, nil),
 		)
 
 		return func(b *testing.B) {

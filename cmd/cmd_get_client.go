@@ -20,7 +20,7 @@ func NewGetClientsCmd() *cobra.Command {
 		Long:    `This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`,
 		Example: `To get the OAuth 2.0 Client's secret, run:
 
-	{{ .CommandPath }} <your-client-id> --json | jq -r '.client_secret'`,
+	{{ .CommandPath }} <your-client-id> --format json | jq -r '.client_secret'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine3.17 AS builder
+FROM golang:1.19-alpine3.18 AS builder
 
 RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
@@ -28,7 +28,7 @@ RUN apk --no-cache --upgrade --latest add softhsm opensc; \
     pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra; \
     go test -p 1 -v -failfast -short -tags=sqlite,hsm ./...
 
-FROM alpine:3.15
+FROM alpine:3.18
 
 RUN apk --no-cache --upgrade --latest add softhsm opensc; \
     pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra

@@ -1828,6 +1828,7 @@ components:
             type: array
       description: Paginated OAuth2 Client List Response
   schemas:
+    DefaultError: {}
     JSONRawMessage:
       title: "JSONRawMessage represents a json.RawMessage that works well with JSON,\
         \ SQL, and Swagger."
@@ -4296,6 +4297,8 @@ components:
         user_code:
           type: string
       type: object
+    unexpectedError:
+      type: string
     version:
       properties:
         version:

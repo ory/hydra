@@ -2134,6 +2134,7 @@
     }
   },
   "definitions": {
+    "DefaultError": {},
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -3626,6 +3627,9 @@
           "type": "string"
         }
       }
+    },
+    "unexpectedError": {
+      "type": "string"
     },
     "version": {
       "type": "object",

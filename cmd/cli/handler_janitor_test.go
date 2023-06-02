@@ -86,7 +86,7 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 
 			notAfter := time.Now().Round(time.Second).Add(-v)
 			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
-			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
+			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg))
 		})
 	}
 

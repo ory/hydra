@@ -56,8 +56,8 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 	t.Run("package=consent/manager="+k, consent.ManagerTests(t2, t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
 
 	t.Run("parallel-boundary", func(t *testing.T) {
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1.Config(), t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2.Config(), t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1, "t1", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2, "t2", parallel))
 	})
 
 	t.Run("package=jwk/manager="+k, func(t *testing.T) {

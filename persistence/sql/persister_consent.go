@@ -191,6 +191,10 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
+	// TODO(hperl): Always check for expiration when decoding the flow.
+	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
+	}
 
 	return f, nil
 }
@@ -252,6 +256,9 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
+	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
+	}
 	lr := f.GetLoginRequest()
 	lr.ID = loginChallenge
 
@@ -261,8 +268,6 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *flow.AcceptOAuth2ConsentRequest) (*flow.OAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer span.End()
-
-	// TODO(hperl): Persist flow here.
 
 	if f == nil {
 		return nil, errorsx.WithStack(x.ErrNotFound.WithDebug("The flow must not be nil"))
@@ -292,7 +297,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *fl
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
 	if updatedFlow.ID != f.ID {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
@@ -322,6 +327,9 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, f *flow.Flow, challe
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleLoginRequest")
 	defer span.End()
 
+	if f == nil {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
@@ -347,7 +355,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, f *flow
 
 	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 	if f.NID != updatedFlow.NID {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)

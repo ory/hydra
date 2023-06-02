@@ -339,7 +339,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 ) (*flow.Flow, error) {
 	f, err := flowctx.FromCookie[flow.Flow](ctx, r, s.r.FlowCipher(), flowctx.FlowCookie)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The flow cookie is missing in the request."))
 	}
 
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, f, verifier)
@@ -1095,13 +1095,13 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	r *http.Request,
 	req fosite.AuthorizeRequester,
 ) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
-	authenticationVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
+	loginVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
-	if authenticationVerifier == "" && consentVerifier == "" {
+	if loginVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to auth endpoint
 		return nil, nil, s.requestAuthentication(ctx, w, r, req)
-	} else if authenticationVerifier != "" {
-		flow, err := s.verifyAuthentication(ctx, w, r, req, authenticationVerifier)
+	} else if loginVerifier != "" {
+		flow, err := s.verifyAuthentication(ctx, w, r, req, loginVerifier)
 		if err != nil {
 			return nil, nil, err
 		}

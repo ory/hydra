@@ -1980,7 +1980,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 			f.SessionIDToken = map[string]interface{}{}
 			f.ConsentWasHandled = false
 			f.State = flow.FlowStateConsentUnused
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
 			consentVerifier := x.Must(f.ToConsentVerifier(s.t1, r))
 
@@ -2007,7 +2006,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			f := newFlow(s.t1NID, client.LegacyClientID, sub, sqlxx.NullString(sessionID))
 			f.State = flow.FlowStateLoginUnused
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
 			loginVerifier := x.Must(f.ToLoginVerifier(s.t1, r))
 			_, err := r.ConsentManager().VerifyAndInvalidateLoginRequest(s.t2, f, loginVerifier)
@@ -2037,7 +2035,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 
 			lrInvalidated, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
 			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, lrInvalidated)
+			require.Nil(t, lrInvalidated)
 			actual := &flow.LogoutRequest{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
 			require.Equal(t, expected, actual)

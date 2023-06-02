@@ -83,19 +83,21 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
 
 	cr1Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
-		ID:       cr1.LoginChallenge.String(),
-		Subject:  cr1.Subject,
-		Client:   cr1.Client,
-		Verifier: cr1.ID,
+		ID:          cr1.LoginChallenge.String(),
+		Subject:     cr1.Subject,
+		Client:      cr1.Client,
+		Verifier:    cr1.ID,
+		RequestedAt: time.Now(),
 	})
 	require.NoError(t, err)
 	cr1Flow.LoginSkip = ar1.Skip
 
 	cr2Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
-		ID:       cr2.LoginChallenge.String(),
-		Subject:  cr2.Subject,
-		Client:   cr2.Client,
-		Verifier: cr2.ID,
+		ID:          cr2.LoginChallenge.String(),
+		Subject:     cr2.Subject,
+		Client:      cr2.Client,
+		Verifier:    cr2.ID,
+		RequestedAt: time.Now(),
 	})
 	require.NoError(t, err)
 	cr2Flow.LoginSkip = ar2.Skip

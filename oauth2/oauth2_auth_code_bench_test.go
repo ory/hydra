@@ -252,16 +252,21 @@ func BenchmarkAuthCode(b *testing.B) {
 		stop := profile(b)
 		defer stop()
 
+		startTime := time.Now()
 		var totalMS int64 = 0
+		var totalRuns atomic.Int64
 		b.RunParallel(func(p *testing.PB) {
 			defer func(t0 time.Time) {
 				atomic.AddInt64(&totalMS, int64(time.Since(t0).Milliseconds()))
 			}(time.Now())
 			for p.Next() {
 				B(b)
+				totalRuns.Add(1)
 			}
 		})
 
+		endTime := time.Since(startTime)
+		b.Logf("Total time: %v, Total runs: %d, Total ops/s: %.02f", endTime, totalRuns.Load(), float64(totalRuns.Load())/endTime.Seconds())
 		b.ReportMetric(0, "ns/op")
 		b.ReportMetric(float64(atomic.LoadInt64(&totalMS))/float64(b.N), "ms/op")
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")

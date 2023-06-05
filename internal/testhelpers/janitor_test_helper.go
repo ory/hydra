@@ -181,22 +181,29 @@ func (j *JanitorConsentTestHelper) GrantNotAfterValidate(ctx context.Context, no
 	}
 }
 
-func (j *JanitorConsentTestHelper) LoginRejectionSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
-	return func(t *testing.T) {
-		var err error
+func (j *JanitorConsentTestHelper) LoginRejectionSetup(ctx context.Context, reg interface {
+	consent.ManagerProvider
+	client.ManagerProvider
+	flow.CipherProvider
+}) func(t *testing.T) {
+	cm := reg.ConsentManager()
+	cl := reg.ClientManager()
 
+	return func(t *testing.T) {
 		// Create login requests
 		for _, r := range j.flushLoginRequests {
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			_, err := cm.CreateLoginRequest(ctx, r)
+			f, err := cm.CreateLoginRequest(ctx, r)
 			require.NoError(t, err)
-		}
 
-		// Explicit rejection
-		for _, r := range j.flushLoginRequests {
+			f.RequestedAt = time.Now() // we won't handle expired flows
+			f.LoginAuthenticatedAt = r.AuthenticatedAt
+			challenge := x.Must(f.ToLoginChallenge(ctx, reg))
+
+			// Explicit rejection
 			if r.ID == j.flushLoginRequests[0].ID {
 				// accept this one
-				_, err = cm.HandleLoginRequest(ctx, nil, "", consent.NewHandledLoginRequest(
+				_, err = cm.HandleLoginRequest(ctx, f, challenge, consent.NewHandledLoginRequest(
 					r.ID, false, r.RequestedAt, r.AuthenticatedAt))
 
 				require.NoError(t, err)
@@ -204,7 +211,7 @@ func (j *JanitorConsentTestHelper) LoginRejectionSetup(ctx context.Context, cm c
 			}
 
 			// reject flush-login-2 and 3
-			_, err = cm.HandleLoginRequest(ctx, nil, "", consent.NewHandledLoginRequest(
+			_, err = cm.HandleLoginRequest(ctx, f, challenge, consent.NewHandledLoginRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -217,16 +224,20 @@ func (j *JanitorConsentTestHelper) LoginRejectionValidate(ctx context.Context, c
 		for _, r := range j.flushLoginRequests {
 			t.Logf("check login: %s", r.ID)
 			_, err := cm.GetLoginRequest(ctx, r.ID)
-			if r.ID == j.flushLoginRequests[0].ID {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			// Login requests should never be persisted.
+			require.Error(t, err)
 		}
 	}
 }
 
-func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
+func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, reg interface {
+	consent.ManagerProvider
+	client.ManagerProvider
+	flow.CipherProvider
+}) func(t *testing.T) {
+	cl := reg.ClientManager()
+	cm := reg.ConsentManager()
+
 	return func(t *testing.T) {
 		var (
 			err error
@@ -238,11 +249,13 @@ func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Ma
 			require.NoError(t, cl.CreateClient(ctx, r.Client))
 			f, err = cm.CreateLoginRequest(ctx, r)
 			require.NoError(t, err)
-		}
 
-		// Reject each request
-		for _, r := range j.flushLoginRequests {
-			_, err = cm.HandleLoginRequest(ctx, f, "", consent.NewHandledLoginRequest(
+			// Reject each request
+			f.RequestedAt = time.Now() // we won't handle expired flows
+			f.LoginAuthenticatedAt = r.AuthenticatedAt
+			challenge := x.Must(f.ToLoginChallenge(ctx, reg))
+
+			_, err = cm.HandleLoginRequest(ctx, f, challenge, consent.NewHandledLoginRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -255,43 +268,50 @@ func (j *JanitorConsentTestHelper) LimitValidate(ctx context.Context, cm consent
 		for _, r := range j.flushLoginRequests {
 			t.Logf("check login: %s", r.ID)
 			_, err := cm.GetLoginRequest(ctx, r.ID)
-			if r.ID == j.flushLoginRequests[0].ID {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			// No Requests should have been persisted.
+			require.Error(t, err)
 		}
 	}
 }
 
-func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
+func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, reg interface {
+	consent.ManagerProvider
+	client.ManagerProvider
+	flow.CipherProvider
+}) func(t *testing.T) {
+	cl := reg.ClientManager()
+	cm := reg.ConsentManager()
+
 	return func(t *testing.T) {
-		var err error
+		var (
+			err error
+			f   *flow.Flow
+		)
 
 		// Create login requests
-		for _, r := range j.flushLoginRequests {
-			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			_, err := cm.CreateLoginRequest(ctx, r)
+		for i, loginRequest := range j.flushLoginRequests {
+			require.NoError(t, cl.CreateClient(ctx, loginRequest.Client))
+			f, err = cm.CreateLoginRequest(ctx, loginRequest)
 			require.NoError(t, err)
-		}
 
-		// Create consent requests
-		for _, r := range j.flushConsentRequests {
-			err := cm.CreateConsentRequest(ctx, nil, r)
+			// Create consent requests
+			consentRequest := j.flushConsentRequests[i]
+			err = cm.CreateConsentRequest(ctx, f, consentRequest)
 			require.NoError(t, err)
-		}
 
-		//Reject the consents
-		for _, r := range j.flushConsentRequests {
-			if r.ID == j.flushConsentRequests[0].ID {
+			f.RequestedAt = time.Now() // we won't handle expired flows
+			f.LoginAuthenticatedAt = consentRequest.AuthenticatedAt
+
+			// Reject the consents
+			if consentRequest.ID == j.flushConsentRequests[0].ID {
 				// accept this one
-				_, err = cm.HandleConsentRequest(ctx, nil, consent.NewHandledConsentRequest(
-					r.ID, false, r.RequestedAt, r.AuthenticatedAt))
+				_, err = cm.HandleConsentRequest(ctx, f, consent.NewHandledConsentRequest(
+					consentRequest.ID, false, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
 				require.NoError(t, err)
 				continue
 			}
-			_, err = cm.HandleConsentRequest(ctx, nil, consent.NewHandledConsentRequest(
-				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
+			_, err = cm.HandleConsentRequest(ctx, f, consent.NewHandledConsentRequest(
+				consentRequest.ID, true, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
 			require.NoError(t, err)
 		}
 	}
@@ -303,16 +323,20 @@ func (j *JanitorConsentTestHelper) ConsentRejectionValidate(ctx context.Context,
 		for _, r := range j.flushConsentRequests {
 			t.Logf("check consent: %s", r.ID)
 			_, err = cm.GetConsentRequest(ctx, r.ID)
-			if r.ID == j.flushConsentRequests[0].ID {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			// Consent requests should never be persisted.
+			require.Error(t, err)
 		}
 	}
 }
 
-func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
+func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, reg interface {
+	consent.ManagerProvider
+	client.ManagerProvider
+	flow.CipherProvider
+}) func(t *testing.T) {
+	cl := reg.ClientManager()
+	cm := reg.ConsentManager()
+
 	return func(t *testing.T) {
 		var (
 			err error
@@ -320,19 +344,22 @@ func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, cm con
 		)
 
 		// Create login requests
-		for _, r := range j.flushLoginRequests {
-			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			f, err = cm.CreateLoginRequest(ctx, r)
+		for i, loginRequest := range j.flushLoginRequests {
+			require.NoError(t, cl.CreateClient(ctx, loginRequest.Client))
+			f, err = cm.CreateLoginRequest(ctx, loginRequest)
 			require.NoError(t, err)
-		}
 
-		// Creating at least 1 that has not timed out
-		_, err = cm.HandleLoginRequest(ctx, f, "", &flow.HandledLoginRequest{
-			ID:              j.flushLoginRequests[0].ID,
-			RequestedAt:     j.flushLoginRequests[0].RequestedAt,
-			AuthenticatedAt: j.flushLoginRequests[0].AuthenticatedAt,
-			WasHandled:      true,
-		})
+			if i == 0 {
+				// Creating at least 1 that has not timed out
+				challenge := x.Must(f.ToLoginChallenge(ctx, reg))
+				_, err = cm.HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
+					ID:              loginRequest.ID,
+					RequestedAt:     loginRequest.RequestedAt,
+					AuthenticatedAt: loginRequest.AuthenticatedAt,
+					WasHandled:      true,
+				})
+			}
+		}
 
 		require.NoError(t, err)
 	}
@@ -340,53 +367,56 @@ func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, cm con
 
 func (j *JanitorConsentTestHelper) LoginTimeoutValidate(ctx context.Context, cm consent.Manager) func(t *testing.T) {
 	return func(t *testing.T) {
-		var err error
-
 		for _, r := range j.flushLoginRequests {
-			_, err = cm.GetLoginRequest(ctx, r.ID)
-			if r.ID == j.flushLoginRequests[0].ID {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			_, err := cm.GetLoginRequest(ctx, r.ID)
+			// Login requests should never be persisted.
+			require.Error(t, err)
 		}
-
 	}
 }
 
-func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
-	return func(t *testing.T) {
-		var err error
+func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, reg interface {
+	consent.ManagerProvider
+	client.ManagerProvider
+	flow.CipherProvider
+}) func(t *testing.T) {
+	cl := reg.ClientManager()
+	cm := reg.ConsentManager()
 
+	return func(t *testing.T) {
 		// Let's reset and accept all login requests to test the consent requests
-		for _, r := range j.flushLoginRequests {
-			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			_, err := cm.CreateLoginRequest(ctx, r)
+		for i, loginRequest := range j.flushLoginRequests {
+			require.NoError(t, cl.CreateClient(ctx, loginRequest.Client))
+			f, err := cm.CreateLoginRequest(ctx, loginRequest)
 			require.NoError(t, err)
-			_, err = cm.HandleLoginRequest(ctx, nil, "", &flow.HandledLoginRequest{
-				ID:              r.ID,
-				AuthenticatedAt: r.AuthenticatedAt,
-				RequestedAt:     r.RequestedAt,
+			f.RequestedAt = time.Now() // we won't handle expired flows
+			challenge := x.Must(f.ToLoginChallenge(ctx, reg))
+			_, err = cm.HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
+				ID:              loginRequest.ID,
+				AuthenticatedAt: loginRequest.AuthenticatedAt,
+				RequestedAt:     loginRequest.RequestedAt,
 				WasHandled:      true,
 			})
 			require.NoError(t, err)
-		}
 
-		// Create consent requests
-		for _, r := range j.flushConsentRequests {
-			err := cm.CreateConsentRequest(ctx, nil, r)
+			// Create consent requests
+			consentRequest := j.flushConsentRequests[i]
+			err = cm.CreateConsentRequest(ctx, f, consentRequest)
 			require.NoError(t, err)
+
+			if i == 0 {
+				// Create at least 1 consent request that has been accepted
+				_, err = cm.HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
+					ID:              consentRequest.ID,
+					WasHandled:      true,
+					HandledAt:       sqlxx.NullTime(time.Now()),
+					RequestedAt:     consentRequest.RequestedAt,
+					AuthenticatedAt: consentRequest.AuthenticatedAt,
+				})
+				require.NoError(t, err)
+			}
 		}
 
-		// Create at least 1 consent request that has been accepted
-		_, err = cm.HandleConsentRequest(ctx, nil, &flow.AcceptOAuth2ConsentRequest{
-			ID:              j.flushConsentRequests[0].ID,
-			WasHandled:      true,
-			HandledAt:       sqlxx.NullTime(time.Now()),
-			RequestedAt:     j.flushConsentRequests[0].RequestedAt,
-			AuthenticatedAt: j.flushConsentRequests[0].AuthenticatedAt,
-		})
-		require.NoError(t, err)
 	}
 }
 
@@ -396,13 +426,8 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutValidate(ctx context.Context, c
 
 		for _, r := range j.flushConsentRequests {
 			_, err = cm.GetConsentRequest(ctx, r.ID)
-			if r.ID == j.flushConsentRequests[0].ID {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-			}
+			require.Error(t, err, "Unverified consent requests are never pesisted")
 		}
-
 	}
 }
 
@@ -569,7 +594,7 @@ func JanitorTests(
 
 			t.Run("case=limit", func(t *testing.T) {
 				// setup
-				t.Run("step=setup", jt.LimitSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.LimitSetup(ctx, reg))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
@@ -586,7 +611,7 @@ func JanitorTests(
 
 			t.Run(fmt.Sprintf("case=%s", "loginRejection"), func(t *testing.T) {
 				// setup
-				t.Run("step=setup", jt.LoginRejectionSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
@@ -601,7 +626,7 @@ func JanitorTests(
 
 			t.Run(fmt.Sprintf("case=%s", "consentRejection"), func(t *testing.T) {
 				// setup
-				t.Run("step=setup", jt.ConsentRejectionSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
@@ -620,7 +645,7 @@ func JanitorTests(
 			t.Run(fmt.Sprintf("case=%s", "login-timeout"), func(t *testing.T) {
 
 				// setup
-				t.Run("step=setup", jt.LoginTimeoutSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
@@ -637,7 +662,7 @@ func JanitorTests(
 			t.Run(fmt.Sprintf("case=%s", "consent-timeout"), func(t *testing.T) {
 
 				// setup
-				t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {

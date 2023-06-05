@@ -107,7 +107,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -129,7 +129,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg))
 
 			// run cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -155,7 +155,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -176,7 +176,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {

@@ -270,7 +270,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	defer span.End()
 
 	if f == nil {
-		return nil, errorsx.WithStack(x.ErrNotFound.WithDebug("The flow must not be nil"))
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
@@ -446,7 +446,7 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
 	defer span.End()
 
-	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid = ?", id, p.NetworkID(ctx)).ExecWithCount()
+	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid=?", id, p.NetworkID(ctx)).ExecWithCount()
 	if count == 0 {
 		return errorsx.WithStack(x.ErrNotFound)
 	} else {

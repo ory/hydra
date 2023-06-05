@@ -6,6 +6,8 @@ package oauth2_test
 import (
 	"context"
 	"flag"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"net/http"
 	"os"
 	"runtime"
@@ -19,10 +21,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
@@ -40,12 +40,14 @@ import (
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/stringsx"
+	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
 var (
-	prof    = flag.String("profile", "", "write a CPU profile to this filename")
-	conc    = flag.Int("conc", runtime.GOMAXPROCS(0), "dispatch this many requests concurrently")
-	tracing = flag.Bool("tracing", false, "send OpenTelemetry traces to localhost:4318")
+	prof        = flag.String("profile", "", "write a CPU profile to this filename")
+	conc        = flag.Int("conc", runtime.GOMAXPROCS(0), "dispatch this many requests concurrently")
+	tracingEmit = flag.Bool("emit-traces", false, "send OpenTelemetry traces to localhost:4318")
+	tracing     = flag.Bool("collect-traces", false, "enables OpenTelemetry trace collection, will cause memory leaks")
 )
 
 func BenchmarkAuthCode(b *testing.B) {
@@ -60,19 +62,23 @@ func BenchmarkAuthCode(b *testing.B) {
 			semconv.SchemaURL, attribute.String(string(semconv.ServiceNameKey), "BenchmarkAuthCode"),
 		)),
 	}
+	var tracer oteltrace.Tracer
 	if *tracing {
-		exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithInsecure(), otlptracehttp.WithEndpoint("localhost:4318"))
-		require.NoError(b, err)
-		opts = append(opts, trace.WithSpanProcessor(trace.NewSimpleSpanProcessor(exporter)))
+		if *tracingEmit {
+			exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithInsecure(), otlptracehttp.WithEndpoint("localhost:4318"))
+			require.NoError(b, err)
+			opts = append(opts, trace.WithSpanProcessor(trace.NewSimpleSpanProcessor(exporter)))
+		}
+		provider := trace.NewTracerProvider(opts...)
+
+		tracer = provider.Tracer("BenchmarkAuthCode")
+		otel.SetTextMapPropagator(propagation.TraceContext{})
+		otel.SetTracerProvider(provider)
+
+		var span oteltrace.Span
+		ctx, span = tracer.Start(ctx, "BenchmarkAuthCode")
+		defer span.End()
 	}
-	provider := trace.NewTracerProvider(opts...)
-
-	tracer := provider.Tracer("BenchmarkAuthCode")
-	otel.SetTextMapPropagator(propagation.TraceContext{})
-	otel.SetTracerProvider(provider)
-
-	ctx, span := tracer.Start(ctx, "BenchmarkAuthCode")
-	defer span.End()
 
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
 
@@ -84,7 +90,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
 	reg.Config().MustSet(ctx, config.KeyHasherAlgorithm, "pbkdf2")
-	reg.Config().MustSet(ctx, config.KeyPBKDF2Iterations, "1000")
+	reg.Config().MustSet(ctx, config.KeyPBKDF2Iterations, "1")
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")

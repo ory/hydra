@@ -226,6 +226,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			acceptConsentHandler(b, c, nil),
 		)
 
+		b.ResetTimer()
 		return func(b *testing.B) {
 			//pop.Debug = true
 			code, _ := getAuthorizeCode(ctx, b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))

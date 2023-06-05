@@ -246,6 +246,7 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	b.ResetTimer()
 
+	b.Logf("Running benchmark with %d parallel requests", *conc)
 	b.SetParallelism(*conc)
 
 	b.Run("strategy=jwt", func(b *testing.B) {

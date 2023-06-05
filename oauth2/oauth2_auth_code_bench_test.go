@@ -247,7 +247,6 @@ func BenchmarkAuthCode(b *testing.B) {
 	b.ResetTimer()
 
 	b.Logf("Running benchmark with %d parallel requests", *conc)
-	b.SetParallelism(*conc)
 
 	b.Run("strategy=jwt", func(b *testing.B) {
 		initialDBSpans := dbSpans(spans)
@@ -259,6 +258,8 @@ func BenchmarkAuthCode(b *testing.B) {
 		startTime := time.Now()
 		var totalMS int64 = 0
 		var totalRuns atomic.Int64
+
+		b.SetParallelism(*conc)
 		b.RunParallel(func(p *testing.PB) {
 			defer func(t0 time.Time) {
 				atomic.AddInt64(&totalMS, int64(time.Since(t0).Milliseconds()))
@@ -287,6 +288,8 @@ func BenchmarkAuthCode(b *testing.B) {
 		startTime := time.Now()
 		var totalMS int64 = 0
 		var totalRuns atomic.Int64
+
+		b.SetParallelism(*conc)
 		b.RunParallel(func(p *testing.PB) {
 			defer func(t0 time.Time) {
 				atomic.AddInt64(&totalMS, int64(time.Since(t0).Milliseconds()))

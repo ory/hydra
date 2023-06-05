@@ -162,7 +162,7 @@ func (j *JanitorConsentTestHelper) GrantNotAfterValidate(ctx context.Context, no
 	return func(t *testing.T) {
 		var err error
 
-		// flush won't delete grants that have not yet expired, so use now to check that
+		// flush won'T delete grants that have not yet expired, so use now to check that
 		deleteUntil := time.Now().Round(time.Second)
 		if deleteUntil.After(notAfter) {
 			deleteUntil = notAfter

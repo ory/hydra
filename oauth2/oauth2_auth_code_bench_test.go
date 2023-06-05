@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"net/http"
 	"os"
-	"runtime"
 	"runtime/pprof"
 	"strings"
 	"sync/atomic"
@@ -45,7 +44,7 @@ import (
 
 var (
 	prof        = flag.String("profile", "", "write a CPU profile to this filename")
-	conc        = flag.Int("conc", runtime.GOMAXPROCS(0), "dispatch this many requests concurrently")
+	conc        = flag.Int("conc", 1, "dispatch this many requests concurrently")
 	tracingEmit = flag.Bool("emit-traces", false, "send OpenTelemetry traces to localhost:4318")
 	tracing     = flag.Bool("collect-traces", false, "enables OpenTelemetry trace collection, will cause memory leaks")
 )

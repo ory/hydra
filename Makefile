@@ -120,6 +120,7 @@ sdk: .bin/swagger .bin/ory node_modules
 	swagger generate spec -m -o spec/swagger.json \
 		-c github.com/ory/hydra/v2/client \
 		-c github.com/ory/hydra/v2/consent \
+		-c github.com/ory/hydra/v2/flow \
 		-c github.com/ory/hydra/v2/health \
 		-c github.com/ory/hydra/v2/jwk \
 		-c github.com/ory/hydra/v2/oauth2 \

@@ -80,7 +80,7 @@ jobs:
           path: |
             internal/httpclient
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: "1.20"
       - run: go list -json > go.list
@@ -89,13 +89,12 @@ jobs:
         with:
           nancyVersion: v1.0.42
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         env:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: v1.47.3
-          skip-go-installation: true
+          version: latest
           skip-pkg-cache: true
       - name: Run go-acc (tests)
         run: |

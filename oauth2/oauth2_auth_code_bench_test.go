@@ -90,7 +90,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
 	reg.Config().MustSet(ctx, config.KeyHasherAlgorithm, "pbkdf2")
-	reg.Config().MustSet(ctx, config.KeyPBKDF2Iterations, "1")
+	reg.Config().MustSet(ctx, config.KeyPBKDF2Iterations, "10")
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")

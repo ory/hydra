@@ -44,7 +44,7 @@ import (
 
 var (
 	prof    = flag.String("profile", "", "write a CPU profile to this filename")
-	conc    = flag.Int("conc", 100, "dispatch this many requests concurrently")
+	conc    = flag.Int("conc", runtime.GOMAXPROCS(0), "dispatch this many requests concurrently")
 	tracing = flag.Bool("tracing", false, "send OpenTelemetry traces to localhost:4318")
 )
 
@@ -246,7 +246,7 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	b.ResetTimer()
 
-	b.SetParallelism(*conc / runtime.GOMAXPROCS(0))
+	b.SetParallelism(*conc)
 
 	b.Run("strategy=jwt", func(b *testing.B) {
 		initialDBSpans := dbSpans(spans)

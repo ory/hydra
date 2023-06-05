@@ -408,7 +408,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 		if session.NID != p.NetworkID(ctx) || session.ID != id {
 			return errorsx.WithStack(x.ErrNotFound)
 		}
-		session.AuthenticatedAt = sqlxx.NullTime(authenticatedAt)
+		session.AuthenticatedAt = sqlxx.NullTime(authenticatedAt.Truncate(time.Second))
 		session.Subject = subject
 		session.Remember = remember
 

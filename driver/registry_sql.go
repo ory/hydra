@@ -78,7 +78,7 @@ func (m *RegistrySQL) Init(
 		}
 
 		// new db connection
-		_, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(
+		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(
 			m.l, m.Config().DSN(),
 		)
 		c, err := pop.NewConnection(
@@ -87,7 +87,7 @@ func (m *RegistrySQL) Init(
 				IdlePool:                  idlePool,
 				ConnMaxLifetime:           connMaxLifetime,
 				ConnMaxIdleTime:           connMaxIdleTime,
-				Pool:                      0,
+				Pool:                      pool,
 				UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
 				InstrumentedDriverOptions: opts,
 				Unsafe:                    m.Config().DbIgnoreUnknownTableColumns(),

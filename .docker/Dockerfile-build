@@ -17,7 +17,7 @@ COPY . .
 
 RUN go build -tags sqlite,json1 -o /usr/bin/hydra
 
-FROM alpine:3.15
+FROM alpine:3.18
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \

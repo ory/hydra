@@ -316,6 +316,8 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *fl
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 
+	f.ConsentChallengeID = sqlxx.NullString(uuid.Must(uuid.NewV4()).String())
+
 	if err = p.Connection(ctx).Create(f); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}

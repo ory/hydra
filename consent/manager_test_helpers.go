@@ -541,6 +541,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 
 					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, f, consentVerifier)
 					require.NoError(t, err)
+					consentRequest.ID = f.ConsentChallengeID.String()
 					compareConsentRequest(t, consentRequest, got2.ConsentRequest)
 					assert.Equal(t, consentRequest.ID, got2.ID)
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
@@ -668,22 +669,22 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: challengerv1, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: f1.ConsentChallengeID.String(), RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
-				&fosite.Request{Client: cr1.Client, ID: challengerv1, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: f1.ConsentChallengeID.String(), RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: challengerv2, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: f2.ConsentChallengeID.String(), RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
-				&fosite.Request{Client: cr2.Client, ID: challengerv2, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: f2.ConsentChallengeID.String(), RequestedAt: time.Now()},
 			))
 
 			for i, tc := range []struct {
@@ -759,9 +760,9 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			require.NoError(t, err)
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
 			require.NoError(t, err)
-			_, err = m.VerifyAndInvalidateConsentRequest(ctx, f1, x.Must(f1.ToConsentVerifier(ctx, deps)))
+			handledConsentRequest1, err := m.VerifyAndInvalidateConsentRequest(ctx, f1, x.Must(f1.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
-			_, err = m.VerifyAndInvalidateConsentRequest(ctx, f2, x.Must(f2.ToConsentVerifier(ctx, deps)))
+			handledConsentRequest2, err := m.VerifyAndInvalidateConsentRequest(ctx, f2, x.Must(f2.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
 
 			for i, tc := range []struct {
@@ -773,13 +774,13 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				{
 					subject:    cr1.Subject,
 					sid:        makeID("fk-login-session", network, "rv1"),
-					challenges: []string{challengerv1},
+					challenges: []string{handledConsentRequest1.ID},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    cr2.Subject,
 					sid:        makeID("fk-login-session", network, "rv2"),
-					challenges: []string{challengerv2},
+					challenges: []string{handledConsentRequest2.ID},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{
@@ -817,12 +818,12 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			}{
 				{
 					subject:    "subjectrv1",
-					challenges: []string{challengerv1},
+					challenges: []string{handledConsentRequest1.ID},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    "subjectrv2",
-					challenges: []string{challengerv2},
+					challenges: []string{handledConsentRequest2.ID},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{

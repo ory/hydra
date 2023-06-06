@@ -399,39 +399,47 @@ func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature str
 }
 
 func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	return otelx.WithSpan(ctx, "persistence.sql.CreateOpenIDConnectSession", func(ctx context.Context) error {
-		return p.createSession(ctx, signature, requester, sqlTableOpenID)
-	})
+	//return otelx.WithSpan(ctx, "persistence.sql.CreateOpenIDConnectSession", func(ctx context.Context) error {
+	//	return p.createSession(ctx, signature, requester, sqlTableOpenID)
+	//})
+	return nil
 }
 
 func (p *Persister) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (_ fosite.Requester, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetOpenIDConnectSession")
-	defer otelx.End(span, &err)
-	return p.findSessionBySignature(ctx, signature, requester.GetSession(), sqlTableOpenID)
+	//ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetOpenIDConnectSession")
+	//defer otelx.End(span, &err)
+	_, sig, ok := strings.Cut(signature, ".")
+	if !ok {
+		return nil, errors.WithStack(fosite.ErrNotFound.WithDebug("Unable to find session because the signature is malformed"))
+	}
+	return p.findSessionBySignature(ctx, sig, requester.GetSession(), sqlTableCode)
 }
 
 func (p *Persister) DeleteOpenIDConnectSession(ctx context.Context, signature string) error {
-	return otelx.WithSpan(ctx, "persistence.sql.DeleteOpenIDConnectSession", func(ctx context.Context) error {
-		return p.deleteSessionBySignature(ctx, signature, sqlTableOpenID)
-	})
+	//return otelx.WithSpan(ctx, "persistence.sql.DeleteOpenIDConnectSession", func(ctx context.Context) error {
+	//	return p.deleteSessionBySignature(ctx, signature, sqlTableOpenID)
+	//})
+	return nil
 }
 
 func (p *Persister) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPKCERequestSession")
 	defer otelx.End(span, &err)
-	return p.findSessionBySignature(ctx, signature, session, sqlTablePKCE)
+	return p.findSessionBySignature(ctx, signature, session, sqlTableCode)
 }
 
 func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	return otelx.WithSpan(ctx, "persistence.sql.CreatePKCERequestSession", func(ctx context.Context) error {
-		return p.createSession(ctx, signature, requester, sqlTablePKCE)
-	})
+	return nil
+	//return otelx.WithSpan(ctx, "persistence.sql.CreatePKCERequestSession", func(ctx context.Context) error {
+	//	return p.createSession(ctx, signature, requester, sqlTablePKCE)
+	//})
 }
 
 func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) error {
-	return otelx.WithSpan(ctx, "persistence.sql.DeletePKCERequestSession", func(ctx context.Context) error {
-		return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
-	})
+	return nil
+	//return otelx.WithSpan(ctx, "persistence.sql.DeletePKCERequestSession", func(ctx context.Context) error {
+	//	return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
+	//})
 }
 
 func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) error {

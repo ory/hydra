@@ -439,7 +439,7 @@ func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature stri
 
 func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) error {
 	return otelx.WithSpan(ctx, "persistence.sql.DeletePKCERequestSession", func(ctx context.Context) error {
-		return nil
+		return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
 	})
 }
 

@@ -1,7 +1,7 @@
-FROM golang:1.19-alpine3.17 AS builder
+FROM golang:1.19-alpine3.18 AS builder
 
-RUN apk update &&\
-    apk -U --no-cache --upgrade --latest add build-base git gcc
+RUN apk update && apk upgrade &&\
+    apk add -U --no-cache --upgrade --latest build-base git gcc
 
 WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient

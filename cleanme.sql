@@ -1,0 +1,59 @@
+ALTER TABLE hydra_oauth2_code DROP CONSTRAINT hydra_oauth2_code_challenge_id_fk;
+ALTER TABLE hydra_oauth2_code DROP CONSTRAINT hydra_oauth2_code_client_id_fk;
+ALTER TABLE hydra_oauth2_code DROP CONSTRAINT hydra_oauth2_code_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_flow DROP CONSTRAINT hydra_oauth2_flow_client_id_fk;
+ALTER TABLE hydra_oauth2_flow DROP CONSTRAINT hydra_oauth2_flow_login_session_id_fk;
+ALTER TABLE hydra_oauth2_flow DROP CONSTRAINT hydra_oauth2_flow_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_logout_request DROP CONSTRAINT hydra_oauth2_logout_request_client_id_fk;
+ALTER TABLE hydra_oauth2_logout_request DROP CONSTRAINT hydra_oauth2_logout_request_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session DROP CONSTRAINT hydra_oauth2_obfuscated_authentication_session_pkey;
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session DROP CONSTRAINT hydra_oauth2_obfuscated_authentication_session_client_id_fk;
+
+ALTER TABLE hydra_oauth2_oidc DROP CONSTRAINT hydra_oauth2_oidc_client_id_fk;
+ALTER TABLE hydra_oauth2_oidc DROP CONSTRAINT hydra_oauth2_oidc_challenge_id_fk;
+ALTER TABLE hydra_oauth2_oidc DROP CONSTRAINT hydra_oauth2_oidc_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_pkce DROP CONSTRAINT hydra_oauth2_pkce_challenge_id_fk;
+ALTER TABLE hydra_oauth2_pkce DROP CONSTRAINT hydra_oauth2_pkce_client_id_fk;
+ALTER TABLE hydra_oauth2_pkce DROP CONSTRAINT hydra_oauth2_pkce_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_refresh DROP CONSTRAINT hydra_oauth2_refresh_challenge_id_fk;
+ALTER TABLE hydra_oauth2_refresh DROP CONSTRAINT hydra_oauth2_refresh_client_id_fk;
+ALTER TABLE hydra_oauth2_refresh DROP CONSTRAINT hydra_oauth2_refresh_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_access DROP CONSTRAINT hydra_oauth2_access_challenge_id_fk;
+ALTER TABLE hydra_oauth2_access DROP CONSTRAINT hydra_oauth2_access_client_id_fk;
+ALTER TABLE hydra_oauth2_access DROP CONSTRAINT hydra_oauth2_access_nid_fk_idx;
+
+ALTER TABLE hydra_oauth2_authentication_session DROP CONSTRAINT hydra_oauth2_authentication_session_nid_fk_idx;
+
+DROP INDEX public.hydra_oauth2_flow_consent_challenge_idx;
+DROP INDEX public.hydra_oauth2_flow_consent_verifier_idx;
+DROP INDEX public.hydra_oauth2_access_challenge_id_idx;
+DROP INDEX public.hydra_oauth2_access_client_id_subject_idx;
+DROP INDEX public.hydra_oauth2_code_challenge_id_idx;
+---
+
+DROP INDEX hydra_oauth2_logout_request_client_id_idx;
+DROP INDEX hydra_oauth2_access_request_id_idx;
+
+DROP INDEX hydra_oauth2_flow_consent_verifier_idx;
+
+DROP INDEX hydra_oauth2_code_challenge_id_idx;
+DROP INDEX hydra_oauth2_code_client_id_idx;
+DROP INDEX hydra_oauth2_access_challenge_id_idx;
+DROP INDEX hydra_oauth2_code_challenge_id_idx;
+DROP INDEX  hydra_oauth2_code_client_id_idx;
+DROP INDEX  hydra_oauth2_code_request_id_idx;
+DROP INDEX  hydra_oauth2_pkce_challenge_id_idx;
+DROP INDEX  hydra_oauth2_pkce_client_id_idx;
+DROP INDEX  hydra_oauth2_pkce_request_id_idx;
+DROP INDEX  hydra_oauth2_oidc_challenge_id_idx;
+DROP INDEX  hydra_oauth2_oidc_client_id_idx;
+DROP INDEX  hydra_oauth2_oidc_request_id_idx;
+
+DROP INDEX public.hydra_oauth2_flow_login_verifier_idx;
+

@@ -50,6 +50,15 @@ type (
 	}
 )
 
+/*
+
+signature PK
+code_challenge_method
+code_challenge
+is_client_public
+
+*/
+
 const (
 	sqlTableOpenID  tableName = "oidc"
 	sqlTableAccess  tableName = "access"
@@ -430,7 +439,7 @@ func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature stri
 
 func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) error {
 	return otelx.WithSpan(ctx, "persistence.sql.DeletePKCERequestSession", func(ctx context.Context) error {
-		return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
+		return nil
 	})
 }
 

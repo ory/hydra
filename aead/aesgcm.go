@@ -31,26 +31,12 @@ func aeadKey(key []byte) *[32]byte {
 }
 
 func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) (string, error) {
-	global, err := c.c.GetGlobalSecret(ctx)
+	key, err := encryptionKey(ctx, c.c, 32)
 	if err != nil {
 		return "", err
 	}
 
-	rotated, err := c.c.GetRotatedGlobalSecrets(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	keys := append([][]byte{global}, rotated...)
-	if len(keys) == 0 {
-		return "", errors.Errorf("at least one encryption key must be defined but none were")
-	}
-
-	if len(keys[0]) < 32 {
-		return "", errors.Errorf("key must be exactly 32 long bytes, got %d bytes", len(keys[0]))
-	}
-
-	ciphertext, err := aesGCMEncrypt(plaintext, aeadKey(keys[0]), additionalData)
+	ciphertext, err := aesGCMEncrypt(plaintext, aeadKey(key), additionalData)
 	if err != nil {
 		return "", errorsx.WithStack(err)
 	}
@@ -58,29 +44,19 @@ func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) 
 	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (c *AESGCM) Decrypt(ctx context.Context, s string, aad []byte) (plaintext []byte, err error) {
-	ciphertext, err := base64.RawURLEncoding.DecodeString(s)
+func (c *AESGCM) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
+	msg, err := base64.RawURLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(err)
 	}
 
-	global, err := c.c.GetGlobalSecret(ctx)
+	keys, err := allKeys(ctx, c.c)
 	if err != nil {
-		return nil, err
-	}
-
-	rotated, err := c.c.GetRotatedGlobalSecrets(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	keys := append([][]byte{global}, rotated...)
-	if len(keys) == 0 {
-		return nil, errors.Errorf("at least one decryption key must be defined but none were")
+		return nil, errorsx.WithStack(err)
 	}
 
 	for _, key := range keys {
-		if plaintext, err = c.decrypt(ciphertext, key, aad); err == nil {
+		if plaintext, err = c.decrypt(msg, key, aad); err == nil {
 			return plaintext, nil
 		}
 	}

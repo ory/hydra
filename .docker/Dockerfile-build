@@ -14,7 +14,7 @@ RUN go mod download &&\
 
 #########################
 
-FROM gcr.io/distroless/base:nonroot AS runner
+FROM gcr.io/distroless/base-nossl-debian11:nonroot AS runner
 
 COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra

@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/driver/config"
 )
 
 type (
@@ -94,7 +95,11 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 }
 
 // SetCookie encrypts the given value and sets it in a cookie.
-func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, cookieName string, value any, opts ...CodecOption) error {
+func SetCookie(ctx context.Context, w http.ResponseWriter, reg interface {
+	FlowCipher() *aead.XChaCha20Poly1305
+	config.Provider
+}, cookieName string, value any, opts ...CodecOption) error {
+	cipher := reg.FlowCipher()
 	cookie, err := Encode(ctx, cipher, value, opts...)
 	if err != nil {
 		return err
@@ -103,10 +108,27 @@ func SetCookie(ctx context.Context, w http.ResponseWriter, cipher aead.Cipher, c
 	http.SetCookie(w, &http.Cookie{
 		Name:     cookieName,
 		Value:    cookie,
-		Path:     "/",
 		HttpOnly: true,
-		Secure:   false,
-		SameSite: http.SameSiteLaxMode,
+		Domain:   reg.Config().CookieDomain(ctx),
+		Secure:   reg.Config().CookieSecure(ctx),
+		SameSite: reg.Config().CookieSameSiteMode(ctx),
+	})
+
+	return nil
+}
+
+// DeleteCookie deletes the flow cookie.
+func DeleteCookie(ctx context.Context, w http.ResponseWriter, reg interface {
+	config.Provider
+}, cookieName string) error {
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieName,
+		Value:    "",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Domain:   reg.Config().CookieDomain(ctx),
+		Secure:   reg.Config().CookieSecure(ctx),
+		SameSite: reg.Config().CookieSameSiteMode(ctx),
 	})
 
 	return nil

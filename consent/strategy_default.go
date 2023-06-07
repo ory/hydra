@@ -231,7 +231,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		if err := s.r.ConsentManager().CreateLoginSession(ctx, loginSession); err != nil {
 			return err
 		}
-		if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.LoginSessionCookie, loginSession); err != nil {
+		if err := flowctx.SetCookie(ctx, w, s.r, flowctx.LoginSessionCookie, loginSession); err != nil {
 			return err
 		}
 	}
@@ -267,7 +267,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
 		return err
 	}
 
@@ -488,7 +488,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
 
-	if err = flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
+	if err = flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
@@ -604,7 +604,7 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
 		return err
 	}
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
@@ -668,8 +668,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 		return nil, nil, err
 	}
 
-	// TODO(hperl): Is this still necessary? Should we remove the cookie here?
-	if err = flowctx.SetCookie(ctx, w, s.r.FlowCipher(), flowctx.FlowCookie, f); err != nil {
+	if err = flowctx.DeleteCookie(ctx, w, s.r, flowctx.FlowCookie); err != nil {
 		return nil, nil, err
 	}
 
@@ -1101,21 +1100,21 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 		// ok, we need to process this request and redirect to auth endpoint
 		return nil, nil, s.requestAuthentication(ctx, w, r, req)
 	} else if loginVerifier != "" {
-		flow, err := s.verifyAuthentication(ctx, w, r, req, loginVerifier)
+		f, err := s.verifyAuthentication(ctx, w, r, req, loginVerifier)
 		if err != nil {
 			return nil, nil, err
 		}
 
 		// ok, we need to process this request and redirect to auth endpoint
-		return nil, flow, s.requestConsent(ctx, w, r, req, flow)
+		return nil, f, s.requestConsent(ctx, w, r, req, f)
 	}
 
-	consentSession, flow, err := s.verifyConsent(ctx, w, r, consentVerifier)
+	consentSession, f, err := s.verifyConsent(ctx, w, r, consentVerifier)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return consentSession, flow, nil
+	return consentSession, f, nil
 }
 
 func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {

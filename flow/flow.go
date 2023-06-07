@@ -65,7 +65,6 @@ const (
 	// If the above is implemented, merge the LoginError and ConsentError fields
 	// and use the following FlowStates when converting to/from
 	// [Handled]{Login|Consent}Request:
-
 	FlowStateLoginError   = int16(128)
 	FlowStateConsentError = int16(129)
 )
@@ -480,11 +479,7 @@ func (f *Flow) AfterFind(c *pop.Connection) error {
 	// TODO Populate the client field in FindInDB and FindByConsentChallengeID in
 	// order to avoid accessing the database twice.
 	f.AfterSave(c)
-	if f.Client != nil {
-		return nil // NOP, client was already loaded by a JOIN query
-	}
 	f.Client = &client.Client{}
-
 	return sqlcon.HandleError(c.Where("id = ? AND nid = ?", f.ClientID, f.NID).First(f.Client))
 }
 
@@ -501,15 +496,22 @@ type CipherProvider interface {
 	FlowCipher() *aead.XChaCha20Poly1305
 }
 
+// ToLoginChallenge converts the flow into a login challenge.
 func (f *Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginChallenge)
 }
+
+// ToLoginVerifier converts the flow into a login verifier.
 func (f *Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginVerifier)
 }
+
+// ToConsentChallenge converts the flow into a consent challenge.
 func (f *Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentChallenge)
 }
+
+// ToConsentVerifier converts the flow into a consent verifier.
 func (f *Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
 }

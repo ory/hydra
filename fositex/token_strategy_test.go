@@ -15,6 +15,8 @@ import (
 // Test that the generic signature function implements the same signature as the
 // HMAC and JWT strategies.
 func TestAccessTokenSignature(t *testing.T) {
+	ctx := context.Background()
+
 	t.Run("strategy=DefaultJWTStrategy", func(t *testing.T) {
 		strategy := new(oauth2.DefaultJWTStrategy)
 		for _, tc := range []struct{ token string }{
@@ -26,7 +28,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		} {
 			t.Run("case="+tc.token, func(t *testing.T) {
 				assert.Equal(t,
-					strategy.AccessTokenSignature(context.TODO(), tc.token),
+					strategy.AccessTokenSignature(ctx, tc.token),
 					genericSignature(tc.token))
 			})
 		}
@@ -42,7 +44,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		} {
 			t.Run("case="+tc.token, func(t *testing.T) {
 				assert.Equal(t,
-					strategy.AccessTokenSignature(context.TODO(), tc.token),
+					strategy.AccessTokenSignature(ctx, tc.token),
 					genericSignature(tc.token))
 			})
 		}

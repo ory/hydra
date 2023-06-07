@@ -223,11 +223,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		d.Logger(),
 		d.Config().Source(ctx),
 		&metricsx.Options{
-			Service: "hydra",
-			DeploymentId: metricsx.Hash(fmt.Sprintf("%s|%s",
-				d.Config().IssuerURL(ctx).String(),
-				d.Config().DSN(),
-			)),
+			Service:      "hydra",
+			DeploymentId: metricsx.Hash(d.Persister().NetworkID(ctx).String()),
 			IsDevelopment: d.Config().DSN() == "memory" ||
 				d.Config().IssuerURL(ctx).String() == "" ||
 				strings.Contains(d.Config().IssuerURL(ctx).String(), "localhost"),

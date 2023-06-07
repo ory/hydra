@@ -4,28 +4,38 @@ RUN apk update && apk upgrade &&\
     apk add -U --no-cache --upgrade --latest build-base git gcc
 
 WORKDIR /go/src/github.com/ory/hydra
-RUN mkdir -p ./internal/httpclient
-
-COPY go.mod go.sum ./
-COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 
-RUN go mod download
-
 COPY . .
-
-RUN go build -tags sqlite,json1 -o /usr/bin/hydra
+RUN go mod download &&\
+    go build -tags sqlite,json1 -o /usr/bin/hydra
 
 #########################
 
-FROM gcr.io/distroless/static-debian11:nonroot as runner
+FROM alpine:3.18 AS runner
+
+RUN addgroup -S ory; \
+    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
+    chown -R ory:ory /home/ory
 
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+
+# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
+# is required for read/write of SQLite.
+RUN mkdir -p /var/lib/sqlite && \
+    chown ory:ory /var/lib/sqlite
+
+VOLUME /var/lib/sqlite
+
+# Exposing the ory home directory
+VOLUME /home/ory
 
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 
-ENTRYPOINT ["/usr/bin/hydra"]
+USER ory
+
+ENTRYPOINT ["hydra"]
 CMD ["serve"]

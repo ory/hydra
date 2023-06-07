@@ -564,7 +564,7 @@ func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, sub
 (state = %d OR state = %d) AND
 subject = ? AND
 consent_skip=FALSE AND
---consent_error='{}' AND
+consent_error='{}' AND
 nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 			)),
 			subject, p.NetworkID(ctx)).

@@ -142,6 +142,19 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Cache-Control, Expires, Last-Modified, Pragma, Content-Length, Content-Language, Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
+			d: "should accept when basic auth client exists and wildcard origin is allowed per client",
+			prep: func(t *testing.T, r driver.Registry) {
+				r.Config().MustSet(ctx, "serve.public.cors.enabled", true)
+				r.Config().MustSet(ctx, "serve.public.cors.allowed_origins", []string{})
+
+				// Ignore unique violations
+				_ = r.ClientManager().CreateClient(ctx, &client.Client{LegacyClientID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*"}})
+			},
+			code:         http.StatusNotImplemented,
+			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-4", "bar"))}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Cache-Control, Expires, Last-Modified, Pragma, Content-Length, Content-Language, Content-Type"}, "Vary": []string{"Origin"}},
+		},
+		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
 			prep: func(t *testing.T, r driver.Registry) {
 				r.Config().MustSet(ctx, "serve.public.cors.enabled", true)

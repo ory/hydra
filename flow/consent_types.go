@@ -78,7 +78,7 @@ type RequestDeniedError struct {
 	Debug string `json:"error_debug"`
 
 	// swagger:ignore
-	Valid bool `json:"v"`
+	Valid bool `json:"valid"`
 }
 
 func (e *RequestDeniedError) IsError() bool {

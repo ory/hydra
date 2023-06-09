@@ -42,7 +42,7 @@
     "error_hint": "",
     "status_code": 0,
     "error_debug": "",
-    "v": false
+    "valid": false
   },
   "LoginAuthenticatedAt": null,
   "ConsentChallengeID": "challenge-0015",
@@ -67,7 +67,7 @@
     "error_hint": "",
     "status_code": 0,
     "error_debug": "",
-    "v": false
+    "valid": false
   },
   "SessionIDToken": {
     "session_id_token-0015": "0015"

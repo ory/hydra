@@ -18,7 +18,6 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.2.2
-	github.com/dgraph-io/ristretto v0.1.1
 	github.com/fatih/structs v1.1.0
 	github.com/go-swagger/go-swagger v0.30.3
 	github.com/gobuffalo/pop/v6 v6.1.2-0.20230318123913-c85387acc9a0
@@ -66,7 +65,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.11.1
 	go.opentelemetry.io/otel/trace v1.11.1
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/crypto v0.1.0
+	golang.org/x/crypto v0.9.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/oauth2 v0.5.0
 	golang.org/x/tools v0.9.1
@@ -93,6 +92,7 @@ require (
 	github.com/cristalhq/jwt/v4 v4.0.2 // indirect
 	github.com/dave/jennifer v1.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/docker/cli v20.10.21+incompatible // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/docker/docker v20.10.24+incompatible // indirect

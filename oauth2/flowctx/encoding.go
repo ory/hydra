@@ -48,7 +48,11 @@ func additionalDataFromOpts(opts ...CodecOption) []byte {
 	for _, o := range opts {
 		o(ad)
 	}
-	b, _ := json.Marshal(ad)
+	b, err := json.Marshal(ad)
+	if err != nil {
+		// Panic is OK here because the struct and the parameters are all known.
+		panic("failed to marshal additional data: " + errors.WithStack(err).Error())
+	}
 
 	return b
 }

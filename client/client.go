@@ -565,5 +565,11 @@ func AccessTokenStrategySource(client fosite.Client) config.AccessTokenStrategyS
 }
 
 func (c *Client) CookieSuffix() string {
-	return strconv.Itoa(int(murmur3.Sum32([]byte(c.LegacyClientID))))
+	return CookieSuffix(c)
+}
+
+type IDer interface{ GetID() string }
+
+func CookieSuffix(client IDer) string {
+	return strconv.Itoa(int(murmur3.Sum32([]byte(client.GetID()))))
 }

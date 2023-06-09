@@ -53,11 +53,6 @@ type (
 		DeleteKeySet(ctx context.Context, set string) error
 	}
 
-	// TODO(hperl): Remove if we decide that caching JWK is OK.
-	BatchManager interface {
-		GetKeySetIDs(ctx context.Context, sets ...string) (map[string][]string, error)
-	}
-
 	SQLData struct {
 		ID  uuid.UUID `db:"pk"`
 		NID uuid.UUID `json:"-" db:"nid"`

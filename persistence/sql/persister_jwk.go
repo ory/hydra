@@ -152,19 +152,6 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet")
 	defer span.End()
 
-	// Caching
-	// Important: Enabling this will break the tests!
-	//
-	//   cacheKey := p.cacheKey(ctx, "GetKeySet", set)
-	//   if res, ok := p.cache.Get(cacheKey); ok && res != nil {
-	//   	return res.(*jose.JSONWebKeySet), nil
-	//   }
-	//   defer func() {
-	//   	if keys != nil {
-	//   		p.cache.SetWithTTL(cacheKey, keys, ptrCost, 5*time.Minute)
-	//   	}
-	//   }()
-
 	var js []jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ?", set).
@@ -196,36 +183,6 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	}
 
 	return keys, nil
-}
-
-func (p *Persister) GetKeySetIDs(ctx context.Context, sets ...string) (map[string][]string, error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySetIDs")
-	defer span.End()
-
-	var rows []jwk.SQLData
-	res := make(map[string][]string)
-	sIDs := make([]any, len(sets))
-	for i, set := range sets {
-		sIDs[i] = set
-		res[set] = []string{}
-	}
-	if err := p.QueryWithNetwork(ctx).
-		Select("kid", "sid").
-		Where("sid in (?)", sIDs...).
-		Order("created_at DESC").
-		All(&rows); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
-
-	if len(rows) < len(sets) {
-		return nil, errors.Wrap(x.ErrNotFound, "")
-	}
-
-	for _, row := range rows {
-		res[row.Set] = append(res[row.Set], row.KID)
-	}
-
-	return res, nil
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {

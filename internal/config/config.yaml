@@ -139,7 +139,7 @@ serve:
 
     # Access Log configuration for public server.
     request_log:
-      # Disable access log for health endpoints.
+      # Disable access log for health and metrics endpoints.
       disable_for_health: false
 
   # admin controls the admin daemon serving admin API endpoints like /jwk, /client, ...

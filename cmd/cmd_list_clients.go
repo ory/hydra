@@ -35,6 +35,7 @@ func NewListClientsCmd() *cobra.Command {
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
+			defer resp.Body.Close()
 
 			var collection outputOAuth2ClientCollection
 			collection.clients = append(collection.clients, list...)

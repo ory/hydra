@@ -341,6 +341,9 @@ func (s *DefaultStrategy) verifyAuthentication(
 	if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The flow cookie is missing in the request."))
 	}
+	if f.Client.GetID() != req.GetClient().GetID() {
+		return nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow cookie client id does not match the authorize request client id."))
+	}
 
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, f, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
@@ -636,6 +639,9 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 	f, err := s.flowFromCookie(r)
 	if err != nil {
 		return nil, nil, err
+	}
+	if f.Client.GetID() != r.URL.Query().Get("client_id") {
+		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow cookie client id does not match the authorize request client id."))
 	}
 
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, f, verifier)

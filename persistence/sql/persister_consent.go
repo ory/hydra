@@ -191,7 +191,6 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
-	// TODO(hperl): Always check for expiration when decoding the flow.
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
@@ -260,6 +259,8 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
 	}
 	lr := f.GetLoginRequest()
+	// Restore the short challenge ID, which was previously sent to the encoded flow,
+	// to make sure that the challenge ID in the returned flow matches the param.
 	lr.ID = loginChallenge
 
 	return lr, nil
@@ -275,7 +276,8 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
-	// Restore the short challenge ID, which was previously sent to the encoded flow.
+	// Restore the short challenge ID, which was previously sent to the encoded flow,
+	// to make sure that the challenge ID in the returned flow matches the param.
 	r.ID = f.ConsentChallengeID.String()
 	if err := f.HandleConsentRequest(r); err != nil {
 		return nil, errorsx.WithStack(err)
@@ -316,6 +318,8 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *fl
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 
+	// We set the consent challenge ID to a new UUID that we can use as a foreign key in the database
+	// without encoding the whole flow.
 	f.ConsentChallengeID = sqlxx.NullString(uuid.Must(uuid.NewV4()).String())
 
 	if err = p.Connection(ctx).Create(f); err != nil {
@@ -405,7 +409,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ConfirmLoginSession")
 	defer span.End()
 
-	// If we previously cached the login session, we now want to persist it to db.
+	// Since we previously cached the login session, we now need to persist it to db.
 	if session != nil {
 		if session.NID != p.NetworkID(ctx) || session.ID != id {
 			return errorsx.WithStack(x.ErrNotFound)

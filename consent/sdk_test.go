@@ -197,7 +197,6 @@ func TestSDK(t *testing.T) {
 	csGot, _, err := sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot))
-	//cs := csGot[0]
 
 	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject2").Execute()
 	require.NoError(t, err)
@@ -206,7 +205,6 @@ func TestSDK(t *testing.T) {
 	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-3").Execute()
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot))
-	//cs = csGot[0]
 
 	csGot, _, err = sdk.OAuth2Api.ListOAuth2ConsentSessions(ctx).Subject("subject3").LoginSessionId("fk-login-session-t1-X").Execute()
 	require.NoError(t, err)

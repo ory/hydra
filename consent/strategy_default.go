@@ -479,7 +479,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	cookie.Options.Path = s.c.SessionCookiePath(ctx)
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
 	cookie.Options.Secure = s.c.CookieSecure(ctx)
-	if err = cookie.Save(r, w); err != nil {
+	if err := cookie.Save(r, w); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 

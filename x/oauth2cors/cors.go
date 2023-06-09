@@ -49,9 +49,8 @@ func Middleware(
 				}
 				g, err := glob.Compile(strings.ToLower(o), '.')
 				if err != nil {
-					reg.Logger().WithError(err).WithField("pattern", o).Error("Unable to parse CORS origin")
-					h.ServeHTTP(w, r)
-					return
+					reg.Logger().WithError(err).WithField("pattern", o).Error("Unable to parse CORS origin, ignoring it")
+					continue
 				}
 
 				patterns = append(patterns, g)

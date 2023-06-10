@@ -695,6 +695,14 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	} else if hr.Skip {
+		if p.Remember && p.RememberFor > 0 { // TODO: Consider removing 'p.RememberFor > 0' to update consent validity in both ways (limited (RememberFor > 0) -> indefinitely (RememberFor = 0) and vice versa)
+			var ctx = r.Context()
+			err = h.r.ConsentManager().ExtendConsentRequest(r.Context(), h.r.Config().GetScopeStrategy(ctx), hr, p.RememberFor)
+			if err != nil {
+				h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+				return
+			}
+		}
 		p.Remember = false
 	}
 

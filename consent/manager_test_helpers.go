@@ -294,7 +294,7 @@ func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2Invalid
 	}
 }
 
-func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
+func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer, scopeStrategy fosite.ScopeStrategy, network string, parallel bool) func(t *testing.T) {
 	lr := make(map[string]*LoginRequest)
 
 	return func(t *testing.T) {
@@ -532,6 +532,129 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					}
 				})
 			}
+		})
+
+		t.Run("case=extend consent request", func(t *testing.T) {
+			cl := &client.Client{LegacyClientID: "client-1"}
+			_ = clientManager.CreateClient(context.Background(), cl)
+			consentFlow := func(subject, sessionId, challenge string, rememberFor time.Duration, requestedAt time.Time, requestedScope string, skip bool) *OAuth2ConsentRequest {
+				require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{
+					ID:             makeID("challenge", network, challenge),
+					SessionID:      sqlxx.NullString(makeID("fk-login-session", network, sessionId)),
+					Client:         cl,
+					Subject:        subject,
+					Verifier:       uuid.New().String(),
+					RequestedAt:    requestedAt,
+					RequestedScope: []string{requestedScope},
+				}))
+
+				require.NoError(t, m.CreateConsentRequest(context.Background(), &OAuth2ConsentRequest{
+					ID:             makeID("challenge", network, challenge),
+					Client:         cl,
+					Subject:        subject,
+					LoginSessionID: sqlxx.NullString(makeID("fk-login-session", network, sessionId)),
+					LoginChallenge: sqlxx.NullString(makeID("challenge", network, challenge)),
+					Skip:           skip,
+					Verifier:       uuid.New().String(),
+					CSRF:           "csrf1",
+				}))
+				cr, err := m.HandleConsentRequest(context.Background(), &AcceptOAuth2ConsentRequest{
+					ID:           makeID("challenge", network, challenge),
+					Remember:     true,
+					RememberFor:  int(rememberFor),
+					WasHandled:   true,
+					HandledAt:    sqlxx.NullTime(time.Now().UTC()),
+					GrantedScope: []string{"scope-a"},
+				})
+				require.NoError(t, err)
+				return cr
+			}
+
+			t.Run("case=extend session related and latest consent expiry times", func(t *testing.T) {
+				var rememberForSession1 time.Duration = 300
+				var remainingValidTimeSession1 time.Duration = 100
+				var rememberForSession2 time.Duration = 300
+				var remainingValidTimeSession2 time.Duration = 150
+				var extendRememberFor time.Duration = 1000
+				requestedAt1 := time.Now().UTC().Round(time.Second).Add(-(rememberForSession1 - remainingValidTimeSession1) * time.Second)
+				requestedAt2 := time.Now().UTC().Round(time.Second).Add(-(rememberForSession2 - remainingValidTimeSession2) * time.Second)
+				requestedAt3 := time.Now().UTC()
+				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+					ID:      makeID("fk-login-session", network, "ec1"),
+					Subject: "subject-1",
+				}))
+				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+					ID:      makeID("fk-login-session", network, "ec2"),
+					Subject: "subject-1",
+				}))
+				consentFlow("subject-1", "ec1", "c1", rememberForSession1, requestedAt1, "scope-a", false)
+				consentFlow("subject-1", "ec2", "c2", rememberForSession2, requestedAt2, "scope-a", false)
+				cr := consentFlow("subject-1", "ec1", "c3", extendRememberFor, requestedAt3, "scope-a", true)
+
+				require.NoError(t, m.ExtendConsentRequest(context.Background(), scopeStrategy, cr, int(extendRememberFor)))
+
+				crs, err := m.FindSubjectsGrantedConsentRequests(context.Background(), "subject-1", 100, 0)
+				require.NoError(t, err)
+				require.EqualValues(t, 2, len(crs))
+				crSession := crs[1]
+				require.EqualValues(t, makeID("challenge", network, "c1"), crSession.ID)
+				expectedExtendedRememberFor1 := int(rememberForSession1 + extendRememberFor - remainingValidTimeSession1)
+				require.InDelta(t, expectedExtendedRememberFor1, crSession.RememberFor, 1)
+				crLatest := crs[0]
+				require.EqualValues(t, makeID("challenge", network, "c2"), crLatest.ID)
+				expectedExtendedRememberFor2 := int(rememberForSession2 + extendRememberFor - remainingValidTimeSession2)
+				require.InDelta(t, expectedExtendedRememberFor2, crLatest.RememberFor, 1)
+			})
+
+			t.Run("case=no previous consent found", func(t *testing.T) {
+				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+					ID:      makeID("fk-login-session", network, "ec3"),
+					Subject: "subject-1",
+				}))
+				cr := consentFlow("subject-1", "ec3", "c4", 300, time.Now().UTC(), "scope-a", true)
+
+				require.ErrorIs(t, m.ExtendConsentRequest(context.Background(), scopeStrategy, cr, 1000), ErrNoPreviousConsentFound)
+			})
+
+			t.Run("case=invalid requested scope", func(t *testing.T) {
+				var rememberForSession1 time.Duration = 300
+				var remainingValidTimeSession1 time.Duration = 100
+				requestedAt1 := time.Now().UTC().Round(time.Second).Add(-(rememberForSession1 - remainingValidTimeSession1) * time.Second)
+				requestedAt2 := time.Now().UTC()
+				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+					ID:      makeID("fk-login-session", network, "ec4"),
+					Subject: "subject-2",
+				}))
+				consentFlow("subject-2", "ec4", "c5", 300, requestedAt1, "scope-a", false)
+				cr := consentFlow("subject-2", "ec4", "c6", 300, requestedAt2, "scope-b", true)
+
+				require.NoError(t, m.ExtendConsentRequest(context.Background(), scopeStrategy, cr, 1000))
+
+				crs, err := m.FindSubjectsGrantedConsentRequests(context.Background(), "subject-2", 10, 0)
+				require.NoError(t, err)
+				require.EqualValues(t, 1, len(crs))
+				cr1 := crs[0]
+				require.EqualValues(t, makeID("challenge", network, "c5"), cr1.ID)
+				require.EqualValues(t, 300, cr1.RememberFor)
+			})
+
+			t.Run("case=initial consent request expired", func(t *testing.T) {
+				var rememberForSession1 time.Duration = 300
+				var remainingValidTimeSession1 time.Duration = 0
+				requestedAtExpired := time.Now().UTC().Round(time.Second).Add(-(rememberForSession1 - remainingValidTimeSession1) * time.Second)
+				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+					ID:      makeID("fk-login-session", network, "ec5"),
+					Subject: "subject-3",
+				}))
+				consentFlow("subject-3", "ec5", "c7", 300, requestedAtExpired, "scope-a", false)
+				time.Sleep(time.Second)
+				cr := consentFlow("subject-3", "ec5", "c8", 300, time.Now().UTC(), "scope-a", true)
+
+				require.NoError(t, m.ExtendConsentRequest(context.Background(), scopeStrategy, cr, 1000))
+
+				_, err := m.FindSubjectsGrantedConsentRequests(context.Background(), "subject-3", 100, 0)
+				require.Error(t, err, ErrNoPreviousConsentFound)
+			})
 		})
 
 		t.Run("case=revoke-auth-request", func(t *testing.T) {

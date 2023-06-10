@@ -283,6 +283,88 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.AcceptO
 	return p.GetConsentRequest(ctx, r.ID)
 }
 
+func (p *Persister) ExtendConsentRequest(ctx context.Context, scopeStrategy fosite.ScopeStrategy, cr *consent.OAuth2ConsentRequest, extendBy int) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ExtendConsentRequest")
+		defer span.End()
+
+		sessionFlow := &flow.Flow{}
+		if err := c.
+			Where(
+				strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+client_id = ? AND
+login_session_id = ? AND
+consent_skip=FALSE AND
+consent_error='{}' AND
+consent_remember=TRUE AND
+nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+				)),
+				cr.Subject, cr.ClientID, cr.LoginSessionID.String(), p.NetworkID(ctx)).
+			Order("requested_at DESC").
+			Limit(1).
+			First(sessionFlow); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errorsx.WithStack(consent.ErrNoPreviousConsentFound)
+			}
+			return sqlcon.HandleError(err)
+		}
+
+		latestFlow := &flow.Flow{}
+		if err := c.
+			Where(
+				strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+client_id = ? AND
+consent_skip=FALSE AND
+consent_error='{}' AND
+consent_remember=TRUE AND
+nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+				)),
+				cr.Subject, cr.ClientID, p.NetworkID(ctx)).
+			Order("requested_at DESC").
+			Limit(1).
+			First(latestFlow); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		if err := p.extendHandledConsentRequest(ctx, cr, scopeStrategy, sessionFlow, extendBy); err != nil {
+			return err
+		}
+
+		if latestFlow.ID != sessionFlow.ID {
+			if err := p.extendHandledConsentRequest(ctx, cr, scopeStrategy, latestFlow, extendBy); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (p *Persister) extendHandledConsentRequest(ctx context.Context, cr *consent.OAuth2ConsentRequest, scopeStrategy fosite.ScopeStrategy, f *flow.Flow, extendBy int) error {
+	for _, scope := range cr.RequestedScope {
+		if !scopeStrategy(f.GrantedScope, scope) {
+			return nil
+		}
+	}
+	hcr := f.GetHandledConsentRequest()
+	if isConsentRequestExpired := hcr.RememberFor > 0 && hcr.RequestedAt.Add(time.Duration(hcr.RememberFor)*time.Second).Before(time.Now().UTC()); isConsentRequestExpired {
+		return nil
+	}
+	remainingTime := hcr.RequestedAt.Unix() + int64(hcr.RememberFor) - time.Now().Unix()
+	extendedRememberFor := hcr.RememberFor + extendBy - int(remainingTime)
+	f.ConsentRememberFor = &extendedRememberFor
+
+	_, err := p.UpdateWithNetwork(ctx, f)
+	if err != nil {
+		return sqlcon.HandleError(err)
+	} else {
+		return nil
+	}
+}
+
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()

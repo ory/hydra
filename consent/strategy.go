@@ -17,4 +17,8 @@ type Strategy interface {
 	HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error)
 	HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error
 	ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error)
+	ExecuteBackChannelLogoutBySession(ctx context.Context, r *http.Request, subject, sid string)
+	ExecuteBackChannelLogoutBySubject(ctx context.Context, r *http.Request, subject string)
+	ExecuteBackChannelLogoutByClient(ctx context.Context, r *http.Request, subject, client string)
+	ExecuteBackChannelLogoutByClientSession(ctx context.Context, r *http.Request, subject, client, sid string)
 }

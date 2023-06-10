@@ -1514,11 +1514,11 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
 
-			cs, err := r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			cs, err := r.Persister().ListUserSessionAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
 			require.Equal(t, 1, len(cs))
 
-			cs, err = r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			cs, err = r.Persister().ListUserSessionAuthenticatedClientsWithBackChannelLogout(s.t2, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
 			require.Equal(t, 2, len(cs))
 		})
@@ -1568,11 +1568,11 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.AcceptOAuth2ConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
 			require.NoError(t, err)
 
-			cs, err := r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			cs, err := r.Persister().ListUserSessionAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
 			require.Equal(t, 1, len(cs))
 
-			cs, err = r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			cs, err = r.Persister().ListUserSessionAuthenticatedClientsWithFrontChannelLogout(s.t2, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
 			require.Equal(t, 2, len(cs))
 		})

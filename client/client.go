@@ -308,6 +308,11 @@ type Client struct {
 	Lifespans
 }
 
+type LoginSessionClient struct {
+	Client
+	LoginSessionID string `json:"login_session_id,omitempty" db:"login_session_id"`
+}
+
 // OAuth 2.0 Client Token Lifespans
 //
 // Lifespans of different token types issued for this OAuth 2.0 Client.

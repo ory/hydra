@@ -1,10 +1,10 @@
 FROM golang:1.19 AS builder
 
+WORKDIR /go/src/github.com/ory/hydra
+
 RUN apt-get update && apt-get upgrade -y &&\
     mkdir -p /var/lib/sqlite &&\
     mkdir -p ./internal/httpclient
-
-WORKDIR /go/src/github.com/ory/hydra
 
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient

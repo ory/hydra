@@ -45,11 +45,11 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 	}
 
 	ciphertext := aead.Seal(nonce, nonce, plaintext, additionalData)
-	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
 func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
-	msg, err := base64.RawURLEncoding.DecodeString(ciphertext)
+	msg, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}

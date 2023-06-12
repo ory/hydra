@@ -425,7 +425,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}{{
 			name:             "fails with wrong client ID after login",
 			client:           withWrongClientAfterLogin,
-			expectedResponse: "invalid_client",
+			expectedResponse: "access_denied",
 		}, {
 			name:             "fails with wrong client ID after consent",
 			client:           withWrongClientAfterConsent,

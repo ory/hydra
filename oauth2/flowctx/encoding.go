@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
 )
@@ -142,7 +143,7 @@ func DeleteCookie(ctx context.Context, w http.ResponseWriter, reg interface {
 func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string, opts ...CodecOption) (*T, error) {
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("No cookie found for this request. Please initiate a new flow and retry."))
 	}
 
 	return Decode[T](ctx, cipher, cookie.Value, opts...)

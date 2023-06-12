@@ -104,7 +104,7 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 		return nil, errorsx.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie := s.loginSessionFromCookie(r)
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, sessionID)
 	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().WithRequest(r).WithError(err).
@@ -231,7 +231,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		if err := s.r.ConsentManager().CreateLoginSession(ctx, loginSession); err != nil {
 			return err
 		}
-		if err := flowctx.SetCookie(ctx, w, s.r, flowctx.LoginSessionCookie, loginSession); err != nil {
+		if err := flowctx.SetCookie(ctx, w, s.r, flowctx.LoginSessionCookie(flowctx.SuffixForClient(ar.GetClient())), loginSession); err != nil {
 			return err
 		}
 	}
@@ -267,7 +267,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(cl), f); err != nil {
 		return err
 	}
 
@@ -337,7 +337,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	req fosite.AuthorizeRequester,
 	verifier string,
 ) (*flow.Flow, error) {
-	f, err := flowctx.FromCookie[flow.Flow](ctx, r, s.r.FlowCipher(), flowctx.FlowCookie)
+	f, err := s.flowFromCookie(r)
 	if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The flow cookie is missing in the request."))
 	}
@@ -444,9 +444,9 @@ func (s *DefaultStrategy) verifyAuthentication(
 				"Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
 		}
 
-		loginSession, err := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
-		if err != nil {
-			return nil, err
+		loginSession := s.loginSessionFromCookie(r)
+		if loginSession == nil {
+			return nil, fosite.ErrAccessDenied.WithHint("The login session cookie was not found or malformed.")
 		}
 
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
@@ -491,7 +491,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
 
-	if err = flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
+	if err = flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(flowctx.SuffixForClient(req.GetClient())), f); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
@@ -607,7 +607,7 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie, f); err != nil {
+	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(cl), f); err != nil {
 		return err
 	}
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
@@ -674,7 +674,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 		return nil, nil, err
 	}
 
-	if err = flowctx.DeleteCookie(ctx, w, s.r, flowctx.FlowCookie); err != nil {
+	if err = flowctx.DeleteCookie(ctx, w, s.r, flowctx.FlowCookie(f.Client)); err != nil {
 		return nil, nil, err
 	}
 
@@ -945,7 +945,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie := s.loginSessionFromCookie(r)
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
@@ -1069,7 +1069,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	sessionFromCookie, _ := flowctx.FromCookie[flow.LoginSession](ctx, r, s.r.FlowCipher(), flowctx.LoginSessionCookie)
+	sessionFromCookie := s.loginSessionFromCookie(r)
 	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionFromCookie, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
@@ -1142,5 +1142,20 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 }
 
 func (s *DefaultStrategy) flowFromCookie(r *http.Request) (*flow.Flow, error) {
-	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.FlowCipher(), flowctx.FlowCookie)
+	clientID := r.URL.Query().Get("client_id")
+	if clientID == "" {
+		return nil, errors.WithStack(fosite.ErrInvalidClient)
+	}
+
+	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.FlowCipher(), flowctx.FlowCookie(flowctx.SuffixFromStatic(clientID)))
+}
+
+func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) *flow.LoginSession {
+	clientID := r.URL.Query().Get("client_id")
+	if clientID == "" {
+		return nil
+	}
+	ls, _ := flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.FlowCipher(), flowctx.LoginSessionCookie(flowctx.SuffixFromStatic(clientID)))
+
+	return ls
 }

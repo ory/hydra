@@ -1066,7 +1066,7 @@ func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interfac
 
 	hc := testhelpers.NewEmptyJarClient(t)
 	hc.Jar.SetCookies(reg.Config().OAuth2AuthURL(ctx), []*http.Cookie{
-		{Name: flowctx.FlowCookie, Value: x.Must(flowctx.Encode(ctx, reg.FlowCipher(), f))},
+		{Name: flowctx.FlowCookie(c), Value: x.Must(flowctx.Encode(ctx, reg.FlowCipher(), f))},
 	})
 
 	return hc

@@ -13,6 +13,7 @@ import (
 )
 
 func TestGenerateJWK(t *testing.T) {
+	t.Parallel()
 	jwks, err := GenerateJWK(context.Background(), jose.RS256, "", "")
 	require.NoError(t, err)
 	assert.NotEmpty(t, jwks.Keys[0].KeyID)

@@ -10,14 +10,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
+	"regexp"
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/ioutilx"
 
-	"github.com/twmb/murmur3"
-
+	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/x/pointerx"
@@ -113,8 +119,12 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
+		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
 
-		makeRequestAndExpectError(t, nil, c, url.Values{"login_verifier": {"does-not-exist"}}, "The login verifier has already been used, has not been granted, or is invalid.")
+		makeRequestAndExpectError(
+			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
+			"The login verifier has already been used, has not been granted, or is invalid.",
+		)
 	})
 
 	t.Run("case=should fail because a non-existing consent verifier was given", func(t *testing.T) {
@@ -123,7 +133,12 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// - This should fail because a consent verifier was given but no login verifier
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
-		makeRequestAndExpectError(t, nil, c, url.Values{"consent_verifier": {"does-not-exist"}}, "The consent verifier has already been used, has not been granted, or is invalid.")
+		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
+
+		makeRequestAndExpectError(
+			t, hc, c, url.Values{"consent_verifier": {"does-not-exist"}},
+			"The consent verifier has already been used, has not been granted, or is invalid.",
+		)
 	})
 
 	t.Run("case=should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
@@ -169,6 +184,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
 		hc := new(http.Client)
+		hc.Jar = DropCookieJar(regexp.MustCompile("ory_hydra_.*_csrf_.*"))
 		makeRequestAndExpectError(t, hc, c, url.Values{}, "No CSRF value available in the session cookie.")
 	})
 
@@ -332,16 +348,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		loginChallengeRedirect, err := oauthRes.Location()
 		require.NoError(t, err)
 		defer oauthRes.Body.Close()
-		setCookieHeader := oauthRes.Header.Get("set-cookie")
-		assert.NotNil(t, setCookieHeader)
 
-		t.Run("login cookie client specific suffix is set", func(t *testing.T) {
-			assert.Regexp(t, fmt.Sprintf("ory_hydra_login_csrf_dev_%d=.*", murmur3.Sum32(c.ID.Bytes())), setCookieHeader)
+		foundLoginCookie := slices.ContainsFunc(oauthRes.Header.Values("set-cookie"), func(sc string) bool {
+			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
+			require.NoError(t, err)
+			return ok
 		})
-
-		t.Run("login cookie max age is set", func(t *testing.T) {
-			assert.Regexp(t, fmt.Sprintf("ory_hydra_login_csrf_dev_%d=.*Max-Age=%.0f;.*", murmur3.Sum32(c.ID.Bytes()), consentRequestMaxAge), setCookieHeader)
-		})
+		require.True(t, foundLoginCookie, "client-specific login cookie with max age set")
 
 		loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
 		require.NoError(t, err)
@@ -352,16 +365,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 		require.NoError(t, err)
 		defer loginVerifierRes.Body.Close()
-		setCookieHeader = loginVerifierRes.Header.Values("set-cookie")[1]
-		assert.NotNil(t, setCookieHeader)
 
-		t.Run("consent cookie client specific suffix set", func(t *testing.T) {
-			assert.Regexp(t, fmt.Sprintf("ory_hydra_consent_csrf_dev_%d=.*", murmur3.Sum32(c.ID.Bytes())), setCookieHeader)
+		foundConsentCookie := slices.ContainsFunc(loginVerifierRes.Header.Values("set-cookie"), func(sc string) bool {
+			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_consent_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
+			require.NoError(t, err)
+			return ok
 		})
-
-		t.Run("consent cookie max age is set", func(t *testing.T) {
-			assert.Regexp(t, fmt.Sprintf("ory_hydra_consent_csrf_dev_%d=.*Max-Age=%.0f;.*", murmur3.Sum32(c.ID.Bytes()), consentRequestMaxAge), setCookieHeader)
-		})
+		require.True(t, foundConsentCookie, "client-specific consent cookie with max age set")
 	})
 
 	t.Run("case=should pass if both login and consent are granted and check remember flows with refresh session cookie", func(t *testing.T) {
@@ -432,6 +442,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			require.NoError(t, err)
 			defer loginChallengeRes.Body.Close()
 			loginVerifierRedirect, err := loginChallengeRes.Location()
+			require.NoError(t, err)
 
 			loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 			require.NoError(t, err)
@@ -580,9 +591,8 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		hc := testhelpers.NewEmptyJarClient(t)
 
-		t.Run("set up initial session", func(t *testing.T) {
-			makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
-		})
+		// set up initial session
+		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
 
 		// By not waiting here we ensure that there are no race conditions when it comes to authenticated_at and
 		// requested_at time comparisons:
@@ -1016,4 +1026,48 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		hc := testhelpers.NewEmptyJarClient(t)
 		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
 	})
+}
+
+func DropCookieJar(drop *regexp.Regexp) http.CookieJar {
+	jar, _ := cookiejar.New(nil)
+	return &dropCSRFCookieJar{
+		jar:  jar,
+		drop: drop,
+	}
+}
+
+type dropCSRFCookieJar struct {
+	jar  *cookiejar.Jar
+	drop *regexp.Regexp
+}
+
+var _ http.CookieJar = (*dropCSRFCookieJar)(nil)
+
+func (d *dropCSRFCookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
+	for _, c := range cookies {
+		if d.drop.MatchString(c.Name) {
+			continue
+		}
+		d.jar.SetCookies(u, []*http.Cookie{c})
+	}
+}
+
+func (d *dropCSRFCookieJar) Cookies(u *url.URL) []*http.Cookie {
+	return d.jar.Cookies(u)
+}
+
+func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interface {
+	ConsentManager() consent.Manager
+	Config() *config.DefaultProvider
+	FlowCipher() *aead.XChaCha20Poly1305
+}, c *client.Client) *http.Client {
+	f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{Client: c})
+	require.NoError(t, err)
+
+	hc := testhelpers.NewEmptyJarClient(t)
+	hc.Jar.SetCookies(reg.Config().OAuth2AuthURL(ctx), []*http.Cookie{
+		{Name: flowctx.FlowCookie(c), Value: x.Must(flowctx.Encode(ctx, reg.FlowCipher(), f))},
+	})
+
+	return hc
 }

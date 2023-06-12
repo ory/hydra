@@ -25,6 +25,8 @@ import (
 )
 
 func TestHandlerWellKnown(t *testing.T) {
+	t.Parallel()
+
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
@@ -37,6 +39,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
+		t.Parallel()
 		if conf.HSMEnabled() {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
@@ -62,6 +65,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	})
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
+		t.Parallel()
 		var IDKS *jose.JSONWebKeySet
 
 		if conf.HSMEnabled() {

@@ -6,8 +6,11 @@ package driver
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/x/httprouterx"
 
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/x/contextx"
 
@@ -46,9 +49,11 @@ type Registry interface {
 	WithConfig(c *config.DefaultProvider) Registry
 	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
+	WithTracer(t trace.Tracer) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 
+	contextx.Provider
 	config.Provider
 	persistence.Provider
 	x.RegistryLogger
@@ -61,6 +66,7 @@ type Registry interface {
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
+	FlowCipher() *aead.XChaCha20Poly1305
 
 	RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic)
 	ClientHandler() *client.Handler
@@ -109,6 +115,7 @@ func CallRegistry(ctx context.Context, r Registry) {
 	r.SubjectIdentifierAlgorithm(ctx)
 	r.KeyManager()
 	r.KeyCipher()
+	r.FlowCipher()
 	r.OAuth2Storage()
 	r.OAuth2Provider()
 	r.AudienceStrategy()

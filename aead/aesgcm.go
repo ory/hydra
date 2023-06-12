@@ -41,11 +41,11 @@ func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) 
 		return "", errorsx.WithStack(err)
 	}
 
-	return base64.RawURLEncoding.EncodeToString(ciphertext), nil
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
 func (c *AESGCM) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
-	msg, err := base64.RawURLEncoding.DecodeString(ciphertext)
+	msg, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}

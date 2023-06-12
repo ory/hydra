@@ -1017,5 +1017,10 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 }
 
 func (h *Handler) flowFromCookie(r *http.Request) (*flow.Flow, error) {
-	return flowctx.FromCookie[flow.Flow](r.Context(), r, h.r.FlowCipher(), flowctx.FlowCookie)
+	clientID := r.URL.Query().Get("client_id")
+	if clientID == "" {
+		return nil, errors.WithStack(fosite.ErrInvalidClient)
+	}
+
+	return flowctx.FromCookie[flow.Flow](r.Context(), r, h.r.FlowCipher(), flowctx.FlowCookie(flowctx.SuffixFromStatic(clientID)))
 }

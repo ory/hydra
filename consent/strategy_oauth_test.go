@@ -119,7 +119,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
-		hc := newHTTPClientWithFlowCookie(t, ctx, reg)
+		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
@@ -133,7 +133,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// - This should fail because a consent verifier was given but no login verifier
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
-		hc := newHTTPClientWithFlowCookie(t, ctx, reg)
+		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"consent_verifier": {"does-not-exist"}},
@@ -1060,8 +1060,8 @@ func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interfac
 	ConsentManager() consent.Manager
 	Config() *config.DefaultProvider
 	FlowCipher() *aead.XChaCha20Poly1305
-}) *http.Client {
-	f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{})
+}, c *client.Client) *http.Client {
+	f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{Client: c})
 	require.NoError(t, err)
 
 	hc := testhelpers.NewEmptyJarClient(t)

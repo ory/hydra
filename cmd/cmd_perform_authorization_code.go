@@ -190,7 +190,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 					go shutdown()
 				} else {
 					// regenerate because we don't want to shutdown and we don't want to reuse nonce & state
-					authCodeURL, state = generateAuthCodeURL()
+					// authCodeURL, state = generateAuthCodeURL()
 				}
 			}
 

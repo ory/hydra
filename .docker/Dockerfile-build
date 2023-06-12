@@ -1,16 +1,21 @@
 FROM golang:1.19 AS builder
 
 RUN apt-get update && apt-get upgrade -y &&\
-    mkdir -p /var/lib/sqlite
+    mkdir -p /var/lib/sqlite &&\
+    mkdir -p ./internal/httpclient
 
 WORKDIR /go/src/github.com/ory/hydra
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 
+RUN go mod download
+
 COPY . .
-RUN go mod download &&\
-    go build -tags sqlite,json1 -o /usr/bin/hydra
+RUN go build -tags sqlite,json1 -o /usr/bin/hydra
 
 #########################
 

@@ -1,11 +1,19 @@
 FROM golang:1.19 AS builder
 
+RUN apt-get update && apt-get upgrade -y &&\
+    mkdir -p /var/lib/sqlite &&\
+    mkdir -p ./internal/httpclient
+
 WORKDIR /go/src/github.com/ory/hydra
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient
+
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 
-COPY . .
 RUN go mod download
+COPY . .
 
 ###############################
 
@@ -20,8 +28,7 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
-RUN apt-get update && apt-get -y upgrade &&\
-    apt-get -y install softhsm opensc &&\
+RUN apt-get -y install softhsm opensc &&\
     pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL" &&\
     go test -p 1 -v -failfast -short -tags=sqlite,hsm ./...
 
@@ -34,8 +41,7 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
-RUN apt-get update && apt-get -y upgrade &&\
-    apt-get -y install softhsm opensc &&\
+RUN apt-get -y install softhsm opensc &&\
     pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL"
 
 RUN addgroup -S ory; \

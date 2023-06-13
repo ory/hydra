@@ -122,9 +122,9 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 	return m.r
 }
 
-func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Handler) http.Handler {
+func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(ctx, m.r)
+		m.oa2mw = oauth2cors.Middleware(m.r)
 	}
 	return m.oa2mw
 }
@@ -153,9 +153,9 @@ func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *httprouterx.Ro
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetRoutes(admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 

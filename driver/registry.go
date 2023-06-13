@@ -5,6 +5,7 @@ package driver
 
 import (
 	"context"
+	"net/http"
 
 	"go.opentelemetry.io/otel/trace"
 
@@ -74,6 +75,7 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+	OAuth2AwareMiddleware() func(h http.Handler) http.Handler
 
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	WithOAuth2Provider(f fosite.OAuth2Provider)

@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package consent
+package flow
 
 import (
 	"database/sql"
@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	consentRequestDeniedErrorName = "consent request denied"
-	loginRequestDeniedErrorName   = "login request denied"
+	ConsentRequestDeniedErrorName = "consent request denied"
+	LoginRequestDeniedErrorName   = "login request denied"
 )
 
 // OAuth 2.0 Redirect Browser To
@@ -49,7 +49,7 @@ type LoginSession struct {
 	Remember        bool           `db:"remember"`
 }
 
-func (_ LoginSession) TableName() string {
+func (LoginSession) TableName() string {
 	return "hydra_oauth2_authentication_session"
 }
 
@@ -77,11 +77,12 @@ type RequestDeniedError struct {
 	// to the public but only in the server logs.
 	Debug string `json:"error_debug"`
 
-	valid bool
+	// swagger:ignore
+	Valid bool `json:"valid"`
 }
 
 func (e *RequestDeniedError) IsError() bool {
-	return e != nil && e.valid
+	return e != nil && e.Valid
 }
 
 func (e *RequestDeniedError) SetDefaults(name string) {
@@ -94,7 +95,7 @@ func (e *RequestDeniedError) SetDefaults(name string) {
 	}
 }
 
-func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
+func (e *RequestDeniedError) ToRFCError() *fosite.RFC6749Error {
 	if e.Name == "" {
 		e.Name = "request_denied"
 	}
@@ -112,7 +113,7 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	}
 }
 
-func (e *RequestDeniedError) Scan(value interface{}) error {
+func (e *RequestDeniedError) Scan(value any) error {
 	v := fmt.Sprintf("%s", value)
 	if len(v) == 0 || v == "{}" {
 		return nil
@@ -122,7 +123,7 @@ func (e *RequestDeniedError) Scan(value interface{}) error {
 		return errorsx.WithStack(err)
 	}
 
-	e.valid = true
+	e.Valid = true
 	return nil
 }
 
@@ -188,6 +189,8 @@ func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 // List of OAuth 2.0 Consent Sessions
 //
 // swagger:model oAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type oAuth2ConsentSessions []OAuth2ConsentSession
 
 // OAuth 2.0 Consent Session
@@ -420,7 +423,7 @@ type LogoutRequest struct {
 	Client                *client.Client `json:"client" db:"-"`
 }
 
-func (_ LogoutRequest) TableName() string {
+func (LogoutRequest) TableName() string {
 	return "hydra_oauth2_logout_request"
 }
 

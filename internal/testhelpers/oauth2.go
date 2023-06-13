@@ -7,14 +7,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 
 	"github.com/ory/fosite/token/jwt"
 
@@ -25,8 +28,6 @@ import (
 
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
-
-	"net/http/httptest"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
@@ -55,7 +56,7 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 	return token
 }
 
-func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
@@ -66,19 +67,22 @@ func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (pu
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
-	publicTS = httptest.NewServer(public)
+	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	internal.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
+
+	reg.RegisterRoutes(ctx, admin, public)
+
+	publicTS = httptest.NewServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+		return r.URL.Path
+	})))
 	t.Cleanup(publicTS.Close)
 
-	adminTS = httptest.NewServer(admin)
+	adminTS = httptest.NewServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+		return r.URL.Path
+	})))
 	t.Cleanup(adminTS.Close)
 
 	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
-	// SendDebugMessagesToClients: true,
-
-	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
-	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
-
-	reg.RegisterRoutes(ctx, admin, public)
 	return publicTS, adminTS
 }
 
@@ -93,7 +97,7 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 	return gjson.ParseBytes(body)
 }
 
-func IntrospectToken(t *testing.T, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
+func IntrospectToken(t testing.TB, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
 	require.NotEmpty(t, token)
 
 	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",
@@ -140,13 +144,13 @@ func HTTPServerNotImplementedHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
+func HTTPServerNoExpectedCallHandler(t testing.TB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("This should not have been called")
 	}
 }
 
-func NewLoginConsentUI(t *testing.T, c *config.DefaultProvider, login, consent http.HandlerFunc) {
+func NewLoginConsentUI(t testing.TB, c *config.DefaultProvider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}
@@ -165,7 +169,7 @@ func NewLoginConsentUI(t *testing.T, c *config.DefaultProvider, login, consent h
 	c.MustSet(context.Background(), config.KeyConsentURL, ct.URL)
 }
 
-func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
+func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 	if h == nil {
 		h = HTTPServerNotImplementedHandler
 	}
@@ -180,14 +184,35 @@ func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
 	return ts.URL + "/" + prefix
 }
 
-func NewEmptyCookieJar(t *testing.T) *cookiejar.Jar {
+func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
 	c, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
 	return c
 }
 
-func NewEmptyJarClient(t *testing.T) *http.Client {
+func NewEmptyJarClient(t testing.TB) *http.Client {
 	return &http.Client{
-		Jar: NewEmptyCookieJar(t),
+		Jar:       NewEmptyCookieJar(t),
+		Transport: &loggingTransport{t},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			//t.Logf("Redirect to %s", req.URL.String())
+
+			if len(via) >= 20 {
+				for k, v := range via {
+					t.Logf("Failed with redirect (%d): %s", k, v.URL.String())
+				}
+				return errors.New("stopped after 20 redirects")
+			}
+			return nil
+		},
 	}
+}
+
+type loggingTransport struct{ t testing.TB }
+
+func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
+	//s.t.Logf("%s %s", r.Method, r.URL.String())
+	//s.t.Logf("%s %s\nWith Cookies: %v", r.Method, r.URL.String(), r.Cookies())
+
+	return otelhttp.DefaultClient.Transport.RoundTrip(r)
 }

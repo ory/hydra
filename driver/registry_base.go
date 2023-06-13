@@ -15,12 +15,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
@@ -59,7 +61,8 @@ type RegistryBase struct {
 	ctxer           contextx.Contextualizer
 	hh              *healthx.Handler
 	migrationStatus *popx.MigrationStatuses
-	kc              *jwk.AEAD
+	kc              *aead.AESGCM
+	flowc           *aead.XChaCha20Poly1305
 	cos             consent.Strategy
 	writer          herodot.Writer
 	hsm             hsm.Context
@@ -187,6 +190,11 @@ func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 	return m.r
 }
 
+func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
+	m.trc = new(otelx.Tracer).WithOTLP(t)
+	return m.r
+}
+
 func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
 		m.l = logrusx.New("Ory Hydra", m.BuildVersion())
@@ -282,11 +290,18 @@ func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	return m.cos
 }
 
-func (m *RegistryBase) KeyCipher() *jwk.AEAD {
+func (m *RegistryBase) KeyCipher() *aead.AESGCM {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.Config())
+		m.kc = aead.NewAESGCM(m.Config())
 	}
 	return m.kc
+}
+
+func (m *RegistryBase) FlowCipher() *aead.XChaCha20Poly1305 {
+	if m.flowc == nil {
+		m.flowc = aead.NewXChaCha20Poly1305(m.Config())
+	}
+	return m.flowc
 }
 
 func (m *RegistryBase) CookieStore(ctx context.Context) (sessions.Store, error) {

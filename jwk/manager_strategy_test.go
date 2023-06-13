@@ -17,6 +17,7 @@ import (
 )
 
 func TestKeyManagerStrategy(t *testing.T) {
+	t.Parallel()
 	ctrl := gomock.NewController(t)
 	softwareKeyManager := NewMockManager(ctrl)
 	hardwareKeyManager := NewMockManager(ctrl)

@@ -695,6 +695,7 @@
 
 ### Features
 
+* Hot-reload Oauth2 CORS settings ([#3537](https://github.com/ory/hydra/issues/3537)) ([a8ecf80](https://github.com/ory/hydra/commit/a8ecf807b2c6bfa6cc2d8b474f527a2fda12daef))
 * Sqa metrics v2 ([#3533](https://github.com/ory/hydra/issues/3533)) ([3ec683d](https://github.com/ory/hydra/commit/3ec683d7cf582443f29bd93c4c88392b3ce692a4))
 
 

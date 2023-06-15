@@ -11,6 +11,7 @@ import (
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/pagination/tokenpagination"
 
 	"github.com/ory/x/httprouterx"
@@ -129,11 +130,13 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject), events.WithClientID(client))
 	case allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
 	default:
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both 'client' and 'all' is not defined but one of them should have been.`)))
 		return
@@ -477,6 +480,8 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	events.Trace(ctx, events.LoginAccepted, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
@@ -578,6 +583,8 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
+	events.Trace(ctx, events.LoginRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
@@ -761,6 +768,8 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	events.Trace(ctx, events.ConsentAccepted, events.WithClientID(cr.Client.GetID()), events.WithSubject(cr.Subject))
+
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
@@ -869,6 +878,8 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
+	events.Trace(ctx, events.ConsentRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),

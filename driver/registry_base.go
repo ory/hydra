@@ -72,6 +72,7 @@ type RegistryBase struct {
 	oah             *oauth2.Handler
 	sia             map[string]consent.SubjectIdentifierAlgorithm
 	trc             *otelx.Tracer
+	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
 	pmm             *prometheus.MetricsManager
 	oa2mw           func(h http.Handler) http.Handler
 	arhs            []oauth2.AccessRequestHook
@@ -192,6 +193,11 @@ func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 
 func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
 	m.trc = new(otelx.Tracer).WithOTLP(t)
+	return m.r
+}
+
+func (m *RegistryBase) WithTracerWrapper(wrapper TracerWrapper) Registry {
+	m.tracerWrapper = wrapper
 	return m.r
 }
 
@@ -475,12 +481,17 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 	return m.sia
 }
 
-func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
+func (m *RegistryBase) Tracer(_ context.Context) *otelx.Tracer {
 	if m.trc == nil {
 		t, err := otelx.New("Ory Hydra", m.l, m.conf.Tracing())
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {
+			// Wrap the tracer if required
+			if m.tracerWrapper != nil {
+				t = m.tracerWrapper(t)
+			}
+
 			m.trc = t
 		}
 	}

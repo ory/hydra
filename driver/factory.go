@@ -8,19 +8,23 @@ import (
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/servicelocatorx"
 )
 
-type options struct {
-	preload  bool
-	validate bool
-	opts     []configx.OptionModifier
-	config   *config.DefaultProvider
-	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
-	skipNetworkInit bool
-}
+type (
+	options struct {
+		preload  bool
+		validate bool
+		opts     []configx.OptionModifier
+		config   *config.DefaultProvider
+		// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
+		skipNetworkInit bool
+		tracerWrapper   TracerWrapper
+	}
+	TracerWrapper func(*otelx.Tracer) *otelx.Tracer
+)
 
 func newOptions() *options {
 	return &options{
@@ -66,6 +70,13 @@ func SkipNetworkInit() OptionsModifier {
 	}
 }
 
+// WithTracerWrapper sets a function that wraps the tracer.
+func WithTracerWrapper(wrapper TracerWrapper) OptionsModifier {
+	return func(o *options) {
+		o.tracerWrapper = wrapper
+	}
+}
+
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
@@ -94,13 +105,17 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 		}
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, ctxter)
+	r, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		l.WithError(err).Error("Unable to create service registry.")
 		return nil, err
 	}
 
-	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.Default{}); err != nil {
+	if o.tracerWrapper != nil {
+		r.WithTracerWrapper(o.tracerWrapper)
+	}
+
+	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")
 		return nil, err
 	}

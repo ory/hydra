@@ -64,7 +64,7 @@ func NewRegistrySQL() *RegistrySQL {
 }
 
 func (m *RegistrySQL) Init(
-	ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer,
+	ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, options ...OptionsModifier,
 ) error {
 	if m.persister == nil {
 		m.WithContextualizer(ctxer)
@@ -75,6 +75,11 @@ func (m *RegistrySQL) Init(
 				instrumentedsql.WithOmitArgs(), // don't risk leaking PII or secrets
 				instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
 			}
+		}
+
+		o := newOptions(options)
+		if o.replaceTracer != nil {
+			m.trc = o.replaceTracer(m.trc)
 		}
 
 		// new db connection

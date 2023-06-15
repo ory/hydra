@@ -6,6 +6,8 @@ package driver
 import (
 	"context"
 
+	"github.com/ory/x/otelx"
+
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
@@ -13,33 +15,44 @@ import (
 	"github.com/ory/x/servicelocatorx"
 )
 
-type options struct {
+type Options struct {
 	preload  bool
 	validate bool
 	opts     []configx.OptionModifier
 	config   *config.DefaultProvider
 	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
 	skipNetworkInit bool
+	replaceTracer   func(*otelx.Tracer) *otelx.Tracer
 }
 
-func newOptions() *options {
-	return &options{
+func newOptions(opts []OptionsModifier) *Options {
+	o := &Options{
 		validate: true,
 		preload:  true,
 		opts:     []configx.OptionModifier{},
 	}
+	for _, f := range opts {
+		f(o)
+	}
+	return o
 }
 
-func WithConfig(config *config.DefaultProvider) func(o *options) {
-	return func(o *options) {
+func WithConfig(config *config.DefaultProvider) func(o *Options) {
+	return func(o *Options) {
 		o.config = config
 	}
 }
 
-type OptionsModifier func(*options)
+func ReplaceTracer(f func(*otelx.Tracer) *otelx.Tracer) func(o *Options) {
+	return func(o *Options) {
+		o.replaceTracer = f
+	}
+}
+
+type OptionsModifier func(*Options)
 
 func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.opts = append(o.opts, opts...)
 	}
 }
@@ -48,29 +61,26 @@ func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
 //
 // This does not affect schema validation!
 func DisableValidation() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.validate = false
 	}
 }
 
 // DisablePreloading will not preload the config.
 func DisablePreloading() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.preload = false
 	}
 }
 
 func SkipNetworkInit() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.skipNetworkInit = true
 	}
 }
 
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
-	o := newOptions()
-	for _, f := range opts {
-		f(o)
-	}
+	o := newOptions(opts)
 
 	l := sl.Logger()
 	if l == nil {

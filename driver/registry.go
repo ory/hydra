@@ -44,7 +44,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, opts ...OptionsModifier) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.DefaultProvider) Registry
@@ -83,12 +83,12 @@ type Registry interface {
 	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, opts ...OptionsModifier) (Registry, error) {
 	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		return nil, err
 	}
-	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, opts...); err != nil {
 		return nil, err
 	}
 	return registry, nil

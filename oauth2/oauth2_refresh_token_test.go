@@ -49,8 +49,8 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 	// first read.
 	workers := 10
 
-	token := "234c678fed33c1d2025537ae464a1ebf7d23fc4a"
-	tokenSignature := "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31"
+	token := "234c678fed33c1d2025537ae464a1ebf7d23fc4a"          //nolint:gosec
+	tokenSignature := "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31" //nolint:gosec
 	testClient := hc.Client{
 		ID:            uuid.Must(uuid.NewV4()),
 		Secret:        "secret",
@@ -112,7 +112,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 						defer wg.Done()
 						ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 						defer cancel()
-						time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
+						time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond) //nolint:gosec
 						// all workers will block here until the for loop above has launched all the worker go-routines
 						// this is to ensure we fire all the workers off at the same
 						<-barrier

@@ -51,6 +51,7 @@ type Registry interface {
 	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
 	WithTracer(t trace.Tracer) Registry
+	WithTracerWrapper(TracerWrapper) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 

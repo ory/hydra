@@ -20,6 +20,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
@@ -363,6 +364,7 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	events.Trace(ctx, events.AccessTokenIssued, events.WithRequest(requester))
 	return otelx.WithSpan(ctx, "persistence.sql.CreateAccessTokenSession", func(ctx context.Context) error {
 		return p.createSession(ctx, signature, requester, sqlTableAccess)
 	})
@@ -381,6 +383,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 }
 
 func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	events.Trace(ctx, events.RefreshTokenIssued, events.WithRequest(requester))
 	return otelx.WithSpan(ctx, "persistence.sql.CreateRefreshTokenSession", func(ctx context.Context) error {
 		return p.createSession(ctx, signature, requester, sqlTableRefresh)
 	})
@@ -399,6 +402,7 @@ func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature str
 }
 
 func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	events.Trace(ctx, events.IdentityTokenIssued, events.WithRequest(requester))
 	return otelx.WithSpan(ctx, "persistence.sql.CreateOpenIDConnectSession", func(ctx context.Context) error {
 		return p.createSession(ctx, signature, requester, sqlTableOpenID)
 	})

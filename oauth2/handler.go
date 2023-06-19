@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -663,6 +664,7 @@ type revokeOAuth2Token struct {
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	events.Trace(r.Context(), events.AccessTokenRevoked)
 
 	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
 	if err != nil {
@@ -800,6 +802,12 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 	}); err != nil {
 		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
 	}
+
+	events.Trace(ctx,
+		events.AccessTokenInspected,
+		events.WithSubject(session.GetSubject()),
+		events.WithClientID(resp.GetAccessRequester().GetClient().GetID()),
+	)
 }
 
 // OAuth 2.0 Token Exchange Parameters
@@ -885,16 +893,19 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+		events.Trace(ctx, events.TokenExchangeError)
 		return
 	}
 
-	if accessRequest.GetGrantTypes().ExactOne("client_credentials") || accessRequest.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") {
+	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 			if err != nil {
 				x.LogError(r, err, h.r.Logger())
 				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 				return
 			}
 		}
@@ -934,6 +945,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		if err := hook(ctx, accessRequest); err != nil {
 			h.logOrAudit(err, r)
 			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 			return
 		}
 	}
@@ -942,6 +954,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 		return
 	}
 

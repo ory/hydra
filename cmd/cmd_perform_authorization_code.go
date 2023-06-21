@@ -198,6 +198,10 @@ and success, unless if the --no-shutdown flag is provided.`,
 				_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
 			})
 
+			r.GET("/perform-flow", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+				http.Redirect(w, r, authCodeURL, http.StatusFound)
+			})
+
 			type ed struct {
 				Name        string
 				Description string

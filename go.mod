@@ -21,7 +21,6 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/go-swagger/go-swagger v0.30.3
 	github.com/gobuffalo/pop/v6 v6.1.2-0.20230318123913-c85387acc9a0
-	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/golang/mock v1.6.0
@@ -106,7 +105,6 @@ require (
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect

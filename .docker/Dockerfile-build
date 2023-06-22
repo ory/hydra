@@ -1,5 +1,4 @@
-FROM golang:1.20-alpine3.17 AS builder
-
+FROM golang:1.20 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
 

@@ -77,7 +77,6 @@ test-resetdb: node_modules
 .PHONY: docker
 docker:
 	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:${IMAGE_TAG}-sqlite .
-	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-distroless-static -t oryd/hydra:${IMAGE_TAG} .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb

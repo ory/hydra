@@ -12,7 +12,7 @@
 version: "3.7"
 services:
   hydra:
-    image: oryd/hydra:v2.1.2
+    image: oryd/hydra:v2.2.0-rc.2
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
@@ -34,7 +34,7 @@ services:
     networks:
       - intranet
   hydra-migrate:
-    image: oryd/hydra:v2.1.2
+    image: oryd/hydra:v2.2.0-rc.2
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
     command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
@@ -52,7 +52,7 @@ services:
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v2.1.2
+    image: oryd/hydra-login-consent-node:v2.2.0-rc.2
     ports:
       - "3000:3000"
     restart: unless-stopped

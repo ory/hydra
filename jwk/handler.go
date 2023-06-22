@@ -36,6 +36,8 @@ type Handler struct {
 // JSON Web Key Set
 //
 // swagger:model jsonWebKeySet
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type jsonWebKeySet struct {
 	// List of JSON Web Keys
 	//
@@ -114,6 +116,8 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 // Get JSON Web Key Request
 //
 // swagger:parameters getJsonWebKey
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getJsonWebKey struct {
 	// JSON Web Key Set ID
 	//
@@ -162,6 +166,8 @@ func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request, ps httpr
 // Get JSON Web Key Set Parameters
 //
 // swagger:parameters getJsonWebKeySet
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getJsonWebKeySet struct {
 	// JSON Web Key Set ID
 	//
@@ -205,6 +211,8 @@ func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps ht
 // Create JSON Web Key Set Request
 //
 // swagger:parameters createJsonWebKeySet
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type adminCreateJsonWebKeySet struct {
 	// The JSON Web Key Set ID
 	//
@@ -283,6 +291,8 @@ func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps
 // Set JSON Web Key Set Request
 //
 // swagger:parameters setJsonWebKeySet
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type setJsonWebKeySet struct {
 	// The JSON Web Key Set ID
 	//
@@ -333,6 +343,8 @@ func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps ht
 // Set JSON Web Key Request
 //
 // swagger:parameters setJsonWebKey
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type setJsonWebKey struct {
 	// The JSON Web Key Set ID
 	//
@@ -389,6 +401,8 @@ func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, 
 // Delete JSON Web Key Set Parameters
 //
 // swagger:parameters deleteJsonWebKeySet
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type deleteJsonWebKeySet struct {
 	// The JSON Web Key Set
 	// in: path
@@ -429,6 +443,8 @@ func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Reques
 // Delete JSON Web Key Parameters
 //
 // swagger:parameters deleteJsonWebKey
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type deleteJsonWebKey struct {
 	// The JSON Web Key Set
 	// in: path

@@ -6,7 +6,7 @@ package jwk_test
 import (
 	"context"
 	"crypto"
-	"crypto/dsa"
+	"crypto/dsa" //lint:ignore SA1019 used for testing invalid key types
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
@@ -46,7 +46,10 @@ func (f *fakeSigner) Public() crypto.PublicKey {
 }
 
 func TestHandlerFindPublicKey(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
+		t.Parallel()
 		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(RSIDKS)
@@ -56,6 +59,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_Opaque", func(t *testing.T) {
+		t.Parallel()
 		key, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		RSIDKS := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{
 			Algorithm:                   "RS256",
@@ -82,6 +86,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
+		t.Parallel()
 		ECDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.ES256, "test-id-2", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(ECDSAIDKS)
@@ -91,6 +96,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_EdDSA", func(t *testing.T) {
+		t.Parallel()
 		EdDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.EdDSA, "test-id-3", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(EdDSAIDKS)
@@ -100,6 +106,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_KeyNotFound", func(t *testing.T) {
+		t.Parallel()
 		keySet := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 		_, err := jwk.FindPublicKey(keySet)
 		require.Error(t, err)
@@ -108,6 +115,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 }
 
 func TestHandlerFindPrivateKey(t *testing.T) {
+	t.Parallel()
 	t.Run("Test_Helper/Run_FindPrivateKey_With_RSA", func(t *testing.T) {
 		RSIDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		keys, err := jwk.FindPrivateKey(RSIDKS)
@@ -143,6 +151,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 }
 
 func TestPEMBlockForKey(t *testing.T) {
+	t.Parallel()
 	t.Run("Test_Helper/Run_PEMBlockForKey_With_RSA", func(t *testing.T) {
 		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, err)
@@ -185,6 +194,7 @@ func TestPEMBlockForKey(t *testing.T) {
 }
 
 func TestExcludeOpaquePrivateKeys(t *testing.T) {
+	t.Parallel()
 	opaqueKeys, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 	assert.NoError(t, err)
 	require.Len(t, opaqueKeys.Keys, 1)
@@ -199,6 +209,7 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 }
 
 func TestGetOrGenerateKeys(t *testing.T) {
+	t.Parallel()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 
 	setId := uuid.NewUUID().String()

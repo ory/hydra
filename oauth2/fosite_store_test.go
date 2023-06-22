@@ -23,8 +23,8 @@ import (
 func TestMain(m *testing.M) {
 	flag.Parse()
 
-	runner := dockertest.Register()
-	runner.Exit(m.Run())
+	defer dockertest.KillAllTestDatabases()
+	m.Run()
 }
 
 var registries = make(map[string]driver.Registry)

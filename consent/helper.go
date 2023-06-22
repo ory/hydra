@@ -6,9 +6,9 @@ package consent
 import (
 	"net/http"
 	"strings"
-
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/x/errorsx"
@@ -33,7 +33,7 @@ func sanitizeClient(c *client.Client) *client.Client {
 	return cc
 }
 
-func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []AcceptOAuth2ConsentRequest, requestedScope []string) *AcceptOAuth2ConsentRequest {
+func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []flow.AcceptOAuth2ConsentRequest, requestedScope []string) *flow.AcceptOAuth2ConsentRequest {
 	for _, cs := range previousConsent {
 		var found = true
 		for _, scope := range requestedScope {

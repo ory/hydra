@@ -24,6 +24,8 @@ package health
 //	Responses:
 //	  200: healthStatus
 //	  500: errorOAuth2
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 func swaggerPublicIsInstanceAlive() {}
 
 // Alive returns an ok status if the instance is ready to handle HTTP requests.
@@ -47,6 +49,8 @@ func swaggerPublicIsInstanceAlive() {}
 //	Responses:
 //	  200: healthStatus
 //	  500: errorOAuth2
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 func swaggerAdminIsInstanceAlive() {}
 
 // Ready returns an ok status if the instance is ready to handle HTTP requests and all ReadyCheckers are ok.
@@ -70,6 +74,8 @@ func swaggerAdminIsInstanceAlive() {}
 //	Responses:
 //	  200: healthStatus
 //	  503: healthNotReadyStatus
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 func swaggerAdminIsInstanceReady() {}
 
 // Ready returns an ok status if the instance is ready to handle HTTP requests and all ReadyCheckers are ok.
@@ -93,6 +99,8 @@ func swaggerAdminIsInstanceReady() {}
 //	Responses:
 //	  200: healthStatus
 //	  503: healthNotReadyStatus
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 func swaggerPublicIsInstanceReady() {}
 
 // Version returns this service's versions.
@@ -111,4 +119,6 @@ func swaggerPublicIsInstanceReady() {}
 //
 //		   Responses:
 //				200: version
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 func swaggerGetVersion() {}

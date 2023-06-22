@@ -14,6 +14,7 @@ import (
 )
 
 func TestMustRSAPrivate(t *testing.T) {
+	t.Parallel()
 	keys, err := GenerateJWK(context.Background(), jose.RS256, "foo", "sig")
 	require.NoError(t, err)
 

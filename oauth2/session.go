@@ -16,6 +16,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/flow"
 
 	"github.com/ory/x/stringslice"
 )
@@ -29,6 +30,8 @@ type Session struct {
 	ConsentChallenge       string                 `json:"consent_challenge"`
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
 	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
+
+	Flow *flow.Flow `json:"-"`
 }
 
 func NewSession(subject string) *Session {

@@ -41,7 +41,8 @@
     "error_description": "",
     "error_hint": "",
     "status_code": 0,
-    "error_debug": ""
+    "error_debug": "",
+    "valid": false
   },
   "LoginAuthenticatedAt": null,
   "ConsentChallengeID": "challenge-0016",
@@ -65,7 +66,8 @@
     "error_description": "",
     "error_hint": "",
     "status_code": 0,
-    "error_debug": ""
+    "error_debug": "",
+    "valid": false
   },
   "SessionIDToken": {
     "session_id_token-0016": "0016"

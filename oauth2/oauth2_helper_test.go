@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/v2/client"
@@ -25,27 +26,27 @@ type consentMock struct {
 	requestTime time.Time
 }
 
-func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.AcceptOAuth2ConsentRequest, error) {
+func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
 	if c.deny {
-		return nil, fosite.ErrRequestForbidden
+		return nil, nil, fosite.ErrRequestForbidden
 	}
 
-	return &consent.AcceptOAuth2ConsentRequest{
-		ConsentRequest: &consent.OAuth2ConsentRequest{
+	return &flow.AcceptOAuth2ConsentRequest{
+		ConsentRequest: &flow.OAuth2ConsentRequest{
 			Subject: "foo",
 			ACR:     "1",
 		},
 		AuthenticatedAt: sqlxx.NullTime(c.authTime),
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
-		Session: &consent.AcceptOAuth2ConsentRequestSession{
+		Session: &flow.AcceptOAuth2ConsentRequestSession{
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},
 		RequestedAt: c.requestTime,
-	}, nil
+	}, nil, nil
 }
 
-func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
+func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error) {
 	panic("not implemented")
 }
 

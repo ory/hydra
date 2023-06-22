@@ -13,21 +13,18 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/x/errorsx"
-
-	"github.com/ory/fosite/storage"
-
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x/events"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
-
-	"github.com/ory/hydra/v2/oauth2"
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}
@@ -80,7 +77,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 	}
 
 	if p.config.EncryptSessionData(ctx) {
-		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session)
+		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -115,14 +112,14 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 	}, nil
 }
 
-func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
+func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (_ *fosite.Request, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.toRequest")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
-		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess))
+		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess), nil)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -173,9 +170,9 @@ func (p *Persister) hashSignature(_ context.Context, signature string, table tab
 	return signature
 }
 
-func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) error {
+func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ClientAssertionJWTValid")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	j, err := p.GetClientAssertionJWT(ctx, jti)
 	if errors.Is(err, sqlcon.ErrNoRows) {
@@ -192,9 +189,9 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 	return nil
 }
 
-func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
+func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.SetClientAssertionJWT")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	// delete expired; this cleanup spares us the need for a background worker
 	if err := p.QueryWithNetwork(ctx).Where("expires_at < CURRENT_TIMESTAMP").Delete(&oauth2.BlacklistedJTI{}); err != nil {
@@ -212,31 +209,31 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 	return nil
 }
 
-func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
+func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (_ *oauth2.BlacklistedJTI, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetClientAssertionJWT")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
 	return jti, sqlcon.HandleError(p.QueryWithNetwork(ctx).Find(jti, jti.ID))
 }
 
-func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
+func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.SetClientAssertionJWTRaw")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, jti))
 }
 
-func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
+func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
 	}
 
-	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 	} else if err != nil {
 		return err
@@ -244,44 +241,39 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
-func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
+func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.findSessionBySignature")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	r := OAuth2RequestSQL{Table: table}
-	var fr fosite.Requester
 
-	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		// We look for the signature as well as the hash of the signature here.
-		// This is because we now always store the hash of the signature in the database,
-		// regardless of the type of the signature. In previous versions, we only stored
-		// the hash of the signature for JWT tokens.
-		//
-		// This code will be removed in a future version.
-		err := p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
-		if errors.Is(err, sql.ErrNoRows) {
-			return errorsx.WithStack(fosite.ErrNotFound)
-		} else if err != nil {
-			return sqlcon.HandleError(err)
-		} else if !r.Active {
-			fr, err = r.toRequest(ctx, session, p)
-			if err != nil {
-				return err
-			} else if table == sqlTableCode {
-				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
-			}
-
-			return errorsx.WithStack(fosite.ErrInactiveToken)
+	// We look for the signature as well as the hash of the signature here.
+	// This is because we now always store the hash of the signature in the database,
+	// regardless of the type of the signature. In previous versions, we only stored
+	// the hash of the signature for JWT tokens.
+	//
+	// This code will be removed in a future version.
+	err = p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errorsx.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	} else if !r.Active {
+		fr, err := r.toRequest(ctx, session, p)
+		if err != nil {
+			return nil, err
+		} else if table == sqlTableCode {
+			return fr, errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 		}
+		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+	}
 
-		fr, err = r.toRequest(ctx, session, p)
-		return err
-	})
+	return r.toRequest(ctx, session, p)
 }
 
-func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
+func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionBySignature")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	signature = p.hashSignature(ctx, signature, table)
 
@@ -291,7 +283,7 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 	// the hash of the signature for JWT tokens.
 	//
 	// This code will be removed in a future version.
-	err := sqlcon.HandleError(
+	err = sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
 			Where("signature IN (?, ?)", signature, SignatureHash(signature)).
 			Delete(&OAuth2RequestSQL{Table: table}))
@@ -306,9 +298,9 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 	return nil
 }
 
-func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) error {
+func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionByRequestID")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	/* #nosec G201 table is static */
 	if err := p.QueryWithNetwork(ctx).
@@ -326,9 +318,9 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 	return nil
 }
 
-func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string, table tableName) error {
+func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string, table tableName) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deactivateSessionByRequestID")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
@@ -342,23 +334,22 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 	)
 }
 
-func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateAuthorizeCodeSession")
-	defer span.End()
-
-	return p.createSession(ctx, signature, requester, sqlTableCode)
+func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	return otelx.WithSpan(ctx, "persistence.sql.CreateAuthorizeCodeSession", func(ctx context.Context) error {
+		return p.createSession(ctx, signature, requester, sqlTableCode)
+	})
 }
 
 func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAuthorizeCodeSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return p.findSessionBySignature(ctx, signature, session, sqlTableCode)
 }
 
 func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateAuthorizeCodeSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
@@ -372,75 +363,106 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 	)
 }
 
-func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	return p.createSession(ctx, signature, requester, sqlTableAccess)
+func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	events.Trace(ctx, events.AccessTokenIssued, events.WithRequest(requester))
+	return otelx.WithSpan(ctx, "persistence.sql.CreateAccessTokenSession", func(ctx context.Context) error {
+		return p.createSession(ctx, signature, requester, sqlTableAccess)
+	})
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAccessTokenSession")
+	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTableAccess)
 }
 
-func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) (err error) {
-	return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
+func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) error {
+	return otelx.WithSpan(ctx, "persistence.sql.DeleteAccessTokenSession", func(ctx context.Context) error {
+		return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
+	})
 }
 
-func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	return p.createSession(ctx, signature, requester, sqlTableRefresh)
+func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
+	events.Trace(ctx, events.RefreshTokenIssued, events.WithRequest(requester))
+	return otelx.WithSpan(ctx, "persistence.sql.CreateRefreshTokenSession", func(ctx context.Context) error {
+		return p.createSession(ctx, signature, requester, sqlTableRefresh)
+	})
 }
 
 func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRefreshTokenSession")
+	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTableRefresh)
 }
 
-func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature string) (err error) {
-	return p.deleteSessionBySignature(ctx, signature, sqlTableRefresh)
+func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature string) error {
+	return otelx.WithSpan(ctx, "persistence.sql.DeleteRefreshTokenSession", func(ctx context.Context) error {
+		return p.deleteSessionBySignature(ctx, signature, sqlTableRefresh)
+	})
 }
 
 func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	return p.createSession(ctx, signature, requester, sqlTableOpenID)
+	events.Trace(ctx, events.IdentityTokenIssued, events.WithRequest(requester))
+	return otelx.WithSpan(ctx, "persistence.sql.CreateOpenIDConnectSession", func(ctx context.Context) error {
+		return p.createSession(ctx, signature, requester, sqlTableOpenID)
+	})
 }
 
-func (p *Persister) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (fosite.Requester, error) {
+func (p *Persister) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (_ fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetOpenIDConnectSession")
+	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, requester.GetSession(), sqlTableOpenID)
 }
 
 func (p *Persister) DeleteOpenIDConnectSession(ctx context.Context, signature string) error {
-	return p.deleteSessionBySignature(ctx, signature, sqlTableOpenID)
+	return otelx.WithSpan(ctx, "persistence.sql.DeleteOpenIDConnectSession", func(ctx context.Context) error {
+		return p.deleteSessionBySignature(ctx, signature, sqlTableOpenID)
+	})
 }
 
-func (p *Persister) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (fosite.Requester, error) {
+func (p *Persister) GetPKCERequestSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPKCERequestSession")
+	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTablePKCE)
 }
 
 func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	return p.createSession(ctx, signature, requester, sqlTablePKCE)
+	return otelx.WithSpan(ctx, "persistence.sql.CreatePKCERequestSession", func(ctx context.Context) error {
+		return p.createSession(ctx, signature, requester, sqlTablePKCE)
+	})
 }
 
 func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) error {
-	return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
+	return otelx.WithSpan(ctx, "persistence.sql.DeletePKCERequestSession", func(ctx context.Context) error {
+		return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
+	})
 }
 
 func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) error {
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+	return otelx.WithSpan(ctx, "persistence.sql.RevokeRefreshToken", func(ctx context.Context) error {
+		return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+	})
 }
 
 func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) error {
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+	return otelx.WithSpan(ctx, "persistence.sql.RevokeRefreshTokenMaybeGracePeriod", func(ctx context.Context) error {
+		return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+	})
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {
-	return p.deleteSessionByRequestID(ctx, id, sqlTableAccess)
+	return otelx.WithSpan(ctx, "persistence.sql.RevokeAccessToken", func(ctx context.Context) error {
+		return p.deleteSessionByRequestID(ctx, id, sqlTableAccess)
+	})
 }
 
-func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int, table tableName, lifespan time.Duration) error {
+func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int, table tableName, lifespan time.Duration) (err error) {
 	/* #nosec G201 table is static */
 	// The value of notAfter should be the minimum between input parameter and token max expire based on its configured age
 	requestMaxExpire := time.Now().Add(-lifespan)
 	if requestMaxExpire.Before(notAfter) {
 		notAfter = requestMaxExpire
 	}
-
-	var err error
 
 	totalDeletedCount := 0
 	for deletedRecords := batchSize; totalDeletedCount < limit && deletedRecords == batchSize; {
@@ -469,16 +491,22 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 }
 
 func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.config.GetAccessTokenLifespan(ctx))
+	return otelx.WithSpan(ctx, "persistence.sql.FlushInactiveAccessTokens", func(ctx context.Context) error {
+		return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.config.GetAccessTokenLifespan(ctx))
+	})
 }
 
 func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.config.GetRefreshTokenLifespan(ctx))
+	return otelx.WithSpan(ctx, "persistence.sql.FlushInactiveRefreshTokens", func(ctx context.Context) error {
+		return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.config.GetRefreshTokenLifespan(ctx))
+	})
 }
 
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.QueryWithNetwork(ctx).Where("client_id=?", clientID).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
-	)
+	return otelx.WithSpan(ctx, "persistence.sql.DeleteAccessTokens", func(ctx context.Context) error {
+		/* #nosec G201 table is static */
+		return sqlcon.HandleError(
+			p.QueryWithNetwork(ctx).Where("client_id=?", clientID).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
+		)
+	})
 }

@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func (_ outputJsonWebKey) Header() []string {
+func (outputJsonWebKey) Header() []string {
 	return []string{"SET ID", "KEY ID", "ALGORITHM", "USE"}
 }
 
@@ -38,7 +38,7 @@ func (i outputJsonWebKey) Interface() interface{} {
 	return i
 }
 
-func (_ outputJSONWebKeyCollection) Header() []string {
+func (outputJSONWebKeyCollection) Header() []string {
 	return outputJsonWebKey{}.Header()
 }
 

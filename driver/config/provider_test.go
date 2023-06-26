@@ -475,6 +475,8 @@ func TestJWTScopeClaimStrategy(t *testing.T) {
 	ctx := context.Background()
 
 	assert.Equal(t, jwt.JWTScopeFieldList, p.GetJWTScopeField(ctx))
+	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "list")
+	assert.Equal(t, jwt.JWTScopeFieldList, p.GetJWTScopeField(ctx))
 	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "string")
 	assert.Equal(t, jwt.JWTScopeFieldString, p.GetJWTScopeField(ctx))
 	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "both")

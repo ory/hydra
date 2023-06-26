@@ -93,14 +93,16 @@ func (p *DefaultProvider) GetScopeStrategy(ctx context.Context) fosite.ScopeStra
 var _ fosite.JWTScopeFieldProvider = (*DefaultProvider)(nil)
 
 func (p *DefaultProvider) GetJWTScopeField(ctx context.Context) jwt.JWTScopeFieldEnum {
-	strategy := strings.ToLower(p.getProvider(ctx).String(KeyJWTScopeClaimStrategy))
-	if strategy == "string" {
+	switch strings.ToLower(p.getProvider(ctx).String(KeyJWTScopeClaimStrategy)) {
+	case "string":
 		return jwt.JWTScopeFieldString
-	}
-	if strategy == "both" {
+	case "both":
 		return jwt.JWTScopeFieldBoth
+	case "list":
+		return jwt.JWTScopeFieldList
+	default:
+		return jwt.JWTScopeFieldUnset
 	}
-	return jwt.JWTScopeFieldList
 }
 
 func (p *DefaultProvider) GetUseLegacyErrorFormat(context.Context) bool {

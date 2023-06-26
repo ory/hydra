@@ -5,7 +5,7 @@ export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
 export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest-sqlite)
 
-GOLANGCI_LINT_VERSION = 1.46.2
+GOLANGCI_LINT_VERSION = 1.53.3
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \

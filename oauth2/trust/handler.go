@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/fosite"
 	"github.com/ory/x/pagination/tokenpagination"
 
 	"github.com/ory/hydra/v2/x"
@@ -110,7 +111,12 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 	var grantRequest createGrantRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {
-		h.registry.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.registry.Writer().WriteError(w, r,
+			errorsx.WithStack(&fosite.RFC6749Error{
+				ErrorField:       "error",
+				DescriptionField: err.Error(),
+				CodeField:        http.StatusBadRequest,
+			}))
 		return
 	}
 

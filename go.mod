@@ -21,7 +21,6 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/go-swagger/go-swagger v0.30.3
 	github.com/gobuffalo/pop/v6 v6.1.2-0.20230318123913-c85387acc9a0
-	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/golang/mock v1.6.0
@@ -43,7 +42,7 @@ require (
 	github.com/ory/herodot v0.10.2
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.559
+	github.com/ory/x v0.0.562
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0

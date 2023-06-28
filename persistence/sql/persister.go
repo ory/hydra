@@ -9,7 +9,6 @@ import (
 	"reflect"
 
 	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
@@ -73,7 +72,7 @@ func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) 
 	c := &pop.Connection{
 		TX:      tx,
 		Store:   tx,
-		ID:      randx.String(30),
+		ID:      uuid.Must(uuid.NewV4()).String(),
 		Dialect: p.conn.Dialect,
 	}
 	return popx.WithTransaction(ctx, c), err

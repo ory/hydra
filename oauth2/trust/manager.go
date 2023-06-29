@@ -7,8 +7,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type GrantManager interface {

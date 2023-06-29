@@ -15,9 +15,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/flow"

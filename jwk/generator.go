@@ -3,7 +3,7 @@
 
 package jwk
 
-import jose "gopkg.in/square/go-jose.v2"
+import jose "github.com/go-jose/go-jose/v3"
 
 type KeyGenerator interface {
 	Generate(id, use string) (*jose.JSONWebKeySet, error)

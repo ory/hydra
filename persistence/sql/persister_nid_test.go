@@ -15,10 +15,10 @@ import (
 
 	"github.com/ory/x/assertx"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"

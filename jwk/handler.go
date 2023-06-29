@@ -20,8 +20,8 @@ import (
 
 	"github.com/ory/hydra/v2/x"
 
+	jose "github.com/go-jose/go-jose/v3"
 	"github.com/julienschmidt/httprouter"
-	jose "gopkg.in/square/go-jose.v2"
 )
 
 const (

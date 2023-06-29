@@ -16,9 +16,9 @@ import (
 
 	"github.com/ory/x/errorsx"
 
+	jose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
 )
 
 func RandomBytes(n int) ([]byte, error) {

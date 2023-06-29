@@ -7,8 +7,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/x/errorsx"
 

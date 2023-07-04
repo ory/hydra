@@ -17,9 +17,9 @@ import (
 
 	"github.com/gofrs/uuid"
 
+	jose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
 
 	. "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"

@@ -9,8 +9,8 @@ import (
 
 	"github.com/ory/x/josex"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"

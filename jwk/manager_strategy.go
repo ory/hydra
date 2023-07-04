@@ -6,9 +6,9 @@ package jwk
 import (
 	"context"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/otelx"

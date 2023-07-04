@@ -14,9 +14,9 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pborman/uuid"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/handler/rfc7523"
 

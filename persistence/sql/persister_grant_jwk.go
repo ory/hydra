@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/x/otelx"

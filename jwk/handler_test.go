@@ -15,9 +15,9 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/contextx"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal"

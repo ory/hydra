@@ -31,9 +31,9 @@ import (
 	"github.com/ory/hydra/v2/x"
 
 	"github.com/ThalesIgnite/crypto11"
+	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v3/cryptosigner"
 	"go.opentelemetry.io/otel"
-	"gopkg.in/square/go-jose.v2"
-	"gopkg.in/square/go-jose.v2/cryptosigner"
 )
 
 const tracingComponent = "github.com/ory/hydra/hsm"

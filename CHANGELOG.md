@@ -708,6 +708,7 @@
 
 ### Features
 
+* Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))
 * Support different jwt scope claim strategies ([#3531](https://github.com/ory/hydra/issues/3531)) ([45da11e](https://github.com/ory/hydra/commit/45da11e4fb4f0a2f939f11682c095b8dbfcddb78))
 
 

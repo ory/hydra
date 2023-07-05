@@ -30,15 +30,16 @@ type Session struct {
 	ConsentChallenge       string                 `json:"consent_challenge"`
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
 	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
+	MirrorTopLevelClaims   bool                   `json:"mirror_top_level_claims"`
 
 	Flow *flow.Flow `json:"-"`
 }
 
 func NewSession(subject string) *Session {
-	return NewSessionWithCustomClaims(subject, nil)
+	return NewSessionWithCustomClaims(subject, nil, true)
 }
 
-func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) *Session {
+func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string, mirrorTopLevelClaims bool) *Session {
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),
@@ -47,6 +48,7 @@ func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) 
 		},
 		Extra:                 map[string]interface{}{},
 		AllowedTopLevelClaims: allowedTopLevelClaims,
+		MirrorTopLevelClaims:  mirrorTopLevelClaims,
 	}
 }
 
@@ -70,7 +72,9 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	}
 
 	//for every other claim that was already reserved and for mirroring, add original extra under "ext"
-	topLevelExtraWithMirrorExt["ext"] = s.Extra
+	if s.MirrorTopLevelClaims {
+		topLevelExtraWithMirrorExt["ext"] = s.Extra
+	}
 
 	claims := &jwt.JWTClaims{
 		Subject: s.Subject,

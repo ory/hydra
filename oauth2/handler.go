@@ -549,7 +549,7 @@ type oidcUserInfo struct {
 //	  default: errorOAuth2
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx), h.c.MirrorTopLevelClaims(ctx))
 	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
@@ -716,7 +716,7 @@ type introspectOAuth2Token struct {
 //	  200: introspectedOAuth2Token
 //	  default: errorOAuth2
 func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()), h.c.MirrorTopLevelClaims(r.Context()))
 	ctx := r.Context()
 
 	if r.Method != "POST" {
@@ -886,7 +886,7 @@ type oAuth2TokenExchange struct {
 //	  200: oAuth2TokenExchange
 //	  default: errorOAuth2
 func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
-	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()), h.c.MirrorTopLevelClaims(r.Context()))
 	ctx := r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
@@ -1075,6 +1075,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		ConsentChallenge:      session.ID,
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+		MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
 		Flow:                  flow,
 	})
 	if err != nil {

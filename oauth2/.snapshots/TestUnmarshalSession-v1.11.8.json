@@ -45,5 +45,6 @@
     "market",
     "zone",
     "login_session_id"
-  ]
+  ],
+  "mirror_top_level_claims": false
 }

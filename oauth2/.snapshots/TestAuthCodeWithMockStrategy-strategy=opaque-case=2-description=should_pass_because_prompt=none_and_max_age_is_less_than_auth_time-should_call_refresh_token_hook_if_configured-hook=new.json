@@ -30,7 +30,8 @@
     "client_id": "app-client",
     "consent_challenge": "",
     "exclude_not_before_claim": false,
-    "allowed_top_level_claims": []
+    "allowed_top_level_claims": [],
+    "mirror_top_level_claims": true
   },
   "request": {
     "client_id": "app-client",

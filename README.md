@@ -76,6 +76,7 @@ The team at Ory has years of experience in cloud computing. Ory's offering is
 the only official program for qualified support from the maintainers.
 For more information see the **[website](https://www.ory.sh/support/)** or
 **[book a meeting](https://www.ory.sh/contact/)**!
+
 ## Get Started
 
 You can use

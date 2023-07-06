@@ -9,7 +9,6 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
-	github.com/ory/fosite => github.com/ory/fosite v0.44.1-0.20230630065531-3dc4f8fdd008
 )
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
@@ -38,7 +37,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.44.0
+	github.com/ory/fosite v0.44.1-0.20230704083823-8098e48b2e09
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.2

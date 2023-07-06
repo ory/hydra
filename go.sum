@@ -645,8 +645,8 @@ github.com/ory/analytics-go/v5 v5.0.1 h1:LX8T5B9FN8KZXOtxgN+R3I4THRRVB6+28IKgKBp
 github.com/ory/analytics-go/v5 v5.0.1/go.mod h1:lWCiCjAaJkKfgR/BN5DCLMol8BjKS1x+4jxBxff/FF0=
 github.com/ory/dockertest/v3 v3.9.1 h1:v4dkG+dlu76goxMiTT2j8zV7s4oPPEppKT8K8p2f1kY=
 github.com/ory/dockertest/v3 v3.9.1/go.mod h1:42Ir9hmvaAPm0Mgibk6mBPi7SFvTXxEcnztDYOJ//uM=
-github.com/ory/fosite v0.44.1-0.20230630065531-3dc4f8fdd008 h1:F/E4hBo2LW+Xq+34GmWLI/s09hPHKNaitPhxxfJtpXI=
-github.com/ory/fosite v0.44.1-0.20230630065531-3dc4f8fdd008/go.mod h1:LtSYk00Kv/5McGtxntF8k8i83cxHuSM+AYlH/935PQ8=
+github.com/ory/fosite v0.44.1-0.20230704083823-8098e48b2e09 h1:2G7vOPmf0u86x6PdlVvjyFZ7bPIUruVmD5CkI++8Dlc=
+github.com/ory/fosite v0.44.1-0.20230704083823-8098e48b2e09/go.mod h1:LtSYk00Kv/5McGtxntF8k8i83cxHuSM+AYlH/935PQ8=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe h1:rvu4obdvqR0fkSIJ8IfgzKOWwZ5kOT2UNfLq81Qk7rc=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe/go.mod h1:z4n3u6as84LbV4YmgjHhnwtccQqzf4cZlSk9f1FhygI=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=

@@ -40,12 +40,12 @@ server.
 ## Ory Hydra on the Ory Network
 
 The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
-worry-free way to use Ory's Services. **Ory OAuth2 & OpenID Connect** is powered by the Ory
-Hydra open source federation server, and it's fully API-compatible.
+worry-free way to use Ory's Services. **Ory OAuth2 & OpenID Connect** is powered
+by the Ory Hydra open source federation server, and it's fully API-compatible.
 
 The Ory Network provides the infrastructure for modern end-to-end security:
 
-- Identity & credential management scaling to billions of users and devices**
+- Identity & credential management scaling to billions of users and devices
 - Registration, Login and Account management flows for passkey, biometric,
   social, SSO and multi-factor authentication
 - **Pre-built login, registration and account management pages and components**
@@ -69,10 +69,13 @@ today!
 
 ## Ory Network Hybrid Support Plan
 
-Ory offers a support plan for Ory Network Hybrid, including Ory on private cloud deployments. If you have a self-hosted solution and would like help, consider a support plan!  
-The team at Ory has years of experience in cloud computing. Ory's offering is the only official program for qualified support from the maintainers.  
-For more information see the **[website](https://www.ory.sh/support/)** or **[book a meeting](https://www.ory.sh/contact/)**!
-
+Ory offers a support plan for Ory Network Hybrid, including Ory on private cloud
+deployments. If you have a self-hosted solution and would like help, consider a
+support plan!
+The team at Ory has years of experience in cloud computing. Ory's offering is
+the only official program for qualified support from the maintainers.
+For more information see the **[website](https://www.ory.sh/support/)** or
+**[book a meeting](https://www.ory.sh/contact/)**!
 ## Get Started
 
 You can use

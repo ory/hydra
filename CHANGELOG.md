@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-07-05)](#000-2023-07-05)
+- [0.0.0 (2023-07-06)](#000-2023-07-06)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,7 +698,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-07-05)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-07-06)
 
 
 ### Bug Fixes
@@ -708,6 +708,8 @@
 
 ### Features
 
+* Add state override ([b8b9154](https://github.com/ory/hydra/commit/b8b9154077963492dad3ed0350a4d93d09a95602))
+* **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))
 * Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))
 * Support different jwt scope claim strategies ([#3531](https://github.com/ory/hydra/issues/3531)) ([45da11e](https://github.com/ory/hydra/commit/45da11e4fb4f0a2f939f11682c095b8dbfcddb78))
 

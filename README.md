@@ -36,6 +36,43 @@ provided.
 Ory Hydra can use [Ory Kratos](https://github.com/ory/kratos) as its identity
 server.
 
+
+## Ory Hydra on the Ory Network
+
+The [Ory Network](https://www.ory.sh/cloud) is the fastest, most secure and
+worry-free way to use Ory's Services. **Ory OAuth2 & OpenID Connect** is powered by the Ory
+Hydra open source federation server, and it's fully API-compatible.
+
+The Ory Network provides the infrastructure for modern end-to-end security:
+
+- Identity & credential management scaling to billions of users and devices**
+- Registration, Login and Account management flows for passkey, biometric,
+  social, SSO and multi-factor authentication
+- **Pre-built login, registration and account management pages and components**
+- **OAuth2 and OpenID provider for single sign on, API access and
+  machine-to-machine authorization**
+- Low-latency permission checks based on Google's Zanzibar model and with
+  built-in support for the Ory Permission Language
+
+It's fully managed, highly available, developer & compliance-friendly!
+
+- GDPR-friendly secure storage with data locality
+- Cloud-native APIs, compatible with Ory's Open Source servers
+- Comprehensive admin tools with the web-based Ory Console and the Ory Command
+  Line Interface (CLI)
+- Extensive documentation, straightforward examples and easy-to-follow guides
+- Fair, usage-based [pricing](https://www.ory.sh/pricing)
+
+Sign up for a
+[**free developer account**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=kratos-readme)
+today!
+
+## Ory Network Hybrid Support Plan
+
+Ory offers a support plan for Ory Network Hybrid, including Ory on private cloud deployments. If you have a self-hosted solution and would like help, consider a support plan!  
+The team at Ory has years of experience in cloud computing. Ory's offering is the only official program for qualified support from the maintainers.  
+For more information see the **[website](https://www.ory.sh/support/)** or **[book a meeting](https://www.ory.sh/contact/)**!
+
 ## Get Started
 
 You can use

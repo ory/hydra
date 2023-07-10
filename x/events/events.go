@@ -29,6 +29,15 @@ const (
 	// ConsentRevoked will be emitted when the user revokes a consent request.
 	ConsentRevoked semconv.Event = "OAuth2ConsentRevoked"
 
+	// ClientCreated will be emitted when a client is created.
+	ClientCreated semconv.Event = "OAuth2ClientCreated"
+
+	// ClientDeleted will be emitted when a client is deleted.
+	ClientDeleted semconv.Event = "OAuth2ClientDeleted"
+
+	// ClientUpdated will be emitted when a client is updated.
+	ClientUpdated semconv.Event = "OAuth2ClientUpdated"
+
 	// AccessTokenIssued will be emitted by requests to POST /oauth2/token in case the request was successful.
 	AccessTokenIssued semconv.Event = "OAuth2AccessTokenIssued" //nolint:gosec
 
@@ -49,13 +58,31 @@ const (
 )
 
 const (
-	attributeKeyOAuth2ClientID = "OAuth2ClientID"
-	attributeKeyOAuth2Subject  = "OAuth2Subject"
+	attributeKeyOAuth2ClientName  = "OAuth2ClientName"
+	attributeKeyOAuth2ClientID    = "OAuth2ClientID"
+	attributeKeyOAuth2Subject     = "OAuth2Subject"
+	attributeKeyOAuth2GrantType   = "OAuth2GrantType"
+	attributeKeyOAuth2TokenFormat = "OAuth2TokenFormat" //nolint:gosec
 )
+
+// WithTokenFormat emits the token format as part of the event.
+func WithTokenFormat(format string) trace.EventOption {
+	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2TokenFormat, format))
+}
+
+// WithGrantType emits the token format as part of the event.
+func WithGrantType(grantType string) trace.EventOption {
+	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2GrantType, grantType))
+}
 
 // WithClientID emits the client ID as part of the event.
 func WithClientID(clientID string) trace.EventOption {
 	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2ClientID, clientID))
+}
+
+// WithClientName emits the client name as part of the event.
+func WithClientName(clientID string) trace.EventOption {
+	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2ClientName, clientID))
 }
 
 // WithSubject emits the subject as part of the event.

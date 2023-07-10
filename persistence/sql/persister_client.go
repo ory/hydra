@@ -6,6 +6,8 @@ package sql
 import (
 	"context"
 
+	"github.com/ory/hydra/v2/x/events"
+
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
@@ -67,6 +69,11 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		} else if count == 0 {
 			return sqlcon.HandleError(sqlcon.ErrNoRows)
 		}
+
+		events.Trace(ctx, events.ClientUpdated,
+			events.WithClientID(cl.ID.String()),
+			events.WithClientName(cl.Name))
+
 		return sqlcon.HandleError(err)
 	})
 }
@@ -103,19 +110,35 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) (err err
 	if c.LegacyClientID == "" {
 		c.LegacyClientID = c.ID.String()
 	}
-	return sqlcon.HandleError(p.CreateWithNetwork(ctx, c))
+	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, c)); err != nil {
+		return err
+	}
+
+	events.Trace(ctx, events.ClientCreated,
+		events.WithClientID(c.ID.String()),
+		events.WithClientName(c.Name))
+
+	return nil
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteClient")
 	defer otelx.End(span, &err)
 
-	_, err = p.GetConcreteClient(ctx, id)
+	c, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).Delete(&client.Client{}))
+	if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).Delete(&client.Client{})); err != nil {
+		return err
+	}
+
+	events.Trace(ctx, events.ClientDeleted,
+		events.WithClientID(c.ID.String()),
+		events.WithClientName(c.Name))
+
+	return nil
 }
 
 func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []client.Client, err error) {

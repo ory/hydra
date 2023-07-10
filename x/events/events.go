@@ -62,7 +62,7 @@ const (
 	attributeKeyOAuth2ClientID    = "OAuth2ClientID"
 	attributeKeyOAuth2Subject     = "OAuth2Subject"
 	attributeKeyOAuth2GrantType   = "OAuth2GrantType"
-	attributeKeyOAuth2TokenFormat = "OAuth2TokenFormat"
+	attributeKeyOAuth2TokenFormat = "OAuth2TokenFormat" //nolint:gosec
 )
 
 // WithTokenFormat emits the token format as part of the event.

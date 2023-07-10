@@ -7,12 +7,14 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/otelx/semconv"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
+	"github.com/ory/x/otelx/semconv"
 
 	"github.com/ory/x/servicelocatorx"
 

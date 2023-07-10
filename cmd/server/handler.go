@@ -7,6 +7,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/x/otelx/semconv"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 	"strings"
 	"sync"
@@ -204,6 +206,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheus.MetricsPrometheusPath)
 	}
 
+	adminmw.UseFunc(semconv.Middleware)
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.PrometheusManager())
 
@@ -215,6 +218,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
+	publicmw.UseFunc(semconv.Middleware)
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.PrometheusManager())
 
@@ -307,7 +311,7 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = otelx.TraceHandler(handler)
+		handler = otelx.TraceHandler(handler, otelhttp.WithTracerProvider(tracer.Provider()))
 	}
 
 	var tlsConfig *tls.Config

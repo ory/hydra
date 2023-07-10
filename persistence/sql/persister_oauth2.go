@@ -364,8 +364,8 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	events.Trace(ctx, events.AccessTokenIssued, events.WithRequest(requester))
 	return otelx.WithSpan(ctx, "persistence.sql.CreateAccessTokenSession", func(ctx context.Context) error {
+		events.Trace(ctx, events.AccessTokenIssued, events.WithRequest(requester))
 		return p.createSession(ctx, signature, requester, sqlTableAccess)
 	})
 }
@@ -383,8 +383,8 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 }
 
 func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) error {
-	events.Trace(ctx, events.RefreshTokenIssued, events.WithRequest(requester))
 	return otelx.WithSpan(ctx, "persistence.sql.CreateRefreshTokenSession", func(ctx context.Context) error {
+		events.Trace(ctx, events.RefreshTokenIssued, events.WithRequest(requester))
 		return p.createSession(ctx, signature, requester, sqlTableRefresh)
 	})
 }

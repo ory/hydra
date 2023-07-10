@@ -495,7 +495,9 @@ func (m *RegistryBase) Tracer(_ context.Context) *otelx.Tracer {
 			m.trc = t
 		}
 	}
+
 	if m.trc.Tracer() == nil {
+		m.Logger().Warn("Tracer is unset, falling back to noop tracer.")
 		m.trc = otelx.NewNoop(m.l, m.Config().Tracing())
 	}
 

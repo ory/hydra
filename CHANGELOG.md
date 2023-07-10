@@ -709,6 +709,7 @@
 
 ### Features
 
+* Add more resolution to events and collect client metrics ([#3568](https://github.com/ory/hydra/issues/3568)) ([466e66b](https://github.com/ory/hydra/commit/466e66bd1df7bf589c5a74ad5be399b1eaa80d9b))
 * Add state override ([b8b9154](https://github.com/ory/hydra/commit/b8b9154077963492dad3ed0350a4d93d09a95602))
 * **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))
 * Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))

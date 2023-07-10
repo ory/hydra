@@ -705,6 +705,7 @@
 
 * Racy random string generation ([#3555](https://github.com/ory/hydra/issues/3555)) ([1b26c4c](https://github.com/ory/hydra/commit/1b26c4cb96400b333fe214d2da892fc045bbc69f))
 * Return proper error when the grant request cannot be parsed ([#3558](https://github.com/ory/hydra/issues/3558)) ([26f2d34](https://github.com/ory/hydra/commit/26f2d34459f55444e880e6e27e081c002d630246))
+* Use correct tracer in middleware ([#3567](https://github.com/ory/hydra/issues/3567)) ([807cbd2](https://github.com/ory/hydra/commit/807cbd209af376b9b2d18c278cc927d1c43e6865))
 
 ### Features
 

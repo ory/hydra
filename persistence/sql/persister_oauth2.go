@@ -5,13 +5,17 @@ package sql
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/sha512"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
 	"time"
+
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -368,10 +372,7 @@ func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature stri
 	defer otelx.End(span, &err)
 
 	events.Trace(ctx, events.AccessTokenIssued,
-		events.WithRequest(requester),
-		events.WithGrantType(requester.GetRequestForm().Get("grant_type")),
-		events.WithTokenFormat(string(p.config.AccessTokenStrategy(ctx))),
-		events.WithClientID(requester.GetClient().GetID()),
+		append(toEventOptions(requester), events.WithGrantType(requester.GetRequestForm().Get("grant_type")))...,
 	)
 
 	return p.createSession(ctx, signature, requester, sqlTableAccess)
@@ -389,14 +390,24 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 	return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
 }
 
+func toEventOptions(requester fosite.Requester) []trace.EventOption {
+	sub := ""
+	if requester.GetSession() != nil {
+		hash := sha256.Sum256([]byte(requester.GetSession().GetSubject()))
+		sub = hex.EncodeToString(hash[:])
+	}
+	return []trace.EventOption{
+		events.WithGrantType(requester.GetRequestForm().Get("grant_type")),
+		events.WithSubject(sub),
+		events.WithRequest(requester),
+		events.WithClientID(requester.GetClient().GetID()),
+	}
+}
+
 func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteCreateRefreshTokenSessionAccessTokenSession")
 	defer otelx.End(span, &err)
-	events.Trace(ctx, events.RefreshTokenIssued,
-		events.WithGrantType(requester.GetRequestForm().Get("grant_type")),
-		events.WithRequest(requester),
-		events.WithClientID(requester.GetClient().GetID()),
-	)
+	events.Trace(ctx, events.RefreshTokenIssued, toEventOptions(requester)...)
 	return p.createSession(ctx, signature, requester, sqlTableRefresh)
 }
 
@@ -415,11 +426,7 @@ func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature str
 func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateOpenIDConnectSession")
 	defer otelx.End(span, &err)
-	events.Trace(ctx, events.IdentityTokenIssued,
-		events.WithRequest(requester),
-		events.WithGrantType(requester.GetRequestForm().Get("grant_type")),
-		events.WithClientID(requester.GetClient().GetID()),
-	)
+	events.Trace(ctx, events.IdentityTokenIssued, toEventOptions(requester)...)
 	return p.createSession(ctx, signature, requester, sqlTableOpenID)
 }
 

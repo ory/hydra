@@ -12,7 +12,7 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"

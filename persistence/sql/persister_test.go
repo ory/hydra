@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-	"github.com/instana/testify/assert"
-	"github.com/instana/testify/require"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
@@ -52,12 +52,12 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 		parallel = false
 	}
 
-	t.Run("package=consent/manager="+k, consent.ManagerTests(t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-	t.Run("package=consent/manager="+k, consent.ManagerTests(t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+	t.Run("package=consent/manager="+k, consent.ManagerTests(t1, t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
+	t.Run("package=consent/manager="+k, consent.ManagerTests(t2, t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
 
 	t.Run("parallel-boundary", func(t *testing.T) {
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1.Config(), t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2.Config(), t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1, "t1", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2, "t2", parallel))
 	})
 
 	t.Run("package=jwk/manager="+k, func(t *testing.T) {
@@ -186,7 +186,7 @@ func TestManagers(t *testing.T) {
 			)
 		}
 		t.Run("package=consent/manager="+k+"/case=nid",
-			consent.TestHelperNID(t1.ClientManager(), t1.ConsentManager(), t2.ConsentManager()),
+			consent.TestHelperNID(t1, t1.ConsentManager(), t2.ConsentManager()),
 		)
 	}
 }

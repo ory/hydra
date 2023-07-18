@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/otelx"
 
@@ -308,6 +309,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.False(t, c.GetScopeStrategy(ctx)([]string{"openid.*"}, "openid.email"), "should us fosite.ExactScopeStrategy")
 	assert.Equal(t, AccessTokenDefaultStrategy, c.AccessTokenStrategy(ctx))
 	assert.Equal(t, false, c.GrantAllClientCredentialsScopesPerDefault(ctx))
+	assert.Equal(t, jwt.JWTScopeFieldList, c.GetJWTScopeField(ctx))
 
 	// ttl
 	assert.Equal(t, 2*time.Hour, c.ConsentRequestMaxAge(ctx))
@@ -472,4 +474,20 @@ func TestJWTBearer(t *testing.T) {
 	assert.Equal(t, 24.0, p2.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIDOptional(ctx))
+}
+
+func TestJWTScopeClaimStrategy(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(io.Discard)
+	p := MustNew(context.Background(), l)
+
+	ctx := context.Background()
+
+	assert.Equal(t, jwt.JWTScopeFieldList, p.GetJWTScopeField(ctx))
+	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "list")
+	assert.Equal(t, jwt.JWTScopeFieldList, p.GetJWTScopeField(ctx))
+	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "string")
+	assert.Equal(t, jwt.JWTScopeFieldString, p.GetJWTScopeField(ctx))
+	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "both")
+	assert.Equal(t, jwt.JWTScopeFieldBoth, p.GetJWTScopeField(ctx))
 }

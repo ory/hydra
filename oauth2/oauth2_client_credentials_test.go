@@ -22,7 +22,7 @@ import (
 	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/contextx"
@@ -276,7 +276,7 @@ func TestClientCredentials(t *testing.T) {
 					}
 
 					hookResp := hydraoauth2.TokenHookResponse{
-						Session: consent.AcceptOAuth2ConsentRequestSession{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
 							AccessToken: claims,
 							IDToken:     claims,
 						},

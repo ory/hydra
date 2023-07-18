@@ -7,13 +7,14 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMustRSAPrivate(t *testing.T) {
+	t.Parallel()
 	keys, err := GenerateJWK(context.Background(), jose.RS256, "foo", "sig")
 	require.NoError(t, err)
 

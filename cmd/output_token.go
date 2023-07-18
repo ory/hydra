@@ -16,7 +16,7 @@ type (
 	outputOAuth2Token oauth2.Token
 )
 
-func (_ outputOAuth2Token) Header() []string {
+func (outputOAuth2Token) Header() []string {
 	return []string{"ACCESS TOKEN", "REFRESH TOKEN", "ID TOKEN", "EXPIRY"}
 }
 

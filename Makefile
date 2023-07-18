@@ -3,12 +3,13 @@ SHELL=/bin/bash -o pipefail
 export GO111MODULE 		:= on
 export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
-export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest-sqlite)
+export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
-GOLANGCI_LINT_VERSION = 1.46.2
+GOLANGCI_LINT_VERSION = 1.53.3
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
+				  golang.org/x/tools/cmd/goimports \
 				  github.com/go-swagger/go-swagger/cmd/swagger
 
 define make-go-dependency
@@ -37,9 +38,6 @@ node_modules: package-lock.json
 docs/cli: .bin/clidoc
 	clidoc .
 
-.bin/goimports: go.sum Makefile
-	GOBIN=$(shell pwd)/.bin go install golang.org/x/tools/cmd/goimports@latest
-
 .bin/licenses: Makefile
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
@@ -63,12 +61,9 @@ test: .bin/go-acc
 # Resets the test databases
 .PHONY: test-resetdb
 test-resetdb: node_modules
-	docker kill hydra_test_database_mysql || true
-	docker kill hydra_test_database_postgres || true
-	docker kill hydra_test_database_cockroach || true
-	docker rm -f hydra_test_database_mysql || true
-	docker rm -f hydra_test_database_postgres || true
-	docker rm -f hydra_test_database_cockroach || true
+	docker rm --force --volumes hydra_test_database_mysql || true
+	docker rm --force --volumes hydra_test_database_postgres || true
+	docker rm --force --volumes hydra_test_database_cockroach || true
 	docker run --rm --name hydra_test_database_mysql  --platform linux/amd64 -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0.26
 	docker run --rm --name hydra_test_database_postgres --platform linux/amd64 -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:11.8
 	docker run --rm --name hydra_test_database_cockroach --platform linux/amd64 -p 3446:26257 -d cockroachdb/cockroach:v22.1.10 start-single-node --insecure
@@ -76,7 +71,7 @@ test-resetdb: node_modules
 # Build local docker images
 .PHONY: docker
 docker:
-	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:${IMAGE_TAG} .
+	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:${IMAGE_TAG}-sqlite .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb
@@ -122,6 +117,7 @@ sdk: .bin/swagger .bin/ory node_modules
 	swagger generate spec -m -o spec/swagger.json \
 		-c github.com/ory/hydra/v2/client \
 		-c github.com/ory/hydra/v2/consent \
+		-c github.com/ory/hydra/v2/flow \
 		-c github.com/ory/hydra/v2/health \
 		-c github.com/ory/hydra/v2/jwk \
 		-c github.com/ory/hydra/v2/oauth2 \

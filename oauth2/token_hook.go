@@ -12,10 +12,10 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/errorsx"
 )
@@ -54,7 +54,7 @@ type TokenHookRequest struct {
 // swagger:ignore
 type TokenHookResponse struct {
 	// Session is the session data returned by the hook.
-	Session consent.AcceptOAuth2ConsentRequestSession `json:"session"`
+	Session flow.AcceptOAuth2ConsentRequestSession `json:"session"`
 }
 
 func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookURL *url.URL, reqBodyBytes []byte, session *Session) error {

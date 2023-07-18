@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/instana/testify/require"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/flow"
 	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"

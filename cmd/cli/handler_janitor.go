@@ -6,6 +6,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/ory/x/servicelocatorx"
@@ -52,12 +53,13 @@ func NewJanitorHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsMo
 	}
 }
 
-func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
+func (*JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 &&
 		!flagx.MustGetBool(cmd, ReadFromEnv) &&
 		len(flagx.MustGetStringSlice(cmd, Config)) == 0 {
 
 		fmt.Printf("%s\n", cmd.UsageString())
+		//lint:ignore ST1005 formatted error string used in CLI output
 		return fmt.Errorf("%s\n%s\n%s\n",
 			"A DSN is required as a positional argument when not passing any of the following flags:",
 			"- Using the environment variable with flag -e, --read-from-env",
@@ -65,6 +67,7 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 	}
 
 	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) && !flagx.MustGetBool(cmd, OnlyGrants) {
+		//lint:ignore ST1005 formatted error string used in CLI output
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor requires at least one of --tokens, --requests or --grants to be set")
 	}
@@ -72,10 +75,12 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 	limit := flagx.MustGetInt(cmd, Limit)
 	batchSize := flagx.MustGetInt(cmd, BatchSize)
 	if limit <= 0 || batchSize <= 0 {
+		//lint:ignore ST1005 formatted error string used in CLI output
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Values for --limit and --batch-size should both be greater than 0")
 	}
 	if batchSize > limit {
+		//lint:ignore ST1005 formatted error string used in CLI output
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Value for --batch-size must not be greater than value for --limit")
 	}
@@ -130,6 +135,7 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 	}
 
 	if len(d.Config().DSN()) == 0 {
+		//lint:ignore ST1005 formatted error string used in CLI output
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")
@@ -154,20 +160,20 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 		routineFlags = append(routineFlags, OnlyGrants)
 	}
 
-	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(p, routineFlags...)...)
+	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(cmd.OutOrStdout(), p, routineFlags...)...)
 }
 
-func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
+func addRoutine(out io.Writer, p persistence.Persister, names ...string) []cleanupRoutine {
 	var routines []cleanupRoutine
 	for _, n := range names {
 		switch n {
 		case OnlyTokens:
-			routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
-			routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
+			routines = append(routines, cleanup(out, p.FlushInactiveAccessTokens, "access tokens"))
+			routines = append(routines, cleanup(out, p.FlushInactiveRefreshTokens, "refresh tokens"))
 		case OnlyRequests:
-			routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
+			routines = append(routines, cleanup(out, p.FlushInactiveLoginConsentRequests, "login-consent requests"))
 		case OnlyGrants:
-			routines = append(routines, cleanup(p.FlushInactiveGrants, "grants"))
+			routines = append(routines, cleanup(out, p.FlushInactiveGrants, "grants"))
 		}
 	}
 	return routines
@@ -175,12 +181,12 @@ func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 
 type cleanupRoutine func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 
-func cleanup(cr cleanupRoutine, routineName string) cleanupRoutine {
+func cleanup(out io.Writer, cr cleanupRoutine, routineName string) cleanupRoutine {
 	return func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 		if err := cr(ctx, notAfter, limit, batchSize); err != nil {
 			return errors.Wrap(errorsx.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
 		}
-		fmt.Printf("Successfully completed Janitor run on %s\n", routineName)
+		fmt.Fprintf(out, "Successfully completed Janitor run on %s\n", routineName)
 		return nil
 	}
 }

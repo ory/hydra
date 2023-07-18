@@ -6,20 +6,22 @@ package sql
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
+	"github.com/ory/hydra/v2/x/events"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/x/sqlcon"
 )
 
-func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
+func (p *Persister) GetConcreteClient(ctx context.Context, id string) (c *client.Client, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteClient")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	var cl client.Client
 	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl); err != nil {
@@ -32,9 +34,9 @@ func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, er
 	return p.GetConcreteClient(ctx, id)
 }
 
-func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
+func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateClient")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		o, err := p.GetConcreteClient(ctx, cl.GetID())
@@ -67,13 +69,18 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		} else if count == 0 {
 			return sqlcon.HandleError(sqlcon.ErrNoRows)
 		}
+
+		events.Trace(ctx, events.ClientUpdated,
+			events.WithClientID(cl.ID.String()),
+			events.WithClientName(cl.Name))
+
 		return sqlcon.HandleError(err)
 	})
 }
 
-func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) (_ *client.Client, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Authenticate")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	c, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
@@ -87,9 +94,9 @@ func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) 
 	return c, nil
 }
 
-func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
+func (p *Persister) CreateClient(ctx context.Context, c *client.Client) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateClient")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	h, err := p.r.ClientHasher().Hash(ctx, []byte(c.Secret))
 	if err != nil {
@@ -103,24 +110,40 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 	if c.LegacyClientID == "" {
 		c.LegacyClientID = c.ID.String()
 	}
-	return sqlcon.HandleError(p.CreateWithNetwork(ctx, c))
+	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, c)); err != nil {
+		return err
+	}
+
+	events.Trace(ctx, events.ClientCreated,
+		events.WithClientID(c.ID.String()),
+		events.WithClientName(c.Name))
+
+	return nil
 }
 
-func (p *Persister) DeleteClient(ctx context.Context, id string) error {
+func (p *Persister) DeleteClient(ctx context.Context, id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteClient")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	_, err := p.GetConcreteClient(ctx, id)
+	c, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).Delete(&client.Client{}))
+	if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).Delete(&client.Client{})); err != nil {
+		return err
+	}
+
+	events.Trace(ctx, events.ClientDeleted,
+		events.WithClientID(c.ID.String()),
+		events.WithClientName(c.Name))
+
+	return nil
 }
 
-func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]client.Client, error) {
+func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []client.Client, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetClients")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	cs := make([]client.Client, 0)
 
@@ -141,10 +164,10 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]cl
 	return cs, nil
 }
 
-func (p *Persister) CountClients(ctx context.Context) (int, error) {
+func (p *Persister) CountClients(ctx context.Context) (n int, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountClients")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	n, err := p.QueryWithNetwork(ctx).Count(&client.Client{})
+	n, err = p.QueryWithNetwork(ctx).Count(&client.Client{})
 	return n, sqlcon.HandleError(err)
 }

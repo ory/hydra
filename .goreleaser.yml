@@ -8,6 +8,6 @@ variables:
   buildinfo_hash: "github.com/ory/hydra/v2/driver/config.Commit"
   buildinfo_tag: "github.com/ory/hydra/v2/driver/config.Version"
   buildinfo_date: "github.com/ory/hydra/v2/driver/config.Date"
-  dockerfile: ".docker/Dockerfile-alpine"
-
+  dockerfile_alpine: ".docker/Dockerfile-alpine"
+  dockerfile_static: ".docker/Dockerfile-distroless-static"
 project_name: hydra

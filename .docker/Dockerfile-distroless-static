@@ -1,0 +1,8 @@
+FROM gcr.io/distroless/static-debian11:nonroot
+
+COPY hydra /usr/bin/hydra
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+
+ENTRYPOINT ["hydra"]
+CMD ["serve", "all"]

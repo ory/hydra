@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package consent
+package flow
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func TestToRFCError(t *testing.T) {
 		{
 			input: &RequestDeniedError{
 				Name:  "not empty",
-				valid: true,
+				Valid: true,
 			},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "not empty",
@@ -34,7 +34,7 @@ func TestToRFCError(t *testing.T) {
 			input: &RequestDeniedError{
 				Name:        "",
 				Description: "not empty",
-				valid:       true,
+				Valid:       true,
 			},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "request_denied",
@@ -44,7 +44,7 @@ func TestToRFCError(t *testing.T) {
 			},
 		},
 		{
-			input: &RequestDeniedError{valid: true},
+			input: &RequestDeniedError{Valid: true},
 			expect: &fosite.RFC6749Error{
 				ErrorField:       "request_denied",
 				DescriptionField: "",
@@ -55,7 +55,7 @@ func TestToRFCError(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			require.EqualValues(t, tc.input.toRFCError(), tc.expect)
+			require.EqualValues(t, tc.input.ToRFCError(), tc.expect)
 		})
 	}
 }

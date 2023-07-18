@@ -11,11 +11,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pborman/uuid"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/handler/rfc7523"
 
@@ -36,7 +37,6 @@ import (
 	"github.com/ory/x/sqlcon"
 
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/consent"
 )
 
 func signatureFromJTI(jti string) string {
@@ -121,9 +121,9 @@ var flushRequests = []*fosite.Request{
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{LegacyClientID: "foobar"}
-	cr := &consent.OAuth2ConsentRequest{
+	cr := &flow.OAuth2ConsentRequest{
 		Client:               cl,
-		OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
+		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
 		LoginChallenge:       sqlxx.NullString(id),
 		ID:                   id,
 		Verifier:             id,
@@ -132,18 +132,36 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 		RequestedAt:          time.Now(),
 	}
 
+	ctx := context.Background()
 	if createClient {
-		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
+		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
-	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
-	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.AcceptOAuth2ConsentRequest{
-		ConsentRequest: cr, Session: new(consent.AcceptOAuth2ConsentRequestSession), AuthenticatedAt: sqlxx.NullTime(time.Now()),
-		ID:          id,
-		RequestedAt: time.Now(),
-		HandledAt:   sqlxx.NullTime(time.Now()),
+	f, err := x.ConsentManager().CreateLoginRequest(
+		ctx, &flow.LoginRequest{
+			Client:               cl,
+			OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
+			ID:                   id,
+			Verifier:             id,
+			AuthenticatedAt:      sqlxx.NullTime(time.Now()),
+			RequestedAt:          time.Now(),
+		})
+	require.NoError(t, err)
+	err = x.ConsentManager().CreateConsentRequest(ctx, f, cr)
+	require.NoError(t, err)
+
+	encodedFlow, err := f.ToConsentVerifier(ctx, x)
+	require.NoError(t, err)
+
+	_, err = x.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
+		ConsentRequest:  cr,
+		Session:         new(flow.AcceptOAuth2ConsentRequestSession),
+		AuthenticatedAt: sqlxx.NullTime(time.Now()),
+		ID:              encodedFlow,
+		RequestedAt:     time.Now(),
+		HandledAt:       sqlxx.NullTime(time.Now()),
 	})
+
 	require.NoError(t, err)
 }
 
@@ -270,10 +288,18 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		mockRequestForeignKey(t, reqIdOne, x, false)
 		mockRequestForeignKey(t, reqIdTwo, x, false)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{
+			ID:          reqIdOne,
+			Client:      &client.Client{LegacyClientID: "foobar"},
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Session:     &Session{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{
+			ID:          reqIdTwo,
+			Client:      &client.Client{LegacyClientID: "foobar"},
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Session:     &Session{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})

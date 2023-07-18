@@ -16,7 +16,7 @@ type (
 	outputOAuth2TokenIntrospection hydra.IntrospectedOAuth2Token
 )
 
-func (_ outputOAuth2TokenIntrospection) Header() []string {
+func (outputOAuth2TokenIntrospection) Header() []string {
 	return []string{"ACTIVE", "SUBJECT", "CLIENT ID", "SCOPE", "EXPIRY", "TOKEN USE"}
 }
 

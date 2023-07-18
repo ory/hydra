@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	jose "github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
-	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 )

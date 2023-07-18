@@ -31,3 +31,10 @@ func LogError(r *http.Request, err error, logger *logrusx.Logger) {
 	logger.WithRequest(r).
 		WithError(err).Errorln("An error occurred")
 }
+
+func Must[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
+}

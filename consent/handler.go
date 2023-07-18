@@ -9,6 +9,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/pagination/tokenpagination"
 
 	"github.com/ory/x/httprouterx"
@@ -71,6 +74,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 // Revoke OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters revokeOAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type revokeOAuth2ConsentSessions struct {
 	// OAuth 2.0 Consent Subject
 	//
@@ -113,7 +118,7 @@ type revokeOAuth2ConsentSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
 	allClients := r.URL.Query().Get("all") == "true"
@@ -128,11 +133,13 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject), events.WithClientID(client))
 	case allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
 	default:
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both 'client' and 'all' is not defined but one of them should have been.`)))
 		return
@@ -144,6 +151,8 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 // List OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters listOAuth2ConsentSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type listOAuth2ConsentSessions struct {
 	tokenpagination.RequestParameters
 
@@ -179,7 +188,7 @@ type listOAuth2ConsentSessions struct {
 //	Responses:
 //	  200: oAuth2ConsentSessions
 //	  default: errorOAuth2
-func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -189,7 +198,7 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 
 	page, itemsPerPage := x.ParsePagination(r)
 
-	var s []AcceptOAuth2ConsentRequest
+	var s []flow.AcceptOAuth2ConsentRequest
 	var err error
 	if len(loginSessionId) == 0 {
 		s, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, itemsPerPage, itemsPerPage*page)
@@ -197,21 +206,21 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 		s, err = h.r.ConsentManager().FindSubjectsSessionGrantedConsentRequests(r.Context(), subject, loginSessionId, itemsPerPage, itemsPerPage*page)
 	}
 	if errors.Is(err, ErrNoPreviousConsentFound) {
-		h.r.Writer().Write(w, r, []OAuth2ConsentSession{})
+		h.r.Writer().Write(w, r, []flow.OAuth2ConsentSession{})
 		return
 	} else if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	var a []OAuth2ConsentSession
+	var a []flow.OAuth2ConsentSession
 	for _, session := range s {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
-		a = append(a, OAuth2ConsentSession(session))
+		a = append(a, flow.OAuth2ConsentSession(session))
 	}
 
 	if len(a) == 0 {
-		a = []OAuth2ConsentSession{}
+		a = []flow.OAuth2ConsentSession{}
 	}
 
 	n, err := h.r.ConsentManager().CountSubjectsGrantedConsentRequests(r.Context(), subject)
@@ -227,6 +236,8 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 // Revoke OAuth 2.0 Consent Login Sessions Parameters
 //
 // swagger:parameters revokeOAuth2LoginSessions
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type revokeOAuth2LoginSessions struct {
 	// OAuth 2.0 Subject
 	//
@@ -267,7 +278,7 @@ type revokeOAuth2LoginSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	sid := r.URL.Query().Get("sid")
 	subject := r.URL.Query().Get("subject")
 
@@ -297,6 +308,8 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Login Request
 //
 // swagger:parameters getOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -331,7 +344,7 @@ type getOAuth2LoginRequest struct {
 //	  200: oAuth2LoginRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -348,7 +361,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &OAuth2RedirectTo{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
 			RedirectTo: request.RequestURL,
 		})
 		return
@@ -361,6 +374,8 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 // Accept OAuth 2.0 Login Request
 //
 // swagger:parameters acceptOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -369,7 +384,7 @@ type acceptOAuth2LoginRequest struct {
 	Challenge string `json:"login_challenge"`
 
 	// in: body
-	Body HandledLoginRequest
+	Body flow.HandledLoginRequest
 }
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/accept oAuth2 acceptOAuth2LoginRequest
@@ -399,7 +414,9 @@ type acceptOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -409,7 +426,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var p HandledLoginRequest
+	var p flow.HandledLoginRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -423,7 +440,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	p.ID = challenge
-	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -443,7 +460,12 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &p)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -455,14 +477,24 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
+	verifier, err := f.ToLoginVerifier(ctx, h.r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	events.Trace(ctx, events.LoginAccepted, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
 }
 
 // Reject OAuth 2.0 Login Request
 //
 // swagger:parameters rejectOAuth2LoginRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type rejectOAuth2LoginRequest struct {
 	// OAuth 2.0 Login Request Challenge
 	//
@@ -471,7 +503,7 @@ type rejectOAuth2LoginRequest struct {
 	Challenge string `json:"login_challenge"`
 
 	// in: body
-	Body RequestDeniedError
+	Body flow.RequestDeniedError
 }
 
 // swagger:route PUT /admin/oauth2/auth/requests/login/reject oAuth2 rejectOAuth2LoginRequest
@@ -500,7 +532,9 @@ type rejectOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -510,7 +544,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var p RequestDeniedError
+	var p flow.RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -518,15 +552,20 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	p.valid = true
-	p.SetDefaults(loginRequestDeniedErrorName)
-	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	p.Valid = true
+	p.SetDefaults(flow.LoginRequestDeniedErrorName)
+	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &HandledLoginRequest{
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: ar.RequestedAt,
@@ -536,20 +575,30 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	verifier, err := f.ToLoginVerifier(ctx, h.r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	ru, err := url.Parse(request.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
+	events.Trace(ctx, events.LoginRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
 }
 
 // Get OAuth 2.0 Consent Request
 //
 // swagger:parameters getOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -585,7 +634,7 @@ type getOAuth2ConsentRequest struct {
 //	  200: oAuth2ConsentRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -601,7 +650,7 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &OAuth2RedirectTo{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
 			RedirectTo: request.RequestURL,
 		})
 		return
@@ -622,6 +671,8 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 // Accept OAuth 2.0 Consent Request
 //
 // swagger:parameters acceptOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -630,7 +681,7 @@ type acceptOAuth2ConsentRequest struct {
 	Challenge string `json:"consent_challenge"`
 
 	// in: body
-	Body AcceptOAuth2ConsentRequest
+	Body flow.AcceptOAuth2ConsentRequest
 }
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/accept oAuth2 acceptOAuth2ConsentRequest
@@ -665,7 +716,9 @@ type acceptOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -675,7 +728,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var p AcceptOAuth2ConsentRequest
+	var p flow.AcceptOAuth2ConsentRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -683,7 +736,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
+	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -693,7 +746,12 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &p)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -707,14 +765,24 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {hr.Verifier}}).String(),
+	verifier, err := f.ToConsentVerifier(ctx, h.r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	events.Trace(ctx, events.ConsentAccepted, events.WithClientID(cr.Client.GetID()), events.WithSubject(cr.Subject))
+
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
 }
 
 // Reject OAuth 2.0 Consent Request
 //
 // swagger:parameters rejectOAuth2ConsentRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type adminRejectOAuth2ConsentRequest struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
@@ -723,7 +791,7 @@ type adminRejectOAuth2ConsentRequest struct {
 	Challenge string `json:"consent_challenge"`
 
 	// in: body
-	Body RequestDeniedError
+	Body flow.RequestDeniedError
 }
 
 // swagger:route PUT /admin/oauth2/auth/requests/consent/reject oAuth2 rejectOAuth2ConsentRequest
@@ -757,7 +825,9 @@ type adminRejectOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -767,7 +837,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var p RequestDeniedError
+	var p flow.RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -775,15 +845,21 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	p.valid = true
-	p.SetDefaults(consentRequestDeniedErrorName)
-	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
+	p.Valid = true
+	p.SetDefaults(flow.ConsentRequestDeniedErrorName)
+	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &AcceptOAuth2ConsentRequest{
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	request, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: hr.RequestedAt,
@@ -800,14 +876,24 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
+	verifier, err := f.ToConsentVerifier(ctx, h.r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	events.Trace(ctx, events.ConsentRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
 }
 
 // Accept OAuth 2.0 Logout Request
 //
 // swagger:parameters acceptOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type acceptOAuth2LogoutRequest struct {
 	// OAuth 2.0 Logout Request Challenge
 	//
@@ -832,7 +918,7 @@ type acceptOAuth2LogoutRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -844,7 +930,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
@@ -852,6 +938,8 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Reject OAuth 2.0 Logout Request
 //
 // swagger:parameters rejectOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type rejectOAuth2LogoutRequest struct {
 	// in: query
 	// required: true
@@ -875,7 +963,7 @@ type rejectOAuth2LogoutRequest struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -892,6 +980,8 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Logout Request
 //
 // swagger:parameters getOAuth2LogoutRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type getOAuth2LogoutRequest struct {
 	// in: query
 	// required: true
@@ -913,7 +1003,7 @@ type getOAuth2LogoutRequest struct {
 //	  200: oAuth2LogoutRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -931,13 +1021,22 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 	}
 
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &OAuth2RedirectTo{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
 			RedirectTo: request.RequestURL,
 		})
 		return
 	}
 
 	h.r.Writer().Write(w, r, request)
+}
+
+func (h *Handler) flowFromCookie(r *http.Request) (*flow.Flow, error) {
+	clientID := r.URL.Query().Get("client_id")
+	if clientID == "" {
+		return nil, errors.WithStack(fosite.ErrInvalidClient)
+	}
+
+	return flowctx.FromCookie[flow.Flow](r.Context(), r, h.r.FlowCipher(), flowctx.FlowCookie(flowctx.SuffixFromStatic(clientID)))
 }
 
 // Verify OAuth 2.0 User Code Request
@@ -949,7 +1048,7 @@ type verifyUserCodeRequest struct {
 	Challenge string `json:"device_challenge"`
 
 	// in: body
-	Body DeviceGrantVerifyUserCodeRequest
+	Body flow.DeviceGrantVerifyUserCodeRequest
 }
 
 // swagger:route PUT /admin/oauth2/auth/requests/device/verify oAuth2 verifyUserCodeRequest
@@ -979,7 +1078,7 @@ func (h *Handler) verifyUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	var p DeviceGrantVerifyUserCodeRequest
+	var p flow.DeviceGrantVerifyUserCodeRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
@@ -1022,7 +1121,7 @@ func (h *Handler) verifyUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	h.r.Writer().Write(w, r, &OAuth2RedirectTo{
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(h.c.OAuth2DeviceAuthorisationURL(r.Context()), url.Values{"device_verifier": {grantRequest.Verifier}, "client_id": {clientId}}).String(),
 	})
 }

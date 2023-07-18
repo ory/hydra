@@ -10,10 +10,11 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/stringsx"
 
 	"github.com/ory/x/sqlcon"
@@ -21,9 +22,9 @@ import (
 
 var _ trust.GrantManager = &Persister{}
 
-func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) error {
+func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateGrant")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
@@ -42,9 +43,9 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 	})
 }
 
-func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Grant, error) {
+func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (_ trust.Grant, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteGrant")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	var data trust.SQLData
 	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&data); err != nil {
@@ -54,9 +55,9 @@ func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Gran
 	return p.jwtGrantFromSQlData(data), nil
 }
 
-func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
+func (p *Persister) DeleteGrant(ctx context.Context, id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteGrant")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		grant, err := p.GetConcreteGrant(ctx, id)
@@ -72,9 +73,9 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 	})
 }
 
-func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]trust.Grant, error) {
+func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) (_ []trust.Grant, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetGrants")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	grantsData := make([]trust.SQLData, 0)
 
@@ -97,18 +98,18 @@ func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIs
 	return grants, nil
 }
 
-func (p *Persister) CountGrants(ctx context.Context) (int, error) {
+func (p *Persister) CountGrants(ctx context.Context) (n int, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountGrants")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	n, err := p.QueryWithNetwork(ctx).
+	n, err = p.QueryWithNetwork(ctx).
 		Count(&trust.SQLData{})
 	return n, sqlcon.HandleError(err)
 }
 
-func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (*jose.JSONWebKey, error) {
+func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKey")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	var data trust.SQLData
 	query := p.QueryWithNetwork(ctx).
@@ -128,9 +129,9 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	return &keySet.Keys[0], nil
 }
 
-func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (*jose.JSONWebKeySet, error) {
+func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeys")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	grantsData := make([]trust.SQLData, 0)
 	query := p.QueryWithNetwork(ctx).
@@ -163,9 +164,9 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	return filteredKeySet, nil
 }
 
-func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) ([]string, error) {
+func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) (_ []string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeyScopes")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	var data trust.SQLData
 	query := p.QueryWithNetwork(ctx).
@@ -181,11 +182,11 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	return p.jwtGrantFromSQlData(data).Scope, nil
 }
 
-func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
+func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (ok bool, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.IsJWTUsed")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	err := p.ClientAssertionJWTValid(ctx, jti)
+	err = p.ClientAssertionJWTValid(ctx, jti)
 	if err != nil {
 		return true, nil
 	}
@@ -193,9 +194,9 @@ func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
 	return false, nil
 }
 
-func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time.Time) error {
+func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time.Time) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.MarkJWTUsedForTime")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	return p.SetClientAssertionJWT(ctx, jti, exp)
 }
@@ -230,9 +231,9 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 	}
 }
 
-func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
+func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, _ int, _ int) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveGrants")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	deleteUntil := time.Now().UTC()
 	if deleteUntil.After(notAfter) {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/mock"
 
 	"github.com/gorilla/securecookie"
@@ -38,22 +39,22 @@ func TestSanitizeClient(t *testing.T) {
 
 func TestMatchScopes(t *testing.T) {
 	for k, tc := range []struct {
-		granted         []AcceptOAuth2ConsentRequest
+		granted         []flow.AcceptOAuth2ConsentRequest
 		requested       []string
 		expectChallenge string
 	}{
 		{
-			granted:         []AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []flow.AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
-			granted:         []AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []flow.AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "",
 		},
 		{
-			granted: []AcceptOAuth2ConsentRequest{
+			granted: []flow.AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar"}},
 			},
@@ -61,7 +62,7 @@ func TestMatchScopes(t *testing.T) {
 			expectChallenge: "1",
 		},
 		{
-			granted: []AcceptOAuth2ConsentRequest{
+			granted: []flow.AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
@@ -69,7 +70,7 @@ func TestMatchScopes(t *testing.T) {
 			expectChallenge: "2",
 		},
 		{
-			granted: []AcceptOAuth2ConsentRequest{
+			granted: []flow.AcceptOAuth2ConsentRequest{
 				{ID: "1", GrantedScope: []string{"foo", "bar"}},
 				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},

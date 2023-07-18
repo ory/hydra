@@ -4,8 +4,11 @@
 package client
 
 import (
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/twmb/murmur3"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/stringsx"
@@ -13,7 +16,7 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/x"
@@ -559,4 +562,14 @@ func AccessTokenStrategySource(client fosite.Client) config.AccessTokenStrategyS
 		return source
 	}
 	return nil
+}
+
+func (c *Client) CookieSuffix() string {
+	return CookieSuffix(c)
+}
+
+type IDer interface{ GetID() string }
+
+func CookieSuffix(client IDer) string {
+	return strconv.Itoa(int(murmur3.Sum32([]byte(client.GetID()))))
 }

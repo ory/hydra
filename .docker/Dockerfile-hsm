@@ -1,9 +1,10 @@
-FROM golang:1.19-alpine3.18 AS builder
-
-RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
+FROM golang:1.20 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
-RUN mkdir -p ./internal/httpclient
+
+RUN apt-get update && apt-get upgrade -y &&\
+    mkdir -p /var/lib/sqlite &&\
+    mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient
@@ -12,11 +13,14 @@ ENV GO111MODULE on
 ENV CGO_ENABLED 1
 
 RUN go mod download
-
 COPY . .
+
+###############################
 
 FROM builder as build-hydra
 RUN go build -tags sqlite,json1,hsm -o /usr/bin/hydra
+
+###############################
 
 FROM builder as test-hsm
 ENV HSM_ENABLED=true
@@ -24,14 +28,21 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
-RUN apk --no-cache --upgrade --latest add softhsm opensc; \
-    pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra; \
+RUN apt-get -y install softhsm opensc &&\
+    pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL" &&\
     go test -p 1 -v -failfast -short -tags=sqlite,hsm ./...
 
-FROM alpine:3.18
+###############################
 
-RUN apk --no-cache --upgrade --latest add softhsm opensc; \
-    pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
+FROM gcr.io/distroless/base-nossl-debian11:debug-nonroot AS runner
+
+ENV HSM_ENABLED=true
+ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
+ENV HSM_TOKEN_LABEL=hydra
+ENV HSM_PIN=1234
+
+RUN apt-get -y install softhsm opensc &&\
+    pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL"
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \

@@ -7,16 +7,17 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 )
 
 func TestKeyManagerStrategy(t *testing.T) {
+	t.Parallel()
 	ctrl := gomock.NewController(t)
 	softwareKeyManager := NewMockManager(ctrl)
 	hardwareKeyManager := NewMockManager(ctrl)

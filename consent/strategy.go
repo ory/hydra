@@ -8,14 +8,25 @@ import (
 	"net/http"
 
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/flow"
 )
 
 var _ Strategy = new(DefaultStrategy)
 
 type Strategy interface {
-	HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*AcceptOAuth2ConsentRequest, error)
-	HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*AcceptOAuth2ConsentRequest, error)
-	HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LogoutResult, error)
+	HandleOAuth2AuthorizationRequest(
+		ctx context.Context,
+		w http.ResponseWriter,
+		r *http.Request,
+		req fosite.AuthorizeRequester,
+	) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error)
+	HandleOAuth2DeviceAuthorizationRequest(
+		ctx context.Context,
+		w http.ResponseWriter,
+		r *http.Request,
+		req fosite.DeviceAuthorizeRequester,
+	) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error)
+	HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error)
 	HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error
 	ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error)
 }

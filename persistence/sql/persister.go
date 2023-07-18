@@ -9,21 +9,21 @@ import (
 	"reflect"
 
 	"github.com/gobuffalo/pop/v6"
-	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
 )
 
@@ -48,16 +48,17 @@ type (
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
-		KeyCipher() *jwk.AEAD
+		KeyCipher() *aead.AESGCM
+		FlowCipher() *aead.XChaCha20Poly1305
 		contextx.Provider
 		x.RegistryLogger
 		x.TracingProvider
 	}
 )
 
-func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
+func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
@@ -71,15 +72,15 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 	c := &pop.Connection{
 		TX:      tx,
 		Store:   tx,
-		ID:      randx.String(30),
+		ID:      uuid.Must(uuid.NewV4()).String(),
 		Dialect: p.conn.Dialect,
 	}
 	return popx.WithTransaction(ctx, c), err
 }
 
-func (p *Persister) Commit(ctx context.Context) error {
+func (p *Persister) Commit(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
@@ -90,9 +91,9 @@ func (p *Persister) Commit(ctx context.Context) error {
 	return errorsx.WithStack(tx.TX.Commit())
 }
 
-func (p *Persister) Rollback(ctx context.Context) error {
+func (p *Persister) Rollback(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)

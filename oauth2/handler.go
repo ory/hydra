@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/pborman/uuid"
@@ -63,7 +64,10 @@ type Handler struct {
 }
 
 func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
-	return &Handler{r: r, c: c}
+	return &Handler{
+		r: r,
+		c: c,
+	}
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
@@ -119,7 +123,7 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 		return
 	}
 
-	session, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r, authorizeRequest)
+	session, flow, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -208,6 +212,7 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 		ConsentChallenge:      session.ID,
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+		Flow:                  flow,
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -678,6 +683,8 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 // OpenID Connect Userinfo
 //
 // swagger:model oidcUserInfo
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type oidcUserInfo struct {
 	// Subject - Identifier for the End-User at the IssuerURL.
 	Subject string `json:"sub"`
@@ -841,6 +848,8 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 // Revoke OAuth 2.0 Access or Refresh Token Request
 //
 // swagger:parameters revokeOAuth2Token
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type revokeOAuth2Token struct {
 	// in: formData
 	// required: true
@@ -874,6 +883,7 @@ type revokeOAuth2Token struct {
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	events.Trace(r.Context(), events.AccessTokenRevoked)
 
 	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
 	if err != nil {
@@ -886,6 +896,8 @@ func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 // Introspect OAuth 2.0 Access or Refresh Token Request
 //
 // swagger:parameters introspectOAuth2Token
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type introspectOAuth2Token struct {
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
@@ -1009,11 +1021,19 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 	}); err != nil {
 		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
 	}
+
+	events.Trace(ctx,
+		events.AccessTokenInspected,
+		events.WithSubject(session.GetSubject()),
+		events.WithClientID(resp.GetAccessRequester().GetClient().GetID()),
+	)
 }
 
 // OAuth 2.0 Token Exchange Parameters
 //
 // swagger:parameters oauth2TokenExchange
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type performOAuth2TokenFlow struct {
 	// in: formData
 	// required: true
@@ -1035,6 +1055,8 @@ type performOAuth2TokenFlow struct {
 // OAuth2 Token Exchange Result
 //
 // swagger:model oAuth2TokenExchange
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type oAuth2TokenExchange struct {
 	// The lifetime in seconds of the access token. For
 	// example, the value "3600" denotes that the access token will
@@ -1083,23 +1105,26 @@ type oAuth2TokenExchange struct {
 //	  200: oAuth2TokenExchange
 //	  default: errorOAuth2
 func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
-	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
-	var ctx = r.Context()
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
+	ctx := r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+		events.Trace(ctx, events.TokenExchangeError)
 		return
 	}
 
-	if accessRequest.GetGrantTypes().ExactOne("client_credentials") || accessRequest.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") {
+	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 			if err != nil {
 				x.LogError(r, err, h.r.Logger())
 				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 				return
 			}
 		}
@@ -1113,7 +1138,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
-		var scopes = accessRequest.GetRequestedScopes()
+		scopes := accessRequest.GetRequestedScopes()
 
 		// Added for compatibility with MITREid
 		if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
@@ -1139,6 +1164,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		if err := hook(ctx, accessRequest); err != nil {
 			h.logOrAudit(err, r)
 			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 			return
 		}
 	}
@@ -1147,6 +1173,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
 		return
 	}
 
@@ -1180,7 +1207,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
+	session, flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -1267,6 +1294,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		ConsentChallenge:      session.ID,
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+		Flow:                  flow,
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -1280,6 +1308,8 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 // Delete OAuth 2.0 Access Token Parameters
 //
 // swagger:parameters deleteOAuth2Token
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type deleteOAuth2Token struct {
 	// OAuth 2.0 Client ID
 	//

@@ -6,6 +6,7 @@ package oauth2
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
@@ -21,6 +22,7 @@ type InternalRegistry interface {
 	x.RegistryLogger
 	consent.Registry
 	Registry
+	FlowCipher() *aead.XChaCha20Poly1305
 }
 
 type Registry interface {

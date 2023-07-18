@@ -5,9 +5,10 @@ package internal
 
 import (
 	"context"
-
 	"sync"
 	"testing"
+
+	"github.com/go-jose/go-jose/v3"
 
 	"github.com/ory/x/configx"
 
@@ -45,19 +46,19 @@ func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {
+func NewRegistryMemory(t testing.TB, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {
 	return newRegistryDefault(t, "memory", c, true, ctxer)
 }
 
-func NewMockedRegistry(t *testing.T, ctxer contextx.Contextualizer) driver.Registry {
+func NewMockedRegistry(t testing.TB, ctxer contextx.Contextualizer) driver.Registry {
 	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true, ctxer)
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+func NewRegistrySQLFromURL(t testing.TB, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
 	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.DefaultProvider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+func newRegistryDefault(t testing.TB, url string, c *config.DefaultProvider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
 	ctx := context.Background()
 	c.MustSet(ctx, config.KeyLogLevel, "trace")
 	c.MustSet(ctx, config.KeyDSN, url)
@@ -77,15 +78,15 @@ func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 	}
 }
 
-func ConnectToMySQL(t *testing.T) string {
-	return dockertest.RunTestMySQLWithVersion(t, "11.8")
+func ConnectToMySQL(t testing.TB) string {
+	return dockertest.RunTestMySQLWithVersion(t, "8.0.26")
 }
 
-func ConnectToPG(t *testing.T) string {
+func ConnectToPG(t testing.TB) string {
 	return dockertest.RunTestPostgreSQLWithVersion(t, "11.8")
 }
 
-func ConnectToCRDB(t *testing.T) string {
+func ConnectToCRDB(t testing.TB) string {
 	return dockertest.RunTestCockroachDBWithVersion(t, "v22.1.2")
 }
 
@@ -134,8 +135,8 @@ func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer)
 	return
 }
 
-func MustEnsureRegistryKeys(r driver.Registry, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, "RS256", key); err != nil {
+func MustEnsureRegistryKeys(ctx context.Context, r driver.Registry, key string) {
+	if err := jwk.EnsureAsymmetricKeypairExists(ctx, r, string(jose.ES256), key); err != nil {
 		panic(err)
 	}
 }

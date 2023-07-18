@@ -9,12 +9,14 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v3"
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/x/pointerx"
 
@@ -152,6 +154,24 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSubjectAndAnySubject() {
 
 	_, _, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because a grant with a subject and allow_any_subject cannot be created")
+}
+
+func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithUnknownJWK() {
+	createRequestParams := hydra.TrustOAuth2JwtGrantIssuer{
+		AllowAnySubject: pointerx.Ptr(true),
+		ExpiresAt:       time.Now().Add(1 * time.Hour),
+		Issuer:          "ory",
+		Jwk: hydra.JsonWebKey{
+			Alg: "unknown",
+		},
+		Scope: []string{"openid", "offline", "profile"},
+	}
+
+	_, res, err := s.hydraClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
+	s.Assert().Equal(http.StatusBadRequest, res.StatusCode)
+	body, _ := io.ReadAll(res.Body)
+	s.Contains(gjson.GetBytes(body, "error_description").String(), "unknown json web key type")
+	s.Require().Error(err, "expected error, because the key type was unknown")
 }
 
 func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {

@@ -7,11 +7,15 @@ package x
 // typically 201.
 //
 // swagger:response emptyResponse
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type emptyResponse struct{}
 
 // Error
 //
 // swagger:model errorOAuth2
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type errorOAuth2 struct {
 	// Error
 	Name string `json:"error"`
@@ -40,6 +44,8 @@ type errorOAuth2 struct {
 // Default Error Response
 //
 // swagger:response errorOAuth2Default
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type errorOAuth2Default struct {
 	// in: body
 	Body errorOAuth2
@@ -48,6 +54,8 @@ type errorOAuth2Default struct {
 // Bad Request Error Response
 //
 // swagger:response errorOAuth2BadRequest
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type errorOAuth2BadRequest struct {
 	// in: body
 	Body errorOAuth2
@@ -56,6 +64,8 @@ type errorOAuth2BadRequest struct {
 // Not Found Error Response
 //
 // swagger:response errorOAuth2NotFound
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type errorOAuth2NotFound struct {
 	// in: body
 	Body errorOAuth2

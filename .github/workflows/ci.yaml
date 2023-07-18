@@ -23,9 +23,9 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
-          go-version: "1.19"
+          go-version: "1.20"
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
@@ -80,22 +80,21 @@ jobs:
           path: |
             internal/httpclient
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v4
         with:
-          go-version: "1.19"
+          go-version: "1.20"
       - run: go list -json > go.list
       - name: Run nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
         with:
           nancyVersion: v1.0.42
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         env:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: v1.47.3
-          skip-go-installation: true
+          version: v1.53.2
           skip-pkg-cache: true
       - name: Run go-acc (tests)
         run: |
@@ -124,9 +123,9 @@ jobs:
           path: |
             internal/httpclient
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
-          go-version: "1.19"
+          go-version: "1.20"
       - name: Setup HSM libs and packages
         run: |
           sudo apt install -y softhsm opensc
@@ -175,9 +174,9 @@ jobs:
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
-          go-version: "1.19"
+          go-version: "1.20"
       - uses: actions/cache@v2
         with:
           path: ./test/e2e/hydra

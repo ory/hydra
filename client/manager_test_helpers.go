@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"

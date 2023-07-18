@@ -209,7 +209,7 @@ func (c *Config) GetAccessTokenIssuer(ctx context.Context) string {
 }
 
 func (c *Config) GetJWTScopeField(ctx context.Context) jwt.JWTScopeFieldEnum {
-	return jwt.JWTScopeFieldList
+	return c.deps.Config().GetJWTScopeField(ctx)
 }
 
 func (c *Config) GetFormPostHTMLTemplate(ctx context.Context) *template.Template {

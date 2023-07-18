@@ -31,15 +31,15 @@ func NewListClientsCmd() *cobra.Command {
 				return err
 			}
 
+			// nolint:bodyclose
 			list, resp, err := m.OAuth2Api.ListOAuth2Clients(cmd.Context()).PageSize(int64(pageSize)).PageToken(pageToken).Execute()
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
+			defer resp.Body.Close()
 
 			var collection outputOAuth2ClientCollection
-			for k := range list {
-				collection.clients = append(collection.clients, list[k])
-			}
+			collection.clients = append(collection.clients, list...)
 
 			interfaceList := make([]interface{}, len(list))
 			for k := range collection.clients {

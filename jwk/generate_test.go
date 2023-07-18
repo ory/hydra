@@ -7,12 +7,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func TestGenerateJWK(t *testing.T) {
+	t.Parallel()
 	jwks, err := GenerateJWK(context.Background(), jose.RS256, "", "")
 	require.NoError(t, err)
 	assert.NotEmpty(t, jwks.Keys[0].KeyID)

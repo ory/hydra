@@ -8,8 +8,8 @@ import (
 
 	"github.com/ory/x/josex"
 
+	jose "github.com/go-jose/go-jose/v3"
 	"github.com/pkg/errors"
-	jose "gopkg.in/square/go-jose.v2"
 )
 
 func MustRSAPublic(key *jose.JSONWebKey) *rsa.PublicKey {

@@ -48,7 +48,7 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyTokens),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -80,13 +80,13 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
 			notAfter := time.Now().Round(time.Second).Add(-v)
 			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
-			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
+			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg))
 		})
 	}
 
@@ -107,14 +107,14 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -129,14 +129,14 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg))
 
 			// run cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -155,14 +155,14 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -176,14 +176,14 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup
-			t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg))
 
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 
@@ -279,7 +279,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup test
-			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.ClientManager(), reg.GrantManager()))
+			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.GrantManager()))
 
 			// run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -287,7 +287,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s", cli.OnlyGrants),
-					jt.GetDSN(ctx),
+					jt.GetDSN(),
 				)
 			})
 

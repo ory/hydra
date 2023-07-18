@@ -14,7 +14,7 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	jose "gopkg.in/square/go-jose.v2"
+	jose "github.com/go-jose/go-jose/v3"
 )
 
 // swagger:type JSONWebKeySet
@@ -71,6 +71,8 @@ func (ns *Duration) UnmarshalJSON(data []byte) error {
 }
 
 // swagger:model NullDuration
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type swaggerNullDuration string
 
 // NullDuration represents a nullable JSON and SQL compatible time.Duration.

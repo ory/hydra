@@ -27,14 +27,14 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/ThalesIgnite/crypto11"
+	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v3/cryptosigner"
 	"github.com/golang/mock/gomock"
 	"github.com/miekg/pkcs11"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
-	"gopkg.in/square/go-jose.v2/cryptosigner"
 
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/hydra/v2/x"

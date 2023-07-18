@@ -18,8 +18,8 @@ import (
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"
 	"github.com/gofrs/uuid"
-	"github.com/instana/testify/assert"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/gobuffalo/pop/v6"
 
@@ -143,7 +143,7 @@ func TestMigrations(t *testing.T) {
 				})
 
 				t.Run("case=hydra_oauth2_authentication_session", func(t *testing.T) {
-					ss := []consent.LoginSession{}
+					ss := []flow.LoginSession{}
 					c.All(&ss)
 					require.Equal(t, 16, len(ss))
 
@@ -168,7 +168,7 @@ func TestMigrations(t *testing.T) {
 				})
 
 				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
-					lrs := []consent.LogoutRequest{}
+					lrs := []flow.LogoutRequest{}
 					c.All(&lrs)
 					require.Equal(t, 6, len(lrs))
 

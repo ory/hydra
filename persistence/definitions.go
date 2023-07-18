@@ -6,6 +6,10 @@ package persistence
 import (
 	"context"
 
+	"github.com/gofrs/uuid"
+
+	"github.com/ory/x/networkx"
+
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/v2/client"
@@ -30,8 +34,14 @@ type (
 		PrepareMigration(context.Context) error
 		Connection(context.Context) *pop.Connection
 		Ping() error
+		Networker
 	}
 	Provider interface {
 		Persister() Persister
+	}
+
+	Networker interface {
+		NetworkID(ctx context.Context) uuid.UUID
+		DetermineNetwork(ctx context.Context) (*networkx.Network, error)
 	}
 )

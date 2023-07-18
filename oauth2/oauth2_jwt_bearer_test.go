@@ -15,12 +15,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -342,7 +342,7 @@ func TestJWTBearer(t *testing.T) {
 					}
 
 					hookResp := hydraoauth2.TokenHookResponse{
-						Session: consent.AcceptOAuth2ConsentRequestSession{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
 							AccessToken: claims,
 							IDToken:     claims,
 						},
@@ -417,7 +417,7 @@ func TestJWTBearer(t *testing.T) {
 					}
 
 					hookResp := hydraoauth2.TokenHookResponse{
-						Session: consent.AcceptOAuth2ConsentRequestSession{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
 							AccessToken: claims,
 							IDToken:     claims,
 						},

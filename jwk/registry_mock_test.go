@@ -13,6 +13,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	herodot "github.com/ory/herodot"
+	"github.com/ory/hydra/v2/aead"
 	config "github.com/ory/hydra/v2/driver/config"
 	jwk "github.com/ory/hydra/v2/jwk"
 	logrusx "github.com/ory/x/logrusx"
@@ -70,10 +71,10 @@ func (mr *MockInternalRegistryMockRecorder) Config() *gomock.Call {
 }
 
 // KeyCipher mocks base method.
-func (m *MockInternalRegistry) KeyCipher() *jwk.AEAD {
+func (m *MockInternalRegistry) KeyCipher() *aead.AESGCM {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "KeyCipher")
-	ret0, _ := ret[0].(*jwk.AEAD)
+	ret0, _ := ret[0].(*aead.AESGCM)
 	return ret0
 }
 
@@ -177,10 +178,10 @@ func (mr *MockRegistryMockRecorder) Config() *gomock.Call {
 }
 
 // KeyCipher mocks base method.
-func (m *MockRegistry) KeyCipher() *jwk.AEAD {
+func (m *MockRegistry) KeyCipher() *aead.AESGCM {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "KeyCipher")
-	ret0, _ := ret[0].(*jwk.AEAD)
+	ret0, _ := ret[0].(*aead.AESGCM)
 	return ret0
 }
 

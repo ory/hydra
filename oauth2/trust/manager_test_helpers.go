@@ -11,10 +11,10 @@ import (
 
 	"github.com/ory/x/josex"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/v2/jwk"
 )

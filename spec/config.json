@@ -812,6 +812,18 @@
           "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens",
           "enum": ["opaque", "jwt"],
           "default": "opaque"
+        },
+        "jwt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "scope_claim": {
+              "type": "string",
+              "description": "Defines how the scope claim is represented within a JWT access token",
+              "enum": ["list", "string", "both"],
+              "default": "list"
+            }
+          }
         }
       }
     },

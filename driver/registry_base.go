@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -22,6 +23,7 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
@@ -60,7 +62,8 @@ type RegistryBase struct {
 	ctxer           contextx.Contextualizer
 	hh              *healthx.Handler
 	migrationStatus *popx.MigrationStatuses
-	kc              *jwk.AEAD
+	kc              *aead.AESGCM
+	flowc           *aead.XChaCha20Poly1305
 	cos             consent.Strategy
 	writer          herodot.Writer
 	hsm             hsm.Context
@@ -70,6 +73,7 @@ type RegistryBase struct {
 	oah             *oauth2.Handler
 	sia             map[string]consent.SubjectIdentifierAlgorithm
 	trc             *otelx.Tracer
+	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
 	pmm             *prometheus.MetricsManager
 	oa2mw           func(h http.Handler) http.Handler
 	arhs            []oauth2.AccessRequestHook
@@ -121,9 +125,9 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 	return m.r
 }
 
-func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Handler) http.Handler {
+func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(ctx, m.r)
+		m.oa2mw = oauth2cors.Middleware(m.r)
 	}
 	return m.oa2mw
 }
@@ -152,9 +156,9 @@ func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *httprouterx.Ro
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetRoutes(admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 
@@ -186,6 +190,16 @@ func (m *RegistryBase) Writer() herodot.Writer {
 
 func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 	m.l = l
+	return m.r
+}
+
+func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
+	m.trc = new(otelx.Tracer).WithOTLP(t)
+	return m.r
+}
+
+func (m *RegistryBase) WithTracerWrapper(wrapper TracerWrapper) Registry {
+	m.tracerWrapper = wrapper
 	return m.r
 }
 
@@ -284,11 +298,18 @@ func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	return m.cos
 }
 
-func (m *RegistryBase) KeyCipher() *jwk.AEAD {
+func (m *RegistryBase) KeyCipher() *aead.AESGCM {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.Config())
+		m.kc = aead.NewAESGCM(m.Config())
 	}
 	return m.kc
+}
+
+func (m *RegistryBase) FlowCipher() *aead.XChaCha20Poly1305 {
+	if m.flowc == nil {
+		m.flowc = aead.NewXChaCha20Poly1305(m.Config())
+	}
+	return m.flowc
 }
 
 func (m *RegistryBase) CookieStore(ctx context.Context) (sessions.Store, error) {
@@ -473,12 +494,17 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 	return m.sia
 }
 
-func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
+func (m *RegistryBase) Tracer(_ context.Context) *otelx.Tracer {
 	if m.trc == nil {
 		t, err := otelx.New("Ory Hydra", m.l, m.conf.Tracing())
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {
+			// Wrap the tracer if required
+			if m.tracerWrapper != nil {
+				t = m.tracerWrapper(t)
+			}
+
 			m.trc = t
 		}
 	}

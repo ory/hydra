@@ -12,12 +12,16 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
+	"github.com/ory/x/otelx/semconv"
+
 	"github.com/ory/x/servicelocatorx"
 
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/httprouterx"
 
-	analytics "github.com/ory/analytics-go/v4"
+	"github.com/ory/analytics-go/v5"
 	"github.com/ory/x/configx"
 
 	"github.com/ory/x/reqlog"
@@ -204,6 +208,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheus.MetricsPrometheusPath)
 	}
 
+	adminmw.UseFunc(semconv.Middleware)
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.PrometheusManager())
 
@@ -215,6 +220,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
+	publicmw.UseFunc(semconv.Middleware)
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.PrometheusManager())
 
@@ -223,11 +229,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		d.Logger(),
 		d.Config().Source(ctx),
 		&metricsx.Options{
-			Service: "ory-hydra",
-			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
-				d.Config().IssuerURL(ctx).String(),
-				d.Config().DSN(),
-			)),
+			Service:      "hydra",
+			DeploymentId: metricsx.Hash(d.Persister().NetworkID(ctx).String()),
 			IsDevelopment: d.Config().DSN() == "memory" ||
 				d.Config().IssuerURL(ctx).String() == "" ||
 				strings.Contains(d.Config().IssuerURL(ctx).String(), "localhost"),
@@ -310,7 +313,7 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = otelx.TraceHandler(handler)
+		handler = otelx.TraceHandler(handler, otelhttp.WithTracerProvider(tracer.Provider()))
 	}
 
 	var tlsConfig *tls.Config

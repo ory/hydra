@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/requirex"
 
@@ -30,7 +31,6 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
@@ -50,7 +50,7 @@ import (
 	"github.com/ory/x/snapshotx"
 )
 
-func noopHandler(t *testing.T) httprouter.Handle {
+func noopHandler(*testing.T) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.WriteHeader(http.StatusNotImplemented)
 	}
@@ -345,6 +345,108 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque")
 		})
+	})
+
+	t.Run("suite=invalid query params", func(t *testing.T) {
+		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		otherClient, _ := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			acceptLoginHandler(t, c, subject, nil),
+			acceptConsentHandler(t, c, subject, nil),
+		)
+
+		withWrongClientAfterLogin := &http.Client{
+			Jar: testhelpers.NewEmptyCookieJar(t),
+			CheckRedirect: func(req *http.Request, _ []*http.Request) error {
+				if req.URL.Path != "/oauth2/auth" {
+					return nil
+				}
+				q := req.URL.Query()
+				if !q.Has("login_verifier") {
+					return nil
+				}
+				q.Set("client_id", otherClient.ID.String())
+				req.URL.RawQuery = q.Encode()
+				return nil
+			},
+		}
+		withWrongClientAfterConsent := &http.Client{
+			Jar: testhelpers.NewEmptyCookieJar(t),
+			CheckRedirect: func(req *http.Request, _ []*http.Request) error {
+				if req.URL.Path != "/oauth2/auth" {
+					return nil
+				}
+				q := req.URL.Query()
+				if !q.Has("consent_verifier") {
+					return nil
+				}
+				q.Set("client_id", otherClient.ID.String())
+				req.URL.RawQuery = q.Encode()
+				return nil
+			},
+		}
+
+		withWrongScopeAfterLogin := &http.Client{
+			Jar: testhelpers.NewEmptyCookieJar(t),
+			CheckRedirect: func(req *http.Request, _ []*http.Request) error {
+				if req.URL.Path != "/oauth2/auth" {
+					return nil
+				}
+				q := req.URL.Query()
+				if !q.Has("login_verifier") {
+					return nil
+				}
+				q.Set("scope", "invalid scope")
+				req.URL.RawQuery = q.Encode()
+				return nil
+			},
+		}
+
+		withWrongScopeAfterConsent := &http.Client{
+			Jar: testhelpers.NewEmptyCookieJar(t),
+			CheckRedirect: func(req *http.Request, _ []*http.Request) error {
+				if req.URL.Path != "/oauth2/auth" {
+					return nil
+				}
+				q := req.URL.Query()
+				if !q.Has("consent_verifier") {
+					return nil
+				}
+				q.Set("scope", "invalid scope")
+				req.URL.RawQuery = q.Encode()
+				return nil
+			},
+		}
+
+		for _, tc := range []struct {
+			name             string
+			client           *http.Client
+			expectedResponse string
+		}{{
+			name:             "fails with wrong client ID after login",
+			client:           withWrongClientAfterLogin,
+			expectedResponse: "access_denied",
+		}, {
+			name:             "fails with wrong client ID after consent",
+			client:           withWrongClientAfterConsent,
+			expectedResponse: "invalid_client",
+		}, {
+			name:             "fails with wrong scopes after login",
+			client:           withWrongScopeAfterLogin,
+			expectedResponse: "invalid_scope",
+		}, {
+			name:             "fails with wrong scopes after consent",
+			client:           withWrongScopeAfterConsent,
+			expectedResponse: "invalid_scope",
+		}} {
+			t.Run("case="+tc.name, func(t *testing.T) {
+				state := uuid.New()
+				resp, err := tc.client.Get(conf.AuthCodeURL(state))
+				require.NoError(t, err)
+				assert.Equal(t, tc.expectedResponse, resp.Request.URL.Query().Get("error"), "%s", resp.Request.URL.RawQuery)
+				resp.Body.Close()
+			})
+		}
 	})
 
 	t.Run("case=checks if request fails when subject is empty", func(t *testing.T) {
@@ -702,7 +804,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					}
 
 					hookResp := hydraoauth2.TokenHookResponse{
-						Session: consent.AcceptOAuth2ConsentRequestSession{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
 							AccessToken: claims,
 							IDToken:     claims,
 						},
@@ -894,8 +996,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			conf.MustSet(ctx, config.KeyAccessTokenStrategy, strat.d)
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
-			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
+			internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+			internal.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
 			consentStrategy := &consentMock{}
 			router := x.NewRouterPublic()
@@ -1102,7 +1204,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					require.NotEmpty(t, code)
 
-					token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+					token, err := oauthConfig.Exchange(context.TODO(), code)
 					if tc.expectOAuthTokenError {
 						require.Error(t, err)
 						return
@@ -1263,7 +1365,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 									}
 
 									hookResp := hydraoauth2.TokenHookResponse{
-										Session: consent.AcceptOAuth2ConsentRequestSession{
+										Session: flow.AcceptOAuth2ConsentRequestSession{
 											AccessToken: claims,
 											IDToken:     claims,
 										},
@@ -1446,7 +1548,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("duplicate code exchange fails", func(t *testing.T) {
-						token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+						token, err := oauthConfig.Exchange(context.TODO(), code)
 						require.Error(t, err)
 						require.Nil(t, token)
 					})

@@ -49,3 +49,7 @@ type Storage interface {
 
 	GetConcreteClient(ctx context.Context, id string) (*Client, error)
 }
+
+type ManagerProvider interface {
+	ClientManager() Manager
+}

@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**CreateOidcDynamicClient**](OidcApi.md#CreateOidcDynamicClient) | **Post** /oauth2/register | Register OAuth2 Client using OpenID Dynamic Client Registration
+[**CreateVerifiableCredential**](OidcApi.md#CreateVerifiableCredential) | **Post** /credentials | Issues a Verifiable Credential
 [**DeleteOidcDynamicClient**](OidcApi.md#DeleteOidcDynamicClient) | **Delete** /oauth2/register/{id} | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
 [**DiscoverOidcConfiguration**](OidcApi.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
 [**GetOidcDynamicClient**](OidcApi.md#GetOidcDynamicClient) | **Get** /oauth2/register/{id} | Get OAuth2 Client using OpenID Dynamic Client Registration
@@ -65,6 +66,72 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**OAuth2Client**](OAuth2Client.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## CreateVerifiableCredential
+
+> VerifiableCredentialResponse CreateVerifiableCredential(ctx).CreateVerifiableCredentialRequestBody(createVerifiableCredentialRequestBody).Execute()
+
+Issues a Verifiable Credential
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    createVerifiableCredentialRequestBody := *openapiclient.NewCreateVerifiableCredentialRequestBody() // CreateVerifiableCredentialRequestBody |  (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.OidcApi.CreateVerifiableCredential(context.Background()).CreateVerifiableCredentialRequestBody(createVerifiableCredentialRequestBody).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.CreateVerifiableCredential``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `CreateVerifiableCredential`: VerifiableCredentialResponse
+    fmt.Fprintf(os.Stdout, "Response from `OidcApi.CreateVerifiableCredential`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiCreateVerifiableCredentialRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createVerifiableCredentialRequestBody** | [**CreateVerifiableCredentialRequestBody**](CreateVerifiableCredentialRequestBody.md) |  | 
+
+### Return type
+
+[**VerifiableCredentialResponse**](VerifiableCredentialResponse.md)
 
 ### Authorization
 

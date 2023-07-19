@@ -1585,6 +1585,52 @@
         }
       }
     },
+    "/credentials": {
+      "post": {
+        "description": "This endpoint creates a verifiable credential that attests that the user\nauthenticated with the provided access token owns a certain public/private key\npair.\n\nMore information can be found at\nhttps://openid.net/specs/openid-connect-userinfo-vc-1_0.html.",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oidc"
+        ],
+        "summary": "Issues a Verifiable Credential",
+        "operationId": "createVerifiableCredential",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateVerifiableCredentialRequestBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "verifiableCredentialResponse",
+            "schema": {
+              "$ref": "#/definitions/verifiableCredentialResponse"
+            }
+          },
+          "400": {
+            "description": "verifiableCredentialPrimingResponse",
+            "schema": {
+              "$ref": "#/definitions/verifiableCredentialPrimingResponse"
+            }
+          },
+          "default": {
+            "description": "errorOAuth2",
+            "schema": {
+              "$ref": "#/definitions/errorOAuth2"
+            }
+          }
+        }
+      }
+    },
     "/health/alive": {
       "get": {
         "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
@@ -2054,6 +2100,24 @@
     }
   },
   "definitions": {
+    "CreateVerifiableCredentialRequestBody": {
+      "type": "object",
+      "title": "CreateVerifiableCredentialRequestBody contains the request body to request a verifiable credential.",
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "proof": {
+          "$ref": "#/definitions/VerifiableCredentialProof"
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "DefaultError": {},
     "JSONRawMessage": {
       "type": "object",
@@ -2064,11 +2128,45 @@
       "type": "string",
       "title": "NullDuration represents a nullable JSON and SQL compatible time.Duration."
     },
+    "RFC6749ErrorJson": {
+      "type": "object",
+      "title": "RFC6749ErrorJson is a helper struct for JSON encoding/decoding of RFC6749Error.",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "error_debug": {
+          "type": "string"
+        },
+        "error_description": {
+          "type": "string"
+        },
+        "error_hint": {
+          "type": "string"
+        },
+        "status_code": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
     "StringSliceJSONFormat": {
       "type": "array",
       "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
       "items": {
         "type": "string"
+      }
+    },
+    "VerifiableCredentialProof": {
+      "type": "object",
+      "title": "VerifiableCredentialProof contains the proof of a verifiable credential.",
+      "properties": {
+        "jwt": {
+          "type": "string"
+        },
+        "proof_type": {
+          "type": "string"
+        }
       }
     },
     "acceptOAuth2ConsentRequest": {
@@ -2174,6 +2272,38 @@
         "use": {
           "description": "JSON Web Key Use\n\nThe \"use\" (public key use) parameter identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Valid values are \"enc\" and \"sig\".",
           "type": "string"
+        }
+      }
+    },
+    "credentialSupportedDraft00": {
+      "description": "Includes information about the supported verifiable credentials.",
+      "type": "object",
+      "title": "Verifiable Credentials Metadata (Draft 00)",
+      "properties": {
+        "cryptographic_binding_methods_supported": {
+          "description": "OpenID Connect Verifiable Credentials Cryptographic Binding Methods Supported\n\nContains a list of cryptographic binding methods supported for signing the proof.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cryptographic_suites_supported": {
+          "description": "OpenID Connect Verifiable Credentials Cryptographic Suites Supported\n\nContains a list of cryptographic suites methods supported for signing the proof.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "description": "OpenID Connect Verifiable Credentials Format\n\nContains the format that is supported by this authorization server.",
+          "type": "string"
+        },
+        "types": {
+          "description": "OpenID Connect Verifiable Credentials Types\n\nContains the types of verifiable credentials supported.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -2999,6 +3129,17 @@
             "type": "string"
           }
         },
+        "credentials_endpoint_draft_00": {
+          "description": "OpenID Connect Verifiable Credentials Endpoint\n\nContains the URL of the Verifiable Credentials Endpoint.",
+          "type": "string"
+        },
+        "credentials_supported_draft_00": {
+          "description": "OpenID Connect Verifiable Credentials Supported\n\nJSON array containing a list of the Verifiable Credentials supported by this authorization server.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/credentialSupportedDraft00"
+          }
+        },
         "end_session_endpoint": {
           "description": "OpenID Connect End-Session Endpoint\n\nURL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
           "type": "string"
@@ -3459,6 +3600,50 @@
     },
     "unexpectedError": {
       "type": "string"
+    },
+    "verifiableCredentialPrimingResponse": {
+      "type": "object",
+      "title": "VerifiableCredentialPrimingResponse contains the nonce to include in the proof-of-possession JWT.",
+      "properties": {
+        "c_nonce": {
+          "type": "string"
+        },
+        "c_nonce_expires_in": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "error": {
+          "type": "string"
+        },
+        "error_debug": {
+          "type": "string"
+        },
+        "error_description": {
+          "type": "string"
+        },
+        "error_hint": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "status_code": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "verifiableCredentialResponse": {
+      "type": "object",
+      "title": "VerifiableCredentialResponse contains the verifiable credential.",
+      "properties": {
+        "credential_draft_00": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        }
+      }
     },
     "version": {
       "type": "object",

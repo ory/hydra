@@ -13,7 +13,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
+	"github.com/ory/x/popx"
 	"github.com/ory/x/servicelocatorx"
 
 	"github.com/pkg/errors"
@@ -28,6 +30,7 @@ import (
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/x/flagx"
 )
 
@@ -259,7 +262,7 @@ func (h *MigrateHandler) MigrateGen(cmd *cobra.Command, args []string) {
 	os.Exit(0)
 }
 
-func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err error) {
+func makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, err error) {
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
@@ -275,16 +278,16 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 				driver.SkipNetworkInit(),
 			})
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if len(d.Config().DSN()) == 0 {
 			_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "When using flag -e, environment variable DSN must be set.")
-			return cmdx.FailSilently(cmd)
+			return nil, cmdx.FailSilently(cmd)
 		}
 	} else {
 		if len(args) != 1 {
 			_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Please provide the database URL.")
-			return cmdx.FailSilently(cmd)
+			return nil, cmdx.FailSilently(cmd)
 		}
 		d, err = driver.New(
 			cmd.Context(),
@@ -300,11 +303,17 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 				driver.SkipNetworkInit(),
 			})
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
+	return d.Persister(), nil
+}
 
-	p := d.Persister()
+func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err error) {
+	p, err := makePersister(cmd, args)
+	if err != nil {
+		return err
+	}
 	conn := p.Connection(context.Background())
 	if conn == nil {
 		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
@@ -348,4 +357,48 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 
 	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!")
 	return nil
+}
+
+func (h *MigrateHandler) MigrateStatus(cmd *cobra.Command, args []string) error {
+	p, err := makePersister(cmd, args)
+	if err != nil {
+		return err
+	}
+	conn := p.Connection(context.Background())
+	if conn == nil {
+		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be checked against a SQL-compatible driver but DSN is not a SQL source.")
+		return cmdx.FailSilently(cmd)
+	}
+
+	if err := conn.Open(); err != nil {
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open the database connection:\n%+v\n", err)
+		return cmdx.FailSilently(cmd)
+	}
+
+	block := flagx.MustGetBool(cmd, "block")
+	ctx := cmd.Context()
+	s, err := p.MigrationStatus(ctx)
+	if err != nil {
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not get migration status: %+v\n", err)
+		return cmdx.FailSilently(cmd)
+	}
+
+	for block && s.HasPending() {
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Waiting for migrations to finish...\n")
+		for _, m := range s {
+			if m.State == popx.Pending {
+				_, _ = fmt.Fprintf(cmd.OutOrStdout(), " - %s\n", m.Name)
+			}
+		}
+		time.Sleep(time.Second)
+		s, err = p.MigrationStatus(ctx)
+		if err != nil {
+			_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not get migration status: %+v\n", err)
+			return cmdx.FailSilently(cmd)
+		}
+	}
+
+	cmdx.PrintTable(cmd, s)
+	return nil
+
 }

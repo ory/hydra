@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-07-12)](#000-2023-07-12)
+- [0.0.0 (2023-07-25)](#000-2023-07-25)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,7 +698,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-07-12)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-07-25)
 
 
 ### Bug Fixes
@@ -709,6 +709,7 @@
 
 ### Features
 
+* Add `hydra migrate status` subcommand ([#3579](https://github.com/ory/hydra/issues/3579)) ([749eb8d](https://github.com/ory/hydra/commit/749eb8db40fb8b2d6333d917fac6c25b6e5574ef))
 * Add more resolution to events and collect client metrics ([#3568](https://github.com/ory/hydra/issues/3568)) ([466e66b](https://github.com/ory/hydra/commit/466e66bd1df7bf589c5a74ad5be399b1eaa80d9b))
 * Add state override ([b8b9154](https://github.com/ory/hydra/commit/b8b9154077963492dad3ed0350a4d93d09a95602))
 * **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))

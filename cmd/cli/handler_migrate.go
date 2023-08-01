@@ -34,10 +34,18 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-type MigrateHandler struct{}
+type MigrateHandler struct {
+	slOpts []servicelocatorx.Option
+	dOpts  []driver.OptionsModifier
+	cOpts  []configx.OptionModifier
+}
 
-func newMigrateHandler() *MigrateHandler {
-	return &MigrateHandler{}
+func newMigrateHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *MigrateHandler {
+	return &MigrateHandler{
+		slOpts: slOpts,
+		dOpts:  dOpts,
+		cOpts:  cOpts,
+	}
 }
 
 const (
@@ -262,21 +270,21 @@ func (h *MigrateHandler) MigrateGen(cmd *cobra.Command, args []string) {
 	os.Exit(0)
 }
 
-func makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, err error) {
+func (h *MigrateHandler) makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, err error) {
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
 		d, err = driver.New(
 			cmd.Context(),
 			servicelocatorx.NewOptions(),
-			[]driver.OptionsModifier{
+			append([]driver.OptionsModifier{
 				driver.WithOptions(
 					configx.SkipValidation(),
 					configx.WithFlags(cmd.Flags())),
 				driver.DisableValidation(),
 				driver.DisablePreloading(),
 				driver.SkipNetworkInit(),
-			})
+			}, h.dOpts...))
 		if err != nil {
 			return nil, err
 		}
@@ -292,7 +300,7 @@ func makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, 
 		d, err = driver.New(
 			cmd.Context(),
 			servicelocatorx.NewOptions(),
-			[]driver.OptionsModifier{
+			append([]driver.OptionsModifier{
 				driver.WithOptions(
 					configx.WithFlags(cmd.Flags()),
 					configx.SkipValidation(),
@@ -301,7 +309,7 @@ func makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, 
 				driver.DisableValidation(),
 				driver.DisablePreloading(),
 				driver.SkipNetworkInit(),
-			})
+			}, h.dOpts...))
 		if err != nil {
 			return nil, err
 		}
@@ -310,7 +318,7 @@ func makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, 
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err error) {
-	p, err := makePersister(cmd, args)
+	p, err := h.makePersister(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -360,7 +368,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err erro
 }
 
 func (h *MigrateHandler) MigrateStatus(cmd *cobra.Command, args []string) error {
-	p, err := makePersister(cmd, args)
+	p, err := h.makePersister(cmd, args)
 	if err != nil {
 		return err
 	}

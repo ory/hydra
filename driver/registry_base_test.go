@@ -67,7 +67,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	r := registry.(*RegistrySQL)
 	r.initialPing = failedPing(errors.New("snizzles"))
 
-	_ = r.Init(context.Background(), true, false, &contextx.TestContextualizer{})
+	_ = r.Init(context.Background(), true, false, &contextx.TestContextualizer{}, nil)
 
 	registryBase := RegistryBase{r: r, l: l}
 	registryBase.WithConfig(c)

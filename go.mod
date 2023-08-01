@@ -40,10 +40,10 @@ require (
 	github.com/ory/fosite v0.44.1-0.20230704083823-8098e48b2e09
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
-	github.com/ory/herodot v0.10.2
+	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.567
+	github.com/ory/x v0.0.574
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0

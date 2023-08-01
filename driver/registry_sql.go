@@ -5,6 +5,7 @@ package driver
 
 import (
 	"context"
+	"io/fs"
 	"strings"
 	"time"
 
@@ -64,7 +65,11 @@ func NewRegistrySQL() *RegistrySQL {
 }
 
 func (m *RegistrySQL) Init(
-	ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer,
+	ctx context.Context,
+	skipNetworkInit bool,
+	migrate bool,
+	ctxer contextx.Contextualizer,
+	extraMigrations []fs.FS,
 ) error {
 	if m.persister == nil {
 		m.WithContextualizer(ctxer)
@@ -100,7 +105,7 @@ func (m *RegistrySQL) Init(
 			return errorsx.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(ctx, c, m, m.Config(), m.l)
+		p, err := sql.NewPersister(ctx, c, m, m.Config(), extraMigrations)
 		if err != nil {
 			return err
 		}

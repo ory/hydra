@@ -313,7 +313,13 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = otelx.TraceHandler(handler, otelhttp.WithTracerProvider(tracer.Provider()))
+		handler = otelx.TraceHandler(
+			handler,
+			otelhttp.WithTracerProvider(tracer.Provider()),
+			otelhttp.WithFilter(func(r *http.Request) bool {
+				return !strings.HasPrefix(r.URL.Path, "/admin/metrics/")
+			}),
+		)
 	}
 
 	var tlsConfig *tls.Config

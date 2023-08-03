@@ -97,6 +97,8 @@ and success, unless if the --no-shutdown flag is provided.`,
 			prompt := flagx.MustGetStringSlice(cmd, "prompt")
 			maxAge := flagx.MustGetInt(cmd, "max-age")
 			redirectUrl := flagx.MustGetString(cmd, "redirect")
+			authUrl := flagx.MustGetString(cmd, "auth-url")
+			tokenUrl := flagx.MustGetString(cmd, "token-url")
 			audience := flagx.MustGetStringSlice(cmd, "audience")
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 
@@ -118,15 +120,20 @@ and success, unless if the --no-shutdown flag is provided.`,
 				redirectUrl = serverLocation + "callback"
 			}
 
-			if err != nil {
-				return err
+			if authUrl == "" {
+				authUrl = urlx.AppendPaths(endpoint, "/oauth2/auth").String()
 			}
+
+			if tokenUrl == "" {
+				tokenUrl = urlx.AppendPaths(endpoint, "/oauth2/token").String()
+			}
+
 			conf := oauth2.Config{
 				ClientID:     clientID,
 				ClientSecret: clientSecret,
 				Endpoint: oauth2.Endpoint{
-					TokenURL: urlx.AppendPaths(endpoint, "/oauth2/token").String(),
-					AuthURL:  urlx.AppendPaths(endpoint, "/oauth2/auth").String(),
+					AuthURL:  authUrl,
+					TokenURL: tokenUrl,
 				},
 				RedirectURL: redirectUrl,
 				Scopes:      scopes,

@@ -6,11 +6,11 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"io/fs"
 	"reflect"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -21,6 +21,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/fsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
@@ -104,8 +105,8 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	return errorsx.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, l *logrusx.Logger) (*Persister, error) {
-	mb, err := popx.NewMigrationBox(migrations, popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0))
+func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS) (*Persister, error) {
+	mb, err := popx.NewMigrationBox(fsx.Merge(append([]fs.FS{migrations}, extraMigrations...)...), popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0))
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -115,7 +116,7 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		mb:     mb,
 		r:      r,
 		config: config,
-		l:      l,
+		l:      r.Logger(),
 		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
 	}, nil
 }

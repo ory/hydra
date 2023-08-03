@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"github.com/ory/x/cmdx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/servicelocatorx"
 
@@ -20,6 +21,7 @@ func NewMigrateStatusCmd(slOpts []servicelocatorx.Option, dOpts []driver.Options
 		RunE:  cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateStatus,
 	}
 
+	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	cmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	cmd.Flags().Bool("block", false, "Block until all migrations have been applied")
 

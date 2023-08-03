@@ -5,6 +5,7 @@ package driver
 
 import (
 	"context"
+	"io/fs"
 	"net/http"
 
 	"go.opentelemetry.io/otel/trace"
@@ -44,7 +45,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, extraMigrations []fs.FS) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.DefaultProvider) Registry
@@ -89,7 +90,7 @@ func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logru
 	if err != nil {
 		return nil, err
 	}
-	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, nil); err != nil {
 		return nil, err
 	}
 	return registry, nil

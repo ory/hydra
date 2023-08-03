@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-07-25)](#000-2023-07-25)
+- [0.0.0 (2023-08-03)](#000-2023-08-03)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,12 +698,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-07-25)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-03)
 
 
 ### Bug Fixes
 
 * Racy random string generation ([#3555](https://github.com/ory/hydra/issues/3555)) ([1b26c4c](https://github.com/ory/hydra/commit/1b26c4cb96400b333fe214d2da892fc045bbc69f))
+* Restore ability to override auth and token urls for exemplary app ([#3590](https://github.com/ory/hydra/issues/3590)) ([dfb129a](https://github.com/ory/hydra/commit/dfb129a5b7c8ae01e1c490fce1a127697abc7bee))
 * Return proper error when the grant request cannot be parsed ([#3558](https://github.com/ory/hydra/issues/3558)) ([26f2d34](https://github.com/ory/hydra/commit/26f2d34459f55444e880e6e27e081c002d630246))
 * Use correct tracer in middleware ([#3567](https://github.com/ory/hydra/issues/3567)) ([807cbd2](https://github.com/ory/hydra/commit/807cbd209af376b9b2d18c278cc927d1c43e6865))
 
@@ -712,6 +713,7 @@
 * Add `hydra migrate status` subcommand ([#3579](https://github.com/ory/hydra/issues/3579)) ([749eb8d](https://github.com/ory/hydra/commit/749eb8db40fb8b2d6333d917fac6c25b6e5574ef))
 * Add more resolution to events and collect client metrics ([#3568](https://github.com/ory/hydra/issues/3568)) ([466e66b](https://github.com/ory/hydra/commit/466e66bd1df7bf589c5a74ad5be399b1eaa80d9b))
 * Add state override ([b8b9154](https://github.com/ory/hydra/commit/b8b9154077963492dad3ed0350a4d93d09a95602))
+* Allow additional SQL migrations ([#3587](https://github.com/ory/hydra/issues/3587)) ([8900cbb](https://github.com/ory/hydra/commit/8900cbb770d6f39a5c3322fce488675ca6d0138a))
 * **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))
 * Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))
 * Support different jwt scope claim strategies ([#3531](https://github.com/ory/hydra/issues/3531)) ([45da11e](https://github.com/ory/hydra/commit/45da11e4fb4f0a2f939f11682c095b8dbfcddb78))

@@ -58,6 +58,7 @@ var defaultFactories = []factory{
 	compose.OAuth2TokenIntrospectionFactory,
 	compose.OAuth2PKCEFactory,
 	compose.RFC7523AssertionGrantFactory,
+	compose.OIDCUserinfoVerifiableCredentialFactory,
 }
 
 func NewConfig(deps configDependencies) *Config {
@@ -68,7 +69,7 @@ func NewConfig(deps configDependencies) *Config {
 	return c
 }
 
-func (c *Config) LoadDefaultHanlders(strategy interface{}) {
+func (c *Config) LoadDefaultHandlers(strategy interface{}) {
 	for _, factory := range defaultFactories {
 		res := factory(c, c.deps.Persister(), strategy)
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {

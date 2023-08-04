@@ -14,6 +14,8 @@ docs/AcceptOAuth2ConsentRequest.md
 docs/AcceptOAuth2ConsentRequestSession.md
 docs/AcceptOAuth2LoginRequest.md
 docs/CreateJsonWebKeySet.md
+docs/CreateVerifiableCredentialRequestBody.md
+docs/CredentialSupportedDraft00.md
 docs/ErrorOAuth2.md
 docs/GenericError.md
 docs/GetVersion200Response.md
@@ -43,6 +45,7 @@ docs/OidcConfiguration.md
 docs/OidcUserInfo.md
 docs/Pagination.md
 docs/PaginationHeaders.md
+docs/RFC6749ErrorJson.md
 docs/RejectOAuth2Request.md
 docs/TokenPagination.md
 docs/TokenPaginationHeaders.md
@@ -51,6 +54,9 @@ docs/TokenPaginationResponseHeaders.md
 docs/TrustOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantIssuer.md
 docs/TrustedOAuth2JwtGrantJsonWebKey.md
+docs/VerifiableCredentialPrimingResponse.md
+docs/VerifiableCredentialProof.md
+docs/VerifiableCredentialResponse.md
 docs/Version.md
 docs/WellknownApi.md
 git_push.sh
@@ -60,6 +66,8 @@ model_accept_o_auth2_consent_request.go
 model_accept_o_auth2_consent_request_session.go
 model_accept_o_auth2_login_request.go
 model_create_json_web_key_set.go
+model_create_verifiable_credential_request_body.go
+model_credential_supported_draft00.go
 model_error_o_auth2.go
 model_generic_error.go
 model_get_version_200_response.go
@@ -86,6 +94,7 @@ model_oidc_user_info.go
 model_pagination.go
 model_pagination_headers.go
 model_reject_o_auth2_request.go
+model_rfc6749_error_json.go
 model_token_pagination.go
 model_token_pagination_headers.go
 model_token_pagination_request_parameters.go
@@ -93,6 +102,9 @@ model_token_pagination_response_headers.go
 model_trust_o_auth2_jwt_grant_issuer.go
 model_trusted_o_auth2_jwt_grant_issuer.go
 model_trusted_o_auth2_jwt_grant_json_web_key.go
+model_verifiable_credential_priming_response.go
+model_verifiable_credential_proof.go
+model_verifiable_credential_response.go
 model_version.go
 response.go
 utils.go

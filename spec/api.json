@@ -49,6 +49,24 @@
       }
     },
     "schemas": {
+      "CreateVerifiableCredentialRequestBody": {
+        "properties": {
+          "format": {
+            "type": "string"
+          },
+          "proof": {
+            "$ref": "#/components/schemas/VerifiableCredentialProof"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "CreateVerifiableCredentialRequestBody contains the request body to request a verifiable credential.",
+        "type": "object"
+      },
       "DefaultError": {},
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -81,6 +99,28 @@
         "nullable": true,
         "type": "string"
       },
+      "RFC6749ErrorJson": {
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "error_debug": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          },
+          "error_hint": {
+            "type": "string"
+          },
+          "status_code": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "RFC6749ErrorJson is a helper struct for JSON encoding/decoding of RFC6749Error.",
+        "type": "object"
+      },
       "StringSliceJSONFormat": {
         "items": {
           "type": "string"
@@ -95,6 +135,18 @@
       "UUID": {
         "format": "uuid4",
         "type": "string"
+      },
+      "VerifiableCredentialProof": {
+        "properties": {
+          "jwt": {
+            "type": "string"
+          },
+          "proof_type": {
+            "type": "string"
+          }
+        },
+        "title": "VerifiableCredentialProof contains the proof of a verifiable credential.",
+        "type": "object"
       },
       "acceptOAuth2ConsentRequest": {
         "properties": {
@@ -196,6 +248,38 @@
           "use",
           "kid"
         ],
+        "type": "object"
+      },
+      "credentialSupportedDraft00": {
+        "description": "Includes information about the supported verifiable credentials.",
+        "properties": {
+          "cryptographic_binding_methods_supported": {
+            "description": "OpenID Connect Verifiable Credentials Cryptographic Binding Methods Supported\n\nContains a list of cryptographic binding methods supported for signing the proof.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "cryptographic_suites_supported": {
+            "description": "OpenID Connect Verifiable Credentials Cryptographic Suites Supported\n\nContains a list of cryptographic suites methods supported for signing the proof.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "format": {
+            "description": "OpenID Connect Verifiable Credentials Format\n\nContains the format that is supported by this authorization server.",
+            "type": "string"
+          },
+          "types": {
+            "description": "OpenID Connect Verifiable Credentials Types\n\nContains the types of verifiable credentials supported.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "Verifiable Credentials Metadata (Draft 00)",
         "type": "object"
       },
       "errorOAuth2": {
@@ -1039,6 +1123,17 @@
             },
             "type": "array"
           },
+          "credentials_endpoint_draft_00": {
+            "description": "OpenID Connect Verifiable Credentials Endpoint\n\nContains the URL of the Verifiable Credentials Endpoint.",
+            "type": "string"
+          },
+          "credentials_supported_draft_00": {
+            "description": "OpenID Connect Verifiable Credentials Supported\n\nJSON array containing a list of the Verifiable Credentials supported by this authorization server.",
+            "items": {
+              "$ref": "#/components/schemas/credentialSupportedDraft00"
+            },
+            "type": "array"
+          },
           "end_session_endpoint": {
             "description": "OpenID Connect End-Session Endpoint\n\nURL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
             "type": "string"
@@ -1512,6 +1607,50 @@
       },
       "unexpectedError": {
         "type": "string"
+      },
+      "verifiableCredentialPrimingResponse": {
+        "properties": {
+          "c_nonce": {
+            "type": "string"
+          },
+          "c_nonce_expires_in": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "error_debug": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          },
+          "error_hint": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "status_code": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "VerifiableCredentialPrimingResponse contains the nonce to include in the proof-of-possession JWT.",
+        "type": "object"
+      },
+      "verifiableCredentialResponse": {
+        "properties": {
+          "credential_draft_00": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "title": "VerifiableCredentialResponse contains the verifiable credential.",
+        "type": "object"
       },
       "version": {
         "properties": {
@@ -3161,6 +3300,58 @@
         "summary": "Get Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "oAuth2"
+        ]
+      }
+    },
+    "/credentials": {
+      "post": {
+        "description": "This endpoint creates a verifiable credential that attests that the user\nauthenticated with the provided access token owns a certain public/private key\npair.\n\nMore information can be found at\nhttps://openid.net/specs/openid-connect-userinfo-vc-1_0.html.",
+        "operationId": "createVerifiableCredential",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVerifiableCredentialRequestBody"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifiableCredentialResponse"
+                }
+              }
+            },
+            "description": "verifiableCredentialResponse"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifiableCredentialPrimingResponse"
+                }
+              }
+            },
+            "description": "verifiableCredentialPrimingResponse"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorOAuth2"
+                }
+              }
+            },
+            "description": "errorOAuth2"
+          }
+        },
+        "summary": "Issues a Verifiable Credential",
+        "tags": [
+          "oidc"
         ]
       }
     },

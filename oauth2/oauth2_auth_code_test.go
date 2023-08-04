@@ -6,6 +6,7 @@ package oauth2_test
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -18,9 +19,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
+	"github.com/golang-jwt/jwt/v5"
+
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/josex"
 	"github.com/ory/x/requirex"
+	"github.com/ory/x/stringsx"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 
@@ -74,35 +83,14 @@ type clientCreator interface {
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
-	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
-		secret := uuid.New()
-		c := &hc.Client{
-			Secret:        secret,
-			RedirectURIs:  []string{cb},
-			ResponseTypes: []string{"id_token", "code", "token"},
-			GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-			Scope:         "hydra offline openid",
-			Audience:      []string{"https://api.ory.sh/"},
-		}
-		require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c))
-		return c, &oauth2.Config{
-			ClientID:     c.GetID(),
-			ClientSecret: secret,
-			Endpoint: oauth2.Endpoint{
-				AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
-				TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
-				AuthStyle: oauth2.AuthStyleInHeader,
-			},
-			Scopes: strings.Split(c.Scope, " "),
-		}
-	}
-
+	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())
+	publicClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: publicTS.URL}}
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
@@ -126,10 +114,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
-			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GetID(), pointerx.Deref(rr.Client.ClientId))
+			assert.Empty(t, pointerx.Deref(rr.Client.ClientSecret))
 			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
 			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
 			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
@@ -137,8 +125,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  subject,
-				Remember: pointerx.Bool(!rr.Skip),
-				Acr:      pointerx.String("1"),
+				Remember: pointerx.Ptr(!rr.Skip),
+				Acr:      pointerx.Ptr("1"),
 				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
@@ -163,12 +151,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
 
-			assert.EqualValues(t, c.GetID(), pointerx.StringR(rr.Client.ClientId))
-			assert.Empty(t, pointerx.StringR(rr.Client.ClientSecret))
+			assert.EqualValues(t, c.GetID(), pointerx.Deref(rr.Client.ClientId))
+			assert.Empty(t, pointerx.Deref(rr.Client.ClientSecret))
 			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
-			assert.EqualValues(t, c.LogoURI, pointerx.StringR(rr.Client.LogoUri))
+			assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
-			assert.EqualValues(t, subject, pointerx.StringR(rr.Subject))
+			assert.EqualValues(t, subject, pointerx.Deref(rr.Subject))
 			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 			assert.Contains(t, *rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
@@ -180,7 +168,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Bool(true), RememberFor: pointerx.Int64(0),
+					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
@@ -239,7 +227,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return i
 	}
 
-	assertJWTAccessToken := func(t *testing.T, strat string, conf *oauth2.Config, token *oauth2.Token, expectedSubject string, expectedExp time.Time) gjson.Result {
+	assertJWTAccessToken := func(t *testing.T, strat string, conf *oauth2.Config, token *oauth2.Token, expectedSubject string, expectedExp time.Time, scopes string) gjson.Result {
 		require.NotEmpty(t, token.AccessToken)
 		parts := strings.Split(token.AccessToken, ".")
 		if strat != "jwt" {
@@ -261,7 +249,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
 		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
-		assert.EqualValues(t, `["hydra","offline","openid"]`, i.Get("scp").Raw, "%s", i)
+		assert.EqualValues(t, scopes, i.Get("scp").Raw, "%s", i)
 		return i
 	}
 
@@ -271,7 +259,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=checks if request fails when audience does not match", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
-		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		_, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("audience", "https://not-ory-api/"))
 		require.Empty(t, code)
 	})
@@ -280,7 +268,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	nonce := uuid.New()
 	t.Run("case=perform authorize code flow with ID token and refresh tokens", func(t *testing.T) {
 		run := func(t *testing.T, strategy string) {
-			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				acceptLoginHandler(t, c, subject, nil),
 				acceptConsentHandler(t, c, subject, nil),
@@ -292,8 +280,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			iat := time.Now()
 			require.NoError(t, err)
 
+			assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
+			assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
 			introspectAccessToken(t, conf, token, subject)
-			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
 			assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
 			assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 
@@ -310,7 +300,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				introspectAccessToken(t, conf, refreshedToken, subject)
 
 				t.Run("followup=refreshed tokens contain valid tokens", func(t *testing.T) {
-					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)))
+					assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
 					assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
 					assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
 				})
@@ -347,9 +337,190 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		})
 	})
 
+	t.Run("case=perform authorize code flow with verifable credentials", func(t *testing.T) {
+		// Make sure we test against all crypto suites that we advertise.
+		cfg, _, err := publicClient.OidcApi.DiscoverOidcConfiguration(ctx).Execute()
+		require.NoError(t, err)
+		supportedCryptoSuites := cfg.CredentialsSupportedDraft00[0].CryptographicSuitesSupported
+
+		run := func(t *testing.T, strategy string) {
+			_, conf := newOAuth2Client(
+				t,
+				reg,
+				testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
+				withScope("openid userinfo_credential_draft_00"),
+			)
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
+				func(w http.ResponseWriter, r *http.Request) {
+					acceptBody := hydra.AcceptOAuth2LoginRequest{
+						Subject: subject,
+						Acr:     pointerx.Ptr("1"),
+						Amr:     []string{"pwd"},
+						Context: map[string]interface{}{"context": "bar"},
+					}
+					v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+						LoginChallenge(r.URL.Query().Get("login_challenge")).
+						AcceptOAuth2LoginRequest(acceptBody).
+						Execute()
+					require.NoError(t, err)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				},
+				func(w http.ResponseWriter, r *http.Request) {
+					rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+					require.NoError(t, err)
+
+					assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Context)
+					v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
+						ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+						AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
+							GrantScope:               []string{"openid", "userinfo_credential_draft_00"},
+							GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+							Session: &hydra.AcceptOAuth2ConsentRequestSession{
+								AccessToken: map[string]interface{}{"foo": "bar"},
+								IdToken:     map[string]interface{}{"bar": "baz"},
+							},
+						}).
+						Execute()
+					require.NoError(t, err)
+					require.NotEmpty(t, v.RedirectTo)
+					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+				},
+			)
+
+			code, _ := getAuthorizeCode(t, conf, nil,
+				oauth2.SetAuthURLParam("nonce", nonce),
+				oauth2.SetAuthURLParam("scope", "openid userinfo_credential_draft_00"),
+			)
+			require.NotEmpty(t, code)
+			token, err := conf.Exchange(context.Background(), code)
+			require.NoError(t, err)
+			iat := time.Now()
+
+			vcNonce := token.Extra("c_nonce_draft_00").(string)
+			assert.NotEmpty(t, vcNonce)
+			expiry := token.Extra("c_nonce_expires_in_draft_00")
+			assert.NotEmpty(t, expiry)
+			assert.NoError(t, reg.Persister().IsNonceValid(ctx, token.AccessToken, vcNonce))
+
+			t.Run("followup=successfully create a verifiable credential", func(t *testing.T) {
+				t.Parallel()
+
+				for _, alg := range supportedCryptoSuites {
+					alg := alg
+					t.Run(fmt.Sprintf("alg=%s", alg), func(t *testing.T) {
+						t.Parallel()
+						assertCreateVerifiableCredential(t, reg, vcNonce, token, jose.SignatureAlgorithm(alg))
+					})
+				}
+			})
+
+			t.Run("followup=get new nonce from priming request", func(t *testing.T) {
+				t.Parallel()
+				// Assert that we can fetch a verifiable credential with the nonce.
+				res, err := doPrimingRequest(t, reg, token, &hydraoauth2.CreateVerifiableCredentialRequestBody{
+					Format: "jwt_vc_json",
+					Types:  []string{"VerifiableCredential", "UserInfoCredential"},
+				})
+				assert.NoError(t, err)
+
+				t.Run("followup=successfully create a verifiable credential from fresh nonce", func(t *testing.T) {
+					assertCreateVerifiableCredential(t, reg, res.Nonce, token, jose.ES256)
+				})
+			})
+
+			t.Run("followup=rejects proof signed by another key", func(t *testing.T) {
+				t.Parallel()
+				for _, tc := range []struct {
+					name      string
+					format    string
+					proofType string
+					proof     func() string
+				}{
+					{
+						name: "proof=mismatching keys",
+						proof: func() string {
+							// Create mismatching public and private keys.
+							pubKey, _, err := josex.NewSigningKey(jose.ES256, 0)
+							require.NoError(t, err)
+							_, privKey, err := josex.NewSigningKey(jose.ES256, 0)
+							require.NoError(t, err)
+							pubKeyJWK := &jose.JSONWebKey{Key: pubKey, Algorithm: string(jose.ES256)}
+							return createVCProofJWT(t, pubKeyJWK, privKey, vcNonce)
+						},
+					},
+					{
+						name:   "proof=invalid format",
+						format: "invalid_format",
+						proof: func() string {
+							// Create mismatching public and private keys.
+							pubKey, privKey, err := josex.NewSigningKey(jose.ES256, 0)
+							require.NoError(t, err)
+							pubKeyJWK := &jose.JSONWebKey{Key: pubKey, Algorithm: string(jose.ES256)}
+							return createVCProofJWT(t, pubKeyJWK, privKey, vcNonce)
+						},
+					},
+					{
+						name:      "proof=invalid type",
+						proofType: "invalid",
+						proof: func() string {
+							// Create mismatching public and private keys.
+							pubKey, privKey, err := josex.NewSigningKey(jose.ES256, 0)
+							require.NoError(t, err)
+							pubKeyJWK := &jose.JSONWebKey{Key: pubKey, Algorithm: string(jose.ES256)}
+							return createVCProofJWT(t, pubKeyJWK, privKey, vcNonce)
+						},
+					},
+					{
+						name: "proof=invalid nonce",
+						proof: func() string {
+							// Create mismatching public and private keys.
+							pubKey, privKey, err := josex.NewSigningKey(jose.ES256, 0)
+							require.NoError(t, err)
+							pubKeyJWK := &jose.JSONWebKey{Key: pubKey, Algorithm: string(jose.ES256)}
+							return createVCProofJWT(t, pubKeyJWK, privKey, "invalid nonce")
+						},
+					},
+				} {
+					tc := tc
+					t.Run(tc.name, func(t *testing.T) {
+						t.Parallel()
+						_, res := createVerifiableCredential(t, reg, token, &hydraoauth2.CreateVerifiableCredentialRequestBody{
+							Format: stringsx.Coalesce(tc.format, "jwt_vc_json"),
+							Types:  []string{"VerifiableCredential", "UserInfoCredential"},
+							Proof: &hydraoauth2.VerifiableCredentialProof{
+								ProofType: stringsx.Coalesce(tc.proofType, "jwt"),
+								JWT:       tc.proof(),
+							},
+						})
+						require.NoError(t, err)
+						require.NotNil(t, res)
+						assert.Equal(t, "invalid_request", res.Error())
+					})
+				}
+
+			})
+
+			t.Run("followup=access token and id token are valid", func(t *testing.T) {
+				assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["openid","userinfo_credential_draft_00"]`)
+				assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+			})
+		}
+
+		t.Run("strategy=jwt", func(t *testing.T) {
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
+			run(t, "jwt")
+		})
+
+		t.Run("strategy=opaque", func(t *testing.T) {
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+			run(t, "opaque")
+		})
+	})
+
 	t.Run("suite=invalid query params", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		otherClient, _ := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		otherClient, _ := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
@@ -453,12 +624,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 			_, res, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
-				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Bool(true)}).Execute()
+				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Ptr(true)}).Execute()
 			require.Error(t, err) // expects 400
 			body := string(ioutilx.MustReadAll(res.Body))
 			assert.Contains(t, body, "Field 'subject' must not be empty", "%s", body)
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
-		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		_, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
 		_, err := testhelpers.NewEmptyJarClient(t).Get(conf.AuthCodeURL(uuid.New()))
 		require.NoError(t, err)
@@ -466,7 +637,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=perform flow with audience", func(t *testing.T) {
 		expectAud := "https://api.ory.sh/"
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				assert.False(t, r.Skip)
@@ -510,7 +681,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			body := introspectAccessToken(t, conf, token, subject)
 			requirex.EqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
-			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration))
+			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), `["hydra","offline","openid"]`)
 			assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.AuthorizationCodeGrantIDTokenLifespan.Duration))
 			assertRefreshToken(t, token, conf, iat.Add(expectedLifespans.AuthorizationCodeGrantRefreshTokenLifespan.Duration))
 
@@ -521,7 +692,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				iat = time.Now()
 				require.NoError(t, err)
 				assertRefreshToken(t, refreshedToken, conf, iat.Add(expectedLifespans.RefreshTokenGrantRefreshTokenLifespan.Duration))
-				assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration))
+				assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), `["hydra","offline","openid"]`)
 				assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(expectedLifespans.RefreshTokenGrantIDTokenLifespan.Duration))
 
 				require.NotEqual(t, token.AccessToken, refreshedToken.AccessToken)
@@ -544,7 +715,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 
 		t.Run("case=custom-lifespans-active-jwt", func(t *testing.T) {
-			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			ls := testhelpers.TestLifespans
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
@@ -558,7 +729,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		})
 
 		t.Run("case=custom-lifespans-active-opaque", func(t *testing.T) {
-			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			ls := testhelpers.TestLifespans
 			ls.AuthorizationCodeGrantAccessTokenLifespan = x.NullDuration{Valid: true, Duration: 6 * time.Second}
 			testhelpers.UpdateClientTokenLifespans(
@@ -572,11 +743,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		})
 
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
-			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
 			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), hc.Lifespans{}, adminTS)
 			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
+			//goland:noinspection GoDeprecation
 			expectedLifespans := hc.Lifespans{
 				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
 				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
@@ -596,7 +768,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=use remember feature and prompt=none", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
@@ -694,7 +866,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=should fail if prompt=none but no auth session given", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
@@ -708,7 +880,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=requires re-authentication when id_token_hint is set to a user 'patrik-neu' but the session is 'aeneas-rekkas' and then fails because the user id from the log in endpoint is 'aeneas-rekkas'", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				require.False(t, r.Skip)
@@ -732,7 +904,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=should not cause issues if max_age is very low and consent takes a long time", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				time.Sleep(time.Second * 2)
@@ -746,7 +918,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=ensure consistent claims returned for userinfo", func(t *testing.T) {
-		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
@@ -821,7 +993,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
 
 				expectAud := "https://api.ory.sh/"
-				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 						assert.False(t, r.Skip)
@@ -841,7 +1013,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				token, err := conf.Exchange(context.Background(), code)
 				require.NoError(t, err)
 
-				assertJWTAccessToken(t, strategy, conf, token, subject, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)))
+				assertJWTAccessToken(t, strategy, conf, token, subject, time.Now().Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
 
 				// NOTE: using introspect to cover both jwt and opaque strategies
 				accessTokenClaims := introspectAccessToken(t, conf, token, subject)
@@ -870,7 +1042,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
 
 				expectAud := "https://api.ory.sh/"
-				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 						assert.False(t, r.Skip)
@@ -910,7 +1082,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
 
 				expectAud := "https://api.ory.sh/"
-				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 						assert.False(t, r.Skip)
@@ -950,7 +1122,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
 
 				expectAud := "https://api.ory.sh/"
-				c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 						assert.False(t, r.Skip)
@@ -975,6 +1147,101 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		t.Run("strategy=opaque", run("opaque"))
 		t.Run("strategy=jwt", run("jwt"))
 	})
+}
+
+func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce string, accessToken *oauth2.Token, alg jose.SignatureAlgorithm) {
+	// Build a proof from the nonce.
+	pubKey, privKey, err := josex.NewSigningKey(alg, 0)
+	require.NoError(t, err)
+	pubKeyJWK := &jose.JSONWebKey{Key: pubKey, Algorithm: string(alg)}
+	proofJWT := createVCProofJWT(t, pubKeyJWK, privKey, nonce)
+
+	// Assert that we can fetch a verifiable credential with the nonce.
+	verifiableCredential, _ := createVerifiableCredential(t, reg, accessToken, &hydraoauth2.CreateVerifiableCredentialRequestBody{
+		Format: "jwt_vc_json",
+		Types:  []string{"VerifiableCredential", "UserInfoCredential"},
+		Proof: &hydraoauth2.VerifiableCredentialProof{
+			ProofType: "jwt",
+			JWT:       proofJWT,
+		},
+	})
+	require.NoError(t, err)
+	assertVerifiableCredentialContainsPublicKey(t, reg, verifiableCredential, pubKeyJWK)
+}
+
+func assertVerifiableCredentialContainsPublicKey(t *testing.T, reg driver.Registry, vc *hydraoauth2.VerifiableCredentialResponse, pubKeyJWK *jose.JSONWebKey) {
+	ctx := context.Background()
+	token, err := jwt.Parse(vc.Credential, func(token *jwt.Token) (interface{}, error) {
+		return x.Must(reg.OpenIDJWTStrategy().GetPublicKey(ctx)).Key, nil
+	})
+	require.NoError(t, err)
+	pubKeyRaw, err := pubKeyJWK.MarshalJSON()
+	require.NoError(t, err)
+	expectedID := fmt.Sprintf("did:jwk:%s", base64.RawURLEncoding.EncodeToString(pubKeyRaw))
+	require.Equal(t, expectedID, token.Claims.(jwt.MapClaims)["vc"].(map[string]any)["credentialSubject"].(map[string]any)["id"])
+}
+
+func createVerifiableCredential(
+	t *testing.T,
+	reg driver.Registry,
+	token *oauth2.Token,
+	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
+) (vcRes *hydraoauth2.VerifiableCredentialResponse, vcErr *fosite.RFC6749Error) {
+	var (
+		ctx  = context.Background()
+		body bytes.Buffer
+	)
+	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
+	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	res, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		var errRes fosite.RFC6749Error
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&errRes))
+		return nil, &errRes
+	}
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	var vc hydraoauth2.VerifiableCredentialResponse
+	require.NoError(t, json.NewDecoder(res.Body).Decode(&vc))
+
+	return &vc, vcErr
+}
+
+func doPrimingRequest(
+	t *testing.T,
+	reg driver.Registry,
+	token *oauth2.Token,
+	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
+) (*hydraoauth2.VerifiableCredentialPrimingResponse, error) {
+	var (
+		ctx  = context.Background()
+		body bytes.Buffer
+	)
+	require.NoError(t, json.NewEncoder(&body).Encode(createVerifiableCredentialReq))
+	req := httpx.MustNewRequest("POST", reg.Config().CredentialsEndpointURL(ctx).String(), &body, "application/json")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	require.Equal(t, http.StatusBadRequest, res.StatusCode)
+	var vc hydraoauth2.VerifiableCredentialPrimingResponse
+	require.NoError(t, json.NewDecoder(res.Body).Decode(&vc))
+
+	return &vc, nil
+}
+
+func createVCProofJWT(t *testing.T, pubKey *jose.JSONWebKey, privKey any, nonce string) string {
+	proofToken := jwt.NewWithClaims(jwt.GetSigningMethod(string(pubKey.Algorithm)), jwt.MapClaims{"nonce": nonce})
+	proofToken.Header["jwk"] = pubKey
+	proofJWT, err := proofToken.SignedString(privKey)
+	require.NoError(t, err)
+
+	return proofJWT
 }
 
 // TestAuthCodeWithMockStrategy runs the authorization_code flow against various ConsentStrategy scenarios.
@@ -1059,7 +1326,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							code = r.URL.Query().Get("code")
 							require.NotEmpty(t, code)
-							w.Write([]byte(r.URL.Query().Get("code")))
+							_, _ = w.Write([]byte(r.URL.Query().Get("code")))
 						}
 					},
 					assertAccessToken: func(t *testing.T, token string) {
@@ -1110,7 +1377,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							code = r.URL.Query().Get("code")
 							require.NotEmpty(t, code)
-							w.Write([]byte(r.URL.Query().Get("code")))
+							_, _ = w.Write([]byte(r.URL.Query().Get("code")))
 						}
 					},
 				},
@@ -1152,7 +1419,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							code = r.URL.Query().Get("code")
 							require.NotEmpty(t, code)
-							w.Write([]byte(r.URL.Query().Get("code")))
+							_, _ = w.Write([]byte(r.URL.Query().Get("code")))
 						}
 					},
 				},
@@ -1344,7 +1611,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 										require.Equal(t, hookReq.Requester.ClientID, oauthConfig.ClientID)
 										require.ElementsMatch(t, hookReq.Requester.GrantedScopes, expectedGrantedScopes)
 
-										snapshotx.SnapshotTExcept(t, hookReq, exceptKeys)
+										snapshotx.SnapshotT(t, hookReq, snapshotx.ExceptPaths(exceptKeys...))
 									} else {
 										var hookReq hydraoauth2.TokenHookRequest
 										require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
@@ -1357,7 +1624,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 										require.ElementsMatch(t, hookReq.Request.GrantedAudience, []string{})
 										require.Equal(t, hookReq.Request.Payload, map[string][]string{})
 
-										snapshotx.SnapshotTExcept(t, hookReq, exceptKeys)
+										snapshotx.SnapshotT(t, hookReq, snapshotx.ExceptPaths(exceptKeys...))
 									}
 
 									claims := map[string]interface{}{
@@ -1582,4 +1849,54 @@ func testRefresh(t *testing.T, token *oauth2.Token, u string, sleep bool) (*http
 	req.SetBasicAuth(oauthClientConfig.ClientID, oauthClientConfig.ClientSecret)
 
 	return http.DefaultClient.Do(req)
+}
+
+func withScope(scope string) func(*hc.Client) {
+	return func(c *hc.Client) {
+		c.Scope = scope
+	}
+}
+
+func newOAuth2Client(
+	t *testing.T,
+	reg interface {
+		config.Provider
+		client.Registry
+	},
+	callbackURL string,
+	opts ...func(*hc.Client),
+) (*hc.Client, *oauth2.Config) {
+	ctx := context.Background()
+	secret := uuid.New()
+	c := &hc.Client{
+		Secret:        secret,
+		RedirectURIs:  []string{callbackURL},
+		ResponseTypes: []string{"id_token", "code", "token"},
+		GrantTypes: []string{
+			"implicit",
+			"refresh_token",
+			"authorization_code",
+			"password",
+			"client_credentials",
+		},
+		Scope:    "hydra offline openid",
+		Audience: []string{"https://api.ory.sh/"},
+	}
+
+	// apply options
+	for _, o := range opts {
+		o(c)
+	}
+
+	require.NoError(t, reg.ClientManager().CreateClient(ctx, c))
+	return c, &oauth2.Config{
+		ClientID:     c.GetID(),
+		ClientSecret: secret,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
+			TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
+			AuthStyle: oauth2.AuthStyleInHeader,
+		},
+		Scopes: strings.Split(c.Scope, " "),
+	}
 }

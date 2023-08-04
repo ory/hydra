@@ -7,11 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bxcodec/faker/v3"
 
 	"github.com/ory/x/sqlxx"
 )

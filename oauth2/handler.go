@@ -24,6 +24,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/urlx"
 
@@ -1060,6 +1061,12 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
 	// done
+	ctx, err = storage.MaybeBeginTx(ctx, h.r.OAuth2Storage())
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
+		return
+	}
 	response, err := h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: claims,
@@ -1078,6 +1085,14 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		Flow:                  flow,
 	})
 	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		if err := storage.MaybeRollbackTx(ctx, h.r.OAuth2Storage()); err != nil {
+			x.LogError(r, err, h.r.Logger())
+		}
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
+		return
+	}
+	if err := storage.MaybeCommitTx(ctx, h.r.OAuth2Storage()); err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return

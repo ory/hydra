@@ -10,7 +10,6 @@ import (
 )
 
 func DeleteHydraRows(t *testing.T, c *pop.Connection) {
-	t.Logf("Deleting hydra rows in database: %s", c.Dialect.Name())
 	for _, tb := range []string{
 		"hydra_oauth2_access",
 		"hydra_oauth2_refresh",
@@ -57,7 +56,7 @@ func CleanSQLPop(t *testing.T, c *pop.Connection) {
 		"schema_migration",
 	} {
 		if err := c.RawQuery("DROP TABLE IF EXISTS " + tb).Exec(); err != nil {
-			t.Logf(`Unable to clean up table "%s": %s`, tb, err)
+			t.Fatalf(`Unable to clean up table "%s": %s`, tb, err)
 		}
 	}
 	t.Logf("Successfully cleaned up database: %s", c.Dialect.Name())

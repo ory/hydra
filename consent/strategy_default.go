@@ -16,6 +16,7 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
@@ -28,6 +29,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringslice"
@@ -117,7 +119,10 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 	return session, nil
 }
 
-func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
+func (s *DefaultStrategy) requestAuthentication(ctx context.Context, w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) (err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.requestAuthentication")
+	defer otelx.End(span, &err)
+
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "login") {
 		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil)
@@ -336,7 +341,10 @@ func (s *DefaultStrategy) verifyAuthentication(
 	r *http.Request,
 	req fosite.AuthorizeRequester,
 	verifier string,
-) (*flow.Flow, error) {
+) (_ *flow.Flow, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyAuthentication")
+	defer otelx.End(span, &err)
+
 	f, err := s.flowFromCookie(r)
 	if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The flow cookie is missing in the request."))
@@ -504,7 +512,10 @@ func (s *DefaultStrategy) requestConsent(
 	r *http.Request,
 	ar fosite.AuthorizeRequester,
 	f *flow.Flow,
-) error {
+) (err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.requestConsent")
+	defer otelx.End(span, &err)
+
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "consent") {
 		return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
@@ -635,7 +646,10 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, verifier string) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
+func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyConsent")
+	defer otelx.End(span, &err)
+
 	f, err := s.flowFromCookie(r)
 	if err != nil {
 		return nil, nil, err
@@ -1099,7 +1113,10 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	w http.ResponseWriter,
 	r *http.Request,
 	req fosite.AuthorizeRequester,
-) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
+) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2AuthorizationRequest")
+	defer otelx.End(span, &err)
+
 	loginVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
 	if loginVerifier == "" && consentVerifier == "" {

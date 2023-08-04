@@ -43,8 +43,6 @@ func TestLogAudit(t *testing.T) {
 			l.Logger.Out = buf
 			LogAudit(r, tc.message, l)
 
-			t.Logf("%s", buf.String())
-
 			assert.Contains(t, buf.String(), "audience=audit")
 			for _, expectContain := range tc.expectContains {
 				assert.Contains(t, buf.String(), expectContain)

@@ -10,6 +10,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/popx"
 
@@ -54,6 +55,7 @@ type Registry interface {
 	WithLogger(l *logrusx.Logger) Registry
 	WithTracer(t trace.Tracer) Registry
 	WithTracerWrapper(TracerWrapper) Registry
+	WithKratos(k kratos.Client) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 
@@ -71,6 +73,8 @@ type Registry interface {
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
 	FlowCipher() *aead.XChaCha20Poly1305
+
+	kratos.Provider
 
 	RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic)
 	ClientHandler() *client.Handler

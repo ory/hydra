@@ -14,6 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/x/errorsx"
@@ -421,13 +422,19 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 		return p.CreateWithNetwork(ctx, session)
 	}
 
+	var kratosSessionID string
+	if session != nil {
+		kratosSessionID = session.KratosSessionID.String()
+	}
+
 	// In some unit tests, we still confirm the login session without data from the cookie. We can remove this case
 	// once all tests are fixed.
 	n, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&flow.LoginSession{
 		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 		Subject:         subject,
 		Remember:        remember,
-	}, "authenticated_at", "subject", "remember")
+		KratosSessionID: sqlxx.NullString(kratosSessionID),
+	}, "authenticated_at", "subject", "remember", "kratos_session_id")
 	if err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -450,16 +457,24 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginS
 	return nil
 }
 
-func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
+func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid=?", id, p.NetworkID(ctx)).ExecWithCount()
-	if count == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
-	} else {
-		return sqlcon.HandleError(err)
+	var session flow.LoginSession
+
+	err = p.Connection(ctx).RawQuery(
+		`DELETE FROM hydra_oauth2_authentication_session
+       WHERE id = ? AND nid = ?
+       RETURNING *`,
+		id,
+		p.NetworkID(ctx),
+	).First(&session)
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
 	}
+
+	return &session, nil
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) (rs []flow.AcceptOAuth2ConsentRequest, err error) {

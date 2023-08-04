@@ -80,6 +80,7 @@ const (
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
+	KeyKratosAdminURL                            = "urls.kratos.admin"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
@@ -386,6 +387,12 @@ func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(
 		KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)),
 	)
+}
+
+func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
+	u := p.getProvider(ctx).RequestURIF(KeyKratosAdminURL, nil)
+
+	return u, u != nil
 }
 
 func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {

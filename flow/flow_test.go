@@ -42,6 +42,7 @@ func (f *Flow) setHandledLoginRequest(r *HandledLoginRequest) {
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Subject = r.Subject
+	f.KratosSessionID = sqlxx.NullString(r.KratosSessionID)
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
 	f.Context = r.Context
 	f.LoginWasUsed = r.WasHandled

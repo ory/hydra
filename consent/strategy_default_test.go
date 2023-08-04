@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -16,8 +17,6 @@ import (
 
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/urlx"
-
-	"net/url"
 
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"

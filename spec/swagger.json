@@ -2246,6 +2246,10 @@
           "type": "integer",
           "format": "int64"
         },
+        "session_id": {
+          "description": "KratosSessionID is the session ID of the end-user that authenticated.\nIf specified, we will use this value to propagate the logout.",
+          "type": "string"
+        },
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated.",
           "type": "string"

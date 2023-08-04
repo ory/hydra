@@ -16,6 +16,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/pointerx"
 
 	"github.com/stretchr/testify/assert"
@@ -35,9 +36,11 @@ import (
 
 func TestLogoutFlows(t *testing.T) {
 	ctx := context.Background()
+	fakeKratos := kratos.NewFake()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
+	reg.WithKratos(fakeKratos)
 
 	defaultRedirectedMessage := "redirected to default server"
 	postLogoutCallback := func(w http.ResponseWriter, r *http.Request) {
@@ -181,7 +184,7 @@ func TestLogoutFlows(t *testing.T) {
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
 				//res.Payload.SessionID
-				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Bool(true)}
+				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Bool(true), SessionId: pointerx.Ptr(kratos.FakeSessionID)}
 			}),
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
 				require.NoError(t, err)
@@ -476,6 +479,7 @@ func TestLogoutFlows(t *testing.T) {
 	})
 
 	t.Run("case=should return to default post logout because session was revoked in browser context", func(t *testing.T) {
+		fakeKratos.Reset()
 		c := createSampleClient(t)
 		sid := make(chan string)
 		acceptLoginAsAndWatchSid(t, subject, sid)
@@ -518,9 +522,13 @@ func TestLogoutFlows(t *testing.T) {
 		assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
 
 		wg.Wait()
+
+		assert.True(t, fakeKratos.DisableSessionWasCalled)
+		assert.Equal(t, fakeKratos.LastDisabledSession, kratos.FakeSessionID)
 	})
 
 	t.Run("case=should execute backchannel logout in headless flow with sid", func(t *testing.T) {
+		fakeKratos.Reset()
 		numSidConsumers := 2
 		sid := make(chan string, numSidConsumers)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, numSidConsumers)
@@ -535,22 +543,31 @@ func TestLogoutFlows(t *testing.T) {
 		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
 
 		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+		assert.True(t, fakeKratos.DisableSessionWasCalled)
+		assert.Equal(t, fakeKratos.LastDisabledSession, kratos.FakeSessionID)
 	})
 
 	t.Run("case=should logout in headless flow with non-existing sid", func(t *testing.T) {
+		fakeKratos.Reset()
 		logoutViaHeadlessAndExpectNoContent(t, browserWithoutSession, url.Values{"sid": {"non-existing-sid"}})
+		assert.False(t, fakeKratos.DisableSessionWasCalled)
 	})
 
 	t.Run("case=should logout in headless flow with session that has remember=false", func(t *testing.T) {
+		fakeKratos.Reset()
 		sid := make(chan string)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, false, 1)
 
 		c := createSampleClient(t)
 
 		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+		assert.True(t, fakeKratos.DisableSessionWasCalled)
+		assert.Equal(t, fakeKratos.LastDisabledSession, kratos.FakeSessionID)
 	})
 
 	t.Run("case=should fail headless logout because neither sid nor subject were provided", func(t *testing.T) {
+		fakeKratos.Reset()
 		logoutViaHeadlessAndExpectError(t, browserWithoutSession, url.Values{}, `Either 'subject' or 'sid' query parameters need to be defined.`)
+		assert.False(t, fakeKratos.DisableSessionWasCalled)
 	})
 }

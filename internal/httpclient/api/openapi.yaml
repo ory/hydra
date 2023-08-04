@@ -2001,6 +2001,10 @@ components:
             \ for the duration of the browser session (using a session cookie)."
           format: int64
           type: integer
+        session_id:
+          description: "KratosSessionID is the session ID of the end-user that authenticated.\n\
+            If specified, we will use this value to propagate the logout."
+          type: string
         subject:
           description: Subject is the user ID of the end-user that authenticated.
           type: string

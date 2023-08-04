@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/x/uuidx"
 
@@ -632,14 +634,22 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			ls := flow.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
+			ls := flow.LoginSession{
+				ID:              uuid.Must(uuid.NewV4()).String(),
+				Remember:        true,
+				KratosSessionID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+			}
 			persistLoginSession(s.t1, t, r.Persister(), &ls)
 
-			require.Error(t, r.Persister().DeleteLoginSession(s.t2, ls.ID))
-			_, err := r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
+			deletedLS, err := r.Persister().DeleteLoginSession(s.t2, ls.ID)
+			require.Error(t, err)
+			assert.Nil(t, deletedLS)
+			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
 			require.NoError(t, err)
 
-			require.NoError(t, r.Persister().DeleteLoginSession(s.t1, ls.ID))
+			deletedLS, err = r.Persister().DeleteLoginSession(s.t1, ls.ID)
+			require.NoError(t, err)
+			assert.Equal(t, ls, *deletedLS)
 			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
 			require.Error(t, err)
 		})

@@ -16,6 +16,7 @@
   "ClientID": "",
   "RequestURL": "http://request/0012",
   "SessionID": "auth_session-0012",
+  "KratosSessionID": "",
   "LoginVerifier": "verifier-0012",
   "LoginCSRF": "csrf-0012",
   "LoginInitializedAt": null,

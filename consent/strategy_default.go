@@ -312,7 +312,9 @@ func (s *DefaultStrategy) revokeAuthenticationSession(ctx context.Context, w htt
 		return nil
 	}
 
-	return s.r.ConsentManager().DeleteLoginSession(r.Context(), sid)
+	_, err = s.r.ConsentManager().DeleteLoginSession(r.Context(), sid)
+
+	return err
 }
 
 func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, ss sessions.Store) (string, error) {
@@ -457,6 +459,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			return nil, fosite.ErrAccessDenied.WithHint("The login session cookie was not found or malformed.")
 		}
 
+		loginSession.KratosSessionID = f.KratosSessionID
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}
@@ -730,7 +733,8 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 	return urls, nil
 }
 
-func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.Request, subject, sid string) error {
+func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid string) error {
+	ctx := r.Context()
 	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return err
@@ -990,8 +994,9 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(_ context.Context, r *http.Request, subject string, sid string) error {
-	if err := s.executeBackChannelLogout(r.Context(), r, subject, sid); err != nil {
+func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Request, subject string, sid string) error {
+	ctx := r.Context()
+	if err := s.executeBackChannelLogout(r, subject, sid); err != nil {
 		return err
 	}
 
@@ -1000,10 +1005,12 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(_ context.Con
 	//
 	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
 	// even if an upstream URL fails!
-	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), sid); errors.Is(err, sqlcon.ErrNoRows) {
+	if session, err := s.r.ConsentManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows) {
 		// This is ok (session probably already revoked), do nothing!
 	} else if err != nil {
 		return err
+	} else {
+		_ = s.r.Kratos().DisableSession(ctx, session.KratosSessionID.String())
 	}
 
 	return nil
@@ -1058,7 +1065,7 @@ func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 		return nil, err
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, lr.Subject, lr.SessionID); err != nil {
+	if err := s.performBackChannelLogoutAndDeleteSession(r, lr.Subject, lr.SessionID); err != nil {
 		return nil, err
 	}
 
@@ -1095,7 +1102,7 @@ func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 		return lsErr
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(r.Context(), r, loginSession.Subject, sid); err != nil {
+	if err := s.performBackChannelLogoutAndDeleteSession(r, loginSession.Subject, sid); err != nil {
 		return err
 	}
 

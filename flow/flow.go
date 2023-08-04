@@ -136,6 +136,8 @@ type Flow struct {
 	// channel logout. Its value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `db:"login_session_id"`
 
+	KratosSessionID sqlxx.NullString `db:"kratos_session_id"`
+
 	LoginVerifier string `db:"login_verifier"`
 	LoginCSRF     string `db:"login_csrf"`
 
@@ -291,6 +293,7 @@ func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
 	f.LoginError = h.Error
 
+	f.KratosSessionID = sqlxx.NullString(h.KratosSessionID)
 	f.LoginRemember = h.Remember
 	f.LoginRememberFor = h.RememberFor
 	f.LoginExtendSessionLifespan = h.ExtendSessionLifespan
@@ -311,6 +314,7 @@ func (f *Flow) GetHandledLoginRequest() HandledLoginRequest {
 		ACR:                    f.ACR,
 		AMR:                    f.AMR,
 		Subject:                f.Subject,
+		KratosSessionID:        f.KratosSessionID.String(),
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
 		Context:                f.Context,
 		WasHandled:             f.LoginWasUsed,

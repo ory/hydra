@@ -29,6 +29,8 @@ type AcceptOAuth2LoginRequest struct {
 	Remember *bool `json:"remember,omitempty"`
 	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered for the duration of the browser session (using a session cookie).
 	RememberFor *int64 `json:"remember_for,omitempty"`
+	// KratosSessionID is the session ID of the end-user that authenticated. If specified, we will use this value to propagate the logout.
+	SessionId *string `json:"session_id,omitempty"`
 	// Subject is the user ID of the end-user that authenticated.
 	Subject string `json:"subject"`
 }
@@ -276,6 +278,38 @@ func (o *AcceptOAuth2LoginRequest) SetRememberFor(v int64) {
 	o.RememberFor = &v
 }
 
+// GetSessionId returns the SessionId field value if set, zero value otherwise.
+func (o *AcceptOAuth2LoginRequest) GetSessionId() string {
+	if o == nil || o.SessionId == nil {
+		var ret string
+		return ret
+	}
+	return *o.SessionId
+}
+
+// GetSessionIdOk returns a tuple with the SessionId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AcceptOAuth2LoginRequest) GetSessionIdOk() (*string, bool) {
+	if o == nil || o.SessionId == nil {
+		return nil, false
+	}
+	return o.SessionId, true
+}
+
+// HasSessionId returns a boolean if a field has been set.
+func (o *AcceptOAuth2LoginRequest) HasSessionId() bool {
+	if o != nil && o.SessionId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSessionId gets a reference to the given string and assigns it to the SessionId field.
+func (o *AcceptOAuth2LoginRequest) SetSessionId(v string) {
+	o.SessionId = &v
+}
+
 // GetSubject returns the Subject field value
 func (o *AcceptOAuth2LoginRequest) GetSubject() string {
 	if o == nil {
@@ -322,6 +356,9 @@ func (o AcceptOAuth2LoginRequest) MarshalJSON() ([]byte, error) {
 	}
 	if o.RememberFor != nil {
 		toSerialize["remember_for"] = o.RememberFor
+	}
+	if o.SessionId != nil {
+		toSerialize["session_id"] = o.SessionId
 	}
 	if true {
 		toSerialize["subject"] = o.Subject

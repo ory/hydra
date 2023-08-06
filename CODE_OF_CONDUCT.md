@@ -39,6 +39,16 @@ Examples of unacceptable behavior include:
 - Other conduct which could reasonably be considered inappropriate in a
   professional setting
 
+## Open Source Community Support
+
+Ory Open source software is collaborative and based on contributions by
+developers in the Ory community. There is no obligation from Ory to help with
+individual problems. If Ory open source software is used in production in a
+for-profit company or enterprise environment, we mandate a paid support contract
+where Ory is obligated under their service level agreements (SLAs) to offer a
+defined level of availability and responsibility. For more information about
+paid support please contact us at sales@ory.sh.
+
 ## Enforcement Responsibilities
 
 Community leaders are responsible for clarifying and enforcing our standards of

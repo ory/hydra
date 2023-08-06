@@ -9,6 +9,7 @@ import (
 	cryptorand "crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"math"
 
 	"golang.org/x/crypto/chacha20poly1305"
 
@@ -36,6 +37,11 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
 		return "", errorsx.WithStack(err)
+	}
+
+	// Make sure the size calculation does not overflow.
+	if len(plaintext) > math.MaxInt-aead.NonceSize()-aead.Overhead() {
+		return "", errorsx.WithStack(fmt.Errorf("plaintext too large"))
 	}
 
 	nonce := make([]byte, aead.NonceSize(), aead.NonceSize()+len(plaintext)+aead.Overhead())

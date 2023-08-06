@@ -69,6 +69,12 @@ func (p *DefaultProvider) GetRefreshTokenLifespan(ctx context.Context) time.Dura
 	return p.getProvider(ctx).DurationF(KeyRefreshTokenLifespan, time.Hour*720)
 }
 
+var _ fosite.VerifiableCredentialsNonceLifespanProvider = (*DefaultProvider)(nil)
+
+func (p *DefaultProvider) GetVerifiableCredentialsNonceLifespan(ctx context.Context) time.Duration {
+	return p.getProvider(ctx).DurationF(KeyVerifiableCredentialsNonceLifespan, time.Hour)
+}
+
 var _ fosite.IDTokenLifespanProvider = (*DefaultProvider)(nil)
 
 func (p *DefaultProvider) GetIDTokenLifespan(ctx context.Context) time.Duration {

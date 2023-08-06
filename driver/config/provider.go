@@ -42,6 +42,7 @@ const (
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
 	KeyOAuth2AuthURL                             = "webfinger.oidc_discovery.auth_url"
+	KeyVerifiableCredentialsURL                  = "webfinger.oidc_discovery.verifiable_credentials_url" // #nosec G101
 	KeyJWKSURL                                   = "webfinger.oidc_discovery.jwks_url"
 	KeyOIDCDiscoverySupportedClaims              = "webfinger.oidc_discovery.supported_claims"
 	KeyOIDCDiscoverySupportedScope               = "webfinger.oidc_discovery.supported_scope"
@@ -65,6 +66,7 @@ const (
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
 	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
+	KeyVerifiableCredentialsNonceLifespan        = "ttl.vc_nonce"      // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
 	KeyScopeStrategy                             = "strategies.scope"
@@ -405,6 +407,10 @@ func (p *DefaultProvider) OAuth2AuthURL(ctx context.Context) *url.URL {
 
 func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(ctx), "/.well-known/jwks.json"))
+}
+
+func (p *DefaultProvider) CredentialsEndpointURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyVerifiableCredentialsURL, urlx.AppendPaths(p.PublicURL(ctx), "/credentials"))
 }
 
 type AccessTokenStrategySource interface {

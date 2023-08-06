@@ -97,6 +97,8 @@ and success, unless if the --no-shutdown flag is provided.`,
 			prompt := flagx.MustGetStringSlice(cmd, "prompt")
 			maxAge := flagx.MustGetInt(cmd, "max-age")
 			redirectUrl := flagx.MustGetString(cmd, "redirect")
+			authUrl := flagx.MustGetString(cmd, "auth-url")
+			tokenUrl := flagx.MustGetString(cmd, "token-url")
 			audience := flagx.MustGetStringSlice(cmd, "audience")
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 
@@ -118,29 +120,38 @@ and success, unless if the --no-shutdown flag is provided.`,
 				redirectUrl = serverLocation + "callback"
 			}
 
-			if err != nil {
-				return err
+			if authUrl == "" {
+				authUrl = urlx.AppendPaths(endpoint, "/oauth2/auth").String()
 			}
+
+			if tokenUrl == "" {
+				tokenUrl = urlx.AppendPaths(endpoint, "/oauth2/token").String()
+			}
+
 			conf := oauth2.Config{
 				ClientID:     clientID,
 				ClientSecret: clientSecret,
 				Endpoint: oauth2.Endpoint{
-					TokenURL: urlx.AppendPaths(endpoint, "/oauth2/token").String(),
-					AuthURL:  urlx.AppendPaths(endpoint, "/oauth2/auth").String(),
+					AuthURL:  authUrl,
+					TokenURL: tokenUrl,
 				},
 				RedirectURL: redirectUrl,
 				Scopes:      scopes,
 			}
 
-			var generateAuthCodeURL = func() (string, []rune) {
-				state, err := randx.RuneSequence(24, randx.AlphaLower)
-				cmdx.Must(err, "Could not generate random state: %s", err)
+			var generateAuthCodeURL = func() (string, string) {
+				state := flagx.MustGetString(cmd, "state")
+				if len(state) == 0 {
+					generatedState, err := randx.RuneSequence(24, randx.AlphaLower)
+					cmdx.Must(err, "Could not generate random state: %s", err)
+					state = string(generatedState)
+				}
 
 				nonce, err := randx.RuneSequence(24, randx.AlphaLower)
 				cmdx.Must(err, "Could not generate random state: %s", err)
 
 				authCodeURL := conf.AuthCodeURL(
-					string(state),
+					state,
 					oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
 					oauth2.SetAuthURLParam("nonce", string(nonce)),
 					oauth2.SetAuthURLParam("prompt", strings.Join(prompt, "+")),
@@ -196,6 +207,10 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
+			})
+
+			r.GET("/perform-flow", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+				http.Redirect(w, r, authCodeURL, http.StatusFound)
 			})
 
 			type ed struct {
@@ -291,6 +306,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	cmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 
+	cmd.Flags().String("state", "", "Force a state value (insecure)")
 	cmd.Flags().String("redirect", "", "Force a redirect url")
 	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	cmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")

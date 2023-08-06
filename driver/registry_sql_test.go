@@ -31,7 +31,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 	reg, err := NewRegistryWithoutInit(c, l)
 	r := reg.(*RegistrySQL)
 	r.initialPing = sussessfulPing()
-	if err := r.Init(context.Background(), true, false, &contextx.Default{}); err != nil {
+	if err := r.Init(context.Background(), true, false, &contextx.Default{}, nil); err != nil {
 		t.Fatalf("unable to init registry: %s", err)
 	}
 	assert.NoError(t, err)

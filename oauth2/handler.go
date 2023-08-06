@@ -1238,7 +1238,7 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 //	  default: errorOAuth2
 func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
+	session := NewSessionWithCustomClaims(ctx, h.c, "")
 	accessToken := fosite.AccessTokenFromRequest(r)
 	tokenType, _, err := h.r.OAuth2Provider().IntrospectToken(ctx, accessToken, fosite.AccessToken, session)
 

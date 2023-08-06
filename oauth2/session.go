@@ -4,6 +4,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 
 	"github.com/ory/x/stringslice"
@@ -36,10 +38,14 @@ type Session struct {
 }
 
 func NewSession(subject string) *Session {
-	return NewSessionWithCustomClaims(subject, nil, true)
+	ctx := context.Background()
+	provider := config.MustNew(ctx, nil)
+	return NewSessionWithCustomClaims(ctx, provider, subject)
 }
 
-func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string, mirrorTopLevelClaims bool) *Session {
+func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, subject string) *Session {
+	allowedTopLevelClaims := p.AllowedTopLevelClaims(ctx)
+	mirrorTopLevelClaims := p.MirrorTopLevelClaims(ctx)
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),

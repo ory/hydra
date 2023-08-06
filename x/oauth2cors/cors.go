@@ -101,7 +101,7 @@ func Middleware(
 							return false
 						}
 
-						session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims(ctx), reg.Config().MirrorTopLevelClaims(ctx))
+						session := oauth2.NewSessionWithCustomClaims(ctx, reg.Config(), "")
 						_, ar, err := reg.OAuth2Provider().IntrospectToken(ctx, token, fosite.AccessToken, session)
 						if err != nil {
 							return false

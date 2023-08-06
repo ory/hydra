@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/stringslice"
 )
 
@@ -39,7 +40,7 @@ type Session struct {
 
 func NewSession(subject string) *Session {
 	ctx := context.Background()
-	provider := config.MustNew(ctx, nil)
+	provider := config.MustNew(ctx, logrusx.New("", ""))
 	return NewSessionWithCustomClaims(ctx, provider, subject)
 }
 

@@ -36,14 +36,20 @@ body:
             Guidelines](https://github.com/ory/hydra/blob/master/CONTRIBUTING.md)."
           required: true
         - label:
-            "This issue affects my [Ory Network](https://www.ory.sh/) project."
-        - label:
             "I have joined the [Ory Community Slack](https://slack.ory.sh)."
         - label:
             "I am signed up to the [Ory Security Patch
             Newsletter](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)."
     id: checklist
     type: checkboxes
+  - attributes:
+      description:
+        "Enter the slug or API URL of the affected Ory Network project. Leave
+        empty when you are self-hosting."
+      label: "Ory Network Project"
+      placeholder: "https://<your-project-slug>.projects.oryapis.com"
+    id: ory-network-project
+    type: input
   - attributes:
       description: |
         This section gives the reader a very rough overview of the landscape in which the new system is being built and what is actually being built. This isn’t a requirements doc. Keep it succinct! The goal is that readers are brought up to speed but some previous knowledge can be assumed and detailed info can be linked to. This section should be entirely focused on objective background facts.

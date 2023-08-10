@@ -190,7 +190,7 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, ls))
 
 			// Expects the login session to be confirmed in the correct context.
-			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls, ls.ID, time.Now(), ls.Subject, !ls.Remember))
+			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls, ls.ID, time.Now().UTC(), ls.Subject, !ls.Remember))
 			actual := &flow.LoginSession{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, ls.ID))
 			exp, _ := json.Marshal(ls)
@@ -199,7 +199,7 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 
 			// Can't find the login session in the wrong context.
 			require.ErrorIs(t,
-				r.Persister().ConfirmLoginSession(s.t2, ls, ls.ID, time.Now(), ls.Subject, !ls.Remember),
+				r.Persister().ConfirmLoginSession(s.t2, ls, ls.ID, time.Now().UTC(), ls.Subject, !ls.Remember),
 				x.ErrNotFound,
 			)
 		})

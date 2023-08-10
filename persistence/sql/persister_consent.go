@@ -461,6 +461,11 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedS
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
 	defer otelx.End(span, &err)
 
+	if p.Connection(ctx).Dialect.Name() == "mysql" {
+		// MySQL does not support RETURNING.
+		return p.mySQLDeleteLoginSession(ctx, id)
+	}
+
 	var session flow.LoginSession
 
 	err = p.Connection(ctx).RawQuery(
@@ -475,6 +480,36 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedS
 	}
 
 	return &session, nil
+}
+
+func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (*flow.LoginSession, error) {
+	var session flow.LoginSession
+
+	err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
+		err := tx.RawQuery(`
+SELECT * FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).First(&session)
+		if err != nil {
+			return err
+		}
+
+		return p.Connection(ctx).RawQuery(`
+DELETE FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).Exec()
+	})
+
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &session, nil
+
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) (rs []flow.AcceptOAuth2ConsentRequest, err error) {

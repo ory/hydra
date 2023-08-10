@@ -1010,7 +1010,11 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Reque
 	} else if err != nil {
 		return err
 	} else {
-		_ = s.r.Kratos().DisableSession(ctx, session.KratosSessionID.String())
+		innerErr := s.r.Kratos().DisableSession(ctx, session.KratosSessionID.String())
+		if innerErr != nil {
+			s.r.Logger().WithError(innerErr).WithField("sid", sid).Error("Unable to revoke session in ORY Kratos.")
+		}
+		// We don't return the error here because we don't want to break the logout flow if Kratos is down.
 	}
 
 	return nil

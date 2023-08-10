@@ -297,7 +297,7 @@ type HandledLoginRequest struct {
 	// If specified, we will use this value to propagate the logout.
 	//
 	// required: false
-	KratosSessionID string `json:"session_id"`
+	KratosSessionID string `json:"kratos_session_id,omitempty"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID

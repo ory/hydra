@@ -60,7 +60,6 @@ func CompareWithFixture(t *testing.T, actual interface{}, prefix string, id stri
 }
 
 func TestMigrations(t *testing.T) {
-	//pop.Debug = true
 	connections := make(map[string]*pop.Connection, 1)
 
 	if testing.Short() {

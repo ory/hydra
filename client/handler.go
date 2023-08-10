@@ -99,7 +99,7 @@ type createOAuth2Client struct {
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -164,7 +164,7 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
 	}
 
 	if isDynamic {

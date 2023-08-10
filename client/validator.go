@@ -65,6 +65,14 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Fields jwks and jwks_uri can not both be set, you must choose one."))
 	}
 
+	if c.JSONWebKeys != nil && c.JSONWebKeys.JSONWebKeySet != nil {
+		for _, k := range c.JSONWebKeys.Keys {
+			if !k.Valid() {
+				return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Invalid JSON web key in set."))
+			}
+		}
+	}
+
 	if v.r.Config().ClientHTTPNoPrivateIPRanges() {
 		values := map[string]string{
 			"jwks_uri":               c.JSONWebKeysURI,

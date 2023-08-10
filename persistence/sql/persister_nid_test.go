@@ -40,14 +40,16 @@ import (
 type PersisterTestSuite struct {
 	suite.Suite
 	registries map[string]driver.Registry
-	clean      func(*testing.T)
 	t1         context.Context
 	t2         context.Context
 	t1NID      uuid.UUID
 	t2NID      uuid.UUID
 }
 
-var _ PersisterTestSuite = PersisterTestSuite{}
+var _ interface {
+	suite.SetupAllSuite
+	suite.TearDownTestSuite
+} = (*PersisterTestSuite)(nil)
 
 func (s *PersisterTestSuite) SetupSuite() {
 	s.registries = map[string]driver.Registry{
@@ -55,7 +57,7 @@ func (s *PersisterTestSuite) SetupSuite() {
 	}
 
 	if !testing.Short() {
-		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], s.clean = internal.ConnectDatabases(s.T(), true, &contextx.Default{})
+		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], _ = internal.ConnectDatabases(s.T(), true, &contextx.Default{})
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -558,11 +560,11 @@ func (s *PersisterTestSuite) DeleteAccessTokenSession() {
 			require.NoError(t, r.Persister().DeleteAccessTokenSession(s.t2, sig))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 			require.Equal(t, s.t1NID, actual.NID)
 
 			require.NoError(t, r.Persister().DeleteAccessTokenSession(s.t1, sig))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
 		})
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/popx"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/hsm"
@@ -45,7 +46,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, extraMigrations []fs.FS) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, extraMigrations []fs.FS, goMigrations []popx.Migration) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.DefaultProvider) Registry
@@ -90,7 +91,7 @@ func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logru
 	if err != nil {
 		return nil, err
 	}
-	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, nil); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, nil, nil); err != nil {
 		return nil, err
 	}
 	return registry, nil

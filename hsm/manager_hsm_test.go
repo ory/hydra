@@ -52,7 +52,7 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	reg.WithLogger(l)
 	reg.WithConfig(c)
 	reg.WithHsmContext(mockHsmContext)
-	err := reg.Init(context.Background(), false, true, &contextx.TestContextualizer{}, nil)
+	err := reg.Init(context.Background(), false, true, &contextx.TestContextualizer{}, nil, nil)
 	assert.NoError(t, err)
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())

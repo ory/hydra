@@ -105,8 +105,11 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	return errorsx.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS) (*Persister, error) {
-	mb, err := popx.NewMigrationBox(fsx.Merge(append([]fs.FS{migrations}, extraMigrations...)...), popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0))
+func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
+	mb, err := popx.NewMigrationBox(
+		fsx.Merge(append([]fs.FS{migrations}, extraMigrations...)...),
+		popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0),
+		popx.WithGoMigrations(goMigrations))
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}

@@ -6,8 +6,11 @@ package config
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
+
+	"github.com/ory/x/corsx"
 
 	"github.com/ory/x/contextx"
 
@@ -71,7 +74,8 @@ func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPe
 }
 
 func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.Options, bool) {
-	return p.getProvider(ctx).CORS(iface.Key(KeyRoot), cors.Options{
+	prefix := iface.Key(KeyRoot)
+	opts, enabled := p.getProvider(ctx).CORS(prefix, cors.Options{
 		AllowedMethods: []string{
 			"POST",
 			"GET",
@@ -102,6 +106,12 @@ func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.
 		},
 		AllowCredentials: true,
 	})
+	opts.AllowOriginRequestFunc = func(r *http.Request, origin string) bool {
+		// load the origins from the config on every request to allow hot-reloading
+		allowedOrigins := p.getProvider(r.Context()).Strings(prefix + ".cors.allowed_origins")
+		return corsx.CheckOrigin(allowedOrigins, origin)
+	}
+	return opts, enabled
 }
 
 func (p *DefaultProvider) DisableHealthAccessLog(iface ServeInterface) bool {

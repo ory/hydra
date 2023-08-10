@@ -41,7 +41,7 @@ require (
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
 	github.com/ory/hydra-client-go/v2 v2.1.1
 	github.com/ory/jsonschema/v3 v3.0.8
-	github.com/ory/x v0.0.577
+	github.com/ory/x v0.0.578-0.20230810070303-e5477e19f134
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0

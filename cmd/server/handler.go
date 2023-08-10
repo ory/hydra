@@ -18,7 +18,6 @@ import (
 
 	"github.com/ory/x/servicelocatorx"
 
-	"github.com/ory/x/corsx"
 	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/analytics-go/v5"
@@ -60,9 +59,6 @@ func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d drive
 	}
 
 	n.UseHandler(router)
-	corsx.ContextualizedMiddleware(func(ctx context.Context) (opts cors.Options, enabled bool) {
-		return d.Config().CORS(ctx, iface)
-	})
 
 	return n
 }
@@ -311,6 +307,10 @@ func serve(
 	permission *configx.UnixPermission,
 ) {
 	defer wg.Done()
+
+	if cfg, enabled := d.Config().CORS(ctx, iface); enabled {
+		handler = cors.New(cfg).Handler(handler)
+	}
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
 		handler = otelx.TraceHandler(

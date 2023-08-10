@@ -1989,6 +1989,10 @@ components:
             \ the proper value, then authentication processes which have id_token_hint\
             \ set might fail."
           type: string
+        kratos_session_id:
+          description: "KratosSessionID is the session ID of the end-user that authenticated.\n\
+            If specified, we will use this value to propagate the logout."
+          type: string
         remember:
           description: "Remember, if set to true, tells ORY Hydra to remember this\
             \ user by telling the user agent (browser) to store\na cookie with authentication\
@@ -2001,10 +2005,6 @@ components:
             \ for the duration of the browser session (using a session cookie)."
           format: int64
           type: integer
-        session_id:
-          description: "KratosSessionID is the session ID of the end-user that authenticated.\n\
-            If specified, we will use this value to propagate the logout."
-          type: string
         subject:
           description: Subject is the user ID of the end-user that authenticated.
           type: string

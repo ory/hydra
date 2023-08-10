@@ -207,6 +207,10 @@
             "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
             "type": "string"
           },
+          "kratos_session_id": {
+            "description": "KratosSessionID is the session ID of the end-user that authenticated.\nIf specified, we will use this value to propagate the logout.",
+            "type": "string"
+          },
           "remember": {
             "description": "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
             "type": "boolean"
@@ -215,10 +219,6 @@
             "description": "RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered for the duration of the browser session (using a session cookie).",
             "format": "int64",
             "type": "integer"
-          },
-          "session_id": {
-            "description": "KratosSessionID is the session ID of the end-user that authenticated.\nIf specified, we will use this value to propagate the logout.",
-            "type": "string"
           },
           "subject": {
             "description": "Subject is the user ID of the end-user that authenticated.",

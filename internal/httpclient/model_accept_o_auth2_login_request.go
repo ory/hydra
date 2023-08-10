@@ -25,12 +25,12 @@ type AcceptOAuth2LoginRequest struct {
 	ExtendSessionLifespan *bool `json:"extend_session_lifespan,omitempty"`
 	// ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID Connect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.  Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the sub claim in the OAuth 2.0 Introspection.  Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's configuration).  Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies that you have to compute this value on every authentication process (probably depending on the client ID or some other unique value).  If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
 	ForceSubjectIdentifier *string `json:"force_subject_identifier,omitempty"`
+	// KratosSessionID is the session ID of the end-user that authenticated. If specified, we will use this value to propagate the logout.
+	KratosSessionId *string `json:"kratos_session_id,omitempty"`
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she will not be asked to log in again.
 	Remember *bool `json:"remember,omitempty"`
 	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered for the duration of the browser session (using a session cookie).
 	RememberFor *int64 `json:"remember_for,omitempty"`
-	// KratosSessionID is the session ID of the end-user that authenticated. If specified, we will use this value to propagate the logout.
-	SessionId *string `json:"session_id,omitempty"`
 	// Subject is the user ID of the end-user that authenticated.
 	Subject string `json:"subject"`
 }
@@ -214,6 +214,38 @@ func (o *AcceptOAuth2LoginRequest) SetForceSubjectIdentifier(v string) {
 	o.ForceSubjectIdentifier = &v
 }
 
+// GetKratosSessionId returns the KratosSessionId field value if set, zero value otherwise.
+func (o *AcceptOAuth2LoginRequest) GetKratosSessionId() string {
+	if o == nil || o.KratosSessionId == nil {
+		var ret string
+		return ret
+	}
+	return *o.KratosSessionId
+}
+
+// GetKratosSessionIdOk returns a tuple with the KratosSessionId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AcceptOAuth2LoginRequest) GetKratosSessionIdOk() (*string, bool) {
+	if o == nil || o.KratosSessionId == nil {
+		return nil, false
+	}
+	return o.KratosSessionId, true
+}
+
+// HasKratosSessionId returns a boolean if a field has been set.
+func (o *AcceptOAuth2LoginRequest) HasKratosSessionId() bool {
+	if o != nil && o.KratosSessionId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetKratosSessionId gets a reference to the given string and assigns it to the KratosSessionId field.
+func (o *AcceptOAuth2LoginRequest) SetKratosSessionId(v string) {
+	o.KratosSessionId = &v
+}
+
 // GetRemember returns the Remember field value if set, zero value otherwise.
 func (o *AcceptOAuth2LoginRequest) GetRemember() bool {
 	if o == nil || o.Remember == nil {
@@ -278,38 +310,6 @@ func (o *AcceptOAuth2LoginRequest) SetRememberFor(v int64) {
 	o.RememberFor = &v
 }
 
-// GetSessionId returns the SessionId field value if set, zero value otherwise.
-func (o *AcceptOAuth2LoginRequest) GetSessionId() string {
-	if o == nil || o.SessionId == nil {
-		var ret string
-		return ret
-	}
-	return *o.SessionId
-}
-
-// GetSessionIdOk returns a tuple with the SessionId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *AcceptOAuth2LoginRequest) GetSessionIdOk() (*string, bool) {
-	if o == nil || o.SessionId == nil {
-		return nil, false
-	}
-	return o.SessionId, true
-}
-
-// HasSessionId returns a boolean if a field has been set.
-func (o *AcceptOAuth2LoginRequest) HasSessionId() bool {
-	if o != nil && o.SessionId != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetSessionId gets a reference to the given string and assigns it to the SessionId field.
-func (o *AcceptOAuth2LoginRequest) SetSessionId(v string) {
-	o.SessionId = &v
-}
-
 // GetSubject returns the Subject field value
 func (o *AcceptOAuth2LoginRequest) GetSubject() string {
 	if o == nil {
@@ -351,14 +351,14 @@ func (o AcceptOAuth2LoginRequest) MarshalJSON() ([]byte, error) {
 	if o.ForceSubjectIdentifier != nil {
 		toSerialize["force_subject_identifier"] = o.ForceSubjectIdentifier
 	}
+	if o.KratosSessionId != nil {
+		toSerialize["kratos_session_id"] = o.KratosSessionId
+	}
 	if o.Remember != nil {
 		toSerialize["remember"] = o.Remember
 	}
 	if o.RememberFor != nil {
 		toSerialize["remember_for"] = o.RememberFor
-	}
-	if o.SessionId != nil {
-		toSerialize["session_id"] = o.SessionId
 	}
 	if true {
 		toSerialize["subject"] = o.Subject

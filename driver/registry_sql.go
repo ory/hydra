@@ -24,6 +24,7 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
 	otelsql "github.com/ory/x/otelx/sql"
+	"github.com/ory/x/popx"
 	"github.com/ory/x/resilience"
 	"github.com/ory/x/sqlcon"
 )
@@ -70,6 +71,7 @@ func (m *RegistrySQL) Init(
 	migrate bool,
 	ctxer contextx.Contextualizer,
 	extraMigrations []fs.FS,
+	goMigrations []popx.Migration,
 ) error {
 	if m.persister == nil {
 		m.WithContextualizer(ctxer)
@@ -105,7 +107,7 @@ func (m *RegistrySQL) Init(
 			return errorsx.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(ctx, c, m, m.Config(), extraMigrations)
+		p, err := sql.NewPersister(ctx, c, m, m.Config(), extraMigrations, goMigrations)
 		if err != nil {
 			return err
 		}

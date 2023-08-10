@@ -11,6 +11,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/popx"
 	"github.com/ory/x/servicelocatorx"
 )
 
@@ -24,6 +25,7 @@ type (
 		skipNetworkInit bool
 		tracerWrapper   TracerWrapper
 		extraMigrations []fs.FS
+		goMigrations    []popx.Migration
 	}
 	OptionsModifier func(*options)
 
@@ -86,6 +88,12 @@ func WithExtraMigrations(m ...fs.FS) OptionsModifier {
 	}
 }
 
+func WithGoMigrations(m ...popx.Migration) OptionsModifier {
+	return func(o *options) {
+		o.goMigrations = append(o.goMigrations, m...)
+	}
+}
+
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
@@ -124,7 +132,7 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 		r.WithTracerWrapper(o.tracerWrapper)
 	}
 
-	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter, o.extraMigrations); err != nil {
+	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")
 		return nil, err
 	}

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-08-08)](#000-2023-08-08)
+- [0.0.0 (2023-08-10)](#000-2023-08-10)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,7 +698,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-08)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-10)
 
 
 ### Bug Fixes
@@ -724,6 +724,7 @@
     suffixed with `draft_00`.
 
 * Allow additional SQL migrations ([#3587](https://github.com/ory/hydra/issues/3587)) ([8900cbb](https://github.com/ory/hydra/commit/8900cbb770d6f39a5c3322fce488675ca6d0138a))
+* Allow Go migrations ([#3602](https://github.com/ory/hydra/issues/3602)) ([8eed306](https://github.com/ory/hydra/commit/8eed306800fa330a1cda752dbb11ddf09faf25ad))
 * Bump fosite and add some more tracing ([0b56f53](https://github.com/ory/hydra/commit/0b56f53a491e165f68a53f013989328ce86928ba))
 * **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))
 * Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))

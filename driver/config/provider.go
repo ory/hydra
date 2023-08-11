@@ -93,6 +93,7 @@ const (
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -201,6 +202,10 @@ func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges() bool {
 
 func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
 	return stringslice.Unique(p.getProvider(ctx).Strings(KeyAllowedTopLevelClaims))
+}
+
+func (p *DefaultProvider) MirrorTopLevelClaims(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyMirrorTopLevelClaims, true)
 }
 
 func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalSources ...AccessTokenStrategySource) []string {

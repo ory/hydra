@@ -4,6 +4,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -16,8 +17,10 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/stringslice"
 )
 
@@ -30,15 +33,20 @@ type Session struct {
 	ConsentChallenge       string                 `json:"consent_challenge"`
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
 	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
+	MirrorTopLevelClaims   bool                   `json:"mirror_top_level_claims"`
 
 	Flow *flow.Flow `json:"-"`
 }
 
 func NewSession(subject string) *Session {
-	return NewSessionWithCustomClaims(subject, nil)
+	ctx := context.Background()
+	provider := config.MustNew(ctx, logrusx.New("", ""))
+	return NewSessionWithCustomClaims(ctx, provider, subject)
 }
 
-func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) *Session {
+func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, subject string) *Session {
+	allowedTopLevelClaims := p.AllowedTopLevelClaims(ctx)
+	mirrorTopLevelClaims := p.MirrorTopLevelClaims(ctx)
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),
@@ -47,6 +55,7 @@ func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) 
 		},
 		Extra:                 map[string]interface{}{},
 		AllowedTopLevelClaims: allowedTopLevelClaims,
+		MirrorTopLevelClaims:  mirrorTopLevelClaims,
 	}
 }
 
@@ -70,7 +79,9 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	}
 
 	//for every other claim that was already reserved and for mirroring, add original extra under "ext"
-	topLevelExtraWithMirrorExt["ext"] = s.Extra
+	if s.MirrorTopLevelClaims {
+		topLevelExtraWithMirrorExt["ext"] = s.Extra
+	}
 
 	claims := &jwt.JWTClaims{
 		Subject: s.Subject,

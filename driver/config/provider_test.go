@@ -91,6 +91,8 @@ func TestCORSOptions(t *testing.T) {
 
 	conf, enabled := p.CORS(ctx, PublicInterface)
 	assert.True(t, enabled)
+	assert.NotNil(t, conf.AllowOriginRequestFunc)
+	conf.AllowOriginRequestFunc = nil
 
 	assert.EqualValues(t, cors.Options{
 		AllowedOrigins:   []string{},

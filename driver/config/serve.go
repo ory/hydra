@@ -107,6 +107,11 @@ func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.
 		AllowCredentials: true,
 	})
 	opts.AllowOriginRequestFunc = func(r *http.Request, origin string) bool {
+		// if cors is not enabled, return false
+		// this enables hot-reloading on every request
+		if !p.getProvider(r.Context()).Bool(prefix + ".cors.enabled") {
+			return false
+		}
 		// load the origins from the config on every request to allow hot-reloading
 		allowedOrigins := p.getProvider(r.Context()).Strings(prefix + ".cors.allowed_origins")
 		return corsx.CheckOrigin(allowedOrigins, origin)

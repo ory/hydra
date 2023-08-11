@@ -263,10 +263,14 @@ func TestViperProviderValidates(t *testing.T) {
 
 	gc, enabled := c.CORS(ctx, AdminInterface)
 	assert.False(t, enabled)
+	assert.NotNil(t, gc.AllowOriginRequestFunc)
+	gc.AllowOriginRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	gc, enabled = c.CORS(ctx, PublicInterface)
 	assert.False(t, enabled)
+	assert.NotNil(t, gc.AllowOriginRequestFunc)
+	gc.AllowOriginRequestFunc = nil
 	assert.Equal(t, expectedCors, gc)
 
 	assert.Equal(t, []string{"127.0.0.1/32"}, c.TLS(ctx, PublicInterface).AllowTerminationFrom())

@@ -706,6 +706,7 @@
 * Deflake ttl test ([6741a49](https://github.com/ory/hydra/commit/6741a49f7b4d55a270f3eb968921894b1e5f2989))
 * Only query access tokens by hashed signature ([a21e945](https://github.com/ory/hydra/commit/a21e94519416cc7801995b0804696348b18fa844))
 * Racy random string generation ([#3555](https://github.com/ory/hydra/issues/3555)) ([1b26c4c](https://github.com/ory/hydra/commit/1b26c4cb96400b333fe214d2da892fc045bbc69f))
+* Reject invalid JWKS in client configuration / dependency cleanup and bump ([#3603](https://github.com/ory/hydra/issues/3603)) ([1d73d83](https://github.com/ory/hydra/commit/1d73d83eb03e4ceef6edb4bd0738959007053118))
 * Restore ability to override auth and token urls for exemplary app ([#3590](https://github.com/ory/hydra/issues/3590)) ([dfb129a](https://github.com/ory/hydra/commit/dfb129a5b7c8ae01e1c490fce1a127697abc7bee))
 * Return proper error when the grant request cannot be parsed ([#3558](https://github.com/ory/hydra/issues/3558)) ([26f2d34](https://github.com/ory/hydra/commit/26f2d34459f55444e880e6e27e081c002d630246))
 * Use correct tracer in middleware ([#3567](https://github.com/ory/hydra/issues/3567)) ([807cbd2](https://github.com/ory/hydra/commit/807cbd209af376b9b2d18c278cc927d1c43e6865))

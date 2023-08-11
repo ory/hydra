@@ -49,7 +49,7 @@ import (
 
 var _ = &consent.Handler{}
 
-func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
+func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, iface config.ServeInterface) http.Handler {
 	if !networkx.AddressIsUnixSocket(address) {
 		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(ctx, iface)))
 	}
@@ -63,7 +63,7 @@ func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d drive
 	return n
 }
 
-func isDSNAllowed(ctx context.Context, r driver.Registry) {
+func ensureNoMemoryDSN(r driver.Registry) {
 	if r.Config().DSN() == "memory" {
 		r.Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
@@ -74,11 +74,11 @@ func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifi
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
 		if err != nil {
 			return err
 		}
-		isDSNAllowed(ctx, d)
+		ensureNoMemoryDSN(d)
 
 		admin, _, adminmw, _ := setup(ctx, d, cmd)
 		d.PrometheusManager().RegisterRouter(admin.Router)
@@ -92,7 +92,7 @@ func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifi
 			cmd,
 			&wg,
 			config.AdminInterface,
-			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface),
 			d.Config().ListenOn(config.AdminInterface),
 			d.Config().SocketPermission(config.AdminInterface),
 		)
@@ -107,11 +107,11 @@ func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModif
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
 		if err != nil {
 			return err
 		}
-		isDSNAllowed(ctx, d)
+		ensureNoMemoryDSN(d)
 
 		_, public, _, publicmw := setup(ctx, d, cmd)
 		d.PrometheusManager().RegisterRouter(public.Router)
@@ -125,7 +125,7 @@ func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModif
 			cmd,
 			&wg,
 			config.PublicInterface,
-			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface),
 			d.Config().ListenOn(config.PublicInterface),
 			d.Config().SocketPermission(config.PublicInterface),
 		)
@@ -140,7 +140,7 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
 		if err != nil {
 			return err
 		}
@@ -159,7 +159,7 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 			cmd,
 			&wg,
 			config.PublicInterface,
-			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface),
 			d.Config().ListenOn(config.PublicInterface),
 			d.Config().SocketPermission(config.PublicInterface),
 		)
@@ -170,7 +170,7 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 			cmd,
 			&wg,
 			config.AdminInterface,
-			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface),
 			d.Config().ListenOn(config.AdminInterface),
 			d.Config().SocketPermission(config.AdminInterface),
 		)
@@ -308,9 +308,8 @@ func serve(
 ) {
 	defer wg.Done()
 
-	if cfg, enabled := d.Config().CORS(ctx, iface); enabled {
-		handler = cors.New(cfg).Handler(handler)
-	}
+	cfg, _ := d.Config().CORS(ctx, iface)
+	handler = cors.New(cfg).Handler(handler)
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
 		handler = otelx.TraceHandler(

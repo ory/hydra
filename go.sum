@@ -646,8 +646,8 @@ github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88 h1:J0CIFKdpUeqKbVMw
 github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88/go.mod h1:MMNmY6MG1uB6fnXYFaHoqdV23DTWctlPsmRCeq/2+wc=
 github.com/ory/jsonschema/v3 v3.0.8 h1:Ssdb3eJ4lDZ/+XnGkvQS/te0p+EkolqwTsDOCxr/FmU=
 github.com/ory/jsonschema/v3 v3.0.8/go.mod h1:ZPzqjDkwd3QTnb2Z6PAS+OTvBE2x5i6m25wCGx54W/0=
-github.com/ory/x v0.0.578-0.20230810070303-e5477e19f134 h1:UpZ9gGyAYYm+XGJXgrSkFIMSBMyxTQjj+OM+hqacn28=
-github.com/ory/x v0.0.578-0.20230810070303-e5477e19f134/go.mod h1:aeJFTlvDLGYSABzPS3z5SeLcYC52Ek7uGZiuYGcTMSU=
+github.com/ory/x v0.0.580 h1:2acv/ORSaAnRGe7wEtWeyrT464o7r+8HC1fZGAb8Ui8=
+github.com/ory/x v0.0.580/go.mod h1:zUGmLuqZ81XQPeTBmE1Fhfvr1ygEkDJky33IxvRaioA=
 github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
 github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.7.0/go.mod h1:vwGMzjaWMwyfHwgIBhI2YUM4fB6nL6lVAvS1LBMMhTE=

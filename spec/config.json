@@ -904,6 +904,12 @@
           },
           "examples": [["username", "email", "user_uuid"]]
         },
+        "mirror_top_level_claims": {
+          "type": "boolean",
+          "description": "Set to false if you don't want to mirror custom claims under 'ext'",
+          "default": true,
+          "examples": [false]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,

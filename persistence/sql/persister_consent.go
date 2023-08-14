@@ -14,6 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/x/errorsx"
@@ -450,16 +451,59 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginS
 	return nil
 }
 
-func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
+func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid=?", id, p.NetworkID(ctx)).ExecWithCount()
-	if count == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
-	} else {
-		return sqlcon.HandleError(err)
+	if p.Connection(ctx).Dialect.Name() == "mysql" {
+		// MySQL does not support RETURNING.
+		return p.mySQLDeleteLoginSession(ctx, id)
 	}
+
+	var session flow.LoginSession
+
+	err = p.Connection(ctx).RawQuery(
+		`DELETE FROM hydra_oauth2_authentication_session
+       WHERE id = ? AND nid = ?
+       RETURNING *`,
+		id,
+		p.NetworkID(ctx),
+	).First(&session)
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &session, nil
+}
+
+func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (*flow.LoginSession, error) {
+	var session flow.LoginSession
+
+	err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
+		err := tx.RawQuery(`
+SELECT * FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).First(&session)
+		if err != nil {
+			return err
+		}
+
+		return p.Connection(ctx).RawQuery(`
+DELETE FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).Exec()
+	})
+
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &session, nil
+
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) (rs []flow.AcceptOAuth2ConsentRequest, err error) {

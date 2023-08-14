@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/x/uuidx"
 
@@ -188,7 +190,7 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, ls))
 
 			// Expects the login session to be confirmed in the correct context.
-			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls, ls.ID, time.Now(), ls.Subject, !ls.Remember))
+			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls, ls.ID, time.Now().UTC(), ls.Subject, !ls.Remember))
 			actual := &flow.LoginSession{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, ls.ID))
 			exp, _ := json.Marshal(ls)
@@ -197,7 +199,7 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 
 			// Can't find the login session in the wrong context.
 			require.ErrorIs(t,
-				r.Persister().ConfirmLoginSession(s.t2, ls, ls.ID, time.Now(), ls.Subject, !ls.Remember),
+				r.Persister().ConfirmLoginSession(s.t2, ls, ls.ID, time.Now().UTC(), ls.Subject, !ls.Remember),
 				x.ErrNotFound,
 			)
 		})
@@ -632,14 +634,22 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			ls := flow.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
+			ls := flow.LoginSession{
+				ID:                        uuid.Must(uuid.NewV4()).String(),
+				Remember:                  true,
+				IdentityProviderSessionID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+			}
 			persistLoginSession(s.t1, t, r.Persister(), &ls)
 
-			require.Error(t, r.Persister().DeleteLoginSession(s.t2, ls.ID))
-			_, err := r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
+			deletedLS, err := r.Persister().DeleteLoginSession(s.t2, ls.ID)
+			require.Error(t, err)
+			assert.Nil(t, deletedLS)
+			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
 			require.NoError(t, err)
 
-			require.NoError(t, r.Persister().DeleteLoginSession(s.t1, ls.ID))
+			deletedLS, err = r.Persister().DeleteLoginSession(s.t1, ls.ID)
+			require.NoError(t, err)
+			assert.Equal(t, ls, *deletedLS)
 			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
 			require.Error(t, err)
 		})

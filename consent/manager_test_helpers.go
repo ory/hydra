@@ -324,8 +324,12 @@ func TestHelperNID(r interface {
 		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS, testLS.ID, time.Now(), testLS.Subject, true))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS, testLS.ID, time.Now(), testLS.Subject, true))
-		require.Error(t, t2InvalidNID.DeleteLoginSession(ctx, testLS.ID))
-		require.NoError(t, t1ValidNID.DeleteLoginSession(ctx, testLS.ID))
+		ls, err := t2InvalidNID.DeleteLoginSession(ctx, testLS.ID)
+		require.Error(t, err)
+		assert.Nil(t, ls)
+		ls, err = t1ValidNID.DeleteLoginSession(ctx, testLS.ID)
+		require.NoError(t, err)
+		assert.Equal(t, testLS.ID, ls.ID)
 	}
 }
 
@@ -429,8 +433,9 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				},
 			} {
 				t.Run("case=delete-get-"+tc.id, func(t *testing.T) {
-					err := m.DeleteLoginSession(ctx, tc.id)
+					ls, err := m.DeleteLoginSession(ctx, tc.id)
 					require.NoError(t, err)
+					assert.EqualValues(t, tc.id, ls.ID)
 
 					_, err = m.GetRememberedLoginSession(ctx, nil, tc.id)
 					require.Error(t, err)
@@ -1083,7 +1088,8 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			require.NoError(t, err)
 			assert.EqualValues(t, expected.ID, result.ID)
 
-			require.NoError(t, m.DeleteLoginSession(ctx, s.ID))
+			_, err = m.DeleteLoginSession(ctx, s.ID)
+			require.NoError(t, err)
 
 			result, err = m.GetConsentRequest(ctx, expected.ID)
 			require.NoError(t, err)

@@ -28,6 +28,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -88,6 +89,7 @@ type RegistryBase struct {
 	hmacs           *foauth2.HMACSHAStrategy
 	fc              *fositex.Config
 	publicCORS      *cors.Cors
+	kratos          kratos.Client
 }
 
 func (m *RegistryBase) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
@@ -198,6 +200,11 @@ func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
 
 func (m *RegistryBase) WithTracerWrapper(wrapper TracerWrapper) Registry {
 	m.tracerWrapper = wrapper
+	return m.r
+}
+
+func (m *RegistryBase) WithKratos(k kratos.Client) Registry {
+	m.kratos = k
 	return m.r
 }
 
@@ -551,4 +558,11 @@ func (m *RegistryBase) HSMContext() hsm.Context {
 
 func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
 	return m.OAuth2Provider().(*fosite.Fosite)
+}
+
+func (m *RegistryBase) Kratos() kratos.Client {
+	if m.kratos == nil {
+		m.kratos = kratos.New(m)
+	}
+	return m.kratos
 }

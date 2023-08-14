@@ -41,7 +41,7 @@ type (
 		// Cookie management
 		GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (*flow.LoginSession, error)
 		CreateLoginSession(ctx context.Context, session *flow.LoginSession) error
-		DeleteLoginSession(ctx context.Context, id string) error
+		DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error)
 		RevokeSubjectLoginSession(ctx context.Context, user string) error
 		ConfirmLoginSession(ctx context.Context, session *flow.LoginSession, id string, authTime time.Time, subject string, remember bool) error
 

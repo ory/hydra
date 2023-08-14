@@ -1989,6 +1989,11 @@ components:
             \ the proper value, then authentication processes which have id_token_hint\
             \ set might fail."
           type: string
+        identity_provider_session_id:
+          description: "IdentityProviderSessionID is the session ID of the end-user\
+            \ that authenticated.\nIf specified, we will use this value to propagate\
+            \ the logout."
+          type: string
         remember:
           description: "Remember, if set to true, tells ORY Hydra to remember this\
             \ user by telling the user agent (browser) to store\na cookie with authentication\

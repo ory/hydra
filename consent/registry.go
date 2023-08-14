@@ -9,6 +9,7 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -17,6 +18,7 @@ type InternalRegistry interface {
 	x.RegistryCookieStore
 	x.RegistryLogger
 	x.HTTPClientProvider
+	kratos.Provider
 	Registry
 	client.Registry
 

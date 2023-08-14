@@ -6,11 +6,8 @@ package config
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
-
-	"github.com/ory/x/corsx"
 
 	"github.com/ory/x/contextx"
 
@@ -74,8 +71,7 @@ func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPe
 }
 
 func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.Options, bool) {
-	prefix := iface.Key(KeyRoot)
-	opts, enabled := p.getProvider(ctx).CORS(prefix, cors.Options{
+	return p.getProvider(ctx).CORS(iface.Key(KeyRoot), cors.Options{
 		AllowedMethods: []string{
 			"POST",
 			"GET",
@@ -106,17 +102,6 @@ func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.
 		},
 		AllowCredentials: true,
 	})
-	opts.AllowOriginRequestFunc = func(r *http.Request, origin string) bool {
-		// if cors is not enabled, return false
-		// this enables hot-reloading on every request
-		if !p.getProvider(r.Context()).Bool(prefix + ".cors.enabled") {
-			return false
-		}
-		// load the origins from the config on every request to allow hot-reloading
-		allowedOrigins := p.getProvider(r.Context()).Strings(prefix + ".cors.allowed_origins")
-		return corsx.CheckOrigin(allowedOrigins, origin)
-	}
-	return opts, enabled
 }
 
 func (p *DefaultProvider) DisableHealthAccessLog(iface ServeInterface) bool {

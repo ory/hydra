@@ -3,6 +3,6 @@
   "NID": "00000000-0000-0000-0000-000000000000",
   "AuthenticatedAt": null,
   "Subject": "subject-0014",
-  "KratosSessionID": "",
+  "IdentityProviderSessionID": "",
   "Remember": false
 }

@@ -459,7 +459,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			return nil, fosite.ErrAccessDenied.WithHint("The login session cookie was not found or malformed.")
 		}
 
-		loginSession.KratosSessionID = f.KratosSessionID
+		loginSession.IdentityProviderSessionID = f.IdentityProviderSessionID
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}
@@ -1010,7 +1010,7 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Reque
 	} else if err != nil {
 		return err
 	} else {
-		innerErr := s.r.Kratos().DisableSession(ctx, session.KratosSessionID.String())
+		innerErr := s.r.Kratos().DisableSession(ctx, session.IdentityProviderSessionID.String())
 		if innerErr != nil {
 			s.r.Logger().WithError(innerErr).WithField("sid", sid).Error("Unable to revoke session in ORY Kratos.")
 		}

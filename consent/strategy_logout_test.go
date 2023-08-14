@@ -184,7 +184,7 @@ func TestLogoutFlows(t *testing.T) {
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
 				//res.Payload.SessionID
-				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Ptr(true), KratosSessionId: pointerx.Ptr(kratos.FakeSessionID)}
+				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Ptr(true), IdentityProviderSessionId: pointerx.Ptr(kratos.FakeSessionID)}
 			}),
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
 				require.NoError(t, err)

@@ -761,11 +761,11 @@
             "/ui"
           ]
         },
-        "kratos": {
+        "identity_provider": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "admin": {
+            "admin_base_url": {
               "type": "string",
               "title": "The admin URL of the ORY Kratos instance.",
               "description": "If set, ORY Hydra will use this URL to log out the user in addition to removing the Hydra session.",

@@ -42,12 +42,12 @@ type OAuth2RedirectTo struct {
 
 // swagger:ignore
 type LoginSession struct {
-	ID              string           `db:"id"`
-	NID             uuid.UUID        `db:"nid"`
-	AuthenticatedAt sqlxx.NullTime   `db:"authenticated_at"`
-	Subject         string           `db:"subject"`
-	KratosSessionID sqlxx.NullString `db:"kratos_session_id"`
-	Remember        bool             `db:"remember"`
+	ID                        string           `db:"id"`
+	NID                       uuid.UUID        `db:"nid"`
+	AuthenticatedAt           sqlxx.NullTime   `db:"authenticated_at"`
+	Subject                   string           `db:"subject"`
+	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id"`
+	Remember                  bool             `db:"remember"`
 }
 
 func (LoginSession) TableName() string {
@@ -293,11 +293,11 @@ type HandledLoginRequest struct {
 	// required: true
 	Subject string `json:"subject"`
 
-	// KratosSessionID is the session ID of the end-user that authenticated.
+	// IdentityProviderSessionID is the session ID of the end-user that authenticated.
 	// If specified, we will use this value to propagate the logout.
 	//
 	// required: false
-	KratosSessionID string `json:"kratos_session_id,omitempty"`
+	IdentityProviderSessionID string `json:"identity_provider_session_id,omitempty"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID

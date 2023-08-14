@@ -25,7 +25,7 @@ type (
 		Kratos() Client
 	}
 	Client interface {
-		DisableSession(ctx context.Context, kratosSessionID string) error
+		DisableSession(ctx context.Context, identityProviderSessionID string) error
 	}
 	Default struct {
 		dependencies
@@ -36,7 +36,7 @@ func New(d dependencies) Client {
 	return &Default{dependencies: d}
 }
 
-func (k *Default) DisableSession(ctx context.Context, kratosSessionID string) (err error) {
+func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID string) (err error) {
 	ctx, span := k.Tracer(ctx).Tracer().Start(ctx, "kratos.DisableSession")
 	otelx.End(span, &err)
 
@@ -47,14 +47,14 @@ func (k *Default) DisableSession(ctx context.Context, kratosSessionID string) (e
 		return nil
 	}
 
-	if kratosSessionID == "" {
+	if identityProviderSessionID == "" {
 		span.SetAttributes(attribute.Bool("skipped", true))
 		span.SetAttributes(attribute.String("reason", "kratos session ID is empty"))
 		return nil
 	}
 
 	kratos := client.NewAPIClient(k.clientConfiguration(ctx, adminURL))
-	_, err = kratos.IdentityApi.DisableSession(ctx, kratosSessionID).Execute()
+	_, err = kratos.IdentityApi.DisableSession(ctx, identityProviderSessionID).Execute()
 
 	return err
 

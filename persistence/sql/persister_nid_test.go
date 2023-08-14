@@ -635,9 +635,9 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
 			ls := flow.LoginSession{
-				ID:              uuid.Must(uuid.NewV4()).String(),
-				Remember:        true,
-				KratosSessionID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+				ID:                        uuid.Must(uuid.NewV4()).String(),
+				Remember:                  true,
+				IdentityProviderSessionID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
 			}
 			persistLoginSession(s.t1, t, r.Persister(), &ls)
 

@@ -132,7 +132,7 @@ func TestMigrations(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				require.Equal(t, 16, len(flows))
+				require.Equal(t, 17, len(flows))
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
@@ -144,7 +144,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_authentication_session", func(t *testing.T) {
 					ss := []flow.LoginSession{}
 					c.All(&ss)
-					require.Equal(t, 16, len(ss))
+					require.Equal(t, 17, len(ss))
 
 					for _, s := range ss {
 						testhelpersuuid.AssertUUID(t, &s.NID)

@@ -80,7 +80,7 @@ const (
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
-	KeyKratosAdminURL                            = "urls.kratos.admin"
+	KeyIdentityProviderAdminURL                  = "urls.identity_provider.admin_base_url"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
@@ -105,8 +105,10 @@ const (
 
 const DSNMemory = "memory"
 
-var _ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
-var _ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
+var (
+	_ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
+	_ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
+)
 
 type DefaultProvider struct {
 	l *logrusx.Logger
@@ -395,7 +397,7 @@ func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
-	u := p.getProvider(ctx).RequestURIF(KeyKratosAdminURL, nil)
+	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderAdminURL, nil)
 
 	return u, u != nil
 }

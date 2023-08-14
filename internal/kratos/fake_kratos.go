@@ -22,9 +22,9 @@ func NewFake() *FakeKratos {
 	return &FakeKratos{}
 }
 
-func (f *FakeKratos) DisableSession(_ context.Context, kratosSessionID string) error {
+func (f *FakeKratos) DisableSession(ctx context.Context, identityProviderSessionID string) error {
 	f.DisableSessionWasCalled = true
-	f.LastDisabledSession = kratosSessionID
+	f.LastDisabledSession = identityProviderSessionID
 
 	return nil
 }

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -777,12 +778,21 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.GetID(), token: t})
 	}
 
-	var execute = func(t task) {
+	span := trace.SpanFromContext(ctx)
+	cl := s.r.HTTPClient(ctx)
+	execute := func(t task) {
 		log := s.r.Logger().WithRequest(r).
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
-		res, err := s.r.HTTPClient(ctx).PostForm(t.url, url.Values{"logout_token": {t.token}})
+		body := url.Values{"logout_token": {t.token}}.Encode()
+		req, err := retryablehttp.NewRequestWithContext(trace.ContextWithSpan(context.Background(), span), "POST", t.url, []byte(body))
+		if err != nil {
+			log.WithError(err).Error("Unable to construct OpenID Connect Back-Channel Logout Request")
+			return
+		}
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		res, err := cl.Do(req)
 		if err != nil {
 			log.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return

@@ -21,42 +21,34 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v5"
-
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/x/httpx"
-	"github.com/ory/x/ioutilx"
-	"github.com/ory/x/josex"
-	"github.com/ory/x/requirex"
-	"github.com/ory/x/stringsx"
-
-	hydra "github.com/ory/hydra-client-go/v2"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/x/assertx"
-
-	"github.com/pborman/uuid"
-	"github.com/tidwall/gjson"
-
-	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/x/contextx"
-
 	"github.com/julienschmidt/httprouter"
+	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/fosite"
-	hc "github.com/ory/hydra/v2/client"
+	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/assertx"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/josex"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/requirex"
 	"github.com/ory/x/snapshotx"
+	"github.com/ory/x/stringsx"
 )
 
 func noopHandler(*testing.T) httprouter.Handle {
@@ -66,7 +58,7 @@ func noopHandler(*testing.T) httprouter.Handle {
 }
 
 type clientCreator interface {
-	CreateClient(cxt context.Context, client *hc.Client) error
+	CreateClient(context.Context, *client.Client) error
 }
 
 // TestAuthCodeWithDefaultStrategy runs proper integration tests against in-memory and database connectors, specifically
@@ -109,7 +101,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return q.Get("code"), resp
 	}
 
-	acceptLoginHandler := func(t *testing.T, c *hc.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
@@ -146,7 +138,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 	}
 
-	acceptConsentHandler := func(t *testing.T, c *hc.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
+	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
@@ -666,7 +658,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	})
 
 	t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
-		run := func(t *testing.T, strategy string, c *hc.Client, conf *oauth2.Config, expectedLifespans hc.Lifespans) {
+		run := func(t *testing.T, strategy string, c *client.Client, conf *oauth2.Config, expectedLifespans client.Lifespans) {
 			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				acceptLoginHandler(t, c, subject, nil),
 				acceptConsentHandler(t, c, subject, nil),
@@ -745,11 +737,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		t.Run("case=custom-lifespans-unset", func(t *testing.T) {
 			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), testhelpers.TestLifespans, adminTS)
-			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), hc.Lifespans{}, adminTS)
+			testhelpers.UpdateClientTokenLifespans(t, &oauth2.Config{ClientID: c.GetID(), ClientSecret: conf.ClientSecret}, c.GetID(), client.Lifespans{}, adminTS)
 			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 
 			//goland:noinspection GoDeprecation
-			expectedLifespans := hc.Lifespans{
+			expectedLifespans := client.Lifespans{
 				AuthorizationCodeGrantAccessTokenLifespan:  x.NullDuration{Valid: true, Duration: reg.Config().GetAccessTokenLifespan(ctx)},
 				AuthorizationCodeGrantIDTokenLifespan:      x.NullDuration{Valid: true, Duration: reg.Config().GetIDTokenLifespan(ctx)},
 				AuthorizationCodeGrantRefreshTokenLifespan: x.NullDuration{Valid: true, Duration: reg.Config().GetRefreshTokenLifespan(ctx)},
@@ -1283,7 +1275,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			})
 			var mutex sync.Mutex
 
-			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
+			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &client.Client{
 				LegacyClientID: "app-client",
 				Secret:         "secret",
 				RedirectURIs:   []string{ts.URL + "/callback"},
@@ -1851,8 +1843,8 @@ func testRefresh(t *testing.T, token *oauth2.Token, u string, sleep bool) (*http
 	return http.DefaultClient.Do(req)
 }
 
-func withScope(scope string) func(*hc.Client) {
-	return func(c *hc.Client) {
+func withScope(scope string) func(*client.Client) {
+	return func(c *client.Client) {
 		c.Scope = scope
 	}
 }
@@ -1864,11 +1856,11 @@ func newOAuth2Client(
 		client.Registry
 	},
 	callbackURL string,
-	opts ...func(*hc.Client),
-) (*hc.Client, *oauth2.Config) {
+	opts ...func(*client.Client),
+) (*client.Client, *oauth2.Config) {
 	ctx := context.Background()
 	secret := uuid.New()
-	c := &hc.Client{
+	c := &client.Client{
 		Secret:        secret,
 		RedirectURIs:  []string{callbackURL},
 		ResponseTypes: []string{"id_token", "code", "token"},

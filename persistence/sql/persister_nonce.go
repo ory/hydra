@@ -5,7 +5,6 @@ package sql
 
 import (
 	"context"
-	"crypto/sha256"
 	"time"
 
 	"github.com/ory/fosite"
@@ -13,10 +12,6 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 )
-
-func accessTokenHash(accessToken string) []byte {
-	return sha256.New().Sum([]byte(accessToken))
-}
 
 // Set the aadAccessTokenPrefix to something unique to avoid ciphertext confusion with other usages of the AEAD cipher.
 var aadAccessTokenPrefix = "vc-nonce-at:" // nolint:gosec

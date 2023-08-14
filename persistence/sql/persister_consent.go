@@ -422,19 +422,13 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 		return p.CreateWithNetwork(ctx, session)
 	}
 
-	var IdentityProviderSessionID string
-	if session != nil {
-		IdentityProviderSessionID = session.IdentityProviderSessionID.String()
-	}
-
 	// In some unit tests, we still confirm the login session without data from the cookie. We can remove this case
 	// once all tests are fixed.
 	n, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&flow.LoginSession{
-		AuthenticatedAt:           sqlxx.NullTime(authenticatedAt),
-		Subject:                   subject,
-		Remember:                  remember,
-		IdentityProviderSessionID: sqlxx.NullString(IdentityProviderSessionID),
-	}, "authenticated_at", "subject", "remember", "identity_provider_session_id")
+		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
+		Subject:         subject,
+		Remember:        remember,
+	}, "authenticated_at", "subject", "remember")
 	if err != nil {
 		return sqlcon.HandleError(err)
 	}

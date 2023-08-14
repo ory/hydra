@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-08-11)](#000-2023-08-11)
+- [0.0.0 (2023-08-14)](#000-2023-08-14)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,7 +698,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-11)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-14)
 
 
 ### Bug Fixes
@@ -745,6 +745,27 @@
 * Bump fosite and add some more tracing ([0b56f53](https://github.com/ory/hydra/commit/0b56f53a491e165f68a53f013989328ce86928ba))
 * **cmd:** Add route that redirects to the auth code url ([4db6416](https://github.com/ory/hydra/commit/4db64161699e4301c003b2787baecae22c912c17))
 * Parallel generation of JSON web key set ([#3561](https://github.com/ory/hydra/issues/3561)) ([5bd9002](https://github.com/ory/hydra/commit/5bd9002db7baa2fe2c2529fee38825d66a68991f))
+* Propagate logout to identity provider ([#3596](https://github.com/ory/hydra/issues/3596)) ([c004fee](https://github.com/ory/hydra/commit/c004fee69497a5a0f8af5ccb6a2ab8d104fd9249)):
+
+    * feat: propagate logout to identity provider
+    
+    This commit improves the integration between Hydra and Kratos when logging
+    out the user.
+    
+    This adds a new configuration key for configuring a Kratos admin URL.
+    Additionally, Kratos can send a session ID when accepting a login request.
+    If a session ID was specified and a Kratos admin URL was configured,
+    Hydra will disable the corresponding Kratos session through the admin API
+    if a frontchannel or backchannel logout was triggered.
+    
+    * fix: add special case for MySQL
+    
+    * chore: update sdk
+    
+    * chore: consistent naming
+    
+    * fix: cleanup persister
+
 * Support different jwt scope claim strategies ([#3531](https://github.com/ory/hydra/issues/3531)) ([45da11e](https://github.com/ory/hydra/commit/45da11e4fb4f0a2f939f11682c095b8dbfcddb78))
 
 

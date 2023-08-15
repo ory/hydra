@@ -1340,8 +1340,14 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 			"id": fmt.Sprintf("did:jwk:%s", base64.RawURLEncoding.EncodeToString(proofJWKJSON)),
 		},
 	})
-
-	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, session.Claims.ToMapClaims(), jwt.NewHeaders())
+	signingKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+	headers := jwt.NewHeaders()
+	headers.Add("kid", signingKeyID)
+	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, session.Claims.ToMapClaims(), headers)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return

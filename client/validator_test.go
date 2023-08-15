@@ -273,13 +273,13 @@ func TestValidateIPRanges(t *testing.T) {
 	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 
 	v := NewValidator(reg)
-	c.MustSet(ctx, config.ViperKeyClientHTTPNoPrivateIPRanges, true)
+	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, true)
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{}))
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{JSONWebKeysURI: "https://localhost:1234"}), "invalid_client_metadata")
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{BackChannelLogoutURI: "https://localhost:1234"}), "invalid_client_metadata")
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{RequestURIs: []string{"https://google", "https://localhost:1234"}}), "invalid_client_metadata")
 
-	c.MustSet(ctx, config.ViperKeyClientHTTPNoPrivateIPRanges, false)
+	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, false)
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{}))
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{JSONWebKeysURI: "https://localhost:1234"}))
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{BackChannelLogoutURI: "https://localhost:1234"}))

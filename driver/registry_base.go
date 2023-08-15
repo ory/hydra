@@ -363,7 +363,11 @@ func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOp
 	}
 
 	if m.Config().ClientHTTPNoPrivateIPRanges() {
-		opts = append(opts, httpx.ResilientClientDisallowInternalIPs())
+		opts = append(
+			opts,
+			httpx.ResilientClientDisallowInternalIPs(),
+			httpx.ResilientClientAllowInternalIPRequestsTo(m.Config().ClientHTTPPrivateIPExceptionURLs()...),
+		)
 	}
 	return httpx.NewResilientClient(opts...)
 }

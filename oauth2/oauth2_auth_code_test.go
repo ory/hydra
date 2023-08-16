@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -1164,6 +1165,18 @@ func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce s
 func assertVerifiableCredentialContainsPublicKey(t *testing.T, reg driver.Registry, vc *hydraoauth2.VerifiableCredentialResponse, pubKeyJWK *jose.JSONWebKey) {
 	ctx := context.Background()
 	token, err := jwt.Parse(vc.Credential, func(token *jwt.Token) (interface{}, error) {
+		kid, found := token.Header["kid"]
+		if !found {
+			return nil, errors.New("missing kid header")
+		}
+		openIDKey, err := reg.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if kid != openIDKey {
+			return nil, errors.New("invalid kid header")
+		}
+
 		return x.Must(reg.OpenIDJWTStrategy().GetPublicKey(ctx)).Key, nil
 	})
 	require.NoError(t, err)

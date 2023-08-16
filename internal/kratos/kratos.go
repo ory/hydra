@@ -5,6 +5,7 @@ package kratos
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -12,6 +13,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 	client "github.com/ory/kratos-client-go"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/otelx"
 )
 
@@ -20,6 +22,7 @@ type (
 		config.Provider
 		x.HTTPClientProvider
 		x.TracingProvider
+		x.RegistryLogger
 	}
 	Provider interface {
 		Kratos() Client
@@ -41,19 +44,26 @@ func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID 
 	otelx.End(span, &err)
 
 	adminURL, ok := k.Config().KratosAdminURL(ctx)
+	span.SetAttributes(attribute.String("admin_url", fmt.Sprintf("%+v", adminURL)))
 	if !ok {
 		span.SetAttributes(attribute.Bool("skipped", true))
 		span.SetAttributes(attribute.String("reason", "kratos admin url not set"))
+
 		return nil
 	}
 
 	if identityProviderSessionID == "" {
 		span.SetAttributes(attribute.Bool("skipped", true))
 		span.SetAttributes(attribute.String("reason", "kratos session ID is empty"))
+
 		return nil
 	}
 
-	kratos := client.NewAPIClient(k.clientConfiguration(ctx, adminURL))
+	configuration := k.clientConfiguration(ctx, adminURL)
+	if header := k.Config().KratosRequestHeader(ctx); header != nil {
+		configuration.HTTPClient.Transport = httpx.WrapTransportWithHeader(configuration.HTTPClient.Transport, header)
+	}
+	kratos := client.NewAPIClient(configuration)
 	_, err = kratos.IdentityApi.DisableSession(ctx, identityProviderSessionID).Execute()
 
 	return err

@@ -6,7 +6,10 @@ package driver
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/ory/x/randx"
@@ -33,7 +36,7 @@ func TestGetJWKSFetcherStrategyHostEnforcment(t *testing.T) {
 	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
 	c.MustSet(ctx, config.KeyDSN, "memory")
 	c.MustSet(ctx, config.HSMEnabled, "false")
-	c.MustSet(ctx, config.ViperKeyClientHTTPNoPrivateIPRanges, true)
+	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, true)
 
 	registry, err := NewRegistryWithoutInit(c, l)
 	require.NoError(t, err)
@@ -88,4 +91,34 @@ func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 	cs := s.(*sessions.CookieStore)
 
 	assert.Equal(t, cs.Options.MaxAge, 0)
+}
+
+func TestRegistryBase_HTTPClient(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		writer.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	t.Setenv("CLIENTS_HTTP_PRIVATE_IP_EXCEPTION_URLS", fmt.Sprintf("[%q]", ts.URL+"/exception/*"))
+
+	ctx := context.Background()
+	r := new(RegistryBase)
+	r.WithConfig(config.MustNew(
+		ctx,
+		logrusx.New("", ""),
+		configx.WithValues(map[string]interface{}{
+			config.KeyClientHTTPNoPrivateIPRanges: true,
+		}),
+	))
+
+	t.Run("case=matches exception glob", func(t *testing.T) {
+		res, err := r.HTTPClient(ctx).Get(ts.URL + "/exception/foo")
+		require.NoError(t, err)
+		assert.Equal(t, 200, res.StatusCode)
+	})
+
+	t.Run("case=does not match exception glob", func(t *testing.T) {
+		_, err := r.HTTPClient(ctx).Get(ts.URL + "/foo")
+		require.Error(t, err)
+	})
 }

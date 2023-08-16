@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/x/hasherx"
 
 	"github.com/gofrs/uuid"
@@ -50,7 +52,8 @@ const (
 	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
 	KeyDSN                                       = "dsn"
-	ViperKeyClientHTTPNoPrivateIPRanges          = "clients.http.disallow_private_ip_ranges"
+	KeyClientHTTPNoPrivateIPRanges               = "clients.http.disallow_private_ip_ranges"
+	KeyClientHTTPPrivateIPExceptionURLs          = "clients.http.private_ip_exception_urls"
 	KeyHasherAlgorithm                           = "oauth2.hashers.algorithm"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyPBKDF2Iterations                          = "oauth2.hashers.pbkdf2.iterations"
@@ -80,7 +83,8 @@ const (
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
-	KeyIdentityProviderAdminURL                  = "urls.identity_provider.admin_base_url"
+	KeyIdentityProviderAdminURL                  = "urls.identity_provider.url"
+	KeyIdentityProviderHeaders                   = "urls.identity_provider.headers"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
@@ -200,7 +204,11 @@ func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) 
 }
 
 func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges() bool {
-	return p.getProvider(contextx.RootContext).Bool(ViperKeyClientHTTPNoPrivateIPRanges)
+	return p.getProvider(contextx.RootContext).Bool(KeyClientHTTPNoPrivateIPRanges)
+}
+
+func (p *DefaultProvider) ClientHTTPPrivateIPExceptionURLs() []string {
+	return p.getProvider(contextx.RootContext).Strings(KeyClientHTTPPrivateIPExceptionURLs)
 }
 
 func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
@@ -400,6 +408,21 @@ func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
 	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderAdminURL, nil)
 
 	return u, u != nil
+}
+func (p *DefaultProvider) KratosRequestHeader(ctx context.Context) http.Header {
+	hh := map[string]string{}
+	if err := p.getProvider(ctx).Unmarshal(KeyIdentityProviderHeaders, &hh); err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", KeyIdentityProviderHeaders)
+		return nil
+	}
+
+	h := make(http.Header)
+	for k, v := range hh {
+		h.Set(k, v)
+	}
+
+	return h
 }
 
 func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {

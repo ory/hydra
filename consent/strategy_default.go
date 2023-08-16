@@ -460,7 +460,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			return nil, fosite.ErrAccessDenied.WithHint("The login session cookie was not found or malformed.")
 		}
 
-		loginSession.IdentityProviderSessionID = f.IdentityProviderSessionID
+		loginSession.IdentityProviderSessionID = sqlxx.NullString(session.IdentityProviderSessionID)
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}

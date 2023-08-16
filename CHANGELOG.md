@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-08-15)](#000-2023-08-15)
+- [0.0.0 (2023-08-16)](#000-2023-08-16)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
@@ -698,12 +698,15 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-15)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v0.0.0) (2023-08-16)
 
 
 ### Bug Fixes
 
+* Add exceptions for internal IP addresses ([#3608](https://github.com/ory/hydra/issues/3608)) ([1f1121c](https://github.com/ory/hydra/commit/1f1121caef6dd2c99c2ab551bfeb82e3cd2d8cf2))
+* Add kid to verifiable credential header ([#3606](https://github.com/ory/hydra/issues/3606)) ([9f1c8d1](https://github.com/ory/hydra/commit/9f1c8d192004e0e7d7f5c3383d4dd1df222dec81))
 * Deflake ttl test ([6741a49](https://github.com/ory/hydra/commit/6741a49f7b4d55a270f3eb968921894b1e5f2989))
+* Enable CORS with hot-reloaded origins ([#3601](https://github.com/ory/hydra/issues/3601)) ([6f592fc](https://github.com/ory/hydra/commit/6f592fc8425887fb403516cbb03838b63f85f87e))
 * Only query access tokens by hashed signature ([a21e945](https://github.com/ory/hydra/commit/a21e94519416cc7801995b0804696348b18fa844))
 * Racy random string generation ([#3555](https://github.com/ory/hydra/issues/3555)) ([1b26c4c](https://github.com/ory/hydra/commit/1b26c4cb96400b333fe214d2da892fc045bbc69f))
 * Reject invalid JWKS in client configuration / dependency cleanup and bump ([#3603](https://github.com/ory/hydra/issues/3603)) ([1d73d83](https://github.com/ory/hydra/commit/1d73d83eb03e4ceef6edb4bd0738959007053118))

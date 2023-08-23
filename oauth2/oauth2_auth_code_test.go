@@ -371,7 +371,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 							Session: &hydra.AcceptOAuth2ConsentRequestSession{
 								AccessToken: map[string]interface{}{"foo": "bar"},
-								IdToken:     map[string]interface{}{"bar": "baz"},
+								IdToken:     map[string]interface{}{"email": "foo@bar.com", "bar": "baz"},
 							},
 						}).
 						Execute()
@@ -1159,12 +1159,15 @@ func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce s
 		},
 	})
 	require.NoError(t, err)
-	assertVerifiableCredentialContainsPublicKey(t, reg, verifiableCredential, pubKeyJWK)
+	require.NotNil(t, verifiableCredential)
+
+	_, claims := claimsFromVCResponse(t, reg, verifiableCredential)
+	assertClaimsContainPublicKey(t, claims, pubKeyJWK)
 }
 
-func assertVerifiableCredentialContainsPublicKey(t *testing.T, reg driver.Registry, vc *hydraoauth2.VerifiableCredentialResponse, pubKeyJWK *jose.JSONWebKey) {
+func claimsFromVCResponse(t *testing.T, reg driver.Registry, vc *hydraoauth2.VerifiableCredentialResponse) (*jwt.Token, *hydraoauth2.VerifableCredentialClaims) {
 	ctx := context.Background()
-	token, err := jwt.Parse(vc.Credential, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(vc.Credential, new(hydraoauth2.VerifableCredentialClaims), func(token *jwt.Token) (interface{}, error) {
 		kid, found := token.Header["kid"]
 		if !found {
 			return nil, errors.New("missing kid header")
@@ -1180,10 +1183,15 @@ func assertVerifiableCredentialContainsPublicKey(t *testing.T, reg driver.Regist
 		return x.Must(reg.OpenIDJWTStrategy().GetPublicKey(ctx)).Key, nil
 	})
 	require.NoError(t, err)
+
+	return token, token.Claims.(*hydraoauth2.VerifableCredentialClaims)
+}
+
+func assertClaimsContainPublicKey(t *testing.T, claims *hydraoauth2.VerifableCredentialClaims, pubKeyJWK *jose.JSONWebKey) {
 	pubKeyRaw, err := pubKeyJWK.MarshalJSON()
 	require.NoError(t, err)
 	expectedID := fmt.Sprintf("did:jwk:%s", base64.RawURLEncoding.EncodeToString(pubKeyRaw))
-	require.Equal(t, expectedID, token.Claims.(jwt.MapClaims)["vc"].(map[string]any)["credentialSubject"].(map[string]any)["id"])
+	require.Equal(t, expectedID, claims.VerifiableCredential.Subject["id"])
 }
 
 func createVerifiableCredential(

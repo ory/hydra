@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/josex"
+	"github.com/ory/x/stringsx"
 
 	jwtV5 "github.com/golang-jwt/jwt/v5"
 
@@ -1332,14 +1333,32 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	session.Claims.Add("vc", map[string]any{
-		"@context": []string{"https://www.w3.org/2018/credentials/v1"},
-		"type":     []string{"VerifiableCredential", "UserInfoCredential"},
-		"credentialSubject": map[string]any{
-			// Encode ID according to https://github.com/quartzjer/did-jwk/blob/main/spec.md
-			"id": fmt.Sprintf("did:jwk:%s", base64.RawURLEncoding.EncodeToString(proofJWKJSON)),
+	// Encode ID according to https://github.com/quartzjer/did-jwk/blob/main/spec.md
+	vcID := fmt.Sprintf("did:jwk:%s", base64.RawURLEncoding.EncodeToString(proofJWKJSON))
+	vcClaims := &VerifableCredentialClaims{
+		RegisteredClaims: jwtV5.RegisteredClaims{
+			Issuer:    session.Claims.Issuer,
+			ID:        stringsx.Coalesce(session.Claims.JTI, uuid.New()),
+			IssuedAt:  jwtV5.NewNumericDate(session.Claims.IssuedAt),
+			NotBefore: jwtV5.NewNumericDate(session.Claims.IssuedAt),
+			ExpiresAt: jwtV5.NewNumericDate(session.Claims.IssuedAt.Add(1 * time.Hour)),
+			Subject:   vcID,
 		},
-	})
+		VerifiableCredential: VerifiableCredentialClaim{
+			Context: []string{"https://www.w3.org/2018/credentials/v1"},
+			Type:    []string{"VerifiableCredential", "UserInfoCredential"},
+			Subject: map[string]any{
+				"id":  vcID,
+				"sub": session.Claims.Subject,
+			},
+		},
+	}
+	if session.Claims.Extra != nil {
+		for claim, val := range session.Claims.Extra {
+			vcClaims.VerifiableCredential.Subject[claim] = val
+		}
+	}
+
 	signingKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -1347,7 +1366,12 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	}
 	headers := jwt.NewHeaders()
 	headers.Add("kid", signingKeyID)
-	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, session.Claims.ToMapClaims(), headers)
+	mapClaims, err := vcClaims.ToMapClaims()
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, mapClaims, headers)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -1355,50 +1379,4 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 
 	response.Credential = rawToken
 	h.r.Writer().Write(w, r, &response)
-}
-
-// Request a Verifiable Credential
-//
-// swagger:parameters createVerifiableCredential
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type createVerifiableCredentialRequest struct {
-	// in: body
-	Body CreateVerifiableCredentialRequestBody
-}
-
-// CreateVerifiableCredentialRequestBody contains the request body to request a verifiable credential.
-//
-// swagger:parameters createVerifiableCredentialRequestBody
-type CreateVerifiableCredentialRequestBody struct {
-	Format string                     `json:"format"`
-	Types  []string                   `json:"types"`
-	Proof  *VerifiableCredentialProof `json:"proof"`
-}
-
-// VerifiableCredentialProof contains the proof of a verifiable credential.
-//
-// swagger:parameters verifiableCredentialProof
-type VerifiableCredentialProof struct {
-	ProofType string `json:"proof_type"`
-	JWT       string `json:"jwt"`
-}
-
-// VerifiableCredentialResponse contains the verifiable credential.
-//
-// swagger:model verifiableCredentialResponse
-type VerifiableCredentialResponse struct {
-	Format     string `json:"format"`
-	Credential string `json:"credential_draft_00"`
-}
-
-// VerifiableCredentialPrimingResponse contains the nonce to include in the proof-of-possession JWT.
-//
-// swagger:model verifiableCredentialPrimingResponse
-type VerifiableCredentialPrimingResponse struct {
-	Format         string `json:"format"`
-	Nonce          string `json:"c_nonce"`
-	NonceExpiresIn int64  `json:"c_nonce_expires_in"`
-
-	fosite.RFC6749ErrorJson
 }

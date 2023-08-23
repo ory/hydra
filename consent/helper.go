@@ -4,20 +4,8 @@
 package consent
 
 import (
-	"net/http"
-	"strings"
-
-	"time"
-
-	"github.com/ory/hydra/v2/x"
-
-	"github.com/ory/x/errorsx"
-
-	"github.com/gorilla/sessions"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/flow"
 )
 
 func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {

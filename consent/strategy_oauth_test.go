@@ -16,15 +16,14 @@ import (
 	"testing"
 	"time"
 
+	"golang.org/x/exp/slices"
+	"golang.org/x/oauth2"
+
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/ioutilx"
-
-	"golang.org/x/exp/slices"
-	"golang.org/x/oauth2"
 
 	"github.com/ory/x/pointerx"
 
@@ -636,7 +635,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		})
 	})
 
-	t.Run("case=should fail at login screen because subject in login challenge does not match subject from previous session", func(t *testing.T) {
+	t.Run("case=should retry the authorization with prompt=login if subject in login challenge does not match subject from previous session", func(t *testing.T) {
 		// Previously: This should fail at login screen because subject from accept does not match subject from session
 		c := createDefaultClient(t)
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
@@ -649,13 +648,15 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
-				_, res, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+				res, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
 					LoginChallenge(r.URL.Query().Get("login_challenge")).
 					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
 						Subject: "not-aeneas-rekkas",
 					}).Execute()
-				require.Error(t, err)
-				assert.Contains(t, string(ioutilx.MustReadAll(res.Body)), "Field 'subject' does not match subject from previous authentication")
+				require.NoError(t, err)
+				redirectURL, err := url.Parse(res.RedirectTo)
+				require.NoError(t, err)
+				assert.Equal(t, "login", redirectURL.Query().Get("prompt"))
 				w.WriteHeader(http.StatusBadRequest)
 			},
 			testhelpers.HTTPServerNoExpectedCallHandler(t))

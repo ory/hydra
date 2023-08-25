@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-08-23)](#000-2023-08-23)
+- [0.0.0 (2023-08-25)](#000-2023-08-25)
     - [Bug Fixes](#bug-fixes)
 - [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
     - [Bug Fixes](#bug-fixes-1)
@@ -701,10 +701,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-08-23)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-08-25)
 
 
 ### Bug Fixes
+
+* Handle subject mismatch gracefully ([#3619](https://github.com/ory/hydra/issues/3619)) ([af0d477](https://github.com/ory/hydra/commit/af0d477e0eb1e336b01fa8d1321e9dce098c82a8)):
+
+    We now redirect to the original request URL if the subjects between
+    the remembered Hydra session and what was confirmed by the login
+    screen does not match.
 
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
 

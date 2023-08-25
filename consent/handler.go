@@ -423,46 +423,57 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var p flow.HandledLoginRequest
+	var handledLoginRequest flow.HandledLoginRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err := d.Decode(&handledLoginRequest); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
-	if p.Subject == "" {
+	if handledLoginRequest.Subject == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
 		return
 	}
 
-	p.ID = challenge
-	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
+	handledLoginRequest.ID = challenge
+	loginRequest, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
-	} else if ar.Subject != "" && p.Subject != ar.Subject {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' does not match subject from previous authentication.")))
+	} else if loginRequest.Subject != "" && handledLoginRequest.Subject != loginRequest.Subject {
+		// The subject that was confirmed by the login screen does not match what we
+		// remembered in the session cookie. We handle this gracefully by redirecting the
+		// original authorization request URL, but attaching "prompt=login" to the query.
+		// This forces the user to log in again.
+		requestURL, err := url.Parse(loginRequest.RequestURL)
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+		h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+			RedirectTo: urlx.SetQuery(requestURL, url.Values{"prompt": {"login"}}).String(),
+		})
 		return
 	}
 
-	if ar.Skip {
-		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		p.AuthenticatedAt = ar.AuthenticatedAt
+	if loginRequest.Skip {
+		handledLoginRequest.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
+		handledLoginRequest.AuthenticatedAt = loginRequest.AuthenticatedAt
 	} else {
-		p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+		handledLoginRequest.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
 			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
 			Truncate(time.Second))
-		ar.AuthenticatedAt = p.AuthenticatedAt
+		loginRequest.AuthenticatedAt = handledLoginRequest.AuthenticatedAt
 	}
-	p.RequestedAt = ar.RequestedAt
+	handledLoginRequest.RequestedAt = loginRequest.RequestedAt
 
 	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &p)
+	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &handledLoginRequest)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return

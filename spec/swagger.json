@@ -3069,8 +3069,7 @@
         },
         "id_token": {
           "description": "To retrieve a refresh token request the id_token scope.",
-          "type": "integer",
-          "format": "int64"
+          "type": "string"
         },
         "refresh_token": {
           "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",

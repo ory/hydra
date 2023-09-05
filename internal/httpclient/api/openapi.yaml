@@ -3586,7 +3586,7 @@ components:
         access_token: access_token
         refresh_token: refresh_token
         scope: scope
-        id_token: 6
+        id_token: id_token
         token_type: token_type
         expires_in: 0
       properties:
@@ -3601,8 +3601,7 @@ components:
           type: integer
         id_token:
           description: To retrieve a refresh token request the id_token scope.
-          format: int64
-          type: integer
+          type: string
         refresh_token:
           description: "The refresh token, which can be used to obtain new\naccess\
             \ tokens. To retrieve it add the scope \"offline\" to your access token\

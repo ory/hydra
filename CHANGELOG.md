@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-08-25)](#000-2023-08-25)
+- [0.0.0 (2023-09-05)](#000-2023-09-05)
     - [Bug Fixes](#bug-fixes)
 - [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
     - [Bug Fixes](#bug-fixes-1)
@@ -701,10 +701,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-08-25)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-09-05)
 
 
 ### Bug Fixes
+
+* Correct id token type in token exchange response ([#3625](https://github.com/ory/hydra/issues/3625)) ([d1f9ba8](https://github.com/ory/hydra/commit/d1f9ba8edee45323e1f13dcf9c67eefbd524dc81)):
+
+    Closes https://github.com/ory/client-go/issues/2
 
 * Handle subject mismatch gracefully ([#3619](https://github.com/ory/hydra/issues/3619)) ([af0d477](https://github.com/ory/hydra/commit/af0d477e0eb1e336b01fa8d1321e9dce098c82a8)):
 

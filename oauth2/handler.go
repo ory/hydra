@@ -909,7 +909,7 @@ type oAuth2TokenExchange struct {
 	Scope string `json:"scope"`
 
 	// To retrieve a refresh token request the id_token scope.
-	IDToken int `json:"id_token"`
+	IDToken string `json:"id_token"`
 
 	// The access token issued by the authorization server.
 	AccessToken string `json:"access_token"`

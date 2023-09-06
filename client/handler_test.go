@@ -309,24 +309,24 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
-					d: "non-uuid fails",
+					d: "non-uuid works",
 					payload: &client.Client{
 						LegacyClientID: "not-a-uuid",
 						Secret:         "averylongsecret",
 						RedirectURIs:   []string{"http://localhost:3000/cb"},
 					},
 					path:       client.ClientsHandlerPath,
-					statusCode: http.StatusBadRequest,
+					statusCode: http.StatusCreated,
 				},
 				{
-					d: "setting client id fails",
+					d: "setting client id as uuid works",
 					payload: &client.Client{
 						LegacyClientID: "98941dac-f963-4468-8a23-9483b1e04e3c",
-						Secret:         "short",
+						Secret:         "not too short",
 						RedirectURIs:   []string{"http://localhost:3000/cb"},
 					},
 					path:       client.ClientsHandlerPath,
-					statusCode: http.StatusBadRequest,
+					statusCode: http.StatusCreated,
 				},
 				{
 					d: "setting access token strategy fails",

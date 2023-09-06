@@ -5,8 +5,6 @@ package client_test
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -14,8 +12,6 @@ import (
 	"github.com/ory/x/assertx"
 
 	"github.com/ory/x/ioutilx"
-
-	"github.com/ory/x/snapshotx"
 
 	"github.com/ory/x/uuidx"
 
@@ -112,7 +108,7 @@ func TestClientSDK(t *testing.T) {
 		assert.EqualValues(t, "bar", result.Metadata.(map[string]interface{})["foo"])
 
 		// secret is not returned on GetOAuth2Client
-		compareClient.ClientSecret = x.ToPointer("")
+		compareClient.ClientSecret = pointerx.Ptr("")
 		gresult, _, err := c.OAuth2Api.GetOAuth2Client(context.Background(), *createClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
@@ -145,7 +141,7 @@ func TestClientSDK(t *testing.T) {
 
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
-		compareClient.ClientSecret = x.ToPointer("")
+		compareClient.ClientSecret = pointerx.Ptr("")
 		gresult, _, err = c.OAuth2Api.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
@@ -160,24 +156,24 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
 		result, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{
-			TokenEndpointAuthMethod: x.ToPointer("none"),
+			TokenEndpointAuthMethod: pointerx.Ptr("none"),
 		}).Execute()
 		require.NoError(t, err)
 
-		assert.Equal(t, "", x.FromPointer[string](result.ClientSecret))
+		assert.Equal(t, "", pointerx.Deref(result.ClientSecret))
 
 		result, _, err = c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
 		require.NoError(t, err)
 
-		assert.Equal(t, "secret", x.FromPointer[string](result.ClientSecret))
+		assert.Equal(t, "secret", pointerx.Deref(result.ClientSecret))
 	})
 
-	t.Run("case=id can not be set", func(t *testing.T) {
-		_, res, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: x.ToPointer(uuidx.NewV4().String())}).Execute()
-		require.Error(t, err)
-		body, err := io.ReadAll(res.Body)
+	t.Run("case=id can be set", func(t *testing.T) {
+		id := uuidx.NewV4().String()
+		result, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: pointerx.Ptr(id)}).Execute()
 		require.NoError(t, err)
-		snapshotx.SnapshotT(t, json.RawMessage(body))
+
+		assert.Equal(t, id, pointerx.Deref(result.ClientId))
 	})
 
 	t.Run("case=patch client legally", func(t *testing.T) {
@@ -185,15 +181,15 @@ func TestClientSDK(t *testing.T) {
 		path := "/redirect_uris/-"
 		value := "http://foo.bar"
 
-		client := createTestClient("")
-		created, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		cl := createTestClient("")
+		created, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(cl).Execute()
 		require.NoError(t, err)
-		client.ClientId = created.ClientId
+		cl.ClientId = created.ClientId
 
-		expected := deepcopy.Copy(client).(hydra.OAuth2Client)
+		expected := deepcopy.Copy(cl).(hydra.OAuth2Client)
 		expected.RedirectUris = append(expected.RedirectUris, value)
 
-		result, _, err := c.OAuth2Api.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		result, _, err := c.OAuth2Api.PatchOAuth2Client(context.Background(), *cl.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
 		expected.CreatedAt = result.CreatedAt
 		expected.UpdatedAt = result.UpdatedAt

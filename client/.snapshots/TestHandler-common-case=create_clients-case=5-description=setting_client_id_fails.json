@@ -1,4 +1,0 @@
-{
-  "error": "The request was malformed or contained invalid parameters",
-  "error_description": "It is no longer possible to set an OAuth2 Client ID as a user. The system will generate a unique ID for you."
-}

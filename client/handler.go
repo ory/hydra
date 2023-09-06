@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
@@ -255,11 +254,7 @@ func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	var err error
-	c.ID, err = uuid.FromString(ps.ByName("id"))
-	if err != nil {
-		c.LegacyClientID = ps.ByName("id")
-	}
+	c.LegacyClientID = ps.ByName("id")
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

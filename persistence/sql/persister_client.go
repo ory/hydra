@@ -53,11 +53,9 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 			}
 			cl.Secret = string(h)
 		}
-		// set the internal primary key
-		cl.ID = o.ID
 
-		// Set the legacy client ID
-		cl.LegacyClientID = o.LegacyClientID
+		// Ensure ID is the same
+		cl.ID = o.ID
 
 		if err = cl.BeforeSave(c); err != nil {
 			return sqlcon.HandleError(err)
@@ -71,7 +69,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		}
 
 		events.Trace(ctx, events.ClientUpdated,
-			events.WithClientID(cl.ID.String()),
+			events.WithClientID(cl.ID),
 			events.WithClientName(cl.Name))
 
 		return sqlcon.HandleError(err)
@@ -104,18 +102,15 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) (err err
 	}
 
 	c.Secret = string(h)
-	if c.ID == uuid.Nil {
-		c.ID = uuid.Must(uuid.NewV4())
-	}
-	if c.LegacyClientID == "" {
-		c.LegacyClientID = c.ID.String()
+	if c.ID == "" {
+		c.ID = uuid.Must(uuid.NewV4()).String()
 	}
 	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, c)); err != nil {
 		return err
 	}
 
 	events.Trace(ctx, events.ClientCreated,
-		events.WithClientID(c.ID.String()),
+		events.WithClientID(c.ID),
 		events.WithClientName(c.Name))
 
 	return nil
@@ -135,7 +130,7 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) (err error) {
 	}
 
 	events.Trace(ctx, events.ClientDeleted,
-		events.WithClientID(c.ID.String()),
+		events.WithClientID(c.ID),
 		events.WithClientName(c.Name))
 
 	return nil
@@ -149,7 +144,7 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []
 
 	query := p.QueryWithNetwork(ctx).
 		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
-		Order("pk")
+		Order("id")
 
 	if filters.Name != "" {
 		query.Where("client_name = ?", filters.Name)

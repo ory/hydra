@@ -311,9 +311,9 @@ func TestHandler(t *testing.T) {
 				{
 					d: "non-uuid works",
 					payload: &client.Client{
-						LegacyClientID: "not-a-uuid",
-						Secret:         "averylongsecret",
-						RedirectURIs:   []string{"http://localhost:3000/cb"},
+						ID:           "not-a-uuid",
+						Secret:       "averylongsecret",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
 					path:       client.ClientsHandlerPath,
 					statusCode: http.StatusCreated,
@@ -321,9 +321,9 @@ func TestHandler(t *testing.T) {
 				{
 					d: "setting client id as uuid works",
 					payload: &client.Client{
-						LegacyClientID: "98941dac-f963-4468-8a23-9483b1e04e3c",
-						Secret:         "not too short",
-						RedirectURIs:   []string{"http://localhost:3000/cb"},
+						ID:           "98941dac-f963-4468-8a23-9483b1e04e3c",
+						Secret:       "not too short",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
 					path:       client.ClientsHandlerPath,
 					statusCode: http.StatusCreated,
@@ -359,9 +359,9 @@ func TestHandler(t *testing.T) {
 				{
 					d: "basic dynamic client registration",
 					payload: &client.Client{
-						LegacyClientID: "ead800c5-a316-4d0c-bf00-d25666ba72cf",
-						Secret:         "averylongsecret",
-						RedirectURIs:   []string{"http://localhost:3000/cb"},
+						ID:           "ead800c5-a316-4d0c-bf00-d25666ba72cf",
+						Secret:       "averylongsecret",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
 					path:       client.DynClientsHandlerPath,
 					statusCode: http.StatusBadRequest,
@@ -383,7 +383,7 @@ func TestHandler(t *testing.T) {
 					if tc.path == client.DynClientsHandlerPath {
 						exclude = append(exclude, "client_id", "client_secret", "registration_client_uri")
 					}
-					if tc.payload.LegacyClientID == "" {
+					if tc.payload.ID == "" {
 						exclude = append(exclude, "client_id", "registration_client_uri")
 						assert.NotEqual(t, uuid.Nil.String(), gjson.Get(body, "client_id").String(), body)
 					}

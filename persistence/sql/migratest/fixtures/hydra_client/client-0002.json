@@ -14,12 +14,11 @@
   "GrantTypes": [
     "grant-0002_1"
   ],
-  "ID": "00000000-0000-0000-0000-000000000000",
+  "ID": "client-0002",
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "",
-  "LegacyClientID": "client-0002",
   "Lifespans": {
     "AuthorizationCodeGrantAccessTokenLifespan": {
       "Duration": 0,

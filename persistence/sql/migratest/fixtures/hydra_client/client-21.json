@@ -22,12 +22,11 @@
     "grant-21_1",
     "grant-21_2"
   ],
-  "ID": "00000000-0000-0000-0000-000000000000",
+  "ID": "client-21",
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/21",
-  "LegacyClientID": "client-21",
   "Lifespans": {
     "AuthorizationCodeGrantAccessTokenLifespan": {
       "Duration": 0,

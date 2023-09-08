@@ -5,6 +5,7 @@ package consent
 
 import (
 	"context"
+	stderrs "errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -57,10 +58,10 @@ func NewStrategy(
 	}
 }
 
-var ErrAbortOAuth2Request = errors.New("the OAuth 2.0 Authorization request must be aborted")
-var ErrNoPreviousConsentFound = errors.New("no previous OAuth 2.0 Consent could be found for this access request")
-var ErrNoAuthenticationSessionFound = errors.New("no previous login session was found")
-var ErrHintDoesNotMatchAuthentication = errors.New("subject from hint does not match subject from session")
+var ErrAbortOAuth2Request = stderrs.New("the OAuth 2.0 Authorization request must be aborted")
+var ErrNoPreviousConsentFound = stderrs.New("no previous OAuth 2.0 Consent could be found for this access request")
+var ErrNoAuthenticationSessionFound = stderrs.New("no previous login session was found")
+var ErrHintDoesNotMatchAuthentication = stderrs.New("subject from hint does not match subject from session")
 
 func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject string, sessionSubject string) error {
 	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(ctx, c, sessionSubject, "")
@@ -763,7 +764,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 
 		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwt.MapClaims{
 			"iss":    s.c.IssuerURL(ctx).String(),
-			"aud":    []string{c.LegacyClientID},
+			"aud":    []string{c.ID},
 			"iat":    time.Now().UTC().Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},

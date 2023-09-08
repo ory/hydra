@@ -76,7 +76,7 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	secret := uuid.New().String()
 	c.Secret = secret
 	c.Scope = "openid offline"
-	c.LegacyClientID = uuid.New().String()
+	c.ID = uuid.New().String()
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	c.Secret = secret
 	return c

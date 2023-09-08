@@ -682,7 +682,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 		{
 			ID:             fmt.Sprintf("%s_flush-access-1", uniqueName),
 			RequestedAt:    time.Now().Round(time.Second),
-			Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-access-1", uniqueName)},
+			Client:         &client.Client{ID: fmt.Sprintf("%s_flush-access-1", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
 			Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -691,7 +691,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 		{
 			ID:             fmt.Sprintf("%s_flush-access-2", uniqueName),
 			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-			Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-access-2", uniqueName)},
+			Client:         &client.Client{ID: fmt.Sprintf("%s_flush-access-2", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
 			Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -700,7 +700,7 @@ func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Requ
 		{
 			ID:             fmt.Sprintf("%s_flush-access-3", uniqueName),
 			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-			Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-access-3", uniqueName)},
+			Client:         &client.Client{ID: fmt.Sprintf("%s_flush-access-3", uniqueName)},
 			RequestedScope: fosite.Arguments{"fa", "ba"},
 			GrantedScope:   fosite.Arguments{"fa", "ba"},
 			Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -719,7 +719,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 			Request: fosite.Request{
 				RequestedAt:    time.Now().Round(time.Second),
 				ID:             fmt.Sprintf("%s_flush-refresh-1", uniqueName),
-				Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-refresh-1", uniqueName)},
+				Client:         &client.Client{ID: fmt.Sprintf("%s_flush-refresh-1", uniqueName)},
 				RequestedScope: []string{"offline"},
 				GrantedScope:   []string{"offline"},
 				Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
@@ -735,7 +735,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 			Request: fosite.Request{
 				RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
 				ID:             fmt.Sprintf("%s_flush-refresh-2", uniqueName),
-				Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-refresh-2", uniqueName)},
+				Client:         &client.Client{ID: fmt.Sprintf("%s_flush-refresh-2", uniqueName)},
 				RequestedScope: []string{"offline"},
 				GrantedScope:   []string{"offline"},
 				Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
@@ -751,7 +751,7 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 			Request: fosite.Request{
 				RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
 				ID:             fmt.Sprintf("%s_flush-refresh-3", uniqueName),
-				Client:         &client.Client{LegacyClientID: fmt.Sprintf("%s_flush-refresh-3", uniqueName)},
+				Client:         &client.Client{ID: fmt.Sprintf("%s_flush-refresh-3", uniqueName)},
 				RequestedScope: []string{"offline"},
 				GrantedScope:   []string{"offline"},
 				Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
@@ -770,8 +770,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRe
 			RequestedScope: []string{"foo", "bar"},
 			Subject:        fmt.Sprintf("%s_flush-login-1", uniqueName),
 			Client: &client.Client{
-				LegacyClientID: fmt.Sprintf("%s_flush-login-consent-1", uniqueName),
-				RedirectURIs:   []string{"http://redirect"},
+				ID:           fmt.Sprintf("%s_flush-login-consent-1", uniqueName),
+				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
 			RequestedAt:     time.Now().Round(time.Second),
@@ -783,8 +783,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRe
 			RequestedScope: []string{"foo", "bar"},
 			Subject:        fmt.Sprintf("%s_flush-login-2", uniqueName),
 			Client: &client.Client{
-				LegacyClientID: fmt.Sprintf("%s_flush-login-consent-2", uniqueName),
-				RedirectURIs:   []string{"http://redirect"},
+				ID:           fmt.Sprintf("%s_flush-login-consent-2", uniqueName),
+				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
 			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + 10*time.Minute)),
@@ -796,8 +796,8 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRe
 			RequestedScope: []string{"foo", "bar"},
 			Subject:        fmt.Sprintf("%s_flush-login-3", uniqueName),
 			Client: &client.Client{
-				LegacyClientID: fmt.Sprintf("%s_flush-login-consent-3", uniqueName),
-				RedirectURIs:   []string{"http://redirect"},
+				ID:           fmt.Sprintf("%s_flush-login-consent-3", uniqueName),
+				RedirectURIs: []string{"http://redirect"},
 			},
 			RequestURL:      "http://redirect",
 			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),

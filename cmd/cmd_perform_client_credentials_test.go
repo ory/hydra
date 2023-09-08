@@ -22,7 +22,7 @@ func TestPerformClientCredentialsGrant(t *testing.T) {
 
 	expected := createClientCredentialsClient(t, reg)
 	t.Run("case=exchanges for access token", func(t *testing.T) {
-		result := cmdx.ExecNoErr(t, c, "--client-id", expected.ID.String(), "--client-secret", expected.Secret)
+		result := cmdx.ExecNoErr(t, c, "--client-id", expected.GetID(), "--client-secret", expected.Secret)
 		actual := gjson.Parse(result)
 		assert.Equal(t, "bearer", actual.Get("token_type").String(), result)
 		assert.NotEmpty(t, actual.Get("access_token").String(), result)

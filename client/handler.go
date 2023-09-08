@@ -164,9 +164,9 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 		if c.Secret != "" {
 			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
+		// We do not allow to set the client ID for dynamic clients.
+		c.ID = uuidx.NewV4().String()
 	}
-
-	c.ID = uuidx.NewV4()
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
@@ -254,7 +254,7 @@ func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	c.LegacyClientID = ps.ByName("id")
+	c.ID = ps.ByName("id")
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -367,7 +367,7 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request, p
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
 
-	c.LegacyClientID = client.GetID()
+	c.ID = client.GetID()
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

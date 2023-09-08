@@ -21,7 +21,7 @@ import (
 )
 
 //go:embed migrations/*.sql
-var migrations embed.FS
+var Migrations embed.FS
 
 func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
 	if p.mbs != nil {
@@ -89,7 +89,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 		return errorsx.WithStack(err)
 	}
 
-	// in this order the migrations only depend on already done ones
+	// in this order the Migrations only depend on already done ones
 	for i, table := range []oldTableName{clientMigrationTableName, jwkMigrationTableName, consentMigrationTableName, oauth2MigrationTableName} {
 		// If table does not exist, we will skip it. Previously, we created a stub table here which
 		// caused the cached statements to fail, see:
@@ -97,7 +97,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 		// https://github.com/flynn/flynn/pull/2306/files
 		// https://github.com/jackc/pgx/issues/110
 		// https://github.com/flynn/flynn/issues/2235
-		// get old migrations
+		// get old Migrations
 		var migrations []OldMigrationRecord
 
 		/* #nosec G201 table is static */
@@ -108,7 +108,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 			return err
 		}
 
-		// translate migrations
+		// translate Migrations
 		for _, m := range migrations {
 			// mark the migration as run for fizz
 			// fizz standard version pattern: YYYYMMDDhhmmss

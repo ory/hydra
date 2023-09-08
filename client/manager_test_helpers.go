@@ -33,12 +33,12 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
-		assert.NoError(t, m.CreateClient(ctx, c))
+		require.NoError(t, m.CreateClient(ctx, c))
 		dbClient, err := m.GetClient(ctx, c.GetID())
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		dbClientConcrete, ok := dbClient.(*Client)
-		assert.True(t, ok)
-		testhelpersuuid.AssertUUID(t, &dbClientConcrete.ID)
+		require.True(t, ok)
+		testhelpersuuid.AssertUUID(t, dbClientConcrete.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }
@@ -47,9 +47,9 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		require.NoError(t, m.CreateClient(ctx, &Client{
-			LegacyClientID: "1234321",
-			Secret:         "secret",
-			RedirectURIs:   []string{"http://redirect"},
+			ID:           "1234321",
+			Secret:       "secret",
+			RedirectURIs: []string{"http://redirect"},
 		}))
 
 		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
@@ -80,7 +80,7 @@ func testHelperUpdateClient(t *testing.T, ctx context.Context, network Storage, 
 	d, err := network.GetClient(ctx, "1234")
 	assert.NoError(t, err)
 	err = network.UpdateClient(ctx, &Client{
-		LegacyClientID:    "2-1234",
+		ID:                "2-1234",
 		Name:              "name-new",
 		Secret:            "secret-new",
 		RedirectURIs:      []string{"http://redirect/new"},
@@ -164,7 +164,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 				for _, expected := range clients {
 					c, err := m.GetClient(ctx, expected.GetID())
 					if check != original {
-						t.Run(fmt.Sprintf("case=must not find client %s", expected.ID), func(t *testing.T) {
+						t.Run(fmt.Sprintf("case=must not find client %s", expected.GetID()), func(t *testing.T) {
 							require.ErrorIs(t, err, sqlcon.ErrNoRows)
 						})
 					} else {
@@ -206,8 +206,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		require.Error(t, err)
 
 		t1c1 := &Client{
-			ID:                                uuid.FromStringOrNil("96bfe52e-af88-4cba-ab00-ae7a8b082228"),
-			LegacyClientID:                    "1234",
+			ID:                                "1234",
 			Name:                              "name",
 			Secret:                            "secret",
 			RedirectURIs:                      []string{"http://redirect", "http://redirect1"},
@@ -243,15 +242,12 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		{
 			t2c1 := *t1c1
 			require.Error(t, connection.Create(&t2c1), "should not be able to create the same client in other manager/network; are they backed by the same database?")
-			t2c1.ID = uuid.Nil
-			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same GetID() but different ID in other network")
+			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same ID in other network")
 		}
 
 		t2c3 := *t1c1
 		{
-			pk, _ := uuid.NewV4()
-			t2c3.ID = pk
-			t2c3.LegacyClientID = "t2c2-1234"
+			t2c3.ID = "t2c2-1234"
 			require.NoError(t, t2.CreateClient(ctx, &t2c3))
 			require.Error(t, t2.CreateClient(ctx, &t2c3))
 		}
@@ -261,8 +257,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		}
 
 		c2Template := &Client{
-			ID:                uuid.FromStringOrNil("a6bfe52e-af88-4cba-ab00-ae7a8b082228"),
-			LegacyClientID:    "2-1234",
+			ID:                "2-1234",
 			Name:              "name2",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -270,14 +265,13 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 			SecretExpiresAt:   1,
 		}
 		assert.NoError(t, t1.CreateClient(ctx, c2Template))
-		c2Template.ID = uuid.Nil
 		assert.NoError(t, t2.CreateClient(ctx, c2Template))
 
 		d, err := t1.GetClient(ctx, "1234")
 		require.NoError(t, err)
 
 		cc := d.(*Client)
-		testhelpersuuid.AssertUUID(t, &cc.NID)
+		testhelpersuuid.AssertUUID(t, cc.NID)
 
 		compare(t, t1c1, d, k)
 

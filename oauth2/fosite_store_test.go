@@ -70,7 +70,7 @@ func TestManagers(t *testing.T) {
 		t.Run("suite="+tc.name, func(t *testing.T) {
 			setupRegistries(t)
 
-			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{ID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
 			for k, store := range registries {
 				net := &networkx.Network{}

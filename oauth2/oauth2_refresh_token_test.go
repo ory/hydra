@@ -52,7 +52,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 	token := "234c678fed33c1d2025537ae464a1ebf7d23fc4a"          //nolint:gosec
 	tokenSignature := "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31" //nolint:gosec
 	testClient := hc.Client{
-		ID:            uuid.Must(uuid.NewV4()),
+		ID:            uuid.Must(uuid.NewV4()).String(),
 		Secret:        "secret",
 		ResponseTypes: []string{"id_token", "code", "token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
@@ -68,7 +68,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			RequestedAt: time.Now(),
 			ID:          uuid.Must(uuid.NewV4()).String(),
 			Client: &hc.Client{
-				ID: uuid.FromStringOrNil(testClient.GetID()),
+				ID: testClient.GetID(),
 			},
 			RequestedScope: []string{"offline"},
 			GrantedScope:   []string{"offline"},

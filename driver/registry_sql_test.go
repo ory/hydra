@@ -52,7 +52,7 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	require.NoError(t, reg.Persister().Connection(ctx).RawQuery(statement).Exec())
 
 	cl := &client.Client{
-		LegacyClientID: strconv.Itoa(rand.Int()),
+		ID: strconv.Itoa(rand.Int()),
 	}
 	require.NoError(t, reg.Persister().CreateClient(ctx, cl))
 	getClients := func(reg Registry) ([]client.Client, error) {

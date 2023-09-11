@@ -1450,7 +1450,6 @@ func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
 		t.Run(k, func(t *testing.T) {
 			cl := &client.Client{ID: uuidx.NewV4().String()}
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			cl.ID = ""
 			require.NoError(t, r.Persister().CreateClient(s.t2, cl))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
@@ -1495,7 +1494,6 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 			c1 := &client.Client{ID: "client-1", BackChannelLogoutURI: "not-null"}
 			c2 := &client.Client{ID: "client-2", BackChannelLogoutURI: "not-null"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
-			c1.ID = ""
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 
@@ -1579,7 +1577,6 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 			c1 := &client.Client{ID: "client-1", FrontChannelLogoutURI: "not-null"}
 			c2 := &client.Client{ID: "client-2", FrontChannelLogoutURI: "not-null"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
-			c1.ID = ""
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 
@@ -1869,7 +1866,7 @@ func (s *PersisterTestSuite) TestUpdateClient() {
 			require.NoError(t, r.Persister().UpdateClient(s.t2, &u1))
 
 			actual := &client.Client{}
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+			require.NoError(t, r.Persister().Connection(context.Background()).Where("nid = ?", s.t1NID).Find(actual, t1c1.ID))
 			require.Equal(t, "original", actual.Name)
 			require.Equal(t, expectedHash, actual.Secret)
 

@@ -1858,33 +1858,44 @@ func (s *PersisterTestSuite) TestUpdateClient() {
 			t2c1 := &client.Client{ID: "client-id", Name: "original", Secret: "original-secret"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, t1c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, t2c1))
-			expectedHash := t1c1.Secret
+			t1Hash, t2Hash := t1c1.Secret, t2c1.Secret
 
 			u1 := *t1c1
 			u1.Name = "updated"
 			u1.Secret = ""
 			require.NoError(t, r.Persister().UpdateClient(s.t2, &u1))
 
-			actual := &client.Client{}
-			require.NoError(t, r.Persister().Connection(context.Background()).Where("nid = ?", s.t1NID).Find(actual, t1c1.ID))
+			actual, err := r.Persister().GetConcreteClient(s.t1, t1c1.ID)
+			require.NoError(t, err)
 			require.Equal(t, "original", actual.Name)
-			require.Equal(t, expectedHash, actual.Secret)
+			require.Equal(t, t1Hash, actual.Secret)
+
+			actual, err = r.Persister().GetConcreteClient(s.t2, t1c1.ID)
+			require.NoError(t, err)
+			require.Equal(t, "updated", actual.Name)
+			require.Equal(t, t2Hash, actual.Secret)
 
 			u2 := *t1c1
 			u2.Name = "updated"
 			u2.Secret = ""
 			require.NoError(t, r.Persister().UpdateClient(s.t1, &u2))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+
+			actual, err = r.Persister().GetConcreteClient(s.t1, t1c1.ID)
 			require.Equal(t, "updated", actual.Name)
-			require.Equal(t, expectedHash, actual.Secret)
+			require.Equal(t, t1Hash, actual.Secret)
 
 			u3 := *t1c1
 			u3.Name = "updated"
 			u3.Secret = "updated-secret"
 			require.NoError(t, r.Persister().UpdateClient(s.t1, &u3))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+
+			actual, err = r.Persister().GetConcreteClient(s.t1, t1c1.ID)
 			require.Equal(t, "updated", actual.Name)
-			require.NotEqual(t, expectedHash, actual.Secret)
+			require.NotEqual(t, t1Hash, actual.Secret)
+
+			actual, err = r.Persister().GetConcreteClient(s.t2, t2c1.ID)
+			require.Equal(t, "updated", actual.Name)
+			require.Equal(t, t2Hash, actual.Secret)
 		})
 	}
 }

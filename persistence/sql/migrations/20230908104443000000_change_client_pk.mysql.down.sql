@@ -1,0 +1,1 @@
+ALTER TABLE hydra_client DROP PRIMARY KEY, ADD PRIMARY KEY (pk);

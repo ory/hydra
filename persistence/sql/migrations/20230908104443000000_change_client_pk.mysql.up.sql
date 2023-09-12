@@ -1,3 +1,1 @@
 ALTER TABLE hydra_client DROP PRIMARY KEY, ADD PRIMARY KEY (id, nid);
-
-ALTER TABLE hydra_client DROP COLUMN pk;

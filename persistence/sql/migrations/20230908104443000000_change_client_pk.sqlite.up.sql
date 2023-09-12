@@ -23,7 +23,7 @@ CREATE TABLE "_hydra_client_tmp"
   userinfo_signed_response_alg                    VARCHAR(10)  NOT NULL DEFAULT '',
   subject_type                                    VARCHAR(15)  NOT NULL DEFAULT '',
   allowed_cors_origins                            TEXT         NOT NULL,
-  pk                                              TEXT         NOT NULL,
+  pk                                              TEXT         NULL,
   pk_deprecated                                   INTEGER NULL DEFAULT NULL,
   audience                                        TEXT         NOT NULL,
   created_at                                      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,

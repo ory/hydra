@@ -44,7 +44,7 @@ type Client struct {
 
 	// DEPRECATED: This field is deprecated and will be removed. It serves
 	// no purpose except the database not complaining.
-	PK sql.NullString `json:"-" db:"pk"`
+	PK sql.NullString `json:"-" db:"pk" faker:"-"`
 
 	// DEPRECATED: This field is deprecated and will be removed. It serves
 	// no purpose except the database not complaining.

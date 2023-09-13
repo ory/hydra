@@ -411,8 +411,8 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					assert.Equal(t, updatedAuth.Unix(), time.Time(got.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
-					time.Sleep(time.Second) // Make sure AuthAt does not equal...
-					updatedAuth2 := time.Now().Truncate(time.Second).UTC()
+					// Make sure AuthAt does not equal...
+					updatedAuth2 := updatedAuth.Add(1 * time.Second).UTC()
 					require.NoError(t, m.ConfirmLoginSession(ctx, nil, tc.s.ID, updatedAuth2, "some-other-subject", true))
 
 					got2, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)

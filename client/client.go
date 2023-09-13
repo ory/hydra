@@ -43,6 +43,10 @@ type Client struct {
 
 	// DEPRECATED: This field is deprecated and will be removed. It serves
 	// no purpose except the database not complaining.
+	PK string `json:"-" db:"pk"`
+
+	// DEPRECATED: This field is deprecated and will be removed. It serves
+	// no purpose except the database not complaining.
 	PKDeprecated int64 `json:"-" db:"pk_deprecated"`
 
 	// OAuth 2.0 Client Name

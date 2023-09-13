@@ -4,6 +4,7 @@
 package client
 
 import (
+	"database/sql"
 	"strconv"
 	"strings"
 	"time"
@@ -43,7 +44,7 @@ type Client struct {
 
 	// DEPRECATED: This field is deprecated and will be removed. It serves
 	// no purpose except the database not complaining.
-	PK string `json:"-" db:"pk"`
+	PK sql.NullString `json:"-" db:"pk"`
 
 	// DEPRECATED: This field is deprecated and will be removed. It serves
 	// no purpose except the database not complaining.

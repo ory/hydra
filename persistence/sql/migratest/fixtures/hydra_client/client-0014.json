@@ -80,6 +80,10 @@
   "NID": "00000000-0000-0000-0000-000000000000",
   "Name": "Client 0014",
   "Owner": "owner-0014",
+  "PK": {
+    "String": "132af297-6add-471c-bd82-1950234baf5b",
+    "Valid": true
+  },
   "PKDeprecated": 14,
   "PolicyURI": "http://policy/0014",
   "PostLogoutRedirectURIs": [

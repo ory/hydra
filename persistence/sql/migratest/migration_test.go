@@ -5,6 +5,7 @@ package migratest
 
 import (
 	"context"
+	stdsql "database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -108,7 +109,9 @@ func TestMigrations(t *testing.T) {
 						c.CreatedAt = time.Time{} // Some CreatedAt and UpdatedAt values are generated during migrations so we zero them in the fixtures
 						c.UpdatedAt = time.Time{}
 						testhelpersuuid.AssertUUID(t, c.NID)
+						testhelpersuuid.AssertUUID(t, c.PK.String)
 						c.NID = uuid.Nil
+						c.PK = stdsql.NullString{}
 						CompareWithFixture(t, structs.Map(c), "hydra_client", c.ID)
 					}
 				})

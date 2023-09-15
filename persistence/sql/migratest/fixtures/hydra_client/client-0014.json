@@ -81,8 +81,8 @@
   "Name": "Client 0014",
   "Owner": "owner-0014",
   "PK": {
-    "String": "132af297-6add-471c-bd82-1950234baf5b",
-    "Valid": true
+    "String": "",
+    "Valid": false
   },
   "PKDeprecated": 14,
   "PolicyURI": "http://policy/0014",

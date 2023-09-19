@@ -79,7 +79,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	ctx := context.Background()
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -955,6 +955,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			return func(t *testing.T) {
 				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+					assert.Equal(t, r.Header.Get("Bearer"), "secret value")
 
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
@@ -981,9 +982,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, &config.HookConfig{
+					URL:     hs.URL,
+					Headers: map[string]string{"Bearer": "secret value"},
+				})
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				expectAud := "https://api.ory.sh/"
 				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
@@ -1030,9 +1034,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				expectAud := "https://api.ory.sh/"
 				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
@@ -1070,9 +1074,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				expectAud := "https://api.ory.sh/"
 				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
@@ -1110,9 +1114,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				expectAud := "https://api.ory.sh/"
 				c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
@@ -1657,11 +1661,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -1699,11 +1703,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
@@ -1734,11 +1738,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -1764,11 +1768,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -1794,11 +1798,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHookURL, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHookURL, nil)
+									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)

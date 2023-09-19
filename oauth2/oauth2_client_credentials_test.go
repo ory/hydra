@@ -256,6 +256,7 @@ func TestClientCredentials(t *testing.T) {
 
 				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+					assert.Equal(t, r.Header.Get("Bearer"), "secret value")
 
 					expectedGrantedScopes := []string{"foobar"}
 					expectedGrantedAudience := []string{"https://api.ory.sh/"}
@@ -286,9 +287,12 @@ func TestClientCredentials(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, &config.HookConfig{
+					URL:     hs.URL,
+					Headers: map[string]string{"Bearer": "secret value"},
+				})
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				secret := uuid.New().String()
 				cl, conf := newCustomClient(t, &hc.Client{
@@ -316,9 +320,9 @@ func TestClientCredentials(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				_, conf := newClient(t)
 
@@ -340,9 +344,9 @@ func TestClientCredentials(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				_, conf := newClient(t)
 
@@ -364,9 +368,9 @@ func TestClientCredentials(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				_, conf := newClient(t)
 

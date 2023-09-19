@@ -354,9 +354,9 @@ func TestJWTBearer(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				conf := newConf(client)
 				conf.EndpointParams = url.Values{"grant_type": {grantType}, "assertion": {token}}
@@ -429,9 +429,9 @@ func TestJWTBearer(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				conf := newConf(client)
 				conf.AuthStyle = goauth2.AuthStyleInParams
@@ -457,9 +457,9 @@ func TestJWTBearer(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				token, _, err := signer.Generate(ctx, jwt.MapClaims{
 					"jti": uuid.NewString(),
@@ -492,9 +492,9 @@ func TestJWTBearer(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				token, _, err := signer.Generate(ctx, jwt.MapClaims{
 					"jti": uuid.NewString(),
@@ -527,9 +527,9 @@ func TestJWTBearer(t *testing.T) {
 				defer hs.Close()
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				reg.Config().MustSet(ctx, config.KeyTokenHookURL, hs.URL)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
 
-				defer reg.Config().MustSet(ctx, config.KeyTokenHookURL, nil)
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
 				token, _, err := signer.Generate(ctx, jwt.MapClaims{
 					"jti": uuid.NewString(),

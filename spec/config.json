@@ -1039,16 +1039,56 @@
           }
         },
         "refresh_token_hook": {
-          "type": "string",
           "description": "Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-refresh-hook"]
+          "examples": ["https://my-example.app/token-refresh-hook"],
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "headers": {
+                  "description": "Sets the header to be used when calling the refresh token hook endpoint.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
         },
         "token_hook": {
-          "type": "string",
           "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-hook"]
+          "examples": ["https://my-example.app/token-hook"],
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "headers": {
+                  "description": "Sets the header to be used when calling the token hook endpoint.",
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     },

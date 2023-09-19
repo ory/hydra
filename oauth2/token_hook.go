@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"net/url"
 
 	"github.com/hashicorp/go-retryablehttp"
 
@@ -57,8 +56,8 @@ type TokenHookResponse struct {
 	Session flow.AcceptOAuth2ConsentRequestSession `json:"session"`
 }
 
-func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookURL *url.URL, reqBodyBytes []byte, session *Session) error {
-	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookURL.String(), bytes.NewReader(reqBodyBytes))
+func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookConfig *config.HookConfig, reqBodyBytes []byte, session *Session) error {
+	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookConfig.URL, bytes.NewReader(reqBodyBytes))
 	if err != nil {
 		return errorsx.WithStack(
 			fosite.ErrServerError.
@@ -66,6 +65,9 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 				WithDescription("An error occurred while preparing the token hook.").
 				WithDebugf("Unable to prepare the HTTP Request: %s", err),
 		)
+	}
+	for k, v := range hookConfig.Headers {
+		req.Header.Set(k, v)
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -123,8 +125,8 @@ func TokenHook(reg interface {
 	x.HTTPClientProvider
 }) AccessRequestHook {
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
-		hookURL := reg.Config().TokenHookURL(ctx)
-		if hookURL == nil {
+		hookConfig := reg.Config().TokenHookConfig(ctx)
+		if hookConfig == nil {
 			return nil
 		}
 
@@ -156,7 +158,7 @@ func TokenHook(reg interface {
 			)
 		}
 
-		err = executeHookAndUpdateSession(ctx, reg, hookURL, reqBodyBytes, session)
+		err = executeHookAndUpdateSession(ctx, reg, hookConfig, reqBodyBytes, session)
 		if err != nil {
 			return err
 		}

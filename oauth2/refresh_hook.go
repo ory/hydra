@@ -52,8 +52,8 @@ func RefreshTokenHook(reg interface {
 	x.HTTPClientProvider
 }) AccessRequestHook {
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
-		hookURL := reg.Config().TokenRefreshHookURL(ctx)
-		if hookURL == nil {
+		hookConfig := reg.Config().TokenRefreshHookConfig(ctx)
+		if hookConfig == nil {
 			return nil
 		}
 
@@ -92,7 +92,7 @@ func RefreshTokenHook(reg interface {
 			)
 		}
 
-		err = executeHookAndUpdateSession(ctx, reg, hookURL, reqBodyBytes, session)
+		err = executeHookAndUpdateSession(ctx, reg, hookConfig, reqBodyBytes, session)
 		if err != nil {
 			return err
 		}

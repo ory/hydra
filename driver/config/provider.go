@@ -102,8 +102,8 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
-	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
-	KeyTokenHookURL                              = "oauth2.token_hook"         // #nosec G101
+	KeyRefreshTokenHook                          = "oauth2.refresh_token_hook" // #nosec G101
+	KeyTokenHook                                 = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
 )
 
@@ -467,12 +467,46 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
-func (p *DefaultProvider) TokenHookURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyTokenHookURL, nil)
+type HookConfig struct {
+	URL     string            `json:"url"`
+	Headers map[string]string `json:"headers"`
 }
 
-func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
+func (p *DefaultProvider) getHookConfig(ctx context.Context, key string) *HookConfig {
+	if hookURL := p.getProvider(ctx).RequestURIF(key, nil); hookURL != nil {
+		return &HookConfig{
+			URL: hookURL.String(),
+		}
+	}
+
+	var hookConfig *HookConfig
+	if err := p.getProvider(ctx).Unmarshal(key, &hookConfig); err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", key)
+		return nil
+	}
+	if hookConfig == nil {
+		return nil
+	}
+
+	// validate URL by parsing it
+	u, err := url.ParseRequestURI(hookConfig.URL)
+	if err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", key)
+		return nil
+	}
+	hookConfig.URL = u.String()
+
+	return hookConfig
+}
+
+func (p *DefaultProvider) TokenHookConfig(ctx context.Context) *HookConfig {
+	return p.getHookConfig(ctx, KeyTokenHook)
+}
+
+func (p *DefaultProvider) TokenRefreshHookConfig(ctx context.Context) *HookConfig {
+	return p.getHookConfig(ctx, KeyRefreshTokenHook)
 }
 
 func (p *DefaultProvider) DbIgnoreUnknownTableColumns() bool {

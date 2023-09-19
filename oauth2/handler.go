@@ -1355,6 +1355,22 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	}
 	if session.Claims.Extra != nil {
 		for claim, val := range session.Claims.Extra {
+			if claim == "updated_at" {
+				var s string
+				switch v := val.(type) {
+				case string:
+					s = v
+				case fmt.Stringer:
+					s = v.String()
+				default:
+					continue
+				}
+				t, err := time.Parse(time.RFC3339Nano, s)
+				if err != nil {
+					continue
+				}
+				val = t.Unix()
+			}
 			vcClaims.VerifiableCredential.Subject[claim] = val
 		}
 	}

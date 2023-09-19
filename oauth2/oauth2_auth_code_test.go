@@ -62,6 +62,8 @@ type clientCreator interface {
 	CreateClient(context.Context, *client.Client) error
 }
 
+var expectedUpdatedAtClaim = time.Now()
+
 // TestAuthCodeWithDefaultStrategy runs proper integration tests against in-memory and database connectors, specifically
 // we test:
 //
@@ -330,7 +332,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		})
 	})
 
-	t.Run("case=perform authorize code flow with verifable credentials", func(t *testing.T) {
+	t.Run("case=perform authorize code flow with verifiable credentials", func(t *testing.T) {
 		// Make sure we test against all crypto suites that we advertise.
 		cfg, _, err := publicClient.OidcApi.DiscoverOidcConfiguration(ctx).Execute()
 		require.NoError(t, err)
@@ -371,7 +373,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 							Session: &hydra.AcceptOAuth2ConsentRequestSession{
 								AccessToken: map[string]interface{}{"foo": "bar"},
-								IdToken:     map[string]interface{}{"email": "foo@bar.com", "bar": "baz"},
+								IdToken: map[string]interface{}{
+									"email":      "foo@bar.com",
+									"bar":        "baz",
+									"updated_at": expectedUpdatedAtClaim.Format(time.RFC3339Nano),
+								},
 							},
 						}).
 						Execute()
@@ -1162,6 +1168,8 @@ func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce s
 	require.NotNil(t, verifiableCredential)
 
 	_, claims := claimsFromVCResponse(t, reg, verifiableCredential)
+	assert.EqualValues(t, expectedUpdatedAtClaim.Unix(), claims.VerifiableCredential.Subject["updated_at"],
+		"updated_at must be a UNIX time stamp")
 	assertClaimsContainPublicKey(t, claims, pubKeyJWK)
 }
 

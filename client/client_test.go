@@ -16,7 +16,7 @@ var _ fosite.Client = new(Client)
 
 func TestClient(t *testing.T) {
 	c := &Client{
-		LegacyClientID:          "foo",
+		ID:                      "foo",
 		RedirectURIs:            []string{"foo"},
 		Scope:                   "foo bar",
 		TokenEndpointAuthMethod: "none",

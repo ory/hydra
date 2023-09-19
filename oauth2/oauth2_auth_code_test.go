@@ -529,7 +529,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				if !q.Has("login_verifier") {
 					return nil
 				}
-				q.Set("client_id", otherClient.ID.String())
+				q.Set("client_id", otherClient.GetID())
 				req.URL.RawQuery = q.Encode()
 				return nil
 			},
@@ -544,7 +544,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				if !q.Has("consent_verifier") {
 					return nil
 				}
-				q.Set("client_id", otherClient.ID.String())
+				q.Set("client_id", otherClient.GetID())
 				req.URL.RawQuery = q.Encode()
 				return nil
 			},
@@ -1297,12 +1297,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &client.Client{
-				LegacyClientID: "app-client",
-				Secret:         "secret",
-				RedirectURIs:   []string{ts.URL + "/callback"},
-				ResponseTypes:  []string{"id_token", "code", "token"},
-				GrantTypes:     []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-				Scope:          "hydra.* offline openid",
+				ID:            "app-client",
+				Secret:        "secret",
+				RedirectURIs:  []string{ts.URL + "/callback"},
+				ResponseTypes: []string{"id_token", "code", "token"},
+				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+				Scope:         "hydra.* offline openid",
 			}))
 
 			oauthConfig := &oauth2.Config{

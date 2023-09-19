@@ -14,12 +14,11 @@
   "GrantTypes": [
     "grant-0004_1"
   ],
-  "ID": "00000000-0000-0000-0000-000000000000",
+  "ID": "client-0004",
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/0004",
-  "LegacyClientID": "client-0004",
   "Lifespans": {
     "AuthorizationCodeGrantAccessTokenLifespan": {
       "Duration": 0,
@@ -75,6 +74,10 @@
   "NID": "00000000-0000-0000-0000-000000000000",
   "Name": "Client 0004",
   "Owner": "owner-0004",
+  "PK": {
+    "String": "",
+    "Valid": false
+  },
   "PKDeprecated": 4,
   "PolicyURI": "http://policy/0004",
   "PostLogoutRedirectURIs": [],

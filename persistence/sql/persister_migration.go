@@ -21,7 +21,7 @@ import (
 )
 
 //go:embed migrations/*.sql
-var migrations embed.FS
+var Migrations embed.FS
 
 func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
 	if p.mbs != nil {

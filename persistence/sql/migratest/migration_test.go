@@ -5,6 +5,7 @@ package migratest
 
 import (
 	"context"
+	stdsql "database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -91,7 +92,7 @@ func TestMigrations(t *testing.T) {
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
 			tm, err := popx.NewMigrationBox(
-				os.DirFS("../migrations"),
+				sql.Migrations,
 				popx.NewMigrator(c, l, nil, 1*time.Minute),
 				popx.WithTestdata(t, os.DirFS("./testdata")))
 			require.NoError(t, err)
@@ -107,11 +108,11 @@ func TestMigrations(t *testing.T) {
 						require.False(t, c.UpdatedAt.IsZero())
 						c.CreatedAt = time.Time{} // Some CreatedAt and UpdatedAt values are generated during migrations so we zero them in the fixtures
 						c.UpdatedAt = time.Time{}
-						testhelpersuuid.AssertUUID(t, &c.ID)
-						testhelpersuuid.AssertUUID(t, &c.NID)
-						c.ID = uuid.Nil
+						testhelpersuuid.AssertUUID(t, c.NID)
+						testhelpersuuid.AssertUUID(t, c.PK.String)
 						c.NID = uuid.Nil
-						CompareWithFixture(t, structs.Map(c), "hydra_client", c.LegacyClientID)
+						c.PK = stdsql.NullString{}
+						CompareWithFixture(t, structs.Map(c), "hydra_client", c.ID)
 					}
 				})
 
@@ -120,8 +121,8 @@ func TestMigrations(t *testing.T) {
 					require.NoError(t, c.All(&js))
 					require.Equal(t, 7, len(js))
 					for _, j := range js {
-						testhelpersuuid.AssertUUID(t, &j.ID)
-						testhelpersuuid.AssertUUID(t, &j.NID)
+						testhelpersuuid.AssertUUID(t, j.ID)
+						testhelpersuuid.AssertUUID(t, j.NID)
 						j.ID = uuid.Nil // Some IDs are generated at migration time so we zero them in the fixtures
 						j.NID = uuid.Nil
 						require.False(t, j.CreatedAt.IsZero())
@@ -147,7 +148,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 17, len(ss))
 
 					for _, s := range ss {
-						testhelpersuuid.AssertUUID(t, &s.NID)
+						testhelpersuuid.AssertUUID(t, s.NID)
 						s.NID = uuid.Nil
 						s.AuthenticatedAt = sqlxx.NullTime(time.Time{})
 						CompareWithFixture(t, s, "hydra_oauth2_authentication_session", s.ID)
@@ -160,7 +161,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(ss))
 
 					for _, s := range ss {
-						testhelpersuuid.AssertUUID(t, &s.NID)
+						testhelpersuuid.AssertUUID(t, s.NID)
 						s.NID = uuid.Nil
 						CompareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
 					}
@@ -172,7 +173,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 6, len(lrs))
 
 					for _, s := range lrs {
-						testhelpersuuid.AssertUUID(t, &s.NID)
+						testhelpersuuid.AssertUUID(t, s.NID)
 						s.NID = uuid.Nil
 						s.Client = nil
 						CompareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
@@ -184,7 +185,7 @@ func TestMigrations(t *testing.T) {
 					c.All(&bjtis)
 					require.Equal(t, 1, len(bjtis))
 					for _, bjti := range bjtis {
-						testhelpersuuid.AssertUUID(t, &bjti.NID)
+						testhelpersuuid.AssertUUID(t, bjti.NID)
 						bjti.NID = uuid.Nil
 						bjti.Expiry = time.Time{}
 						CompareWithFixture(t, bjti, "hydra_oauth2_jti_blacklist", bjti.ID)
@@ -197,7 +198,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(as))
 
 					for _, a := range as {
-						testhelpersuuid.AssertUUID(t, &a.NID)
+						testhelpersuuid.AssertUUID(t, a.NID)
 						a.NID = uuid.Nil
 						require.False(t, a.RequestedAt.IsZero())
 						a.RequestedAt = time.Time{}
@@ -213,7 +214,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(rs))
 
 					for _, r := range rs {
-						testhelpersuuid.AssertUUID(t, &r.NID)
+						testhelpersuuid.AssertUUID(t, r.NID)
 						r.NID = uuid.Nil
 						require.False(t, r.RequestedAt.IsZero())
 						r.RequestedAt = time.Time{}
@@ -229,7 +230,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(cs))
 
 					for _, c := range cs {
-						testhelpersuuid.AssertUUID(t, &c.NID)
+						testhelpersuuid.AssertUUID(t, c.NID)
 						c.NID = uuid.Nil
 						require.False(t, c.RequestedAt.IsZero())
 						c.RequestedAt = time.Time{}
@@ -245,7 +246,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(os))
 
 					for _, o := range os {
-						testhelpersuuid.AssertUUID(t, &o.NID)
+						testhelpersuuid.AssertUUID(t, o.NID)
 						o.NID = uuid.Nil
 						require.False(t, o.RequestedAt.IsZero())
 						o.RequestedAt = time.Time{}
@@ -261,7 +262,7 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 11, len(ps))
 
 					for _, p := range ps {
-						testhelpersuuid.AssertUUID(t, &p.NID)
+						testhelpersuuid.AssertUUID(t, p.NID)
 						p.NID = uuid.Nil
 						require.False(t, p.RequestedAt.IsZero())
 						p.RequestedAt = time.Time{}
@@ -276,7 +277,7 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM networks").All(&ns)
 					require.Equal(t, 1, len(ns))
 					for _, n := range ns {
-						testhelpersuuid.AssertUUID(t, &n.ID)
+						testhelpersuuid.AssertUUID(t, n.ID)
 						require.NotZero(t, n.CreatedAt)
 						require.NotZero(t, n.UpdatedAt)
 					}

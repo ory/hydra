@@ -24,7 +24,7 @@ func TestUpdateClient(t *testing.T) {
 
 	original := createClient(t, reg, nil)
 	t.Run("case=creates successfully", func(t *testing.T) {
-		actual := gjson.Parse(cmdx.ExecNoErr(t, c, "--grant-type", "implicit", original.ID.String()))
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, "--grant-type", "implicit", original.GetID()))
 		expected, err := reg.ClientManager().GetClient(ctx, actual.Get("client_id").String())
 		require.NoError(t, err)
 
@@ -35,7 +35,7 @@ func TestUpdateClient(t *testing.T) {
 
 	t.Run("case=supports encryption", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c,
-			original.ID.String(),
+			original.GetID(),
 			"--secret", "some-userset-secret",
 			"--pgp-key", base64EncodedPGPPublicKey(t),
 		))

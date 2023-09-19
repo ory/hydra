@@ -661,7 +661,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 		/* #nosec G201 - channel can either be "front" or "back" */
 		fmt.Sprintf(`
 SELECT DISTINCT c.* FROM hydra_client as c
-JOIN hydra_oauth2_flow as f ON (c.id = f.client_id)
+JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
 	f.subject=? AND
 	c.%schannel_logout_uri!='' AND

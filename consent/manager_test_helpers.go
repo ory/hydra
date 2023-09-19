@@ -40,7 +40,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		Client:                 &client.Client{LegacyClientID: "fk-client-" + key},
+		Client:                 &client.Client{ID: "fk-client-" + key},
 		RequestURL:             "https://request-url/path" + key,
 		LoginChallenge:         sqlxx.NullString(makeID(loginChallengeBase, network, key)),
 		LoginSessionID:         sqlxx.NullString(makeID("fk-login-session", network, key)),
@@ -109,7 +109,7 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 	var cl *client.Client
 	if withClient {
 		cl = &client.Client{
-			LegacyClientID: "fk-client-" + key,
+			ID: "fk-client-" + key,
 		}
 	}
 	return &flow.LogoutRequest{
@@ -134,7 +134,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 			Display:   "popup" + key,
 		},
 		RequestedAt:    time.Now().UTC().Add(-time.Minute),
-		Client:         &client.Client{LegacyClientID: "fk-client-" + key},
+		Client:         &client.Client{ID: "fk-client-" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
 		Skip:           true,
@@ -276,7 +276,7 @@ func TestHelperNID(r interface {
 	client.ManagerProvider
 	FlowCipher() *aead.XChaCha20Poly1305
 }, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
-	testClient := client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"}
+	testClient := client.Client{ID: "2022-03-11-client-nid-test-1"}
 	testLS := flow.LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
@@ -286,7 +286,7 @@ func TestHelperNID(r interface {
 		Subject:     "2022-03-11-test-1-sub",
 		Verifier:    "2022-03-11-test-1-ver",
 		RequestedAt: time.Now(),
-		Client:      &client.Client{LegacyClientID: "2022-03-11-client-nid-test-1"},
+		Client:      &client.Client{ID: "2022-03-11-client-nid-test-1"},
 	}
 	testHLR := flow.HandledLoginRequest{
 		LoginRequest:           &testLR,
@@ -348,7 +348,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 		ctx := context.Background()
 		t.Run("case=init-fks", func(t *testing.T) {
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
-				require.NoError(t, clientManager.CreateClient(ctx, &client.Client{LegacyClientID: fmt.Sprintf("fk-client-%s", k)}))
+				require.NoError(t, clientManager.CreateClient(ctx, &client.Client{ID: fmt.Sprintf("fk-client-%s", k)}))
 
 				loginSession := &flow.LoginSession{
 					ID:              makeID("fk-login-session", network, k),
@@ -363,7 +363,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					Subject:         fmt.Sprintf("subject%s", k),
 					SessionID:       sqlxx.NullString(makeID("fk-login-session", network, k)),
 					Verifier:        makeID("fk-login-verifier", network, k),
-					Client:          &client.Client{LegacyClientID: fmt.Sprintf("fk-client-%s", k)},
+					Client:          &client.Client{ID: fmt.Sprintf("fk-client-%s", k)},
 					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
 				}
@@ -411,8 +411,8 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					assert.Equal(t, updatedAuth.Unix(), time.Time(got.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
-					time.Sleep(time.Second) // Make sure AuthAt does not equal...
-					updatedAuth2 := time.Now().Truncate(time.Second).UTC()
+					// Make sure AuthAt does not equal...
+					updatedAuth2 := updatedAuth.Add(1 * time.Second).UTC()
 					require.NoError(t, m.ConfirmLoginSession(ctx, nil, tc.s.ID, updatedAuth2, "some-other-subject", true))
 
 					got2, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
@@ -916,7 +916,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 						require.NoError(t, m.CreateLoginSession(ctx, ls))
 						require.NoError(t, m.ConfirmLoginSession(ctx, ls, ls.ID, time.Now(), ls.Subject, true))
 
-						cl := &client.Client{LegacyClientID: uuid.New().String()}
+						cl := &client.Client{ID: uuid.New().String()}
 						switch k % 4 {
 						case 0:
 							cl.FrontChannelLogoutURI = "http://some-url.com/"
@@ -1043,7 +1043,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 		})
 
 		t.Run("case=foreign key regression", func(t *testing.T) {
-			cl := &client.Client{LegacyClientID: uuid.New().String()}
+			cl := &client.Client{ID: uuid.New().String()}
 			require.NoError(t, clientManager.CreateClient(ctx, cl))
 
 			subject := uuid.New().String()
@@ -1074,7 +1074,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				Subject:              subject,
 				OpenIDConnectContext: nil,
 				Client:               cl,
-				ClientID:             cl.LegacyClientID,
+				ClientID:             cl.ID,
 				RequestURL:           "",
 				LoginChallenge:       sqlxx.NullString(lr.ID),
 				LoginSessionID:       sqlxx.NullString(s.ID),

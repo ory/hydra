@@ -107,7 +107,7 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 
 func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
 	mb, err := popx.NewMigrationBox(
-		fsx.Merge(append([]fs.FS{migrations}, extraMigrations...)...),
+		fsx.Merge(append([]fs.FS{Migrations}, extraMigrations...)...),
 		popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0),
 		popx.WithGoMigrations(goMigrations))
 	if err != nil {

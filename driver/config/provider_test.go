@@ -444,7 +444,7 @@ func TestHookConfigs(t *testing.T) {
 
 		c.MustSet(ctx, key, map[string]any{
 			"url": "http://localhost:8080/hook2",
-			"header": map[string]any{
+			"headers": map[string]any{
 				"My-Headers": "my-value",
 			},
 		})

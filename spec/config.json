@@ -274,8 +274,7 @@
               "required": ["name", "value"],
               "properties": {
                 "in": {
-                  "enum": ["header", "cookie"],
-                  "default": "header"
+                  "enum": ["header", "cookie"]
                 },
                 "name": {
                   "description": "The header or cookie name.",

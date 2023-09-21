@@ -256,7 +256,7 @@ func TestClientCredentials(t *testing.T) {
 
 				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
-					assert.Equal(t, r.Header.Get("Bearer"), "secret value")
+					assert.Equal(t, r.Header.Get("Authorization"), "Bearer secret value")
 
 					expectedGrantedScopes := []string{"foobar"}
 					expectedGrantedAudience := []string{"https://api.ory.sh/"}
@@ -288,8 +288,11 @@ func TestClientCredentials(t *testing.T) {
 
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 				reg.Config().MustSet(ctx, config.KeyTokenHook, &config.HookConfig{
-					URL:     hs.URL,
-					Headers: map[string]string{"Bearer": "secret value"},
+					URL: hs.URL,
+					Auth: &config.Auth{
+						Type:   "api_key",
+						Config: json.RawMessage(`{"in": "header", "name": "Authorization", "value": "Bearer secret value"}`),
+					},
 				})
 
 				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)

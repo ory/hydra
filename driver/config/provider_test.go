@@ -5,6 +5,7 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -444,14 +445,16 @@ func TestHookConfigs(t *testing.T) {
 
 		c.MustSet(ctx, key, map[string]any{
 			"url": "http://localhost:8080/hook2",
-			"headers": map[string]any{
-				"My-Headers": "my-value",
+			"auth": map[string]any{
+				"type":   "api_key",
+				"config": json.RawMessage(`{"in":"header","name":"my-header","value":"my-value"}`),
 			},
 		})
 		hc = getFunc(ctx)
 		require.NotNil(t, hc)
 		assert.EqualValues(t, "http://localhost:8080/hook2", hc.URL)
-		assert.EqualValues(t, "my-value", hc.Headers["My-Headers"])
+		assert.EqualValues(t, "api_key", hc.Auth.Type)
+		assert.JSONEq(t, `{"in":"header","name":"my-header","value":"my-value"}`, string(hc.Auth.Config))
 	}
 }
 

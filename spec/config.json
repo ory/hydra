@@ -248,6 +248,48 @@
           }
         }
       }
+    },
+    "webhook_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures a webhook.",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL to send the webhook to."
+        },
+        "auth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "config"],
+          "properties": {
+            "type": {
+              "const": "api_key"
+            },
+            "config": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "value"],
+              "properties": {
+                "in": {
+                  "enum": ["header", "cookie"],
+                  "default": "header"
+                },
+                "name": {
+                  "description": "The header or cookie name.",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "The header or cookie value.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -1047,20 +1089,7 @@
               "format": "uri"
             },
             {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "headers": {
-                  "description": "Sets the header to be used when calling the refresh token hook endpoint.",
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/webhook_config"
             }
           ]
         },
@@ -1073,20 +1102,7 @@
               "format": "uri"
             },
             {
-              "type": "object",
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "format": "uri"
-                },
-                "headers": {
-                  "description": "Sets the header to be used when calling the token hook endpoint.",
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                }
-              }
+              "$ref": "#/definitions/webhook_config"
             }
           ]
         }

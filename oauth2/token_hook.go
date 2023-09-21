@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/ory/hydra/v2/flow"
@@ -56,6 +58,40 @@ type TokenHookResponse struct {
 	Session flow.AcceptOAuth2ConsentRequestSession `json:"session"`
 }
 
+type APIKeyAuthConfig struct {
+	In    string `json:"in"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+func applyAuth(req *retryablehttp.Request, auth *config.Auth) error {
+	if auth == nil {
+		return nil
+	}
+
+	switch auth.Type {
+	case "api_key":
+		c := struct {
+			In    string `json:"in"`
+			Name  string `json:"name"`
+			Value string `json:"value"`
+		}{}
+		if err := json.Unmarshal(auth.Config, &c); err != nil {
+			return err
+		}
+
+		switch c.In {
+		case "header":
+			req.Header.Set(c.Name, c.Value)
+		case "cookie":
+			req.AddCookie(&http.Cookie{Name: c.Name, Value: c.Value})
+		}
+	default:
+		return errors.Errorf("unsupported auth type %q", auth.Type)
+	}
+	return nil
+}
+
 func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookConfig *config.HookConfig, reqBodyBytes []byte, session *Session) error {
 	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookConfig.URL, bytes.NewReader(reqBodyBytes))
 	if err != nil {
@@ -66,8 +102,12 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 				WithDebugf("Unable to prepare the HTTP Request: %s", err),
 		)
 	}
-	for k, v := range hookConfig.Headers {
-		req.Header.Set(k, v)
+	if err := applyAuth(req, hookConfig.Auth); err != nil {
+		return errorsx.WithStack(
+			fosite.ErrServerError.
+				WithWrap(err).
+				WithDescription("An error occurred while applying the token hook authentication.").
+				WithDebugf("Unable to apply the token hook authentication: %s", err))
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 

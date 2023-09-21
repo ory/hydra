@@ -5,6 +5,7 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -467,10 +468,16 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
-type HookConfig struct {
-	URL     string            `json:"url"`
-	Headers map[string]string `json:"headers"`
-}
+type (
+	Auth struct {
+		Type   string          `json:"type"`
+		Config json.RawMessage `json:"config"`
+	}
+	HookConfig struct {
+		URL  string `json:"url"`
+		Auth *Auth  `json:"auth"`
+	}
+)
 
 func (p *DefaultProvider) getHookConfig(ctx context.Context, key string) *HookConfig {
 	if hookURL := p.getProvider(ctx).RequestURIF(key, nil); hookURL != nil {

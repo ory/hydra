@@ -82,7 +82,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
 	reg.Config().MustSet(ctx, config.KeyLogLevel, "error")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyRefreshTokenHookURL, "")
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")

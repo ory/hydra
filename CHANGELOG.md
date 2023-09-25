@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-09-19)](#000-2023-09-19)
+- [0.0.0 (2023-09-25)](#000-2023-09-25)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
@@ -702,7 +702,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-09-19)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-09-25)
 
 
 ### Bug Fixes
@@ -721,6 +721,7 @@
 
 ### Features
 
+* Add authentication options to hooks ([#3633](https://github.com/ory/hydra/issues/3633)) ([5c8e792](https://github.com/ory/hydra/commit/5c8e7923ed22f6d231ca748bb76e4261a87afb08))
 * Re-enable legacy client IDs ([#3628](https://github.com/ory/hydra/issues/3628)) ([5dd7d30](https://github.com/ory/hydra/commit/5dd7d306ba8181b1fff1225d056a2ee69183392e)):
 
     This patch changes the primary key of the `hydra_client` table. We do not expect issues, as that table is probably not overly huge in any deployment. We do however highly recommend to test the migration performance on a staging environment with a similar database setup.

@@ -87,7 +87,7 @@ func (c *Config) LoadDefaultHandlers(strategy interface{}) {
 	}
 }
 
-func (c *Config) GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy {
+func (c *Config) GetJWKSFetcherStrategy(context.Context) fosite.JWKSFetcherStrategy {
 	return c.deps.GetJWKSFetcherStrategy()
 }
 
@@ -95,47 +95,47 @@ func (c *Config) GetHTTPClient(ctx context.Context) *retryablehttp.Client {
 	return c.deps.HTTPClient(ctx)
 }
 
-func (c *Config) GetAuthorizeEndpointHandlers(ctx context.Context) fosite.AuthorizeEndpointHandlers {
+func (c *Config) GetAuthorizeEndpointHandlers(context.Context) fosite.AuthorizeEndpointHandlers {
 	return c.authorizeEndpointHandlers
 }
 
-func (c *Config) GetTokenEndpointHandlers(ctx context.Context) fosite.TokenEndpointHandlers {
+func (c *Config) GetTokenEndpointHandlers(context.Context) fosite.TokenEndpointHandlers {
 	return c.tokenEndpointHandlers
 }
 
-func (c *Config) GetTokenIntrospectionHandlers(ctx context.Context) (r fosite.TokenIntrospectionHandlers) {
+func (c *Config) GetTokenIntrospectionHandlers(context.Context) (r fosite.TokenIntrospectionHandlers) {
 	return c.tokenIntrospectionHandlers
 }
 
-func (c *Config) GetRevocationHandlers(ctx context.Context) fosite.RevocationHandlers {
+func (c *Config) GetRevocationHandlers(context.Context) fosite.RevocationHandlers {
 	return c.revocationHandlers
 }
 
-func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(ctx context.Context) bool {
+func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(context.Context) bool {
 	return false
 }
 
-func (c *Config) GetAudienceStrategy(ctx context.Context) fosite.AudienceMatchingStrategy {
+func (c *Config) GetAudienceStrategy(context.Context) fosite.AudienceMatchingStrategy {
 	return fosite.DefaultAudienceMatchingStrategy
 }
 
-func (c *Config) GetOmitRedirectScopeParam(ctx context.Context) bool {
+func (c *Config) GetOmitRedirectScopeParam(context.Context) bool {
 	return false
 }
 
-func (c *Config) GetSanitationWhiteList(ctx context.Context) []string {
+func (c *Config) GetSanitationWhiteList(context.Context) []string {
 	return []string{"code", "redirect_uri"}
 }
 
-func (c *Config) GetEnablePKCEPlainChallengeMethod(ctx context.Context) bool {
+func (c *Config) GetEnablePKCEPlainChallengeMethod(context.Context) bool {
 	return false
 }
 
-func (c *Config) GetDisableRefreshTokenValidation(ctx context.Context) bool {
+func (c *Config) GetDisableRefreshTokenValidation(context.Context) bool {
 	return false
 }
 
-func (c *Config) GetRefreshTokenScopes(ctx context.Context) []string {
+func (c *Config) GetRefreshTokenScopes(context.Context) []string {
 	return []string{"offline", "offline_access"}
 }
 
@@ -143,12 +143,12 @@ func (c *Config) GetMinParameterEntropy(_ context.Context) int {
 	return fosite.MinParameterEntropy
 }
 
-func (c *Config) GetClientAuthenticationStrategy(ctx context.Context) fosite.ClientAuthenticationStrategy {
+func (c *Config) GetClientAuthenticationStrategy(context.Context) fosite.ClientAuthenticationStrategy {
 	// Fosite falls back to the default fosite.Fosite.DefaultClientAuthenticationStrategy when this is nil.
 	return nil
 }
 
-func (c *Config) GetResponseModeHandlerExtension(ctx context.Context) fosite.ResponseModeHandler {
+func (c *Config) GetResponseModeHandlerExtension(context.Context) fosite.ResponseModeHandler {
 	return defaultResponseModeHandler
 }
 
@@ -156,20 +156,20 @@ func (c *Config) GetSendDebugMessagesToClients(ctx context.Context) bool {
 	return c.deps.Config().GetSendDebugMessagesToClients(ctx)
 }
 
-func (c *Config) GetMessageCatalog(ctx context.Context) i18n.MessageCatalog {
+func (c *Config) GetMessageCatalog(context.Context) i18n.MessageCatalog {
 	// Fosite falls back to the default messages when this is nil.
 	return nil
 }
 
-func (c *Config) GetSecretsHasher(ctx context.Context) fosite.Hasher {
+func (c *Config) GetSecretsHasher(context.Context) fosite.Hasher {
 	return c.deps.ClientHasher()
 }
 
-func (c *Config) GetTokenEntropy(ctx context.Context) int {
+func (c *Config) GetTokenEntropy(context.Context) int {
 	return 32
 }
 
-func (c *Config) GetHMACHasher(ctx context.Context) func() hash.Hash {
+func (c *Config) GetHMACHasher(context.Context) func() hash.Hash {
 	return sha512.New512_256
 }
 
@@ -177,11 +177,11 @@ func (c *Config) GetIDTokenIssuer(ctx context.Context) string {
 	return c.deps.Config().IssuerURL(ctx).String()
 }
 
-func (c *Config) GetAllowedPrompts(ctx context.Context) []string {
-	return []string{"login", "none", "consent"}
+func (c *Config) GetAllowedPrompts(context.Context) []string {
+	return []string{"login", "none", "consent", "registration"}
 }
 
-func (c *Config) GetRedirectSecureChecker(ctx context.Context) func(context.Context, *url.URL) bool {
+func (c *Config) GetRedirectSecureChecker(context.Context) func(context.Context, *url.URL) bool {
 	return x.IsRedirectURISecure(c.deps.Config())
 }
 
@@ -193,7 +193,7 @@ func (c *Config) GetJWTScopeField(ctx context.Context) jwt.JWTScopeFieldEnum {
 	return c.deps.Config().GetJWTScopeField(ctx)
 }
 
-func (c *Config) GetFormPostHTMLTemplate(ctx context.Context) *template.Template {
+func (c *Config) GetFormPostHTMLTemplate(context.Context) *template.Template {
 	return fosite.DefaultFormPostTemplate
 }
 

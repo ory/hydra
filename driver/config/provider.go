@@ -78,6 +78,7 @@ const (
 	KeyGetSystemSecret                           = "secrets.system"
 	KeyLogoutRedirectURL                         = "urls.post_logout_redirect"
 	KeyLoginURL                                  = "urls.login"
+	KeyRegistrationURL                           = "urls.registration"
 	KeyLogoutURL                                 = "urls.logout"
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
@@ -373,6 +374,10 @@ func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host str
 
 func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).URIF(KeyLoginURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/login")))
+}
+
+func (p *DefaultProvider) RegistrationURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).URIF(KeyRegistrationURL, p.LoginURL(ctx)))
 }
 
 func (p *DefaultProvider) LogoutURL(ctx context.Context) *url.URL {

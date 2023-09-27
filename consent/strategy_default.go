@@ -204,7 +204,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		skip = true
 	}
 
-	// Let'id validate that prompt is actually not "none" if we can't skip authentication
+	// Let's validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "none") && !skip {
 		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint(`Prompt 'none' was requested, but no existing login session was found.`))
@@ -293,7 +293,14 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return err
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LoginURL(ctx), url.Values{"login_challenge": {encodedFlow}}).String(), http.StatusFound)
+	var baseURL *url.URL
+	if stringslice.Has(prompt, "registration") {
+		baseURL = s.c.RegistrationURL(ctx)
+	} else {
+		baseURL = s.c.LoginURL(ctx)
+	}
+
+	http.Redirect(w, r, urlx.SetQuery(baseURL, url.Values{"login_challenge": {encodedFlow}}).String(), http.StatusFound)
 
 	// generate the verifier
 	return errorsx.WithStack(ErrAbortOAuth2Request)

@@ -480,17 +480,13 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 
 					loginVerifier := x.Must(f.ToLoginVerifier(ctx, deps))
 
-					got2, err := m.VerifyAndInvalidateLoginRequest(ctx, f, loginVerifier)
+					got2, err := m.VerifyAndInvalidateLoginRequest(ctx, loginVerifier)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got2.LoginRequest)
-
-					_, err = m.VerifyAndInvalidateLoginRequest(ctx, nil, loginVerifier)
-					require.Error(t, err)
 
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 					got1, err = m.GetLoginRequest(ctx, loginChallenge)
 					require.NoError(t, err)
-					assert.True(t, got1.WasHandled)
 				})
 			}
 		})
@@ -544,32 +540,18 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 
 					consentVerifier := x.Must(f.ToConsentVerifier(ctx, deps))
 
-					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, f, consentVerifier)
+					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
 					require.NoError(t, err)
-					consentRequest.ID = f.ConsentChallengeID.String()
+					consentRequest.ID = got2.ID
 					compareConsentRequest(t, consentRequest, got2.ConsentRequest)
 					assert.Equal(t, consentRequest.ID, got2.ID)
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
-
-					// Trying to update this again should return an error because the consent request was used.
-					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience", "new-audience-2"}
-					_, err = m.HandleConsentRequest(ctx, f, h)
-					require.Error(t, err)
 
 					if tc.hasError {
 						assert.True(t, got2.HasError())
 					}
 					assert.Equal(t, tc.remember, got2.Remember)
 					assert.Equal(t, tc.rememberFor, got2.RememberFor)
-
-					_, err = m.VerifyAndInvalidateConsentRequest(ctx, f, makeID("verifier", network, tc.key))
-					require.Error(t, err)
-
-					// Because we don't persist the flow any more, we can't check for this.
-					//got1, err = m.GetConsentRequest(ctx, consentChallenge)
-					//require.NoError(t, err)
-					//assert.True(t, got1.WasHandled)
-
 				})
 			}
 
@@ -648,6 +630,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 		challengerv1 := makeID("challenge", network, "rv1")
 		challengerv2 := makeID("challenge", network, "rv2")
 		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
+
 			cr1, hcr1, f1 := MockConsentRequest("rv1", false, 0, false, false, false, "fk-login-challenge", network)
 			cr2, hcr2, f2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
 			f1.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
@@ -666,30 +649,30 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
 			require.NoError(t, err)
 
-			_, err = m.VerifyAndInvalidateConsentRequest(ctx, f1, x.Must(f1.ToConsentVerifier(ctx, deps)))
+			crr1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
-			_, err = m.VerifyAndInvalidateConsentRequest(ctx, f2, x.Must(f2.ToConsentVerifier(ctx, deps)))
+			crr2, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f2.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
 
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: f1.ConsentChallengeID.String(), RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
-				&fosite.Request{Client: cr1.Client, ID: f1.ConsentChallengeID.String(), RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: f2.ConsentChallengeID.String(), RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now()},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
-				&fosite.Request{Client: cr2.Client, ID: f2.ConsentChallengeID.String(), RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now()},
 			))
 
 			for i, tc := range []struct {
@@ -765,9 +748,9 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			require.NoError(t, err)
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
 			require.NoError(t, err)
-			handledConsentRequest1, err := m.VerifyAndInvalidateConsentRequest(ctx, f1, x.Must(f1.ToConsentVerifier(ctx, deps)))
+			handledConsentRequest1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
-			handledConsentRequest2, err := m.VerifyAndInvalidateConsentRequest(ctx, f2, x.Must(f2.ToConsentVerifier(ctx, deps)))
+			handledConsentRequest2, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f2.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
 
 			for i, tc := range []struct {
@@ -937,7 +920,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 						f.NID = deps.Contextualizer().Network(ctx, gofrsuuid.Nil)
 						cr := SaneMockConsentRequest(t, m, f, false)
 						_ = SaneMockHandleConsentRequest(t, m, f, cr, time.Time{}, 0, false, false)
-						_, err = m.VerifyAndInvalidateConsentRequest(ctx, f, x.Must(f.ToConsentVerifier(ctx, deps)))
+						_, err = m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f.ToConsentVerifier(ctx, deps)))
 						require.NoError(t, err)
 
 						sessions[k] = *ls

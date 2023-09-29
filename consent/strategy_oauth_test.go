@@ -21,10 +21,6 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/consent"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/ory/x/pointerx"
 
 	"github.com/tidwall/gjson"
@@ -1057,18 +1053,14 @@ func (d *dropCSRFCookieJar) Cookies(u *url.URL) []*http.Cookie {
 	return d.jar.Cookies(u)
 }
 
+// TODO(hperl): rename
 func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interface {
 	ConsentManager() consent.Manager
 	Config() *config.DefaultProvider
 	FlowCipher() *aead.XChaCha20Poly1305
 }, c *client.Client) *http.Client {
-	f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{Client: c})
-	require.NoError(t, err)
 
 	hc := testhelpers.NewEmptyJarClient(t)
-	hc.Jar.SetCookies(reg.Config().OAuth2AuthURL(ctx), []*http.Cookie{
-		{Name: flowctx.FlowCookie(c), Value: x.Must(flowctx.Encode(ctx, reg.FlowCipher(), f))},
-	})
 
 	return hc
 }

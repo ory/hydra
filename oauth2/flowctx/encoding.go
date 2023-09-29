@@ -122,23 +122,6 @@ func SetCookie(ctx context.Context, w http.ResponseWriter, reg interface {
 	return nil
 }
 
-// DeleteCookie deletes the flow cookie.
-func DeleteCookie(ctx context.Context, w http.ResponseWriter, reg interface {
-	config.Provider
-}, cookieName string) error {
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    "",
-		MaxAge:   -1,
-		HttpOnly: true,
-		Domain:   reg.Config().CookieDomain(ctx),
-		Secure:   reg.Config().CookieSecure(ctx),
-		SameSite: reg.Config().CookieSameSiteMode(ctx),
-	})
-
-	return nil
-}
-
 // FromCookie looks up the value stored in the cookie and decodes it.
 func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string, opts ...CodecOption) (*T, error) {
 	cookie, err := r.Cookie(cookieName)

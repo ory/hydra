@@ -287,33 +287,17 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	return f.GetConsentRequest(), nil
 }
 
-func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *flow.Flow, verifier string) (*flow.AcceptOAuth2ConsentRequest, error) {
+func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()
 
-	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
+	if err != nil {
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
-
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
-	if err != nil {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
-	}
-	if updatedFlow.ID != f.ID {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
-	}
-	if updatedFlow.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-
-	// Update flow from login request, but keep requested at.
-	updatedFlow.NID = f.NID
-	updatedFlow.ConsentCSRF = f.ConsentCSRF
-	updatedFlow.ConsentVerifier = f.ConsentVerifier
-	*f = *updatedFlow
 
 	if err = f.InvalidateConsentRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
@@ -349,35 +333,17 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, f *flow.Flow, challe
 	return p.GetLoginRequest(ctx, challenge)
 }
 
-func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, f *flow.Flow, verifier string) (*flow.HandledLoginRequest, error) {
+func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.HandledLoginRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
 	defer span.End()
 
-	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
+	if err != nil {
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
-
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
-	if err != nil {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-	if f.NID != updatedFlow.NID {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-
-	if updatedFlow.ID != f.ID {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match login request."))
-	}
-
-	// Update flow from login request, but keep requested at.
-	updatedFlow.NID = f.NID
-	updatedFlow.RequestedAt = f.RequestedAt
-	updatedFlow.LoginCSRF = f.LoginCSRF
-	updatedFlow.LoginVerifier = f.LoginVerifier
-	*f = *updatedFlow
 
 	if err := f.InvalidateLoginRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))

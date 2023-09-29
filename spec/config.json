@@ -776,6 +776,15 @@
             "/ui/login"
           ]
         },
+        "registration": {
+          "type": "string",
+          "description": "Sets the OAuth2 Registration Endpoint URL of the OAuth2 User Login & Consent flow. Defaults to the same value as `login`. The registration URL is used if the authorization request was started with the `prompt=registration` parameter.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-login.app/registration",
+            "/ui/registration"
+          ]
+        },
         "consent": {
           "type": "string",
           "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",

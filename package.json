@@ -16,7 +16,7 @@
     "doctoc": "^2.2.1"
   },
   "devDependencies": {
-    "cypress": "^9.7.0",
+    "cypress": "^13.3.0",
     "dayjs": "^1.10.6",
     "jsonwebtoken": "^8.5.1",
     "license-checker": "^25.0.1",

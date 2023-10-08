@@ -347,7 +347,7 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
-					d: "setting skip_consent suceeds for admin registration",
+					d: "setting skip_consent succeeds for admin registration",
 					payload: &client.Client{
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 						SkipConsent:  true,

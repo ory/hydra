@@ -547,6 +547,11 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					assert.Equal(t, consentRequest.ID, got2.ID)
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
 
+					t.Run("subcase=detect double-submit for consent verifier", func(t *testing.T) {
+						_, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
+						require.Error(t, err)
+					})
+
 					if tc.hasError {
 						assert.True(t, got2.HasError())
 					}

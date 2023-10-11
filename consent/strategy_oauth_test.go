@@ -118,7 +118,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
-			"The login verifier has already been used, has not been granted, or is invalid.",
+			"The resource owner or authorization server denied the request. The login verifier is invalid",
 		)
 	})
 

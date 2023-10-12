@@ -158,11 +158,11 @@ func (s *PersisterTestSuite) TestAuthenticate() {
 			client := &client.Client{ID: "client-id", Secret: "secret"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
-			actual, err := r.Persister().Authenticate(s.t2, "client-id", []byte("secret"))
+			actual, err := r.Persister().AuthenticateClient(s.t2, "client-id", []byte("secret"))
 			require.Error(t, err)
 			require.Nil(t, actual)
 
-			actual, err = r.Persister().Authenticate(s.t1, "client-id", []byte("secret"))
+			actual, err = r.Persister().AuthenticateClient(s.t1, "client-id", []byte("secret"))
 			require.NoError(t, err)
 			require.NotNil(t, actual)
 		})

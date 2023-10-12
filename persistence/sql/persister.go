@@ -17,6 +17,7 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
@@ -51,6 +52,7 @@ type (
 		ClientHasher() fosite.Hasher
 		KeyCipher() *aead.AESGCM
 		FlowCipher() *aead.XChaCha20Poly1305
+		Kratos() kratos.Client
 		contextx.Provider
 		x.RegistryLogger
 		x.TracingProvider

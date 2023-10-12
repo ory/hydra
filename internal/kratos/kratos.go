@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/ory/hydra/v2/driver/config"
@@ -29,6 +30,7 @@ type (
 	}
 	Client interface {
 		DisableSession(ctx context.Context, identityProviderSessionID string) error
+		Authenticate(ctx context.Context, name, secret string) error
 	}
 	Default struct {
 		dependencies
@@ -37,6 +39,37 @@ type (
 
 func New(d dependencies) Client {
 	return &Default{dependencies: d}
+}
+
+func (k *Default) Authenticate(ctx context.Context, name, secret string) (err error) {
+	ctx, span := k.Tracer(ctx).Tracer().Start(ctx, "kratos.Authenticate")
+	otelx.End(span, &err)
+
+	publicURL, ok := k.Config().KratosPublicURL(ctx)
+	span.SetAttributes(attribute.String("public_url", fmt.Sprintf("%+v", publicURL)))
+	if !ok {
+		span.SetAttributes(attribute.Bool("skipped", true))
+		span.SetAttributes(attribute.String("reason", "kratos public url not set"))
+
+		return errors.New("kratos public url not set")
+	}
+
+	kratos := k.newKratosClient(ctx, publicURL)
+
+	flow, _, err := kratos.FrontendApi.CreateNativeLoginFlow(ctx).Execute()
+	if err != nil {
+		return err
+	}
+
+	_, _, err = kratos.FrontendApi.UpdateLoginFlow(ctx).Flow(flow.Id).UpdateLoginFlowBody(client.UpdateLoginFlowBody{
+		UpdateLoginFlowWithPasswordMethod: &client.UpdateLoginFlowWithPasswordMethod{
+			Method:     "password",
+			Identifier: name,
+			Password:   secret,
+		},
+	}).Execute()
+
+	return err
 }
 
 func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID string) (err error) {
@@ -67,7 +100,6 @@ func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID 
 	_, err = kratos.IdentityApi.DisableSession(ctx, identityProviderSessionID).Execute()
 
 	return err
-
 }
 
 func (k *Default) clientConfiguration(ctx context.Context, adminURL *url.URL) *client.Configuration {
@@ -76,4 +108,13 @@ func (k *Default) clientConfiguration(ctx context.Context, adminURL *url.URL) *c
 	configuration.HTTPClient = k.HTTPClient(ctx).StandardClient()
 
 	return configuration
+}
+
+func (k *Default) newKratosClient(ctx context.Context, publicURL *url.URL) *client.APIClient {
+	configuration := k.clientConfiguration(ctx, publicURL)
+	if header := k.Config().KratosRequestHeader(ctx); header != nil {
+		configuration.HTTPClient.Transport = httpx.WrapTransportWithHeader(configuration.HTTPClient.Transport, header)
+	}
+	kratos := client.NewAPIClient(configuration)
+	return kratos
 }

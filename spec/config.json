@@ -834,6 +834,14 @@
                 "https://kratos.example.com/admin"
               ]
             },
+            "publicUrl": {
+              "title": "The public URL of the ORY Kratos instance.",
+              "type": "string",
+              "format": "uri",
+              "examples": [
+                "https://kratos.example.com/public"
+              ]
+            },
             "headers": {
               "title": "HTTP Request Headers",
               "description": "These headers will be passed in HTTP requests to the Identity Provider.",

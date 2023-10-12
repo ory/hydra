@@ -22,6 +22,7 @@ type FositeStorer interface {
 	pkce.PKCERequestStorage
 	rfc7523.RFC7523KeyStorage
 	verifiable.NonceManager
+	oauth2.ResourceOwnerPasswordCredentialsGrantStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error
 

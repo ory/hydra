@@ -90,6 +90,7 @@ type RegistryBase struct {
 	fc              *fositex.Config
 	publicCORS      *cors.Cors
 	kratos          kratos.Client
+	fositeFactories []fositex.Factory
 }
 
 func (m *RegistryBase) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
@@ -415,6 +416,16 @@ func (m *RegistryBase) OAuth2Config() *fositex.Config {
 
 	m.fc = fositex.NewConfig(m.r)
 	return m.fc
+}
+
+func (m *RegistryBase) ExtraFositeFactories() []fositex.Factory {
+	return m.fositeFactories
+}
+
+func (m *RegistryBase) WithExtraFositeFactories(f []fositex.Factory) Registry {
+	m.fositeFactories = f
+
+	return m.r
 }
 
 func (m *RegistryBase) OAuth2ProviderConfig() fosite.Configurator {

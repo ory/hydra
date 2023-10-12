@@ -10,6 +10,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/popx"
@@ -58,6 +59,9 @@ type Registry interface {
 	WithKratos(k kratos.Client) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
+
+	WithExtraFositeFactories(f []fositex.Factory) Registry
+	ExtraFositeFactories() []fositex.Factory
 
 	contextx.Provider
 	config.Provider

@@ -29,9 +29,10 @@ type configDependencies interface {
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 	ClientHasher() fosite.Hasher
+	ExtraFositeFactories() []Factory
 }
 
-type factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
+type Factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
 
 type Config struct {
 	deps configDependencies
@@ -45,7 +46,7 @@ type Config struct {
 }
 
 var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
-var defaultFactories = []factory{
+var defaultFactories = []Factory{
 	compose.OAuth2AuthorizeExplicitFactory,
 	compose.OAuth2AuthorizeImplicitFactory,
 	compose.OAuth2ClientCredentialsGrantFactory,
@@ -70,7 +71,8 @@ func NewConfig(deps configDependencies) *Config {
 }
 
 func (c *Config) LoadDefaultHandlers(strategy interface{}) {
-	for _, factory := range defaultFactories {
+	factories := append(defaultFactories, c.deps.ExtraFositeFactories()...)
+	for _, factory := range factories {
 		res := factory(c, c.deps.Persister(), strategy)
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)

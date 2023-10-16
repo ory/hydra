@@ -385,7 +385,11 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.Login
 		session.Subject = subject
 		session.Remember = remember
 
-		return p.CreateWithNetwork(ctx, session)
+		err := p.CreateWithNetwork(ctx, session)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return nil
 	}
 
 	// In some unit tests, we still confirm the login session without data from the cookie. We can remove this case

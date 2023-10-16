@@ -202,6 +202,76 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		makeRequestAndExpectError(t, nil, c, url.Values{}, "expect-reject-consent")
 	})
 
+	t.Run("suite=double-submit", func(t *testing.T) {
+		ctx := context.Background()
+		c := createDefaultClient(t)
+		hc := testhelpers.NewEmptyJarClient(t)
+		var loginChallenge, consentChallenge string
+
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			func(w http.ResponseWriter, r *http.Request) {
+				res, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).
+					LoginChallenge(r.URL.Query().Get("login_challenge")).
+					Execute()
+				require.NoError(t, err)
+				loginChallenge = res.Challenge
+
+				v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+					LoginChallenge(loginChallenge).
+					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
+					Execute()
+				require.NoError(t, err)
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			},
+			func(w http.ResponseWriter, r *http.Request) {
+				res, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).
+					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+					Execute()
+				require.NoError(t, err)
+				consentChallenge = res.Challenge
+
+				v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+					ConsentChallenge(consentChallenge).
+					AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
+					Execute()
+				require.NoError(t, err)
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			})
+
+		makeRequestAndExpectCode(t, hc, c, url.Values{})
+
+		t.Run("case=double-submit login verifier", func(t *testing.T) {
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+				LoginChallenge(loginChallenge).
+				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
+				Execute()
+			require.NoError(t, err)
+			res, err := hc.Get(v.RedirectTo)
+			require.NoError(t, err)
+			q := res.Request.URL.Query()
+			assert.Equal(t,
+				"The resource owner or authorization server denied the request. The login verifier has already been used.",
+				q.Get("error_description"), q)
+		})
+
+		t.Run("case=double-submit consent verifier", func(t *testing.T) {
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+				ConsentChallenge(consentChallenge).
+				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
+				Execute()
+			require.NoError(t, err)
+			res, err := hc.Get(v.RedirectTo)
+			require.NoError(t, err)
+			q := res.Request.URL.Query()
+			assert.Equal(t,
+				"The resource owner or authorization server denied the request. The consent verifier has already been used.",
+				q.Get("error_description"), q)
+		})
+
+	})
+
 	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
 		c := createDefaultClient(t)
 		testhelpers.NewLoginConsentUI(t, reg.Config(),

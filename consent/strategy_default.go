@@ -464,6 +464,9 @@ func (s *DefaultStrategy) verifyAuthentication(
 
 		loginSession.IdentityProviderSessionID = sqlxx.NullString(session.IdentityProviderSessionID)
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+			if errors.Is(err, sqlcon.ErrUniqueViolation) {
+				return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used."))
+			}
 			return nil, err
 		}
 	}
@@ -659,7 +662,9 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	}
 
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, sqlcon.ErrUniqueViolation) {
+		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
+	} else if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, nil, err

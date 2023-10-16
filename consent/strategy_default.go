@@ -274,10 +274,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(cl), f); err != nil {
-		return err
-	}
-
 	store, err := s.r.CookieStore(ctx)
 	if err != nil {
 		return err
@@ -356,15 +352,13 @@ func (s *DefaultStrategy) verifyAuthentication(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyAuthentication")
 	defer otelx.End(span, &err)
 
-	f, err := s.flowFromCookie(r)
+	// We decode the flow from the cookie again because VerifyAndInvalidateLoginRequest does not return the flow
+	f, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
 	if err != nil {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The flow cookie is missing in the request."))
-	}
-	if f.Client.GetID() != req.GetClient().GetID() {
-		return nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow cookie client id does not match the authorize request client id."))
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier is invalid."))
 	}
 
-	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, f, verifier)
+	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
@@ -470,6 +464,9 @@ func (s *DefaultStrategy) verifyAuthentication(
 
 		loginSession.IdentityProviderSessionID = sqlxx.NullString(session.IdentityProviderSessionID)
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+			if errors.Is(err, sqlcon.ErrUniqueViolation) {
+				return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used."))
+			}
 			return nil, err
 		}
 	}
@@ -510,10 +507,6 @@ func (s *DefaultStrategy) verifyAuthentication(
 			"cookie_same_site": s.c.CookieSameSiteMode(ctx),
 			"cookie_secure":    s.c.CookieSecure(ctx),
 		}).Debug("Authentication session cookie was set.")
-
-	if err = flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(flowctx.SuffixForClient(req.GetClient())), f); err != nil {
-		return nil, errorsx.WithStack(err)
-	}
 
 	return f, nil
 }
@@ -630,9 +623,6 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return errorsx.WithStack(err)
 	}
 
-	if err := flowctx.SetCookie(ctx, w, s.r, flowctx.FlowCookie(cl), f); err != nil {
-		return err
-	}
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
 	if err != nil {
 		return err
@@ -658,20 +648,23 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWriter, r *http.Request, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyConsent")
 	defer otelx.End(span, &err)
 
-	f, err := s.flowFromCookie(r)
+	// We decode the flow here once again because VerifyAndInvalidateConsentRequest does not return the flow
+	f, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
 	if f.Client.GetID() != r.URL.Query().Get("client_id") {
-		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow cookie client id does not match the authorize request client id."))
+		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
-	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, f, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
+	if errors.Is(err, sqlcon.ErrUniqueViolation) {
+		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
+	} else if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, nil, err
@@ -697,10 +690,6 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 
 	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), session.ConsentRequest.Client.CookieSuffix())
 	if err := validateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, session.ConsentRequest.CSRF); err != nil {
-		return nil, nil, err
-	}
-
-	if err = flowctx.DeleteCookie(ctx, w, s.r, flowctx.FlowCookie(f.Client)); err != nil {
 		return nil, nil, err
 	}
 
@@ -1185,15 +1174,6 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
 	}
 	return subject, nil
-}
-
-func (s *DefaultStrategy) flowFromCookie(r *http.Request) (*flow.Flow, error) {
-	clientID := r.URL.Query().Get("client_id")
-	if clientID == "" {
-		return nil, errors.WithStack(fosite.ErrInvalidClient)
-	}
-
-	return flowctx.FromCookie[flow.Flow](r.Context(), r, s.r.FlowCipher(), flowctx.FlowCookie(flowctx.SuffixFromStatic(clientID)))
 }
 
 func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) *flow.LoginSession {

@@ -21,10 +21,6 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/consent"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/ory/x/pointerx"
 
 	"github.com/tidwall/gjson"
@@ -122,7 +118,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
-			"The login verifier has already been used, has not been granted, or is invalid.",
+			"The resource owner or authorization server denied the request. The login verifier is invalid",
 		)
 	})
 
@@ -204,6 +200,76 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			})
 
 		makeRequestAndExpectError(t, nil, c, url.Values{}, "expect-reject-consent")
+	})
+
+	t.Run("suite=double-submit", func(t *testing.T) {
+		ctx := context.Background()
+		c := createDefaultClient(t)
+		hc := testhelpers.NewEmptyJarClient(t)
+		var loginChallenge, consentChallenge string
+
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			func(w http.ResponseWriter, r *http.Request) {
+				res, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).
+					LoginChallenge(r.URL.Query().Get("login_challenge")).
+					Execute()
+				require.NoError(t, err)
+				loginChallenge = res.Challenge
+
+				v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+					LoginChallenge(loginChallenge).
+					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
+					Execute()
+				require.NoError(t, err)
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			},
+			func(w http.ResponseWriter, r *http.Request) {
+				res, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).
+					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+					Execute()
+				require.NoError(t, err)
+				consentChallenge = res.Challenge
+
+				v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+					ConsentChallenge(consentChallenge).
+					AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
+					Execute()
+				require.NoError(t, err)
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			})
+
+		makeRequestAndExpectCode(t, hc, c, url.Values{})
+
+		t.Run("case=double-submit login verifier", func(t *testing.T) {
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+				LoginChallenge(loginChallenge).
+				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
+				Execute()
+			require.NoError(t, err)
+			res, err := hc.Get(v.RedirectTo)
+			require.NoError(t, err)
+			q := res.Request.URL.Query()
+			assert.Equal(t,
+				"The resource owner or authorization server denied the request. The login verifier has already been used.",
+				q.Get("error_description"), q)
+		})
+
+		t.Run("case=double-submit consent verifier", func(t *testing.T) {
+			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+				ConsentChallenge(consentChallenge).
+				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
+				Execute()
+			require.NoError(t, err)
+			res, err := hc.Get(v.RedirectTo)
+			require.NoError(t, err)
+			q := res.Request.URL.Query()
+			assert.Equal(t,
+				"The resource owner or authorization server denied the request. The consent verifier has already been used.",
+				q.Get("error_description"), q)
+		})
+
 	})
 
 	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
@@ -1057,18 +1123,14 @@ func (d *dropCSRFCookieJar) Cookies(u *url.URL) []*http.Cookie {
 	return d.jar.Cookies(u)
 }
 
+// TODO(hperl): rename
 func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interface {
 	ConsentManager() consent.Manager
 	Config() *config.DefaultProvider
 	FlowCipher() *aead.XChaCha20Poly1305
 }, c *client.Client) *http.Client {
-	f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{Client: c})
-	require.NoError(t, err)
 
 	hc := testhelpers.NewEmptyJarClient(t)
-	hc.Jar.SetCookies(reg.Config().OAuth2AuthURL(ctx), []*http.Cookie{
-		{Name: flowctx.FlowCookie(c), Value: x.Must(flowctx.Encode(ctx, reg.FlowCipher(), f))},
-	})
 
 	return hc
 }

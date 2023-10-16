@@ -18,13 +18,9 @@ func (s StaticSuffix) CookieSuffix() string { return string(s) }
 func (s clientID) GetID() string            { return string(s) }
 
 const (
-	flowCookie         = "ory_hydra_flow"
 	loginSessionCookie = "ory_hydra_loginsession"
 )
 
-func FlowCookie(suffix CookieSuffixer) string {
-	return flowCookie + "_" + suffix.CookieSuffix()
-}
 func LoginSessionCookie(suffix CookieSuffixer) string {
 	return loginSessionCookie + "_" + suffix.CookieSuffix()
 }

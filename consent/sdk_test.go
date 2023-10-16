@@ -139,9 +139,9 @@ func TestSDK(t *testing.T) {
 	_, err = m.HandleConsentRequest(context.Background(), cr4Flow, hcr4)
 	require.NoError(t, err)
 
-	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), cr3Flow, consentVerifier(cr3Flow))
+	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr3Flow))
 	require.NoError(t, err)
-	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), cr4Flow, consentVerifier(cr4Flow))
+	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr4Flow))
 	require.NoError(t, err)
 
 	lur1 := MockLogoutRequest("testsdk-1", true, network)

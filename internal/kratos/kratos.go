@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 	client "github.com/ory/kratos-client-go"
@@ -68,8 +69,11 @@ func (k *Default) Authenticate(ctx context.Context, name, secret string) (err er
 			Password:   secret,
 		},
 	}).Execute()
+	if err != nil {
+		return fosite.ErrNotFound.WithWrap(err)
+	}
 
-	return err
+	return nil
 }
 
 func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID string) (err error) {

@@ -1219,6 +1219,11 @@
       "title": "Enable development mode",
       "description": "If true, disables critical security measures to allow easier local development. Do not use in production.",
       "default": false
+    },
+    "feature_flags": {
+      "title": "Feature flags",
+      "type": "object",
+      "additionalProperties": true
     }
   },
   "additionalProperties": false

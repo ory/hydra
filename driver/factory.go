@@ -8,6 +8,7 @@ import (
 	"io/fs"
 
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
@@ -22,10 +23,11 @@ type (
 		opts     []configx.OptionModifier
 		config   *config.DefaultProvider
 		// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
-		skipNetworkInit bool
-		tracerWrapper   TracerWrapper
-		extraMigrations []fs.FS
-		goMigrations    []popx.Migration
+		skipNetworkInit  bool
+		tracerWrapper    TracerWrapper
+		extraMigrations  []fs.FS
+		goMigrations     []popx.Migration
+		fositexFactories []fositex.Factory
 	}
 	OptionsModifier func(*options)
 
@@ -94,6 +96,12 @@ func WithGoMigrations(m ...popx.Migration) OptionsModifier {
 	}
 }
 
+func WithExtraFositeFactories(f ...fositex.Factory) OptionsModifier {
+	return func(o *options) {
+		o.fositexFactories = append(o.fositexFactories, f...)
+	}
+}
+
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
@@ -131,6 +139,8 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 	if o.tracerWrapper != nil {
 		r.WithTracerWrapper(o.tracerWrapper)
 	}
+
+	r.WithExtraFositeFactories(o.fositexFactories)
 
 	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")

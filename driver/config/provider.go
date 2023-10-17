@@ -86,6 +86,7 @@ const (
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyIdentityProviderAdminURL                  = "urls.identity_provider.url"
+	KeyIdentityProviderPublicURL                 = "urls.identity_provider.publicUrl"
 	KeyIdentityProviderHeaders                   = "urls.identity_provider.headers"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
@@ -415,6 +416,12 @@ func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
 
 	return u, u != nil
 }
+func (p *DefaultProvider) KratosPublicURL(ctx context.Context) (*url.URL, bool) {
+	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderPublicURL, nil)
+
+	return u, u != nil
+}
+
 func (p *DefaultProvider) KratosRequestHeader(ctx context.Context) http.Header {
 	hh := map[string]string{}
 	if err := p.getProvider(ctx).Unmarshal(KeyIdentityProviderHeaders, &hh); err != nil {

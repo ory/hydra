@@ -52,11 +52,11 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 			RedirectURIs: []string{"http://redirect"},
 		}))
 
-		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
+		c, err := m.AuthenticateClient(ctx, "1234321", []byte("secret1"))
 		require.Error(t, err)
 		require.Nil(t, c)
 
-		c, err = m.Authenticate(ctx, "1234321", []byte("secret"))
+		c, err = m.AuthenticateClient(ctx, "1234321", []byte("secret"))
 		require.NoError(t, err)
 		assert.Equal(t, "1234321", c.GetID())
 	}

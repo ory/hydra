@@ -76,8 +76,8 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 	})
 }
 
-func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) (_ *client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Authenticate")
+func (p *Persister) AuthenticateClient(ctx context.Context, id string, secret []byte) (_ *client.Client, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AuthenticateClient")
 	defer otelx.End(span, &err)
 
 	c, err := p.GetConcreteClient(ctx, id)

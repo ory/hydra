@@ -643,7 +643,7 @@ GetOidcUserInfo OpenID Connect Userinfo
 This endpoint returns the payload of the ID Token, including `session.id_token` values, of
 the provided OAuth 2.0 Access Token's consent request.
 
-In the case of authentication error, a WWW-AuthenticateClient header might be set in the response
+In the case of authentication error, a WWW-Authenticate header might be set in the response
 with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 for more details about header format.
 

@@ -1134,7 +1134,7 @@ paths:
         \ the authentication session(s), the subject\nhas to re-authenticate at the\
         \ Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf\
         \ you send the subject in a query param, all authentication sessions that\
-        \ belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel\
+        \ belong to that subject are revoked.\nNo OpenID Connect Front- or Back-channel\
         \ logout is performed in this case.\n\nAlternatively, you can send a SessionID\
         \ via `sid` query param, in which case, only the session that is connected\n\
         to that SessionID is revoked. OpenID Connect Back-channel logout is performed\

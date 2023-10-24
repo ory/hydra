@@ -25,6 +25,7 @@ LICENSE.txt
 hydra-login-consent-node
 ./cypress/screenshots
 *-packr.go
+consent/csrf_flagka.go
 packrd/
 persistence/sql/migrations/schema.sql
 cypress/videos

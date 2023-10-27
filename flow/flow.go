@@ -295,9 +295,11 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	f.LoginExtendSessionLifespan = h.ExtendSessionLifespan
 	f.ACR = h.ACR
 	f.AMR = h.AMR
-	if h.Context == nil {
+
+	if len(h.Context) > 0 {
 		f.Context = h.Context
 	}
+
 	f.LoginWasUsed = h.WasHandled
 	f.LoginAuthenticatedAt = h.AuthenticatedAt
 	return nil
@@ -390,7 +392,7 @@ func (f *Flow) HandleConsentRequest(r *consent.AcceptOAuth2ConsentRequest) error
 	f.ConsentWasHandled = r.WasHandled
 	f.ConsentError = r.Error
 
-	if r.Context != nil {
+	if len(r.Context) > 0 {
 		f.Context = r.Context
 	}
 

@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Context** | Pointer to **interface{}** |  | [optional] 
 **GrantAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
 **GrantScope** | Pointer to **[]string** |  | [optional] 
 **HandledAt** | Pointer to **time.Time** |  | [optional] 
@@ -30,6 +31,41 @@ NewAcceptOAuth2ConsentRequestWithDefaults instantiates a new AcceptOAuth2Consent
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
+### GetContext
+
+`func (o *AcceptOAuth2ConsentRequest) GetContext() interface{}`
+
+GetContext returns the Context field if non-nil, zero value otherwise.
+
+### GetContextOk
+
+`func (o *AcceptOAuth2ConsentRequest) GetContextOk() (*interface{}, bool)`
+
+GetContextOk returns a tuple with the Context field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetContext
+
+`func (o *AcceptOAuth2ConsentRequest) SetContext(v interface{})`
+
+SetContext sets Context field to given value.
+
+### HasContext
+
+`func (o *AcceptOAuth2ConsentRequest) HasContext() bool`
+
+HasContext returns a boolean if a field has been set.
+
+### SetContextNil
+
+`func (o *AcceptOAuth2ConsentRequest) SetContextNil(b bool)`
+
+ SetContextNil sets the value for Context to be an explicit nil
+
+### UnsetContext
+`func (o *AcceptOAuth2ConsentRequest) UnsetContext()`
+
+UnsetContext ensures that no value is present for Context, not even an explicit nil
 ### GetGrantAccessTokenAudience
 
 `func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudience() []string`

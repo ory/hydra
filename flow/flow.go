@@ -290,6 +290,11 @@ func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
 	} else {
 		f.State = FlowStateLoginUnused
 	}
+
+	if f.Context != nil {
+		f.Context = h.Context
+	}
+
 	f.ID = h.ID
 	f.Subject = h.Subject
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
@@ -301,7 +306,6 @@ func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
 	f.LoginExtendSessionLifespan = h.ExtendSessionLifespan
 	f.ACR = h.ACR
 	f.AMR = h.AMR
-	f.Context = h.Context
 	f.LoginWasUsed = h.WasHandled
 	f.LoginAuthenticatedAt = h.AuthenticatedAt
 	return nil
@@ -394,7 +398,9 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 	f.ConsentHandledAt = r.HandledAt
 	f.ConsentWasHandled = r.WasHandled
 	f.ConsentError = r.Error
-	f.Context = r.Context
+	if r.Context != nil {
+		f.Context = r.Context
+	}
 
 	if r.Session != nil {
 		f.SessionIDToken = r.Session.IDToken

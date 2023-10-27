@@ -6,10 +6,11 @@
 package consent
 
 import (
-	"github.com/ory/hydra/v2/flow"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/v2/flow"
 
 	"github.com/gorilla/sessions"
 
@@ -18,6 +19,8 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
 )
+
+// WARNING - changes in this file need to be mirrored elsewhere.
 
 func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name string, csrfValue string, maxAge time.Duration) error {
 	// Errors can be ignored here, because we always get a session back. Error typically means that the

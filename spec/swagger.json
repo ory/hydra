@@ -2173,6 +2173,9 @@
       "type": "object",
       "title": "The request payload used to accept a consent request.",
       "properties": {
+        "context": {
+          "$ref": "#/definitions/JSONRawMessage"
+        },
         "grant_access_token_audience": {
           "$ref": "#/definitions/StringSliceJSONFormat"
         },
@@ -2937,6 +2940,9 @@
       "properties": {
         "consent_request": {
           "$ref": "#/definitions/oAuth2ConsentRequest"
+        },
+        "context": {
+          "$ref": "#/definitions/JSONRawMessage"
         },
         "grant_access_token_audience": {
           "$ref": "#/definitions/StringSliceJSONFormat"

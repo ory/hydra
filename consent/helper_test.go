@@ -266,7 +266,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				assert.NoError(t, err, "failed to save cookie %s", c.name)
 			}
 
-			err := validateCsrfSession(r, config, store, name, tc.csrfValue)
+			err := ValidateCsrfSession(r, config, store, name, tc.csrfValue)
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {

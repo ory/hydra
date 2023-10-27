@@ -6,6 +6,7 @@
 package consent
 
 import (
+	"github.com/ory/hydra/v2/flow"
 	"net/http"
 	"strings"
 	"time"
@@ -45,7 +46,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConf
 	return nil
 }
 
-func validateCsrfSession(r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string) error {
+func ValidateCsrfSession(r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string, f *flow.Flow) error {
 	if cookie, err := getCsrfSession(r, store, conf, name); err != nil {
 		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("CSRF session cookie could not be decoded."))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {

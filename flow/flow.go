@@ -394,6 +394,7 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 	f.ConsentHandledAt = r.HandledAt
 	f.ConsentWasHandled = r.WasHandled
 	f.ConsentError = r.Error
+	f.Context = r.Context
 
 	if r.Session != nil {
 		f.SessionIDToken = r.Session.IDToken
@@ -458,6 +459,7 @@ func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
 		RememberFor:        crf,
 		HandledAt:          f.ConsentHandledAt,
 		WasHandled:         f.ConsentWasHandled,
+		Context:            f.Context,
 		ConsentRequest:     f.GetConsentRequest(),
 		Error:              f.ConsentError,
 		RequestedAt:        f.RequestedAt,

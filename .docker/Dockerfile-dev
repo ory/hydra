@@ -1,0 +1,25 @@
+FROM golang:1.17-alpine3.15 AS builder
+
+RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
+
+WORKDIR /go/src/github.com/ory/hydra
+
+COPY go.mod go.sum ./
+ENV GO111MODULE on
+ENV CGO_ENABLED 1
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o /usr/bin/hydra
+
+FROM alpine:3.15
+
+COPY --from=builder /usr/bin/hydra /usr/bin/hydra
+
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
+
+ENTRYPOINT ["hydra"]
+# CMD ["serve"]

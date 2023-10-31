@@ -88,7 +88,7 @@ type WellKnown struct {
 	GrantTypesSupported []string `json:"grant_types_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.
-	ResponseModesSupported []string `json:"response_modes_supported"`
+	// ResponseModesSupported []string `json:"response_modes_supported"`
 
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint string `json:"userinfo_endpoint"`
@@ -102,7 +102,7 @@ type WellKnown struct {
 	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 
 	// 	JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
-	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
+	// UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
 	// to encode the Claims in a JWT.
@@ -111,48 +111,51 @@ type WellKnown struct {
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 
 	// 	Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
-	RequestParameterSupported bool `json:"request_parameter_supported"`
+	// RequestParameterSupported bool `json:"request_parameter_supported"`
 
 	// Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
-	RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
+	// RequestURIParameterSupported bool `json:"request_uri_parameter_supported"`
 
 	// Boolean value specifying whether the OP requires any request_uri values used to be pre-registered
 	// using the request_uris registration parameter.
-	RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
+	// RequireRequestURIRegistration bool `json:"require_request_uri_registration"`
 
 	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
-	ClaimsParameterSupported bool `json:"claims_parameter_supported"`
+	// ClaimsParameterSupported bool `json:"claims_parameter_supported"`
 
 	// URL of the authorization server's OAuth 2.0 revocation endpoint.
-	RevocationEndpoint string `json:"revocation_endpoint"`
+	// RevocationEndpoint string `json:"revocation_endpoint"`
 
 	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
-	BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
+	// BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
 
 	// Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
 	// session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
-	BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
+	// BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
 
 	// Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
-	FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
+	// FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
 
 	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
 	// the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
 	// included in ID Tokens issued by the OP.
-	FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
+	// FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
 
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
-	EndSessionEndpoint string `json:"end_session_endpoint"`
+	// EndSessionEndpoint string `json:"end_session_endpoint"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
 	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
 	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
 	// (using the request_uri parameter).
-	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
+	// RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
 
 	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
 	// by this authorization server.
-	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+	// CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+
+	ClaimTypesSupported []string `json:"claim_types_supported"`
+	UiLocalesSupported  []string `json:"ui_locales_supported"`
 }
 
 // swagger:parameters deleteOAuth2Token

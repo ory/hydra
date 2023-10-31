@@ -271,7 +271,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/auth"), c.OAuth2AuthURL())
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/token"), c.OAuth2TokenURL())
 	assert.Equal(t, []string{"sub", "username"}, c.OIDCDiscoverySupportedClaims())
-	assert.Equal(t, []string{"offline_access", "offline", "openid", "whatever"}, c.OIDCDiscoverySupportedScope())
+	assert.Equal(t, []string{"openid", "whatever"}, c.OIDCDiscoverySupportedScope())
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OIDCDiscoveryUserinfoEndpoint())
 
 	// oidc

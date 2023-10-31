@@ -21,7 +21,7 @@ LICENSE.txt
 ./hydra
 !./hydra/
 hydra-login-consent-node
-./cypress/screenshots
+cypress/screenshots
 *-packr.go
 packrd/
 persistence/sql/migrations/schema.sql

@@ -178,7 +178,7 @@ func (p *Provider) SubjectTypesSupported() []string {
 func (p *Provider) DefaultClientScope() []string {
 	return p.p.StringsF(
 		KeyDefaultClientScope,
-		[]string{"offline_access", "offline", "openid"},
+		[]string{"openid"},
 	)
 }
 
@@ -419,7 +419,7 @@ func (p *Provider) OIDCDiscoverySupportedClaims() []string {
 func (p *Provider) OIDCDiscoverySupportedScope() []string {
 	return stringslice.Unique(
 		append(
-			[]string{"offline_access", "offline", "openid"},
+			[]string{"openid"},
 			p.p.Strings(KeyOIDCDiscoverySupportedScope)...,
 		),
 	)

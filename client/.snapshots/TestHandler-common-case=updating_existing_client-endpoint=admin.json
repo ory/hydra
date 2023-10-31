@@ -9,7 +9,7 @@
     ],
     "grant_types": null,
     "response_types": null,
-    "scope": "offline_access offline openid",
+    "scope": "openid",
     "audience": [],
     "owner": "",
     "policy_uri": "",

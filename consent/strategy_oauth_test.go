@@ -19,8 +19,6 @@ import (
 	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/hydra/v2/aead"
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/x/pointerx"
 
 	"github.com/tidwall/gjson"
@@ -114,7 +112,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
-		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
+		hc := testhelpers.NewEmptyJarClient(t)
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
@@ -128,7 +126,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// - This should fail because a consent verifier was given but no login verifier
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
-		hc := newHTTPClientWithFlowCookie(t, ctx, reg, c)
+		hc := testhelpers.NewEmptyJarClient(t)
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"consent_verifier": {"does-not-exist"}},
@@ -252,7 +250,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			require.NoError(t, err)
 			q := res.Request.URL.Query()
 			assert.Equal(t,
-				"The resource owner or authorization server denied the request. The login verifier has already been used.",
+				"The resource owner or authorization server denied the request. The consent verifier has already been used.",
 				q.Get("error_description"), q)
 		})
 
@@ -1121,16 +1119,4 @@ func (d *dropCSRFCookieJar) SetCookies(u *url.URL, cookies []*http.Cookie) {
 
 func (d *dropCSRFCookieJar) Cookies(u *url.URL) []*http.Cookie {
 	return d.jar.Cookies(u)
-}
-
-// TODO(hperl): rename
-func newHTTPClientWithFlowCookie(t *testing.T, ctx context.Context, reg interface {
-	ConsentManager() consent.Manager
-	Config() *config.DefaultProvider
-	FlowCipher() *aead.XChaCha20Poly1305
-}, c *client.Client) *http.Client {
-
-	hc := testhelpers.NewEmptyJarClient(t)
-
-	return hc
 }

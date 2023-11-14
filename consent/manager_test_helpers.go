@@ -322,8 +322,8 @@ func TestHelperNID(r interface {
 		require.Error(t, err)
 		_, err = t1ValidNID.HandleLoginRequest(ctx, f, testLR.ID, &testHLR)
 		require.NoError(t, err)
-		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS, testLS.ID, time.Now(), testLS.Subject, true))
-		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS, testLS.ID, time.Now(), testLS.Subject, true))
+		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS))
+		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
 		ls, err := t2InvalidNID.DeleteLoginSession(ctx, testLS.ID)
 		require.Error(t, err)
 		assert.Nil(t, ls)
@@ -356,7 +356,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}
 				require.NoError(t, m.CreateLoginSession(ctx, loginSession))
-				require.NoError(t, m.ConfirmLoginSession(ctx, loginSession, loginSession.ID, time.Now().Round(time.Second).UTC(), loginSession.Subject, true))
+				require.NoError(t, m.ConfirmLoginSession(ctx, loginSession))
 
 				lr[k] = &flow.LoginRequest{
 					ID:              makeID("fk-login-challenge", network, k),
@@ -392,6 +392,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					},
 				},
 			} {
+				tc := tc
 				t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
 					_, err := m.GetRememberedLoginSession(ctx, &tc.s, tc.s.ID)
 					require.EqualError(t, err, x.ErrNotFound.Error(), "%#v", err)
@@ -403,17 +404,28 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					require.EqualError(t, err, x.ErrNotFound.Error())
 
 					updatedAuth := time.Time(tc.s.AuthenticatedAt).Add(time.Second)
-					require.NoError(t, m.ConfirmLoginSession(ctx, &tc.s, tc.s.ID, updatedAuth, tc.s.Subject, true))
+					tc.s.AuthenticatedAt = sqlxx.NullTime(updatedAuth)
+					require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
+						ID:              tc.s.ID,
+						AuthenticatedAt: sqlxx.NullTime(updatedAuth),
+						Subject:         tc.s.Subject,
+						Remember:        true,
+					}))
 
 					got, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got.ID)
-					assert.Equal(t, updatedAuth.Unix(), time.Time(got.AuthenticatedAt).Unix()) // this was updated from confirm...
+					assert.Equal(t, tc.s.AuthenticatedAt, got.AuthenticatedAt) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
 					// Make sure AuthAt does not equal...
 					updatedAuth2 := updatedAuth.Add(1 * time.Second).UTC()
-					require.NoError(t, m.ConfirmLoginSession(ctx, nil, tc.s.ID, updatedAuth2, "some-other-subject", true))
+					require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
+						ID:              tc.s.ID,
+						AuthenticatedAt: sqlxx.NullTime(updatedAuth2),
+						Subject:         "some-other-subject",
+						Remember:        true,
+					}))
 
 					got2, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
 					require.NoError(t, err)
@@ -902,7 +914,8 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 							Subject:         subject,
 						}
 						require.NoError(t, m.CreateLoginSession(ctx, ls))
-						require.NoError(t, m.ConfirmLoginSession(ctx, ls, ls.ID, time.Now(), ls.Subject, true))
+						ls.Remember = true
+						require.NoError(t, m.ConfirmLoginSession(ctx, ls))
 
 						cl := &client.Client{ID: uuid.New().String()}
 						switch k % 4 {
@@ -1042,7 +1055,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			}
 
 			require.NoError(t, m.CreateLoginSession(ctx, &s))
-			require.NoError(t, m.ConfirmLoginSession(ctx, &s, s.ID, time.Time(s.AuthenticatedAt), s.Subject, false))
+			require.NoError(t, m.ConfirmLoginSession(ctx, &s))
 
 			lr := &flow.LoginRequest{
 				ID:              uuid.New().String(),

@@ -787,17 +787,23 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 }
 
 func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.LoginSession) error {
-	err := p.Connection(ctx).Create(session)
+	err := sqlcon.HandleError(p.Connection(ctx).Create(session))
+	if err == nil {
+		return nil
+	}
+
+	if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+		return err
+	}
+
+	n, err := p.Connection(ctx).
+		Where("id = ? and nid = ?", session.ID, session.NID).
+		UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember")
 	if err != nil {
-		n, err := p.Connection(ctx).
-			Where("id = ? and nid = ?", session.ID, session.NID).
-			UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember")
-		if err != nil {
-			return errors.WithStack(sqlcon.HandleError(err))
-		}
-		if n == 0 {
-			return errorsx.WithStack(x.ErrNotFound)
-		}
+		return errors.WithStack(sqlcon.HandleError(err))
+	}
+	if n == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
 	}
 
 	return nil

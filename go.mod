@@ -1,6 +1,8 @@
 module github.com/ory/hydra/v2
 
-go 1.20
+go 1.21
+
+toolchain go1.21.0
 
 replace (
 	github.com/jackc/pcmock => github.com/jackc/pgmock v0.0.0-20210724152146-4ad1a8207f65
@@ -221,7 +223,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
 	go.mongodb.org/mongo-driver v1.12.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.42.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.44.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.17.0 // indirect
 	go.opentelemetry.io/contrib/propagators/jaeger v1.17.0 // indirect
 	go.opentelemetry.io/contrib/samplers/jaegerremote v0.11.0 // indirect

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-10-24)](#000-2023-10-24)
+- [0.0.0 (2023-11-15)](#000-2023-11-15)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-10-24)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-11-15)
 
 
 ### Bug Fixes
@@ -743,6 +743,7 @@
 
     This patch removes the flow cookie. All information is already tracked in the request query parameters as part of the {login|consent}_{challenge|verifier}.
 
+* Remove login session cookie during consent flow ([#3667](https://github.com/ory/hydra/issues/3667)) ([5f41949](https://github.com/ory/hydra/commit/5f41949ad209c90d114dc427bd6ccde5e08f05da))
 
 
 # [2.2.0-rc.3](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v2.2.0-rc.3) (2023-08-16)

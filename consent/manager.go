@@ -5,7 +5,6 @@ package consent
 
 import (
 	"context"
-	"time"
 
 	"github.com/gofrs/uuid"
 
@@ -43,7 +42,7 @@ type (
 		CreateLoginSession(ctx context.Context, session *flow.LoginSession) error
 		DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error)
 		RevokeSubjectLoginSession(ctx context.Context, user string) error
-		ConfirmLoginSession(ctx context.Context, session *flow.LoginSession, id string, authTime time.Time, subject string, remember bool) error
+		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error
 
 		CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (*flow.Flow, error)
 		GetLoginRequest(ctx context.Context, challenge string) (*flow.LoginRequest, error)

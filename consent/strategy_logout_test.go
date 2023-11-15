@@ -512,11 +512,11 @@ func TestLogoutFlows(t *testing.T) {
 				defer wg.Done()
 				require.NoError(t, err)
 				assert.False(t, res.Skip)
-				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Bool(true)}
+				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Ptr(true)}
 			}),
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
 				require.NoError(t, err)
-				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(true)}
+				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Ptr(true)}
 			}))
 
 		// Make an oauth 2 request to trigger the login check.

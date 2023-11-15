@@ -581,7 +581,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				return nil
 			},
 		}
-
 		for _, tc := range []struct {
 			name             string
 			client           *http.Client
@@ -589,7 +588,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}{{
 			name:             "fails with wrong client ID after login",
 			client:           withWrongClientAfterLogin,
-			expectedResponse: "access_denied",
+			expectedResponse: "invalid_client",
 		}, {
 			name:             "fails with wrong client ID after consent",
 			client:           withWrongClientAfterConsent,

@@ -108,8 +108,7 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 		return nil, errorsx.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	sessionFromCookie := s.loginSessionFromCookie(r)
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, sessionID)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), nil, sessionID)
 	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().WithRequest(r).WithError(err).
 			Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
@@ -232,15 +231,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 	sessionID := uuid.New()
 	if session != nil {
 		sessionID = session.ID
-	} else {
-		// Create a stub session so that we can later update it.
-		loginSession := &flow.LoginSession{ID: sessionID}
-		if err := s.r.ConsentManager().CreateLoginSession(ctx, loginSession); err != nil {
-			return err
-		}
-		if err := flowctx.SetCookie(ctx, w, s.r, flowctx.LoginSessionCookie(flowctx.SuffixForClient(ar.GetClient())), loginSession); err != nil {
-			return err
-		}
 	}
 
 	// Set the session
@@ -454,16 +444,17 @@ func (s *DefaultStrategy) verifyAuthentication(
 	if !session.LoginRequest.Skip {
 		if time.Time(session.AuthenticatedAt).IsZero() {
 			return nil, errorsx.WithStack(fosite.ErrServerError.WithHint(
-				"Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
+				"Expected the handled login request to contain a valid authenticated_at value but it was zero. " +
+					"This is a bug which should be reported to https://github.com/ory/hydra."))
 		}
 
-		loginSession := s.loginSessionFromCookie(r)
-		if loginSession == nil {
-			return nil, fosite.ErrAccessDenied.WithHint("The login session cookie was not found or malformed.")
-		}
-
-		loginSession.IdentityProviderSessionID = sqlxx.NullString(session.IdentityProviderSessionID)
-		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, loginSession, sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
+		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, &flow.LoginSession{
+			ID:                        sessionID,
+			AuthenticatedAt:           session.AuthenticatedAt,
+			Subject:                   session.Subject,
+			IdentityProviderSessionID: sqlxx.NullString(session.IdentityProviderSessionID),
+			Remember:                  session.Remember,
+		}); err != nil {
 			if errors.Is(err, sqlcon.ErrUniqueViolation) {
 				return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used."))
 			}
@@ -631,6 +622,10 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	store, err := s.r.CookieStore(ctx)
 	if err != nil {
 		return err
+	}
+
+	if f.Client.GetID() != cl.GetID() {
+		return errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
 	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), cl.CookieSuffix())
@@ -970,8 +965,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	sessionFromCookie := s.loginSessionFromCookie(r)
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionFromCookie, hintSid)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), nil, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
@@ -1101,8 +1095,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	sessionFromCookie := s.loginSessionFromCookie(r)
-	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionFromCookie, sid)
+	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, nil, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
 		// This is ok (session probably already revoked), do nothing!

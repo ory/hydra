@@ -180,7 +180,9 @@ type fakeHTTP struct {
 }
 
 func (f *fakeHTTP) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
-	return httpx.NewResilientClient(httpx.ResilientClientWithClient(f.c))
+	c := httpx.NewResilientClient(opts...)
+	c.HTTPClient = f.c
+	return c
 }
 
 func TestValidateSectorIdentifierURL(t *testing.T) {

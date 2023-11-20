@@ -107,24 +107,19 @@ var (
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _  = os.ReadFile("./config.json")
-	httpClient = httpx.NewResilientClient(
-		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
-		httpx.ResilientClientWithClient(&http.Client{
-			Timeout: time.Second * 5,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true,
-				},
-			},
-		}))
-
-	workdir string
+	httpClient = httpx.NewResilientClient(httpx.ResilientClientWithMinxRetryWait(time.Second * 5))
+	workdir    string
 
 	hydra = hydrac.NewAPIClient(hydrac.NewConfiguration())
 )
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	httpClient.HTTPClient.Timeout = 5 * time.Second
+	httpClient.HTTPClient.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
 	hydra.GetConfig().HTTPClient = httpClient.HTTPClient
 	hydra.GetConfig().Servers = hydrac.ServerConfigurations{{URL: "https://127.0.0.1:4445"}}
 }

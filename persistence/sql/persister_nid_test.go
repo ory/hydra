@@ -1883,6 +1883,7 @@ func (s *PersisterTestSuite) TestUpdateClient() {
 			require.NoError(t, r.Persister().UpdateClient(s.t1, &u2))
 
 			actual, err = r.Persister().GetConcreteClient(s.t1, t1c1.ID)
+			require.NoError(t, err)
 			require.Equal(t, "updated", actual.Name)
 			require.Equal(t, t1Hash, actual.Secret)
 
@@ -1892,10 +1893,12 @@ func (s *PersisterTestSuite) TestUpdateClient() {
 			require.NoError(t, r.Persister().UpdateClient(s.t1, &u3))
 
 			actual, err = r.Persister().GetConcreteClient(s.t1, t1c1.ID)
+			require.NoError(t, err)
 			require.Equal(t, "updated", actual.Name)
 			require.NotEqual(t, t1Hash, actual.Secret)
 
 			actual, err = r.Persister().GetConcreteClient(s.t2, t2c1.ID)
+			require.NoError(t, err)
 			require.Equal(t, "updated", actual.Name)
 			require.Equal(t, t2Hash, actual.Secret)
 		})

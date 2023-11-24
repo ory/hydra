@@ -29,6 +29,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -90,6 +91,8 @@ type RegistryBase struct {
 	devHmac         rfc8628.RFC8628CodeStrategy
 	fc              *fositex.Config
 	publicCORS      *cors.Cors
+	kratos          kratos.Client
+	fositeFactories []fositex.Factory
 }
 
 func (m *RegistryBase) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
@@ -200,6 +203,11 @@ func (m *RegistryBase) WithTracer(t trace.Tracer) Registry {
 
 func (m *RegistryBase) WithTracerWrapper(wrapper TracerWrapper) Registry {
 	m.tracerWrapper = wrapper
+	return m.r
+}
+
+func (m *RegistryBase) WithKratos(k kratos.Client) Registry {
+	m.kratos = k
 	return m.r
 }
 
@@ -358,7 +366,11 @@ func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOp
 	}
 
 	if m.Config().ClientHTTPNoPrivateIPRanges() {
-		opts = append(opts, httpx.ResilientClientDisallowInternalIPs())
+		opts = append(
+			opts,
+			httpx.ResilientClientDisallowInternalIPs(),
+			httpx.ResilientClientAllowInternalIPRequestsTo(m.Config().ClientHTTPPrivateIPExceptionURLs()...),
+		)
 	}
 	return httpx.NewResilientClient(opts...)
 }
@@ -417,6 +429,16 @@ func (m *RegistryBase) OAuth2Config() *fositex.Config {
 	return m.fc
 }
 
+func (m *RegistryBase) ExtraFositeFactories() []fositex.Factory {
+	return m.fositeFactories
+}
+
+func (m *RegistryBase) WithExtraFositeFactories(f []fositex.Factory) Registry {
+	m.fositeFactories = f
+
+	return m.r
+}
+
 func (m *RegistryBase) OAuth2ProviderConfig() fosite.Configurator {
 	if m.oc != nil {
 		return m.oc
@@ -433,7 +455,7 @@ func (m *RegistryBase) OAuth2ProviderConfig() fosite.Configurator {
 		Config:          conf,
 	}
 
-	conf.LoadDefaultHanlders(&compose.CommonStrategy{
+	conf.LoadDefaultHandlers(&compose.CommonStrategy{
 		CoreStrategy: fositex.NewTokenStrategy(m.Config(), hmacAtStrategy, &foauth2.DefaultJWTStrategy{
 			Signer:          jwtAtStrategy,
 			HMACSHAStrategy: hmacAtStrategy,
@@ -564,4 +586,11 @@ func (m *RegistryBase) HSMContext() hsm.Context {
 
 func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
 	return m.OAuth2Provider().(*fosite.Fosite)
+}
+
+func (m *RegistryBase) Kratos() kratos.Client {
+	if m.kratos == nil {
+		m.kratos = kratos.New(m)
+	}
+	return m.kratos
 }

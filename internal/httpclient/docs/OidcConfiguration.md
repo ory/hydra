@@ -10,6 +10,8 @@ Name | Type | Description | Notes
 **ClaimsParameterSupported** | Pointer to **bool** | OpenID Connect Claims Parameter Parameter Supported  Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support. | [optional] 
 **ClaimsSupported** | Pointer to **[]string** | OpenID Connect Supported Claims  JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list. | [optional] 
 **CodeChallengeMethodsSupported** | Pointer to **[]string** | OAuth 2.0 PKCE Supported Code Challenge Methods  JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by this authorization server. | [optional] 
+**CredentialsEndpointDraft00** | Pointer to **string** | OpenID Connect Verifiable Credentials Endpoint  Contains the URL of the Verifiable Credentials Endpoint. | [optional] 
+**CredentialsSupportedDraft00** | Pointer to [**[]CredentialSupportedDraft00**](CredentialSupportedDraft00.md) | OpenID Connect Verifiable Credentials Supported  JSON array containing a list of the Verifiable Credentials supported by this authorization server. | [optional] 
 **DeviceAuthorizationEndpoint** | Pointer to **string** | URL of the authorization server&#39;s device authorization endpoint | [optional] 
 **EndSessionEndpoint** | Pointer to **string** | OpenID Connect End-Session Endpoint  URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP. | [optional] 
 **FrontchannelLogoutSessionSupported** | Pointer to **bool** | OpenID Connect Front-Channel Logout Session Required  Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP. | [optional] 
@@ -198,6 +200,56 @@ SetCodeChallengeMethodsSupported sets CodeChallengeMethodsSupported field to giv
 `func (o *OidcConfiguration) HasCodeChallengeMethodsSupported() bool`
 
 HasCodeChallengeMethodsSupported returns a boolean if a field has been set.
+
+### GetCredentialsEndpointDraft00
+
+`func (o *OidcConfiguration) GetCredentialsEndpointDraft00() string`
+
+GetCredentialsEndpointDraft00 returns the CredentialsEndpointDraft00 field if non-nil, zero value otherwise.
+
+### GetCredentialsEndpointDraft00Ok
+
+`func (o *OidcConfiguration) GetCredentialsEndpointDraft00Ok() (*string, bool)`
+
+GetCredentialsEndpointDraft00Ok returns a tuple with the CredentialsEndpointDraft00 field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCredentialsEndpointDraft00
+
+`func (o *OidcConfiguration) SetCredentialsEndpointDraft00(v string)`
+
+SetCredentialsEndpointDraft00 sets CredentialsEndpointDraft00 field to given value.
+
+### HasCredentialsEndpointDraft00
+
+`func (o *OidcConfiguration) HasCredentialsEndpointDraft00() bool`
+
+HasCredentialsEndpointDraft00 returns a boolean if a field has been set.
+
+### GetCredentialsSupportedDraft00
+
+`func (o *OidcConfiguration) GetCredentialsSupportedDraft00() []CredentialSupportedDraft00`
+
+GetCredentialsSupportedDraft00 returns the CredentialsSupportedDraft00 field if non-nil, zero value otherwise.
+
+### GetCredentialsSupportedDraft00Ok
+
+`func (o *OidcConfiguration) GetCredentialsSupportedDraft00Ok() (*[]CredentialSupportedDraft00, bool)`
+
+GetCredentialsSupportedDraft00Ok returns a tuple with the CredentialsSupportedDraft00 field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetCredentialsSupportedDraft00
+
+`func (o *OidcConfiguration) SetCredentialsSupportedDraft00(v []CredentialSupportedDraft00)`
+
+SetCredentialsSupportedDraft00 sets CredentialsSupportedDraft00 field to given value.
+
+### HasCredentialsSupportedDraft00
+
+`func (o *OidcConfiguration) HasCredentialsSupportedDraft00() bool`
+
+HasCredentialsSupportedDraft00 returns a boolean if a field has been set.
 
 ### GetDeviceAuthorizationEndpoint
 

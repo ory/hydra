@@ -22,7 +22,7 @@ type OAuth2TokenExchange struct {
 	// The lifetime in seconds of the access token. For example, the value \"3600\" denotes that the access token will expire in one hour from the time the response was generated.
 	ExpiresIn *int64 `json:"expires_in,omitempty"`
 	// To retrieve a refresh token request the id_token scope.
-	IdToken *int64 `json:"id_token,omitempty"`
+	IdToken *string `json:"id_token,omitempty"`
 	// The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \"offline\" to your access token request.
 	RefreshToken *string `json:"refresh_token,omitempty"`
 	// The scope of the access token
@@ -113,9 +113,9 @@ func (o *OAuth2TokenExchange) SetExpiresIn(v int64) {
 }
 
 // GetIdToken returns the IdToken field value if set, zero value otherwise.
-func (o *OAuth2TokenExchange) GetIdToken() int64 {
+func (o *OAuth2TokenExchange) GetIdToken() string {
 	if o == nil || o.IdToken == nil {
-		var ret int64
+		var ret string
 		return ret
 	}
 	return *o.IdToken
@@ -123,7 +123,7 @@ func (o *OAuth2TokenExchange) GetIdToken() int64 {
 
 // GetIdTokenOk returns a tuple with the IdToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *OAuth2TokenExchange) GetIdTokenOk() (*int64, bool) {
+func (o *OAuth2TokenExchange) GetIdTokenOk() (*string, bool) {
 	if o == nil || o.IdToken == nil {
 		return nil, false
 	}
@@ -139,8 +139,8 @@ func (o *OAuth2TokenExchange) HasIdToken() bool {
 	return false
 }
 
-// SetIdToken gets a reference to the given int64 and assigns it to the IdToken field.
-func (o *OAuth2TokenExchange) SetIdToken(v int64) {
+// SetIdToken gets a reference to the given string and assigns it to the IdToken field.
+func (o *OAuth2TokenExchange) SetIdToken(v string) {
 	o.IdToken = &v
 }
 

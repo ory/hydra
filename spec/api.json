@@ -49,6 +49,24 @@
       }
     },
     "schemas": {
+      "CreateVerifiableCredentialRequestBody": {
+        "properties": {
+          "format": {
+            "type": "string"
+          },
+          "proof": {
+            "$ref": "#/components/schemas/VerifiableCredentialProof"
+          },
+          "types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "CreateVerifiableCredentialRequestBody contains the request body to request a verifiable credential.",
+        "type": "object"
+      },
       "DefaultError": {},
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -81,6 +99,28 @@
         "nullable": true,
         "type": "string"
       },
+      "RFC6749ErrorJson": {
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "error_debug": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          },
+          "error_hint": {
+            "type": "string"
+          },
+          "status_code": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "RFC6749ErrorJson is a helper struct for JSON encoding/decoding of RFC6749Error.",
+        "type": "object"
+      },
       "StringSliceJSONFormat": {
         "items": {
           "type": "string"
@@ -102,6 +142,18 @@
       "UUID": {
         "format": "uuid4",
         "type": "string"
+      },
+      "VerifiableCredentialProof": {
+        "properties": {
+          "jwt": {
+            "type": "string"
+          },
+          "proof_type": {
+            "type": "string"
+          }
+        },
+        "title": "VerifiableCredentialProof contains the proof of a verifiable credential.",
+        "type": "object"
       },
       "acceptOAuth2ConsentRequest": {
         "properties": {
@@ -162,6 +214,10 @@
             "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
             "type": "string"
           },
+          "identity_provider_session_id": {
+            "description": "IdentityProviderSessionID is the session ID of the end-user that authenticated.\nIf specified, we will use this value to propagate the logout.",
+            "type": "string"
+          },
           "remember": {
             "description": "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
             "type": "boolean"
@@ -203,6 +259,38 @@
           "use",
           "kid"
         ],
+        "type": "object"
+      },
+      "credentialSupportedDraft00": {
+        "description": "Includes information about the supported verifiable credentials.",
+        "properties": {
+          "cryptographic_binding_methods_supported": {
+            "description": "OpenID Connect Verifiable Credentials Cryptographic Binding Methods Supported\n\nContains a list of cryptographic binding methods supported for signing the proof.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "cryptographic_suites_supported": {
+            "description": "OpenID Connect Verifiable Credentials Cryptographic Suites Supported\n\nContains a list of cryptographic suites methods supported for signing the proof.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "format": {
+            "description": "OpenID Connect Verifiable Credentials Format\n\nContains the format that is supported by this authorization server.",
+            "type": "string"
+          },
+          "types": {
+            "description": "OpenID Connect Verifiable Credentials Types\n\nContains the types of verifiable credentials supported.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "Verifiable Credentials Metadata (Draft 00)",
         "type": "object"
       },
       "deviceAuthorization": {
@@ -627,7 +715,7 @@
             "$ref": "#/components/schemas/NullDuration"
           },
           "client_id": {
-            "description": "OAuth 2.0 Client ID\n\nThe ID is autogenerated and immutable.",
+            "description": "OAuth 2.0 Client ID\n\nThe ID is immutable. If no ID is provided, a UUID4 will be generated.",
             "type": "string"
           },
           "client_name": {
@@ -1065,8 +1153,7 @@
           },
           "id_token": {
             "description": "To retrieve a refresh token request the id_token scope.",
-            "format": "int64",
-            "type": "integer"
+            "type": "string"
           },
           "refresh_token": {
             "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
@@ -1114,6 +1201,17 @@
             "description": "OAuth 2.0 PKCE Supported Code Challenge Methods\n\nJSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
             "items": {
               "type": "string"
+            },
+            "type": "array"
+          },
+          "credentials_endpoint_draft_00": {
+            "description": "OpenID Connect Verifiable Credentials Endpoint\n\nContains the URL of the Verifiable Credentials Endpoint.",
+            "type": "string"
+          },
+          "credentials_supported_draft_00": {
+            "description": "OpenID Connect Verifiable Credentials Supported\n\nJSON array containing a list of the Verifiable Credentials supported by this authorization server.",
+            "items": {
+              "$ref": "#/components/schemas/credentialSupportedDraft00"
             },
             "type": "array"
           },
@@ -1592,6 +1690,53 @@
         },
         "type": "object"
       },
+      "unexpectedError": {
+        "type": "string"
+      },
+      "verifiableCredentialPrimingResponse": {
+        "properties": {
+          "c_nonce": {
+            "type": "string"
+          },
+          "c_nonce_expires_in": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "error_debug": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          },
+          "error_hint": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "status_code": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "VerifiableCredentialPrimingResponse contains the nonce to include in the proof-of-possession JWT.",
+        "type": "object"
+      },
+      "verifiableCredentialResponse": {
+        "properties": {
+          "credential_draft_00": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "title": "VerifiableCredentialResponse contains the verifiable credential.",
+        "type": "object"
+      },
       "verifyUserCodeRequest": {
         "description": "Contains information on an device verification",
         "properties": {
@@ -1600,9 +1745,6 @@
           }
         },
         "type": "object"
-	  },
-      "unexpectedError": {
-        "type": "string"
       },
       "version": {
         "properties": {
@@ -2996,7 +3138,7 @@
     },
     "/admin/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpennID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.",
+        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpenID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.",
         "operationId": "revokeOAuth2LoginSessions",
         "parameters": [
           {
@@ -3304,6 +3446,58 @@
         "summary": "Get Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "oAuth2"
+        ]
+      }
+    },
+    "/credentials": {
+      "post": {
+        "description": "This endpoint creates a verifiable credential that attests that the user\nauthenticated with the provided access token owns a certain public/private key\npair.\n\nMore information can be found at\nhttps://openid.net/specs/openid-connect-userinfo-vc-1_0.html.",
+        "operationId": "createVerifiableCredential",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVerifiableCredentialRequestBody"
+              }
+            }
+          },
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifiableCredentialResponse"
+                }
+              }
+            },
+            "description": "verifiableCredentialResponse"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifiableCredentialPrimingResponse"
+                }
+              }
+            },
+            "description": "verifiableCredentialPrimingResponse"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorOAuth2"
+                }
+              }
+            },
+            "description": "errorOAuth2"
+          }
+        },
+        "summary": "Issues a Verifiable Credential",
+        "tags": [
+          "oidc"
         ]
       }
     },

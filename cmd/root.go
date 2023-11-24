@@ -73,6 +73,7 @@ func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Op
 	migrateCmd := NewMigrateCmd()
 	migrateCmd.AddCommand(NewMigrateGenCmd())
 	migrateCmd.AddCommand(NewMigrateSqlCmd(slOpts, dOpts, cOpts))
+	migrateCmd.AddCommand(NewMigrateStatusCmd(slOpts, dOpts, cOpts))
 
 	serveCmd := NewServeCmd()
 	serveCmd.AddCommand(NewServeAdminCmd(slOpts, dOpts, cOpts))

@@ -14,6 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/oauth2/flowctx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/x/errorsx"
@@ -340,33 +341,17 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	return f.GetConsentRequest(), nil
 }
 
-func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, f *flow.Flow, verifier string) (*flow.AcceptOAuth2ConsentRequest, error) {
+func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.AcceptOAuth2ConsentRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer span.End()
 
-	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
+	if err != nil {
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
-
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
-	if err != nil {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
-	}
-	if updatedFlow.ID != f.ID {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier does not match login request."))
-	}
-	if updatedFlow.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-
-	// Update flow from login request, but keep requested at.
-	updatedFlow.NID = f.NID
-	updatedFlow.ConsentCSRF = f.ConsentCSRF
-	updatedFlow.ConsentVerifier = f.ConsentVerifier
-	*f = *updatedFlow
 
 	if err = f.InvalidateConsentRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
@@ -402,35 +387,17 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, f *flow.Flow, challe
 	return p.GetLoginRequest(ctx, challenge)
 }
 
-func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, f *flow.Flow, verifier string) (*flow.HandledLoginRequest, error) {
+func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.HandledLoginRequest, error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
 	defer span.End()
 
-	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
+	if err != nil {
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
 	}
-
-	updatedFlow, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
-	if err != nil {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-	if f.NID != updatedFlow.NID {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
-	}
-
-	if updatedFlow.ID != f.ID {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier does not match login request."))
-	}
-
-	// Update flow from login request, but keep requested at.
-	updatedFlow.NID = f.NID
-	updatedFlow.RequestedAt = f.RequestedAt
-	updatedFlow.LoginCSRF = f.LoginCSRF
-	updatedFlow.LoginVerifier = f.LoginVerifier
-	*f = *updatedFlow
 
 	if err := f.InvalidateLoginRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
@@ -459,35 +426,47 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionF
 	return &s, nil
 }
 
-func (p *Persister) ConfirmLoginSession(ctx context.Context, session *flow.LoginSession, id string, authenticatedAt time.Time, subject string, remember bool) error {
+// ConfirmLoginSession creates or updates the login session. The NID will be set to the network ID of the context.
+func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ConfirmLoginSession")
 	defer span.End()
 
-	// Since we previously cached the login session, we now need to persist it to db.
-	if session != nil {
-		if session.NID != p.NetworkID(ctx) || session.ID != id {
+	loginSession.NID = p.NetworkID(ctx)
+	loginSession.AuthenticatedAt = sqlxx.NullTime(time.Time(loginSession.AuthenticatedAt).Truncate(time.Second))
+
+	if p.Connection(ctx).Dialect.Name() == "mysql" {
+		// MySQL does not support UPSERT.
+		return p.mySQLConfirmLoginSession(ctx, loginSession)
+	}
+
+	err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
+		res, err := tx.TX.NamedExec(`
+INSERT INTO hydra_oauth2_authentication_session (id, nid, authenticated_at, subject, remember, identity_provider_session_id)
+VALUES (:id, :nid, :authenticated_at, :subject, :remember, :identity_provider_session_id)
+ON CONFLICT(id) DO
+UPDATE SET
+	authenticated_at = :authenticated_at,
+	subject = :subject,
+	remember = :remember,
+	identity_provider_session_id = :identity_provider_session_id
+WHERE hydra_oauth2_authentication_session.id = :id AND hydra_oauth2_authentication_session.nid = :nid
+`, loginSession)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		n, err := res.RowsAffected()
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		if n == 0 {
 			return errorsx.WithStack(x.ErrNotFound)
 		}
-		session.AuthenticatedAt = sqlxx.NullTime(authenticatedAt.Truncate(time.Second))
-		session.Subject = subject
-		session.Remember = remember
-
-		return p.CreateWithNetwork(ctx, session)
-	}
-
-	// In some unit tests, we still confirm the login session without data from the cookie. We can remove this case
-	// once all tests are fixed.
-	n, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&flow.LoginSession{
-		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
-		Subject:         subject,
-		Remember:        remember,
-	}, "authenticated_at", "subject", "remember")
+		return nil
+	})
 	if err != nil {
-		return sqlcon.HandleError(err)
+		return errors.WithStack(err)
 	}
-	if n == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
-	}
+
 	return nil
 }
 
@@ -504,16 +483,59 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginS
 	return nil
 }
 
-func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
+func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
-	defer span.End()
+	defer otelx.End(span, &err)
 
-	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid=?", id, p.NetworkID(ctx)).ExecWithCount()
-	if count == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
-	} else {
-		return sqlcon.HandleError(err)
+	if p.Connection(ctx).Dialect.Name() == "mysql" {
+		// MySQL does not support RETURNING.
+		return p.mySQLDeleteLoginSession(ctx, id)
 	}
+
+	var session flow.LoginSession
+
+	err = p.Connection(ctx).RawQuery(
+		`DELETE FROM hydra_oauth2_authentication_session
+       WHERE id = ? AND nid = ?
+       RETURNING *`,
+		id,
+		p.NetworkID(ctx),
+	).First(&session)
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &session, nil
+}
+
+func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (*flow.LoginSession, error) {
+	var session flow.LoginSession
+
+	err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
+		err := tx.RawQuery(`
+SELECT * FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).First(&session)
+		if err != nil {
+			return err
+		}
+
+		return p.Connection(ctx).RawQuery(`
+DELETE FROM hydra_oauth2_authentication_session
+WHERE id = ? AND nid = ?`,
+			id,
+			p.NetworkID(ctx),
+		).Exec()
+	})
+
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &session, nil
+
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) (rs []flow.AcceptOAuth2ConsentRequest, err error) {
@@ -671,7 +693,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 		/* #nosec G201 - channel can either be "front" or "back" */
 		fmt.Sprintf(`
 SELECT DISTINCT c.* FROM hydra_client as c
-JOIN hydra_oauth2_flow as f ON (c.id = f.client_id)
+JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
 	f.subject=? AND
 	c.%schannel_logout_uri!='' AND
@@ -813,6 +835,29 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		if err := q.Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}
+	}
+
+	return nil
+}
+
+func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.LoginSession) error {
+	err := sqlcon.HandleError(p.Connection(ctx).Create(session))
+	if err == nil {
+		return nil
+	}
+
+	if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+		return err
+	}
+
+	n, err := p.Connection(ctx).
+		Where("id = ? and nid = ?", session.ID, session.NID).
+		UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember")
+	if err != nil {
+		return errors.WithStack(sqlcon.HandleError(err))
+	}
+	if n == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
 	}
 
 	return nil

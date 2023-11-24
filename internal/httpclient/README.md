@@ -119,6 +119,7 @@ Class | Method | HTTP request | Description
 *OAuth2Api* | [**TrustOAuth2JwtGrantIssuer**](docs/OAuth2Api.md#trustoauth2jwtgrantissuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer
 *OAuth2Api* | [**VerifyUserCodeRequest**](docs/OAuth2Api.md#verifyusercoderequest) | **Put** /admin/oauth2/auth/requests/device/verify | Verifies a device grant request
 *OidcApi* | [**CreateOidcDynamicClient**](docs/OidcApi.md#createoidcdynamicclient) | **Post** /oauth2/register | Register OAuth2 Client using OpenID Dynamic Client Registration
+*OidcApi* | [**CreateVerifiableCredential**](docs/OidcApi.md#createverifiablecredential) | **Post** /credentials | Issues a Verifiable Credential
 *OidcApi* | [**DeleteOidcDynamicClient**](docs/OidcApi.md#deleteoidcdynamicclient) | **Delete** /oauth2/register/{id} | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
 *OidcApi* | [**DiscoverOidcConfiguration**](docs/OidcApi.md#discoveroidcconfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
 *OidcApi* | [**GetOidcDynamicClient**](docs/OidcApi.md#getoidcdynamicclient) | **Get** /oauth2/register/{id} | Get OAuth2 Client using OpenID Dynamic Client Registration
@@ -135,6 +136,8 @@ Class | Method | HTTP request | Description
  - [AcceptOAuth2ConsentRequestSession](docs/AcceptOAuth2ConsentRequestSession.md)
  - [AcceptOAuth2LoginRequest](docs/AcceptOAuth2LoginRequest.md)
  - [CreateJsonWebKeySet](docs/CreateJsonWebKeySet.md)
+ - [CreateVerifiableCredentialRequestBody](docs/CreateVerifiableCredentialRequestBody.md)
+ - [CredentialSupportedDraft00](docs/CredentialSupportedDraft00.md)
  - [DeviceAuthorization](docs/DeviceAuthorization.md)
  - [DeviceGrantRequest](docs/DeviceGrantRequest.md)
  - [ErrorOAuth2](docs/ErrorOAuth2.md)
@@ -162,6 +165,7 @@ Class | Method | HTTP request | Description
  - [OidcUserInfo](docs/OidcUserInfo.md)
  - [Pagination](docs/Pagination.md)
  - [PaginationHeaders](docs/PaginationHeaders.md)
+ - [RFC6749ErrorJson](docs/RFC6749ErrorJson.md)
  - [RejectOAuth2Request](docs/RejectOAuth2Request.md)
  - [TokenPagination](docs/TokenPagination.md)
  - [TokenPaginationHeaders](docs/TokenPaginationHeaders.md)
@@ -170,6 +174,9 @@ Class | Method | HTTP request | Description
  - [TrustOAuth2JwtGrantIssuer](docs/TrustOAuth2JwtGrantIssuer.md)
  - [TrustedOAuth2JwtGrantIssuer](docs/TrustedOAuth2JwtGrantIssuer.md)
  - [TrustedOAuth2JwtGrantJsonWebKey](docs/TrustedOAuth2JwtGrantJsonWebKey.md)
+ - [VerifiableCredentialPrimingResponse](docs/VerifiableCredentialPrimingResponse.md)
+ - [VerifiableCredentialProof](docs/VerifiableCredentialProof.md)
+ - [VerifiableCredentialResponse](docs/VerifiableCredentialResponse.md)
  - [VerifyUserCodeRequest](docs/VerifyUserCodeRequest.md)
  - [Version](docs/Version.md)
 

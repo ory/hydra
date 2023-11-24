@@ -16,7 +16,7 @@ type Handler struct {
 
 func NewHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *Handler {
 	return &Handler{
-		Migration: newMigrateHandler(),
+		Migration: newMigrateHandler(slOpts, dOpts, cOpts),
 		Janitor:   NewJanitorHandler(slOpts, dOpts, cOpts),
 	}
 }

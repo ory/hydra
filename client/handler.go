@@ -12,26 +12,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/x/pagination/tokenpagination"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/x/openapix"
-
-	"github.com/ory/x/uuidx"
-
-	"github.com/ory/x/jsonx"
-	"github.com/ory/x/urlx"
-
-	"github.com/ory/fosite"
-
-	"github.com/ory/x/errorsx"
-
-	"github.com/ory/herodot"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
+
+	"github.com/ory/fosite"
+	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/jsonx"
+	"github.com/ory/x/openapix"
+	"github.com/ory/x/pagination/tokenpagination"
+	"github.com/ory/x/urlx"
+	"github.com/ory/x/uuidx"
 )
 
 type Handler struct {
@@ -99,7 +92,7 @@ type createOAuth2Client struct {
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -164,21 +157,16 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
 	}
 
 	if isDynamic {
 		if c.Secret != "" {
 			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
+		// We do not allow to set the client ID for dynamic clients.
+		c.ID = uuidx.NewV4().String()
 	}
-
-	if len(c.LegacyClientID) > 0 {
-		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReason("It is no longer possible to set an OAuth2 Client ID as a user. The system will generate a unique ID for you."))
-	}
-
-	c.ID = uuidx.NewV4()
-	c.LegacyClientID = c.ID.String()
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
@@ -266,7 +254,7 @@ func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	c.LegacyClientID = ps.ByName("id")
+	c.ID = ps.ByName("id")
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -379,7 +367,7 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request, p
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
 
-	c.LegacyClientID = client.GetID()
+	c.ID = client.GetID()
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

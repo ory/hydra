@@ -104,7 +104,7 @@ func TestSDK(t *testing.T) {
 
 	loginSession3 := &LoginSession{ID: cr3.LoginSessionID.String()}
 	require.NoError(t, m.CreateLoginSession(context.Background(), loginSession3))
-	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession3, loginSession3.ID, time.Now(), cr3.Subject, true))
+	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession3))
 	cr3Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
 		ID:          cr3.LoginChallenge.String(),
 		Subject:     cr3.Subject,
@@ -117,7 +117,7 @@ func TestSDK(t *testing.T) {
 
 	loginSession4 := &LoginSession{ID: cr4.LoginSessionID.String()}
 	require.NoError(t, m.CreateLoginSession(context.Background(), loginSession4))
-	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession4, loginSession4.ID, time.Now(), cr4.Subject, true))
+	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession4))
 	cr4Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
 		ID:        cr4.LoginChallenge.String(),
 		Client:    cr4.Client,
@@ -139,9 +139,9 @@ func TestSDK(t *testing.T) {
 	_, err = m.HandleConsentRequest(context.Background(), cr4Flow, hcr4)
 	require.NoError(t, err)
 
-	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), cr3Flow, consentVerifier(cr3Flow))
+	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr3Flow))
 	require.NoError(t, err)
-	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), cr4Flow, consentVerifier(cr4Flow))
+	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr4Flow))
 	require.NoError(t, err)
 
 	lur1 := MockLogoutRequest("testsdk-1", true, network)

@@ -13,20 +13,20 @@ import (
 func AddFositeExamples(r driver.Registry) {
 	for _, c := range []client.Client{
 		{
-			LegacyClientID: "my-client",
-			Secret:         "foobar",
-			RedirectURIs:   []string{"http://localhost:3846/callback"},
-			ResponseTypes:  []string{"id_token", "code", "token"},
-			GrantTypes:     []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-			Scope:          "fosite,openid,photos,offline",
+			ID:            "my-client",
+			Secret:        "foobar",
+			RedirectURIs:  []string{"http://localhost:3846/callback"},
+			ResponseTypes: []string{"id_token", "code", "token"},
+			GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+			Scope:         "fosite,openid,photos,offline",
 		},
 		{
-			LegacyClientID: "encoded:client",
-			Secret:         "encoded&password",
-			RedirectURIs:   []string{"http://localhost:3846/callback"},
-			ResponseTypes:  []string{"id_token", "code", "token"},
-			GrantTypes:     []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-			Scope:          "fosite,openid,photos,offline",
+			ID:            "encoded:client",
+			Secret:        "encoded&password",
+			RedirectURIs:  []string{"http://localhost:3846/callback"},
+			ResponseTypes: []string{"id_token", "code", "token"},
+			GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+			Scope:         "fosite,openid,photos,offline",
 		},
 	} {
 		// #nosec G601

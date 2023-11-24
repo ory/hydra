@@ -29,6 +29,10 @@ type OidcConfiguration struct {
 	ClaimsSupported []string `json:"claims_supported,omitempty"`
 	// OAuth 2.0 PKCE Supported Code Challenge Methods  JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported by this authorization server.
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,omitempty"`
+	// OpenID Connect Verifiable Credentials Endpoint  Contains the URL of the Verifiable Credentials Endpoint.
+	CredentialsEndpointDraft00 *string `json:"credentials_endpoint_draft_00,omitempty"`
+	// OpenID Connect Verifiable Credentials Supported  JSON array containing a list of the Verifiable Credentials supported by this authorization server.
+	CredentialsSupportedDraft00 []CredentialSupportedDraft00 `json:"credentials_supported_draft_00,omitempty"`
 	// URL of the authorization server's device authorization endpoint
 	DeviceAuthorizationEndpoint *string `json:"device_authorization_endpoint,omitempty"`
 	// OpenID Connect End-Session Endpoint  URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
@@ -287,6 +291,70 @@ func (o *OidcConfiguration) HasCodeChallengeMethodsSupported() bool {
 // SetCodeChallengeMethodsSupported gets a reference to the given []string and assigns it to the CodeChallengeMethodsSupported field.
 func (o *OidcConfiguration) SetCodeChallengeMethodsSupported(v []string) {
 	o.CodeChallengeMethodsSupported = v
+}
+
+// GetCredentialsEndpointDraft00 returns the CredentialsEndpointDraft00 field value if set, zero value otherwise.
+func (o *OidcConfiguration) GetCredentialsEndpointDraft00() string {
+	if o == nil || o.CredentialsEndpointDraft00 == nil {
+		var ret string
+		return ret
+	}
+	return *o.CredentialsEndpointDraft00
+}
+
+// GetCredentialsEndpointDraft00Ok returns a tuple with the CredentialsEndpointDraft00 field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OidcConfiguration) GetCredentialsEndpointDraft00Ok() (*string, bool) {
+	if o == nil || o.CredentialsEndpointDraft00 == nil {
+		return nil, false
+	}
+	return o.CredentialsEndpointDraft00, true
+}
+
+// HasCredentialsEndpointDraft00 returns a boolean if a field has been set.
+func (o *OidcConfiguration) HasCredentialsEndpointDraft00() bool {
+	if o != nil && o.CredentialsEndpointDraft00 != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCredentialsEndpointDraft00 gets a reference to the given string and assigns it to the CredentialsEndpointDraft00 field.
+func (o *OidcConfiguration) SetCredentialsEndpointDraft00(v string) {
+	o.CredentialsEndpointDraft00 = &v
+}
+
+// GetCredentialsSupportedDraft00 returns the CredentialsSupportedDraft00 field value if set, zero value otherwise.
+func (o *OidcConfiguration) GetCredentialsSupportedDraft00() []CredentialSupportedDraft00 {
+	if o == nil || o.CredentialsSupportedDraft00 == nil {
+		var ret []CredentialSupportedDraft00
+		return ret
+	}
+	return o.CredentialsSupportedDraft00
+}
+
+// GetCredentialsSupportedDraft00Ok returns a tuple with the CredentialsSupportedDraft00 field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OidcConfiguration) GetCredentialsSupportedDraft00Ok() ([]CredentialSupportedDraft00, bool) {
+	if o == nil || o.CredentialsSupportedDraft00 == nil {
+		return nil, false
+	}
+	return o.CredentialsSupportedDraft00, true
+}
+
+// HasCredentialsSupportedDraft00 returns a boolean if a field has been set.
+func (o *OidcConfiguration) HasCredentialsSupportedDraft00() bool {
+	if o != nil && o.CredentialsSupportedDraft00 != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetCredentialsSupportedDraft00 gets a reference to the given []CredentialSupportedDraft00 and assigns it to the CredentialsSupportedDraft00 field.
+func (o *OidcConfiguration) SetCredentialsSupportedDraft00(v []CredentialSupportedDraft00) {
+	o.CredentialsSupportedDraft00 = v
 }
 
 // GetDeviceAuthorizationEndpoint returns the DeviceAuthorizationEndpoint field value if set, zero value otherwise.
@@ -1012,6 +1080,12 @@ func (o OidcConfiguration) MarshalJSON() ([]byte, error) {
 	}
 	if o.CodeChallengeMethodsSupported != nil {
 		toSerialize["code_challenge_methods_supported"] = o.CodeChallengeMethodsSupported
+	}
+	if o.CredentialsEndpointDraft00 != nil {
+		toSerialize["credentials_endpoint_draft_00"] = o.CredentialsEndpointDraft00
+	}
+	if o.CredentialsSupportedDraft00 != nil {
+		toSerialize["credentials_supported_draft_00"] = o.CredentialsSupportedDraft00
 	}
 	if o.DeviceAuthorizationEndpoint != nil {
 		toSerialize["device_authorization_endpoint"] = o.DeviceAuthorizationEndpoint

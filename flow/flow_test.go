@@ -7,11 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/bxcodec/faker/v3"
 
 	"github.com/ory/x/sqlxx"
 )
@@ -43,6 +42,7 @@ func (f *Flow) setHandledLoginRequest(r *HandledLoginRequest) {
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Subject = r.Subject
+	f.IdentityProviderSessionID = sqlxx.NullString(r.IdentityProviderSessionID)
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
 	f.Context = r.Context
 	f.LoginWasUsed = r.WasHandled

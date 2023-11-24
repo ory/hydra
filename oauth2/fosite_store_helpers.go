@@ -79,7 +79,7 @@ type AssertionJWTReader interface {
 var defaultRequest = fosite.Request{
 	ID:                "blank",
 	RequestedAt:       time.Now().UTC().Round(time.Second),
-	Client:            &client.Client{LegacyClientID: "foobar"},
+	Client:            &client.Client{ID: "foobar"},
 	RequestedScope:    fosite.Arguments{"fa", "ba"},
 	GrantedScope:      fosite.Arguments{"fa", "ba"},
 	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
@@ -93,7 +93,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{LegacyClientID: "foobar"},
+		Client:         &client.Client{ID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -102,7 +102,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-2",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{LegacyClientID: "foobar"},
+		Client:         &client.Client{ID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -111,7 +111,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-3",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{LegacyClientID: "foobar"},
+		Client:         &client.Client{ID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -120,7 +120,7 @@ var flushRequests = []*fosite.Request{
 }
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
-	cl := &client.Client{LegacyClientID: "foobar"}
+	cl := &client.Client{ID: "foobar"}
 	cr := &flow.OAuth2ConsentRequest{
 		Client:               cl,
 		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
@@ -203,7 +203,7 @@ func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.
 	return func(t *testing.T) {
 		requestId := uuid.New()
 		mockRequestForeignKey(t, requestId, m, true)
-		cl := &client.Client{LegacyClientID: "foobar"}
+		cl := &client.Client{ID: "foobar"}
 
 		fositeRequest := &fosite.Request{
 			ID:          requestId,
@@ -290,14 +290,14 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 
 		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{
 			ID:          reqIdOne,
-			Client:      &client.Client{LegacyClientID: "foobar"},
+			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Session:     &Session{}})
 		require.NoError(t, err)
 
 		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{
 			ID:          reqIdTwo,
-			Client:      &client.Client{LegacyClientID: "foobar"},
+			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Session:     &Session{}})
 		require.NoError(t, err)
@@ -353,7 +353,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		c := &client.Client{LegacyClientID: "nil-request-client-id-123"}
+		c := &client.Client{ID: "nil-request-client-id-123"}
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
 		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
 			ID:                "",
@@ -1085,7 +1085,7 @@ func createTestRequest(id string) *fosite.Request {
 	return &fosite.Request{
 		ID:                id,
 		RequestedAt:       time.Now().UTC().Round(time.Second),
-		Client:            &client.Client{LegacyClientID: "foobar"},
+		Client:            &client.Client{ID: "foobar"},
 		RequestedScope:    fosite.Arguments{"fa", "ba"},
 		GrantedScope:      fosite.Arguments{"fa", "ba"},
 		RequestedAudience: fosite.Arguments{"ad1", "ad2"},

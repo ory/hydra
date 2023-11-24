@@ -1,0 +1,8 @@
+{
+  "ID": "auth_session-0017",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "AuthenticatedAt": null,
+  "Subject": "subject-0017",
+  "IdentityProviderSessionID": "identity_provider_session_id-0017",
+  "Remember": true
+}

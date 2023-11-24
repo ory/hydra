@@ -8,25 +8,21 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
-	hydra "github.com/ory/hydra-client-go/v2"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/x/urlx"
-
-	"net/url"
-
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
+	"github.com/ory/fosite/token/jwt"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/urlx"
 )
 
 func checkAndAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClient, subject string, cb func(*testing.T, *hydra.OAuth2LoginRequest, error) hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
@@ -80,7 +76,7 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	secret := uuid.New().String()
 	c.Secret = secret
 	c.Scope = "openid offline"
-	c.LegacyClientID = uuid.New().String()
+	c.ID = uuid.New().String()
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	c.Secret = secret
 	return c

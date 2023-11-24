@@ -1,0 +1,79 @@
+{
+  "ID": "challenge-0017",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "RequestedScope": [
+    "requested_scope-0016_1",
+    "requested_scope-0016_2"
+  ],
+  "RequestedAudience": [
+    "requested_audience-0016_1",
+    "requested_audience-0016_2"
+  ],
+  "LoginSkip": true,
+  "Subject": "subject-0017",
+  "OpenIDConnectContext": {
+    "display": "display-0017"
+  },
+  "Client": null,
+  "ClientID": "",
+  "RequestURL": "http://request/0017",
+  "SessionID": "auth_session-0017",
+  "IdentityProviderSessionID": "identity_provider_session_id-0017",
+  "LoginVerifier": "verifier-0017",
+  "LoginCSRF": "csrf-0017",
+  "LoginInitializedAt": null,
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "State": 128,
+  "LoginRemember": true,
+  "LoginRememberFor": 15,
+  "LoginExtendSessionLifespan": true,
+  "ACR": "acr-0017",
+  "AMR": [
+    "amr-0017-1",
+    "amr-0017-2"
+  ],
+  "ForceSubjectIdentifier": "force_subject_id-0017",
+  "Context": {
+    "context": "0017"
+  },
+  "LoginWasUsed": true,
+  "LoginError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "LoginAuthenticatedAt": null,
+  "ConsentChallengeID": "challenge-0017",
+  "ConsentSkip": true,
+  "ConsentVerifier": "verifier-0017",
+  "ConsentCSRF": "csrf-0017",
+  "GrantedScope": [
+    "granted_scope-0016_1",
+    "granted_scope-0016_2"
+  ],
+  "GrantedAudience": [
+    "granted_audience-0016_1",
+    "granted_audience-0016_2"
+  ],
+  "ConsentRemember": true,
+  "ConsentRememberFor": 15,
+  "ConsentHandledAt": null,
+  "ConsentWasHandled": true,
+  "ConsentError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "SessionIDToken": {
+    "session_id_token-0017": "0017"
+  },
+  "SessionAccessToken": {
+    "session_access_token-0017": "0017"
+  }
+}

@@ -162,6 +162,136 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiCreateVerifiableCredentialRequest struct {
+	ctx                                   context.Context
+	ApiService                            *OidcApiService
+	createVerifiableCredentialRequestBody *CreateVerifiableCredentialRequestBody
+}
+
+func (r ApiCreateVerifiableCredentialRequest) CreateVerifiableCredentialRequestBody(createVerifiableCredentialRequestBody CreateVerifiableCredentialRequestBody) ApiCreateVerifiableCredentialRequest {
+	r.createVerifiableCredentialRequestBody = &createVerifiableCredentialRequestBody
+	return r
+}
+
+func (r ApiCreateVerifiableCredentialRequest) Execute() (*VerifiableCredentialResponse, *http.Response, error) {
+	return r.ApiService.CreateVerifiableCredentialExecute(r)
+}
+
+/*
+CreateVerifiableCredential Issues a Verifiable Credential
+
+This endpoint creates a verifiable credential that attests that the user
+authenticated with the provided access token owns a certain public/private key
+pair.
+
+More information can be found at
+https://openid.net/specs/openid-connect-userinfo-vc-1_0.html.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateVerifiableCredentialRequest
+*/
+func (a *OidcApiService) CreateVerifiableCredential(ctx context.Context) ApiCreateVerifiableCredentialRequest {
+	return ApiCreateVerifiableCredentialRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return VerifiableCredentialResponse
+func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiableCredentialRequest) (*VerifiableCredentialResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *VerifiableCredentialResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.CreateVerifiableCredential")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/credentials"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.createVerifiableCredentialRequestBody
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v VerifiableCredentialPrimingResponse
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v ErrorOAuth2
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiDeleteOidcDynamicClientRequest struct {
 	ctx        context.Context
 	ApiService *OidcApiService

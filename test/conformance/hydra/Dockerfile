@@ -1,4 +1,4 @@
-FROM golang:1.20-buster AS builder
+FROM golang:1.21 AS builder
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \

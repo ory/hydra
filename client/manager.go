@@ -31,7 +31,7 @@ type Filter struct {
 type Manager interface {
 	Storage
 
-	Authenticate(ctx context.Context, id string, secret []byte) (*Client, error)
+	AuthenticateClient(ctx context.Context, id string, secret []byte) (*Client, error)
 }
 
 type Storage interface {

@@ -5,10 +5,10 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -434,17 +434,37 @@ func TestCookieSecure(t *testing.T) {
 	assert.True(t, c.CookieSecure(ctx))
 }
 
-func TestTokenRefreshHookURL(t *testing.T) {
+func TestHookConfigs(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
 	c := MustNew(context.Background(), l, configx.SkipValidation())
 
-	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL(ctx))
-	c.MustSet(ctx, KeyRefreshTokenHookURL, "")
-	assert.EqualValues(t, (*url.URL)(nil), c.TokenRefreshHookURL(ctx))
-	c.MustSet(ctx, KeyRefreshTokenHookURL, "http://localhost:8080/oauth/token_refresh")
-	assert.EqualValues(t, "http://localhost:8080/oauth/token_refresh", c.TokenRefreshHookURL(ctx).String())
+	for key, getFunc := range map[string]func(context.Context) *HookConfig{
+		KeyRefreshTokenHook: c.TokenRefreshHookConfig,
+		KeyTokenHook:        c.TokenHookConfig,
+	} {
+		assert.Nil(t, getFunc(ctx))
+		c.MustSet(ctx, key, "")
+		assert.Nil(t, getFunc(ctx))
+		c.MustSet(ctx, key, "http://localhost:8080/hook")
+		hc := getFunc(ctx)
+		require.NotNil(t, hc)
+		assert.EqualValues(t, "http://localhost:8080/hook", hc.URL)
+
+		c.MustSet(ctx, key, map[string]any{
+			"url": "http://localhost:8080/hook2",
+			"auth": map[string]any{
+				"type":   "api_key",
+				"config": json.RawMessage(`{"in":"header","name":"my-header","value":"my-value"}`),
+			},
+		})
+		hc = getFunc(ctx)
+		require.NotNil(t, hc)
+		assert.EqualValues(t, "http://localhost:8080/hook2", hc.URL)
+		assert.EqualValues(t, "api_key", hc.Auth.Type)
+		assert.JSONEq(t, `{"in":"header","name":"my-header","value":"my-value"}`, string(hc.Auth.Config))
+	}
 }
 
 func TestJWTBearer(t *testing.T) {

@@ -1,4 +1,4 @@
-FROM golang:1.20 AS builder
+FROM golang:1.21 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
 
@@ -19,7 +19,7 @@ RUN go build -tags sqlite,json1 -o /usr/bin/hydra
 
 #########################
 
-FROM gcr.io/distroless/base-nossl-debian11:nonroot AS runner
+FROM gcr.io/distroless/base-nossl-debian12:nonroot AS runner
 
 COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra

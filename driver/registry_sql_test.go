@@ -31,7 +31,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 	reg, err := NewRegistryWithoutInit(c, l)
 	r := reg.(*RegistrySQL)
 	r.initialPing = sussessfulPing()
-	if err := r.Init(context.Background(), true, false, &contextx.Default{}); err != nil {
+	if err := r.Init(context.Background(), true, false, &contextx.Default{}, nil, nil); err != nil {
 		t.Fatalf("unable to init registry: %s", err)
 	}
 	assert.NoError(t, err)
@@ -52,7 +52,7 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	require.NoError(t, reg.Persister().Connection(ctx).RawQuery(statement).Exec())
 
 	cl := &client.Client{
-		LegacyClientID: strconv.Itoa(rand.Int()),
+		ID: strconv.Itoa(rand.Int()),
 	}
 	require.NoError(t, reg.Persister().CreateClient(ctx, cl))
 	getClients := func(reg Registry) ([]client.Client, error) {

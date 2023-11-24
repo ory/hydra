@@ -11,6 +11,31 @@
     "S256"
   ],
   "device_authorization_endpoint": "http://hydra.localhost/oauth2/device/auth",
+  "credentials_endpoint_draft_00": "http://hydra.localhost/credentials",
+  "credentials_supported_draft_00": [
+    {
+      "cryptographic_binding_methods_supported": [
+        "jwk"
+      ],
+      "cryptographic_suites_supported": [
+        "PS256",
+        "RS256",
+        "ES256",
+        "PS384",
+        "RS384",
+        "ES384",
+        "PS512",
+        "RS512",
+        "ES512",
+        "EdDSA"
+      ],
+      "format": "jwt_vc_json",
+      "types": [
+        "VerifiableCredential",
+        "UserInfoCredential"
+      ]
+    }
+  ],
   "end_session_endpoint": "http://hydra.localhost/oauth2/sessions/logout",
   "frontchannel_logout_session_supported": true,
   "frontchannel_logout_supported": true,

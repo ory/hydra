@@ -14,6 +14,7 @@
   "ClientID": "",
   "RequestURL": "http://request/0001",
   "SessionID": "",
+  "IdentityProviderSessionID": "",
   "LoginVerifier": "verifier-0001",
   "LoginCSRF": "csrf-0001",
   "LoginInitializedAt": null,

@@ -1,4 +1,4 @@
-FROM golang:1.20 AS builder
+FROM golang:1.21 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
 
@@ -34,7 +34,7 @@ RUN apt-get -y install softhsm opensc &&\
 
 ###############################
 
-FROM gcr.io/distroless/base-nossl-debian11:debug-nonroot AS runner
+FROM gcr.io/distroless/base-nossl-debian12:debug-nonroot AS runner
 
 ENV HSM_ENABLED=true
 ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so

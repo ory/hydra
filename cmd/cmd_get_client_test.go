@@ -24,7 +24,7 @@ func TestGetClient(t *testing.T) {
 
 	expected := createClient(t, reg, nil)
 	t.Run("case=gets client", func(t *testing.T) {
-		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.ID.String()))
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.GetID()))
 		assert.NotEmpty(t, actual.Get("client_id").String())
 		assert.Empty(t, actual.Get("client_secret").String())
 
@@ -36,7 +36,7 @@ func TestGetClient(t *testing.T) {
 	})
 
 	t.Run("case=gets multiple clients", func(t *testing.T) {
-		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.ID.String(), expected.ID.String()))
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.GetID(), expected.ID))
 		snapshotx.SnapshotT(t, json.RawMessage(actual.Raw), snapshotExcludedClientFields...)
 	})
 }

@@ -5,11 +5,14 @@ package config
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/ory/x/hasherx"
 
@@ -42,6 +45,7 @@ const (
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
 	KeyOAuth2AuthURL                             = "webfinger.oidc_discovery.auth_url"
+	KeyVerifiableCredentialsURL                  = "webfinger.oidc_discovery.verifiable_credentials_url" // #nosec G101
 	KeyJWKSURL                                   = "webfinger.oidc_discovery.jwks_url"
 	KeyOIDCDiscoverySupportedClaims              = "webfinger.oidc_discovery.supported_claims"
 	KeyOIDCDiscoverySupportedScope               = "webfinger.oidc_discovery.supported_scope"
@@ -50,7 +54,8 @@ const (
 	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
 	KeyDSN                                       = "dsn"
-	ViperKeyClientHTTPNoPrivateIPRanges          = "clients.http.disallow_private_ip_ranges"
+	KeyClientHTTPNoPrivateIPRanges               = "clients.http.disallow_private_ip_ranges"
+	KeyClientHTTPPrivateIPExceptionURLs          = "clients.http.private_ip_exception_urls"
 	KeyHasherAlgorithm                           = "oauth2.hashers.algorithm"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyPBKDF2Iterations                          = "oauth2.hashers.pbkdf2.iterations"
@@ -67,6 +72,7 @@ const (
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
 	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
+	KeyVerifiableCredentialsNonceLifespan        = "ttl.vc_nonce"      // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
 	KeyDeviceAndUserCodeLifespan                 = "ttl.device_user_code" // #nosec G101
@@ -75,6 +81,7 @@ const (
 	KeyGetSystemSecret                           = "secrets.system"
 	KeyLogoutRedirectURL                         = "urls.post_logout_redirect"
 	KeyLoginURL                                  = "urls.login"
+	KeyRegistrationURL                           = "urls.registration"
 	KeyLogoutURL                                 = "urls.logout"
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
@@ -84,6 +91,9 @@ const (
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyDeviceVerificationURL                     = "urls.self.device"
+	KeyIdentityProviderAdminURL                  = "urls.identity_provider.url"
+	KeyIdentityProviderPublicURL                 = "urls.identity_provider.publicUrl"
+	KeyIdentityProviderHeaders                   = "urls.identity_provider.headers"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeyJWTScopeClaimStrategy                     = "strategies.jwt.scope_claim"
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
@@ -98,18 +108,21 @@ const (
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
-	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
-	KeyTokenHookURL                              = "oauth2.token_hook"         // #nosec G101
+	KeyRefreshTokenHook                          = "oauth2.refresh_token_hook" // #nosec G101
+	KeyTokenHook                                 = "oauth2.token_hook"         // #nosec G101
 	KeyDevelopmentMode                           = "dev"
 )
 
 const DSNMemory = "memory"
 
-var _ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
-var _ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
+var (
+	_ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
+	_ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
+)
 
 type DefaultProvider struct {
 	l *logrusx.Logger
@@ -201,11 +214,19 @@ func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) 
 }
 
 func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges() bool {
-	return p.getProvider(contextx.RootContext).Bool(ViperKeyClientHTTPNoPrivateIPRanges)
+	return p.getProvider(contextx.RootContext).Bool(KeyClientHTTPNoPrivateIPRanges)
+}
+
+func (p *DefaultProvider) ClientHTTPPrivateIPExceptionURLs() []string {
+	return p.getProvider(contextx.RootContext).Strings(KeyClientHTTPPrivateIPExceptionURLs)
 }
 
 func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
 	return stringslice.Unique(p.getProvider(ctx).Strings(KeyAllowedTopLevelClaims))
+}
+
+func (p *DefaultProvider) MirrorTopLevelClaims(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyMirrorTopLevelClaims, true)
 }
 
 func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalSources ...AccessTokenStrategySource) []string {
@@ -371,6 +392,10 @@ func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).URIF(KeyLoginURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/login")))
 }
 
+func (p *DefaultProvider) RegistrationURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).URIF(KeyRegistrationURL, p.LoginURL(ctx)))
+}
+
 func (p *DefaultProvider) LogoutURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).RequestURIF(KeyLogoutURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/logout")))
 }
@@ -409,6 +434,33 @@ func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
 	)
 }
 
+func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
+	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderAdminURL, nil)
+
+	return u, u != nil
+}
+func (p *DefaultProvider) KratosPublicURL(ctx context.Context) (*url.URL, bool) {
+	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderPublicURL, nil)
+
+	return u, u != nil
+}
+
+func (p *DefaultProvider) KratosRequestHeader(ctx context.Context) http.Header {
+	hh := map[string]string{}
+	if err := p.getProvider(ctx).Unmarshal(KeyIdentityProviderHeaders, &hh); err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", KeyIdentityProviderHeaders)
+		return nil
+	}
+
+	h := make(http.Header)
+	for k, v := range hh {
+		h.Set(k, v)
+	}
+
+	return h
+}
+
 func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyOAuth2ClientRegistrationURL, new(url.URL))
 }
@@ -427,6 +479,10 @@ func (p *DefaultProvider) OAuth2DeviceAuthorisationURL(ctx context.Context) *url
 
 func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(ctx), "/.well-known/jwks.json"))
+}
+
+func (p *DefaultProvider) CredentialsEndpointURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyVerifiableCredentialsURL, urlx.AppendPaths(p.PublicURL(ctx), "/credentials"))
 }
 
 type AccessTokenStrategySource interface {
@@ -451,12 +507,52 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 	return s
 }
 
-func (p *DefaultProvider) TokenHookURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyTokenHookURL, nil)
+type (
+	Auth struct {
+		Type   string          `json:"type"`
+		Config json.RawMessage `json:"config"`
+	}
+	HookConfig struct {
+		URL  string `json:"url"`
+		Auth *Auth  `json:"auth"`
+	}
+)
+
+func (p *DefaultProvider) getHookConfig(ctx context.Context, key string) *HookConfig {
+	if hookURL := p.getProvider(ctx).RequestURIF(key, nil); hookURL != nil {
+		return &HookConfig{
+			URL: hookURL.String(),
+		}
+	}
+
+	var hookConfig *HookConfig
+	if err := p.getProvider(ctx).Unmarshal(key, &hookConfig); err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", key)
+		return nil
+	}
+	if hookConfig == nil {
+		return nil
+	}
+
+	// validate URL by parsing it
+	u, err := url.ParseRequestURI(hookConfig.URL)
+	if err != nil {
+		p.l.WithError(errors.WithStack(err)).
+			Errorf("Configuration value from key %s could not be decoded.", key)
+		return nil
+	}
+	hookConfig.URL = u.String()
+
+	return hookConfig
 }
 
-func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(KeyRefreshTokenHookURL, nil)
+func (p *DefaultProvider) TokenHookConfig(ctx context.Context) *HookConfig {
+	return p.getHookConfig(ctx, KeyTokenHook)
+}
+
+func (p *DefaultProvider) TokenRefreshHookConfig(ctx context.Context) *HookConfig {
+	return p.getHookConfig(ctx, KeyRefreshTokenHook)
 }
 
 func (p *DefaultProvider) DbIgnoreUnknownTableColumns() bool {

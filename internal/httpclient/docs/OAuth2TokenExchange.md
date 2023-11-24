@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AccessToken** | Pointer to **string** | The access token issued by the authorization server. | [optional] 
 **ExpiresIn** | Pointer to **int64** | The lifetime in seconds of the access token. For example, the value \&quot;3600\&quot; denotes that the access token will expire in one hour from the time the response was generated. | [optional] 
-**IdToken** | Pointer to **int64** | To retrieve a refresh token request the id_token scope. | [optional] 
+**IdToken** | Pointer to **string** | To retrieve a refresh token request the id_token scope. | [optional] 
 **RefreshToken** | Pointer to **string** | The refresh token, which can be used to obtain new access tokens. To retrieve it add the scope \&quot;offline\&quot; to your access token request. | [optional] 
 **Scope** | Pointer to **string** | The scope of the access token | [optional] 
 **TokenType** | Pointer to **string** | The type of the token issued | [optional] 
@@ -82,20 +82,20 @@ HasExpiresIn returns a boolean if a field has been set.
 
 ### GetIdToken
 
-`func (o *OAuth2TokenExchange) GetIdToken() int64`
+`func (o *OAuth2TokenExchange) GetIdToken() string`
 
 GetIdToken returns the IdToken field if non-nil, zero value otherwise.
 
 ### GetIdTokenOk
 
-`func (o *OAuth2TokenExchange) GetIdTokenOk() (*int64, bool)`
+`func (o *OAuth2TokenExchange) GetIdTokenOk() (*string, bool)`
 
 GetIdTokenOk returns a tuple with the IdToken field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetIdToken
 
-`func (o *OAuth2TokenExchange) SetIdToken(v int64)`
+`func (o *OAuth2TokenExchange) SetIdToken(v string)`
 
 SetIdToken sets IdToken field to given value.
 

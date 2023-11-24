@@ -69,7 +69,7 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
-func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
+func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		p.l.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -103,7 +103,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 	return &OAuth2RequestSQL{
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
-		ID:                p.hashSignature(ctx, rawSignature, table),
+		ID:                signature,
 		RequestedAt:       r.GetRequestedAt(),
 		Client:            r.GetClient().GetID(),
 		Scopes:            strings.Join(r.GetRequestedScopes(), "|"),
@@ -162,20 +162,6 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	}, nil
 }
 
-// SignatureHash hashes the signature to prevent errors where the signature is
-// longer than 128 characters (and thus doesn't fit into the pk).
-func SignatureHash(signature string) string {
-	return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
-}
-
-// hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
-func (p *Persister) hashSignature(_ context.Context, signature string, table tableName) string {
-	if table == sqlTableAccess {
-		return SignatureHash(signature)
-	}
-	return signature
-}
-
 func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ClientAssertionJWTValid")
 	defer otelx.End(span, &err)
@@ -230,10 +216,7 @@ func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.Bl
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, jti))
 }
 
-func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
-	defer otelx.End(span, &err)
-
+func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
@@ -269,28 +252,21 @@ func (p *Persister) updateSessionBySignature(ctx context.Context, signature stri
 	return nil
 }
 
-func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (_ fosite.Requester, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.findSessionBySignature")
-	defer otelx.End(span, &err)
-
+func (p *Persister) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	r := OAuth2RequestSQL{Table: table}
-
-	// We look for the signature as well as the hash of the signature here.
-	// This is because we now always store the hash of the signature in the database,
-	// regardless of the type of the signature. In previous versions, we only stored
-	// the hash of the signature for JWT tokens.
-	//
-	// This code will be removed in a future version.
-	err = p.QueryWithNetwork(ctx).Where("signature IN (?, ?)", rawSignature, SignatureHash(rawSignature)).First(&r)
+	err := p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrNotFound)
-	} else if err != nil {
+	}
+	if err != nil {
 		return nil, sqlcon.HandleError(err)
-	} else if !r.Active {
+	}
+	if !r.Active {
 		fr, err := r.toRequest(ctx, session, p)
 		if err != nil {
 			return nil, err
-		} else if table == sqlTableCode {
+		}
+		if table == sqlTableCode {
 			return fr, errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 		} else if table == sqlTableDeviceCode {
 			return fr, errorsx.WithStack(fosite.ErrInvalidatedDeviceCode)
@@ -312,46 +288,35 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	return r.toRequest(ctx, session, p)
 }
 
-func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionBySignature")
-	defer otelx.End(span, &err)
-
-	signature = p.hashSignature(ctx, signature, table)
-
-	// We look for the signature as well as the hash of the signature here.
-	// This is because we now always store the hash of the signature in the database,
-	// regardless of the type of the signature. In previous versions, we only stored
-	// the hash of the signature for JWT tokens.
-	//
-	// This code will be removed in a future version.
-	err = sqlcon.HandleError(
+func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
+	err := sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
-			Where("signature IN (?, ?)", signature, SignatureHash(signature)).
+			Where("signature = ?", signature).
 			Delete(&OAuth2RequestSQL{Table: table}))
-
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
-	} else if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-	} else if err != nil {
-		return err
 	}
-	return nil
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	}
+	return err
 }
 
 func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionByRequestID")
 	defer otelx.End(span, &err)
 
-	/* #nosec G201 table is static */
-	if err := p.QueryWithNetwork(ctx).
+	err = p.QueryWithNetwork(ctx).
 		Where("request_id=?", id).
-		Delete(&OAuth2RequestSQL{Table: table}); errors.Is(err, sql.ErrNoRows) {
+		Delete(&OAuth2RequestSQL{Table: table})
+	if errors.Is(err, sql.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
-	} else if err := sqlcon.HandleError(err); err != nil {
+	}
+	if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-		} else if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
+		}
+		if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 		}
 		return err
@@ -396,12 +361,18 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableCode}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active = false WHERE signature = ? AND nid = ?", OAuth2RequestSQL{Table: sqlTableCode}.TableName()),
 				signature,
 				p.NetworkID(ctx),
 			).
 			Exec(),
 	)
+}
+
+// SignatureHash hashes the signature to prevent errors where the signature is
+// longer than 128 characters (and thus doesn't fit into the pk).
+func SignatureHash(signature string) string {
+	return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
@@ -412,19 +383,62 @@ func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature stri
 		append(toEventOptions(requester), events.WithGrantType(requester.GetRequestForm().Get("grant_type")))...,
 	)
 
-	return p.createSession(ctx, signature, requester, sqlTableAccess)
+	return p.createSession(ctx, SignatureHash(signature), requester, sqlTableAccess)
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAccessTokenSession")
 	defer otelx.End(span, &err)
-	return p.findSessionBySignature(ctx, signature, session, sqlTableAccess)
+
+	r := OAuth2RequestSQL{Table: sqlTableAccess}
+	err = p.QueryWithNetwork(ctx).Where("signature = ?", SignatureHash(signature)).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		// Backwards compatibility: we previously did not always hash the
+		// signature before inserting. In case there are still very old (but
+		// valid) access tokens in the database, this should get them.
+		err = p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(fosite.ErrNotFound)
+		}
+	}
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+	if !r.Active {
+		fr, err := r.toRequest(ctx, session, p)
+		if err != nil {
+			return nil, err
+		}
+		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+	}
+
+	return r.toRequest(ctx, session, p)
 }
 
 func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteAccessTokenSession")
 	defer otelx.End(span, &err)
-	return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
+
+	err = sqlcon.HandleError(
+		p.QueryWithNetwork(ctx).
+			Where("signature = ?", SignatureHash(signature)).
+			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}))
+	if errors.Is(err, sqlcon.ErrNoRows) {
+		// Backwards compatibility: we previously did not always hash the
+		// signature before inserting. In case there are still very old (but
+		// valid) access tokens in the database, this should get them.
+		err = sqlcon.HandleError(
+			p.QueryWithNetwork(ctx).
+				Where("signature = ?", signature).
+				Delete(&OAuth2RequestSQL{Table: sqlTableAccess}))
+		if errors.Is(err, sqlcon.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		}
+	}
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	}
+	return err
 }
 
 func toEventOptions(requester fosite.Requester) []trace.EventOption {
@@ -442,7 +456,7 @@ func toEventOptions(requester fosite.Requester) []trace.EventOption {
 }
 
 func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteCreateRefreshTokenSessionAccessTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateRefreshTokenSession")
 	defer otelx.End(span, &err)
 	events.Trace(ctx, events.RefreshTokenIssued, toEventOptions(requester)...)
 	return p.createSession(ctx, signature, requester, sqlTableRefresh)

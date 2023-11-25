@@ -54,24 +54,24 @@ func (c *consentMock) HandleHeadlessLogout(ctx context.Context, w http.ResponseW
 	panic("not implemented")
 }
 
-func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*consent.AcceptOAuth2ConsentRequest, error) {
+func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
 	if c.deny {
-		return nil, fosite.ErrRequestForbidden
+		return nil, nil, fosite.ErrRequestForbidden
 	}
 
-	return &consent.AcceptOAuth2ConsentRequest{
-		ConsentRequest: &consent.OAuth2ConsentRequest{
+	return &flow.AcceptOAuth2ConsentRequest{
+		ConsentRequest: &flow.OAuth2ConsentRequest{
 			Subject: "foo",
 			ACR:     "1",
 		},
 		AuthenticatedAt: sqlxx.NullTime(c.authTime),
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
-		Session: &consent.AcceptOAuth2ConsentRequestSession{
+		Session: &flow.AcceptOAuth2ConsentRequestSession{
 			AccessToken: map[string]interface{}{},
 			IDToken:     map[string]interface{}{},
 		},
 		RequestedAt: c.requestTime,
-	}, nil
+	}, nil, nil
 }
 
 func (c *consentMock) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {

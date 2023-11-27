@@ -283,7 +283,7 @@ type deviceAuthorization struct {
 	Interval int `json:"interval"`
 }
 
-// swagger:route GET /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
+// swagger:route POST /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
 //
 // # The OAuth 2.0 Device Authorize Endpoint
 //

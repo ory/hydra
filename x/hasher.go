@@ -8,6 +8,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/hasherx"
+	"github.com/ory/x/otelx"
 
 	"go.opentelemetry.io/otel"
 
@@ -51,9 +52,9 @@ func NewHasher(c config) *Hasher {
 	}
 }
 
-func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
+func (b *Hasher) Hash(ctx context.Context, data []byte) (hash []byte, err error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	switch b.c.GetHasherAlgorithm(ctx) {
 	case HashAlgorithmBCrypt:
@@ -65,9 +66,9 @@ func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
 	}
 }
 
-func (b *Hasher) Compare(ctx context.Context, hash, data []byte) error {
-	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
-	defer span.End()
+func (b *Hasher) Compare(ctx context.Context, hash, data []byte) (err error) {
+	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Compare")
+	defer otelx.End(span, &err)
 
 	if err := hasherx.Compare(ctx, data, hash); err != nil {
 		return errorsx.WithStack(err)

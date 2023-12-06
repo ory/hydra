@@ -60,7 +60,7 @@ func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 
 func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GenerateAndPersistKeySet")
-	defer span.End()
+	defer otelx.End(span, &err)
 	attrs := map[string]string{
 		"set": set,
 		"kid": kid,
@@ -121,7 +121,7 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 
 func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKey")
-	defer span.End()
+	defer otelx.End(span, &err)
 	attrs := map[string]string{
 		"set": set,
 		"kid": kid,
@@ -152,7 +152,7 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 
 func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
-	defer span.End()
+	defer otelx.End(span, &err)
 	attrs := map[string]string{
 		"set": set,
 	}
@@ -188,7 +188,7 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 
 func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKey")
-	defer span.End()
+	defer otelx.End(span, &err)
 	attrs := map[string]string{
 		"set": set,
 		"kid": kid,
@@ -218,7 +218,7 @@ func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 
 func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) error {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKeySet")
-	defer span.End()
+	defer otelx.End(span, &err)
 	attrs := map[string]string{
 		"set": set,
 	}

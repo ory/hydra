@@ -157,7 +157,7 @@ func TestLogoutFlows(t *testing.T) {
 		return &wg
 	}
 
-	checkAndAcceptLogout := func(t *testing.T, wg *sync.WaitGroup, cb func(*testing.T, *hydra.OAuth2LogoutRequest, error)) {
+	setupCheckAndAcceptLogoutHandler := func(t *testing.T, wg *sync.WaitGroup, cb func(*testing.T, *hydra.OAuth2LogoutRequest, error)) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if wg != nil {
 				defer wg.Done()
@@ -166,6 +166,8 @@ func TestLogoutFlows(t *testing.T) {
 			res, _, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
 			if cb != nil {
 				cb(t, res, err)
+			} else {
+				require.NoError(t, err)
 			}
 
 			v, _, err := adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
@@ -242,7 +244,7 @@ func TestLogoutFlows(t *testing.T) {
 		acceptLoginAs(t, subject)
 
 		wg := newWg(2)
-		checkAndAcceptLogout(t, wg, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
+		setupCheckAndAcceptLogoutHandler(t, wg, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
 			require.NoError(t, err)
 			assert.EqualValues(t, subject, *res.Subject)
 			assert.NotEmpty(t, subject, res.Sid)
@@ -262,7 +264,7 @@ func TestLogoutFlows(t *testing.T) {
 
 		// run once to invalidate session
 		wg := newWg(1)
-		checkAndAcceptLogout(t, wg, nil)
+		setupCheckAndAcceptLogoutHandler(t, wg, nil)
 		logoutAndExpectPostLogoutPage(t, browser, http.MethodGet, url.Values{}, defaultRedirectedMessage)
 
 		t.Run("method=get", testExpectPostLogoutPage(browser, http.MethodGet, url.Values{}, defaultRedirectedMessage))
@@ -271,12 +273,59 @@ func TestLogoutFlows(t *testing.T) {
 		wg.Wait() // we want to ensure that logout ui was called exactly once
 	})
 
+	t.Run("case=should handle double-submit of the logout challenge gracefully", func(t *testing.T) {
+		acceptLoginAs(t, subject)
+		browser := createBrowserWithSession(t, createSampleClient(t))
+
+		var logoutReq *hydra.OAuth2LogoutRequest
+		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, req *hydra.OAuth2LogoutRequest, err error) {
+			require.NoError(t, err)
+			logoutReq = req
+		})
+
+		// run once to log out
+		logoutAndExpectPostLogoutPage(t, browser, http.MethodGet, url.Values{}, defaultRedirectedMessage)
+
+		// run again to ensure that the logout challenge is invalid
+		_, _, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
+		assert.Error(t, err)
+
+		v, _, err := adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
+		require.NoError(t, err)
+		require.NotEmpty(t, v.RedirectTo)
+
+		res, err := browser.Get(v.RedirectTo)
+		require.NoError(t, err)
+		assert.Equal(t, 200, res.StatusCode)
+	})
+
+	t.Run("case=should handle an invalid logout challenge", func(t *testing.T) {
+		_, res, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		assert.Error(t, err)
+		assert.Equal(t, http.StatusNotFound, res.StatusCode)
+
+		_, res, err = adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		assert.Error(t, err)
+		assert.Equal(t, http.StatusNotFound, res.StatusCode)
+
+		res, err = adminApi.OAuth2Api.RejectOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		assert.Error(t, err)
+		assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	})
+
+	t.Run("case=should handle an invalid logout verifier", func(t *testing.T) {
+		setupCheckAndAcceptLogoutHandler(t, nil, nil)
+		logoutAndExpectErrorPage(t, http.DefaultClient, http.MethodGet, url.Values{
+			"logout_verifier": {"an-invalid-verifier"},
+		}, "Description: Unable to locate the requested resource")
+	})
+
 	t.Run("case=should execute backchannel logout if issued without rp-involvement", func(t *testing.T) {
 		sid := make(chan string)
 		acceptLoginAsAndWatchSid(t, subject, sid)
 
 		logoutWg := newWg(2)
-		checkAndAcceptLogout(t, logoutWg, nil)
+		setupCheckAndAcceptLogoutHandler(t, logoutWg, nil)
 
 		backChannelWG := newWg(2)
 		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
@@ -298,7 +347,7 @@ func TestLogoutFlows(t *testing.T) {
 	t.Run("case=should fail several flows when id_token_hint is invalid", func(t *testing.T) {
 		t.Run("case=should error when rp-flow without valid id token", func(t *testing.T) {
 			acceptLoginAs(t, "aeneas-rekkas")
-			checkAndAcceptLogout(t, nil, nil)
+			setupCheckAndAcceptLogoutHandler(t, nil, nil)
 
 			expectedMessage := "compact JWS format must have three parts"
 			browser := createBrowserWithSession(t, createSampleClient(t))
@@ -344,7 +393,7 @@ func TestLogoutFlows(t *testing.T) {
 				browser := createBrowserWithSession(t, c)
 
 				wg := newWg(1)
-				checkAndAcceptLogout(t, wg, nil)
+				setupCheckAndAcceptLogoutHandler(t, wg, nil)
 				tc.claims["sub"] = subject
 				tc.claims["sid"] = <-sid
 				tc.claims["aud"] = c.GetID()
@@ -389,7 +438,7 @@ func TestLogoutFlows(t *testing.T) {
 				sid := make(chan string)
 				acceptLoginAsAndWatchSid(t, subject, sid)
 
-				checkAndAcceptLogout(t, nil, nil)
+				setupCheckAndAcceptLogoutHandler(t, nil, nil)
 				browser := createBrowserWithSession(t, c)
 
 				sendClaims := jwtgo.MapClaims{
@@ -436,7 +485,7 @@ func TestLogoutFlows(t *testing.T) {
 		c := createSampleClient(t)
 		acceptLoginAs(t, subject)
 
-		checkAndAcceptLogout(t, nil, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
+		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
 			t.Fatalf("Logout should not have been called")
 		})
 		browser := createBrowserWithSession(t, c)
@@ -460,7 +509,7 @@ func TestLogoutFlows(t *testing.T) {
 		sid := make(chan string)
 		acceptLoginAsAndWatchSid(t, subject, sid)
 
-		checkAndAcceptLogout(t, nil, nil)
+		setupCheckAndAcceptLogoutHandler(t, nil, nil)
 		browser := createBrowserWithSession(t, c)
 
 		body, res := makeLogoutRequest(t, browser, "GET", url.Values{
@@ -488,7 +537,7 @@ func TestLogoutFlows(t *testing.T) {
 		acceptLoginAsAndWatchSid(t, subject, sid)
 
 		wg := newWg(2)
-		checkAndAcceptLogout(t, wg, nil)
+		setupCheckAndAcceptLogoutHandler(t, wg, nil)
 		browser := createBrowserWithSession(t, c)
 
 		// Use another browser (without session cookie) to make the logout request:

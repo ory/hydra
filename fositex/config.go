@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
 )
 
@@ -199,6 +200,9 @@ func (c *Config) GetFormPostHTMLTemplate(context.Context) *template.Template {
 	return fosite.DefaultFormPostTemplate
 }
 
-func (c *Config) GetTokenURL(ctx context.Context) string {
-	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String()
+func (c *Config) GetTokenURLs(ctx context.Context) []string {
+	return stringslice.Unique([]string{
+		c.OAuth2TokenURL(ctx).String(),
+		urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String(),
+	})
 }

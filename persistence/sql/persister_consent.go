@@ -706,8 +706,13 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	defer span.End()
 
 	var lr flow.LogoutRequest
-	if count, err := p.Connection(ctx).RawQuery(
-		"UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE nid = ? AND verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE",
+	if count, err := p.Connection(ctx).RawQuery(`
+UPDATE hydra_oauth2_logout_request
+  SET was_used = TRUE
+WHERE nid = ?
+  AND verifier = ?
+  AND accepted = TRUE
+  AND rejected = FALSE`,
 		p.NetworkID(ctx),
 		verifier,
 	).ExecWithCount(); count == 0 && err == nil {
@@ -716,7 +721,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 		return nil, sqlcon.HandleError(err)
 	}
 
-	err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier=?", verifier).First(&lr))
+	err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier = ?", verifier).First(&lr))
 	if err != nil {
 		return nil, err
 	}

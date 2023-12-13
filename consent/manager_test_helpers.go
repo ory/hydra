@@ -1027,7 +1027,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 							compareLogoutRequest(t, c, got3)
 
 							_, err = m.VerifyAndInvalidateLogoutRequest(ctx, verifier)
-							require.Error(t, err)
+							require.NoError(t, err)
 
 							got2, err = m.GetLogoutRequest(ctx, challenge)
 							require.NoError(t, err)

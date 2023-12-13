@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-11-22)](#000-2023-11-22)
+- [0.0.0 (2023-12-13)](#000-2023-12-13)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-11-22)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-12-13)
 
 
 ### Bug Fixes
@@ -712,6 +712,8 @@
 
     Closes https://github.com/ory/client-go/issues/2
 
+* Dropped persistence/sql test errors ([#3670](https://github.com/ory/hydra/issues/3670)) ([22f0119](https://github.com/ory/hydra/commit/22f0119ad300c1e09c03e966a3d3411e57db444f))
+* Handle logout double-submit gracefully ([#3675](https://github.com/ory/hydra/issues/3675)) ([5133cf9](https://github.com/ory/hydra/commit/5133cf972ecfca18d7799c00a7afeae6a4386fbf))
 * Handle subject mismatch gracefully ([#3619](https://github.com/ory/hydra/issues/3619)) ([af0d477](https://github.com/ory/hydra/commit/af0d477e0eb1e336b01fa8d1321e9dce098c82a8)):
 
     We now redirect to the original request URL if the subjects between

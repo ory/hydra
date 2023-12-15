@@ -1006,8 +1006,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				reg.Config().MustSet(ctx, config.KeyTokenHook, &config.HookConfig{
 					URL: hs.URL,
 					Auth: &config.Auth{
-						Type:   "api_key",
-						Config: json.RawMessage(`{"in": "header", "name": "Authorization", "value": "Bearer secret value"}`),
+						Type: "api_key",
+						Config: config.AuthConfig{
+							In:    "header",
+							Name:  "Authorization",
+							Value: "Bearer secret value",
+						},
 					},
 				})
 

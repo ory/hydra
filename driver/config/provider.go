@@ -5,7 +5,6 @@ package config
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -482,8 +481,13 @@ func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context, additionalSou
 
 type (
 	Auth struct {
-		Type   string          `json:"type"`
-		Config json.RawMessage `json:"config"`
+		Type   string     `json:"type"`
+		Config AuthConfig `json:"config"`
+	}
+	AuthConfig struct {
+		In    string `json:"in"`
+		Name  string `json:"name"`
+		Value string `json:"value"`
 	}
 	HookConfig struct {
 		URL  string `json:"url"`

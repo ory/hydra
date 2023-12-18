@@ -71,20 +71,11 @@ func applyAuth(req *retryablehttp.Request, auth *config.Auth) error {
 
 	switch auth.Type {
 	case "api_key":
-		c := struct {
-			In    string `json:"in"`
-			Name  string `json:"name"`
-			Value string `json:"value"`
-		}{}
-		if err := json.Unmarshal(auth.Config, &c); err != nil {
-			return err
-		}
-
-		switch c.In {
+		switch auth.Config.In {
 		case "header":
-			req.Header.Set(c.Name, c.Value)
+			req.Header.Set(auth.Config.Name, auth.Config.Value)
 		case "cookie":
-			req.AddCookie(&http.Cookie{Name: c.Name, Value: c.Value})
+			req.AddCookie(&http.Cookie{Name: auth.Config.Name, Value: auth.Config.Value})
 		}
 	default:
 		return errors.Errorf("unsupported auth type %q", auth.Type)

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-12-13)](#000-2023-12-13)
+- [0.0.0 (2023-12-18)](#000-2023-12-18)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-12-13)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-12-18)
 
 
 ### Bug Fixes
@@ -719,6 +719,12 @@
     We now redirect to the original request URL if the subjects between
     the remembered Hydra session and what was confirmed by the login
     screen does not match.
+
+* Handle token hook auth config ([#3677](https://github.com/ory/hydra/issues/3677)) ([1a40833](https://github.com/ory/hydra/commit/1a40833e2c87c98541d053f7c54b38f791dbb448)):
+
+    * fix: handle token hook auth config
+    
+    * fix: bump golangci-lint
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
@@ -747,6 +753,7 @@
     This patch removes the flow cookie. All information is already tracked in the request query parameters as part of the {login|consent}_{challenge|verifier}.
 
 * Remove login session cookie during consent flow ([#3667](https://github.com/ory/hydra/issues/3667)) ([5f41949](https://github.com/ory/hydra/commit/5f41949ad209c90d114dc427bd6ccde5e08f05da))
+* Support multiple token URLs ([#3676](https://github.com/ory/hydra/issues/3676)) ([95cc273](https://github.com/ory/hydra/commit/95cc2735ed18374cc01d625c66417e42b600778d))
 
 
 # [2.2.0-rc.3](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v2.2.0-rc.3) (2023-08-16)

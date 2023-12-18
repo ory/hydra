@@ -38,6 +38,7 @@ type (
 		CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 		// Cookie management
+		GetLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (*flow.LoginSession, error)
 		GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (*flow.LoginSession, error)
 		CreateLoginSession(ctx context.Context, session *flow.LoginSession) error
 		DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error)

@@ -363,7 +363,26 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionF
 
 	var s flow.LoginSession
 
-	if err := p.QueryWithNetwork(ctx).Where("remember = TRUE").Find(&s, id); errors.Is(err, sql.ErrNoRows) {
+	if err := p.QueryWithNetwork(ctx).Where("remember AND nid = ?", s.NID).Find(&s, id); errors.Is(err, sql.ErrNoRows) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return &s, nil
+}
+
+func (p *Persister) GetLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (_ *flow.LoginSession, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginSession")
+	defer otelx.End(span, &err)
+
+	if s := loginSessionFromCookie; s != nil && s.NID == p.NetworkID(ctx) && s.ID == id {
+		return s, nil
+	}
+
+	var s flow.LoginSession
+
+	if err := p.QueryWithNetwork(ctx).Where("nid = ?", s.NID).Find(&s, id); errors.Is(err, sql.ErrNoRows) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)

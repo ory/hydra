@@ -4,13 +4,17 @@
 package jwk
 
 import (
+	"bytes"
 	"context"
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"sync"
+
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/josex"
 
@@ -148,4 +152,33 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	default:
 		return nil, errors.New("Invalid key type")
 	}
+}
+
+func OnlyPublicSDKKeys(in []hydra.JsonWebKey) (out []hydra.JsonWebKey, _ error) {
+	var interim []jose.JSONWebKey
+	var b bytes.Buffer
+
+	if err := json.NewEncoder(&b).Encode(&in); err != nil {
+		return nil, errors.Wrap(err, "failed to encode JSON Web Key Set")
+	}
+
+	if err := json.NewDecoder(&b).Decode(&interim); err != nil {
+		return nil, errors.Wrap(err, "failed to encode JSON Web Key Set")
+	}
+
+	for i, key := range interim {
+		interim[i] = key.Public()
+	}
+
+	b.Reset()
+	if err := json.NewEncoder(&b).Encode(&interim); err != nil {
+		return nil, errors.Wrap(err, "failed to encode JSON Web Key Set")
+	}
+
+	var keys []hydra.JsonWebKey
+	if err := json.NewDecoder(&b).Decode(&keys); err != nil {
+		return nil, errors.Wrap(err, "failed to encode JSON Web Key Set")
+	}
+
+	return keys, nil
 }

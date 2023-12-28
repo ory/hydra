@@ -275,15 +275,15 @@ func TestOnlyPublicSDKKeys(t *testing.T) {
 	set, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 	require.NoError(t, err)
 
-	out, err := json.Marshal(set)
+	out, err := json.Marshal(set.Keys)
 	require.NoError(t, err)
 
-	var sdkSet hydra.JsonWebKeySet
+	var sdkSet []hydra.JsonWebKey
 	require.NoError(t, json.Unmarshal(out, &sdkSet))
 
-	assert.NotEmpty(t, sdkSet.Keys[0].P)
-	result, err := jwk.OnlyPublicSDKKeys(&sdkSet)
+	assert.NotEmpty(t, sdkSet[0].P)
+	result, err := jwk.OnlyPublicSDKKeys(sdkSet)
 	require.NoError(t, err)
 
-	assert.Empty(t, result.Keys[0].P)
+	assert.Empty(t, result[0].P)
 }

@@ -33,4 +33,12 @@ func TestCreateJWKS(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("keys.0.kid").String())
 	})
+
+	t.Run("case=gets jwks public", func(t *testing.T) {
+		set := uuid.Must(uuid.NewV4()).String()
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set, "--use", "enc", "--alg", "RS256", "--public"))
+
+		assert.NotEmptyf(t, actual.Get("keys.0.kid").String(), "Expected kid to be set but got: %s", actual.Raw)
+		assert.Empty(t, actual.Get("keys.0.p").String(), "public key should not contain private key components: %s", actual.Raw)
+	})
 }

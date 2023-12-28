@@ -6,6 +6,8 @@ package cmd
 import (
 	"context"
 
+	"github.com/ory/hydra/v2/jwk"
+
 	"github.com/spf13/cobra"
 
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -46,12 +48,20 @@ func NewCreateJWKSCmd() *cobra.Command {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
 
+			if flagx.MustGetBool(cmd, "public") {
+				jwks.Keys, err = jwk.OnlyPublicSDKKeys(jwks.Keys)
+				if err != nil {
+					return err
+				}
+			}
+
 			cmdx.PrintTable(cmd, &outputJSONWebKeyCollection{Keys: jwks.Keys, Set: args[0]})
 			return nil
 		},
 	}
-	cmd.Root().Name()
+
 	cmd.Flags().String(alg, "RS256", "The algorithm to be used to generated they key. Supports: RS256, RS512, ES256, ES512, EdDSA")
 	cmd.Flags().String(use, "sig", "The intended use of this key. Supports: sig, enc")
+	cmd.Flags().Bool("public", false, "Only return public keys")
 	return cmd
 }

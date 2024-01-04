@@ -24,7 +24,7 @@ type Strategy interface {
 		ctx context.Context,
 		w http.ResponseWriter,
 		r *http.Request,
-		req fosite.DeviceAuthorizeRequester,
+		req fosite.DeviceUserRequester,
 	) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error)
 	HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error)
 	HandleHeadlessLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, sid string) error

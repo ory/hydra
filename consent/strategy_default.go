@@ -216,7 +216,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 
 	// Generate the request URL
 	iu := s.c.OAuth2AuthURL(ctx)
-	if _, ok := req.(fosite.DeviceAuthorizeRequester); ok {
+	if _, ok := req.(fosite.DeviceUserRequester); ok {
 		iu = s.c.OAuth2DeviceAuthorisationURL(ctx)
 	}
 	iu.RawQuery = r.URL.RawQuery
@@ -426,8 +426,8 @@ func (s *DefaultStrategy) verifyAuthentication(
 				},
 			},
 		}
-	} else if _, ok := req.(fosite.DeviceAuthorizeRequester); ok {
-		cleanReq = &fosite.DeviceAuthorizeRequest{
+	} else if _, ok := req.(fosite.DeviceUserRequester); ok {
+		cleanReq = &fosite.DeviceUserRequest{
 			Request: fosite.Request{
 				ID:                req.GetID(),
 				RequestedAt:       req.GetRequestedAt(),
@@ -1261,7 +1261,7 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	return errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyDevice(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester, verifier string) (*flow.DeviceGrantRequest, error) {
+func (s *DefaultStrategy) verifyDevice(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceUserRequester, verifier string) (*flow.DeviceGrantRequest, error) {
 	session, err := s.r.ConsentManager().GetDeviceGrantRequestByVerifier(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
@@ -1289,7 +1289,7 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, w http.ResponseWrite
 	return session, nil
 }
 
-func (s *DefaultStrategy) invalidateDeviceRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester, verifier string) (*flow.DeviceGrantRequest, error) {
+func (s *DefaultStrategy) invalidateDeviceRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceUserRequester, verifier string) (*flow.DeviceGrantRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateDeviceGrantRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
@@ -1304,7 +1304,7 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
-	req fosite.DeviceAuthorizeRequester,
+	req fosite.DeviceUserRequester,
 ) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
 	loginVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))

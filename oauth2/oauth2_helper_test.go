@@ -54,7 +54,7 @@ func (c *consentMock) HandleHeadlessLogout(ctx context.Context, w http.ResponseW
 	panic("not implemented")
 }
 
-func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceAuthorizeRequester) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
+func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.DeviceUserRequester) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
 	if c.deny {
 		return nil, nil, fosite.ErrRequestForbidden
 	}

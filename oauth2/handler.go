@@ -128,7 +128,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
-	authorizeRequest, err := h.r.OAuth2Provider().NewDeviceAuthorizeRequest(ctx, r)
+	authorizeRequest, err := h.r.OAuth2Provider().NewDeviceUserRequest(ctx, r)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		return
@@ -208,7 +208,7 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
 	// done
-	response, err := h.r.OAuth2Provider().NewDeviceAuthorizeResponse(ctx, authorizeRequest, &Session{
+	response, err := h.r.OAuth2Provider().NewDeviceUserResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: claims,
 			Headers: &jwt.Headers{Extra: map[string]interface{}{
@@ -237,7 +237,7 @@ func (h *Handler) performOAuth2DeviceAuthorizationFlow(w http.ResponseWriter, r 
 		h.r.Writer().WriteError(w, r, err)
 	}
 
-	h.r.OAuth2Provider().WriteDeviceAuthorizeResponse(ctx, r, w, authorizeRequest, response)
+	h.r.OAuth2Provider().WriteDeviceUserResponse(ctx, r, w, authorizeRequest, response)
 }
 
 // OAuth2 Device Flow

@@ -37,12 +37,12 @@ type Factory func(config fosite.Configurator, storage interface{}, strategy inte
 type Config struct {
 	deps configDependencies
 
-	authorizeEndpointHandlers       fosite.AuthorizeEndpointHandlers
-	tokenEndpointHandlers           fosite.TokenEndpointHandlers
-	tokenIntrospectionHandlers      fosite.TokenIntrospectionHandlers
-	revocationHandlers              fosite.RevocationHandlers
-	deviceEndpointHandlers          fosite.DeviceEndpointHandlers
-	deviceAuthorizeEndpointHandlers fosite.DeviceAuthorizeEndpointHandlers
+	authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
+	tokenEndpointHandlers      fosite.TokenEndpointHandlers
+	tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
+	revocationHandlers         fosite.RevocationHandlers
+	deviceEndpointHandlers     fosite.DeviceEndpointHandlers
+	deviceUserEndpointHandlers fosite.DeviceUserEndpointHandlers
 
 	*config.DefaultProvider
 }
@@ -83,8 +83,8 @@ func (c *Config) LoadDefaultHandlers(strategy interface{}) {
 		if dh, ok := res.(fosite.DeviceEndpointHandler); ok {
 			c.deviceEndpointHandlers.Append(dh)
 		}
-		if dah, ok := res.(fosite.DeviceAuthorizeEndpointHandler); ok {
-			c.deviceAuthorizeEndpointHandlers.Append(dah)
+		if duh, ok := res.(fosite.DeviceUserEndpointHandler); ok {
+			c.deviceUserEndpointHandlers.Append(duh)
 		}
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)
@@ -129,8 +129,8 @@ func (c *Config) GetDeviceEndpointHandlers(ctx context.Context) fosite.DeviceEnd
 	return c.deviceEndpointHandlers
 }
 
-func (c *Config) GetDeviceAuthorizeEndpointHandlers(ctx context.Context) fosite.DeviceAuthorizeEndpointHandlers {
-	return c.deviceAuthorizeEndpointHandlers
+func (c *Config) GetDeviceUserEndpointHandlers(ctx context.Context) fosite.DeviceUserEndpointHandlers {
+	return c.deviceUserEndpointHandlers
 }
 
 func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(context.Context) bool {

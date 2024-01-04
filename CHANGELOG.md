@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-11-22)](#000-2023-11-22)
+- [0.0.0 (2023-12-28)](#000-2023-12-28)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-11-22)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-12-28)
 
 
 ### Bug Fixes
@@ -712,11 +712,19 @@
 
     Closes https://github.com/ory/client-go/issues/2
 
+* Dropped persistence/sql test errors ([#3670](https://github.com/ory/hydra/issues/3670)) ([22f0119](https://github.com/ory/hydra/commit/22f0119ad300c1e09c03e966a3d3411e57db444f))
+* Handle logout double-submit gracefully ([#3675](https://github.com/ory/hydra/issues/3675)) ([5133cf9](https://github.com/ory/hydra/commit/5133cf972ecfca18d7799c00a7afeae6a4386fbf))
 * Handle subject mismatch gracefully ([#3619](https://github.com/ory/hydra/issues/3619)) ([af0d477](https://github.com/ory/hydra/commit/af0d477e0eb1e336b01fa8d1321e9dce098c82a8)):
 
     We now redirect to the original request URL if the subjects between
     the remembered Hydra session and what was confirmed by the login
     screen does not match.
+
+* Handle token hook auth config ([#3677](https://github.com/ory/hydra/issues/3677)) ([1a40833](https://github.com/ory/hydra/commit/1a40833e2c87c98541d053f7c54b38f791dbb448)):
+
+    * fix: handle token hook auth config
+    
+    * fix: bump golangci-lint
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
@@ -728,6 +736,7 @@
 ### Features
 
 * Add authentication options to hooks ([#3633](https://github.com/ory/hydra/issues/3633)) ([5c8e792](https://github.com/ory/hydra/commit/5c8e7923ed22f6d231ca748bb76e4261a87afb08))
+* Add flag to export public keys ([#3684](https://github.com/ory/hydra/issues/3684)) ([62c006b](https://github.com/ory/hydra/commit/62c006b916351e7f74fb00e0006ea112801143d7))
 * Add prompt=registration ([#3636](https://github.com/ory/hydra/issues/3636)) ([19857d2](https://github.com/ory/hydra/commit/19857d20b1d7d3b918de5388f17076de0660a6be)):
 
     Ory Hydra now supports a `registration` value for the `prompt` parameter of
@@ -745,6 +754,7 @@
     This patch removes the flow cookie. All information is already tracked in the request query parameters as part of the {login|consent}_{challenge|verifier}.
 
 * Remove login session cookie during consent flow ([#3667](https://github.com/ory/hydra/issues/3667)) ([5f41949](https://github.com/ory/hydra/commit/5f41949ad209c90d114dc427bd6ccde5e08f05da))
+* Support multiple token URLs ([#3676](https://github.com/ory/hydra/issues/3676)) ([95cc273](https://github.com/ory/hydra/commit/95cc2735ed18374cc01d625c66417e42b600778d))
 
 
 # [2.2.0-rc.3](https://github.com/ory/hydra/compare/v2.2.0-pre.0...v2.2.0-rc.3) (2023-08-16)

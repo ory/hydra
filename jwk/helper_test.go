@@ -11,10 +11,13 @@ import (
 	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"io"
 	"strings"
 	"testing"
+
+	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
@@ -266,4 +269,21 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "key not found")
 	})
+}
+
+func TestOnlyPublicSDKKeys(t *testing.T) {
+	set, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+	require.NoError(t, err)
+
+	out, err := json.Marshal(set.Keys)
+	require.NoError(t, err)
+
+	var sdkSet []hydra.JsonWebKey
+	require.NoError(t, json.Unmarshal(out, &sdkSet))
+
+	assert.NotEmpty(t, sdkSet[0].P)
+	result, err := jwk.OnlyPublicSDKKeys(sdkSet)
+	require.NoError(t, err)
+
+	assert.Empty(t, result[0].P)
 }

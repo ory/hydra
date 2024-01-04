@@ -39,7 +39,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.44.1-0.20230807113540-d4605bb2b3a6
+	github.com/ory/fosite v0.44.1-0.20231218095112-ac9ae4bd99d7
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
@@ -68,7 +68,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.21.0
 	go.opentelemetry.io/otel/trace v1.21.0
 	go.uber.org/automaxprocs v1.5.3
-	golang.org/x/crypto v0.15.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 	golang.org/x/oauth2 v0.14.0
 	golang.org/x/sync v0.5.0
@@ -238,7 +238,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect

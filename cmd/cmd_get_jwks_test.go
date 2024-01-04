@@ -17,7 +17,7 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func TestGetJwks(t *testing.T) {
+func TestGetJWKS(t *testing.T) {
 	ctx := context.Background()
 	c := cmd.NewGetJWKSCmd()
 	reg := setup(t, c)
@@ -33,5 +33,17 @@ func TestGetJwks(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("kid").String())
+	})
+
+	t.Run("case=gets jwks public", func(t *testing.T) {
+		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set, "--public"))
+
+		expected, err := reg.KeyManager().GetKeySet(ctx, set)
+		require.NoError(t, err)
+
+		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("kid").String())
+
+		assert.NotEmptyf(t, actual.Get("kid").String(), "Expected kid to be set but got: %s", actual.Raw)
+		assert.Empty(t, actual.Get("p").String(), "public key should not contain private key components: %s", actual.Raw)
 	})
 }

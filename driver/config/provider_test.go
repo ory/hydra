@@ -452,18 +452,25 @@ func TestHookConfigs(t *testing.T) {
 		require.NotNil(t, hc)
 		assert.EqualValues(t, "http://localhost:8080/hook", hc.URL)
 
-		c.MustSet(ctx, key, map[string]any{
-			"url": "http://localhost:8080/hook2",
-			"auth": map[string]any{
-				"type":   "api_key",
-				"config": json.RawMessage(`{"in":"header","name":"my-header","value":"my-value"}`),
-			},
-		})
+		c.MustSet(ctx, key, `
+{
+	"url": "http://localhost:8080/hook2",
+	"auth": {
+		"type": "api_key",
+		"config": {
+			"in": "header",
+			"name": "my-header",
+			"value": "my-value"
+		}
+	}
+}`)
 		hc = getFunc(ctx)
 		require.NotNil(t, hc)
 		assert.EqualValues(t, "http://localhost:8080/hook2", hc.URL)
 		assert.EqualValues(t, "api_key", hc.Auth.Type)
-		assert.JSONEq(t, `{"in":"header","name":"my-header","value":"my-value"}`, string(hc.Auth.Config))
+		rawConfig, err := json.Marshal(hc.Auth.Config)
+		require.NoError(t, err)
+		assert.JSONEq(t, `{"in":"header","name":"my-header","value":"my-value"}`, string(rawConfig))
 	}
 }
 

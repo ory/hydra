@@ -134,7 +134,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	defer otelx.End(span, &err)
 
 	expiresAt := "expires_at > NOW()"
-	if p.conn.Dialect.Name() == "sqlite" {
+	if p.conn.Dialect.Name() == "sqlite3" {
 		expiresAt = "expires_at > datetime('now')"
 	}
 

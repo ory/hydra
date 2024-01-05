@@ -1000,6 +1000,30 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			require.NotNil(t, jwks)
 			require.NotEmpty(t, jwks.Keys)
 		})
+
+		t.Run("case=does not return expired values", func(t *testing.T) {
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[0].Public()
+			issuer := "unlimited-issuer"
+			grant := trust.Grant{
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         "",
+				AllowAnySubject: true,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(-1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			_, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+		})
 	}
 }
 

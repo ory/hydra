@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/sqlcon"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/persistence"
@@ -1343,38 +1341,22 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			t.Run("get key", func(t *testing.T) {
-				ks := newKeySet("ks-id", "use")
-				grant := trust.Grant{
-					ID:        uuid.Must(uuid.NewV4()).String(),
-					ExpiresAt: time.Now().Add(time.Hour),
-					PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
-				}
-				require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-				require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			ks := newKeySet("ks-id", "use")
+			grant := trust.Grant{
+				ID:        uuid.Must(uuid.NewV4()).String(),
+				ExpiresAt: time.Now().Add(time.Hour),
+				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
+			}
+			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
 
-				actual, err := r.Persister().GetPublicKeys(s.t2, grant.Issuer, grant.Subject)
-				require.NoError(t, err)
-				require.Nil(t, actual.Keys)
+			actual, err := r.Persister().GetPublicKeys(s.t2, grant.Issuer, grant.Subject)
+			require.NoError(t, err)
+			require.Nil(t, actual.Keys)
 
-				actual, err = r.Persister().GetPublicKeys(s.t1, grant.Issuer, grant.Subject)
-				require.NoError(t, err)
-				require.NotNil(t, actual.Keys)
-			})
-
-			t.Run("get expired key fails", func(t *testing.T) {
-				ks := newKeySet("ks-id", "use")
-				grant := trust.Grant{
-					ID:        uuid.Must(uuid.NewV4()).String(),
-					ExpiresAt: time.Now().Add(-time.Hour),
-					PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
-				}
-				require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-				require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
-
-				_, err := r.Persister().GetPublicKeys(s.t2, grant.Issuer, grant.Subject)
-				require.ErrorIs(t, err, sqlcon.ErrNoRows)
-			})
+			actual, err = r.Persister().GetPublicKeys(s.t1, grant.Issuer, grant.Subject)
+			require.NoError(t, err)
+			require.NotNil(t, actual.Keys)
 		})
 	}
 }

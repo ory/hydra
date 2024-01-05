@@ -727,6 +727,7 @@
     * fix: bump golangci-lint
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
+* Remove required mark ([#3693](https://github.com/ory/hydra/issues/3693)) ([3a764a0](https://github.com/ory/hydra/commit/3a764a053a3d7eab698668cf63d387ea76c1db40))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
 
 ### Documentation

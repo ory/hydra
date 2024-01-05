@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2023-12-28)](#000-2023-12-28)
+- [0.0.0 (2024-01-05)](#000-2024-01-05)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2023-12-28)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2024-01-05)
 
 
 ### Bug Fixes
@@ -737,6 +737,7 @@
 
 * Add authentication options to hooks ([#3633](https://github.com/ory/hydra/issues/3633)) ([5c8e792](https://github.com/ory/hydra/commit/5c8e7923ed22f6d231ca748bb76e4261a87afb08))
 * Add flag to export public keys ([#3684](https://github.com/ory/hydra/issues/3684)) ([62c006b](https://github.com/ory/hydra/commit/62c006b916351e7f74fb00e0006ea112801143d7))
+* Add missing index for jwk table ([#3691](https://github.com/ory/hydra/issues/3691)) ([39ee5e1](https://github.com/ory/hydra/commit/39ee5e1f0cfa7fae5c4f9e1663a930cb5b8c2bc9))
 * Add prompt=registration ([#3636](https://github.com/ory/hydra/issues/3636)) ([19857d2](https://github.com/ory/hydra/commit/19857d20b1d7d3b918de5388f17076de0660a6be)):
 
     Ory Hydra now supports a `registration` value for the `prompt` parameter of

@@ -3463,8 +3463,6 @@ components:
       - challenge
       - client
       - request_url
-      - requested_access_token_audience
-      - requested_scope
       - skip
       - subject
       title: Contains information on an ongoing login request.

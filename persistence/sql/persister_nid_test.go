@@ -7,9 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/ory/x/sqlcon"
 	"testing"
 	"time"
+
+	"github.com/ory/x/sqlcon"
 
 	"github.com/stretchr/testify/assert"
 

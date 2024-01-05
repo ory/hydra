@@ -471,13 +471,9 @@ type LoginRequest struct {
 	ID string `json:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	//
-	// required: true
 	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
 
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
-	//
-	// required: true
 	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.

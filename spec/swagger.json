@@ -2969,8 +2969,6 @@
       "title": "Contains information on an ongoing login request.",
       "required": [
         "challenge",
-        "requested_scope",
-        "requested_access_token_audience",
         "skip",
         "subject",
         "client",

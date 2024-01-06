@@ -1021,7 +1021,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
 			require.NoError(t, err)
 
-			_, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			_, err = grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
 			require.ErrorIs(t, err, sqlcon.ErrNoRows)
 		})
 	}

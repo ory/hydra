@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-01-05)](#000-2024-01-05)
+- [0.0.0 (2024-01-08)](#000-2024-01-08)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -703,7 +703,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2024-01-05)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0-rc.3...v0.0.0) (2024-01-08)
 
 
 ### Bug Fixes
@@ -728,6 +728,7 @@
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
 * Remove required mark ([#3693](https://github.com/ory/hydra/issues/3693)) ([3a764a0](https://github.com/ory/hydra/commit/3a764a053a3d7eab698668cf63d387ea76c1db40))
+* Timeout in jwt-bearer grants when too many grants are available ([#3692](https://github.com/ory/hydra/issues/3692)) ([a748797](https://github.com/ory/hydra/commit/a748797761f5503b048df1b57bcc406f16cd40a3))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
 
 ### Documentation

@@ -133,11 +133,19 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeys")
 	defer otelx.End(span, &err)
 
+	expiresAt := "expires_at > NOW()"
+	if p.conn.Dialect.Name() == "sqlite3" {
+		expiresAt = "expires_at > datetime('now')"
+	}
+
 	grantsData := make([]trust.SQLData, 0)
 	query := p.QueryWithNetwork(ctx).
+		Select("key_set", "key_id").
+		Where(expiresAt).
 		Where("issuer = ?", issuer).
 		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
-		Where("nid = ?", p.NetworkID(ctx))
+		Order("created_at DESC").
+		Limit(100) // Load maximum of 100 keys
 
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)

@@ -100,6 +100,7 @@ func TestJWKSDK(t *testing.T) {
 			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: "RS256",
 				Kid: "key-bar",
+				Use: "sig",
 			}).Execute()
 			require.NoError(t, err)
 			require.Len(t, resultKeys.Keys, 1)

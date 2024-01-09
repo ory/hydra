@@ -28,25 +28,25 @@ Create JSON Web Key
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | The JSON Web Key Set ID
-    createJsonWebKeySet := *openapiclient.NewCreateJsonWebKeySet("Alg_example", "Kid_example", "Use_example") // CreateJsonWebKeySet | 
+	set := "set_example" // string | The JSON Web Key Set ID
+	createJsonWebKeySet := *openapiclient.NewCreateJsonWebKeySet("Alg_example", "Kid_example", "Use_example") // CreateJsonWebKeySet | 
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.CreateJsonWebKeySet(context.Background(), set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.CreateJsonWebKeySet``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `CreateJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `JwkApi.CreateJsonWebKeySet`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.JwkApi.CreateJsonWebKeySet(context.Background(), set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.CreateJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `CreateJsonWebKeySet`: JsonWebKeySet
+	fmt.Fprintf(os.Stdout, "Response from `JwkApi.CreateJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -100,23 +100,23 @@ Delete JSON Web Key
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | The JSON Web Key Set
-    kid := "kid_example" // string | The JSON Web Key ID (kid)
+	set := "set_example" // string | The JSON Web Key Set
+	kid := "kid_example" // string | The JSON Web Key ID (kid)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.DeleteJsonWebKey(context.Background(), set, kid).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKey``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.JwkApi.DeleteJsonWebKey(context.Background(), set, kid).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -171,22 +171,22 @@ Delete JSON Web Key Set
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | The JSON Web Key Set
+	set := "set_example" // string | The JSON Web Key Set
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.DeleteJsonWebKeySet(context.Background(), set).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKeySet``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.JwkApi.DeleteJsonWebKeySet(context.Background(), set).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -239,25 +239,25 @@ Get JSON Web Key
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | JSON Web Key Set ID
-    kid := "kid_example" // string | JSON Web Key ID
+	set := "set_example" // string | JSON Web Key Set ID
+	kid := "kid_example" // string | JSON Web Key ID
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.GetJsonWebKey(context.Background(), set, kid).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKey``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetJsonWebKey`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKey`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.JwkApi.GetJsonWebKey(context.Background(), set, kid).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetJsonWebKey`: JsonWebKeySet
+	fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -312,24 +312,24 @@ Retrieve a JSON Web Key Set
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | JSON Web Key Set ID
+	set := "set_example" // string | JSON Web Key Set ID
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.GetJsonWebKeySet(context.Background(), set).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKeySet``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKeySet`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.JwkApi.GetJsonWebKeySet(context.Background(), set).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetJsonWebKeySet`: JsonWebKeySet
+	fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -382,26 +382,26 @@ Set JSON Web Key
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | The JSON Web Key Set ID
-    kid := "kid_example" // string | JSON Web Key ID
-    jsonWebKey := *openapiclient.NewJsonWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig") // JsonWebKey |  (optional)
+	set := "set_example" // string | The JSON Web Key Set ID
+	kid := "kid_example" // string | JSON Web Key ID
+	jsonWebKey := *openapiclient.NewJsonWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig") // JsonWebKey |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.SetJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKey``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `SetJsonWebKey`: JsonWebKey
-    fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKey`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.JwkApi.SetJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `SetJsonWebKey`: JsonWebKey
+	fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -457,25 +457,25 @@ Update a JSON Web Key Set
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    set := "set_example" // string | The JSON Web Key Set ID
-    jsonWebKeySet := *openapiclient.NewJsonWebKeySet() // JsonWebKeySet |  (optional)
+	set := "set_example" // string | The JSON Web Key Set ID
+	jsonWebKeySet := *openapiclient.NewJsonWebKeySet() // JsonWebKeySet |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.JwkApi.SetJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKeySet``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `SetJsonWebKeySet`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKeySet`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.JwkApi.SetJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `SetJsonWebKeySet`: JsonWebKeySet
+	fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKeySet`: %v\n", resp)
 }
 ```
 

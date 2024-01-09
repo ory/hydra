@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the IsReady503Response type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &IsReady503Response{}
+
 // IsReady503Response struct for IsReady503Response
 type IsReady503Response struct {
 	// Errors contains a list of errors that caused the not ready status.
@@ -40,7 +43,7 @@ func NewIsReady503ResponseWithDefaults() *IsReady503Response {
 
 // GetErrors returns the Errors field value if set, zero value otherwise.
 func (o *IsReady503Response) GetErrors() map[string]string {
-	if o == nil || o.Errors == nil {
+	if o == nil || IsNil(o.Errors) {
 		var ret map[string]string
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *IsReady503Response) GetErrors() map[string]string {
 // GetErrorsOk returns a tuple with the Errors field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *IsReady503Response) GetErrorsOk() (*map[string]string, bool) {
-	if o == nil || o.Errors == nil {
+	if o == nil || IsNil(o.Errors) {
 		return nil, false
 	}
 	return o.Errors, true
@@ -58,7 +61,7 @@ func (o *IsReady503Response) GetErrorsOk() (*map[string]string, bool) {
 
 // HasErrors returns a boolean if a field has been set.
 func (o *IsReady503Response) HasErrors() bool {
-	if o != nil && o.Errors != nil {
+	if o != nil && !IsNil(o.Errors) {
 		return true
 	}
 
@@ -71,11 +74,19 @@ func (o *IsReady503Response) SetErrors(v map[string]string) {
 }
 
 func (o IsReady503Response) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Errors != nil {
-		toSerialize["errors"] = o.Errors
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o IsReady503Response) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Errors) {
+		toSerialize["errors"] = o.Errors
+	}
+	return toSerialize, nil
 }
 
 type NullableIsReady503Response struct {

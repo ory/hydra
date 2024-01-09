@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the OAuth2LogoutRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &OAuth2LogoutRequest{}
+
 // OAuth2LogoutRequest struct for OAuth2LogoutRequest
 type OAuth2LogoutRequest struct {
 	// Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to identify the session.
@@ -49,7 +52,7 @@ func NewOAuth2LogoutRequestWithDefaults() *OAuth2LogoutRequest {
 
 // GetChallenge returns the Challenge field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetChallenge() string {
-	if o == nil || o.Challenge == nil {
+	if o == nil || IsNil(o.Challenge) {
 		var ret string
 		return ret
 	}
@@ -59,7 +62,7 @@ func (o *OAuth2LogoutRequest) GetChallenge() string {
 // GetChallengeOk returns a tuple with the Challenge field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetChallengeOk() (*string, bool) {
-	if o == nil || o.Challenge == nil {
+	if o == nil || IsNil(o.Challenge) {
 		return nil, false
 	}
 	return o.Challenge, true
@@ -67,7 +70,7 @@ func (o *OAuth2LogoutRequest) GetChallengeOk() (*string, bool) {
 
 // HasChallenge returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasChallenge() bool {
-	if o != nil && o.Challenge != nil {
+	if o != nil && !IsNil(o.Challenge) {
 		return true
 	}
 
@@ -81,7 +84,7 @@ func (o *OAuth2LogoutRequest) SetChallenge(v string) {
 
 // GetClient returns the Client field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetClient() OAuth2Client {
-	if o == nil || o.Client == nil {
+	if o == nil || IsNil(o.Client) {
 		var ret OAuth2Client
 		return ret
 	}
@@ -91,7 +94,7 @@ func (o *OAuth2LogoutRequest) GetClient() OAuth2Client {
 // GetClientOk returns a tuple with the Client field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetClientOk() (*OAuth2Client, bool) {
-	if o == nil || o.Client == nil {
+	if o == nil || IsNil(o.Client) {
 		return nil, false
 	}
 	return o.Client, true
@@ -99,7 +102,7 @@ func (o *OAuth2LogoutRequest) GetClientOk() (*OAuth2Client, bool) {
 
 // HasClient returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasClient() bool {
-	if o != nil && o.Client != nil {
+	if o != nil && !IsNil(o.Client) {
 		return true
 	}
 
@@ -113,7 +116,7 @@ func (o *OAuth2LogoutRequest) SetClient(v OAuth2Client) {
 
 // GetRequestUrl returns the RequestUrl field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetRequestUrl() string {
-	if o == nil || o.RequestUrl == nil {
+	if o == nil || IsNil(o.RequestUrl) {
 		var ret string
 		return ret
 	}
@@ -123,7 +126,7 @@ func (o *OAuth2LogoutRequest) GetRequestUrl() string {
 // GetRequestUrlOk returns a tuple with the RequestUrl field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetRequestUrlOk() (*string, bool) {
-	if o == nil || o.RequestUrl == nil {
+	if o == nil || IsNil(o.RequestUrl) {
 		return nil, false
 	}
 	return o.RequestUrl, true
@@ -131,7 +134,7 @@ func (o *OAuth2LogoutRequest) GetRequestUrlOk() (*string, bool) {
 
 // HasRequestUrl returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasRequestUrl() bool {
-	if o != nil && o.RequestUrl != nil {
+	if o != nil && !IsNil(o.RequestUrl) {
 		return true
 	}
 
@@ -145,7 +148,7 @@ func (o *OAuth2LogoutRequest) SetRequestUrl(v string) {
 
 // GetRpInitiated returns the RpInitiated field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetRpInitiated() bool {
-	if o == nil || o.RpInitiated == nil {
+	if o == nil || IsNil(o.RpInitiated) {
 		var ret bool
 		return ret
 	}
@@ -155,7 +158,7 @@ func (o *OAuth2LogoutRequest) GetRpInitiated() bool {
 // GetRpInitiatedOk returns a tuple with the RpInitiated field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetRpInitiatedOk() (*bool, bool) {
-	if o == nil || o.RpInitiated == nil {
+	if o == nil || IsNil(o.RpInitiated) {
 		return nil, false
 	}
 	return o.RpInitiated, true
@@ -163,7 +166,7 @@ func (o *OAuth2LogoutRequest) GetRpInitiatedOk() (*bool, bool) {
 
 // HasRpInitiated returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasRpInitiated() bool {
-	if o != nil && o.RpInitiated != nil {
+	if o != nil && !IsNil(o.RpInitiated) {
 		return true
 	}
 
@@ -177,7 +180,7 @@ func (o *OAuth2LogoutRequest) SetRpInitiated(v bool) {
 
 // GetSid returns the Sid field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetSid() string {
-	if o == nil || o.Sid == nil {
+	if o == nil || IsNil(o.Sid) {
 		var ret string
 		return ret
 	}
@@ -187,7 +190,7 @@ func (o *OAuth2LogoutRequest) GetSid() string {
 // GetSidOk returns a tuple with the Sid field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetSidOk() (*string, bool) {
-	if o == nil || o.Sid == nil {
+	if o == nil || IsNil(o.Sid) {
 		return nil, false
 	}
 	return o.Sid, true
@@ -195,7 +198,7 @@ func (o *OAuth2LogoutRequest) GetSidOk() (*string, bool) {
 
 // HasSid returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasSid() bool {
-	if o != nil && o.Sid != nil {
+	if o != nil && !IsNil(o.Sid) {
 		return true
 	}
 
@@ -209,7 +212,7 @@ func (o *OAuth2LogoutRequest) SetSid(v string) {
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetSubject() string {
-	if o == nil || o.Subject == nil {
+	if o == nil || IsNil(o.Subject) {
 		var ret string
 		return ret
 	}
@@ -219,7 +222,7 @@ func (o *OAuth2LogoutRequest) GetSubject() string {
 // GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LogoutRequest) GetSubjectOk() (*string, bool) {
-	if o == nil || o.Subject == nil {
+	if o == nil || IsNil(o.Subject) {
 		return nil, false
 	}
 	return o.Subject, true
@@ -227,7 +230,7 @@ func (o *OAuth2LogoutRequest) GetSubjectOk() (*string, bool) {
 
 // HasSubject returns a boolean if a field has been set.
 func (o *OAuth2LogoutRequest) HasSubject() bool {
-	if o != nil && o.Subject != nil {
+	if o != nil && !IsNil(o.Subject) {
 		return true
 	}
 
@@ -240,26 +243,34 @@ func (o *OAuth2LogoutRequest) SetSubject(v string) {
 }
 
 func (o OAuth2LogoutRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Challenge != nil {
-		toSerialize["challenge"] = o.Challenge
-	}
-	if o.Client != nil {
-		toSerialize["client"] = o.Client
-	}
-	if o.RequestUrl != nil {
-		toSerialize["request_url"] = o.RequestUrl
-	}
-	if o.RpInitiated != nil {
-		toSerialize["rp_initiated"] = o.RpInitiated
-	}
-	if o.Sid != nil {
-		toSerialize["sid"] = o.Sid
-	}
-	if o.Subject != nil {
-		toSerialize["subject"] = o.Subject
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o OAuth2LogoutRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Challenge) {
+		toSerialize["challenge"] = o.Challenge
+	}
+	if !IsNil(o.Client) {
+		toSerialize["client"] = o.Client
+	}
+	if !IsNil(o.RequestUrl) {
+		toSerialize["request_url"] = o.RequestUrl
+	}
+	if !IsNil(o.RpInitiated) {
+		toSerialize["rp_initiated"] = o.RpInitiated
+	}
+	if !IsNil(o.Sid) {
+		toSerialize["sid"] = o.Sid
+	}
+	if !IsNil(o.Subject) {
+		toSerialize["subject"] = o.Subject
+	}
+	return toSerialize, nil
 }
 
 type NullableOAuth2LogoutRequest struct {

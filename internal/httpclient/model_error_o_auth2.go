@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the ErrorOAuth2 type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ErrorOAuth2{}
+
 // ErrorOAuth2 Error
 type ErrorOAuth2 struct {
 	// Error
@@ -48,7 +51,7 @@ func NewErrorOAuth2WithDefaults() *ErrorOAuth2 {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *ErrorOAuth2) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -58,7 +61,7 @@ func (o *ErrorOAuth2) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorOAuth2) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -66,7 +69,7 @@ func (o *ErrorOAuth2) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *ErrorOAuth2) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !IsNil(o.Error) {
 		return true
 	}
 
@@ -80,7 +83,7 @@ func (o *ErrorOAuth2) SetError(v string) {
 
 // GetErrorDebug returns the ErrorDebug field value if set, zero value otherwise.
 func (o *ErrorOAuth2) GetErrorDebug() string {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		var ret string
 		return ret
 	}
@@ -90,7 +93,7 @@ func (o *ErrorOAuth2) GetErrorDebug() string {
 // GetErrorDebugOk returns a tuple with the ErrorDebug field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorOAuth2) GetErrorDebugOk() (*string, bool) {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		return nil, false
 	}
 	return o.ErrorDebug, true
@@ -98,7 +101,7 @@ func (o *ErrorOAuth2) GetErrorDebugOk() (*string, bool) {
 
 // HasErrorDebug returns a boolean if a field has been set.
 func (o *ErrorOAuth2) HasErrorDebug() bool {
-	if o != nil && o.ErrorDebug != nil {
+	if o != nil && !IsNil(o.ErrorDebug) {
 		return true
 	}
 
@@ -112,7 +115,7 @@ func (o *ErrorOAuth2) SetErrorDebug(v string) {
 
 // GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
 func (o *ErrorOAuth2) GetErrorDescription() string {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		var ret string
 		return ret
 	}
@@ -122,7 +125,7 @@ func (o *ErrorOAuth2) GetErrorDescription() string {
 // GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorOAuth2) GetErrorDescriptionOk() (*string, bool) {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		return nil, false
 	}
 	return o.ErrorDescription, true
@@ -130,7 +133,7 @@ func (o *ErrorOAuth2) GetErrorDescriptionOk() (*string, bool) {
 
 // HasErrorDescription returns a boolean if a field has been set.
 func (o *ErrorOAuth2) HasErrorDescription() bool {
-	if o != nil && o.ErrorDescription != nil {
+	if o != nil && !IsNil(o.ErrorDescription) {
 		return true
 	}
 
@@ -144,7 +147,7 @@ func (o *ErrorOAuth2) SetErrorDescription(v string) {
 
 // GetErrorHint returns the ErrorHint field value if set, zero value otherwise.
 func (o *ErrorOAuth2) GetErrorHint() string {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		var ret string
 		return ret
 	}
@@ -154,7 +157,7 @@ func (o *ErrorOAuth2) GetErrorHint() string {
 // GetErrorHintOk returns a tuple with the ErrorHint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorOAuth2) GetErrorHintOk() (*string, bool) {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		return nil, false
 	}
 	return o.ErrorHint, true
@@ -162,7 +165,7 @@ func (o *ErrorOAuth2) GetErrorHintOk() (*string, bool) {
 
 // HasErrorHint returns a boolean if a field has been set.
 func (o *ErrorOAuth2) HasErrorHint() bool {
-	if o != nil && o.ErrorHint != nil {
+	if o != nil && !IsNil(o.ErrorHint) {
 		return true
 	}
 
@@ -176,7 +179,7 @@ func (o *ErrorOAuth2) SetErrorHint(v string) {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *ErrorOAuth2) GetStatusCode() int64 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		var ret int64
 		return ret
 	}
@@ -186,7 +189,7 @@ func (o *ErrorOAuth2) GetStatusCode() int64 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *ErrorOAuth2) GetStatusCodeOk() (*int64, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -194,7 +197,7 @@ func (o *ErrorOAuth2) GetStatusCodeOk() (*int64, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *ErrorOAuth2) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !IsNil(o.StatusCode) {
 		return true
 	}
 
@@ -207,23 +210,31 @@ func (o *ErrorOAuth2) SetStatusCode(v int64) {
 }
 
 func (o ErrorOAuth2) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
-	}
-	if o.ErrorDebug != nil {
-		toSerialize["error_debug"] = o.ErrorDebug
-	}
-	if o.ErrorDescription != nil {
-		toSerialize["error_description"] = o.ErrorDescription
-	}
-	if o.ErrorHint != nil {
-		toSerialize["error_hint"] = o.ErrorHint
-	}
-	if o.StatusCode != nil {
-		toSerialize["status_code"] = o.StatusCode
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ErrorOAuth2) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	if !IsNil(o.ErrorDebug) {
+		toSerialize["error_debug"] = o.ErrorDebug
+	}
+	if !IsNil(o.ErrorDescription) {
+		toSerialize["error_description"] = o.ErrorDescription
+	}
+	if !IsNil(o.ErrorHint) {
+		toSerialize["error_hint"] = o.ErrorHint
+	}
+	if !IsNil(o.StatusCode) {
+		toSerialize["status_code"] = o.StatusCode
+	}
+	return toSerialize, nil
 }
 
 type NullableErrorOAuth2 struct {

@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the RejectOAuth2Request type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &RejectOAuth2Request{}
+
 // RejectOAuth2Request struct for RejectOAuth2Request
 type RejectOAuth2Request struct {
 	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).  Defaults to `request_denied`.
@@ -48,7 +51,7 @@ func NewRejectOAuth2RequestWithDefaults() *RejectOAuth2Request {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *RejectOAuth2Request) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -58,7 +61,7 @@ func (o *RejectOAuth2Request) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RejectOAuth2Request) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -66,7 +69,7 @@ func (o *RejectOAuth2Request) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *RejectOAuth2Request) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !IsNil(o.Error) {
 		return true
 	}
 
@@ -80,7 +83,7 @@ func (o *RejectOAuth2Request) SetError(v string) {
 
 // GetErrorDebug returns the ErrorDebug field value if set, zero value otherwise.
 func (o *RejectOAuth2Request) GetErrorDebug() string {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		var ret string
 		return ret
 	}
@@ -90,7 +93,7 @@ func (o *RejectOAuth2Request) GetErrorDebug() string {
 // GetErrorDebugOk returns a tuple with the ErrorDebug field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RejectOAuth2Request) GetErrorDebugOk() (*string, bool) {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		return nil, false
 	}
 	return o.ErrorDebug, true
@@ -98,7 +101,7 @@ func (o *RejectOAuth2Request) GetErrorDebugOk() (*string, bool) {
 
 // HasErrorDebug returns a boolean if a field has been set.
 func (o *RejectOAuth2Request) HasErrorDebug() bool {
-	if o != nil && o.ErrorDebug != nil {
+	if o != nil && !IsNil(o.ErrorDebug) {
 		return true
 	}
 
@@ -112,7 +115,7 @@ func (o *RejectOAuth2Request) SetErrorDebug(v string) {
 
 // GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
 func (o *RejectOAuth2Request) GetErrorDescription() string {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		var ret string
 		return ret
 	}
@@ -122,7 +125,7 @@ func (o *RejectOAuth2Request) GetErrorDescription() string {
 // GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RejectOAuth2Request) GetErrorDescriptionOk() (*string, bool) {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		return nil, false
 	}
 	return o.ErrorDescription, true
@@ -130,7 +133,7 @@ func (o *RejectOAuth2Request) GetErrorDescriptionOk() (*string, bool) {
 
 // HasErrorDescription returns a boolean if a field has been set.
 func (o *RejectOAuth2Request) HasErrorDescription() bool {
-	if o != nil && o.ErrorDescription != nil {
+	if o != nil && !IsNil(o.ErrorDescription) {
 		return true
 	}
 
@@ -144,7 +147,7 @@ func (o *RejectOAuth2Request) SetErrorDescription(v string) {
 
 // GetErrorHint returns the ErrorHint field value if set, zero value otherwise.
 func (o *RejectOAuth2Request) GetErrorHint() string {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		var ret string
 		return ret
 	}
@@ -154,7 +157,7 @@ func (o *RejectOAuth2Request) GetErrorHint() string {
 // GetErrorHintOk returns a tuple with the ErrorHint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RejectOAuth2Request) GetErrorHintOk() (*string, bool) {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		return nil, false
 	}
 	return o.ErrorHint, true
@@ -162,7 +165,7 @@ func (o *RejectOAuth2Request) GetErrorHintOk() (*string, bool) {
 
 // HasErrorHint returns a boolean if a field has been set.
 func (o *RejectOAuth2Request) HasErrorHint() bool {
-	if o != nil && o.ErrorHint != nil {
+	if o != nil && !IsNil(o.ErrorHint) {
 		return true
 	}
 
@@ -176,7 +179,7 @@ func (o *RejectOAuth2Request) SetErrorHint(v string) {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *RejectOAuth2Request) GetStatusCode() int64 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		var ret int64
 		return ret
 	}
@@ -186,7 +189,7 @@ func (o *RejectOAuth2Request) GetStatusCode() int64 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RejectOAuth2Request) GetStatusCodeOk() (*int64, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -194,7 +197,7 @@ func (o *RejectOAuth2Request) GetStatusCodeOk() (*int64, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *RejectOAuth2Request) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !IsNil(o.StatusCode) {
 		return true
 	}
 
@@ -207,23 +210,31 @@ func (o *RejectOAuth2Request) SetStatusCode(v int64) {
 }
 
 func (o RejectOAuth2Request) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
-	}
-	if o.ErrorDebug != nil {
-		toSerialize["error_debug"] = o.ErrorDebug
-	}
-	if o.ErrorDescription != nil {
-		toSerialize["error_description"] = o.ErrorDescription
-	}
-	if o.ErrorHint != nil {
-		toSerialize["error_hint"] = o.ErrorHint
-	}
-	if o.StatusCode != nil {
-		toSerialize["status_code"] = o.StatusCode
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o RejectOAuth2Request) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	if !IsNil(o.ErrorDebug) {
+		toSerialize["error_debug"] = o.ErrorDebug
+	}
+	if !IsNil(o.ErrorDescription) {
+		toSerialize["error_description"] = o.ErrorDescription
+	}
+	if !IsNil(o.ErrorHint) {
+		toSerialize["error_hint"] = o.ErrorHint
+	}
+	if !IsNil(o.StatusCode) {
+		toSerialize["status_code"] = o.StatusCode
+	}
+	return toSerialize, nil
 }
 
 type NullableRejectOAuth2Request struct {

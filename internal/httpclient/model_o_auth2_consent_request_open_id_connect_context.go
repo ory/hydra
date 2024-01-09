@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the OAuth2ConsentRequestOpenIDConnectContext type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &OAuth2ConsentRequestOpenIDConnectContext{}
+
 // OAuth2ConsentRequestOpenIDConnectContext struct for OAuth2ConsentRequestOpenIDConnectContext
 type OAuth2ConsentRequestOpenIDConnectContext struct {
 	// ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.  OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.
@@ -48,7 +51,7 @@ func NewOAuth2ConsentRequestOpenIDConnectContextWithDefaults() *OAuth2ConsentReq
 
 // GetAcrValues returns the AcrValues field value if set, zero value otherwise.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetAcrValues() []string {
-	if o == nil || o.AcrValues == nil {
+	if o == nil || IsNil(o.AcrValues) {
 		var ret []string
 		return ret
 	}
@@ -58,7 +61,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetAcrValues() []string {
 // GetAcrValuesOk returns a tuple with the AcrValues field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetAcrValuesOk() ([]string, bool) {
-	if o == nil || o.AcrValues == nil {
+	if o == nil || IsNil(o.AcrValues) {
 		return nil, false
 	}
 	return o.AcrValues, true
@@ -66,7 +69,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetAcrValuesOk() ([]string, b
 
 // HasAcrValues returns a boolean if a field has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) HasAcrValues() bool {
-	if o != nil && o.AcrValues != nil {
+	if o != nil && !IsNil(o.AcrValues) {
 		return true
 	}
 
@@ -80,7 +83,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) SetAcrValues(v []string) {
 
 // GetDisplay returns the Display field value if set, zero value otherwise.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetDisplay() string {
-	if o == nil || o.Display == nil {
+	if o == nil || IsNil(o.Display) {
 		var ret string
 		return ret
 	}
@@ -90,7 +93,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetDisplay() string {
 // GetDisplayOk returns a tuple with the Display field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetDisplayOk() (*string, bool) {
-	if o == nil || o.Display == nil {
+	if o == nil || IsNil(o.Display) {
 		return nil, false
 	}
 	return o.Display, true
@@ -98,7 +101,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetDisplayOk() (*string, bool
 
 // HasDisplay returns a boolean if a field has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) HasDisplay() bool {
-	if o != nil && o.Display != nil {
+	if o != nil && !IsNil(o.Display) {
 		return true
 	}
 
@@ -112,7 +115,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) SetDisplay(v string) {
 
 // GetIdTokenHintClaims returns the IdTokenHintClaims field value if set, zero value otherwise.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetIdTokenHintClaims() map[string]interface{} {
-	if o == nil || o.IdTokenHintClaims == nil {
+	if o == nil || IsNil(o.IdTokenHintClaims) {
 		var ret map[string]interface{}
 		return ret
 	}
@@ -122,15 +125,15 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetIdTokenHintClaims() map[st
 // GetIdTokenHintClaimsOk returns a tuple with the IdTokenHintClaims field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetIdTokenHintClaimsOk() (map[string]interface{}, bool) {
-	if o == nil || o.IdTokenHintClaims == nil {
-		return nil, false
+	if o == nil || IsNil(o.IdTokenHintClaims) {
+		return map[string]interface{}{}, false
 	}
 	return o.IdTokenHintClaims, true
 }
 
 // HasIdTokenHintClaims returns a boolean if a field has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) HasIdTokenHintClaims() bool {
-	if o != nil && o.IdTokenHintClaims != nil {
+	if o != nil && !IsNil(o.IdTokenHintClaims) {
 		return true
 	}
 
@@ -144,7 +147,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) SetIdTokenHintClaims(v map[st
 
 // GetLoginHint returns the LoginHint field value if set, zero value otherwise.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetLoginHint() string {
-	if o == nil || o.LoginHint == nil {
+	if o == nil || IsNil(o.LoginHint) {
 		var ret string
 		return ret
 	}
@@ -154,7 +157,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetLoginHint() string {
 // GetLoginHintOk returns a tuple with the LoginHint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetLoginHintOk() (*string, bool) {
-	if o == nil || o.LoginHint == nil {
+	if o == nil || IsNil(o.LoginHint) {
 		return nil, false
 	}
 	return o.LoginHint, true
@@ -162,7 +165,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetLoginHintOk() (*string, bo
 
 // HasLoginHint returns a boolean if a field has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) HasLoginHint() bool {
-	if o != nil && o.LoginHint != nil {
+	if o != nil && !IsNil(o.LoginHint) {
 		return true
 	}
 
@@ -176,7 +179,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) SetLoginHint(v string) {
 
 // GetUiLocales returns the UiLocales field value if set, zero value otherwise.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetUiLocales() []string {
-	if o == nil || o.UiLocales == nil {
+	if o == nil || IsNil(o.UiLocales) {
 		var ret []string
 		return ret
 	}
@@ -186,7 +189,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetUiLocales() []string {
 // GetUiLocalesOk returns a tuple with the UiLocales field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) GetUiLocalesOk() ([]string, bool) {
-	if o == nil || o.UiLocales == nil {
+	if o == nil || IsNil(o.UiLocales) {
 		return nil, false
 	}
 	return o.UiLocales, true
@@ -194,7 +197,7 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) GetUiLocalesOk() ([]string, b
 
 // HasUiLocales returns a boolean if a field has been set.
 func (o *OAuth2ConsentRequestOpenIDConnectContext) HasUiLocales() bool {
-	if o != nil && o.UiLocales != nil {
+	if o != nil && !IsNil(o.UiLocales) {
 		return true
 	}
 
@@ -207,23 +210,31 @@ func (o *OAuth2ConsentRequestOpenIDConnectContext) SetUiLocales(v []string) {
 }
 
 func (o OAuth2ConsentRequestOpenIDConnectContext) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.AcrValues != nil {
-		toSerialize["acr_values"] = o.AcrValues
-	}
-	if o.Display != nil {
-		toSerialize["display"] = o.Display
-	}
-	if o.IdTokenHintClaims != nil {
-		toSerialize["id_token_hint_claims"] = o.IdTokenHintClaims
-	}
-	if o.LoginHint != nil {
-		toSerialize["login_hint"] = o.LoginHint
-	}
-	if o.UiLocales != nil {
-		toSerialize["ui_locales"] = o.UiLocales
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o OAuth2ConsentRequestOpenIDConnectContext) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AcrValues) {
+		toSerialize["acr_values"] = o.AcrValues
+	}
+	if !IsNil(o.Display) {
+		toSerialize["display"] = o.Display
+	}
+	if !IsNil(o.IdTokenHintClaims) {
+		toSerialize["id_token_hint_claims"] = o.IdTokenHintClaims
+	}
+	if !IsNil(o.LoginHint) {
+		toSerialize["login_hint"] = o.LoginHint
+	}
+	if !IsNil(o.UiLocales) {
+		toSerialize["ui_locales"] = o.UiLocales
+	}
+	return toSerialize, nil
 }
 
 type NullableOAuth2ConsentRequestOpenIDConnectContext struct {

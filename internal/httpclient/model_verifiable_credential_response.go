@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the VerifiableCredentialResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VerifiableCredentialResponse{}
+
 // VerifiableCredentialResponse struct for VerifiableCredentialResponse
 type VerifiableCredentialResponse struct {
 	CredentialDraft00 *string `json:"credential_draft_00,omitempty"`
@@ -40,7 +43,7 @@ func NewVerifiableCredentialResponseWithDefaults() *VerifiableCredentialResponse
 
 // GetCredentialDraft00 returns the CredentialDraft00 field value if set, zero value otherwise.
 func (o *VerifiableCredentialResponse) GetCredentialDraft00() string {
-	if o == nil || o.CredentialDraft00 == nil {
+	if o == nil || IsNil(o.CredentialDraft00) {
 		var ret string
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *VerifiableCredentialResponse) GetCredentialDraft00() string {
 // GetCredentialDraft00Ok returns a tuple with the CredentialDraft00 field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialResponse) GetCredentialDraft00Ok() (*string, bool) {
-	if o == nil || o.CredentialDraft00 == nil {
+	if o == nil || IsNil(o.CredentialDraft00) {
 		return nil, false
 	}
 	return o.CredentialDraft00, true
@@ -58,7 +61,7 @@ func (o *VerifiableCredentialResponse) GetCredentialDraft00Ok() (*string, bool) 
 
 // HasCredentialDraft00 returns a boolean if a field has been set.
 func (o *VerifiableCredentialResponse) HasCredentialDraft00() bool {
-	if o != nil && o.CredentialDraft00 != nil {
+	if o != nil && !IsNil(o.CredentialDraft00) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *VerifiableCredentialResponse) SetCredentialDraft00(v string) {
 
 // GetFormat returns the Format field value if set, zero value otherwise.
 func (o *VerifiableCredentialResponse) GetFormat() string {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		var ret string
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *VerifiableCredentialResponse) GetFormat() string {
 // GetFormatOk returns a tuple with the Format field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialResponse) GetFormatOk() (*string, bool) {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		return nil, false
 	}
 	return o.Format, true
@@ -90,7 +93,7 @@ func (o *VerifiableCredentialResponse) GetFormatOk() (*string, bool) {
 
 // HasFormat returns a boolean if a field has been set.
 func (o *VerifiableCredentialResponse) HasFormat() bool {
-	if o != nil && o.Format != nil {
+	if o != nil && !IsNil(o.Format) {
 		return true
 	}
 
@@ -103,14 +106,22 @@ func (o *VerifiableCredentialResponse) SetFormat(v string) {
 }
 
 func (o VerifiableCredentialResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.CredentialDraft00 != nil {
-		toSerialize["credential_draft_00"] = o.CredentialDraft00
-	}
-	if o.Format != nil {
-		toSerialize["format"] = o.Format
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o VerifiableCredentialResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.CredentialDraft00) {
+		toSerialize["credential_draft_00"] = o.CredentialDraft00
+	}
+	if !IsNil(o.Format) {
+		toSerialize["format"] = o.Format
+	}
+	return toSerialize, nil
 }
 
 type NullableVerifiableCredentialResponse struct {

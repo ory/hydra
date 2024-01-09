@@ -24,23 +24,23 @@ Return Running Software Version.
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.MetadataApi.GetVersion(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.GetVersion``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetVersion`: GetVersion200Response
-    fmt.Fprintf(os.Stdout, "Response from `MetadataApi.GetVersion`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.MetadataApi.GetVersion(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.GetVersion``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetVersion`: GetVersion200Response
+	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.GetVersion`: %v\n", resp)
 }
 ```
 
@@ -85,23 +85,23 @@ Check HTTP Server Status
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.MetadataApi.IsAlive(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsAlive``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `IsAlive`: HealthStatus
-    fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsAlive`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.MetadataApi.IsAlive(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsAlive``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `IsAlive`: HealthStatus
+	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsAlive`: %v\n", resp)
 }
 ```
 
@@ -146,23 +146,23 @@ Check HTTP Server and Database Status
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.MetadataApi.IsReady(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsReady``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `IsReady`: IsReady200Response
-    fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsReady`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.MetadataApi.IsReady(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsReady``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `IsReady`: IsReady200Response
+	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsReady`: %v\n", resp)
 }
 ```
 

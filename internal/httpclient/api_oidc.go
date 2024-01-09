@@ -14,7 +14,7 @@ package openapi
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -118,9 +118,9 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -137,6 +137,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -146,6 +147,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -248,9 +250,9 @@ func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiable
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -267,6 +269,7 @@ func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiable
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -276,6 +279,7 @@ func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiable
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -343,7 +347,7 @@ func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicCl
 	}
 
 	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -376,9 +380,9 @@ func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicCl
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -394,6 +398,7 @@ func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicCl
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -477,9 +482,9 @@ func (a *OidcApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfi
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -495,6 +500,7 @@ func (a *OidcApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfi
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -561,7 +567,7 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 	}
 
 	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -594,9 +600,9 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -612,6 +618,7 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -706,9 +713,9 @@ func (a *OidcApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*O
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -724,6 +731,7 @@ func (a *OidcApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*O
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -815,9 +823,9 @@ func (a *OidcApiService) RevokeOidcSessionExecute(r ApiRevokeOidcSessionRequest)
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -898,7 +906,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 	}
 
 	localVarPath := localBasePath + "/oauth2/register/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -936,9 +944,9 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -955,6 +963,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -964,6 +973,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

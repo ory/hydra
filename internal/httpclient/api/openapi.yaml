@@ -24,10 +24,10 @@ tags:
 paths:
   /.well-known/jwks.json:
     get:
-      description: "This endpoint returns JSON Web Keys required to verifying OpenID\
-        \ Connect ID Tokens and,\nif enabled, OAuth 2.0 JWT Access Tokens. This endpoint\
-        \ can be used with client libraries like\n[node-jwks-rsa](https://github.com/auth0/node-jwks-rsa)\
-        \ among others."
+      description: |-
+        This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
+        if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+        [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
       operationId: discoverJsonWebKeys
       responses:
         "200":
@@ -47,11 +47,11 @@ paths:
       - wellknown
   /.well-known/openid-configuration:
     get:
-      description: "A mechanism for an OpenID Connect Relying Party to discover the\
-        \ End-User's OpenID Provider and obtain information needed to interact with\
-        \ it, including its OAuth 2.0 endpoint locations.\n\nPopular libraries for\
-        \ OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang),\
-        \ and others.\nFor a full list of clients go here: https://openid.net/developers/certified/"
+      description: |-
+        A mechanism for an OpenID Connect Relying Party to discover the End-User's OpenID Provider and obtain information needed to interact with it, including its OAuth 2.0 endpoint locations.
+
+        Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
+        For a full list of clients go here: https://openid.net/developers/certified/
       operationId: discoverOidcConfiguration
       responses:
         "200":
@@ -71,12 +71,16 @@ paths:
       - oidc
   /admin/clients:
     get:
-      description: "This endpoint lists all clients in the database, and never returns\
-        \ client secrets.\nAs a default it lists the first 100 clients."
+      description: |-
+        This endpoint lists all clients in the database, and never returns client secrets.
+        As a default it lists the first 100 clients.
       operationId: listOAuth2Clients
       parameters:
-      - description: "Items per Page\n\nThis is the number of items per page to return.\n\
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      - description: |-
+          Items per Page
+
+          This is the number of items per page to return.
+          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_size
@@ -88,8 +92,11 @@ paths:
           minimum: 1
           type: integer
         style: form
-      - description: "Next Page Token\n\nThe next page token.\nFor details on pagination\
-          \ please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      - description: |-
+          Next Page Token
+
+          The next page token.
+          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_token
@@ -134,9 +141,9 @@ paths:
       tags:
       - oAuth2
     post:
-      description: "Create a new OAuth 2.0 client. If you pass `client_secret` the\
-        \ secret is used, otherwise a random secret\nis generated. The secret is echoed\
-        \ in the response. It is not possible to retrieve it later on."
+      description: |-
+        Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret
+        is generated. The secret is echoed in the response. It is not possible to retrieve it later on.
       operationId: createOAuth2Client
       requestBody:
         content:
@@ -170,11 +177,13 @@ paths:
       - oAuth2
   /admin/clients/{id}:
     delete:
-      description: "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients\
-        \ are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0\
-        \ clients are\ngenerated for applications which want to consume your OAuth\
-        \ 2.0 or OpenID Connect capabilities.\n\nMake sure that this endpoint is well\
-        \ protected and only callable by first-party components."
+      description: |-
+        Delete an existing OAuth 2.0 Client by its ID.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
+        Make sure that this endpoint is well protected and only callable by first-party components.
       operationId: deleteOAuth2Client
       parameters:
       - description: The id of the OAuth 2.0 Client.
@@ -187,8 +196,9 @@ paths:
         style: simple
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -199,10 +209,11 @@ paths:
       tags:
       - oAuth2
     get:
-      description: "Get an OAuth 2.0 client by its ID. This endpoint never returns\
-        \ the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and\
-        \ OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications\
-        \ which want to consume your OAuth 2.0 or OpenID Connect capabilities."
+      description: |-
+        Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: getOAuth2Client
       parameters:
       - description: The id of the OAuth 2.0 Client.
@@ -230,13 +241,13 @@ paths:
       tags:
       - oAuth2
     patch:
-      description: "Patch an existing OAuth 2.0 Client using JSON Patch. If you pass\
-        \ `client_secret`\nthe secret will be updated and returned via the API. This\
-        \ is the\nonly time you will be able to retrieve the client secret, so write\
-        \ it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth\
-        \ 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated\
-        \ for applications which want to consume your OAuth 2.0 or OpenID Connect\
-        \ capabilities."
+      description: |-
+        Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`
+        the secret will be updated and returned via the API. This is the
+        only time you will be able to retrieve the client secret, so write it down and keep it safe.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: patchOAuth2Client
       parameters:
       - description: The id of the OAuth 2.0 Client.
@@ -278,13 +289,14 @@ paths:
       tags:
       - oAuth2
     put:
-      description: "Replaces an existing OAuth 2.0 Client with the payload you send.\
-        \ If you pass `client_secret` the secret is used,\notherwise the existing\
-        \ secret is used.\n\nIf set, the secret is echoed in the response. It is not\
-        \ possible to retrieve it later on.\n\nOAuth 2.0 Clients are used to perform\
-        \ OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated\
-        \ for applications which want to consume your OAuth 2.0 or OpenID Connect\
-        \ capabilities."
+      description: |-
+        Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,
+        otherwise the existing secret is used.
+
+        If set, the secret is echoed in the response. It is not possible to retrieve it later on.
+
+        OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: setOAuth2Client
       parameters:
       - description: OAuth 2.0 Client ID
@@ -369,13 +381,10 @@ paths:
       - oAuth2
   /admin/keys/{set}:
     delete:
-      description: "Use this endpoint to delete a complete JSON Web Key Set and all\
-        \ the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation\
-        \ (JSON) data structure that represents a cryptographic key. A JWK Set is\
-        \ a JSON data structure that represents a set of JWKs. A JSON Web Key is identified\
-        \ by its set and key id. ORY Hydra uses this functionality to store cryptographic\
-        \ keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),\
-        \ and allows storing user-defined keys as well."
+      description: |-
+        Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: deleteJsonWebKeySet
       parameters:
       - description: The JSON Web Key Set
@@ -388,8 +397,9 @@ paths:
         style: simple
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -400,13 +410,10 @@ paths:
       tags:
       - jwk
     get:
-      description: "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\
-        \nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
-        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
-        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
-        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
-        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
-        \ storing user-defined keys as well."
+      description: |-
+        This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: getJsonWebKeySet
       parameters:
       - description: JSON Web Key Set ID
@@ -434,16 +441,10 @@ paths:
       tags:
       - jwk
     post:
-      description: "This endpoint is capable of generating JSON Web Key Sets for you.\
-        \ There a different strategies available, such as symmetric cryptographic\
-        \ keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If\
-        \ the specified JSON Web Key Set does not exist, it will be created.\n\nA\
-        \ JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure\
-        \ that represents a cryptographic key. A JWK Set is a JSON data structure\
-        \ that represents a set of JWKs. A JSON Web Key is identified by its set and\
-        \ key id. ORY Hydra uses this functionality to store cryptographic keys used\
-        \ for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows\
-        \ storing user-defined keys as well."
+      description: |-
+        This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: createJsonWebKeySet
       parameters:
       - description: The JSON Web Key Set ID
@@ -478,13 +479,10 @@ paths:
       tags:
       - jwk
     put:
-      description: "Use this method if you do not want to let Hydra generate the JWKs\
-        \ for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript\
-        \ Object Notation (JSON) data structure that represents a cryptographic key.\
-        \ A JWK Set is a JSON data structure that represents a set of JWKs. A JSON\
-        \ Web Key is identified by its set and key id. ORY Hydra uses this functionality\
-        \ to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID\
-        \ Connect ID tokens), and allows storing user-defined keys as well."
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: setJsonWebKeySet
       parameters:
       - description: The JSON Web Key Set ID
@@ -519,13 +517,13 @@ paths:
       - jwk
   /admin/keys/{set}/{kid}:
     delete:
-      description: "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web\
-        \ Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents\
-        \ a cryptographic key. A\nJWK Set is a JSON data structure that represents\
-        \ a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra\
-        \ uses\nthis functionality to store cryptographic keys used for TLS and JSON\
-        \ Web Tokens (such as OpenID Connect ID tokens),\nand allows storing user-defined\
-        \ keys as well."
+      description: |-
+        Use this endpoint to delete a single JSON Web Key.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A
+        JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses
+        this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),
+        and allows storing user-defined keys as well.
       operationId: deleteJsonWebKey
       parameters:
       - description: The JSON Web Key Set
@@ -546,8 +544,9 @@ paths:
         style: simple
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -595,13 +594,10 @@ paths:
       tags:
       - jwk
     put:
-      description: "Use this method if you do not want to let Hydra generate the JWKs\
-        \ for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript\
-        \ Object Notation (JSON) data structure that represents a cryptographic key.\
-        \ A JWK Set is a JSON data structure that represents a set of JWKs. A JSON\
-        \ Web Key is identified by its set and key id. ORY Hydra uses this functionality\
-        \ to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID\
-        \ Connect ID tokens), and allows storing user-defined keys as well."
+      description: |-
+        Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+        A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
       operationId: setJsonWebKey
       parameters:
       - description: The JSON Web Key Set ID
@@ -644,17 +640,17 @@ paths:
       - jwk
   /admin/oauth2/auth/requests/consent:
     get:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell Ory now about it. If the subject authenticated, he/she must now\
-        \ be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed\
-        \ to access the resources on the subject's behalf.\n\nThe consent challenge\
-        \ is appended to the consent provider's URL to which the subject's user-agent\
-        \ (browser) is redirected to. The consent\nprovider uses that challenge to\
-        \ fetch information on the OAuth2 request and then tells Ory if the subject\
-        \ accepted\nor rejected the request.\n\nThe default consent provider is available\
-        \ via the Ory Managed Account Experience. To customize the consent provider,\
-        \ please\nhead over to the OAuth 2.0 documentation."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if
+        the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+        The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+        provider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted
+        or rejected the request.
+
+        The default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please
+        head over to the OAuth 2.0 documentation.
       operationId: getOAuth2ConsentRequest
       parameters:
       - description: OAuth 2.0 Consent Request Challenge
@@ -689,22 +685,23 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/consent/accept:
     put:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell Ory now about it. If the subject authenticated, he/she must now\
-        \ be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed\
-        \ to access the resources on the subject's behalf.\n\nThe consent challenge\
-        \ is appended to the consent provider's URL to which the subject's user-agent\
-        \ (browser) is redirected to. The consent\nprovider uses that challenge to\
-        \ fetch information on the OAuth2 request and then tells Ory if the subject\
-        \ accepted\nor rejected the request.\n\nThis endpoint tells Ory that the subject\
-        \ has authorized the OAuth 2.0 client to access resources on his/her behalf.\n\
-        The consent provider includes additional information, such as session data\
-        \ for access and ID tokens, and if the\nconsent request should be used as\
-        \ basis for future requests.\n\nThe response contains a redirect URL which\
-        \ the consent provider should redirect the user-agent to.\n\nThe default consent\
-        \ provider is available via the Ory Managed Account Experience. To customize\
-        \ the consent provider, please\nhead over to the OAuth 2.0 documentation."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if
+        the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+        The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+        provider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted
+        or rejected the request.
+
+        This endpoint tells Ory that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
+        The consent provider includes additional information, such as session data for access and ID tokens, and if the
+        consent request should be used as basis for future requests.
+
+        The response contains a redirect URL which the consent provider should redirect the user-agent to.
+
+        The default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please
+        head over to the OAuth 2.0 documentation.
       operationId: acceptOAuth2ConsentRequest
       parameters:
       - description: OAuth 2.0 Consent Request Challenge
@@ -739,21 +736,22 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/consent/reject:
     put:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell Ory now about it. If the subject authenticated, he/she must now\
-        \ be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed\
-        \ to access the resources on the subject's behalf.\n\nThe consent challenge\
-        \ is appended to the consent provider's URL to which the subject's user-agent\
-        \ (browser) is redirected to. The consent\nprovider uses that challenge to\
-        \ fetch information on the OAuth2 request and then tells Ory if the subject\
-        \ accepted\nor rejected the request.\n\nThis endpoint tells Ory that the subject\
-        \ has not authorized the OAuth 2.0 client to access resources on his/her behalf.\n\
-        The consent provider must include a reason why the consent was not granted.\n\
-        \nThe response contains a redirect URL which the consent provider should redirect\
-        \ the user-agent to.\n\nThe default consent provider is available via the\
-        \ Ory Managed Account Experience. To customize the consent provider, please\n\
-        head over to the OAuth 2.0 documentation."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell Ory now about it. If the subject authenticated, he/she must now be asked if
+        the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+
+        The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+        provider uses that challenge to fetch information on the OAuth2 request and then tells Ory if the subject accepted
+        or rejected the request.
+
+        This endpoint tells Ory that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
+        The consent provider must include a reason why the consent was not granted.
+
+        The response contains a redirect URL which the consent provider should redirect the user-agent to.
+
+        The default consent provider is available via the Ory Managed Account Experience. To customize the consent provider, please
+        head over to the OAuth 2.0 documentation.
       operationId: rejectOAuth2ConsentRequest
       parameters:
       - description: OAuth 2.0 Consent Request Challenge
@@ -788,17 +786,16 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/login:
     get:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell the Ory OAuth2 Service about it.\n\nPer default, the login provider\
-        \ is Ory itself. You may use a different login provider which needs to be\
-        \ a web-app\nyou write and host, and it must be able to authenticate (\"show\
-        \ the subject a login screen\")\na subject (in OAuth2 the proper name for\
-        \ subject is \"resource owner\").\n\nThe authentication challenge is appended\
-        \ to the login provider URL to which the subject's user-agent (browser) is\
-        \ redirected to. The login\nprovider uses that challenge to fetch information\
-        \ on the OAuth2 request and then accept or reject the requested authentication\
-        \ process."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell the Ory OAuth2 Service about it.
+
+        Per default, the login provider is Ory itself. You may use a different login provider which needs to be a web-app
+        you write and host, and it must be able to authenticate ("show the subject a login screen")
+        a subject (in OAuth2 the proper name for subject is "resource owner").
+
+        The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+        provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
       operationId: getOAuth2LoginRequest
       parameters:
       - description: OAuth 2.0 Login Request Challenge
@@ -833,17 +830,18 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/login/accept:
     put:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell the Ory OAuth2 Service about it.\n\nThe authentication challenge\
-        \ is appended to the login provider URL to which the subject's user-agent\
-        \ (browser) is redirected to. The login\nprovider uses that challenge to fetch\
-        \ information on the OAuth2 request and then accept or reject the requested\
-        \ authentication process.\n\nThis endpoint tells Ory that the subject has\
-        \ successfully authenticated and includes additional information such as\n\
-        the subject's ID and if Ory should remember the subject's subject agent for\
-        \ future authentication attempts by setting\na cookie.\n\nThe response contains\
-        \ a redirect URL which the login provider should redirect the user-agent to."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell the Ory OAuth2 Service about it.
+
+        The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+        provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+
+        This endpoint tells Ory that the subject has successfully authenticated and includes additional information such as
+        the subject's ID and if Ory should remember the subject's subject agent for future authentication attempts by setting
+        a cookie.
+
+        The response contains a redirect URL which the login provider should redirect the user-agent to.
       operationId: acceptOAuth2LoginRequest
       parameters:
       - description: OAuth 2.0 Login Request Challenge
@@ -878,16 +876,17 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/login/reject:
     put:
-      description: "When an authorization code, hybrid, or implicit OAuth 2.0 Flow\
-        \ is initiated, Ory asks the login provider\nto authenticate the subject and\
-        \ then tell the Ory OAuth2 Service about it.\n\nThe authentication challenge\
-        \ is appended to the login provider URL to which the subject's user-agent\
-        \ (browser) is redirected to. The login\nprovider uses that challenge to fetch\
-        \ information on the OAuth2 request and then accept or reject the requested\
-        \ authentication process.\n\nThis endpoint tells Ory that the subject has\
-        \ not authenticated and includes a reason why the authentication\nwas denied.\n\
-        \nThe response contains a redirect URL which the login provider should redirect\
-        \ the user-agent to."
+      description: |-
+        When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider
+        to authenticate the subject and then tell the Ory OAuth2 Service about it.
+
+        The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
+        provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+
+        This endpoint tells Ory that the subject has not authenticated and includes a reason why the authentication
+        was denied.
+
+        The response contains a redirect URL which the login provider should redirect the user-agent to.
       operationId: rejectOAuth2LoginRequest
       parameters:
       - description: OAuth 2.0 Login Request Challenge
@@ -956,10 +955,10 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/logout/accept:
     put:
-      description: "When a user or an application requests Ory OAuth 2.0 to remove\
-        \ the session state of a subject, this endpoint is used to confirm that logout\
-        \ request.\n\nThe response contains a redirect URL which the consent provider\
-        \ should redirect the user-agent to."
+      description: |-
+        When a user or an application requests Ory OAuth 2.0 to remove the session state of a subject, this endpoint is used to confirm that logout request.
+
+        The response contains a redirect URL which the consent provider should redirect the user-agent to.
       operationId: acceptOAuth2LogoutRequest
       parameters:
       - description: OAuth 2.0 Logout Request Challenge
@@ -988,10 +987,11 @@ paths:
       - oAuth2
   /admin/oauth2/auth/requests/logout/reject:
     put:
-      description: "When a user or an application requests Ory OAuth 2.0 to remove\
-        \ the session state of a subject, this endpoint is used to deny that logout\
-        \ request.\nNo HTTP request body is required.\n\nThe response is empty as\
-        \ the logout provider has to chose what action to perform next."
+      description: |-
+        When a user or an application requests Ory OAuth 2.0 to remove the session state of a subject, this endpoint is used to deny that logout request.
+        No HTTP request body is required.
+
+        The response is empty as the logout provider has to chose what action to perform next.
       operationId: rejectOAuth2LogoutRequest
       parameters:
       - explode: true
@@ -1003,8 +1003,9 @@ paths:
         style: form
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1032,8 +1033,10 @@ paths:
         schema:
           type: string
         style: form
-      - description: "OAuth 2.0 Client ID\n\nIf set, deletes only those consent sessions\
-          \ that have been granted to the specified OAuth 2.0 Client ID."
+      - description: |-
+          OAuth 2.0 Client ID
+
+          If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID.
         explode: true
         in: query
         name: client
@@ -1054,8 +1057,9 @@ paths:
         style: form
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1066,14 +1070,17 @@ paths:
       tags:
       - oAuth2
     get:
-      description: "This endpoint lists all subject's granted consent sessions, including\
-        \ client and granted scope.\nIf the subject is unknown or has not granted\
-        \ any consent sessions yet, the endpoint returns an\nempty JSON array with\
-        \ status code 200 OK."
+      description: |-
+        This endpoint lists all subject's granted consent sessions, including client and granted scope.
+        If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
+        empty JSON array with status code 200 OK.
       operationId: listOAuth2ConsentSessions
       parameters:
-      - description: "Items per Page\n\nThis is the number of items per page to return.\n\
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      - description: |-
+          Items per Page
+
+          This is the number of items per page to return.
+          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_size
@@ -1085,8 +1092,11 @@ paths:
           minimum: 1
           type: integer
         style: form
-      - description: "Next Page Token\n\nThe next page token.\nFor details on pagination\
-          \ please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      - description: |-
+          Next Page Token
+
+          The next page token.
+          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_token
@@ -1130,15 +1140,15 @@ paths:
       - oAuth2
   /admin/oauth2/auth/sessions/login:
     delete:
-      description: "This endpoint invalidates authentication sessions. After revoking\
-        \ the authentication session(s), the subject\nhas to re-authenticate at the\
-        \ Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf\
-        \ you send the subject in a query param, all authentication sessions that\
-        \ belong to that subject are revoked.\nNo OpenID Connect Front- or Back-channel\
-        \ logout is performed in this case.\n\nAlternatively, you can send a SessionID\
-        \ via `sid` query param, in which case, only the session that is connected\n\
-        to that SessionID is revoked. OpenID Connect Back-channel logout is performed\
-        \ in this case."
+      description: |-
+        This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject
+        has to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.
+
+        If you send the subject in a query param, all authentication sessions that belong to that subject are revoked.
+        No OpenID Connect Front- or Back-channel logout is performed in this case.
+
+        Alternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected
+        to that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.
       operationId: revokeOAuth2LoginSessions
       parameters:
       - description: |-
@@ -1165,8 +1175,9 @@ paths:
         style: form
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1178,11 +1189,10 @@ paths:
       - oAuth2
   /admin/oauth2/introspect:
     post:
-      description: "The introspection endpoint allows to check if a token (both refresh\
-        \ and access) is active or not. An active token\nis neither expired nor revoked.\
-        \ If a token is active, additional information on the token will be included.\
-        \ You can\nset additional data for a token by setting `session.access_token`\
-        \ during the consent flow."
+      description: |-
+        The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
+        is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
+        set additional data for a token by setting `session.access_token` during the consent flow.
       operationId: introspectOAuth2Token
       requestBody:
         content:
@@ -1221,8 +1231,9 @@ paths:
         style: form
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1279,9 +1290,10 @@ paths:
       tags:
       - oAuth2
     post:
-      description: "Use this endpoint to establish a trust relationship for a JWT\
-        \ issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\n\
-        and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523)."
+      description: |-
+        Use this endpoint to establish a trust relationship for a JWT issuer
+        to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+        and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
       operationId: trustOAuth2JwtGrantIssuer
       requestBody:
         content:
@@ -1307,11 +1319,12 @@ paths:
       - oAuth2
   /admin/trust/grants/jwt-bearer/issuers/{id}:
     delete:
-      description: "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer.\
-        \ The ID is the one returned when you\ncreated the trust relationship.\n\n\
-        Once deleted, the associated issuer will no longer be able to perform the\
-        \ JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization\
-        \ Grant."
+      description: |-
+        Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+        created the trust relationship.
+
+        Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+        for OAuth 2.0 Client Authentication and Authorization Grant.
       operationId: deleteTrustedOAuth2JwtGrantIssuer
       parameters:
       - description: The id of the desired grant
@@ -1324,8 +1337,9 @@ paths:
         style: simple
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1405,13 +1419,15 @@ paths:
       - oidc
   /health/alive:
     get:
-      description: "This endpoint returns a HTTP 200 status code when Ory Hydra is\
-        \ accepting incoming\nHTTP requests. This status does currently not include\
-        \ checks whether the database connection is working.\n\nIf the service supports\
-        \ TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto`\
-        \ header to be set.\n\nBe aware that if you are running multiple nodes of\
-        \ this service, the health status will never\nrefer to the cluster state,\
-        \ only to a single instance."
+      description: |-
+        This endpoint returns a HTTP 200 status code when Ory Hydra is accepting incoming
+        HTTP requests. This status does currently not include checks whether the database connection is working.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of this service, the health status will never
+        refer to the cluster state, only to a single instance.
       operationId: isAlive
       responses:
         "200":
@@ -1431,12 +1447,15 @@ paths:
       - metadata
   /health/ready:
     get:
-      description: "This endpoint returns a HTTP 200 status code when Ory Hydra is\
-        \ up running and the environment dependencies (e.g.\nthe database) are responsive\
-        \ as well.\n\nIf the service supports TLS Edge Termination, this endpoint\
-        \ does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware\
-        \ that if you are running multiple nodes of Ory Hydra, the health status will\
-        \ never\nrefer to the cluster state, only to a single instance."
+      description: |-
+        This endpoint returns a HTTP 200 status code when Ory Hydra is up running and the environment dependencies (e.g.
+        the database) are responsive as well.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of Ory Hydra, the health status will never
+        refer to the cluster state, only to a single instance.
       operationId: isReady
       responses:
         "200":
@@ -1464,8 +1483,9 @@ paths:
       operationId: oAuth2Authorize
       responses:
         "302":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1522,18 +1542,18 @@ paths:
       - oidc
   /oauth2/register/{id}:
     delete:
-      description: "This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`)\
-        \ but is capable of facing the\npublic internet directly and can be used in\
-        \ self-service. It implements the OpenID Connect\nDynamic Client Registration\
-        \ Protocol. This feature needs to be enabled in the configuration. This endpoint\n\
-        is disabled by default. It can be enabled by an administrator.\n\nTo use this\
-        \ endpoint, you will need to present the client's authentication credentials.\
-        \ If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`,\
-        \ you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`,\
-        \ present the Client ID and the Client Secret in the Authorization header.\n\
-        \nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.\
-        \ Usually, OAuth 2.0 clients are\ngenerated for applications which want to\
-        \ consume your OAuth 2.0 or OpenID Connect capabilities."
+      description: |-
+        This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+        is disabled by default. It can be enabled by an administrator.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: deleteOidcDynamicClient
       parameters:
       - description: The id of the OAuth 2.0 Client.
@@ -1546,8 +1566,9 @@ paths:
         style: simple
       responses:
         "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1561,14 +1582,14 @@ paths:
       tags:
       - oidc
     get:
-      description: "This endpoint behaves like the administrative counterpart (`getOAuth2Client`)\
-        \ but is capable of facing the\npublic internet directly and can be used in\
-        \ self-service. It implements the OpenID Connect\nDynamic Client Registration\
-        \ Protocol.\n\nTo use this endpoint, you will need to present the client's\
-        \ authentication credentials. If the OAuth2 Client\nuses the Token Endpoint\
-        \ Authentication Method `client_secret_post`, you need to present the client\
-        \ secret in the URL query.\nIf it uses `client_secret_basic`, present the\
-        \ Client ID and the Client Secret in the Authorization header."
+      description: |-
+        This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
       operationId: getOidcDynamicClient
       parameters:
       - description: The id of the OAuth 2.0 Client.
@@ -1598,20 +1619,22 @@ paths:
       tags:
       - oidc
     put:
-      description: "This endpoint behaves like the administrative counterpart (`setOAuth2Client`)\
-        \ but is capable of facing the\npublic internet directly to be used by third\
-        \ parties. It implements the OpenID Connect\nDynamic Client Registration Protocol.\n\
-        \nThis feature is disabled per default. It can be enabled by a system administrator.\n\
-        \nIf you pass `client_secret` the secret is used, otherwise the existing secret\
-        \ is used. If set, the secret is echoed in the response.\nIt is not possible\
-        \ to retrieve it later on.\n\nTo use this endpoint, you will need to present\
-        \ the client's authentication credentials. If the OAuth2 Client\nuses the\
-        \ Token Endpoint Authentication Method `client_secret_post`, you need to present\
-        \ the client secret in the URL query.\nIf it uses `client_secret_basic`, present\
-        \ the Client ID and the Client Secret in the Authorization header.\n\nOAuth\
-        \ 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually,\
-        \ OAuth 2.0 clients are\ngenerated for applications which want to consume\
-        \ your OAuth 2.0 or OpenID Connect capabilities."
+      description: |-
+        This endpoint behaves like the administrative counterpart (`setOAuth2Client`) but is capable of facing the
+        public internet directly to be used by third parties. It implements the OpenID Connect
+        Dynamic Client Registration Protocol.
+
+        This feature is disabled per default. It can be enabled by a system administrator.
+
+        If you pass `client_secret` the secret is used, otherwise the existing secret is used. If set, the secret is echoed in the response.
+        It is not possible to retrieve it later on.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       operationId: setOidcDynamicClient
       parameters:
       - description: OAuth 2.0 Client ID
@@ -1656,12 +1679,11 @@ paths:
       - oidc
   /oauth2/revoke:
     post:
-      description: "Revoking a token (both access and refresh) means that the tokens\
-        \ will be invalid. A revoked access token can no\nlonger be used to make access\
-        \ requests, and a revoked refresh token can no longer be used to refresh an\
-        \ access token.\nRevoking a refresh token also invalidates the access token\
-        \ that was created with it. A token may only be revoked by\nthe client the\
-        \ token was generated for."
+      description: |-
+        Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
+        longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
+        Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
+        the client the token was generated for.
       operationId: revokeOAuth2Token
       requestBody:
         content:
@@ -1670,8 +1692,9 @@ paths:
               $ref: '#/components/schemas/revokeOAuth2Token_request'
       responses:
         "200":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
         default:
           content:
             application/json:
@@ -1696,8 +1719,9 @@ paths:
       operationId: revokeOidcSession
       responses:
         "302":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
       summary: OpenID Connect Front- and Back-channel Enabled Logout
       tags:
       - oidc
@@ -1735,11 +1759,13 @@ paths:
       - oAuth2
   /userinfo:
     get:
-      description: "This endpoint returns the payload of the ID Token, including `session.id_token`\
-        \ values, of\nthe provided OAuth 2.0 Access Token's consent request.\n\nIn\
-        \ the case of authentication error, a WWW-Authenticate header might be set\
-        \ in the response\nwith more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)\n\
-        for more details about header format."
+      description: |-
+        This endpoint returns the payload of the ID Token, including `session.id_token` values, of
+        the provided OAuth 2.0 Access Token's consent request.
+
+        In the case of authentication error, a WWW-Authenticate header might be set in the response
+        with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
+        for more details about header format.
       operationId: getOidcUserInfo
       responses:
         "200":
@@ -1761,11 +1787,14 @@ paths:
       - oidc
   /version:
     get:
-      description: "This endpoint returns the version of Ory Hydra.\n\nIf the service\
-        \ supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto`\
-        \ header to be set.\n\nBe aware that if you are running multiple nodes of\
-        \ this service, the version will never\nrefer to the cluster state, only to\
-        \ a single instance."
+      description: |-
+        This endpoint returns the version of Ory Hydra.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of this service, the version will never
+        refer to the cluster state, only to a single instance.
       operationId: getVersion
       responses:
         "200":
@@ -1780,8 +1809,9 @@ paths:
 components:
   responses:
     emptyResponse:
-      description: "Empty responses are sent when, for example, resources are deleted.\
-        \ The HTTP status code for empty responses is\ntypically 201."
+      description: |-
+        Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+        typically 201.
     errorOAuth2BadRequest:
       content:
         application/json:
@@ -1913,14 +1943,14 @@ components:
           title: NullTime implements sql.NullTime functionality.
           type: string
         remember:
-          description: "Remember, if set to true, tells ORY Hydra to remember this\
-            \ consent authorization and reuse it if the same\nclient asks the same\
-            \ user for the same, or a subset of, scope."
+          description: |-
+            Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
+            client asks the same user for the same, or a subset of, scope.
           type: boolean
         remember_for:
-          description: "RememberFor sets how long the consent authorization should\
-            \ be remembered for in seconds. If set to `0`, the\nauthorization will\
-            \ be remembered indefinitely."
+          description: |-
+            RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
+            authorization will be remembered indefinitely.
           format: int64
           type: integer
         session:
@@ -1933,13 +1963,11 @@ components:
         id_token: ""
       properties:
         access_token:
-          description: "AccessToken sets session data for the access and refresh token,\
-            \ as well as any future tokens issued by the\nrefresh grant. Keep in mind\
-            \ that this data will be available to anyone performing OAuth 2.0 Challenge\
-            \ Introspection.\nIf only your services can perform OAuth 2.0 Challenge\
-            \ Introspection, this is usually fine. But if third parties\ncan access\
-            \ that endpoint as well, sensitive data from the session might be exposed\
-            \ to them. Use with care!"
+          description: |-
+            AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the
+            refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
+            If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties
+            can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
         id_token:
           description: |-
             IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
@@ -1949,9 +1977,9 @@ components:
     acceptOAuth2LoginRequest:
       properties:
         acr:
-          description: "ACR sets the Authentication AuthorizationContext Class Reference\
-            \ value for this authentication session. You can use it\nto express that,\
-            \ for example, a user authenticated using two factor authentication."
+          description: |-
+            ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
+            to express that, for example, a user authenticated using two factor authentication.
           type: string
         amr:
           items:
@@ -1963,47 +1991,48 @@ components:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
         extend_session_lifespan:
-          description: "Extend OAuth2 authentication session lifespan\n\nIf set to\
-            \ `true`, the OAuth2 authentication cookie lifespan is extended. This\
-            \ is for example useful if you want the user to be able to use `prompt=none`\
-            \ continuously.\n\nThis value can only be set to `true` if the user has\
-            \ an authentication, which is the case if the `skip` value is `true`."
+          description: |-
+            Extend OAuth2 authentication session lifespan
+
+            If set to `true`, the OAuth2 authentication cookie lifespan is extended. This is for example useful if you want the user to be able to use `prompt=none` continuously.
+
+            This value can only be set to `true` if the user has an authentication, which is the case if the `skip` value is `true`.
           type: boolean
         force_subject_identifier:
-          description: "ForceSubjectIdentifier forces the \"pairwise\" user ID of\
-            \ the end-user that authenticated. The \"pairwise\" user ID refers to\
-            \ the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg]\
-            \ of the OpenID\nConnect specification. It allows you to set an obfuscated\
-            \ subject (\"user\") identifier that is unique to the client.\n\nPlease\
-            \ note that this changes the user ID on endpoint /userinfo and sub claim\
-            \ of the ID Token. It does not change the\nsub claim in the OAuth 2.0\
-            \ Introspection.\n\nPer default, ORY Hydra handles this value with its\
-            \ own algorithm. In case you want to set this yourself\nyou can use this\
-            \ field. Please note that setting this field has no effect if `pairwise`\
-            \ is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect\
-            \ a pairwise identifier (set via `subject_type` key in the client's\n\
-            configuration).\n\nPlease also be aware that ORY Hydra is unable to properly\
-            \ compute this value during authentication. This implies\nthat you have\
-            \ to compute this value on every authentication process (probably depending\
-            \ on the client ID or some\nother unique value).\n\nIf you fail to compute\
-            \ the proper value, then authentication processes which have id_token_hint\
-            \ set might fail."
+          description: |-
+            ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
+            (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
+            Connect specification. It allows you to set an obfuscated subject ("user") identifier that is unique to the client.
+
+            Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the
+            sub claim in the OAuth 2.0 Introspection.
+
+            Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself
+            you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in
+            ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
+            configuration).
+
+            Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies
+            that you have to compute this value on every authentication process (probably depending on the client ID or some
+            other unique value).
+
+            If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
           type: string
         identity_provider_session_id:
-          description: "IdentityProviderSessionID is the session ID of the end-user\
-            \ that authenticated.\nIf specified, we will use this value to propagate\
-            \ the logout."
+          description: |-
+            IdentityProviderSessionID is the session ID of the end-user that authenticated.
+            If specified, we will use this value to propagate the logout.
           type: string
         remember:
-          description: "Remember, if set to true, tells ORY Hydra to remember this\
-            \ user by telling the user agent (browser) to store\na cookie with authentication\
-            \ data. If the same user performs another OAuth 2.0 Authorization Request,\
-            \ he/she\nwill not be asked to log in again."
+          description: |-
+            Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
+            a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
+            will not be asked to log in again.
           type: boolean
         remember_for:
-          description: "RememberFor sets how long the authentication should be remembered\
-            \ for in seconds. If set to `0`, the\nauthorization will be remembered\
-            \ for the duration of the browser session (using a session cookie)."
+          description: |-
+            RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
+            authorization will be remembered for the duration of the browser session (using a session cookie).
           format: int64
           type: integer
         subject:
@@ -2017,8 +2046,10 @@ components:
       description: Create JSON Web Key Set Request Body
       properties:
         alg:
-          description: "JSON Web Key Algorithm\n\nThe algorithm to be used for creating\
-            \ the key. Supports `RS256`, `ES256`, `ES512`, `HS512`, and `HS256`."
+          description: |-
+            JSON Web Key Algorithm
+
+            The algorithm to be used for creating the key. Supports `RS256`, `ES256`, `ES512`, `HS512`, and `HS256`.
           type: string
         kid:
           description: |-
@@ -2187,8 +2218,9 @@ components:
           type: string
       type: object
     introspectedOAuth2Token:
-      description: "Introspection contains an access token's session data as specified\
-        \ by\n[IETF RFC 7662](https://tools.ietf.org/html/rfc7662)"
+      description: |-
+        Introspection contains an access token's session data as specified by
+        [IETF RFC 7662](https://tools.ietf.org/html/rfc7662)
       example:
         ext:
           key: ""
@@ -2209,14 +2241,16 @@ components:
         username: username
       properties:
         active:
-          description: "Active is a boolean indicator of whether or not the presented\
-            \ token\nis currently active.  The specifics of a token's \"active\" state\n\
-            will vary depending on the implementation of the authorization\nserver\
-            \ and the information it keeps about its tokens, but a \"true\"\nvalue\
-            \ return for the \"active\" property will generally indicate\nthat a given\
-            \ token has been issued by this authorization server,\nhas not been revoked\
-            \ by the resource owner, and is within its\ngiven time window of validity\
-            \ (e.g., after its issuance time and\nbefore its expiration time)."
+          description: |-
+            Active is a boolean indicator of whether or not the presented token
+            is currently active.  The specifics of a token's "active" state
+            will vary depending on the implementation of the authorization
+            server and the information it keeps about its tokens, but a "true"
+            value return for the "active" property will generally indicate
+            that a given token has been issued by this authorization server,
+            has not been revoked by the resource owner, and is within its
+            given time window of validity (e.g., after its issuance time and
+            before its expiration time).
           type: boolean
         aud:
           description: Audience contains a list of the token's intended audiences.
@@ -2229,9 +2263,9 @@ components:
             requested this token.
           type: string
         exp:
-          description: "Expires at is an integer timestamp, measured in the number\
-            \ of seconds\nsince January 1 1970 UTC, indicating when this token will\
-            \ expire."
+          description: |-
+            Expires at is an integer timestamp, measured in the number of seconds
+            since January 1 1970 UTC, indicating when this token will expire.
           format: int64
           type: integer
         ext:
@@ -2239,18 +2273,20 @@ components:
           description: Extra is arbitrary data set by the session.
           type: object
         iat:
-          description: "Issued at is an integer timestamp, measured in the number\
-            \ of seconds\nsince January 1 1970 UTC, indicating when this token was\n\
-            originally issued."
+          description: |-
+            Issued at is an integer timestamp, measured in the number of seconds
+            since January 1 1970 UTC, indicating when this token was
+            originally issued.
           format: int64
           type: integer
         iss:
           description: IssuerURL is a string representing the issuer of this token
           type: string
         nbf:
-          description: "NotBefore is an integer timestamp, measured in the number\
-            \ of seconds\nsince January 1 1970 UTC, indicating when this token is\
-            \ not to be\nused before."
+          description: |-
+            NotBefore is an integer timestamp, measured in the number of seconds
+            since January 1 1970 UTC, indicating when this token is not to be
+            used before.
           format: int64
           type: integer
         obfuscated_subject:
@@ -2264,9 +2300,10 @@ components:
             scopes associated with this token.
           type: string
         sub:
-          description: "Subject of the token, as defined in JWT [RFC7519].\nUsually\
-            \ a machine-readable identifier of the resource owner who\nauthorized\
-            \ this token."
+          description: |-
+            Subject of the token, as defined in JWT [RFC7519].
+            Usually a machine-readable identifier of the resource owner who
+            authorized this token.
           type: string
         token_type:
           description: "TokenType is the introspected token's type, typically `Bearer`."
@@ -2287,8 +2324,10 @@ components:
       description: A JSONPatch document as defined by RFC 6902
       properties:
         from:
-          description: "This field is used together with operation \"move\" and uses\
-            \ JSON Pointer notation.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5)."
+          description: |-
+            This field is used together with operation "move" and uses JSON Pointer notation.
+
+            Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
           example: /name
           type: string
         op:
@@ -2297,13 +2336,17 @@ components:
           example: replace
           type: string
         path:
-          description: "The path to the target path. Uses JSON pointer notation.\n\
-            \nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5)."
+          description: |-
+            The path to the target path. Uses JSON pointer notation.
+
+            Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
           example: /name
           type: string
         value:
-          description: "The value to be used within the operations.\n\nLearn more\
-            \ [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5)."
+          description: |-
+            The value to be used within the operations.
+
+            Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
           example: foobar
       required:
       - op
@@ -2337,11 +2380,12 @@ components:
         alg: RS256
       properties:
         alg:
-          description: "The \"alg\" (algorithm) parameter identifies the algorithm\
-            \ intended for\nuse with the key.  The values used should either be registered\
-            \ in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\n\
-            established by [JWA] or be a value that contains a Collision-\nResistant\
-            \ Name."
+          description: |-
+            The "alg" (algorithm) parameter identifies the algorithm intended for
+            use with the key.  The values used should either be registered in the
+            IANA "JSON Web Signature and Encryption Algorithms" registry
+            established by [JWA] or be a value that contains a Collision-
+            Resistant Name.
           example: RS256
           type: string
         crv:
@@ -2363,23 +2407,25 @@ components:
           example: GawgguFyGrWKav7AX4VKUg
           type: string
         kid:
-          description: "The \"kid\" (key ID) parameter is used to match a specific\
-            \ key.  This\nis used, for instance, to choose among a set of keys within\
-            \ a JWK Set\nduring key rollover.  The structure of the \"kid\" value\
-            \ is\nunspecified.  When \"kid\" values are used within a JWK Set, different\n\
-            keys within the JWK Set SHOULD use distinct \"kid\" values.  (One\nexample\
-            \ in which different keys might use the same \"kid\" value is if\nthey\
-            \ have different \"kty\" (key type) values but are considered to be\n\
-            equivalent alternatives by the application using them.)  The \"kid\"\n\
-            value is a case-sensitive string."
+          description: |-
+            The "kid" (key ID) parameter is used to match a specific key.  This
+            is used, for instance, to choose among a set of keys within a JWK Set
+            during key rollover.  The structure of the "kid" value is
+            unspecified.  When "kid" values are used within a JWK Set, different
+            keys within the JWK Set SHOULD use distinct "kid" values.  (One
+            example in which different keys might use the same "kid" value is if
+            they have different "kty" (key type) values but are considered to be
+            equivalent alternatives by the application using them.)  The "kid"
+            value is a case-sensitive string.
           example: 1603dfe0af8f4596
           type: string
         kty:
-          description: "The \"kty\" (key type) parameter identifies the cryptographic\
-            \ algorithm\nfamily used with the key, such as \"RSA\" or \"EC\". \"kty\"\
-            \ values should\neither be registered in the IANA \"JSON Web Key Types\"\
-            \ registry\nestablished by [JWA] or be a value that contains a Collision-\n\
-            Resistant Name.  The \"kty\" value is a case-sensitive string."
+          description: |-
+            The "kty" (key type) parameter identifies the cryptographic algorithm
+            family used with the key, such as "RSA" or "EC". "kty" values should
+            either be registered in the IANA "JSON Web Key Types" registry
+            established by [JWA] or be a value that contains a Collision-
+            Resistant Name.  The "kty" value is a case-sensitive string.
           example: RSA
           type: string
         "n":
@@ -2406,12 +2452,14 @@ components:
           example: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
           type: string
         x5c:
-          description: "The \"x5c\" (X.509 certificate chain) parameter contains a\
-            \ chain of one\nor more PKIX certificates [RFC5280].  The certificate\
-            \ chain is\nrepresented as a JSON array of certificate value strings.\
-            \  Each\nstring in the array is a base64-encoded (Section 4 of [RFC4648]\
-            \ --\nnot base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.\n\
-            The PKIX certificate containing the key value MUST be the first\ncertificate."
+          description: |-
+            The "x5c" (X.509 certificate chain) parameter contains a chain of one
+            or more PKIX certificates [RFC5280].  The certificate chain is
+            represented as a JSON array of certificate value strings.  Each
+            string in the array is a base64-encoded (Section 4 of [RFC4648] --
+            not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.
+            The PKIX certificate containing the key value MUST be the first
+            certificate.
           items:
             type: string
           type: array
@@ -2468,11 +2516,14 @@ components:
           alg: RS256
       properties:
         keys:
-          description: "List of JSON Web Keys\n\nThe value of the \"keys\" parameter\
-            \ is an array of JSON Web Key (JWK)\nvalues. By default, the order of\
-            \ the JWK values within the array does\nnot imply an order of preference\
-            \ among them, although applications\nof JWK Sets can choose to assign\
-            \ a meaning to the order for their\npurposes, if desired."
+          description: |-
+            List of JSON Web Keys
+
+            The value of the "keys" parameter is an array of JSON Web Key (JWK)
+            values. By default, the order of the JWK values within the array does
+            not imply an order of preference among them, although applications
+            of JWK Sets can choose to assign a meaning to the order for their
+            purposes, if desired.
           items:
             $ref: '#/components/schemas/jsonWebKey'
           type: array
@@ -2489,9 +2540,9 @@ components:
       title: NullTime implements sql.NullTime functionality.
       type: string
     oAuth2Client:
-      description: "OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect\
-        \ flows. Usually, OAuth 2.0 clients are\ngenerated for applications which\
-        \ want to consume your OAuth 2.0 or OpenID Connect capabilities."
+      description: |-
+        OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       example:
         metadata: ""
         token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
@@ -2558,10 +2609,12 @@ components:
         - response_types
       properties:
         access_token_strategy:
-          description: "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is\
-            \ the strategy used to generate access tokens.\nValid options are `jwt`\
-            \ and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens\n\
-            Setting the stragegy here overrides the global setting in `strategies.access_token`."
+          description: |-
+            OAuth 2.0 Access Token Strategy
+
+            AccessTokenStrategy is the strategy used to generate access tokens.
+            Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+            Setting the stragegy here overrides the global setting in `strategies.access_token`.
           type: string
         allowed_cors_origins:
           items:
@@ -2594,11 +2647,12 @@ components:
           title: Time duration
           type: string
         backchannel_logout_session_required:
-          description: "OpenID Connect Back-Channel Logout Session Required\n\nBoolean\
-            \ value specifying whether the RP requires that a sid (session ID) Claim\
-            \ be included in the Logout\nToken to identify the RP session with the\
-            \ OP when the backchannel_logout_uri is used.\nIf omitted, the default\
-            \ value is false."
+          description: |-
+            OpenID Connect Back-Channel Logout Session Required
+
+            Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
+            Token to identify the RP session with the OP when the backchannel_logout_uri is used.
+            If omitted, the default value is false.
           type: boolean
         backchannel_logout_uri:
           description: |-
@@ -2613,8 +2667,10 @@ components:
           title: Time duration
           type: string
         client_id:
-          description: "OAuth 2.0 Client ID\n\nThe ID is immutable. If no ID is provided,\
-            \ a UUID4 will be generated."
+          description: |-
+            OAuth 2.0 Client ID
+
+            The ID is immutable. If no ID is provided, a UUID4 will be generated.
           type: string
         client_name:
           description: |-
@@ -2624,9 +2680,11 @@ components:
             end-user during authorization.
           type: string
         client_secret:
-          description: "OAuth 2.0 Client Secret\n\nThe secret will be included in\
-            \ the create request as cleartext, and then\nnever again. The secret is\
-            \ kept in hashed format and is not recoverable once lost."
+          description: |-
+            OAuth 2.0 Client Secret
+
+            The secret will be included in the create request as cleartext, and then
+            never again. The secret is kept in hashed format and is not recoverable once lost.
           type: string
         client_secret_expires_at:
           description: |-
@@ -2636,9 +2694,12 @@ components:
           format: int64
           type: integer
         client_uri:
-          description: "OAuth 2.0 Client URI\n\nClientURI is a URL string of a web\
-            \ page providing information about the client.\nIf present, the server\
-            \ SHOULD display this URL to the end-user in\na clickable fashion."
+          description: |-
+            OAuth 2.0 Client URI
+
+            ClientURI is a URL string of a web page providing information about the client.
+            If present, the server SHOULD display this URL to the end-user in
+            a clickable fashion.
           type: string
         contacts:
           items:
@@ -2654,19 +2715,21 @@ components:
           format: date-time
           type: string
         frontchannel_logout_session_required:
-          description: "OpenID Connect Front-Channel Logout Session Required\n\nBoolean\
-            \ value specifying whether the RP requires that iss (issuer) and sid (session\
-            \ ID) query parameters be\nincluded to identify the RP session with the\
-            \ OP when the frontchannel_logout_uri is used.\nIf omitted, the default\
-            \ value is false."
+          description: |-
+            OpenID Connect Front-Channel Logout Session Required
+
+            Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be
+            included to identify the RP session with the OP when the frontchannel_logout_uri is used.
+            If omitted, the default value is false.
           type: boolean
         frontchannel_logout_uri:
-          description: "OpenID Connect Front-Channel Logout URI\n\nRP URL that will\
-            \ cause the RP to log itself out when rendered in an iframe by the OP.\
-            \ An iss (issuer) query\nparameter and a sid (session ID) query parameter\
-            \ MAY be included by the OP to enable the RP to validate the\nrequest\
-            \ and to determine which of the potentially multiple sessions is to be\
-            \ logged out; if either is\nincluded, both MUST be."
+          description: |-
+            OpenID Connect Front-Channel Logout URI
+
+            RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query
+            parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the
+            request and to determine which of the potentially multiple sessions is to be logged out; if either is
+            included, both MUST be.
           type: string
         grant_types:
           items:
@@ -2687,31 +2750,28 @@ components:
           title: Time duration
           type: string
         jwks:
-          description: "OAuth 2.0 Client JSON Web Key Set\n\nClient's JSON Web Key\
-            \ Set [JWK] document, passed by value. The semantics of the jwks parameter\
-            \ are the same as\nthe jwks_uri parameter, other than that the JWK Set\
-            \ is passed by value, rather than by reference. This parameter\nis intended\
-            \ only to be used by Clients that, for some reason, are unable to use\
-            \ the jwks_uri parameter, for\ninstance, by native applications that might\
-            \ not have a location to host the contents of the JWK Set. If a Client\n\
-            can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks\
-            \ is that it does not enable key rotation\n(which jwks_uri does, as described\
-            \ in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri\
-            \ and jwks\nparameters MUST NOT be used together."
+          description: |-
+            OAuth 2.0 Client JSON Web Key Set
+
+            Client's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as
+            the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter
+            is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for
+            instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client
+            can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation
+            (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks
+            parameters MUST NOT be used together.
         jwks_uri:
-          description: "OAuth 2.0 Client JSON Web Key Set URL\n\nURL for the Client's\
-            \ JSON Web Key Set [JWK] document. If the Client signs requests to the\
-            \ Server, it contains\nthe signing key(s) the Server uses to validate\
-            \ signatures from the Client. The JWK Set MAY also contain the\nClient's\
-            \ encryption keys(s), which are used by the Server to encrypt responses\
-            \ to the Client. When both signing\nand encryption keys are made available,\
-            \ a use (Key Use) parameter value is REQUIRED for all keys in the referenced\n\
-            JWK Set to indicate each key's intended usage. Although some algorithms\
-            \ allow the same key to be used for both\nsignatures and encryption, doing\
-            \ so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY\
-            \ be used\nto provide X.509 representations of keys provided. When used,\
-            \ the bare key values MUST still be present and MUST\nmatch those in the\
-            \ certificate."
+          description: |-
+            OAuth 2.0 Client JSON Web Key Set URL
+
+            URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains
+            the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the
+            Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing
+            and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced
+            JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both
+            signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used
+            to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST
+            match those in the certificate.
           type: string
         jwt_bearer_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
@@ -2735,10 +2795,12 @@ components:
             Owner is a string identifying the owner of the OAuth 2.0 Client.
           type: string
         policy_uri:
-          description: "OAuth 2.0 Client Policy URI\n\nPolicyURI is a URL string that\
-            \ points to a human-readable privacy policy document\nthat describes how\
-            \ the deployment organization collects, uses,\nretains, and discloses\
-            \ personal data."
+          description: |-
+            OAuth 2.0 Client Policy URI
+
+            PolicyURI is a URL string that points to a human-readable privacy policy document
+            that describes how the deployment organization collects, uses,
+            retains, and discloses personal data.
           type: string
         post_logout_redirect_uris:
           items:
@@ -2771,19 +2833,24 @@ components:
           title: Time duration
           type: string
         registration_access_token:
-          description: "OpenID Connect Dynamic Client Registration Access Token\n\n\
-            RegistrationAccessToken can be used to update, get, or delete the OAuth2\
-            \ Client. It is sent when creating a client\nusing Dynamic Client Registration."
+          description: |-
+            OpenID Connect Dynamic Client Registration Access Token
+
+            RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client. It is sent when creating a client
+            using Dynamic Client Registration.
           type: string
         registration_client_uri:
-          description: "OpenID Connect Dynamic Client Registration URL\n\nRegistrationClientURI\
-            \ is the URL used to update, get, or delete the OAuth2 Client."
+          description: |-
+            OpenID Connect Dynamic Client Registration URL
+
+            RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
           type: string
         request_object_signing_alg:
-          description: "OpenID Connect Request Object Signing Algorithm\n\nJWS [JWS]\
-            \ alg algorithm [JWA] that MUST be used for signing Request Objects sent\
-            \ to the OP. All Request Objects\nfrom this Client MUST be rejected, if\
-            \ not signed with this algorithm."
+          description: |-
+            OpenID Connect Request Object Signing Algorithm
+
+            JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
+            from this Client MUST be rejected, if not signed with this algorithm.
           type: string
         request_uris:
           items:
@@ -2798,9 +2865,12 @@ components:
             \ JSON for SQL storage."
           type: array
         scope:
-          description: "OAuth 2.0 Client Scope\n\nScope is a string containing a space-separated\
-            \ list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749])\
-            \ that the client\ncan use when requesting access tokens."
+          description: |-
+            OAuth 2.0 Client Scope
+
+            Scope is a string containing a space-separated list of scope values (as
+            described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
+            can use when requesting access tokens.
           example: scope1 scope-2 scope.3 scope:4
           type: string
         sector_identifier_uri:
@@ -2824,14 +2894,15 @@ components:
           type: string
         token_endpoint_auth_method:
           default: client_secret_basic
-          description: "OAuth 2.0 Token Endpoint Authentication Method\n\nRequested\
-            \ Client Authentication method for the Token Endpoint. The options are:\n\
-            \n`client_secret_basic`: (default) Send `client_id` and `client_secret`\
-            \ as `application/x-www-form-urlencoded` encoded in the HTTP Authorization\
-            \ header.\n`client_secret_post`: Send `client_id` and `client_secret`\
-            \ as `application/x-www-form-urlencoded` in the HTTP body.\n`private_key_jwt`:\
-            \ Use JSON Web Tokens to authenticate the client.\n`none`: Used for public\
-            \ clients (native apps, mobile apps) which can not have secrets."
+          description: |-
+            OAuth 2.0 Token Endpoint Authentication Method
+
+            Requested Client Authentication method for the Token Endpoint. The options are:
+
+            `client_secret_basic`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header.
+            `client_secret_post`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body.
+            `private_key_jwt`: Use JSON Web Tokens to authenticate the client.
+            `none`: Used for public clients (native apps, mobile apps) which can not have secrets.
           type: string
         token_endpoint_auth_signing_alg:
           description: |-
@@ -2856,12 +2927,12 @@ components:
           format: date-time
           type: string
         userinfo_signed_response_alg:
-          description: "OpenID Connect Request Userinfo Signed Response Algorithm\n\
-            \nJWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If\
-            \ this is specified, the response will be JWT\n[JWT] serialized, and signed\
-            \ using JWS. The default, if omitted, is for the UserInfo Response to\
-            \ return the Claims\nas a UTF-8 encoded JSON object using the application/json\
-            \ content-type."
+          description: |-
+            OpenID Connect Request Userinfo Signed Response Algorithm
+
+            JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT
+            [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims
+            as a UTF-8 encoded JSON object using the application/json content-type.
           type: string
       title: OAuth 2.0 Client
       type: object
@@ -3026,9 +3097,9 @@ components:
         - requested_scope
       properties:
         acr:
-          description: "ACR represents the Authentication AuthorizationContext Class\
-            \ Reference value for this authentication session. You can use it\nto\
-            \ express that, for example, a user authenticated using two factor authentication."
+          description: |-
+            ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
+            to express that, for example, a user authenticated using two factor authentication.
           type: string
         amr:
           items:
@@ -3061,11 +3132,10 @@ components:
         oidc_context:
           $ref: '#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext'
         request_url:
-          description: "RequestURL is the original OAuth 2.0 Authorization URL requested\
-            \ by the OAuth 2.0 client. It is the URL which\ninitiates the OAuth 2.0\
-            \ Authorization Code or OAuth 2.0 Implicit flow. This URL is typically\
-            \ not needed, but\nmight come in handy if you want to deal with additional\
-            \ request parameters."
+          description: |-
+            RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
+            initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
+            might come in handy if you want to deal with additional request parameters.
           type: string
         requested_access_token_audience:
           items:
@@ -3080,15 +3150,15 @@ components:
             \ JSON for SQL storage."
           type: array
         skip:
-          description: "Skip, if true, implies that the client has requested the same\
-            \ scopes from the same user previously.\nIf true, you must not ask the\
-            \ user to grant the requested scopes. You must however either allow or\
-            \ deny the\nconsent request using the usual API call."
+          description: |-
+            Skip, if true, implies that the client has requested the same scopes from the same user previously.
+            If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
+            consent request using the usual API call.
           type: boolean
         subject:
-          description: "Subject is the user ID of the end-user that authenticated.\
-            \ Now, that end user needs to grant or deny the scope\nrequested by the\
-            \ OAuth 2.0 client."
+          description: |-
+            Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
+            requested by the OAuth 2.0 client.
           type: string
       required:
       - challenge
@@ -3108,36 +3178,29 @@ components:
         display: display
       properties:
         acr_values:
-          description: "ACRValues is the Authentication AuthorizationContext Class\
-            \ Reference requested in the OAuth 2.0 Authorization request.\nIt is a\
-            \ parameter defined by OpenID Connect and expresses which level of authentication\
-            \ (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n>\
-            \ Requested Authentication AuthorizationContext Class Reference values.\
-            \ Space-separated string that specifies the acr values\nthat the Authorization\
-            \ Server is being requested to use for processing this Authentication\
-            \ Request, with the\nvalues appearing in order of preference. The Authentication\
-            \ AuthorizationContext Class satisfied by the authentication\nperformed\
-            \ is returned as the acr Claim Value, as specified in Section 2. The acr\
-            \ Claim is requested as a\nVoluntary Claim by this parameter."
+          description: |-
+            ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.
+            It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.
+
+            OpenID Connect defines it as follows:
+            > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values
+            that the Authorization Server is being requested to use for processing this Authentication Request, with the
+            values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication
+            performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a
+            Voluntary Claim by this parameter.
           items:
             type: string
           type: array
         display:
-          description: "Display is a string value that specifies how the Authorization\
-            \ Server displays the authentication and consent user interface pages\
-            \ to the End-User.\nThe defined values are:\npage: The Authorization Server\
-            \ SHOULD display the authentication and consent UI consistent with a full\
-            \ User Agent page view. If the display parameter is not specified, this\
-            \ is the default display mode.\npopup: The Authorization Server SHOULD\
-            \ display the authentication and consent UI consistent with a popup User\
-            \ Agent window. The popup User Agent window should be of an appropriate\
-            \ size for a login-focused dialog and should not obscure the entire window\
-            \ that it is popping up over.\ntouch: The Authorization Server SHOULD\
-            \ display the authentication and consent UI consistent with a device that\
-            \ leverages a touch interface.\nwap: The Authorization Server SHOULD display\
-            \ the authentication and consent UI consistent with a \"feature phone\"\
-            \ type display.\n\nThe Authorization Server MAY also attempt to detect\
-            \ the capabilities of the User Agent and present an appropriate display."
+          description: |-
+            Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User.
+            The defined values are:
+            page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode.
+            popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over.
+            touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface.
+            wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display.
+
+            The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.
           type: string
         id_token_hint_claims:
           additionalProperties: {}
@@ -3153,14 +3216,12 @@ components:
             phone number in the format specified for the phone_number Claim. The use of this parameter is optional.
           type: string
         ui_locales:
-          description: "UILocales is the End-User'id preferred languages and scripts\
-            \ for the user interface, represented as a\nspace-separated list of BCP47\
-            \ [RFC5646] language tag values, ordered by preference. For instance,\
-            \ the value\n\"fr-CA fr en\" represents a preference for French as spoken\
-            \ in Canada, then French (without a region designation),\nfollowed by\
-            \ English (without a region designation). An error SHOULD NOT result if\
-            \ some or all of the requested\nlocales are not supported by the OpenID\
-            \ Provider."
+          description: |-
+            UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a
+            space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value
+            "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation),
+            followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested
+            locales are not supported by the OpenID Provider.
           items:
             type: string
           type: array
@@ -3302,14 +3363,18 @@ components:
           title: NullTime implements sql.NullTime functionality.
           type: string
         remember:
-          description: "Remember Consent\n\nRemember, if set to true, tells ORY Hydra\
-            \ to remember this consent authorization and reuse it if the same\nclient\
-            \ asks the same user for the same, or a subset of, scope."
+          description: |-
+            Remember Consent
+
+            Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
+            client asks the same user for the same, or a subset of, scope.
           type: boolean
         remember_for:
-          description: "Remember Consent For\n\nRememberFor sets how long the consent\
-            \ authorization should be remembered for in seconds. If set to `0`, the\n\
-            authorization will be remembered indefinitely."
+          description: |-
+            Remember Consent For
+
+            RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
+            authorization will be remembered indefinitely.
           format: int64
           type: integer
         session:
@@ -3420,11 +3485,10 @@ components:
         oidc_context:
           $ref: '#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext'
         request_url:
-          description: "RequestURL is the original OAuth 2.0 Authorization URL requested\
-            \ by the OAuth 2.0 client. It is the URL which\ninitiates the OAuth 2.0\
-            \ Authorization Code or OAuth 2.0 Implicit flow. This URL is typically\
-            \ not needed, but\nmight come in handy if you want to deal with additional\
-            \ request parameters."
+          description: |-
+            RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
+            initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
+            might come in handy if you want to deal with additional request parameters.
           type: string
         requested_access_token_audience:
           items:
@@ -3446,18 +3510,17 @@ components:
             channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
           type: string
         skip:
-          description: "Skip, if true, implies that the client has requested the same\
-            \ scopes from the same user previously.\nIf true, you can skip asking\
-            \ the user to grant the requested scopes, and simply forward the user\
-            \ to the redirect URL.\n\nThis feature allows you to update / set session\
-            \ information."
+          description: |-
+            Skip, if true, implies that the client has requested the same scopes from the same user previously.
+            If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
+
+            This feature allows you to update / set session information.
           type: boolean
         subject:
-          description: "Subject is the user ID of the end-user that authenticated.\
-            \ Now, that end user needs to grant or deny the scope\nrequested by the\
-            \ OAuth 2.0 client. If this value is set and `skip` is true, you MUST\
-            \ include this subject type\nwhen accepting the login request, or the\
-            \ request will fail."
+          description: |-
+            Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
+            requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
+            when accepting the login request, or the request will fail.
           type: string
       required:
       - challenge
@@ -3590,18 +3653,19 @@ components:
           description: The access token issued by the authorization server.
           type: string
         expires_in:
-          description: "The lifetime in seconds of the access token. For\nexample,\
-            \ the value \"3600\" denotes that the access token will\nexpire in one\
-            \ hour from the time the response was generated."
+          description: |-
+            The lifetime in seconds of the access token. For
+            example, the value "3600" denotes that the access token will
+            expire in one hour from the time the response was generated.
           format: int64
           type: integer
         id_token:
           description: To retrieve a refresh token request the id_token scope.
           type: string
         refresh_token:
-          description: "The refresh token, which can be used to obtain new\naccess\
-            \ tokens. To retrieve it add the scope \"offline\" to your access token\
-            \ request."
+          description: |-
+            The refresh token, which can be used to obtain new
+            access tokens. To retrieve it add the scope "offline" to your access token request.
           type: string
         scope:
           description: The scope of the access token
@@ -3698,33 +3762,39 @@ components:
           example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
           type: string
         backchannel_logout_session_supported:
-          description: "OpenID Connect Back-Channel Logout Session Required\n\nBoolean\
-            \ value specifying whether the OP can pass a sid (session ID) Claim in\
-            \ the Logout Token to identify the RP\nsession with the OP. If supported,\
-            \ the sid Claim is also included in ID Tokens issued by the OP"
+          description: |-
+            OpenID Connect Back-Channel Logout Session Required
+
+            Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
+            session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
           type: boolean
         backchannel_logout_supported:
-          description: "OpenID Connect Back-Channel Logout Supported\n\nBoolean value\
-            \ specifying whether the OP supports back-channel logout, with true indicating\
-            \ support."
+          description: |-
+            OpenID Connect Back-Channel Logout Supported
+
+            Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
           type: boolean
         claims_parameter_supported:
-          description: "OpenID Connect Claims Parameter Parameter Supported\n\nBoolean\
-            \ value specifying whether the OP supports use of the claims parameter,\
-            \ with true indicating support."
+          description: |-
+            OpenID Connect Claims Parameter Parameter Supported
+
+            Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
           type: boolean
         claims_supported:
-          description: "OpenID Connect Supported Claims\n\nJSON array containing a\
-            \ list of the Claim Names of the Claims that the OpenID Provider MAY be\
-            \ able to supply\nvalues for. Note that for privacy or other reasons,\
-            \ this might not be an exhaustive list."
+          description: |-
+            OpenID Connect Supported Claims
+
+            JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
+            values for. Note that for privacy or other reasons, this might not be an exhaustive list.
           items:
             type: string
           type: array
         code_challenge_methods_supported:
-          description: "OAuth 2.0 PKCE Supported Code Challenge Methods\n\nJSON array\
-            \ containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code\
-            \ challenge methods supported\nby this authorization server."
+          description: |-
+            OAuth 2.0 PKCE Supported Code Challenge Methods
+
+            JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
+            by this authorization server.
           items:
             type: string
           type: array
@@ -3749,16 +3819,18 @@ components:
             URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
           type: string
         frontchannel_logout_session_supported:
-          description: "OpenID Connect Front-Channel Logout Session Required\n\nBoolean\
-            \ value specifying whether the OP can pass iss (issuer) and sid (session\
-            \ ID) query parameters to identify\nthe RP session with the OP when the\
-            \ frontchannel_logout_uri is used. If supported, the sid Claim is also\n\
-            included in ID Tokens issued by the OP."
+          description: |-
+            OpenID Connect Front-Channel Logout Session Required
+
+            Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
+            the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
+            included in ID Tokens issued by the OP.
           type: boolean
         frontchannel_logout_supported:
-          description: "OpenID Connect Front-Channel Logout Supported\n\nBoolean value\
-            \ specifying whether the OP supports HTTP-based logout, with true indicating\
-            \ support."
+          description: |-
+            OpenID Connect Front-Channel Logout Supported
+
+            Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
           type: boolean
         grant_types_supported:
           description: |-
@@ -3786,26 +3858,25 @@ components:
             type: string
           type: array
         issuer:
-          description: "OpenID Connect Issuer URL\n\nAn URL using the https scheme\
-            \ with no query or fragment component that the OP asserts as its IssuerURL\
-            \ Identifier.\nIf IssuerURL discovery is supported , this value MUST be\
-            \ identical to the issuer value returned\nby WebFinger. This also MUST\
-            \ be identical to the iss Claim value in ID Tokens issued from this IssuerURL."
+          description: |-
+            OpenID Connect Issuer URL
+
+            An URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
+            If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned
+            by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
           example: https://playground.ory.sh/ory-hydra/public/
           type: string
         jwks_uri:
-          description: "OpenID Connect Well-Known JSON Web Keys URL\n\nURL of the\
-            \ OP's JSON Web Key Set [JWK] document. This contains the signing key(s)\
-            \ the RP uses to validate\nsignatures from the OP. The JWK Set MAY also\
-            \ contain the Server's encryption key(s), which are used by RPs\nto encrypt\
-            \ requests to the Server. When both signing and encryption keys are made\
-            \ available, a use (Key Use)\nparameter value is REQUIRED for all keys\
-            \ in the referenced JWK Set to indicate each key's intended usage.\nAlthough\
-            \ some algorithms allow the same key to be used for both signatures and\
-            \ encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The\
-            \ JWK x5c parameter MAY be used to provide X.509 representations of\n\
-            keys provided. When used, the bare key values MUST still be present and\
-            \ MUST match those in the certificate."
+          description: |-
+            OpenID Connect Well-Known JSON Web Keys URL
+
+            URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate
+            signatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs
+            to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)
+            parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.
+            Although some algorithms allow the same key to be used for both signatures and encryption, doing so is
+            NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of
+            keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
           example: "https://{slug}.projects.oryapis.com/.well-known/jwks.json"
           type: string
         registration_endpoint:
@@ -3813,25 +3884,27 @@ components:
           example: https://playground.ory.sh/ory-hydra/admin/client
           type: string
         request_object_signing_alg_values_supported:
-          description: "OpenID Connect Supported Request Object Signing Algorithms\n\
-            \nJSON array containing a list of the JWS signing algorithms (alg values)\
-            \ supported by the OP for Request Objects,\nwhich are described in Section\
-            \ 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used\
-            \ both when\nthe Request Object is passed by value (using the request\
-            \ parameter) and when it is passed by reference\n(using the request_uri\
-            \ parameter)."
+          description: |-
+            OpenID Connect Supported Request Object Signing Algorithms
+
+            JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
+            which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
+            the Request Object is passed by value (using the request parameter) and when it is passed by reference
+            (using the request_uri parameter).
           items:
             type: string
           type: array
         request_parameter_supported:
-          description: "OpenID Connect Request Parameter Supported\n\nBoolean value\
-            \ specifying whether the OP supports use of the request parameter, with\
-            \ true indicating support."
+          description: |-
+            OpenID Connect Request Parameter Supported
+
+            Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
           type: boolean
         request_uri_parameter_supported:
-          description: "OpenID Connect Request URI Parameter Supported\n\nBoolean\
-            \ value specifying whether the OP supports use of the request_uri parameter,\
-            \ with true indicating support."
+          description: |-
+            OpenID Connect Request URI Parameter Supported
+
+            Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.
           type: boolean
         require_request_uri_registration:
           description: |-
@@ -3849,10 +3922,11 @@ components:
             type: string
           type: array
         response_types_supported:
-          description: "OAuth 2.0 Supported Response Types\n\nJSON array containing\
-            \ a list of the OAuth 2.0 response_type values that this OP supports.\
-            \ Dynamic OpenID\nProviders MUST support the code, id_token, and the token\
-            \ id_token Response Type values."
+          description: |-
+            OAuth 2.0 Supported Response Types
+
+            JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
+            Providers MUST support the code, id_token, and the token id_token Response Type values.
           items:
             type: string
           type: array
@@ -3863,11 +3937,11 @@ components:
             URL of the authorization server's OAuth 2.0 revocation endpoint.
           type: string
         scopes_supported:
-          description: "OAuth 2.0 Supported Scope Values\n\nJSON array containing\
-            \ a list of the OAuth 2.0 [RFC6749] scope values that this server supports.\
-            \ The server MUST\nsupport the openid scope value. Servers MAY choose\
-            \ not to advertise some supported scope values even when this parameter\
-            \ is used"
+          description: |-
+            OAuth 2.0 Supported Scope Values
+
+            JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST
+            support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used
           items:
             type: string
           type: array
@@ -3885,11 +3959,11 @@ components:
           example: https://playground.ory.sh/ory-hydra/public/oauth2/token
           type: string
         token_endpoint_auth_methods_supported:
-          description: "OAuth 2.0 Supported Client Authentication Methods\n\nJSON\
-            \ array containing a list of Client Authentication methods supported by\
-            \ this Token Endpoint. The options are\nclient_secret_post, client_secret_basic,\
-            \ client_secret_jwt, and private_key_jwt, as described in Section 9 of\
-            \ OpenID Connect Core 1.0"
+          description: |-
+            OAuth 2.0 Supported Client Authentication Methods
+
+            JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are
+            client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
           items:
             type: string
           type: array
@@ -3908,10 +3982,10 @@ components:
             type: string
           type: array
         userinfo_signing_alg_values_supported:
-          description: "OpenID Connect Supported Userinfo Signing Algorithm\n\nJSON\
-            \ array containing a list of the JWS [JWS] signing algorithms (alg values)\
-            \ [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT\
-            \ [JWT]."
+          description: |-
+            OpenID Connect Supported Userinfo Signing Algorithm
+
+            JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
           items:
             type: string
           type: array
@@ -4069,36 +4143,49 @@ components:
       properties:
         page_size:
           default: 250
-          description: "Items per page\n\nThis is the number of items per page to\
-            \ return.\nFor details on pagination please head over to the [pagination\
-            \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Items per page
+
+            This is the number of items per page to return.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 1000
           minimum: 1
           type: integer
         page_token:
           default: "1"
-          description: "Next Page Token\n\nThe next page token.\nFor details on pagination\
-            \ please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Next Page Token
+
+            The next page token.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           minimum: 1
           type: string
       type: object
     paginationHeaders:
       properties:
         link:
-          description: "The link header contains pagination links.\n\nFor details\
-            \ on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\
-            \nin: header"
+          description: |-
+            The link header contains pagination links.
+
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+
+            in: header
           type: string
         x-total-count:
-          description: "The total number of clients.\n\nin: header"
+          description: |-
+            The total number of clients.
+
+            in: header
           type: string
       type: object
     rejectOAuth2Request:
       properties:
         error:
-          description: "The error should follow the OAuth2 error format (e.g. `invalid_request`,\
-            \ `login_required`).\n\nDefaults to `request_denied`."
+          description: |-
+            The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
+
+            Defaults to `request_denied`.
           type: string
         error_debug:
           description: |-
@@ -4124,69 +4211,92 @@ components:
       properties:
         page_size:
           default: 250
-          description: "Items per page\n\nThis is the number of items per page to\
-            \ return.\nFor details on pagination please head over to the [pagination\
-            \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Items per page
+
+            This is the number of items per page to return.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 1000
           minimum: 1
           type: integer
         page_token:
           default: "1"
-          description: "Next Page Token\n\nThe next page token.\nFor details on pagination\
-            \ please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Next Page Token
+
+            The next page token.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           minimum: 1
           type: string
       type: object
     tokenPaginationHeaders:
       properties:
         link:
-          description: "The link header contains pagination links.\n\nFor details\
-            \ on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\
-            \nin: header"
+          description: |-
+            The link header contains pagination links.
+
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+
+            in: header
           type: string
         x-total-count:
-          description: "The total number of clients.\n\nin: header"
+          description: |-
+            The total number of clients.
+
+            in: header
           type: string
       type: object
     tokenPaginationRequestParameters:
-      description: "The `Link` HTTP header contains multiple links (`first`, `next`,\
-        \ `last`, `previous`) formatted as:\n`<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>;\
-        \ rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination\
-        \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      description: |-
+        The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:
+        `<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>; rel="{page}"`
+
+        For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
       properties:
         page_size:
           default: 250
-          description: "Items per Page\n\nThis is the number of items per page to\
-            \ return.\nFor details on pagination please head over to the [pagination\
-            \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Items per Page
+
+            This is the number of items per page to return.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 500
           minimum: 1
           type: integer
         page_token:
           default: "1"
-          description: "Next Page Token\n\nThe next page token.\nFor details on pagination\
-            \ please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+          description: |-
+            Next Page Token
+
+            The next page token.
+            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
           minimum: 1
           type: string
       title: Pagination Request Parameters
       type: object
     tokenPaginationResponseHeaders:
-      description: "The `Link` HTTP header contains multiple links (`first`, `next`,\
-        \ `last`, `previous`) formatted as:\n`<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>;\
-        \ rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination\
-        \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+      description: |-
+        The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:
+        `<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>; rel="{page}"`
+
+        For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
       properties:
         link:
-          description: "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited\
-            \ list of links to the following pages:\n\nfirst: The first page of results.\n\
-            next: The next page of results.\nprev: The previous page of results.\n\
-            last: The last page of results.\n\nPages are omitted if they do not exist.\
-            \ For example, if there is no next page, the `next` link is omitted. Examples:\n\
-            \n</clients?page_size=5&page_token=0>; rel=\"first\",</clients?page_size=5&page_token=15>;\
-            \ rel=\"next\",</clients?page_size=5&page_token=5>; rel=\"prev\",</clients?page_size=5&page_token=20>;\
-            \ rel=\"last\""
+          description: |-
+            The Link HTTP Header
+
+            The `Link` header contains a comma-delimited list of links to the following pages:
+
+            first: The first page of results.
+            next: The next page of results.
+            prev: The previous page of results.
+            last: The last page of results.
+
+            Pages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:
+
+            </clients?page_size=5&page_token=0>; rel="first",</clients?page_size=5&page_token=15>; rel="next",</clients?page_size=5&page_token=5>; rel="prev",</clients?page_size=5&page_token=20>; rel="last"
           type: string
         x-total-count:
           description: |-
@@ -4357,16 +4467,17 @@ components:
     introspectOAuth2Token_request:
       properties:
         scope:
-          description: "An optional, space separated list of required scopes. If the\
-            \ access token was not granted one of the\nscopes, the result of active\
-            \ will be false."
+          description: |-
+            An optional, space separated list of required scopes. If the access token was not granted one of the
+            scopes, the result of active will be false.
           type: string
           x-formData-name: scope
         token:
-          description: "The string value of the token. For access tokens, this\nis\
-            \ the \"access_token\" value returned from the token endpoint\ndefined\
-            \ in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue\
-            \ returned."
+          description: |-
+            The string value of the token. For access tokens, this
+            is the "access_token" value returned from the token endpoint
+            defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
+            value returned.
           required:
           - token
           type: string

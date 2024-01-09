@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CredentialSupportedDraft00 type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CredentialSupportedDraft00{}
+
 // CredentialSupportedDraft00 Includes information about the supported verifiable credentials.
 type CredentialSupportedDraft00 struct {
 	// OpenID Connect Verifiable Credentials Cryptographic Binding Methods Supported  Contains a list of cryptographic binding methods supported for signing the proof.
@@ -46,7 +49,7 @@ func NewCredentialSupportedDraft00WithDefaults() *CredentialSupportedDraft00 {
 
 // GetCryptographicBindingMethodsSupported returns the CryptographicBindingMethodsSupported field value if set, zero value otherwise.
 func (o *CredentialSupportedDraft00) GetCryptographicBindingMethodsSupported() []string {
-	if o == nil || o.CryptographicBindingMethodsSupported == nil {
+	if o == nil || IsNil(o.CryptographicBindingMethodsSupported) {
 		var ret []string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *CredentialSupportedDraft00) GetCryptographicBindingMethodsSupported() [
 // GetCryptographicBindingMethodsSupportedOk returns a tuple with the CryptographicBindingMethodsSupported field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CredentialSupportedDraft00) GetCryptographicBindingMethodsSupportedOk() ([]string, bool) {
-	if o == nil || o.CryptographicBindingMethodsSupported == nil {
+	if o == nil || IsNil(o.CryptographicBindingMethodsSupported) {
 		return nil, false
 	}
 	return o.CryptographicBindingMethodsSupported, true
@@ -64,7 +67,7 @@ func (o *CredentialSupportedDraft00) GetCryptographicBindingMethodsSupportedOk()
 
 // HasCryptographicBindingMethodsSupported returns a boolean if a field has been set.
 func (o *CredentialSupportedDraft00) HasCryptographicBindingMethodsSupported() bool {
-	if o != nil && o.CryptographicBindingMethodsSupported != nil {
+	if o != nil && !IsNil(o.CryptographicBindingMethodsSupported) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *CredentialSupportedDraft00) SetCryptographicBindingMethodsSupported(v [
 
 // GetCryptographicSuitesSupported returns the CryptographicSuitesSupported field value if set, zero value otherwise.
 func (o *CredentialSupportedDraft00) GetCryptographicSuitesSupported() []string {
-	if o == nil || o.CryptographicSuitesSupported == nil {
+	if o == nil || IsNil(o.CryptographicSuitesSupported) {
 		var ret []string
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *CredentialSupportedDraft00) GetCryptographicSuitesSupported() []string 
 // GetCryptographicSuitesSupportedOk returns a tuple with the CryptographicSuitesSupported field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CredentialSupportedDraft00) GetCryptographicSuitesSupportedOk() ([]string, bool) {
-	if o == nil || o.CryptographicSuitesSupported == nil {
+	if o == nil || IsNil(o.CryptographicSuitesSupported) {
 		return nil, false
 	}
 	return o.CryptographicSuitesSupported, true
@@ -96,7 +99,7 @@ func (o *CredentialSupportedDraft00) GetCryptographicSuitesSupportedOk() ([]stri
 
 // HasCryptographicSuitesSupported returns a boolean if a field has been set.
 func (o *CredentialSupportedDraft00) HasCryptographicSuitesSupported() bool {
-	if o != nil && o.CryptographicSuitesSupported != nil {
+	if o != nil && !IsNil(o.CryptographicSuitesSupported) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *CredentialSupportedDraft00) SetCryptographicSuitesSupported(v []string)
 
 // GetFormat returns the Format field value if set, zero value otherwise.
 func (o *CredentialSupportedDraft00) GetFormat() string {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		var ret string
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *CredentialSupportedDraft00) GetFormat() string {
 // GetFormatOk returns a tuple with the Format field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CredentialSupportedDraft00) GetFormatOk() (*string, bool) {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		return nil, false
 	}
 	return o.Format, true
@@ -128,7 +131,7 @@ func (o *CredentialSupportedDraft00) GetFormatOk() (*string, bool) {
 
 // HasFormat returns a boolean if a field has been set.
 func (o *CredentialSupportedDraft00) HasFormat() bool {
-	if o != nil && o.Format != nil {
+	if o != nil && !IsNil(o.Format) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *CredentialSupportedDraft00) SetFormat(v string) {
 
 // GetTypes returns the Types field value if set, zero value otherwise.
 func (o *CredentialSupportedDraft00) GetTypes() []string {
-	if o == nil || o.Types == nil {
+	if o == nil || IsNil(o.Types) {
 		var ret []string
 		return ret
 	}
@@ -152,7 +155,7 @@ func (o *CredentialSupportedDraft00) GetTypes() []string {
 // GetTypesOk returns a tuple with the Types field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CredentialSupportedDraft00) GetTypesOk() ([]string, bool) {
-	if o == nil || o.Types == nil {
+	if o == nil || IsNil(o.Types) {
 		return nil, false
 	}
 	return o.Types, true
@@ -160,7 +163,7 @@ func (o *CredentialSupportedDraft00) GetTypesOk() ([]string, bool) {
 
 // HasTypes returns a boolean if a field has been set.
 func (o *CredentialSupportedDraft00) HasTypes() bool {
-	if o != nil && o.Types != nil {
+	if o != nil && !IsNil(o.Types) {
 		return true
 	}
 
@@ -173,20 +176,28 @@ func (o *CredentialSupportedDraft00) SetTypes(v []string) {
 }
 
 func (o CredentialSupportedDraft00) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.CryptographicBindingMethodsSupported != nil {
-		toSerialize["cryptographic_binding_methods_supported"] = o.CryptographicBindingMethodsSupported
-	}
-	if o.CryptographicSuitesSupported != nil {
-		toSerialize["cryptographic_suites_supported"] = o.CryptographicSuitesSupported
-	}
-	if o.Format != nil {
-		toSerialize["format"] = o.Format
-	}
-	if o.Types != nil {
-		toSerialize["types"] = o.Types
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CredentialSupportedDraft00) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.CryptographicBindingMethodsSupported) {
+		toSerialize["cryptographic_binding_methods_supported"] = o.CryptographicBindingMethodsSupported
+	}
+	if !IsNil(o.CryptographicSuitesSupported) {
+		toSerialize["cryptographic_suites_supported"] = o.CryptographicSuitesSupported
+	}
+	if !IsNil(o.Format) {
+		toSerialize["format"] = o.Format
+	}
+	if !IsNil(o.Types) {
+		toSerialize["types"] = o.Types
+	}
+	return toSerialize, nil
 }
 
 type NullableCredentialSupportedDraft00 struct {

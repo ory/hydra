@@ -14,7 +14,7 @@ package openapi
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -75,7 +75,7 @@ func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -113,9 +113,9 @@ func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -131,6 +131,7 @@ func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -196,8 +197,8 @@ func (a *JwkApiService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterValueToString(r.kid, "kid")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -230,9 +231,9 @@ func (a *JwkApiService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -248,6 +249,7 @@ func (a *JwkApiService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -298,7 +300,7 @@ func (a *JwkApiService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetReque
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -331,9 +333,9 @@ func (a *JwkApiService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetReque
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -349,6 +351,7 @@ func (a *JwkApiService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetReque
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -403,8 +406,8 @@ func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterValueToString(r.kid, "kid")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -437,9 +440,9 @@ func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -455,6 +458,7 @@ func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -517,7 +521,7 @@ func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -550,9 +554,9 @@ func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -568,6 +572,7 @@ func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -639,8 +644,8 @@ func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterValueToString(r.kid, "kid")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -675,9 +680,9 @@ func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -693,6 +698,7 @@ func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -761,7 +767,7 @@ func (a *JwkApiService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*
 	}
 
 	localVarPath := localBasePath + "/admin/keys/{set}"
-	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterValueToString(r.set, "set")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -796,9 +802,9 @@ func (a *JwkApiService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -814,6 +820,7 @@ func (a *JwkApiService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

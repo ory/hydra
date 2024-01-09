@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the VerifiableCredentialPrimingResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VerifiableCredentialPrimingResponse{}
+
 // VerifiableCredentialPrimingResponse struct for VerifiableCredentialPrimingResponse
 type VerifiableCredentialPrimingResponse struct {
 	CNonce           *string `json:"c_nonce,omitempty"`
@@ -46,7 +49,7 @@ func NewVerifiableCredentialPrimingResponseWithDefaults() *VerifiableCredentialP
 
 // GetCNonce returns the CNonce field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetCNonce() string {
-	if o == nil || o.CNonce == nil {
+	if o == nil || IsNil(o.CNonce) {
 		var ret string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *VerifiableCredentialPrimingResponse) GetCNonce() string {
 // GetCNonceOk returns a tuple with the CNonce field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetCNonceOk() (*string, bool) {
-	if o == nil || o.CNonce == nil {
+	if o == nil || IsNil(o.CNonce) {
 		return nil, false
 	}
 	return o.CNonce, true
@@ -64,7 +67,7 @@ func (o *VerifiableCredentialPrimingResponse) GetCNonceOk() (*string, bool) {
 
 // HasCNonce returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasCNonce() bool {
-	if o != nil && o.CNonce != nil {
+	if o != nil && !IsNil(o.CNonce) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *VerifiableCredentialPrimingResponse) SetCNonce(v string) {
 
 // GetCNonceExpiresIn returns the CNonceExpiresIn field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetCNonceExpiresIn() int64 {
-	if o == nil || o.CNonceExpiresIn == nil {
+	if o == nil || IsNil(o.CNonceExpiresIn) {
 		var ret int64
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *VerifiableCredentialPrimingResponse) GetCNonceExpiresIn() int64 {
 // GetCNonceExpiresInOk returns a tuple with the CNonceExpiresIn field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetCNonceExpiresInOk() (*int64, bool) {
-	if o == nil || o.CNonceExpiresIn == nil {
+	if o == nil || IsNil(o.CNonceExpiresIn) {
 		return nil, false
 	}
 	return o.CNonceExpiresIn, true
@@ -96,7 +99,7 @@ func (o *VerifiableCredentialPrimingResponse) GetCNonceExpiresInOk() (*int64, bo
 
 // HasCNonceExpiresIn returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasCNonceExpiresIn() bool {
-	if o != nil && o.CNonceExpiresIn != nil {
+	if o != nil && !IsNil(o.CNonceExpiresIn) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *VerifiableCredentialPrimingResponse) SetCNonceExpiresIn(v int64) {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *VerifiableCredentialPrimingResponse) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -128,7 +131,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !IsNil(o.Error) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *VerifiableCredentialPrimingResponse) SetError(v string) {
 
 // GetErrorDebug returns the ErrorDebug field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetErrorDebug() string {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		var ret string
 		return ret
 	}
@@ -152,7 +155,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorDebug() string {
 // GetErrorDebugOk returns a tuple with the ErrorDebug field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetErrorDebugOk() (*string, bool) {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		return nil, false
 	}
 	return o.ErrorDebug, true
@@ -160,7 +163,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorDebugOk() (*string, bool) 
 
 // HasErrorDebug returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasErrorDebug() bool {
-	if o != nil && o.ErrorDebug != nil {
+	if o != nil && !IsNil(o.ErrorDebug) {
 		return true
 	}
 
@@ -174,7 +177,7 @@ func (o *VerifiableCredentialPrimingResponse) SetErrorDebug(v string) {
 
 // GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetErrorDescription() string {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		var ret string
 		return ret
 	}
@@ -184,7 +187,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorDescription() string {
 // GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetErrorDescriptionOk() (*string, bool) {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		return nil, false
 	}
 	return o.ErrorDescription, true
@@ -192,7 +195,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorDescriptionOk() (*string, 
 
 // HasErrorDescription returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasErrorDescription() bool {
-	if o != nil && o.ErrorDescription != nil {
+	if o != nil && !IsNil(o.ErrorDescription) {
 		return true
 	}
 
@@ -206,7 +209,7 @@ func (o *VerifiableCredentialPrimingResponse) SetErrorDescription(v string) {
 
 // GetErrorHint returns the ErrorHint field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetErrorHint() string {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		var ret string
 		return ret
 	}
@@ -216,7 +219,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorHint() string {
 // GetErrorHintOk returns a tuple with the ErrorHint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetErrorHintOk() (*string, bool) {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		return nil, false
 	}
 	return o.ErrorHint, true
@@ -224,7 +227,7 @@ func (o *VerifiableCredentialPrimingResponse) GetErrorHintOk() (*string, bool) {
 
 // HasErrorHint returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasErrorHint() bool {
-	if o != nil && o.ErrorHint != nil {
+	if o != nil && !IsNil(o.ErrorHint) {
 		return true
 	}
 
@@ -238,7 +241,7 @@ func (o *VerifiableCredentialPrimingResponse) SetErrorHint(v string) {
 
 // GetFormat returns the Format field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetFormat() string {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		var ret string
 		return ret
 	}
@@ -248,7 +251,7 @@ func (o *VerifiableCredentialPrimingResponse) GetFormat() string {
 // GetFormatOk returns a tuple with the Format field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetFormatOk() (*string, bool) {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		return nil, false
 	}
 	return o.Format, true
@@ -256,7 +259,7 @@ func (o *VerifiableCredentialPrimingResponse) GetFormatOk() (*string, bool) {
 
 // HasFormat returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasFormat() bool {
-	if o != nil && o.Format != nil {
+	if o != nil && !IsNil(o.Format) {
 		return true
 	}
 
@@ -270,7 +273,7 @@ func (o *VerifiableCredentialPrimingResponse) SetFormat(v string) {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *VerifiableCredentialPrimingResponse) GetStatusCode() int64 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		var ret int64
 		return ret
 	}
@@ -280,7 +283,7 @@ func (o *VerifiableCredentialPrimingResponse) GetStatusCode() int64 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialPrimingResponse) GetStatusCodeOk() (*int64, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -288,7 +291,7 @@ func (o *VerifiableCredentialPrimingResponse) GetStatusCodeOk() (*int64, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *VerifiableCredentialPrimingResponse) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !IsNil(o.StatusCode) {
 		return true
 	}
 
@@ -301,32 +304,40 @@ func (o *VerifiableCredentialPrimingResponse) SetStatusCode(v int64) {
 }
 
 func (o VerifiableCredentialPrimingResponse) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.CNonce != nil {
-		toSerialize["c_nonce"] = o.CNonce
-	}
-	if o.CNonceExpiresIn != nil {
-		toSerialize["c_nonce_expires_in"] = o.CNonceExpiresIn
-	}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
-	}
-	if o.ErrorDebug != nil {
-		toSerialize["error_debug"] = o.ErrorDebug
-	}
-	if o.ErrorDescription != nil {
-		toSerialize["error_description"] = o.ErrorDescription
-	}
-	if o.ErrorHint != nil {
-		toSerialize["error_hint"] = o.ErrorHint
-	}
-	if o.Format != nil {
-		toSerialize["format"] = o.Format
-	}
-	if o.StatusCode != nil {
-		toSerialize["status_code"] = o.StatusCode
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o VerifiableCredentialPrimingResponse) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.CNonce) {
+		toSerialize["c_nonce"] = o.CNonce
+	}
+	if !IsNil(o.CNonceExpiresIn) {
+		toSerialize["c_nonce_expires_in"] = o.CNonceExpiresIn
+	}
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	if !IsNil(o.ErrorDebug) {
+		toSerialize["error_debug"] = o.ErrorDebug
+	}
+	if !IsNil(o.ErrorDescription) {
+		toSerialize["error_description"] = o.ErrorDescription
+	}
+	if !IsNil(o.ErrorHint) {
+		toSerialize["error_hint"] = o.ErrorHint
+	}
+	if !IsNil(o.Format) {
+		toSerialize["format"] = o.Format
+	}
+	if !IsNil(o.StatusCode) {
+		toSerialize["status_code"] = o.StatusCode
+	}
+	return toSerialize, nil
 }
 
 type NullableVerifiableCredentialPrimingResponse struct {

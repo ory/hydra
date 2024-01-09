@@ -14,7 +14,7 @@ package openapi
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -100,7 +100,7 @@ func (a *OAuth2ApiService) AcceptOAuth2ConsentRequestExecute(r ApiAcceptOAuth2Co
 		return localVarReturnValue, nil, reportError("consentChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("consent_challenge", parameterToString(*r.consentChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "consent_challenge", r.consentChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -130,9 +130,9 @@ func (a *OAuth2ApiService) AcceptOAuth2ConsentRequestExecute(r ApiAcceptOAuth2Co
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -148,6 +148,7 @@ func (a *OAuth2ApiService) AcceptOAuth2ConsentRequestExecute(r ApiAcceptOAuth2Co
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -236,7 +237,7 @@ func (a *OAuth2ApiService) AcceptOAuth2LoginRequestExecute(r ApiAcceptOAuth2Logi
 		return localVarReturnValue, nil, reportError("loginChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("login_challenge", parameterToString(*r.loginChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "login_challenge", r.loginChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -266,9 +267,9 @@ func (a *OAuth2ApiService) AcceptOAuth2LoginRequestExecute(r ApiAcceptOAuth2Logi
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -284,6 +285,7 @@ func (a *OAuth2ApiService) AcceptOAuth2LoginRequestExecute(r ApiAcceptOAuth2Logi
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -358,7 +360,7 @@ func (a *OAuth2ApiService) AcceptOAuth2LogoutRequestExecute(r ApiAcceptOAuth2Log
 		return localVarReturnValue, nil, reportError("logoutChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("logout_challenge", parameterToString(*r.logoutChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "logout_challenge", r.logoutChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -386,9 +388,9 @@ func (a *OAuth2ApiService) AcceptOAuth2LogoutRequestExecute(r ApiAcceptOAuth2Log
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -404,6 +406,7 @@ func (a *OAuth2ApiService) AcceptOAuth2LogoutRequestExecute(r ApiAcceptOAuth2Log
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -506,9 +509,9 @@ func (a *OAuth2ApiService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -525,6 +528,7 @@ func (a *OAuth2ApiService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -534,6 +538,7 @@ func (a *OAuth2ApiService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -596,7 +601,7 @@ func (a *OAuth2ApiService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 	}
 
 	localVarPath := localBasePath + "/admin/clients/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -629,9 +634,9 @@ func (a *OAuth2ApiService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -647,6 +652,7 @@ func (a *OAuth2ApiService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -707,7 +713,7 @@ func (a *OAuth2ApiService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenReques
 		return nil, reportError("clientId is required and must be specified")
 	}
 
-	localVarQueryParams.Add("client_id", parameterToString(*r.clientId, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "client_id", r.clientId, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -735,9 +741,9 @@ func (a *OAuth2ApiService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenReques
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -753,6 +759,7 @@ func (a *OAuth2ApiService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenReques
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -805,7 +812,7 @@ func (a *OAuth2ApiService) DeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiDeleteT
 	}
 
 	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -838,9 +845,9 @@ func (a *OAuth2ApiService) DeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiDeleteT
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -856,6 +863,7 @@ func (a *OAuth2ApiService) DeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiDeleteT
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -910,7 +918,7 @@ func (a *OAuth2ApiService) GetOAuth2ClientExecute(r ApiGetOAuth2ClientRequest) (
 	}
 
 	localVarPath := localBasePath + "/admin/clients/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -943,9 +951,9 @@ func (a *OAuth2ApiService) GetOAuth2ClientExecute(r ApiGetOAuth2ClientRequest) (
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -961,6 +969,7 @@ func (a *OAuth2ApiService) GetOAuth2ClientExecute(r ApiGetOAuth2ClientRequest) (
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1042,7 +1051,7 @@ func (a *OAuth2ApiService) GetOAuth2ConsentRequestExecute(r ApiGetOAuth2ConsentR
 		return localVarReturnValue, nil, reportError("consentChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("consent_challenge", parameterToString(*r.consentChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "consent_challenge", r.consentChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1070,9 +1079,9 @@ func (a *OAuth2ApiService) GetOAuth2ConsentRequestExecute(r ApiGetOAuth2ConsentR
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1089,6 +1098,7 @@ func (a *OAuth2ApiService) GetOAuth2ConsentRequestExecute(r ApiGetOAuth2ConsentR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1098,6 +1108,7 @@ func (a *OAuth2ApiService) GetOAuth2ConsentRequestExecute(r ApiGetOAuth2ConsentR
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1178,7 +1189,7 @@ func (a *OAuth2ApiService) GetOAuth2LoginRequestExecute(r ApiGetOAuth2LoginReque
 		return localVarReturnValue, nil, reportError("loginChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("login_challenge", parameterToString(*r.loginChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "login_challenge", r.loginChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1206,9 +1217,9 @@ func (a *OAuth2ApiService) GetOAuth2LoginRequestExecute(r ApiGetOAuth2LoginReque
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1225,6 +1236,7 @@ func (a *OAuth2ApiService) GetOAuth2LoginRequestExecute(r ApiGetOAuth2LoginReque
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1234,6 +1246,7 @@ func (a *OAuth2ApiService) GetOAuth2LoginRequestExecute(r ApiGetOAuth2LoginReque
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1305,7 +1318,7 @@ func (a *OAuth2ApiService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 		return localVarReturnValue, nil, reportError("logoutChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("logout_challenge", parameterToString(*r.logoutChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "logout_challenge", r.logoutChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -1333,9 +1346,9 @@ func (a *OAuth2ApiService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1352,6 +1365,7 @@ func (a *OAuth2ApiService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -1361,6 +1375,7 @@ func (a *OAuth2ApiService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1422,7 +1437,7 @@ func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrusted
 	}
 
 	localVarPath := localBasePath + "/admin/trust/grants/jwt-bearer/issuers/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -1455,9 +1470,9 @@ func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrusted
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1473,6 +1488,7 @@ func (a *OAuth2ApiService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrusted
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1572,9 +1588,9 @@ func (a *OAuth2ApiService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2Tok
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	if r.scope != nil {
-		localVarFormParams.Add("scope", parameterToString(*r.scope, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "scope", r.scope, "")
 	}
-	localVarFormParams.Add("token", parameterToString(*r.token, ""))
+	parameterAddToHeaderOrQuery(localVarFormParams, "token", r.token, "")
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -1585,9 +1601,9 @@ func (a *OAuth2ApiService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2Tok
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1603,6 +1619,7 @@ func (a *OAuth2ApiService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2Tok
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1695,16 +1712,22 @@ func (a *OAuth2ApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 	localVarFormParams := url.Values{}
 
 	if r.pageSize != nil {
-		localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_size", r.pageSize, "")
+	} else {
+		var defaultValue int64 = 250
+		r.pageSize = &defaultValue
 	}
 	if r.pageToken != nil {
-		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_token", r.pageToken, "")
+	} else {
+		var defaultValue string = "1"
+		r.pageToken = &defaultValue
 	}
 	if r.clientName != nil {
-		localVarQueryParams.Add("client_name", parameterToString(*r.clientName, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "client_name", r.clientName, "")
 	}
 	if r.owner != nil {
-		localVarQueryParams.Add("owner", parameterToString(*r.owner, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "owner", r.owner, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1733,9 +1756,9 @@ func (a *OAuth2ApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1751,6 +1774,7 @@ func (a *OAuth2ApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1847,14 +1871,20 @@ func (a *OAuth2ApiService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 	}
 
 	if r.pageSize != nil {
-		localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_size", r.pageSize, "")
+	} else {
+		var defaultValue int64 = 250
+		r.pageSize = &defaultValue
 	}
 	if r.pageToken != nil {
-		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_token", r.pageToken, "")
+	} else {
+		var defaultValue string = "1"
+		r.pageToken = &defaultValue
 	}
-	localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "subject", r.subject, "")
 	if r.loginSessionId != nil {
-		localVarQueryParams.Add("login_session_id", parameterToString(*r.loginSessionId, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "login_session_id", r.loginSessionId, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -1883,9 +1913,9 @@ func (a *OAuth2ApiService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -1901,6 +1931,7 @@ func (a *OAuth2ApiService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -1983,13 +2014,13 @@ func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 	localVarFormParams := url.Values{}
 
 	if r.maxItems != nil {
-		localVarQueryParams.Add("MaxItems", parameterToString(*r.maxItems, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "MaxItems", r.maxItems, "")
 	}
 	if r.defaultItems != nil {
-		localVarQueryParams.Add("DefaultItems", parameterToString(*r.defaultItems, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "DefaultItems", r.defaultItems, "")
 	}
 	if r.issuer != nil {
-		localVarQueryParams.Add("issuer", parameterToString(*r.issuer, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "issuer", r.issuer, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2018,9 +2049,9 @@ func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2036,6 +2067,7 @@ func (a *OAuth2ApiService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2128,9 +2160,9 @@ func (a *OAuth2ApiService) OAuth2AuthorizeExecute(r ApiOAuth2AuthorizeRequest) (
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2146,6 +2178,7 @@ func (a *OAuth2ApiService) OAuth2AuthorizeExecute(r ApiOAuth2AuthorizeRequest) (
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2262,17 +2295,17 @@ func (a *OAuth2ApiService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRe
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	if r.clientId != nil {
-		localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "client_id", r.clientId, "")
 	}
 	if r.code != nil {
-		localVarFormParams.Add("code", parameterToString(*r.code, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "code", r.code, "")
 	}
-	localVarFormParams.Add("grant_type", parameterToString(*r.grantType, ""))
+	parameterAddToHeaderOrQuery(localVarFormParams, "grant_type", r.grantType, "")
 	if r.redirectUri != nil {
-		localVarFormParams.Add("redirect_uri", parameterToString(*r.redirectUri, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "redirect_uri", r.redirectUri, "")
 	}
 	if r.refreshToken != nil {
-		localVarFormParams.Add("refresh_token", parameterToString(*r.refreshToken, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "refresh_token", r.refreshToken, "")
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
@@ -2284,9 +2317,9 @@ func (a *OAuth2ApiService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRe
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2302,6 +2335,7 @@ func (a *OAuth2ApiService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRe
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2374,7 +2408,7 @@ func (a *OAuth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 	}
 
 	localVarPath := localBasePath + "/admin/clients/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -2412,9 +2446,9 @@ func (a *OAuth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2431,6 +2465,7 @@ func (a *OAuth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -2440,6 +2475,7 @@ func (a *OAuth2ApiService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2532,7 +2568,7 @@ func (a *OAuth2ApiService) RejectOAuth2ConsentRequestExecute(r ApiRejectOAuth2Co
 		return localVarReturnValue, nil, reportError("consentChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("consent_challenge", parameterToString(*r.consentChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "consent_challenge", r.consentChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -2562,9 +2598,9 @@ func (a *OAuth2ApiService) RejectOAuth2ConsentRequestExecute(r ApiRejectOAuth2Co
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2580,6 +2616,7 @@ func (a *OAuth2ApiService) RejectOAuth2ConsentRequestExecute(r ApiRejectOAuth2Co
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2667,7 +2704,7 @@ func (a *OAuth2ApiService) RejectOAuth2LoginRequestExecute(r ApiRejectOAuth2Logi
 		return localVarReturnValue, nil, reportError("loginChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("login_challenge", parameterToString(*r.loginChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "login_challenge", r.loginChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -2697,9 +2734,9 @@ func (a *OAuth2ApiService) RejectOAuth2LoginRequestExecute(r ApiRejectOAuth2Logi
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -2715,6 +2752,7 @@ func (a *OAuth2ApiService) RejectOAuth2LoginRequestExecute(r ApiRejectOAuth2Logi
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -2786,7 +2824,7 @@ func (a *OAuth2ApiService) RejectOAuth2LogoutRequestExecute(r ApiRejectOAuth2Log
 		return nil, reportError("logoutChallenge is required and must be specified")
 	}
 
-	localVarQueryParams.Add("logout_challenge", parameterToString(*r.logoutChallenge, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "logout_challenge", r.logoutChallenge, "")
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 
@@ -2814,9 +2852,9 @@ func (a *OAuth2ApiService) RejectOAuth2LogoutRequestExecute(r ApiRejectOAuth2Log
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -2832,6 +2870,7 @@ func (a *OAuth2ApiService) RejectOAuth2LogoutRequestExecute(r ApiRejectOAuth2Log
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -2907,12 +2946,12 @@ func (a *OAuth2ApiService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 		return nil, reportError("subject is required and must be specified")
 	}
 
-	localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	parameterAddToHeaderOrQuery(localVarQueryParams, "subject", r.subject, "")
 	if r.client != nil {
-		localVarQueryParams.Add("client", parameterToString(*r.client, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "client", r.client, "")
 	}
 	if r.all != nil {
-		localVarQueryParams.Add("all", parameterToString(*r.all, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "all", r.all, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -2941,9 +2980,9 @@ func (a *OAuth2ApiService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -2959,6 +2998,7 @@ func (a *OAuth2ApiService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -3031,10 +3071,10 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 	localVarFormParams := url.Values{}
 
 	if r.subject != nil {
-		localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "subject", r.subject, "")
 	}
 	if r.sid != nil {
-		localVarQueryParams.Add("sid", parameterToString(*r.sid, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "sid", r.sid, "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -3063,9 +3103,9 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -3081,6 +3121,7 @@ func (a *OAuth2ApiService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -3173,12 +3214,12 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	if r.clientId != nil {
-		localVarFormParams.Add("client_id", parameterToString(*r.clientId, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "client_id", r.clientId, "")
 	}
 	if r.clientSecret != nil {
-		localVarFormParams.Add("client_secret", parameterToString(*r.clientSecret, ""))
+		parameterAddToHeaderOrQuery(localVarFormParams, "client_secret", r.clientSecret, "")
 	}
-	localVarFormParams.Add("token", parameterToString(*r.token, ""))
+	parameterAddToHeaderOrQuery(localVarFormParams, "token", r.token, "")
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return nil, err
@@ -3189,9 +3230,9 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 		return localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -3207,6 +3248,7 @@ func (a *OAuth2ApiService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 			newErr.error = err.Error()
 			return localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarHTTPResponse, newErr
 	}
@@ -3271,7 +3313,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 	}
 
 	localVarPath := localBasePath + "/admin/clients/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3309,9 +3351,9 @@ func (a *OAuth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -3328,6 +3370,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -3338,6 +3381,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
@@ -3347,6 +3391,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -3413,7 +3458,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientLifespansExecute(r ApiSetOAuth2ClientL
 	}
 
 	localVarPath := localBasePath + "/admin/clients/{id}/lifespans"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3448,9 +3493,9 @@ func (a *OAuth2ApiService) SetOAuth2ClientLifespansExecute(r ApiSetOAuth2ClientL
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -3466,6 +3511,7 @@ func (a *OAuth2ApiService) SetOAuth2ClientLifespansExecute(r ApiSetOAuth2ClientL
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -3565,9 +3611,9 @@ func (a *OAuth2ApiService) TrustOAuth2JwtGrantIssuerExecute(r ApiTrustOAuth2JwtG
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -3583,6 +3629,7 @@ func (a *OAuth2ApiService) TrustOAuth2JwtGrantIssuerExecute(r ApiTrustOAuth2JwtG
 			newErr.error = err.Error()
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

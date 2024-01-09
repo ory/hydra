@@ -145,9 +145,10 @@ sdk: .bin/swagger .bin/ory node_modules
 		-g go \
 		-o "internal/httpclient" \
 		--git-user-id ory \
-		--git-repo-id hydra-client-go \
-		--git-host github.com
-	(cd internal/httpclient && go mod edit -module github.com/ory/hydra-client-go/v2)
+		--git-repo-id hydra-client-go/v2 \
+		--git-host github.com \
+		--api-name-suffix "Api" \
+		--global-property apiTests=false
 
 	make format
 

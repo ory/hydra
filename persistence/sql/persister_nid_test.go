@@ -103,6 +103,37 @@ func (s *PersisterTestSuite) TestAcceptLogoutRequest() {
 	}
 }
 
+func (s *PersisterTestSuite) TestAcceptDeviceGrantRequest() {
+	t := s.T()
+	dgr := newDeviceGrantRequest()
+
+	for k, r := range s.registries {
+		t.Run("dialect="+k, func(*testing.T) {
+			require.NoError(t, r.ConsentManager().CreateDeviceGrantRequest(s.t1, dgr))
+
+			expected, err := r.ConsentManager().GetDeviceGrantRequestByVerifier(s.t1, dgr.Verifier)
+			require.NoError(t, err)
+			require.Equal(t, false, expected.Accepted)
+
+			client := &client.Client{ID: "client-id", Secret: "secret"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+
+			dgrAccepted, err := r.ConsentManager().AcceptDeviceGrantRequest(s.t2, dgr.ID, "aaaa", "client-id", fosite.Arguments{"openid"}, fosite.Arguments{""})
+			require.Error(t, err)
+			require.Equal(t, &flow.DeviceGrantRequest{}, dgrAccepted)
+
+			actual, err := r.ConsentManager().GetDeviceGrantRequestByVerifier(s.t1, dgr.Verifier)
+			require.NoError(t, err)
+			require.Equal(t, expected, actual)
+
+			dgrAccepted, err = r.ConsentManager().AcceptDeviceGrantRequest(s.t1, dgr.ID, "aaaa", "client-id", fosite.Arguments{"openid"}, fosite.Arguments{""})
+			require.NoError(t, err)
+			require.Equal(t, dgrAccepted, actual)
+			require.Equal(t, true, actual.Accepted)
+		})
+	}
+}
+
 func (s *PersisterTestSuite) TestAddKeyGetKeyDeleteKey() {
 	t := s.T()
 	key := newKey("test-ks", "test")
@@ -2071,6 +2102,32 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 	}
 }
 
+func (s *PersisterTestSuite) TestVerifyAndInvalidateDeviceGrantRequest() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(t *testing.T) {
+			dgr := newDeviceGrantRequest()
+
+			actual := &flow.DeviceGrantRequest{}
+
+			require.NoError(t, r.ConsentManager().CreateDeviceGrantRequest(s.t1, dgr))
+
+			expected, err := r.ConsentManager().GetDeviceGrantRequestByVerifier(s.t1, dgr.Verifier)
+			require.NoError(t, err)
+
+			dgrInvalidated, err := r.ConsentManager().VerifyAndInvalidateDeviceGrantRequest(s.t2, dgr.Verifier)
+			require.Error(t, err)
+			require.Nil(t, dgrInvalidated)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, dgr.ID))
+			require.Equal(t, expected, actual)
+
+			_, err = r.ConsentManager().VerifyAndInvalidateDeviceGrantRequest(s.t1, dgr.Verifier)
+			require.NoError(t, err)
+			require.Error(t, x.ErrNotFound, r.Persister().Connection(context.Background()).Find(actual, dgr.ID))
+		})
+	}
+}
+
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	t := s.T()
 	for k, r := range s.registries {
@@ -2130,6 +2187,13 @@ func newGrant(keySet string, keyID string) trust.Grant {
 			Set:   keySet,
 			KeyID: keyID,
 		},
+	}
+}
+
+func newDeviceGrantRequest() *flow.DeviceGrantRequest {
+	return &flow.DeviceGrantRequest{
+		ID: uuid.Must(uuid.NewV4()).String(),
+		Verifier: uuid.Must(uuid.NewV4()).String(),
 	}
 }
 

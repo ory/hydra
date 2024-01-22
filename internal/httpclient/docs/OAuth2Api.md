@@ -49,25 +49,25 @@ Accept OAuth 2.0 Consent Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
-    acceptOAuth2ConsentRequest := *openapiclient.NewAcceptOAuth2ConsentRequest() // AcceptOAuth2ConsentRequest |  (optional)
+	consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
+	acceptOAuth2ConsentRequest := *openapiclient.NewAcceptOAuth2ConsentRequest() // AcceptOAuth2ConsentRequest |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2ConsentRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AcceptOAuth2ConsentRequest`: OAuth2RedirectTo
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2ConsentRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `AcceptOAuth2ConsentRequest`: OAuth2RedirectTo
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -117,25 +117,25 @@ Accept OAuth 2.0 Login Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
-    acceptOAuth2LoginRequest := *openapiclient.NewAcceptOAuth2LoginRequest("Subject_example") // AcceptOAuth2LoginRequest |  (optional)
+	loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
+	acceptOAuth2LoginRequest := *openapiclient.NewAcceptOAuth2LoginRequest("Subject_example") // AcceptOAuth2LoginRequest |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LoginRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AcceptOAuth2LoginRequest`: OAuth2RedirectTo
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LoginRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `AcceptOAuth2LoginRequest`: OAuth2RedirectTo
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -185,24 +185,24 @@ Accept OAuth 2.0 Session Logout Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | OAuth 2.0 Logout Request Challenge
+	logoutChallenge := "logoutChallenge_example" // string | OAuth 2.0 Logout Request Challenge
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LogoutRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `AcceptOAuth2LogoutRequest`: OAuth2RedirectTo
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LogoutRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `AcceptOAuth2LogoutRequest`: OAuth2RedirectTo
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -251,24 +251,24 @@ Create OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | OAuth 2.0 Client Request Body
+	oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | OAuth 2.0 Client Request Body
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.CreateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `CreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.CreateOAuth2Client`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.CreateOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `CreateOAuth2Client`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.CreateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -317,22 +317,22 @@ Delete OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
+	id := "id_example" // string | The id of the OAuth 2.0 Client.
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.DeleteOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.DeleteOAuth2Client(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -385,22 +385,22 @@ Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    clientId := "clientId_example" // string | OAuth 2.0 Client ID
+	clientId := "clientId_example" // string | OAuth 2.0 Client ID
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.DeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Token``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.DeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -449,22 +449,22 @@ Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | The id of the desired grant
+	id := "id_example" // string | The id of the desired grant
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -517,24 +517,24 @@ Get an OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
+	id := "id_example" // string | The id of the OAuth 2.0 Client.
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.GetOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2Client`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.GetOAuth2Client(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetOAuth2Client`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -587,24 +587,24 @@ Get OAuth 2.0 Consent Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
+	consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2ConsentRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetOAuth2ConsentRequest`: OAuth2ConsentRequest
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2ConsentRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetOAuth2ConsentRequest`: OAuth2ConsentRequest
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -653,24 +653,24 @@ Get OAuth 2.0 Login Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
+	loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LoginRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetOAuth2LoginRequest`: OAuth2LoginRequest
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LoginRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetOAuth2LoginRequest`: OAuth2LoginRequest
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -719,24 +719,24 @@ Get OAuth 2.0 Session Logout Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | 
+	logoutChallenge := "logoutChallenge_example" // string | 
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.GetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LogoutRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetOAuth2LogoutRequest`: OAuth2LogoutRequest
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LogoutRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.GetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetOAuth2LogoutRequest`: OAuth2LogoutRequest
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -785,24 +785,24 @@ Get Trusted OAuth2 JWT Bearer Grant Type Issuer
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | The id of the desired grant
+	id := "id_example" // string | The id of the desired grant
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.GetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `GetTrustedOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.GetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `GetTrustedOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 
@@ -855,25 +855,25 @@ Introspect OAuth2 Access and Refresh Tokens
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    token := "token_example" // string | The string value of the token. For access tokens, this is the \\\"access_token\\\" value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\"refresh_token\\\" value returned.
-    scope := "scope_example" // string | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. (optional)
+	token := "token_example" // string | The string value of the token. For access tokens, this is the \\\"access_token\\\" value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \\\"refresh_token\\\" value returned.
+	scope := "scope_example" // string | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.IntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.IntrospectOAuth2Token``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `IntrospectOAuth2Token`: IntrospectedOAuth2Token
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.IntrospectOAuth2Token`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.IntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.IntrospectOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `IntrospectOAuth2Token`: IntrospectedOAuth2Token
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.IntrospectOAuth2Token`: %v\n", resp)
 }
 ```
 
@@ -923,27 +923,27 @@ List OAuth 2.0 Clients
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-    pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
-    clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
-    owner := "owner_example" // string | The owner of the clients to filter by. (optional)
+	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
+	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
+	clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
+	owner := "owner_example" // string | The owner of the clients to filter by. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2Clients``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `ListOAuth2Clients`: []OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2Clients`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2Clients``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ListOAuth2Clients`: []OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2Clients`: %v\n", resp)
 }
 ```
 
@@ -995,27 +995,27 @@ List OAuth 2.0 Consent Sessions of a Subject
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    subject := "subject_example" // string | The subject to list the consent sessions for.
-    pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
-    pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
-    loginSessionId := "loginSessionId_example" // string | The login session id to list the consent sessions for. (optional)
+	subject := "subject_example" // string | The subject to list the consent sessions for.
+	pageSize := int64(789) // int64 | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to 250)
+	pageToken := "pageToken_example" // string | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). (optional) (default to "1")
+	loginSessionId := "loginSessionId_example" // string | The login session id to list the consent sessions for. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2ConsentSessions``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `ListOAuth2ConsentSessions`: []OAuth2ConsentSession
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2ConsentSessions`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2ConsentSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ListOAuth2ConsentSessions`: []OAuth2ConsentSession
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2ConsentSessions`: %v\n", resp)
 }
 ```
 
@@ -1067,26 +1067,26 @@ List Trusted OAuth2 JWT Bearer Grant Type Issuers
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    maxItems := int64(789) // int64 |  (optional)
-    defaultItems := int64(789) // int64 |  (optional)
-    issuer := "issuer_example" // string | If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned. (optional)
+	maxItems := int64(789) // int64 |  (optional)
+	defaultItems := int64(789) // int64 |  (optional)
+	issuer := "issuer_example" // string | If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `ListTrustedOAuth2JwtGrantIssuers`: []TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ListTrustedOAuth2JwtGrantIssuers`: []TrustedOAuth2JwtGrantIssuer
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
 }
 ```
 
@@ -1137,23 +1137,23 @@ OAuth 2.0 Authorize Endpoint
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.OAuth2Authorize(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.OAuth2Authorize``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `OAuth2Authorize`: ErrorOAuth2
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.OAuth2Authorize`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.OAuth2Authorize(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.OAuth2Authorize``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `OAuth2Authorize`: ErrorOAuth2
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.OAuth2Authorize`: %v\n", resp)
 }
 ```
 
@@ -1198,28 +1198,28 @@ The OAuth 2.0 Token Endpoint
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    grantType := "grantType_example" // string | 
-    clientId := "clientId_example" // string |  (optional)
-    code := "code_example" // string |  (optional)
-    redirectUri := "redirectUri_example" // string |  (optional)
-    refreshToken := "refreshToken_example" // string |  (optional)
+	grantType := "grantType_example" // string | 
+	clientId := "clientId_example" // string |  (optional)
+	code := "code_example" // string |  (optional)
+	redirectUri := "redirectUri_example" // string |  (optional)
+	refreshToken := "refreshToken_example" // string |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.Oauth2TokenExchange``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `Oauth2TokenExchange`: OAuth2TokenExchange
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.Oauth2TokenExchange`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.Oauth2TokenExchange``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `Oauth2TokenExchange`: OAuth2TokenExchange
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.Oauth2TokenExchange`: %v\n", resp)
 }
 ```
 
@@ -1272,25 +1272,25 @@ Patch OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch | OAuth 2.0 Client JSON Patch Body
+	id := "id_example" // string | The id of the OAuth 2.0 Client.
+	jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch | OAuth 2.0 Client JSON Patch Body
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.PatchOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `PatchOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.PatchOAuth2Client`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.PatchOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `PatchOAuth2Client`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.PatchOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -1344,25 +1344,25 @@ Reject OAuth 2.0 Consent Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
-    rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
+	consentChallenge := "consentChallenge_example" // string | OAuth 2.0 Consent Request Challenge
+	rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2ConsentRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `RejectOAuth2ConsentRequest`: OAuth2RedirectTo
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2ConsentRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.RejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `RejectOAuth2ConsentRequest`: OAuth2RedirectTo
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -1412,25 +1412,25 @@ Reject OAuth 2.0 Login Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
-    rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
+	loginChallenge := "loginChallenge_example" // string | OAuth 2.0 Login Request Challenge
+	rejectOAuth2Request := *openapiclient.NewRejectOAuth2Request() // RejectOAuth2Request |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LoginRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `RejectOAuth2LoginRequest`: OAuth2RedirectTo
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2LoginRequest`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.RejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `RejectOAuth2LoginRequest`: OAuth2RedirectTo
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -1480,22 +1480,22 @@ Reject OAuth 2.0 Session Logout Request
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    logoutChallenge := "logoutChallenge_example" // string | 
+	logoutChallenge := "logoutChallenge_example" // string | 
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LogoutRequest``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.RejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -1544,24 +1544,24 @@ Revoke OAuth 2.0 Consent Sessions of a Subject
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    subject := "subject_example" // string | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted.
-    client := "client_example" // string | OAuth 2.0 Client ID  If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. (optional)
-    all := true // bool | Revoke All Consent Sessions  If set to `true` deletes all consent sessions by the Subject that have been granted. (optional)
+	subject := "subject_example" // string | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted.
+	client := "client_example" // string | OAuth 2.0 Client ID  If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. (optional)
+	all := true // bool | Revoke All Consent Sessions  If set to `true` deletes all consent sessions by the Subject that have been granted. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2ConsentSessions``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2ConsentSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -1612,23 +1612,23 @@ Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    subject := "subject_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
-    sid := "sid_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
+	subject := "subject_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
+	sid := "sid_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2LoginSessions(context.Background()).Subject(subject).Sid(sid).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2LoginSessions``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.RevokeOAuth2LoginSessions(context.Background()).Subject(subject).Sid(sid).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2LoginSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -1678,24 +1678,24 @@ Revoke OAuth 2.0 Access or Refresh Token
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    token := "token_example" // string | 
-    clientId := "clientId_example" // string |  (optional)
-    clientSecret := "clientSecret_example" // string |  (optional)
+	token := "token_example" // string | 
+	clientId := "clientId_example" // string |  (optional)
+	clientSecret := "clientSecret_example" // string |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2Token``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
 }
 ```
 
@@ -1746,25 +1746,25 @@ Set OAuth 2.0 Client
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | OAuth 2.0 Client ID
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | OAuth 2.0 Client Request Body
+	id := "id_example" // string | OAuth 2.0 Client ID
+	oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | OAuth 2.0 Client Request Body
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.SetOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `SetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2Client`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.SetOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `SetOAuth2Client`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -1818,25 +1818,25 @@ Set OAuth2 Client Token Lifespans
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    id := "id_example" // string | OAuth 2.0 Client ID
-    oAuth2ClientTokenLifespans := *openapiclient.NewOAuth2ClientTokenLifespans() // OAuth2ClientTokenLifespans |  (optional)
+	id := "id_example" // string | OAuth 2.0 Client ID
+	oAuth2ClientTokenLifespans := *openapiclient.NewOAuth2ClientTokenLifespans() // OAuth2ClientTokenLifespans |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.SetOAuth2ClientLifespans(context.Background(), id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2ClientLifespans``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `SetOAuth2ClientLifespans`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2ClientLifespans`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.SetOAuth2ClientLifespans(context.Background(), id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2ClientLifespans``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `SetOAuth2ClientLifespans`: OAuth2Client
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2ClientLifespans`: %v\n", resp)
 }
 ```
 
@@ -1890,25 +1890,25 @@ Trust OAuth2 JWT Bearer Grant Type Issuer
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
+	"context"
+	"fmt"
+	"os"
     "time"
-    openapiclient "./openapi"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
-    trustOAuth2JwtGrantIssuer := *openapiclient.NewTrustOAuth2JwtGrantIssuer(time.Now(), "https://jwt-idp.example.com", *openapiclient.NewJsonWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig"), []string{"Scope_example"}) // TrustOAuth2JwtGrantIssuer |  (optional)
+	trustOAuth2JwtGrantIssuer := *openapiclient.NewTrustOAuth2JwtGrantIssuer(time.Now(), "https://jwt-idp.example.com", *openapiclient.NewJsonWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig"), []string{"Scope_example"}) // TrustOAuth2JwtGrantIssuer |  (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.TrustOAuth2JwtGrantIssuer``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `TrustOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-    fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.TrustOAuth2JwtGrantIssuer`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.TrustOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `TrustOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.TrustOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 

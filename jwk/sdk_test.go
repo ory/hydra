@@ -9,18 +9,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/v2/driver/config"
-
-	hydra "github.com/ory/hydra-client-go/v2"
-
-	"github.com/ory/hydra/v2/internal"
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal"
 	. "github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
 )
 
 func TestJWKSDK(t *testing.T) {
@@ -100,6 +97,7 @@ func TestJWKSDK(t *testing.T) {
 			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: "RS256",
 				Kid: "key-bar",
+				Use: "sig",
 			}).Execute()
 			require.NoError(t, err)
 			require.Len(t, resultKeys.Keys, 1)

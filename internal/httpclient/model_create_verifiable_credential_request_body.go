@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the CreateVerifiableCredentialRequestBody type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &CreateVerifiableCredentialRequestBody{}
+
 // CreateVerifiableCredentialRequestBody struct for CreateVerifiableCredentialRequestBody
 type CreateVerifiableCredentialRequestBody struct {
 	Format *string                    `json:"format,omitempty"`
@@ -41,7 +44,7 @@ func NewCreateVerifiableCredentialRequestBodyWithDefaults() *CreateVerifiableCre
 
 // GetFormat returns the Format field value if set, zero value otherwise.
 func (o *CreateVerifiableCredentialRequestBody) GetFormat() string {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetFormat() string {
 // GetFormatOk returns a tuple with the Format field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CreateVerifiableCredentialRequestBody) GetFormatOk() (*string, bool) {
-	if o == nil || o.Format == nil {
+	if o == nil || IsNil(o.Format) {
 		return nil, false
 	}
 	return o.Format, true
@@ -59,7 +62,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetFormatOk() (*string, bool) {
 
 // HasFormat returns a boolean if a field has been set.
 func (o *CreateVerifiableCredentialRequestBody) HasFormat() bool {
-	if o != nil && o.Format != nil {
+	if o != nil && !IsNil(o.Format) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *CreateVerifiableCredentialRequestBody) SetFormat(v string) {
 
 // GetProof returns the Proof field value if set, zero value otherwise.
 func (o *CreateVerifiableCredentialRequestBody) GetProof() VerifiableCredentialProof {
-	if o == nil || o.Proof == nil {
+	if o == nil || IsNil(o.Proof) {
 		var ret VerifiableCredentialProof
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetProof() VerifiableCredentialP
 // GetProofOk returns a tuple with the Proof field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CreateVerifiableCredentialRequestBody) GetProofOk() (*VerifiableCredentialProof, bool) {
-	if o == nil || o.Proof == nil {
+	if o == nil || IsNil(o.Proof) {
 		return nil, false
 	}
 	return o.Proof, true
@@ -91,7 +94,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetProofOk() (*VerifiableCredent
 
 // HasProof returns a boolean if a field has been set.
 func (o *CreateVerifiableCredentialRequestBody) HasProof() bool {
-	if o != nil && o.Proof != nil {
+	if o != nil && !IsNil(o.Proof) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *CreateVerifiableCredentialRequestBody) SetProof(v VerifiableCredentialP
 
 // GetTypes returns the Types field value if set, zero value otherwise.
 func (o *CreateVerifiableCredentialRequestBody) GetTypes() []string {
-	if o == nil || o.Types == nil {
+	if o == nil || IsNil(o.Types) {
 		var ret []string
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetTypes() []string {
 // GetTypesOk returns a tuple with the Types field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *CreateVerifiableCredentialRequestBody) GetTypesOk() ([]string, bool) {
-	if o == nil || o.Types == nil {
+	if o == nil || IsNil(o.Types) {
 		return nil, false
 	}
 	return o.Types, true
@@ -123,7 +126,7 @@ func (o *CreateVerifiableCredentialRequestBody) GetTypesOk() ([]string, bool) {
 
 // HasTypes returns a boolean if a field has been set.
 func (o *CreateVerifiableCredentialRequestBody) HasTypes() bool {
-	if o != nil && o.Types != nil {
+	if o != nil && !IsNil(o.Types) {
 		return true
 	}
 
@@ -136,17 +139,25 @@ func (o *CreateVerifiableCredentialRequestBody) SetTypes(v []string) {
 }
 
 func (o CreateVerifiableCredentialRequestBody) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Format != nil {
-		toSerialize["format"] = o.Format
-	}
-	if o.Proof != nil {
-		toSerialize["proof"] = o.Proof
-	}
-	if o.Types != nil {
-		toSerialize["types"] = o.Types
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o CreateVerifiableCredentialRequestBody) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Format) {
+		toSerialize["format"] = o.Format
+	}
+	if !IsNil(o.Proof) {
+		toSerialize["proof"] = o.Proof
+	}
+	if !IsNil(o.Types) {
+		toSerialize["types"] = o.Types
+	}
+	return toSerialize, nil
 }
 
 type NullableCreateVerifiableCredentialRequestBody struct {

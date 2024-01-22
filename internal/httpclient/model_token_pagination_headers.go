@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TokenPaginationHeaders type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TokenPaginationHeaders{}
+
 // TokenPaginationHeaders struct for TokenPaginationHeaders
 type TokenPaginationHeaders struct {
 	// The link header contains pagination links.  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).  in: header
@@ -42,7 +45,7 @@ func NewTokenPaginationHeadersWithDefaults() *TokenPaginationHeaders {
 
 // GetLink returns the Link field value if set, zero value otherwise.
 func (o *TokenPaginationHeaders) GetLink() string {
-	if o == nil || o.Link == nil {
+	if o == nil || IsNil(o.Link) {
 		var ret string
 		return ret
 	}
@@ -52,7 +55,7 @@ func (o *TokenPaginationHeaders) GetLink() string {
 // GetLinkOk returns a tuple with the Link field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TokenPaginationHeaders) GetLinkOk() (*string, bool) {
-	if o == nil || o.Link == nil {
+	if o == nil || IsNil(o.Link) {
 		return nil, false
 	}
 	return o.Link, true
@@ -60,7 +63,7 @@ func (o *TokenPaginationHeaders) GetLinkOk() (*string, bool) {
 
 // HasLink returns a boolean if a field has been set.
 func (o *TokenPaginationHeaders) HasLink() bool {
-	if o != nil && o.Link != nil {
+	if o != nil && !IsNil(o.Link) {
 		return true
 	}
 
@@ -74,7 +77,7 @@ func (o *TokenPaginationHeaders) SetLink(v string) {
 
 // GetXTotalCount returns the XTotalCount field value if set, zero value otherwise.
 func (o *TokenPaginationHeaders) GetXTotalCount() string {
-	if o == nil || o.XTotalCount == nil {
+	if o == nil || IsNil(o.XTotalCount) {
 		var ret string
 		return ret
 	}
@@ -84,7 +87,7 @@ func (o *TokenPaginationHeaders) GetXTotalCount() string {
 // GetXTotalCountOk returns a tuple with the XTotalCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TokenPaginationHeaders) GetXTotalCountOk() (*string, bool) {
-	if o == nil || o.XTotalCount == nil {
+	if o == nil || IsNil(o.XTotalCount) {
 		return nil, false
 	}
 	return o.XTotalCount, true
@@ -92,7 +95,7 @@ func (o *TokenPaginationHeaders) GetXTotalCountOk() (*string, bool) {
 
 // HasXTotalCount returns a boolean if a field has been set.
 func (o *TokenPaginationHeaders) HasXTotalCount() bool {
-	if o != nil && o.XTotalCount != nil {
+	if o != nil && !IsNil(o.XTotalCount) {
 		return true
 	}
 
@@ -105,14 +108,22 @@ func (o *TokenPaginationHeaders) SetXTotalCount(v string) {
 }
 
 func (o TokenPaginationHeaders) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Link != nil {
-		toSerialize["link"] = o.Link
-	}
-	if o.XTotalCount != nil {
-		toSerialize["x-total-count"] = o.XTotalCount
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TokenPaginationHeaders) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Link) {
+		toSerialize["link"] = o.Link
+	}
+	if !IsNil(o.XTotalCount) {
+		toSerialize["x-total-count"] = o.XTotalCount
+	}
+	return toSerialize, nil
 }
 
 type NullableTokenPaginationHeaders struct {

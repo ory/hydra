@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+// checks if the AcceptOAuth2ConsentRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AcceptOAuth2ConsentRequest{}
+
 // AcceptOAuth2ConsentRequest struct for AcceptOAuth2ConsentRequest
 type AcceptOAuth2ConsentRequest struct {
 	GrantAccessTokenAudience []string   `json:"grant_access_token_audience,omitempty"`
@@ -47,7 +50,7 @@ func NewAcceptOAuth2ConsentRequestWithDefaults() *AcceptOAuth2ConsentRequest {
 
 // GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudience() []string {
-	if o == nil || o.GrantAccessTokenAudience == nil {
+	if o == nil || IsNil(o.GrantAccessTokenAudience) {
 		var ret []string
 		return ret
 	}
@@ -57,7 +60,7 @@ func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudience() []string {
 // GetGrantAccessTokenAudienceOk returns a tuple with the GrantAccessTokenAudience field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudienceOk() ([]string, bool) {
-	if o == nil || o.GrantAccessTokenAudience == nil {
+	if o == nil || IsNil(o.GrantAccessTokenAudience) {
 		return nil, false
 	}
 	return o.GrantAccessTokenAudience, true
@@ -65,7 +68,7 @@ func (o *AcceptOAuth2ConsentRequest) GetGrantAccessTokenAudienceOk() ([]string, 
 
 // HasGrantAccessTokenAudience returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasGrantAccessTokenAudience() bool {
-	if o != nil && o.GrantAccessTokenAudience != nil {
+	if o != nil && !IsNil(o.GrantAccessTokenAudience) {
 		return true
 	}
 
@@ -79,7 +82,7 @@ func (o *AcceptOAuth2ConsentRequest) SetGrantAccessTokenAudience(v []string) {
 
 // GetGrantScope returns the GrantScope field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetGrantScope() []string {
-	if o == nil || o.GrantScope == nil {
+	if o == nil || IsNil(o.GrantScope) {
 		var ret []string
 		return ret
 	}
@@ -89,7 +92,7 @@ func (o *AcceptOAuth2ConsentRequest) GetGrantScope() []string {
 // GetGrantScopeOk returns a tuple with the GrantScope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetGrantScopeOk() ([]string, bool) {
-	if o == nil || o.GrantScope == nil {
+	if o == nil || IsNil(o.GrantScope) {
 		return nil, false
 	}
 	return o.GrantScope, true
@@ -97,7 +100,7 @@ func (o *AcceptOAuth2ConsentRequest) GetGrantScopeOk() ([]string, bool) {
 
 // HasGrantScope returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasGrantScope() bool {
-	if o != nil && o.GrantScope != nil {
+	if o != nil && !IsNil(o.GrantScope) {
 		return true
 	}
 
@@ -111,7 +114,7 @@ func (o *AcceptOAuth2ConsentRequest) SetGrantScope(v []string) {
 
 // GetHandledAt returns the HandledAt field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetHandledAt() time.Time {
-	if o == nil || o.HandledAt == nil {
+	if o == nil || IsNil(o.HandledAt) {
 		var ret time.Time
 		return ret
 	}
@@ -121,7 +124,7 @@ func (o *AcceptOAuth2ConsentRequest) GetHandledAt() time.Time {
 // GetHandledAtOk returns a tuple with the HandledAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetHandledAtOk() (*time.Time, bool) {
-	if o == nil || o.HandledAt == nil {
+	if o == nil || IsNil(o.HandledAt) {
 		return nil, false
 	}
 	return o.HandledAt, true
@@ -129,7 +132,7 @@ func (o *AcceptOAuth2ConsentRequest) GetHandledAtOk() (*time.Time, bool) {
 
 // HasHandledAt returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasHandledAt() bool {
-	if o != nil && o.HandledAt != nil {
+	if o != nil && !IsNil(o.HandledAt) {
 		return true
 	}
 
@@ -143,7 +146,7 @@ func (o *AcceptOAuth2ConsentRequest) SetHandledAt(v time.Time) {
 
 // GetRemember returns the Remember field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetRemember() bool {
-	if o == nil || o.Remember == nil {
+	if o == nil || IsNil(o.Remember) {
 		var ret bool
 		return ret
 	}
@@ -153,7 +156,7 @@ func (o *AcceptOAuth2ConsentRequest) GetRemember() bool {
 // GetRememberOk returns a tuple with the Remember field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetRememberOk() (*bool, bool) {
-	if o == nil || o.Remember == nil {
+	if o == nil || IsNil(o.Remember) {
 		return nil, false
 	}
 	return o.Remember, true
@@ -161,7 +164,7 @@ func (o *AcceptOAuth2ConsentRequest) GetRememberOk() (*bool, bool) {
 
 // HasRemember returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasRemember() bool {
-	if o != nil && o.Remember != nil {
+	if o != nil && !IsNil(o.Remember) {
 		return true
 	}
 
@@ -175,7 +178,7 @@ func (o *AcceptOAuth2ConsentRequest) SetRemember(v bool) {
 
 // GetRememberFor returns the RememberFor field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetRememberFor() int64 {
-	if o == nil || o.RememberFor == nil {
+	if o == nil || IsNil(o.RememberFor) {
 		var ret int64
 		return ret
 	}
@@ -185,7 +188,7 @@ func (o *AcceptOAuth2ConsentRequest) GetRememberFor() int64 {
 // GetRememberForOk returns a tuple with the RememberFor field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetRememberForOk() (*int64, bool) {
-	if o == nil || o.RememberFor == nil {
+	if o == nil || IsNil(o.RememberFor) {
 		return nil, false
 	}
 	return o.RememberFor, true
@@ -193,7 +196,7 @@ func (o *AcceptOAuth2ConsentRequest) GetRememberForOk() (*int64, bool) {
 
 // HasRememberFor returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasRememberFor() bool {
-	if o != nil && o.RememberFor != nil {
+	if o != nil && !IsNil(o.RememberFor) {
 		return true
 	}
 
@@ -207,7 +210,7 @@ func (o *AcceptOAuth2ConsentRequest) SetRememberFor(v int64) {
 
 // GetSession returns the Session field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetSession() AcceptOAuth2ConsentRequestSession {
-	if o == nil || o.Session == nil {
+	if o == nil || IsNil(o.Session) {
 		var ret AcceptOAuth2ConsentRequestSession
 		return ret
 	}
@@ -217,7 +220,7 @@ func (o *AcceptOAuth2ConsentRequest) GetSession() AcceptOAuth2ConsentRequestSess
 // GetSessionOk returns a tuple with the Session field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AcceptOAuth2ConsentRequest) GetSessionOk() (*AcceptOAuth2ConsentRequestSession, bool) {
-	if o == nil || o.Session == nil {
+	if o == nil || IsNil(o.Session) {
 		return nil, false
 	}
 	return o.Session, true
@@ -225,7 +228,7 @@ func (o *AcceptOAuth2ConsentRequest) GetSessionOk() (*AcceptOAuth2ConsentRequest
 
 // HasSession returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequest) HasSession() bool {
-	if o != nil && o.Session != nil {
+	if o != nil && !IsNil(o.Session) {
 		return true
 	}
 
@@ -238,26 +241,34 @@ func (o *AcceptOAuth2ConsentRequest) SetSession(v AcceptOAuth2ConsentRequestSess
 }
 
 func (o AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.GrantAccessTokenAudience != nil {
-		toSerialize["grant_access_token_audience"] = o.GrantAccessTokenAudience
-	}
-	if o.GrantScope != nil {
-		toSerialize["grant_scope"] = o.GrantScope
-	}
-	if o.HandledAt != nil {
-		toSerialize["handled_at"] = o.HandledAt
-	}
-	if o.Remember != nil {
-		toSerialize["remember"] = o.Remember
-	}
-	if o.RememberFor != nil {
-		toSerialize["remember_for"] = o.RememberFor
-	}
-	if o.Session != nil {
-		toSerialize["session"] = o.Session
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o AcceptOAuth2ConsentRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.GrantAccessTokenAudience) {
+		toSerialize["grant_access_token_audience"] = o.GrantAccessTokenAudience
+	}
+	if !IsNil(o.GrantScope) {
+		toSerialize["grant_scope"] = o.GrantScope
+	}
+	if !IsNil(o.HandledAt) {
+		toSerialize["handled_at"] = o.HandledAt
+	}
+	if !IsNil(o.Remember) {
+		toSerialize["remember"] = o.Remember
+	}
+	if !IsNil(o.RememberFor) {
+		toSerialize["remember_for"] = o.RememberFor
+	}
+	if !IsNil(o.Session) {
+		toSerialize["session"] = o.Session
+	}
+	return toSerialize, nil
 }
 
 type NullableAcceptOAuth2ConsentRequest struct {

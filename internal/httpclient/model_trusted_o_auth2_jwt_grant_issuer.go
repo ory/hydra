@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+// checks if the TrustedOAuth2JwtGrantIssuer type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TrustedOAuth2JwtGrantIssuer{}
+
 // TrustedOAuth2JwtGrantIssuer OAuth2 JWT Bearer Grant Type Issuer Trust Relationship
 type TrustedOAuth2JwtGrantIssuer struct {
 	// The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.
@@ -53,7 +56,7 @@ func NewTrustedOAuth2JwtGrantIssuerWithDefaults() *TrustedOAuth2JwtGrantIssuer {
 
 // GetAllowAnySubject returns the AllowAnySubject field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubject() bool {
-	if o == nil || o.AllowAnySubject == nil {
+	if o == nil || IsNil(o.AllowAnySubject) {
 		var ret bool
 		return ret
 	}
@@ -63,7 +66,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubject() bool {
 // GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool) {
-	if o == nil || o.AllowAnySubject == nil {
+	if o == nil || IsNil(o.AllowAnySubject) {
 		return nil, false
 	}
 	return o.AllowAnySubject, true
@@ -71,7 +74,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool) {
 
 // HasAllowAnySubject returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasAllowAnySubject() bool {
-	if o != nil && o.AllowAnySubject != nil {
+	if o != nil && !IsNil(o.AllowAnySubject) {
 		return true
 	}
 
@@ -85,7 +88,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetAllowAnySubject(v bool) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || IsNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -95,7 +98,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || IsNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -103,7 +106,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !IsNil(o.CreatedAt) {
 		return true
 	}
 
@@ -117,7 +120,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetCreatedAt(v time.Time) {
 
 // GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetExpiresAt() time.Time {
-	if o == nil || o.ExpiresAt == nil {
+	if o == nil || IsNil(o.ExpiresAt) {
 		var ret time.Time
 		return ret
 	}
@@ -127,7 +130,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetExpiresAt() time.Time {
 // GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetExpiresAtOk() (*time.Time, bool) {
-	if o == nil || o.ExpiresAt == nil {
+	if o == nil || IsNil(o.ExpiresAt) {
 		return nil, false
 	}
 	return o.ExpiresAt, true
@@ -135,7 +138,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetExpiresAtOk() (*time.Time, bool) {
 
 // HasExpiresAt returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasExpiresAt() bool {
-	if o != nil && o.ExpiresAt != nil {
+	if o != nil && !IsNil(o.ExpiresAt) {
 		return true
 	}
 
@@ -149,7 +152,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetExpiresAt(v time.Time) {
 
 // GetId returns the Id field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetId() string {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
 	}
@@ -159,7 +162,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetId() string {
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetIdOk() (*string, bool) {
-	if o == nil || o.Id == nil {
+	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
 	return o.Id, true
@@ -167,7 +170,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetIdOk() (*string, bool) {
 
 // HasId returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasId() bool {
-	if o != nil && o.Id != nil {
+	if o != nil && !IsNil(o.Id) {
 		return true
 	}
 
@@ -181,7 +184,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetId(v string) {
 
 // GetIssuer returns the Issuer field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetIssuer() string {
-	if o == nil || o.Issuer == nil {
+	if o == nil || IsNil(o.Issuer) {
 		var ret string
 		return ret
 	}
@@ -191,7 +194,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetIssuer() string {
 // GetIssuerOk returns a tuple with the Issuer field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetIssuerOk() (*string, bool) {
-	if o == nil || o.Issuer == nil {
+	if o == nil || IsNil(o.Issuer) {
 		return nil, false
 	}
 	return o.Issuer, true
@@ -199,7 +202,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetIssuerOk() (*string, bool) {
 
 // HasIssuer returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasIssuer() bool {
-	if o != nil && o.Issuer != nil {
+	if o != nil && !IsNil(o.Issuer) {
 		return true
 	}
 
@@ -213,7 +216,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetIssuer(v string) {
 
 // GetPublicKey returns the PublicKey field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetPublicKey() TrustedOAuth2JwtGrantJsonWebKey {
-	if o == nil || o.PublicKey == nil {
+	if o == nil || IsNil(o.PublicKey) {
 		var ret TrustedOAuth2JwtGrantJsonWebKey
 		return ret
 	}
@@ -223,7 +226,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetPublicKey() TrustedOAuth2JwtGrantJsonWe
 // GetPublicKeyOk returns a tuple with the PublicKey field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetPublicKeyOk() (*TrustedOAuth2JwtGrantJsonWebKey, bool) {
-	if o == nil || o.PublicKey == nil {
+	if o == nil || IsNil(o.PublicKey) {
 		return nil, false
 	}
 	return o.PublicKey, true
@@ -231,7 +234,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetPublicKeyOk() (*TrustedOAuth2JwtGrantJs
 
 // HasPublicKey returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasPublicKey() bool {
-	if o != nil && o.PublicKey != nil {
+	if o != nil && !IsNil(o.PublicKey) {
 		return true
 	}
 
@@ -245,7 +248,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetPublicKey(v TrustedOAuth2JwtGrantJsonWe
 
 // GetScope returns the Scope field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetScope() []string {
-	if o == nil || o.Scope == nil {
+	if o == nil || IsNil(o.Scope) {
 		var ret []string
 		return ret
 	}
@@ -255,7 +258,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetScope() []string {
 // GetScopeOk returns a tuple with the Scope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetScopeOk() ([]string, bool) {
-	if o == nil || o.Scope == nil {
+	if o == nil || IsNil(o.Scope) {
 		return nil, false
 	}
 	return o.Scope, true
@@ -263,7 +266,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetScopeOk() ([]string, bool) {
 
 // HasScope returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasScope() bool {
-	if o != nil && o.Scope != nil {
+	if o != nil && !IsNil(o.Scope) {
 		return true
 	}
 
@@ -277,7 +280,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetScope(v []string) {
 
 // GetSubject returns the Subject field value if set, zero value otherwise.
 func (o *TrustedOAuth2JwtGrantIssuer) GetSubject() string {
-	if o == nil || o.Subject == nil {
+	if o == nil || IsNil(o.Subject) {
 		var ret string
 		return ret
 	}
@@ -287,7 +290,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetSubject() string {
 // GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) GetSubjectOk() (*string, bool) {
-	if o == nil || o.Subject == nil {
+	if o == nil || IsNil(o.Subject) {
 		return nil, false
 	}
 	return o.Subject, true
@@ -295,7 +298,7 @@ func (o *TrustedOAuth2JwtGrantIssuer) GetSubjectOk() (*string, bool) {
 
 // HasSubject returns a boolean if a field has been set.
 func (o *TrustedOAuth2JwtGrantIssuer) HasSubject() bool {
-	if o != nil && o.Subject != nil {
+	if o != nil && !IsNil(o.Subject) {
 		return true
 	}
 
@@ -308,32 +311,40 @@ func (o *TrustedOAuth2JwtGrantIssuer) SetSubject(v string) {
 }
 
 func (o TrustedOAuth2JwtGrantIssuer) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.AllowAnySubject != nil {
-		toSerialize["allow_any_subject"] = o.AllowAnySubject
-	}
-	if o.CreatedAt != nil {
-		toSerialize["created_at"] = o.CreatedAt
-	}
-	if o.ExpiresAt != nil {
-		toSerialize["expires_at"] = o.ExpiresAt
-	}
-	if o.Id != nil {
-		toSerialize["id"] = o.Id
-	}
-	if o.Issuer != nil {
-		toSerialize["issuer"] = o.Issuer
-	}
-	if o.PublicKey != nil {
-		toSerialize["public_key"] = o.PublicKey
-	}
-	if o.Scope != nil {
-		toSerialize["scope"] = o.Scope
-	}
-	if o.Subject != nil {
-		toSerialize["subject"] = o.Subject
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TrustedOAuth2JwtGrantIssuer) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AllowAnySubject) {
+		toSerialize["allow_any_subject"] = o.AllowAnySubject
+	}
+	if !IsNil(o.CreatedAt) {
+		toSerialize["created_at"] = o.CreatedAt
+	}
+	if !IsNil(o.ExpiresAt) {
+		toSerialize["expires_at"] = o.ExpiresAt
+	}
+	if !IsNil(o.Id) {
+		toSerialize["id"] = o.Id
+	}
+	if !IsNil(o.Issuer) {
+		toSerialize["issuer"] = o.Issuer
+	}
+	if !IsNil(o.PublicKey) {
+		toSerialize["public_key"] = o.PublicKey
+	}
+	if !IsNil(o.Scope) {
+		toSerialize["scope"] = o.Scope
+	}
+	if !IsNil(o.Subject) {
+		toSerialize["subject"] = o.Subject
+	}
+	return toSerialize, nil
 }
 
 type NullableTrustedOAuth2JwtGrantIssuer struct {

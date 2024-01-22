@@ -12,8 +12,13 @@ Contact: hi@ory.sh
 package openapi
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 )
+
+// checks if the OAuth2LoginRequest type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &OAuth2LoginRequest{}
 
 // OAuth2LoginRequest struct for OAuth2LoginRequest
 type OAuth2LoginRequest struct {
@@ -32,6 +37,8 @@ type OAuth2LoginRequest struct {
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type when accepting the login request, or the request will fail.
 	Subject string `json:"subject"`
 }
+
+type _OAuth2LoginRequest OAuth2LoginRequest
 
 // NewOAuth2LoginRequest instantiates a new OAuth2LoginRequest object
 // This constructor will assign default values to properties that have it defined,
@@ -105,7 +112,7 @@ func (o *OAuth2LoginRequest) SetClient(v OAuth2Client) {
 
 // GetOidcContext returns the OidcContext field value if set, zero value otherwise.
 func (o *OAuth2LoginRequest) GetOidcContext() OAuth2ConsentRequestOpenIDConnectContext {
-	if o == nil || o.OidcContext == nil {
+	if o == nil || IsNil(o.OidcContext) {
 		var ret OAuth2ConsentRequestOpenIDConnectContext
 		return ret
 	}
@@ -115,7 +122,7 @@ func (o *OAuth2LoginRequest) GetOidcContext() OAuth2ConsentRequestOpenIDConnectC
 // GetOidcContextOk returns a tuple with the OidcContext field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LoginRequest) GetOidcContextOk() (*OAuth2ConsentRequestOpenIDConnectContext, bool) {
-	if o == nil || o.OidcContext == nil {
+	if o == nil || IsNil(o.OidcContext) {
 		return nil, false
 	}
 	return o.OidcContext, true
@@ -123,7 +130,7 @@ func (o *OAuth2LoginRequest) GetOidcContextOk() (*OAuth2ConsentRequestOpenIDConn
 
 // HasOidcContext returns a boolean if a field has been set.
 func (o *OAuth2LoginRequest) HasOidcContext() bool {
-	if o != nil && o.OidcContext != nil {
+	if o != nil && !IsNil(o.OidcContext) {
 		return true
 	}
 
@@ -161,7 +168,7 @@ func (o *OAuth2LoginRequest) SetRequestUrl(v string) {
 
 // GetRequestedAccessTokenAudience returns the RequestedAccessTokenAudience field value if set, zero value otherwise.
 func (o *OAuth2LoginRequest) GetRequestedAccessTokenAudience() []string {
-	if o == nil || o.RequestedAccessTokenAudience == nil {
+	if o == nil || IsNil(o.RequestedAccessTokenAudience) {
 		var ret []string
 		return ret
 	}
@@ -171,7 +178,7 @@ func (o *OAuth2LoginRequest) GetRequestedAccessTokenAudience() []string {
 // GetRequestedAccessTokenAudienceOk returns a tuple with the RequestedAccessTokenAudience field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LoginRequest) GetRequestedAccessTokenAudienceOk() ([]string, bool) {
-	if o == nil || o.RequestedAccessTokenAudience == nil {
+	if o == nil || IsNil(o.RequestedAccessTokenAudience) {
 		return nil, false
 	}
 	return o.RequestedAccessTokenAudience, true
@@ -179,7 +186,7 @@ func (o *OAuth2LoginRequest) GetRequestedAccessTokenAudienceOk() ([]string, bool
 
 // HasRequestedAccessTokenAudience returns a boolean if a field has been set.
 func (o *OAuth2LoginRequest) HasRequestedAccessTokenAudience() bool {
-	if o != nil && o.RequestedAccessTokenAudience != nil {
+	if o != nil && !IsNil(o.RequestedAccessTokenAudience) {
 		return true
 	}
 
@@ -193,7 +200,7 @@ func (o *OAuth2LoginRequest) SetRequestedAccessTokenAudience(v []string) {
 
 // GetRequestedScope returns the RequestedScope field value if set, zero value otherwise.
 func (o *OAuth2LoginRequest) GetRequestedScope() []string {
-	if o == nil || o.RequestedScope == nil {
+	if o == nil || IsNil(o.RequestedScope) {
 		var ret []string
 		return ret
 	}
@@ -203,7 +210,7 @@ func (o *OAuth2LoginRequest) GetRequestedScope() []string {
 // GetRequestedScopeOk returns a tuple with the RequestedScope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LoginRequest) GetRequestedScopeOk() ([]string, bool) {
-	if o == nil || o.RequestedScope == nil {
+	if o == nil || IsNil(o.RequestedScope) {
 		return nil, false
 	}
 	return o.RequestedScope, true
@@ -211,7 +218,7 @@ func (o *OAuth2LoginRequest) GetRequestedScopeOk() ([]string, bool) {
 
 // HasRequestedScope returns a boolean if a field has been set.
 func (o *OAuth2LoginRequest) HasRequestedScope() bool {
-	if o != nil && o.RequestedScope != nil {
+	if o != nil && !IsNil(o.RequestedScope) {
 		return true
 	}
 
@@ -225,7 +232,7 @@ func (o *OAuth2LoginRequest) SetRequestedScope(v []string) {
 
 // GetSessionId returns the SessionId field value if set, zero value otherwise.
 func (o *OAuth2LoginRequest) GetSessionId() string {
-	if o == nil || o.SessionId == nil {
+	if o == nil || IsNil(o.SessionId) {
 		var ret string
 		return ret
 	}
@@ -235,7 +242,7 @@ func (o *OAuth2LoginRequest) GetSessionId() string {
 // GetSessionIdOk returns a tuple with the SessionId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2LoginRequest) GetSessionIdOk() (*string, bool) {
-	if o == nil || o.SessionId == nil {
+	if o == nil || IsNil(o.SessionId) {
 		return nil, false
 	}
 	return o.SessionId, true
@@ -243,7 +250,7 @@ func (o *OAuth2LoginRequest) GetSessionIdOk() (*string, bool) {
 
 // HasSessionId returns a boolean if a field has been set.
 func (o *OAuth2LoginRequest) HasSessionId() bool {
-	if o != nil && o.SessionId != nil {
+	if o != nil && !IsNil(o.SessionId) {
 		return true
 	}
 
@@ -304,35 +311,74 @@ func (o *OAuth2LoginRequest) SetSubject(v string) {
 }
 
 func (o OAuth2LoginRequest) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["challenge"] = o.Challenge
-	}
-	if true {
-		toSerialize["client"] = o.Client
-	}
-	if o.OidcContext != nil {
-		toSerialize["oidc_context"] = o.OidcContext
-	}
-	if true {
-		toSerialize["request_url"] = o.RequestUrl
-	}
-	if o.RequestedAccessTokenAudience != nil {
-		toSerialize["requested_access_token_audience"] = o.RequestedAccessTokenAudience
-	}
-	if o.RequestedScope != nil {
-		toSerialize["requested_scope"] = o.RequestedScope
-	}
-	if o.SessionId != nil {
-		toSerialize["session_id"] = o.SessionId
-	}
-	if true {
-		toSerialize["skip"] = o.Skip
-	}
-	if true {
-		toSerialize["subject"] = o.Subject
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o OAuth2LoginRequest) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["challenge"] = o.Challenge
+	toSerialize["client"] = o.Client
+	if !IsNil(o.OidcContext) {
+		toSerialize["oidc_context"] = o.OidcContext
+	}
+	toSerialize["request_url"] = o.RequestUrl
+	if !IsNil(o.RequestedAccessTokenAudience) {
+		toSerialize["requested_access_token_audience"] = o.RequestedAccessTokenAudience
+	}
+	if !IsNil(o.RequestedScope) {
+		toSerialize["requested_scope"] = o.RequestedScope
+	}
+	if !IsNil(o.SessionId) {
+		toSerialize["session_id"] = o.SessionId
+	}
+	toSerialize["skip"] = o.Skip
+	toSerialize["subject"] = o.Subject
+	return toSerialize, nil
+}
+
+func (o *OAuth2LoginRequest) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"challenge",
+		"client",
+		"request_url",
+		"skip",
+		"subject",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varOAuth2LoginRequest := _OAuth2LoginRequest{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varOAuth2LoginRequest)
+
+	if err != nil {
+		return err
+	}
+
+	*o = OAuth2LoginRequest(varOAuth2LoginRequest)
+
+	return err
 }
 
 type NullableOAuth2LoginRequest struct {

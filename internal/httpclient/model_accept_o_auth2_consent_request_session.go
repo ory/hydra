@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the AcceptOAuth2ConsentRequestSession type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AcceptOAuth2ConsentRequestSession{}
+
 // AcceptOAuth2ConsentRequestSession struct for AcceptOAuth2ConsentRequestSession
 type AcceptOAuth2ConsentRequestSession struct {
 	// AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
@@ -53,7 +56,7 @@ func (o *AcceptOAuth2ConsentRequestSession) GetAccessToken() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AcceptOAuth2ConsentRequestSession) GetAccessTokenOk() (*interface{}, bool) {
-	if o == nil || o.AccessToken == nil {
+	if o == nil || IsNil(o.AccessToken) {
 		return nil, false
 	}
 	return &o.AccessToken, true
@@ -61,7 +64,7 @@ func (o *AcceptOAuth2ConsentRequestSession) GetAccessTokenOk() (*interface{}, bo
 
 // HasAccessToken returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequestSession) HasAccessToken() bool {
-	if o != nil && o.AccessToken != nil {
+	if o != nil && IsNil(o.AccessToken) {
 		return true
 	}
 
@@ -86,7 +89,7 @@ func (o *AcceptOAuth2ConsentRequestSession) GetIdToken() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *AcceptOAuth2ConsentRequestSession) GetIdTokenOk() (*interface{}, bool) {
-	if o == nil || o.IdToken == nil {
+	if o == nil || IsNil(o.IdToken) {
 		return nil, false
 	}
 	return &o.IdToken, true
@@ -94,7 +97,7 @@ func (o *AcceptOAuth2ConsentRequestSession) GetIdTokenOk() (*interface{}, bool) 
 
 // HasIdToken returns a boolean if a field has been set.
 func (o *AcceptOAuth2ConsentRequestSession) HasIdToken() bool {
-	if o != nil && o.IdToken != nil {
+	if o != nil && IsNil(o.IdToken) {
 		return true
 	}
 
@@ -107,6 +110,14 @@ func (o *AcceptOAuth2ConsentRequestSession) SetIdToken(v interface{}) {
 }
 
 func (o AcceptOAuth2ConsentRequestSession) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o AcceptOAuth2ConsentRequestSession) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if o.AccessToken != nil {
 		toSerialize["access_token"] = o.AccessToken
@@ -114,7 +125,7 @@ func (o AcceptOAuth2ConsentRequestSession) MarshalJSON() ([]byte, error) {
 	if o.IdToken != nil {
 		toSerialize["id_token"] = o.IdToken
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableAcceptOAuth2ConsentRequestSession struct {

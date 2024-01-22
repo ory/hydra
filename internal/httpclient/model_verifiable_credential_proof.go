@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the VerifiableCredentialProof type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &VerifiableCredentialProof{}
+
 // VerifiableCredentialProof struct for VerifiableCredentialProof
 type VerifiableCredentialProof struct {
 	Jwt       *string `json:"jwt,omitempty"`
@@ -40,7 +43,7 @@ func NewVerifiableCredentialProofWithDefaults() *VerifiableCredentialProof {
 
 // GetJwt returns the Jwt field value if set, zero value otherwise.
 func (o *VerifiableCredentialProof) GetJwt() string {
-	if o == nil || o.Jwt == nil {
+	if o == nil || IsNil(o.Jwt) {
 		var ret string
 		return ret
 	}
@@ -50,7 +53,7 @@ func (o *VerifiableCredentialProof) GetJwt() string {
 // GetJwtOk returns a tuple with the Jwt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialProof) GetJwtOk() (*string, bool) {
-	if o == nil || o.Jwt == nil {
+	if o == nil || IsNil(o.Jwt) {
 		return nil, false
 	}
 	return o.Jwt, true
@@ -58,7 +61,7 @@ func (o *VerifiableCredentialProof) GetJwtOk() (*string, bool) {
 
 // HasJwt returns a boolean if a field has been set.
 func (o *VerifiableCredentialProof) HasJwt() bool {
-	if o != nil && o.Jwt != nil {
+	if o != nil && !IsNil(o.Jwt) {
 		return true
 	}
 
@@ -72,7 +75,7 @@ func (o *VerifiableCredentialProof) SetJwt(v string) {
 
 // GetProofType returns the ProofType field value if set, zero value otherwise.
 func (o *VerifiableCredentialProof) GetProofType() string {
-	if o == nil || o.ProofType == nil {
+	if o == nil || IsNil(o.ProofType) {
 		var ret string
 		return ret
 	}
@@ -82,7 +85,7 @@ func (o *VerifiableCredentialProof) GetProofType() string {
 // GetProofTypeOk returns a tuple with the ProofType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *VerifiableCredentialProof) GetProofTypeOk() (*string, bool) {
-	if o == nil || o.ProofType == nil {
+	if o == nil || IsNil(o.ProofType) {
 		return nil, false
 	}
 	return o.ProofType, true
@@ -90,7 +93,7 @@ func (o *VerifiableCredentialProof) GetProofTypeOk() (*string, bool) {
 
 // HasProofType returns a boolean if a field has been set.
 func (o *VerifiableCredentialProof) HasProofType() bool {
-	if o != nil && o.ProofType != nil {
+	if o != nil && !IsNil(o.ProofType) {
 		return true
 	}
 
@@ -103,14 +106,22 @@ func (o *VerifiableCredentialProof) SetProofType(v string) {
 }
 
 func (o VerifiableCredentialProof) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Jwt != nil {
-		toSerialize["jwt"] = o.Jwt
-	}
-	if o.ProofType != nil {
-		toSerialize["proof_type"] = o.ProofType
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o VerifiableCredentialProof) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Jwt) {
+		toSerialize["jwt"] = o.Jwt
+	}
+	if !IsNil(o.ProofType) {
+		toSerialize["proof_type"] = o.ProofType
+	}
+	return toSerialize, nil
 }
 
 type NullableVerifiableCredentialProof struct {

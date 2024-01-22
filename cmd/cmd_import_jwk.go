@@ -73,15 +73,18 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 
 				key = cli.ToSDKFriendlyJSONWebKey(key, "", "")
 
-				var buf bytes.Buffer
-				var jsonWebKey hydra.JsonWebKey
+				type jwk hydra.JsonWebKey // opt out of OpenAPI-generated UnmarshalJSON
+				var (
+					buf        bytes.Buffer
+					jsonWebKey jwk
+				)
 				if err := json.NewEncoder(&buf).Encode(key); err != nil {
 					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not encode key from `%s` to JSON: %s", src, err)
 					return cmdx.FailSilently(cmd)
 				}
 
 				if err := json.NewDecoder(&buf).Decode(&jsonWebKey); err != nil {
-					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not decode key from `%s` to JSON: %s", src, err)
+					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not decode key from `%s` from JSON: %s", src, err)
 					return cmdx.FailSilently(cmd)
 				}
 
@@ -107,7 +110,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 					return cmdx.FailSilently(cmd)
 				}
 
-				keys[src] = append(keys[src], jsonWebKey)
+				keys[src] = append(keys[src], hydra.JsonWebKey(jsonWebKey))
 			}
 
 			imported := make([]hydra.JsonWebKey, 0, len(keys))

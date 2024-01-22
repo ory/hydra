@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the RFC6749ErrorJson type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &RFC6749ErrorJson{}
+
 // RFC6749ErrorJson struct for RFC6749ErrorJson
 type RFC6749ErrorJson struct {
 	Error            *string `json:"error,omitempty"`
@@ -43,7 +46,7 @@ func NewRFC6749ErrorJsonWithDefaults() *RFC6749ErrorJson {
 
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *RFC6749ErrorJson) GetError() string {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		var ret string
 		return ret
 	}
@@ -53,7 +56,7 @@ func (o *RFC6749ErrorJson) GetError() string {
 // GetErrorOk returns a tuple with the Error field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RFC6749ErrorJson) GetErrorOk() (*string, bool) {
-	if o == nil || o.Error == nil {
+	if o == nil || IsNil(o.Error) {
 		return nil, false
 	}
 	return o.Error, true
@@ -61,7 +64,7 @@ func (o *RFC6749ErrorJson) GetErrorOk() (*string, bool) {
 
 // HasError returns a boolean if a field has been set.
 func (o *RFC6749ErrorJson) HasError() bool {
-	if o != nil && o.Error != nil {
+	if o != nil && !IsNil(o.Error) {
 		return true
 	}
 
@@ -75,7 +78,7 @@ func (o *RFC6749ErrorJson) SetError(v string) {
 
 // GetErrorDebug returns the ErrorDebug field value if set, zero value otherwise.
 func (o *RFC6749ErrorJson) GetErrorDebug() string {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		var ret string
 		return ret
 	}
@@ -85,7 +88,7 @@ func (o *RFC6749ErrorJson) GetErrorDebug() string {
 // GetErrorDebugOk returns a tuple with the ErrorDebug field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RFC6749ErrorJson) GetErrorDebugOk() (*string, bool) {
-	if o == nil || o.ErrorDebug == nil {
+	if o == nil || IsNil(o.ErrorDebug) {
 		return nil, false
 	}
 	return o.ErrorDebug, true
@@ -93,7 +96,7 @@ func (o *RFC6749ErrorJson) GetErrorDebugOk() (*string, bool) {
 
 // HasErrorDebug returns a boolean if a field has been set.
 func (o *RFC6749ErrorJson) HasErrorDebug() bool {
-	if o != nil && o.ErrorDebug != nil {
+	if o != nil && !IsNil(o.ErrorDebug) {
 		return true
 	}
 
@@ -107,7 +110,7 @@ func (o *RFC6749ErrorJson) SetErrorDebug(v string) {
 
 // GetErrorDescription returns the ErrorDescription field value if set, zero value otherwise.
 func (o *RFC6749ErrorJson) GetErrorDescription() string {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		var ret string
 		return ret
 	}
@@ -117,7 +120,7 @@ func (o *RFC6749ErrorJson) GetErrorDescription() string {
 // GetErrorDescriptionOk returns a tuple with the ErrorDescription field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RFC6749ErrorJson) GetErrorDescriptionOk() (*string, bool) {
-	if o == nil || o.ErrorDescription == nil {
+	if o == nil || IsNil(o.ErrorDescription) {
 		return nil, false
 	}
 	return o.ErrorDescription, true
@@ -125,7 +128,7 @@ func (o *RFC6749ErrorJson) GetErrorDescriptionOk() (*string, bool) {
 
 // HasErrorDescription returns a boolean if a field has been set.
 func (o *RFC6749ErrorJson) HasErrorDescription() bool {
-	if o != nil && o.ErrorDescription != nil {
+	if o != nil && !IsNil(o.ErrorDescription) {
 		return true
 	}
 
@@ -139,7 +142,7 @@ func (o *RFC6749ErrorJson) SetErrorDescription(v string) {
 
 // GetErrorHint returns the ErrorHint field value if set, zero value otherwise.
 func (o *RFC6749ErrorJson) GetErrorHint() string {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		var ret string
 		return ret
 	}
@@ -149,7 +152,7 @@ func (o *RFC6749ErrorJson) GetErrorHint() string {
 // GetErrorHintOk returns a tuple with the ErrorHint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RFC6749ErrorJson) GetErrorHintOk() (*string, bool) {
-	if o == nil || o.ErrorHint == nil {
+	if o == nil || IsNil(o.ErrorHint) {
 		return nil, false
 	}
 	return o.ErrorHint, true
@@ -157,7 +160,7 @@ func (o *RFC6749ErrorJson) GetErrorHintOk() (*string, bool) {
 
 // HasErrorHint returns a boolean if a field has been set.
 func (o *RFC6749ErrorJson) HasErrorHint() bool {
-	if o != nil && o.ErrorHint != nil {
+	if o != nil && !IsNil(o.ErrorHint) {
 		return true
 	}
 
@@ -171,7 +174,7 @@ func (o *RFC6749ErrorJson) SetErrorHint(v string) {
 
 // GetStatusCode returns the StatusCode field value if set, zero value otherwise.
 func (o *RFC6749ErrorJson) GetStatusCode() int64 {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		var ret int64
 		return ret
 	}
@@ -181,7 +184,7 @@ func (o *RFC6749ErrorJson) GetStatusCode() int64 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RFC6749ErrorJson) GetStatusCodeOk() (*int64, bool) {
-	if o == nil || o.StatusCode == nil {
+	if o == nil || IsNil(o.StatusCode) {
 		return nil, false
 	}
 	return o.StatusCode, true
@@ -189,7 +192,7 @@ func (o *RFC6749ErrorJson) GetStatusCodeOk() (*int64, bool) {
 
 // HasStatusCode returns a boolean if a field has been set.
 func (o *RFC6749ErrorJson) HasStatusCode() bool {
-	if o != nil && o.StatusCode != nil {
+	if o != nil && !IsNil(o.StatusCode) {
 		return true
 	}
 
@@ -202,23 +205,31 @@ func (o *RFC6749ErrorJson) SetStatusCode(v int64) {
 }
 
 func (o RFC6749ErrorJson) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Error != nil {
-		toSerialize["error"] = o.Error
-	}
-	if o.ErrorDebug != nil {
-		toSerialize["error_debug"] = o.ErrorDebug
-	}
-	if o.ErrorDescription != nil {
-		toSerialize["error_description"] = o.ErrorDescription
-	}
-	if o.ErrorHint != nil {
-		toSerialize["error_hint"] = o.ErrorHint
-	}
-	if o.StatusCode != nil {
-		toSerialize["status_code"] = o.StatusCode
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o RFC6749ErrorJson) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Error) {
+		toSerialize["error"] = o.Error
+	}
+	if !IsNil(o.ErrorDebug) {
+		toSerialize["error_debug"] = o.ErrorDebug
+	}
+	if !IsNil(o.ErrorDescription) {
+		toSerialize["error_description"] = o.ErrorDescription
+	}
+	if !IsNil(o.ErrorHint) {
+		toSerialize["error_hint"] = o.ErrorHint
+	}
+	if !IsNil(o.StatusCode) {
+		toSerialize["status_code"] = o.StatusCode
+	}
+	return toSerialize, nil
 }
 
 type NullableRFC6749ErrorJson struct {

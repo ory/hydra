@@ -16,6 +16,9 @@ import (
 	"time"
 )
 
+// checks if the OAuth2Client type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &OAuth2Client{}
+
 // OAuth2Client OAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 type OAuth2Client struct {
 	// OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens Setting the stragegy here overrides the global setting in `strategies.access_token`.
@@ -128,7 +131,7 @@ func NewOAuth2ClientWithDefaults() *OAuth2Client {
 
 // GetAccessTokenStrategy returns the AccessTokenStrategy field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAccessTokenStrategy() string {
-	if o == nil || o.AccessTokenStrategy == nil {
+	if o == nil || IsNil(o.AccessTokenStrategy) {
 		var ret string
 		return ret
 	}
@@ -138,7 +141,7 @@ func (o *OAuth2Client) GetAccessTokenStrategy() string {
 // GetAccessTokenStrategyOk returns a tuple with the AccessTokenStrategy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAccessTokenStrategyOk() (*string, bool) {
-	if o == nil || o.AccessTokenStrategy == nil {
+	if o == nil || IsNil(o.AccessTokenStrategy) {
 		return nil, false
 	}
 	return o.AccessTokenStrategy, true
@@ -146,7 +149,7 @@ func (o *OAuth2Client) GetAccessTokenStrategyOk() (*string, bool) {
 
 // HasAccessTokenStrategy returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAccessTokenStrategy() bool {
-	if o != nil && o.AccessTokenStrategy != nil {
+	if o != nil && !IsNil(o.AccessTokenStrategy) {
 		return true
 	}
 
@@ -160,7 +163,7 @@ func (o *OAuth2Client) SetAccessTokenStrategy(v string) {
 
 // GetAllowedCorsOrigins returns the AllowedCorsOrigins field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAllowedCorsOrigins() []string {
-	if o == nil || o.AllowedCorsOrigins == nil {
+	if o == nil || IsNil(o.AllowedCorsOrigins) {
 		var ret []string
 		return ret
 	}
@@ -170,7 +173,7 @@ func (o *OAuth2Client) GetAllowedCorsOrigins() []string {
 // GetAllowedCorsOriginsOk returns a tuple with the AllowedCorsOrigins field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAllowedCorsOriginsOk() ([]string, bool) {
-	if o == nil || o.AllowedCorsOrigins == nil {
+	if o == nil || IsNil(o.AllowedCorsOrigins) {
 		return nil, false
 	}
 	return o.AllowedCorsOrigins, true
@@ -178,7 +181,7 @@ func (o *OAuth2Client) GetAllowedCorsOriginsOk() ([]string, bool) {
 
 // HasAllowedCorsOrigins returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAllowedCorsOrigins() bool {
-	if o != nil && o.AllowedCorsOrigins != nil {
+	if o != nil && !IsNil(o.AllowedCorsOrigins) {
 		return true
 	}
 
@@ -192,7 +195,7 @@ func (o *OAuth2Client) SetAllowedCorsOrigins(v []string) {
 
 // GetAudience returns the Audience field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAudience() []string {
-	if o == nil || o.Audience == nil {
+	if o == nil || IsNil(o.Audience) {
 		var ret []string
 		return ret
 	}
@@ -202,7 +205,7 @@ func (o *OAuth2Client) GetAudience() []string {
 // GetAudienceOk returns a tuple with the Audience field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAudienceOk() ([]string, bool) {
-	if o == nil || o.Audience == nil {
+	if o == nil || IsNil(o.Audience) {
 		return nil, false
 	}
 	return o.Audience, true
@@ -210,7 +213,7 @@ func (o *OAuth2Client) GetAudienceOk() ([]string, bool) {
 
 // HasAudience returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAudience() bool {
-	if o != nil && o.Audience != nil {
+	if o != nil && !IsNil(o.Audience) {
 		return true
 	}
 
@@ -224,7 +227,7 @@ func (o *OAuth2Client) SetAudience(v []string) {
 
 // GetAuthorizationCodeGrantAccessTokenLifespan returns the AuthorizationCodeGrantAccessTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespan() string {
-	if o == nil || o.AuthorizationCodeGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantAccessTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -234,7 +237,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespan() string {
 // GetAuthorizationCodeGrantAccessTokenLifespanOk returns a tuple with the AuthorizationCodeGrantAccessTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string, bool) {
-	if o == nil || o.AuthorizationCodeGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantAccessTokenLifespan) {
 		return nil, false
 	}
 	return o.AuthorizationCodeGrantAccessTokenLifespan, true
@@ -242,7 +245,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantAccessTokenLifespanOk() (*string
 
 // HasAuthorizationCodeGrantAccessTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAuthorizationCodeGrantAccessTokenLifespan() bool {
-	if o != nil && o.AuthorizationCodeGrantAccessTokenLifespan != nil {
+	if o != nil && !IsNil(o.AuthorizationCodeGrantAccessTokenLifespan) {
 		return true
 	}
 
@@ -256,7 +259,7 @@ func (o *OAuth2Client) SetAuthorizationCodeGrantAccessTokenLifespan(v string) {
 
 // GetAuthorizationCodeGrantIdTokenLifespan returns the AuthorizationCodeGrantIdTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespan() string {
-	if o == nil || o.AuthorizationCodeGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantIdTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -266,7 +269,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespan() string {
 // GetAuthorizationCodeGrantIdTokenLifespanOk returns a tuple with the AuthorizationCodeGrantIdTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bool) {
-	if o == nil || o.AuthorizationCodeGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantIdTokenLifespan) {
 		return nil, false
 	}
 	return o.AuthorizationCodeGrantIdTokenLifespan, true
@@ -274,7 +277,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantIdTokenLifespanOk() (*string, bo
 
 // HasAuthorizationCodeGrantIdTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAuthorizationCodeGrantIdTokenLifespan() bool {
-	if o != nil && o.AuthorizationCodeGrantIdTokenLifespan != nil {
+	if o != nil && !IsNil(o.AuthorizationCodeGrantIdTokenLifespan) {
 		return true
 	}
 
@@ -288,7 +291,7 @@ func (o *OAuth2Client) SetAuthorizationCodeGrantIdTokenLifespan(v string) {
 
 // GetAuthorizationCodeGrantRefreshTokenLifespan returns the AuthorizationCodeGrantRefreshTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespan() string {
-	if o == nil || o.AuthorizationCodeGrantRefreshTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantRefreshTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -298,7 +301,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespan() string {
 // GetAuthorizationCodeGrantRefreshTokenLifespanOk returns a tuple with the AuthorizationCodeGrantRefreshTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*string, bool) {
-	if o == nil || o.AuthorizationCodeGrantRefreshTokenLifespan == nil {
+	if o == nil || IsNil(o.AuthorizationCodeGrantRefreshTokenLifespan) {
 		return nil, false
 	}
 	return o.AuthorizationCodeGrantRefreshTokenLifespan, true
@@ -306,7 +309,7 @@ func (o *OAuth2Client) GetAuthorizationCodeGrantRefreshTokenLifespanOk() (*strin
 
 // HasAuthorizationCodeGrantRefreshTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasAuthorizationCodeGrantRefreshTokenLifespan() bool {
-	if o != nil && o.AuthorizationCodeGrantRefreshTokenLifespan != nil {
+	if o != nil && !IsNil(o.AuthorizationCodeGrantRefreshTokenLifespan) {
 		return true
 	}
 
@@ -320,7 +323,7 @@ func (o *OAuth2Client) SetAuthorizationCodeGrantRefreshTokenLifespan(v string) {
 
 // GetBackchannelLogoutSessionRequired returns the BackchannelLogoutSessionRequired field value if set, zero value otherwise.
 func (o *OAuth2Client) GetBackchannelLogoutSessionRequired() bool {
-	if o == nil || o.BackchannelLogoutSessionRequired == nil {
+	if o == nil || IsNil(o.BackchannelLogoutSessionRequired) {
 		var ret bool
 		return ret
 	}
@@ -330,7 +333,7 @@ func (o *OAuth2Client) GetBackchannelLogoutSessionRequired() bool {
 // GetBackchannelLogoutSessionRequiredOk returns a tuple with the BackchannelLogoutSessionRequired field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetBackchannelLogoutSessionRequiredOk() (*bool, bool) {
-	if o == nil || o.BackchannelLogoutSessionRequired == nil {
+	if o == nil || IsNil(o.BackchannelLogoutSessionRequired) {
 		return nil, false
 	}
 	return o.BackchannelLogoutSessionRequired, true
@@ -338,7 +341,7 @@ func (o *OAuth2Client) GetBackchannelLogoutSessionRequiredOk() (*bool, bool) {
 
 // HasBackchannelLogoutSessionRequired returns a boolean if a field has been set.
 func (o *OAuth2Client) HasBackchannelLogoutSessionRequired() bool {
-	if o != nil && o.BackchannelLogoutSessionRequired != nil {
+	if o != nil && !IsNil(o.BackchannelLogoutSessionRequired) {
 		return true
 	}
 
@@ -352,7 +355,7 @@ func (o *OAuth2Client) SetBackchannelLogoutSessionRequired(v bool) {
 
 // GetBackchannelLogoutUri returns the BackchannelLogoutUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetBackchannelLogoutUri() string {
-	if o == nil || o.BackchannelLogoutUri == nil {
+	if o == nil || IsNil(o.BackchannelLogoutUri) {
 		var ret string
 		return ret
 	}
@@ -362,7 +365,7 @@ func (o *OAuth2Client) GetBackchannelLogoutUri() string {
 // GetBackchannelLogoutUriOk returns a tuple with the BackchannelLogoutUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetBackchannelLogoutUriOk() (*string, bool) {
-	if o == nil || o.BackchannelLogoutUri == nil {
+	if o == nil || IsNil(o.BackchannelLogoutUri) {
 		return nil, false
 	}
 	return o.BackchannelLogoutUri, true
@@ -370,7 +373,7 @@ func (o *OAuth2Client) GetBackchannelLogoutUriOk() (*string, bool) {
 
 // HasBackchannelLogoutUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasBackchannelLogoutUri() bool {
-	if o != nil && o.BackchannelLogoutUri != nil {
+	if o != nil && !IsNil(o.BackchannelLogoutUri) {
 		return true
 	}
 
@@ -384,7 +387,7 @@ func (o *OAuth2Client) SetBackchannelLogoutUri(v string) {
 
 // GetClientCredentialsGrantAccessTokenLifespan returns the ClientCredentialsGrantAccessTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespan() string {
-	if o == nil || o.ClientCredentialsGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.ClientCredentialsGrantAccessTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -394,7 +397,7 @@ func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespan() string {
 // GetClientCredentialsGrantAccessTokenLifespanOk returns a tuple with the ClientCredentialsGrantAccessTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespanOk() (*string, bool) {
-	if o == nil || o.ClientCredentialsGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.ClientCredentialsGrantAccessTokenLifespan) {
 		return nil, false
 	}
 	return o.ClientCredentialsGrantAccessTokenLifespan, true
@@ -402,7 +405,7 @@ func (o *OAuth2Client) GetClientCredentialsGrantAccessTokenLifespanOk() (*string
 
 // HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientCredentialsGrantAccessTokenLifespan() bool {
-	if o != nil && o.ClientCredentialsGrantAccessTokenLifespan != nil {
+	if o != nil && !IsNil(o.ClientCredentialsGrantAccessTokenLifespan) {
 		return true
 	}
 
@@ -416,7 +419,7 @@ func (o *OAuth2Client) SetClientCredentialsGrantAccessTokenLifespan(v string) {
 
 // GetClientId returns the ClientId field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientId() string {
-	if o == nil || o.ClientId == nil {
+	if o == nil || IsNil(o.ClientId) {
 		var ret string
 		return ret
 	}
@@ -426,7 +429,7 @@ func (o *OAuth2Client) GetClientId() string {
 // GetClientIdOk returns a tuple with the ClientId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientIdOk() (*string, bool) {
-	if o == nil || o.ClientId == nil {
+	if o == nil || IsNil(o.ClientId) {
 		return nil, false
 	}
 	return o.ClientId, true
@@ -434,7 +437,7 @@ func (o *OAuth2Client) GetClientIdOk() (*string, bool) {
 
 // HasClientId returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientId() bool {
-	if o != nil && o.ClientId != nil {
+	if o != nil && !IsNil(o.ClientId) {
 		return true
 	}
 
@@ -448,7 +451,7 @@ func (o *OAuth2Client) SetClientId(v string) {
 
 // GetClientName returns the ClientName field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientName() string {
-	if o == nil || o.ClientName == nil {
+	if o == nil || IsNil(o.ClientName) {
 		var ret string
 		return ret
 	}
@@ -458,7 +461,7 @@ func (o *OAuth2Client) GetClientName() string {
 // GetClientNameOk returns a tuple with the ClientName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientNameOk() (*string, bool) {
-	if o == nil || o.ClientName == nil {
+	if o == nil || IsNil(o.ClientName) {
 		return nil, false
 	}
 	return o.ClientName, true
@@ -466,7 +469,7 @@ func (o *OAuth2Client) GetClientNameOk() (*string, bool) {
 
 // HasClientName returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientName() bool {
-	if o != nil && o.ClientName != nil {
+	if o != nil && !IsNil(o.ClientName) {
 		return true
 	}
 
@@ -480,7 +483,7 @@ func (o *OAuth2Client) SetClientName(v string) {
 
 // GetClientSecret returns the ClientSecret field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientSecret() string {
-	if o == nil || o.ClientSecret == nil {
+	if o == nil || IsNil(o.ClientSecret) {
 		var ret string
 		return ret
 	}
@@ -490,7 +493,7 @@ func (o *OAuth2Client) GetClientSecret() string {
 // GetClientSecretOk returns a tuple with the ClientSecret field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientSecretOk() (*string, bool) {
-	if o == nil || o.ClientSecret == nil {
+	if o == nil || IsNil(o.ClientSecret) {
 		return nil, false
 	}
 	return o.ClientSecret, true
@@ -498,7 +501,7 @@ func (o *OAuth2Client) GetClientSecretOk() (*string, bool) {
 
 // HasClientSecret returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientSecret() bool {
-	if o != nil && o.ClientSecret != nil {
+	if o != nil && !IsNil(o.ClientSecret) {
 		return true
 	}
 
@@ -512,7 +515,7 @@ func (o *OAuth2Client) SetClientSecret(v string) {
 
 // GetClientSecretExpiresAt returns the ClientSecretExpiresAt field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientSecretExpiresAt() int64 {
-	if o == nil || o.ClientSecretExpiresAt == nil {
+	if o == nil || IsNil(o.ClientSecretExpiresAt) {
 		var ret int64
 		return ret
 	}
@@ -522,7 +525,7 @@ func (o *OAuth2Client) GetClientSecretExpiresAt() int64 {
 // GetClientSecretExpiresAtOk returns a tuple with the ClientSecretExpiresAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientSecretExpiresAtOk() (*int64, bool) {
-	if o == nil || o.ClientSecretExpiresAt == nil {
+	if o == nil || IsNil(o.ClientSecretExpiresAt) {
 		return nil, false
 	}
 	return o.ClientSecretExpiresAt, true
@@ -530,7 +533,7 @@ func (o *OAuth2Client) GetClientSecretExpiresAtOk() (*int64, bool) {
 
 // HasClientSecretExpiresAt returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientSecretExpiresAt() bool {
-	if o != nil && o.ClientSecretExpiresAt != nil {
+	if o != nil && !IsNil(o.ClientSecretExpiresAt) {
 		return true
 	}
 
@@ -544,7 +547,7 @@ func (o *OAuth2Client) SetClientSecretExpiresAt(v int64) {
 
 // GetClientUri returns the ClientUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetClientUri() string {
-	if o == nil || o.ClientUri == nil {
+	if o == nil || IsNil(o.ClientUri) {
 		var ret string
 		return ret
 	}
@@ -554,7 +557,7 @@ func (o *OAuth2Client) GetClientUri() string {
 // GetClientUriOk returns a tuple with the ClientUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetClientUriOk() (*string, bool) {
-	if o == nil || o.ClientUri == nil {
+	if o == nil || IsNil(o.ClientUri) {
 		return nil, false
 	}
 	return o.ClientUri, true
@@ -562,7 +565,7 @@ func (o *OAuth2Client) GetClientUriOk() (*string, bool) {
 
 // HasClientUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasClientUri() bool {
-	if o != nil && o.ClientUri != nil {
+	if o != nil && !IsNil(o.ClientUri) {
 		return true
 	}
 
@@ -576,7 +579,7 @@ func (o *OAuth2Client) SetClientUri(v string) {
 
 // GetContacts returns the Contacts field value if set, zero value otherwise.
 func (o *OAuth2Client) GetContacts() []string {
-	if o == nil || o.Contacts == nil {
+	if o == nil || IsNil(o.Contacts) {
 		var ret []string
 		return ret
 	}
@@ -586,7 +589,7 @@ func (o *OAuth2Client) GetContacts() []string {
 // GetContactsOk returns a tuple with the Contacts field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetContactsOk() ([]string, bool) {
-	if o == nil || o.Contacts == nil {
+	if o == nil || IsNil(o.Contacts) {
 		return nil, false
 	}
 	return o.Contacts, true
@@ -594,7 +597,7 @@ func (o *OAuth2Client) GetContactsOk() ([]string, bool) {
 
 // HasContacts returns a boolean if a field has been set.
 func (o *OAuth2Client) HasContacts() bool {
-	if o != nil && o.Contacts != nil {
+	if o != nil && !IsNil(o.Contacts) {
 		return true
 	}
 
@@ -608,7 +611,7 @@ func (o *OAuth2Client) SetContacts(v []string) {
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *OAuth2Client) GetCreatedAt() time.Time {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || IsNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -618,7 +621,7 @@ func (o *OAuth2Client) GetCreatedAt() time.Time {
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetCreatedAtOk() (*time.Time, bool) {
-	if o == nil || o.CreatedAt == nil {
+	if o == nil || IsNil(o.CreatedAt) {
 		return nil, false
 	}
 	return o.CreatedAt, true
@@ -626,7 +629,7 @@ func (o *OAuth2Client) GetCreatedAtOk() (*time.Time, bool) {
 
 // HasCreatedAt returns a boolean if a field has been set.
 func (o *OAuth2Client) HasCreatedAt() bool {
-	if o != nil && o.CreatedAt != nil {
+	if o != nil && !IsNil(o.CreatedAt) {
 		return true
 	}
 
@@ -640,7 +643,7 @@ func (o *OAuth2Client) SetCreatedAt(v time.Time) {
 
 // GetFrontchannelLogoutSessionRequired returns the FrontchannelLogoutSessionRequired field value if set, zero value otherwise.
 func (o *OAuth2Client) GetFrontchannelLogoutSessionRequired() bool {
-	if o == nil || o.FrontchannelLogoutSessionRequired == nil {
+	if o == nil || IsNil(o.FrontchannelLogoutSessionRequired) {
 		var ret bool
 		return ret
 	}
@@ -650,7 +653,7 @@ func (o *OAuth2Client) GetFrontchannelLogoutSessionRequired() bool {
 // GetFrontchannelLogoutSessionRequiredOk returns a tuple with the FrontchannelLogoutSessionRequired field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetFrontchannelLogoutSessionRequiredOk() (*bool, bool) {
-	if o == nil || o.FrontchannelLogoutSessionRequired == nil {
+	if o == nil || IsNil(o.FrontchannelLogoutSessionRequired) {
 		return nil, false
 	}
 	return o.FrontchannelLogoutSessionRequired, true
@@ -658,7 +661,7 @@ func (o *OAuth2Client) GetFrontchannelLogoutSessionRequiredOk() (*bool, bool) {
 
 // HasFrontchannelLogoutSessionRequired returns a boolean if a field has been set.
 func (o *OAuth2Client) HasFrontchannelLogoutSessionRequired() bool {
-	if o != nil && o.FrontchannelLogoutSessionRequired != nil {
+	if o != nil && !IsNil(o.FrontchannelLogoutSessionRequired) {
 		return true
 	}
 
@@ -672,7 +675,7 @@ func (o *OAuth2Client) SetFrontchannelLogoutSessionRequired(v bool) {
 
 // GetFrontchannelLogoutUri returns the FrontchannelLogoutUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetFrontchannelLogoutUri() string {
-	if o == nil || o.FrontchannelLogoutUri == nil {
+	if o == nil || IsNil(o.FrontchannelLogoutUri) {
 		var ret string
 		return ret
 	}
@@ -682,7 +685,7 @@ func (o *OAuth2Client) GetFrontchannelLogoutUri() string {
 // GetFrontchannelLogoutUriOk returns a tuple with the FrontchannelLogoutUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetFrontchannelLogoutUriOk() (*string, bool) {
-	if o == nil || o.FrontchannelLogoutUri == nil {
+	if o == nil || IsNil(o.FrontchannelLogoutUri) {
 		return nil, false
 	}
 	return o.FrontchannelLogoutUri, true
@@ -690,7 +693,7 @@ func (o *OAuth2Client) GetFrontchannelLogoutUriOk() (*string, bool) {
 
 // HasFrontchannelLogoutUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasFrontchannelLogoutUri() bool {
-	if o != nil && o.FrontchannelLogoutUri != nil {
+	if o != nil && !IsNil(o.FrontchannelLogoutUri) {
 		return true
 	}
 
@@ -704,7 +707,7 @@ func (o *OAuth2Client) SetFrontchannelLogoutUri(v string) {
 
 // GetGrantTypes returns the GrantTypes field value if set, zero value otherwise.
 func (o *OAuth2Client) GetGrantTypes() []string {
-	if o == nil || o.GrantTypes == nil {
+	if o == nil || IsNil(o.GrantTypes) {
 		var ret []string
 		return ret
 	}
@@ -714,7 +717,7 @@ func (o *OAuth2Client) GetGrantTypes() []string {
 // GetGrantTypesOk returns a tuple with the GrantTypes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetGrantTypesOk() ([]string, bool) {
-	if o == nil || o.GrantTypes == nil {
+	if o == nil || IsNil(o.GrantTypes) {
 		return nil, false
 	}
 	return o.GrantTypes, true
@@ -722,7 +725,7 @@ func (o *OAuth2Client) GetGrantTypesOk() ([]string, bool) {
 
 // HasGrantTypes returns a boolean if a field has been set.
 func (o *OAuth2Client) HasGrantTypes() bool {
-	if o != nil && o.GrantTypes != nil {
+	if o != nil && !IsNil(o.GrantTypes) {
 		return true
 	}
 
@@ -736,7 +739,7 @@ func (o *OAuth2Client) SetGrantTypes(v []string) {
 
 // GetImplicitGrantAccessTokenLifespan returns the ImplicitGrantAccessTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespan() string {
-	if o == nil || o.ImplicitGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.ImplicitGrantAccessTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -746,7 +749,7 @@ func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespan() string {
 // GetImplicitGrantAccessTokenLifespanOk returns a tuple with the ImplicitGrantAccessTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespanOk() (*string, bool) {
-	if o == nil || o.ImplicitGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.ImplicitGrantAccessTokenLifespan) {
 		return nil, false
 	}
 	return o.ImplicitGrantAccessTokenLifespan, true
@@ -754,7 +757,7 @@ func (o *OAuth2Client) GetImplicitGrantAccessTokenLifespanOk() (*string, bool) {
 
 // HasImplicitGrantAccessTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasImplicitGrantAccessTokenLifespan() bool {
-	if o != nil && o.ImplicitGrantAccessTokenLifespan != nil {
+	if o != nil && !IsNil(o.ImplicitGrantAccessTokenLifespan) {
 		return true
 	}
 
@@ -768,7 +771,7 @@ func (o *OAuth2Client) SetImplicitGrantAccessTokenLifespan(v string) {
 
 // GetImplicitGrantIdTokenLifespan returns the ImplicitGrantIdTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetImplicitGrantIdTokenLifespan() string {
-	if o == nil || o.ImplicitGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.ImplicitGrantIdTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -778,7 +781,7 @@ func (o *OAuth2Client) GetImplicitGrantIdTokenLifespan() string {
 // GetImplicitGrantIdTokenLifespanOk returns a tuple with the ImplicitGrantIdTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetImplicitGrantIdTokenLifespanOk() (*string, bool) {
-	if o == nil || o.ImplicitGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.ImplicitGrantIdTokenLifespan) {
 		return nil, false
 	}
 	return o.ImplicitGrantIdTokenLifespan, true
@@ -786,7 +789,7 @@ func (o *OAuth2Client) GetImplicitGrantIdTokenLifespanOk() (*string, bool) {
 
 // HasImplicitGrantIdTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasImplicitGrantIdTokenLifespan() bool {
-	if o != nil && o.ImplicitGrantIdTokenLifespan != nil {
+	if o != nil && !IsNil(o.ImplicitGrantIdTokenLifespan) {
 		return true
 	}
 
@@ -811,7 +814,7 @@ func (o *OAuth2Client) GetJwks() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *OAuth2Client) GetJwksOk() (*interface{}, bool) {
-	if o == nil || o.Jwks == nil {
+	if o == nil || IsNil(o.Jwks) {
 		return nil, false
 	}
 	return &o.Jwks, true
@@ -819,7 +822,7 @@ func (o *OAuth2Client) GetJwksOk() (*interface{}, bool) {
 
 // HasJwks returns a boolean if a field has been set.
 func (o *OAuth2Client) HasJwks() bool {
-	if o != nil && o.Jwks != nil {
+	if o != nil && IsNil(o.Jwks) {
 		return true
 	}
 
@@ -833,7 +836,7 @@ func (o *OAuth2Client) SetJwks(v interface{}) {
 
 // GetJwksUri returns the JwksUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetJwksUri() string {
-	if o == nil || o.JwksUri == nil {
+	if o == nil || IsNil(o.JwksUri) {
 		var ret string
 		return ret
 	}
@@ -843,7 +846,7 @@ func (o *OAuth2Client) GetJwksUri() string {
 // GetJwksUriOk returns a tuple with the JwksUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetJwksUriOk() (*string, bool) {
-	if o == nil || o.JwksUri == nil {
+	if o == nil || IsNil(o.JwksUri) {
 		return nil, false
 	}
 	return o.JwksUri, true
@@ -851,7 +854,7 @@ func (o *OAuth2Client) GetJwksUriOk() (*string, bool) {
 
 // HasJwksUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasJwksUri() bool {
-	if o != nil && o.JwksUri != nil {
+	if o != nil && !IsNil(o.JwksUri) {
 		return true
 	}
 
@@ -865,7 +868,7 @@ func (o *OAuth2Client) SetJwksUri(v string) {
 
 // GetJwtBearerGrantAccessTokenLifespan returns the JwtBearerGrantAccessTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespan() string {
-	if o == nil || o.JwtBearerGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.JwtBearerGrantAccessTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -875,7 +878,7 @@ func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespan() string {
 // GetJwtBearerGrantAccessTokenLifespanOk returns a tuple with the JwtBearerGrantAccessTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool) {
-	if o == nil || o.JwtBearerGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.JwtBearerGrantAccessTokenLifespan) {
 		return nil, false
 	}
 	return o.JwtBearerGrantAccessTokenLifespan, true
@@ -883,7 +886,7 @@ func (o *OAuth2Client) GetJwtBearerGrantAccessTokenLifespanOk() (*string, bool) 
 
 // HasJwtBearerGrantAccessTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasJwtBearerGrantAccessTokenLifespan() bool {
-	if o != nil && o.JwtBearerGrantAccessTokenLifespan != nil {
+	if o != nil && !IsNil(o.JwtBearerGrantAccessTokenLifespan) {
 		return true
 	}
 
@@ -897,7 +900,7 @@ func (o *OAuth2Client) SetJwtBearerGrantAccessTokenLifespan(v string) {
 
 // GetLogoUri returns the LogoUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetLogoUri() string {
-	if o == nil || o.LogoUri == nil {
+	if o == nil || IsNil(o.LogoUri) {
 		var ret string
 		return ret
 	}
@@ -907,7 +910,7 @@ func (o *OAuth2Client) GetLogoUri() string {
 // GetLogoUriOk returns a tuple with the LogoUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetLogoUriOk() (*string, bool) {
-	if o == nil || o.LogoUri == nil {
+	if o == nil || IsNil(o.LogoUri) {
 		return nil, false
 	}
 	return o.LogoUri, true
@@ -915,7 +918,7 @@ func (o *OAuth2Client) GetLogoUriOk() (*string, bool) {
 
 // HasLogoUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasLogoUri() bool {
-	if o != nil && o.LogoUri != nil {
+	if o != nil && !IsNil(o.LogoUri) {
 		return true
 	}
 
@@ -940,7 +943,7 @@ func (o *OAuth2Client) GetMetadata() interface{} {
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *OAuth2Client) GetMetadataOk() (*interface{}, bool) {
-	if o == nil || o.Metadata == nil {
+	if o == nil || IsNil(o.Metadata) {
 		return nil, false
 	}
 	return &o.Metadata, true
@@ -948,7 +951,7 @@ func (o *OAuth2Client) GetMetadataOk() (*interface{}, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *OAuth2Client) HasMetadata() bool {
-	if o != nil && o.Metadata != nil {
+	if o != nil && IsNil(o.Metadata) {
 		return true
 	}
 
@@ -962,7 +965,7 @@ func (o *OAuth2Client) SetMetadata(v interface{}) {
 
 // GetOwner returns the Owner field value if set, zero value otherwise.
 func (o *OAuth2Client) GetOwner() string {
-	if o == nil || o.Owner == nil {
+	if o == nil || IsNil(o.Owner) {
 		var ret string
 		return ret
 	}
@@ -972,7 +975,7 @@ func (o *OAuth2Client) GetOwner() string {
 // GetOwnerOk returns a tuple with the Owner field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetOwnerOk() (*string, bool) {
-	if o == nil || o.Owner == nil {
+	if o == nil || IsNil(o.Owner) {
 		return nil, false
 	}
 	return o.Owner, true
@@ -980,7 +983,7 @@ func (o *OAuth2Client) GetOwnerOk() (*string, bool) {
 
 // HasOwner returns a boolean if a field has been set.
 func (o *OAuth2Client) HasOwner() bool {
-	if o != nil && o.Owner != nil {
+	if o != nil && !IsNil(o.Owner) {
 		return true
 	}
 
@@ -994,7 +997,7 @@ func (o *OAuth2Client) SetOwner(v string) {
 
 // GetPolicyUri returns the PolicyUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetPolicyUri() string {
-	if o == nil || o.PolicyUri == nil {
+	if o == nil || IsNil(o.PolicyUri) {
 		var ret string
 		return ret
 	}
@@ -1004,7 +1007,7 @@ func (o *OAuth2Client) GetPolicyUri() string {
 // GetPolicyUriOk returns a tuple with the PolicyUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetPolicyUriOk() (*string, bool) {
-	if o == nil || o.PolicyUri == nil {
+	if o == nil || IsNil(o.PolicyUri) {
 		return nil, false
 	}
 	return o.PolicyUri, true
@@ -1012,7 +1015,7 @@ func (o *OAuth2Client) GetPolicyUriOk() (*string, bool) {
 
 // HasPolicyUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasPolicyUri() bool {
-	if o != nil && o.PolicyUri != nil {
+	if o != nil && !IsNil(o.PolicyUri) {
 		return true
 	}
 
@@ -1026,7 +1029,7 @@ func (o *OAuth2Client) SetPolicyUri(v string) {
 
 // GetPostLogoutRedirectUris returns the PostLogoutRedirectUris field value if set, zero value otherwise.
 func (o *OAuth2Client) GetPostLogoutRedirectUris() []string {
-	if o == nil || o.PostLogoutRedirectUris == nil {
+	if o == nil || IsNil(o.PostLogoutRedirectUris) {
 		var ret []string
 		return ret
 	}
@@ -1036,7 +1039,7 @@ func (o *OAuth2Client) GetPostLogoutRedirectUris() []string {
 // GetPostLogoutRedirectUrisOk returns a tuple with the PostLogoutRedirectUris field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetPostLogoutRedirectUrisOk() ([]string, bool) {
-	if o == nil || o.PostLogoutRedirectUris == nil {
+	if o == nil || IsNil(o.PostLogoutRedirectUris) {
 		return nil, false
 	}
 	return o.PostLogoutRedirectUris, true
@@ -1044,7 +1047,7 @@ func (o *OAuth2Client) GetPostLogoutRedirectUrisOk() ([]string, bool) {
 
 // HasPostLogoutRedirectUris returns a boolean if a field has been set.
 func (o *OAuth2Client) HasPostLogoutRedirectUris() bool {
-	if o != nil && o.PostLogoutRedirectUris != nil {
+	if o != nil && !IsNil(o.PostLogoutRedirectUris) {
 		return true
 	}
 
@@ -1058,7 +1061,7 @@ func (o *OAuth2Client) SetPostLogoutRedirectUris(v []string) {
 
 // GetRedirectUris returns the RedirectUris field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRedirectUris() []string {
-	if o == nil || o.RedirectUris == nil {
+	if o == nil || IsNil(o.RedirectUris) {
 		var ret []string
 		return ret
 	}
@@ -1068,7 +1071,7 @@ func (o *OAuth2Client) GetRedirectUris() []string {
 // GetRedirectUrisOk returns a tuple with the RedirectUris field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRedirectUrisOk() ([]string, bool) {
-	if o == nil || o.RedirectUris == nil {
+	if o == nil || IsNil(o.RedirectUris) {
 		return nil, false
 	}
 	return o.RedirectUris, true
@@ -1076,7 +1079,7 @@ func (o *OAuth2Client) GetRedirectUrisOk() ([]string, bool) {
 
 // HasRedirectUris returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRedirectUris() bool {
-	if o != nil && o.RedirectUris != nil {
+	if o != nil && !IsNil(o.RedirectUris) {
 		return true
 	}
 
@@ -1090,7 +1093,7 @@ func (o *OAuth2Client) SetRedirectUris(v []string) {
 
 // GetRefreshTokenGrantAccessTokenLifespan returns the RefreshTokenGrantAccessTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespan() string {
-	if o == nil || o.RefreshTokenGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantAccessTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -1100,7 +1103,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespan() string {
 // GetRefreshTokenGrantAccessTokenLifespanOk returns a tuple with the RefreshTokenGrantAccessTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, bool) {
-	if o == nil || o.RefreshTokenGrantAccessTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantAccessTokenLifespan) {
 		return nil, false
 	}
 	return o.RefreshTokenGrantAccessTokenLifespan, true
@@ -1108,7 +1111,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantAccessTokenLifespanOk() (*string, boo
 
 // HasRefreshTokenGrantAccessTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRefreshTokenGrantAccessTokenLifespan() bool {
-	if o != nil && o.RefreshTokenGrantAccessTokenLifespan != nil {
+	if o != nil && !IsNil(o.RefreshTokenGrantAccessTokenLifespan) {
 		return true
 	}
 
@@ -1122,7 +1125,7 @@ func (o *OAuth2Client) SetRefreshTokenGrantAccessTokenLifespan(v string) {
 
 // GetRefreshTokenGrantIdTokenLifespan returns the RefreshTokenGrantIdTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespan() string {
-	if o == nil || o.RefreshTokenGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantIdTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -1132,7 +1135,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespan() string {
 // GetRefreshTokenGrantIdTokenLifespanOk returns a tuple with the RefreshTokenGrantIdTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool) {
-	if o == nil || o.RefreshTokenGrantIdTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantIdTokenLifespan) {
 		return nil, false
 	}
 	return o.RefreshTokenGrantIdTokenLifespan, true
@@ -1140,7 +1143,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantIdTokenLifespanOk() (*string, bool) {
 
 // HasRefreshTokenGrantIdTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRefreshTokenGrantIdTokenLifespan() bool {
-	if o != nil && o.RefreshTokenGrantIdTokenLifespan != nil {
+	if o != nil && !IsNil(o.RefreshTokenGrantIdTokenLifespan) {
 		return true
 	}
 
@@ -1154,7 +1157,7 @@ func (o *OAuth2Client) SetRefreshTokenGrantIdTokenLifespan(v string) {
 
 // GetRefreshTokenGrantRefreshTokenLifespan returns the RefreshTokenGrantRefreshTokenLifespan field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespan() string {
-	if o == nil || o.RefreshTokenGrantRefreshTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantRefreshTokenLifespan) {
 		var ret string
 		return ret
 	}
@@ -1164,7 +1167,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespan() string {
 // GetRefreshTokenGrantRefreshTokenLifespanOk returns a tuple with the RefreshTokenGrantRefreshTokenLifespan field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bool) {
-	if o == nil || o.RefreshTokenGrantRefreshTokenLifespan == nil {
+	if o == nil || IsNil(o.RefreshTokenGrantRefreshTokenLifespan) {
 		return nil, false
 	}
 	return o.RefreshTokenGrantRefreshTokenLifespan, true
@@ -1172,7 +1175,7 @@ func (o *OAuth2Client) GetRefreshTokenGrantRefreshTokenLifespanOk() (*string, bo
 
 // HasRefreshTokenGrantRefreshTokenLifespan returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRefreshTokenGrantRefreshTokenLifespan() bool {
-	if o != nil && o.RefreshTokenGrantRefreshTokenLifespan != nil {
+	if o != nil && !IsNil(o.RefreshTokenGrantRefreshTokenLifespan) {
 		return true
 	}
 
@@ -1186,7 +1189,7 @@ func (o *OAuth2Client) SetRefreshTokenGrantRefreshTokenLifespan(v string) {
 
 // GetRegistrationAccessToken returns the RegistrationAccessToken field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRegistrationAccessToken() string {
-	if o == nil || o.RegistrationAccessToken == nil {
+	if o == nil || IsNil(o.RegistrationAccessToken) {
 		var ret string
 		return ret
 	}
@@ -1196,7 +1199,7 @@ func (o *OAuth2Client) GetRegistrationAccessToken() string {
 // GetRegistrationAccessTokenOk returns a tuple with the RegistrationAccessToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRegistrationAccessTokenOk() (*string, bool) {
-	if o == nil || o.RegistrationAccessToken == nil {
+	if o == nil || IsNil(o.RegistrationAccessToken) {
 		return nil, false
 	}
 	return o.RegistrationAccessToken, true
@@ -1204,7 +1207,7 @@ func (o *OAuth2Client) GetRegistrationAccessTokenOk() (*string, bool) {
 
 // HasRegistrationAccessToken returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRegistrationAccessToken() bool {
-	if o != nil && o.RegistrationAccessToken != nil {
+	if o != nil && !IsNil(o.RegistrationAccessToken) {
 		return true
 	}
 
@@ -1218,7 +1221,7 @@ func (o *OAuth2Client) SetRegistrationAccessToken(v string) {
 
 // GetRegistrationClientUri returns the RegistrationClientUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRegistrationClientUri() string {
-	if o == nil || o.RegistrationClientUri == nil {
+	if o == nil || IsNil(o.RegistrationClientUri) {
 		var ret string
 		return ret
 	}
@@ -1228,7 +1231,7 @@ func (o *OAuth2Client) GetRegistrationClientUri() string {
 // GetRegistrationClientUriOk returns a tuple with the RegistrationClientUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRegistrationClientUriOk() (*string, bool) {
-	if o == nil || o.RegistrationClientUri == nil {
+	if o == nil || IsNil(o.RegistrationClientUri) {
 		return nil, false
 	}
 	return o.RegistrationClientUri, true
@@ -1236,7 +1239,7 @@ func (o *OAuth2Client) GetRegistrationClientUriOk() (*string, bool) {
 
 // HasRegistrationClientUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRegistrationClientUri() bool {
-	if o != nil && o.RegistrationClientUri != nil {
+	if o != nil && !IsNil(o.RegistrationClientUri) {
 		return true
 	}
 
@@ -1250,7 +1253,7 @@ func (o *OAuth2Client) SetRegistrationClientUri(v string) {
 
 // GetRequestObjectSigningAlg returns the RequestObjectSigningAlg field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRequestObjectSigningAlg() string {
-	if o == nil || o.RequestObjectSigningAlg == nil {
+	if o == nil || IsNil(o.RequestObjectSigningAlg) {
 		var ret string
 		return ret
 	}
@@ -1260,7 +1263,7 @@ func (o *OAuth2Client) GetRequestObjectSigningAlg() string {
 // GetRequestObjectSigningAlgOk returns a tuple with the RequestObjectSigningAlg field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRequestObjectSigningAlgOk() (*string, bool) {
-	if o == nil || o.RequestObjectSigningAlg == nil {
+	if o == nil || IsNil(o.RequestObjectSigningAlg) {
 		return nil, false
 	}
 	return o.RequestObjectSigningAlg, true
@@ -1268,7 +1271,7 @@ func (o *OAuth2Client) GetRequestObjectSigningAlgOk() (*string, bool) {
 
 // HasRequestObjectSigningAlg returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRequestObjectSigningAlg() bool {
-	if o != nil && o.RequestObjectSigningAlg != nil {
+	if o != nil && !IsNil(o.RequestObjectSigningAlg) {
 		return true
 	}
 
@@ -1282,7 +1285,7 @@ func (o *OAuth2Client) SetRequestObjectSigningAlg(v string) {
 
 // GetRequestUris returns the RequestUris field value if set, zero value otherwise.
 func (o *OAuth2Client) GetRequestUris() []string {
-	if o == nil || o.RequestUris == nil {
+	if o == nil || IsNil(o.RequestUris) {
 		var ret []string
 		return ret
 	}
@@ -1292,7 +1295,7 @@ func (o *OAuth2Client) GetRequestUris() []string {
 // GetRequestUrisOk returns a tuple with the RequestUris field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetRequestUrisOk() ([]string, bool) {
-	if o == nil || o.RequestUris == nil {
+	if o == nil || IsNil(o.RequestUris) {
 		return nil, false
 	}
 	return o.RequestUris, true
@@ -1300,7 +1303,7 @@ func (o *OAuth2Client) GetRequestUrisOk() ([]string, bool) {
 
 // HasRequestUris returns a boolean if a field has been set.
 func (o *OAuth2Client) HasRequestUris() bool {
-	if o != nil && o.RequestUris != nil {
+	if o != nil && !IsNil(o.RequestUris) {
 		return true
 	}
 
@@ -1314,7 +1317,7 @@ func (o *OAuth2Client) SetRequestUris(v []string) {
 
 // GetResponseTypes returns the ResponseTypes field value if set, zero value otherwise.
 func (o *OAuth2Client) GetResponseTypes() []string {
-	if o == nil || o.ResponseTypes == nil {
+	if o == nil || IsNil(o.ResponseTypes) {
 		var ret []string
 		return ret
 	}
@@ -1324,7 +1327,7 @@ func (o *OAuth2Client) GetResponseTypes() []string {
 // GetResponseTypesOk returns a tuple with the ResponseTypes field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetResponseTypesOk() ([]string, bool) {
-	if o == nil || o.ResponseTypes == nil {
+	if o == nil || IsNil(o.ResponseTypes) {
 		return nil, false
 	}
 	return o.ResponseTypes, true
@@ -1332,7 +1335,7 @@ func (o *OAuth2Client) GetResponseTypesOk() ([]string, bool) {
 
 // HasResponseTypes returns a boolean if a field has been set.
 func (o *OAuth2Client) HasResponseTypes() bool {
-	if o != nil && o.ResponseTypes != nil {
+	if o != nil && !IsNil(o.ResponseTypes) {
 		return true
 	}
 
@@ -1346,7 +1349,7 @@ func (o *OAuth2Client) SetResponseTypes(v []string) {
 
 // GetScope returns the Scope field value if set, zero value otherwise.
 func (o *OAuth2Client) GetScope() string {
-	if o == nil || o.Scope == nil {
+	if o == nil || IsNil(o.Scope) {
 		var ret string
 		return ret
 	}
@@ -1356,7 +1359,7 @@ func (o *OAuth2Client) GetScope() string {
 // GetScopeOk returns a tuple with the Scope field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetScopeOk() (*string, bool) {
-	if o == nil || o.Scope == nil {
+	if o == nil || IsNil(o.Scope) {
 		return nil, false
 	}
 	return o.Scope, true
@@ -1364,7 +1367,7 @@ func (o *OAuth2Client) GetScopeOk() (*string, bool) {
 
 // HasScope returns a boolean if a field has been set.
 func (o *OAuth2Client) HasScope() bool {
-	if o != nil && o.Scope != nil {
+	if o != nil && !IsNil(o.Scope) {
 		return true
 	}
 
@@ -1378,7 +1381,7 @@ func (o *OAuth2Client) SetScope(v string) {
 
 // GetSectorIdentifierUri returns the SectorIdentifierUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetSectorIdentifierUri() string {
-	if o == nil || o.SectorIdentifierUri == nil {
+	if o == nil || IsNil(o.SectorIdentifierUri) {
 		var ret string
 		return ret
 	}
@@ -1388,7 +1391,7 @@ func (o *OAuth2Client) GetSectorIdentifierUri() string {
 // GetSectorIdentifierUriOk returns a tuple with the SectorIdentifierUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetSectorIdentifierUriOk() (*string, bool) {
-	if o == nil || o.SectorIdentifierUri == nil {
+	if o == nil || IsNil(o.SectorIdentifierUri) {
 		return nil, false
 	}
 	return o.SectorIdentifierUri, true
@@ -1396,7 +1399,7 @@ func (o *OAuth2Client) GetSectorIdentifierUriOk() (*string, bool) {
 
 // HasSectorIdentifierUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasSectorIdentifierUri() bool {
-	if o != nil && o.SectorIdentifierUri != nil {
+	if o != nil && !IsNil(o.SectorIdentifierUri) {
 		return true
 	}
 
@@ -1410,7 +1413,7 @@ func (o *OAuth2Client) SetSectorIdentifierUri(v string) {
 
 // GetSkipConsent returns the SkipConsent field value if set, zero value otherwise.
 func (o *OAuth2Client) GetSkipConsent() bool {
-	if o == nil || o.SkipConsent == nil {
+	if o == nil || IsNil(o.SkipConsent) {
 		var ret bool
 		return ret
 	}
@@ -1420,7 +1423,7 @@ func (o *OAuth2Client) GetSkipConsent() bool {
 // GetSkipConsentOk returns a tuple with the SkipConsent field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetSkipConsentOk() (*bool, bool) {
-	if o == nil || o.SkipConsent == nil {
+	if o == nil || IsNil(o.SkipConsent) {
 		return nil, false
 	}
 	return o.SkipConsent, true
@@ -1428,7 +1431,7 @@ func (o *OAuth2Client) GetSkipConsentOk() (*bool, bool) {
 
 // HasSkipConsent returns a boolean if a field has been set.
 func (o *OAuth2Client) HasSkipConsent() bool {
-	if o != nil && o.SkipConsent != nil {
+	if o != nil && !IsNil(o.SkipConsent) {
 		return true
 	}
 
@@ -1442,7 +1445,7 @@ func (o *OAuth2Client) SetSkipConsent(v bool) {
 
 // GetSubjectType returns the SubjectType field value if set, zero value otherwise.
 func (o *OAuth2Client) GetSubjectType() string {
-	if o == nil || o.SubjectType == nil {
+	if o == nil || IsNil(o.SubjectType) {
 		var ret string
 		return ret
 	}
@@ -1452,7 +1455,7 @@ func (o *OAuth2Client) GetSubjectType() string {
 // GetSubjectTypeOk returns a tuple with the SubjectType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetSubjectTypeOk() (*string, bool) {
-	if o == nil || o.SubjectType == nil {
+	if o == nil || IsNil(o.SubjectType) {
 		return nil, false
 	}
 	return o.SubjectType, true
@@ -1460,7 +1463,7 @@ func (o *OAuth2Client) GetSubjectTypeOk() (*string, bool) {
 
 // HasSubjectType returns a boolean if a field has been set.
 func (o *OAuth2Client) HasSubjectType() bool {
-	if o != nil && o.SubjectType != nil {
+	if o != nil && !IsNil(o.SubjectType) {
 		return true
 	}
 
@@ -1474,7 +1477,7 @@ func (o *OAuth2Client) SetSubjectType(v string) {
 
 // GetTokenEndpointAuthMethod returns the TokenEndpointAuthMethod field value if set, zero value otherwise.
 func (o *OAuth2Client) GetTokenEndpointAuthMethod() string {
-	if o == nil || o.TokenEndpointAuthMethod == nil {
+	if o == nil || IsNil(o.TokenEndpointAuthMethod) {
 		var ret string
 		return ret
 	}
@@ -1484,7 +1487,7 @@ func (o *OAuth2Client) GetTokenEndpointAuthMethod() string {
 // GetTokenEndpointAuthMethodOk returns a tuple with the TokenEndpointAuthMethod field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetTokenEndpointAuthMethodOk() (*string, bool) {
-	if o == nil || o.TokenEndpointAuthMethod == nil {
+	if o == nil || IsNil(o.TokenEndpointAuthMethod) {
 		return nil, false
 	}
 	return o.TokenEndpointAuthMethod, true
@@ -1492,7 +1495,7 @@ func (o *OAuth2Client) GetTokenEndpointAuthMethodOk() (*string, bool) {
 
 // HasTokenEndpointAuthMethod returns a boolean if a field has been set.
 func (o *OAuth2Client) HasTokenEndpointAuthMethod() bool {
-	if o != nil && o.TokenEndpointAuthMethod != nil {
+	if o != nil && !IsNil(o.TokenEndpointAuthMethod) {
 		return true
 	}
 
@@ -1506,7 +1509,7 @@ func (o *OAuth2Client) SetTokenEndpointAuthMethod(v string) {
 
 // GetTokenEndpointAuthSigningAlg returns the TokenEndpointAuthSigningAlg field value if set, zero value otherwise.
 func (o *OAuth2Client) GetTokenEndpointAuthSigningAlg() string {
-	if o == nil || o.TokenEndpointAuthSigningAlg == nil {
+	if o == nil || IsNil(o.TokenEndpointAuthSigningAlg) {
 		var ret string
 		return ret
 	}
@@ -1516,7 +1519,7 @@ func (o *OAuth2Client) GetTokenEndpointAuthSigningAlg() string {
 // GetTokenEndpointAuthSigningAlgOk returns a tuple with the TokenEndpointAuthSigningAlg field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetTokenEndpointAuthSigningAlgOk() (*string, bool) {
-	if o == nil || o.TokenEndpointAuthSigningAlg == nil {
+	if o == nil || IsNil(o.TokenEndpointAuthSigningAlg) {
 		return nil, false
 	}
 	return o.TokenEndpointAuthSigningAlg, true
@@ -1524,7 +1527,7 @@ func (o *OAuth2Client) GetTokenEndpointAuthSigningAlgOk() (*string, bool) {
 
 // HasTokenEndpointAuthSigningAlg returns a boolean if a field has been set.
 func (o *OAuth2Client) HasTokenEndpointAuthSigningAlg() bool {
-	if o != nil && o.TokenEndpointAuthSigningAlg != nil {
+	if o != nil && !IsNil(o.TokenEndpointAuthSigningAlg) {
 		return true
 	}
 
@@ -1538,7 +1541,7 @@ func (o *OAuth2Client) SetTokenEndpointAuthSigningAlg(v string) {
 
 // GetTosUri returns the TosUri field value if set, zero value otherwise.
 func (o *OAuth2Client) GetTosUri() string {
-	if o == nil || o.TosUri == nil {
+	if o == nil || IsNil(o.TosUri) {
 		var ret string
 		return ret
 	}
@@ -1548,7 +1551,7 @@ func (o *OAuth2Client) GetTosUri() string {
 // GetTosUriOk returns a tuple with the TosUri field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetTosUriOk() (*string, bool) {
-	if o == nil || o.TosUri == nil {
+	if o == nil || IsNil(o.TosUri) {
 		return nil, false
 	}
 	return o.TosUri, true
@@ -1556,7 +1559,7 @@ func (o *OAuth2Client) GetTosUriOk() (*string, bool) {
 
 // HasTosUri returns a boolean if a field has been set.
 func (o *OAuth2Client) HasTosUri() bool {
-	if o != nil && o.TosUri != nil {
+	if o != nil && !IsNil(o.TosUri) {
 		return true
 	}
 
@@ -1570,7 +1573,7 @@ func (o *OAuth2Client) SetTosUri(v string) {
 
 // GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *OAuth2Client) GetUpdatedAt() time.Time {
-	if o == nil || o.UpdatedAt == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		var ret time.Time
 		return ret
 	}
@@ -1580,7 +1583,7 @@ func (o *OAuth2Client) GetUpdatedAt() time.Time {
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetUpdatedAtOk() (*time.Time, bool) {
-	if o == nil || o.UpdatedAt == nil {
+	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
 	return o.UpdatedAt, true
@@ -1588,7 +1591,7 @@ func (o *OAuth2Client) GetUpdatedAtOk() (*time.Time, bool) {
 
 // HasUpdatedAt returns a boolean if a field has been set.
 func (o *OAuth2Client) HasUpdatedAt() bool {
-	if o != nil && o.UpdatedAt != nil {
+	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
 
@@ -1602,7 +1605,7 @@ func (o *OAuth2Client) SetUpdatedAt(v time.Time) {
 
 // GetUserinfoSignedResponseAlg returns the UserinfoSignedResponseAlg field value if set, zero value otherwise.
 func (o *OAuth2Client) GetUserinfoSignedResponseAlg() string {
-	if o == nil || o.UserinfoSignedResponseAlg == nil {
+	if o == nil || IsNil(o.UserinfoSignedResponseAlg) {
 		var ret string
 		return ret
 	}
@@ -1612,7 +1615,7 @@ func (o *OAuth2Client) GetUserinfoSignedResponseAlg() string {
 // GetUserinfoSignedResponseAlgOk returns a tuple with the UserinfoSignedResponseAlg field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *OAuth2Client) GetUserinfoSignedResponseAlgOk() (*string, bool) {
-	if o == nil || o.UserinfoSignedResponseAlg == nil {
+	if o == nil || IsNil(o.UserinfoSignedResponseAlg) {
 		return nil, false
 	}
 	return o.UserinfoSignedResponseAlg, true
@@ -1620,7 +1623,7 @@ func (o *OAuth2Client) GetUserinfoSignedResponseAlgOk() (*string, bool) {
 
 // HasUserinfoSignedResponseAlg returns a boolean if a field has been set.
 func (o *OAuth2Client) HasUserinfoSignedResponseAlg() bool {
-	if o != nil && o.UserinfoSignedResponseAlg != nil {
+	if o != nil && !IsNil(o.UserinfoSignedResponseAlg) {
 		return true
 	}
 
@@ -1633,149 +1636,157 @@ func (o *OAuth2Client) SetUserinfoSignedResponseAlg(v string) {
 }
 
 func (o OAuth2Client) MarshalJSON() ([]byte, error) {
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(toSerialize)
+}
+
+func (o OAuth2Client) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if o.AccessTokenStrategy != nil {
+	if !IsNil(o.AccessTokenStrategy) {
 		toSerialize["access_token_strategy"] = o.AccessTokenStrategy
 	}
-	if o.AllowedCorsOrigins != nil {
+	if !IsNil(o.AllowedCorsOrigins) {
 		toSerialize["allowed_cors_origins"] = o.AllowedCorsOrigins
 	}
-	if o.Audience != nil {
+	if !IsNil(o.Audience) {
 		toSerialize["audience"] = o.Audience
 	}
-	if o.AuthorizationCodeGrantAccessTokenLifespan != nil {
+	if !IsNil(o.AuthorizationCodeGrantAccessTokenLifespan) {
 		toSerialize["authorization_code_grant_access_token_lifespan"] = o.AuthorizationCodeGrantAccessTokenLifespan
 	}
-	if o.AuthorizationCodeGrantIdTokenLifespan != nil {
+	if !IsNil(o.AuthorizationCodeGrantIdTokenLifespan) {
 		toSerialize["authorization_code_grant_id_token_lifespan"] = o.AuthorizationCodeGrantIdTokenLifespan
 	}
-	if o.AuthorizationCodeGrantRefreshTokenLifespan != nil {
+	if !IsNil(o.AuthorizationCodeGrantRefreshTokenLifespan) {
 		toSerialize["authorization_code_grant_refresh_token_lifespan"] = o.AuthorizationCodeGrantRefreshTokenLifespan
 	}
-	if o.BackchannelLogoutSessionRequired != nil {
+	if !IsNil(o.BackchannelLogoutSessionRequired) {
 		toSerialize["backchannel_logout_session_required"] = o.BackchannelLogoutSessionRequired
 	}
-	if o.BackchannelLogoutUri != nil {
+	if !IsNil(o.BackchannelLogoutUri) {
 		toSerialize["backchannel_logout_uri"] = o.BackchannelLogoutUri
 	}
-	if o.ClientCredentialsGrantAccessTokenLifespan != nil {
+	if !IsNil(o.ClientCredentialsGrantAccessTokenLifespan) {
 		toSerialize["client_credentials_grant_access_token_lifespan"] = o.ClientCredentialsGrantAccessTokenLifespan
 	}
-	if o.ClientId != nil {
+	if !IsNil(o.ClientId) {
 		toSerialize["client_id"] = o.ClientId
 	}
-	if o.ClientName != nil {
+	if !IsNil(o.ClientName) {
 		toSerialize["client_name"] = o.ClientName
 	}
-	if o.ClientSecret != nil {
+	if !IsNil(o.ClientSecret) {
 		toSerialize["client_secret"] = o.ClientSecret
 	}
-	if o.ClientSecretExpiresAt != nil {
+	if !IsNil(o.ClientSecretExpiresAt) {
 		toSerialize["client_secret_expires_at"] = o.ClientSecretExpiresAt
 	}
-	if o.ClientUri != nil {
+	if !IsNil(o.ClientUri) {
 		toSerialize["client_uri"] = o.ClientUri
 	}
-	if o.Contacts != nil {
+	if !IsNil(o.Contacts) {
 		toSerialize["contacts"] = o.Contacts
 	}
-	if o.CreatedAt != nil {
+	if !IsNil(o.CreatedAt) {
 		toSerialize["created_at"] = o.CreatedAt
 	}
-	if o.FrontchannelLogoutSessionRequired != nil {
+	if !IsNil(o.FrontchannelLogoutSessionRequired) {
 		toSerialize["frontchannel_logout_session_required"] = o.FrontchannelLogoutSessionRequired
 	}
-	if o.FrontchannelLogoutUri != nil {
+	if !IsNil(o.FrontchannelLogoutUri) {
 		toSerialize["frontchannel_logout_uri"] = o.FrontchannelLogoutUri
 	}
-	if o.GrantTypes != nil {
+	if !IsNil(o.GrantTypes) {
 		toSerialize["grant_types"] = o.GrantTypes
 	}
-	if o.ImplicitGrantAccessTokenLifespan != nil {
+	if !IsNil(o.ImplicitGrantAccessTokenLifespan) {
 		toSerialize["implicit_grant_access_token_lifespan"] = o.ImplicitGrantAccessTokenLifespan
 	}
-	if o.ImplicitGrantIdTokenLifespan != nil {
+	if !IsNil(o.ImplicitGrantIdTokenLifespan) {
 		toSerialize["implicit_grant_id_token_lifespan"] = o.ImplicitGrantIdTokenLifespan
 	}
 	if o.Jwks != nil {
 		toSerialize["jwks"] = o.Jwks
 	}
-	if o.JwksUri != nil {
+	if !IsNil(o.JwksUri) {
 		toSerialize["jwks_uri"] = o.JwksUri
 	}
-	if o.JwtBearerGrantAccessTokenLifespan != nil {
+	if !IsNil(o.JwtBearerGrantAccessTokenLifespan) {
 		toSerialize["jwt_bearer_grant_access_token_lifespan"] = o.JwtBearerGrantAccessTokenLifespan
 	}
-	if o.LogoUri != nil {
+	if !IsNil(o.LogoUri) {
 		toSerialize["logo_uri"] = o.LogoUri
 	}
 	if o.Metadata != nil {
 		toSerialize["metadata"] = o.Metadata
 	}
-	if o.Owner != nil {
+	if !IsNil(o.Owner) {
 		toSerialize["owner"] = o.Owner
 	}
-	if o.PolicyUri != nil {
+	if !IsNil(o.PolicyUri) {
 		toSerialize["policy_uri"] = o.PolicyUri
 	}
-	if o.PostLogoutRedirectUris != nil {
+	if !IsNil(o.PostLogoutRedirectUris) {
 		toSerialize["post_logout_redirect_uris"] = o.PostLogoutRedirectUris
 	}
-	if o.RedirectUris != nil {
+	if !IsNil(o.RedirectUris) {
 		toSerialize["redirect_uris"] = o.RedirectUris
 	}
-	if o.RefreshTokenGrantAccessTokenLifespan != nil {
+	if !IsNil(o.RefreshTokenGrantAccessTokenLifespan) {
 		toSerialize["refresh_token_grant_access_token_lifespan"] = o.RefreshTokenGrantAccessTokenLifespan
 	}
-	if o.RefreshTokenGrantIdTokenLifespan != nil {
+	if !IsNil(o.RefreshTokenGrantIdTokenLifespan) {
 		toSerialize["refresh_token_grant_id_token_lifespan"] = o.RefreshTokenGrantIdTokenLifespan
 	}
-	if o.RefreshTokenGrantRefreshTokenLifespan != nil {
+	if !IsNil(o.RefreshTokenGrantRefreshTokenLifespan) {
 		toSerialize["refresh_token_grant_refresh_token_lifespan"] = o.RefreshTokenGrantRefreshTokenLifespan
 	}
-	if o.RegistrationAccessToken != nil {
+	if !IsNil(o.RegistrationAccessToken) {
 		toSerialize["registration_access_token"] = o.RegistrationAccessToken
 	}
-	if o.RegistrationClientUri != nil {
+	if !IsNil(o.RegistrationClientUri) {
 		toSerialize["registration_client_uri"] = o.RegistrationClientUri
 	}
-	if o.RequestObjectSigningAlg != nil {
+	if !IsNil(o.RequestObjectSigningAlg) {
 		toSerialize["request_object_signing_alg"] = o.RequestObjectSigningAlg
 	}
-	if o.RequestUris != nil {
+	if !IsNil(o.RequestUris) {
 		toSerialize["request_uris"] = o.RequestUris
 	}
-	if o.ResponseTypes != nil {
+	if !IsNil(o.ResponseTypes) {
 		toSerialize["response_types"] = o.ResponseTypes
 	}
-	if o.Scope != nil {
+	if !IsNil(o.Scope) {
 		toSerialize["scope"] = o.Scope
 	}
-	if o.SectorIdentifierUri != nil {
+	if !IsNil(o.SectorIdentifierUri) {
 		toSerialize["sector_identifier_uri"] = o.SectorIdentifierUri
 	}
-	if o.SkipConsent != nil {
+	if !IsNil(o.SkipConsent) {
 		toSerialize["skip_consent"] = o.SkipConsent
 	}
-	if o.SubjectType != nil {
+	if !IsNil(o.SubjectType) {
 		toSerialize["subject_type"] = o.SubjectType
 	}
-	if o.TokenEndpointAuthMethod != nil {
+	if !IsNil(o.TokenEndpointAuthMethod) {
 		toSerialize["token_endpoint_auth_method"] = o.TokenEndpointAuthMethod
 	}
-	if o.TokenEndpointAuthSigningAlg != nil {
+	if !IsNil(o.TokenEndpointAuthSigningAlg) {
 		toSerialize["token_endpoint_auth_signing_alg"] = o.TokenEndpointAuthSigningAlg
 	}
-	if o.TosUri != nil {
+	if !IsNil(o.TosUri) {
 		toSerialize["tos_uri"] = o.TosUri
 	}
-	if o.UpdatedAt != nil {
+	if !IsNil(o.UpdatedAt) {
 		toSerialize["updated_at"] = o.UpdatedAt
 	}
-	if o.UserinfoSignedResponseAlg != nil {
+	if !IsNil(o.UserinfoSignedResponseAlg) {
 		toSerialize["userinfo_signed_response_alg"] = o.UserinfoSignedResponseAlg
 	}
-	return json.Marshal(toSerialize)
+	return toSerialize, nil
 }
 
 type NullableOAuth2Client struct {

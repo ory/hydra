@@ -15,6 +15,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the TokenPaginationResponseHeaders type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TokenPaginationResponseHeaders{}
+
 // TokenPaginationResponseHeaders The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as: `<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>; rel=\"{page}\"`  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 type TokenPaginationResponseHeaders struct {
 	// The Link HTTP Header  The `Link` header contains a comma-delimited list of links to the following pages:  first: The first page of results. next: The next page of results. prev: The previous page of results. last: The last page of results.  Pages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:  </clients?page_size=5&page_token=0>; rel=\"first\",</clients?page_size=5&page_token=15>; rel=\"next\",</clients?page_size=5&page_token=5>; rel=\"prev\",</clients?page_size=5&page_token=20>; rel=\"last\"
@@ -42,7 +45,7 @@ func NewTokenPaginationResponseHeadersWithDefaults() *TokenPaginationResponseHea
 
 // GetLink returns the Link field value if set, zero value otherwise.
 func (o *TokenPaginationResponseHeaders) GetLink() string {
-	if o == nil || o.Link == nil {
+	if o == nil || IsNil(o.Link) {
 		var ret string
 		return ret
 	}
@@ -52,7 +55,7 @@ func (o *TokenPaginationResponseHeaders) GetLink() string {
 // GetLinkOk returns a tuple with the Link field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TokenPaginationResponseHeaders) GetLinkOk() (*string, bool) {
-	if o == nil || o.Link == nil {
+	if o == nil || IsNil(o.Link) {
 		return nil, false
 	}
 	return o.Link, true
@@ -60,7 +63,7 @@ func (o *TokenPaginationResponseHeaders) GetLinkOk() (*string, bool) {
 
 // HasLink returns a boolean if a field has been set.
 func (o *TokenPaginationResponseHeaders) HasLink() bool {
-	if o != nil && o.Link != nil {
+	if o != nil && !IsNil(o.Link) {
 		return true
 	}
 
@@ -74,7 +77,7 @@ func (o *TokenPaginationResponseHeaders) SetLink(v string) {
 
 // GetXTotalCount returns the XTotalCount field value if set, zero value otherwise.
 func (o *TokenPaginationResponseHeaders) GetXTotalCount() int64 {
-	if o == nil || o.XTotalCount == nil {
+	if o == nil || IsNil(o.XTotalCount) {
 		var ret int64
 		return ret
 	}
@@ -84,7 +87,7 @@ func (o *TokenPaginationResponseHeaders) GetXTotalCount() int64 {
 // GetXTotalCountOk returns a tuple with the XTotalCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TokenPaginationResponseHeaders) GetXTotalCountOk() (*int64, bool) {
-	if o == nil || o.XTotalCount == nil {
+	if o == nil || IsNil(o.XTotalCount) {
 		return nil, false
 	}
 	return o.XTotalCount, true
@@ -92,7 +95,7 @@ func (o *TokenPaginationResponseHeaders) GetXTotalCountOk() (*int64, bool) {
 
 // HasXTotalCount returns a boolean if a field has been set.
 func (o *TokenPaginationResponseHeaders) HasXTotalCount() bool {
-	if o != nil && o.XTotalCount != nil {
+	if o != nil && !IsNil(o.XTotalCount) {
 		return true
 	}
 
@@ -105,14 +108,22 @@ func (o *TokenPaginationResponseHeaders) SetXTotalCount(v int64) {
 }
 
 func (o TokenPaginationResponseHeaders) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Link != nil {
-		toSerialize["link"] = o.Link
-	}
-	if o.XTotalCount != nil {
-		toSerialize["x-total-count"] = o.XTotalCount
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o TokenPaginationResponseHeaders) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Link) {
+		toSerialize["link"] = o.Link
+	}
+	if !IsNil(o.XTotalCount) {
+		toSerialize["x-total-count"] = o.XTotalCount
+	}
+	return toSerialize, nil
 }
 
 type NullableTokenPaginationResponseHeaders struct {

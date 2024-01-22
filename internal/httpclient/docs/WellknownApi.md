@@ -22,23 +22,23 @@ Discover Well-Known JSON Web Keys
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/ory/hydra-client-go/v2"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.WellknownApi.DiscoverJsonWebKeys(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `WellknownApi.DiscoverJsonWebKeys``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DiscoverJsonWebKeys`: JsonWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `WellknownApi.DiscoverJsonWebKeys`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.WellknownApi.DiscoverJsonWebKeys(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `WellknownApi.DiscoverJsonWebKeys``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `DiscoverJsonWebKeys`: JsonWebKeySet
+	fmt.Fprintf(os.Stdout, "Response from `WellknownApi.DiscoverJsonWebKeys`: %v\n", resp)
 }
 ```
 

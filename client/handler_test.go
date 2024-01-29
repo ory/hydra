@@ -13,6 +13,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/tidwall/sjson"
@@ -347,11 +349,30 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
-					d: "setting skip_consent suceeds for admin registration",
+					d: "setting skip_consent succeeds for admin registration",
 					payload: &client.Client{
 						RedirectURIs: []string{"http://localhost:3000/cb"},
-						SkipConsent:  true,
 						Secret:       "2SKZkBf2P5g4toAXXnCrr~_sDM",
+						SkipConsent:  true,
+					},
+					path:       client.ClientsHandlerPath,
+					statusCode: http.StatusCreated,
+				},
+				{
+					d: "setting skip_logout_consent fails for dynamic registration",
+					payload: &client.Client{
+						RedirectURIs:      []string{"http://localhost:3000/cb"},
+						SkipLogoutConsent: sqlxx.NullBool{Bool: true, Valid: true},
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+				{
+					d: "setting skip_logout_consent succeeds for admin registration",
+					payload: &client.Client{
+						RedirectURIs:      []string{"http://localhost:3000/cb"},
+						SkipLogoutConsent: sqlxx.NullBool{Bool: true, Valid: true},
+						Secret:            "2SKZkBf2P5g4toAXXnCrr~_sDM",
 					},
 					path:       client.ClientsHandlerPath,
 					statusCode: http.StatusCreated,

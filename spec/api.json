@@ -753,6 +753,10 @@
             "description": "SkipConsent skips the consent screen for this client. This field can only\nbe set from the admin API.",
             "type": "boolean"
           },
+          "skip_logout_consent": {
+            "description": "SkipLogoutConsent skips the logout consent screen for this client. This field can only\nbe set from the admin API.",
+            "type": "boolean"
+          },
           "subject_type": {
             "description": "OpenID Connect Subject Type\n\nThe `subject_types_supported` Discovery parameter contains a\nlist of the supported subject_type values for this server. Valid types include `pairwise` and `public`.",
             "type": "string"

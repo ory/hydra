@@ -102,7 +102,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
 					cs := []client.Client{}
 					require.NoError(t, c.All(&cs))
-					require.Equal(t, 18, len(cs))
+					require.Equal(t, 19, len(cs))
 					for _, c := range cs {
 						require.False(t, c.CreatedAt.IsZero())
 						require.False(t, c.UpdatedAt.IsZero())

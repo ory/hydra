@@ -311,6 +311,10 @@ type Client struct {
 	// be set from the admin API.
 	SkipConsent bool `json:"skip_consent" db:"skip_consent" faker:"-"`
 
+	// SkipLogoutConsent skips the logout consent screen for this client. This field can only
+	// be set from the admin API.
+	SkipLogoutConsent sqlxx.NullBool `json:"skip_logout_consent" db:"skip_logout_consent" faker:"-"`
+
 	Lifespans
 }
 

@@ -1,28 +1,32 @@
 {
   "AccessTokenStrategy": "",
   "AllowedCORSOrigins": [
-    "http://cors/2005_1"
+    "http://cors/22_1",
+    "http://cors/22_2"
   ],
   "Audience": [
-    "autdience-2005_1"
+    "autdience-22_1",
+    "autdience-22_2"
   ],
   "BackChannelLogoutSessionRequired": true,
-  "BackChannelLogoutURI": "http://back_logout/2005",
-  "ClientURI": "http://client/2005",
+  "BackChannelLogoutURI": "http://back_logout/22",
+  "ClientURI": "http://client/22",
   "Contacts": [
-    "contact-2005_1"
+    "contact-22_1",
+    "contact-22_2"
   ],
   "CreatedAt": "0001-01-01T00:00:00Z",
   "FrontChannelLogoutSessionRequired": true,
-  "FrontChannelLogoutURI": "http://front_logout/2005",
+  "FrontChannelLogoutURI": "http://front_logout/22",
   "GrantTypes": [
-    "grant-2005_1"
+    "grant-22_1",
+    "grant-22_2"
   ],
-  "ID": "client-2005",
+  "ID": "client-22",
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
-  "JSONWebKeysURI": "http://jwks/2005",
+  "JSONWebKeysURI": "http://jwks/22",
   "Lifespans": {
     "AuthorizationCodeGrantAccessTokenLifespan": {
       "Duration": 0,
@@ -73,48 +77,52 @@
       "Valid": false
     }
   },
-  "LogoURI": "http://logo/2005",
+  "LogoURI": "http://logo/22",
   "Metadata": {
-    "migration": "2005"
+    "migration": "22"
   },
   "NID": "00000000-0000-0000-0000-000000000000",
-  "Name": "Client 2005",
-  "Owner": "owner-2005",
+  "Name": "Client 22",
+  "Owner": "owner-22",
   "PK": {
     "String": "",
     "Valid": false
   },
-  "PKDeprecated": 2005,
-  "PolicyURI": "http://policy/2005",
+  "PKDeprecated": 0,
+  "PolicyURI": "http://policy/22",
   "PostLogoutRedirectURIs": [
-    "http://post_redirect/2005_1"
+    "http://post_redirect/22_1",
+    "http://post_redirect/22_2"
   ],
   "RedirectURIs": [
-    "http://redirect/2005_1"
+    "http://redirect/22_1",
+    "http://redirect/22_2"
   ],
   "RegistrationAccessToken": "",
   "RegistrationAccessTokenSignature": "",
   "RegistrationClientURI": "",
-  "RequestObjectSigningAlgorithm": "r_alg-2005",
+  "RequestObjectSigningAlgorithm": "r_alg-22",
   "RequestURIs": [
-    "http://request/2005_1"
+    "http://request/22_1",
+    "http://request/22_2"
   ],
   "ResponseTypes": [
-    "response-2005_1"
+    "response-22_1",
+    "response-22_2"
   ],
-  "Scope": "scope-2005",
-  "Secret": "secret-2005",
+  "Scope": "scope-22",
+  "Secret": "secret-22",
   "SecretExpiresAt": 0,
-  "SectorIdentifierURI": "http://sector_id/2005",
-  "SkipConsent": false,
+  "SectorIdentifierURI": "http://sector_id/22",
+  "SkipConsent": true,
   "SkipLogoutConsent": {
-    "Bool": false,
-    "Valid": false
+    "Bool": true,
+    "Valid": true
   },
-  "SubjectType": "subject-2005",
-  "TermsOfServiceURI": "http://tos/2005",
-  "TokenEndpointAuthMethod": "token_auth-2005",
+  "SubjectType": "subject-22",
+  "TermsOfServiceURI": "http://tos/22",
+  "TokenEndpointAuthMethod": "token_auth-22",
   "TokenEndpointAuthSigningAlgorithm": "",
   "UpdatedAt": "0001-01-01T00:00:00Z",
-  "UserinfoSignedResponseAlg": "u_alg-2005"
+  "UserinfoSignedResponseAlg": "u_alg-22"
 }

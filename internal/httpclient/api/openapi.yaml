@@ -2593,6 +2593,7 @@ components:
         sector_identifier_uri: sector_identifier_uri
         frontchannel_logout_session_required: true
         frontchannel_logout_uri: frontchannel_logout_uri
+        skip_logout_consent: true
         refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
         implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
         client_secret_expires_at: 0
@@ -2885,6 +2886,11 @@ components:
             SkipConsent skips the consent screen for this client. This field can only
             be set from the admin API.
           type: boolean
+        skip_logout_consent:
+          description: |-
+            SkipLogoutConsent skips the logout consent screen for this client. This field can only
+            be set from the admin API.
+          type: boolean
         subject_type:
           description: |-
             OpenID Connect Subject Type
@@ -3077,6 +3083,7 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
@@ -3306,6 +3313,7 @@ components:
             sector_identifier_uri: sector_identifier_uri
             frontchannel_logout_session_required: true
             frontchannel_logout_uri: frontchannel_logout_uri
+            skip_logout_consent: true
             refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
             implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
             client_secret_expires_at: 0
@@ -3454,6 +3462,7 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0
@@ -3584,6 +3593,7 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
+          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
           implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
           client_secret_expires_at: 0

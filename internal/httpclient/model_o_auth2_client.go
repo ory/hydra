@@ -94,6 +94,8 @@ type OAuth2Client struct {
 	SectorIdentifierUri *string `json:"sector_identifier_uri,omitempty"`
 	// SkipConsent skips the consent screen for this client. This field can only be set from the admin API.
 	SkipConsent *bool `json:"skip_consent,omitempty"`
+	// SkipLogoutConsent skips the logout consent screen for this client. This field can only be set from the admin API.
+	SkipLogoutConsent *bool `json:"skip_logout_consent,omitempty"`
 	// OpenID Connect Subject Type  The `subject_types_supported` Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
 	SubjectType *string `json:"subject_type,omitempty"`
 	// OAuth 2.0 Token Endpoint Authentication Method  Requested Client Authentication method for the Token Endpoint. The options are:  `client_secret_basic`: (default) Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` encoded in the HTTP Authorization header. `client_secret_post`: Send `client_id` and `client_secret` as `application/x-www-form-urlencoded` in the HTTP body. `private_key_jwt`: Use JSON Web Tokens to authenticate the client. `none`: Used for public clients (native apps, mobile apps) which can not have secrets.
@@ -1443,6 +1445,38 @@ func (o *OAuth2Client) SetSkipConsent(v bool) {
 	o.SkipConsent = &v
 }
 
+// GetSkipLogoutConsent returns the SkipLogoutConsent field value if set, zero value otherwise.
+func (o *OAuth2Client) GetSkipLogoutConsent() bool {
+	if o == nil || IsNil(o.SkipLogoutConsent) {
+		var ret bool
+		return ret
+	}
+	return *o.SkipLogoutConsent
+}
+
+// GetSkipLogoutConsentOk returns a tuple with the SkipLogoutConsent field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2Client) GetSkipLogoutConsentOk() (*bool, bool) {
+	if o == nil || IsNil(o.SkipLogoutConsent) {
+		return nil, false
+	}
+	return o.SkipLogoutConsent, true
+}
+
+// HasSkipLogoutConsent returns a boolean if a field has been set.
+func (o *OAuth2Client) HasSkipLogoutConsent() bool {
+	if o != nil && !IsNil(o.SkipLogoutConsent) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkipLogoutConsent gets a reference to the given bool and assigns it to the SkipLogoutConsent field.
+func (o *OAuth2Client) SetSkipLogoutConsent(v bool) {
+	o.SkipLogoutConsent = &v
+}
+
 // GetSubjectType returns the SubjectType field value if set, zero value otherwise.
 func (o *OAuth2Client) GetSubjectType() string {
 	if o == nil || IsNil(o.SubjectType) {
@@ -1767,6 +1801,9 @@ func (o OAuth2Client) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SkipConsent) {
 		toSerialize["skip_consent"] = o.SkipConsent
+	}
+	if !IsNil(o.SkipLogoutConsent) {
+		toSerialize["skip_logout_consent"] = o.SkipLogoutConsent
 	}
 	if !IsNil(o.SubjectType) {
 		toSerialize["subject_type"] = o.SubjectType

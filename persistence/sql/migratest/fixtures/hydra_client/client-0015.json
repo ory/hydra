@@ -107,6 +107,10 @@
   "SecretExpiresAt": 0,
   "SectorIdentifierURI": "http://sector_id/0015",
   "SkipConsent": false,
+  "SkipLogoutConsent": {
+    "Bool": false,
+    "Valid": false
+  },
   "SubjectType": "subject-0015",
   "TermsOfServiceURI": "http://tos/0015",
   "TokenEndpointAuthMethod": "token_auth-0015",

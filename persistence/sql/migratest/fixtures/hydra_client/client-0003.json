@@ -97,6 +97,10 @@
   "SecretExpiresAt": 0,
   "SectorIdentifierURI": "",
   "SkipConsent": false,
+  "SkipLogoutConsent": {
+    "Bool": false,
+    "Valid": false
+  },
   "SubjectType": "",
   "TermsOfServiceURI": "http://tos/0003",
   "TokenEndpointAuthMethod": "none",

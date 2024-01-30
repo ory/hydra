@@ -101,6 +101,10 @@
   "SecretExpiresAt": 0,
   "SectorIdentifierURI": "http://sector_id/0009",
   "SkipConsent": false,
+  "SkipLogoutConsent": {
+    "Bool": false,
+    "Valid": false
+  },
   "SubjectType": "subject-0009",
   "TermsOfServiceURI": "http://tos/0009",
   "TokenEndpointAuthMethod": "token_auth-0009",

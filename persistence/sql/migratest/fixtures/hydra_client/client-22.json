@@ -1,32 +1,32 @@
 {
   "AccessTokenStrategy": "",
   "AllowedCORSOrigins": [
-    "http://cors/21_1",
-    "http://cors/21_2"
+    "http://cors/22_1",
+    "http://cors/22_2"
   ],
   "Audience": [
-    "autdience-21_1",
-    "autdience-21_2"
+    "autdience-22_1",
+    "autdience-22_2"
   ],
   "BackChannelLogoutSessionRequired": true,
-  "BackChannelLogoutURI": "http://back_logout/21",
-  "ClientURI": "http://client/21",
+  "BackChannelLogoutURI": "http://back_logout/22",
+  "ClientURI": "http://client/22",
   "Contacts": [
-    "contact-21_1",
-    "contact-21_2"
+    "contact-22_1",
+    "contact-22_2"
   ],
   "CreatedAt": "0001-01-01T00:00:00Z",
   "FrontChannelLogoutSessionRequired": true,
-  "FrontChannelLogoutURI": "http://front_logout/21",
+  "FrontChannelLogoutURI": "http://front_logout/22",
   "GrantTypes": [
-    "grant-21_1",
-    "grant-21_2"
+    "grant-22_1",
+    "grant-22_2"
   ],
   "ID": "client-22",
   "JSONWebKeys": {
     "JSONWebKeySet": null
   },
-  "JSONWebKeysURI": "http://jwks/21",
+  "JSONWebKeysURI": "http://jwks/22",
   "Lifespans": {
     "AuthorizationCodeGrantAccessTokenLifespan": {
       "Duration": 0,
@@ -77,52 +77,52 @@
       "Valid": false
     }
   },
-  "LogoURI": "http://logo/21",
+  "LogoURI": "http://logo/22",
   "Metadata": {
-    "migration": "21"
+    "migration": "22"
   },
   "NID": "00000000-0000-0000-0000-000000000000",
-  "Name": "Client 21",
-  "Owner": "owner-21",
+  "Name": "Client 22",
+  "Owner": "owner-22",
   "PK": {
     "String": "",
     "Valid": false
   },
   "PKDeprecated": 0,
-  "PolicyURI": "http://policy/21",
+  "PolicyURI": "http://policy/22",
   "PostLogoutRedirectURIs": [
-    "http://post_redirect/21_1",
-    "http://post_redirect/21_2"
+    "http://post_redirect/22_1",
+    "http://post_redirect/22_2"
   ],
   "RedirectURIs": [
-    "http://redirect/21_1",
-    "http://redirect/21_2"
+    "http://redirect/22_1",
+    "http://redirect/22_2"
   ],
   "RegistrationAccessToken": "",
   "RegistrationAccessTokenSignature": "",
   "RegistrationClientURI": "",
-  "RequestObjectSigningAlgorithm": "r_alg-21",
+  "RequestObjectSigningAlgorithm": "r_alg-22",
   "RequestURIs": [
-    "http://request/21_1",
-    "http://request/21_2"
+    "http://request/22_1",
+    "http://request/22_2"
   ],
   "ResponseTypes": [
-    "response-21_1",
-    "response-21_2"
+    "response-22_1",
+    "response-22_2"
   ],
-  "Scope": "scope-21",
-  "Secret": "secret-21",
+  "Scope": "scope-22",
+  "Secret": "secret-22",
   "SecretExpiresAt": 0,
-  "SectorIdentifierURI": "http://sector_id/21",
+  "SectorIdentifierURI": "http://sector_id/22",
   "SkipConsent": true,
   "SkipLogoutConsent": {
     "Bool": true,
     "Valid": true
   },
-  "SubjectType": "subject-21",
-  "TermsOfServiceURI": "http://tos/21",
-  "TokenEndpointAuthMethod": "token_auth-21",
+  "SubjectType": "subject-22",
+  "TermsOfServiceURI": "http://tos/22",
+  "TokenEndpointAuthMethod": "token_auth-22",
   "TokenEndpointAuthSigningAlgorithm": "",
   "UpdatedAt": "0001-01-01T00:00:00Z",
-  "UserinfoSignedResponseAlg": "u_alg-21"
+  "UserinfoSignedResponseAlg": "u_alg-22"
 }

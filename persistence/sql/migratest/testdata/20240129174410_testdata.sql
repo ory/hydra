@@ -38,4 +38,9 @@ INSERT INTO hydra_client (id,
                           skip_consent,
                           skip_logout_consent)
 VALUES ('client-22',
-        (SELECT id FROM networks LIMIT 1), 'Client 21', 'secret-21', '["http://redirect/21_1","http://redirect/21_2"]', '["grant-21_1","grant-21_2"]', '["response-21_1","response-21_2"]', 'scope-21', 'owner-21', 'http://policy/21', 'http://tos/21', 'http://client/21', 'http://logo/21', '["contact-21_1","contact-21_2"]', 0, 'http://sector_id/21', '', 'http://jwks/21', '["http://request/21_1","http://request/21_2"]', 'token_auth-21', 'r_alg-21', 'u_alg-21', 'subject-21', '["http://cors/21_1","http://cors/21_2"]', 0, '["autdience-21_1","autdience-21_2"]', '2022-02-15 22:20:23.004598', '2022-02-15 22:20:23.004598', 'http://front_logout/21', true, '["http://post_redirect/21_1","http://post_redirect/21_2"]', 'http://back_logout/21', true, '{"migration": "21"}', '', '47434cc1-ae2d-4791-83d2-afb46cb84ee3', '', TRUE, TRUE );
+        (SELECT id FROM networks LIMIT 1), 'Client 22', 'secret-22', '["http://redirect/22_1","http://redirect/22_2"]', '["grant-22_1","grant-22_2"]',
+  '["response-22_1","response-22_2"]', 'scope-22', 'owner-22', 'http://policy/22', 'http://tos/22', 'http://client/22', 'http://logo/22',
+  '["contact-22_1","contact-22_2"]', 0, 'http://sector_id/22', '', 'http://jwks/22', '["http://request/22_1","http://request/22_2"]',
+  'token_auth-22', 'r_alg-22', 'u_alg-22', 'subject-22', '["http://cors/22_1","http://cors/22_2"]', 0, '["autdience-22_1","autdience-22_2"]',
+  '2022-02-15 22:20:23.004598', '2022-02-15 22:20:23.004598', 'http://front_logout/22', true, '["http://post_redirect/22_1","http://post_redirect/22_2"]',
+  'http://back_logout/22', true, '{"migration": "22"}', '', '2ca3b77b-ee29-4b63-aa07-6384e6c650fb', '', TRUE, TRUE );

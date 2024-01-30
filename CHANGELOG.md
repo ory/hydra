@@ -727,6 +727,7 @@
     * fix: bump golangci-lint
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
+* Incorrect down migration ([#3708](https://github.com/ory/hydra/issues/3708)) ([8812e0e](https://github.com/ory/hydra/commit/8812e0e67b1f192de4ab6819c8f2bb98e6a5b7a7)), closes [/github.com/ory/hydra/pull/3705#discussion_r1471514014](https://github.com//github.com/ory/hydra/pull/3705/issues/discussion_r1471514014)
 * Remove required mark ([#3693](https://github.com/ory/hydra/issues/3693)) ([3a764a0](https://github.com/ory/hydra/commit/3a764a053a3d7eab698668cf63d387ea76c1db40))
 * Timeout in jwt-bearer grants when too many grants are available ([#3692](https://github.com/ory/hydra/issues/3692)) ([a748797](https://github.com/ory/hydra/commit/a748797761f5503b048df1b57bcc406f16cd40a3))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))

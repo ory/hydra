@@ -207,7 +207,7 @@ func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) 
 	if c.SkipConsent {
 		return errorsx.WithStack(ErrInvalidRequest.WithDescription(`"skip_consent" cannot be set for dynamic client registration`))
 	}
-	if c.SkipLogoutConsent.Valid {
+	if c.SkipLogoutConsent.Bool {
 		return errorsx.WithStack(ErrInvalidRequest.WithDescription(`"skip_logout_consent" cannot be set for dynamic client registration`))
 	}
 

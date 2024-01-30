@@ -22,6 +22,7 @@
     "userinfo_signed_response_alg": "none",
     "metadata": {},
     "skip_consent": false,
+    "skip_logout_consent": null,
     "authorization_code_grant_access_token_lifespan": "31h0m0s",
     "authorization_code_grant_id_token_lifespan": "32h0m0s",
     "authorization_code_grant_refresh_token_lifespan": "33h0m0s",

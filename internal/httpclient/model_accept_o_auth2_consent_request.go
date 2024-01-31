@@ -21,9 +21,10 @@ var _ MappedNullable = &AcceptOAuth2ConsentRequest{}
 
 // AcceptOAuth2ConsentRequest struct for AcceptOAuth2ConsentRequest
 type AcceptOAuth2ConsentRequest struct {
-	GrantAccessTokenAudience []string   `json:"grant_access_token_audience,omitempty"`
-	GrantScope               []string   `json:"grant_scope,omitempty"`
-	HandledAt                *time.Time `json:"handled_at,omitempty"`
+	Context                  interface{} `json:"context,omitempty"`
+	GrantAccessTokenAudience []string    `json:"grant_access_token_audience,omitempty"`
+	GrantScope               []string    `json:"grant_scope,omitempty"`
+	HandledAt                *time.Time  `json:"handled_at,omitempty"`
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
 	Remember *bool `json:"remember,omitempty"`
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
@@ -46,6 +47,39 @@ func NewAcceptOAuth2ConsentRequest() *AcceptOAuth2ConsentRequest {
 func NewAcceptOAuth2ConsentRequestWithDefaults() *AcceptOAuth2ConsentRequest {
 	this := AcceptOAuth2ConsentRequest{}
 	return &this
+}
+
+// GetContext returns the Context field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *AcceptOAuth2ConsentRequest) GetContext() interface{} {
+	if o == nil {
+		var ret interface{}
+		return ret
+	}
+	return o.Context
+}
+
+// GetContextOk returns a tuple with the Context field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *AcceptOAuth2ConsentRequest) GetContextOk() (*interface{}, bool) {
+	if o == nil || IsNil(o.Context) {
+		return nil, false
+	}
+	return &o.Context, true
+}
+
+// HasContext returns a boolean if a field has been set.
+func (o *AcceptOAuth2ConsentRequest) HasContext() bool {
+	if o != nil && IsNil(o.Context) {
+		return true
+	}
+
+	return false
+}
+
+// SetContext gets a reference to the given interface{} and assigns it to the Context field.
+func (o *AcceptOAuth2ConsentRequest) SetContext(v interface{}) {
+	o.Context = v
 }
 
 // GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field value if set, zero value otherwise.
@@ -250,6 +284,9 @@ func (o AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
 
 func (o AcceptOAuth2ConsentRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if o.Context != nil {
+		toSerialize["context"] = o.Context
+	}
 	if !IsNil(o.GrantAccessTokenAudience) {
 		toSerialize["grant_access_token_audience"] = o.GrantAccessTokenAudience
 	}

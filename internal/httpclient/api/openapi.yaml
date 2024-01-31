@@ -1926,6 +1926,9 @@ components:
       type: object
     acceptOAuth2ConsentRequest:
       properties:
+        context:
+          title: "JSONRawMessage represents a json.RawMessage that works well with\
+            \ JSON, SQL, and Swagger."
         grant_access_token_audience:
           items:
             type: string
@@ -3341,6 +3344,7 @@ components:
         session:
           access_token: ""
           id_token: ""
+        context: ""
         grant_access_token_audience:
         - grant_access_token_audience
         - grant_access_token_audience
@@ -3352,6 +3356,9 @@ components:
       properties:
         consent_request:
           $ref: '#/components/schemas/oAuth2ConsentRequest'
+        context:
+          title: "JSONRawMessage represents a json.RawMessage that works well with\
+            \ JSON, SQL, and Swagger."
         expires_at:
           $ref: '#/components/schemas/oAuth2ConsentSession_expires_at'
         grant_access_token_audience:

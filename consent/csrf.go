@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/flow"
+
 	"github.com/gorilla/sessions"
 
 	"github.com/ory/fosite"
@@ -17,6 +19,8 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
 )
+
+// WARNING - changes in this file need to be mirrored elsewhere.
 
 func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name string, csrfValue string, maxAge time.Duration) error {
 	// Errors can be ignored here, because we always get a session back. Error typically means that the
@@ -45,7 +49,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, conf x.CookieConf
 	return nil
 }
 
-func validateCsrfSession(r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string) error {
+func ValidateCsrfSession(r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string, f *flow.Flow) error {
 	if cookie, err := getCsrfSession(r, store, conf, name); err != nil {
 		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("CSRF session cookie could not be decoded."))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {

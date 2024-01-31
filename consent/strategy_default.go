@@ -370,7 +370,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	}
 
 	clientSpecificCookieNameLoginCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameLoginCSRF(ctx), session.LoginRequest.Client.CookieSuffix())
-	if err := validateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameLoginCSRF, session.LoginRequest.CSRF); err != nil {
+	if err := ValidateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameLoginCSRF, session.LoginRequest.CSRF, f); err != nil {
 		return nil, err
 	}
 
@@ -684,7 +684,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	}
 
 	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), session.ConsentRequest.Client.CookieSuffix())
-	if err := validateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, session.ConsentRequest.CSRF); err != nil {
+	if err := ValidateCsrfSession(r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, session.ConsentRequest.CSRF, f); err != nil {
 		return nil, nil, err
 	}
 

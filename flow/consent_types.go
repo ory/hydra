@@ -174,6 +174,11 @@ type AcceptOAuth2ConsentRequest struct {
 	// the flow.
 	WasHandled bool `json:"-"`
 
+	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
+	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
+	// data.
+	Context sqlxx.JSONRawMessage `json:"context"`
+
 	ConsentRequest  *OAuth2ConsentRequest `json:"-"`
 	Error           *RequestDeniedError   `json:"-"`
 	RequestedAt     time.Time             `json:"-"`
@@ -239,6 +244,11 @@ type OAuth2ConsentSession struct {
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
 	WasHandled bool `json:"-" db:"was_used"`
+
+	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
+	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
+	// data.
+	Context sqlxx.JSONRawMessage `json:"context"`
 
 	// Consent Request
 	//

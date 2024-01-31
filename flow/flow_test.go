@@ -87,6 +87,9 @@ func (f *Flow) setHandledConsentRequest(r AcceptOAuth2ConsentRequest) {
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 	f.SessionIDToken = r.SessionIDToken
 	f.SessionAccessToken = r.SessionAccessToken
+	if r.Context != nil {
+		f.Context = r.Context
+	}
 }
 
 func TestFlow_GetLoginRequest(t *testing.T) {

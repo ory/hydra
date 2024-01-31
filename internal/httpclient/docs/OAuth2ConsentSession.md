@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ConsentRequest** | Pointer to [**OAuth2ConsentRequest**](OAuth2ConsentRequest.md) |  | [optional] 
+**Context** | Pointer to **interface{}** |  | [optional] 
 **ExpiresAt** | Pointer to [**OAuth2ConsentSessionExpiresAt**](OAuth2ConsentSessionExpiresAt.md) |  | [optional] 
 **GrantAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
 **GrantScope** | Pointer to **[]string** |  | [optional] 
@@ -57,6 +58,41 @@ SetConsentRequest sets ConsentRequest field to given value.
 
 HasConsentRequest returns a boolean if a field has been set.
 
+### GetContext
+
+`func (o *OAuth2ConsentSession) GetContext() interface{}`
+
+GetContext returns the Context field if non-nil, zero value otherwise.
+
+### GetContextOk
+
+`func (o *OAuth2ConsentSession) GetContextOk() (*interface{}, bool)`
+
+GetContextOk returns a tuple with the Context field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetContext
+
+`func (o *OAuth2ConsentSession) SetContext(v interface{})`
+
+SetContext sets Context field to given value.
+
+### HasContext
+
+`func (o *OAuth2ConsentSession) HasContext() bool`
+
+HasContext returns a boolean if a field has been set.
+
+### SetContextNil
+
+`func (o *OAuth2ConsentSession) SetContextNil(b bool)`
+
+ SetContextNil sets the value for Context to be an explicit nil
+
+### UnsetContext
+`func (o *OAuth2ConsentSession) UnsetContext()`
+
+UnsetContext ensures that no value is present for Context, not even an explicit nil
 ### GetExpiresAt
 
 `func (o *OAuth2ConsentSession) GetExpiresAt() OAuth2ConsentSessionExpiresAt`

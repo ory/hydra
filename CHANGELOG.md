@@ -738,6 +738,7 @@
 
 ### Features
 
+* Add --skip-logout-consent flag to CLI ([#3709](https://github.com/ory/hydra/issues/3709)) ([f502d6e](https://github.com/ory/hydra/commit/f502d6e38747986cca2ce42b0854f194e85ed103))
 * Add authentication options to hooks ([#3633](https://github.com/ory/hydra/issues/3633)) ([5c8e792](https://github.com/ory/hydra/commit/5c8e7923ed22f6d231ca748bb76e4261a87afb08))
 * Add flag to export public keys ([#3684](https://github.com/ory/hydra/issues/3684)) ([62c006b](https://github.com/ory/hydra/commit/62c006b916351e7f74fb00e0006ea112801143d7))
 * Add missing index for jwk table ([#3691](https://github.com/ory/hydra/issues/3691)) ([39ee5e1](https://github.com/ory/hydra/commit/39ee5e1f0cfa7fae5c4f9e1663a930cb5b8c2bc9))

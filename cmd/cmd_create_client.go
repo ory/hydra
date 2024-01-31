@@ -39,6 +39,7 @@ const (
 	flagClientScope                             = "scope"
 	flagClientSectorIdentifierURI               = "sector-identifier-uri"
 	flagClientSkipConsent                       = "skip-consent"
+	flagClientLogoutSkipConsent                 = "skip-logout-consent"
 	flagClientSubjectType                       = "subject-type"
 	flagClientTokenEndpointAuthMethod           = "token-endpoint-auth-method"
 	flagClientSecret                            = "secret"

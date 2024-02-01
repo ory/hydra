@@ -248,6 +248,47 @@
           }
         }
       }
+    },
+    "webhook_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures a webhook.",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL to send the webhook to."
+        },
+        "auth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "config"],
+          "properties": {
+            "type": {
+              "const": "api_key"
+            },
+            "config": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "value"],
+              "properties": {
+                "in": {
+                  "enum": ["header", "cookie"]
+                },
+                "name": {
+                  "description": "The header or cookie name.",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "The header or cookie value.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -735,6 +776,15 @@
             "/ui/login"
           ]
         },
+        "registration": {
+          "type": "string",
+          "description": "Sets the OAuth2 Registration Endpoint URL of the OAuth2 User Login & Consent flow. Defaults to the same value as `login`. The registration URL is used if the authorization request was started with the `prompt=registration` parameter.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-login.app/registration",
+            "/ui/registration"
+          ]
+        },
         "consent": {
           "type": "string",
           "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
@@ -782,6 +832,14 @@
               "format": "uri",
               "examples": [
                 "https://kratos.example.com/admin"
+              ]
+            },
+            "publicUrl": {
+              "title": "The public URL of the ORY Kratos instance.",
+              "type": "string",
+              "format": "uri",
+              "examples": [
+                "https://kratos.example.com/public"
               ]
             },
             "headers": {
@@ -1039,16 +1097,30 @@
           }
         },
         "refresh_token_hook": {
-          "type": "string",
           "description": "Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-refresh-hook"]
+          "examples": ["https://my-example.app/token-refresh-hook"],
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "$ref": "#/definitions/webhook_config"
+            }
+          ]
         },
         "token_hook": {
-          "type": "string",
           "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",
-          "format": "uri",
-          "examples": ["https://my-example.app/token-hook"]
+          "examples": ["https://my-example.app/token-hook"],
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "$ref": "#/definitions/webhook_config"
+            }
+          ]
         }
       }
     },
@@ -1096,7 +1168,7 @@
       "examples": ["cpu"]
     },
     "tracing": {
-      "$ref": "https://raw.githubusercontent.com/ory/x/v0.0.582-0.20230816082414-f1e6acad79b5/otelx/config.schema.json"
+      "$ref": "https://raw.githubusercontent.com/ory/x/v0.0.612-0.20240130132700-6275e3f1ad0d/otelx/config.schema.json"
     },
     "sqa": {
       "type": "object",
@@ -1147,6 +1219,11 @@
       "title": "Enable development mode",
       "description": "If true, disables critical security measures to allow easier local development. Do not use in production.",
       "default": false
+    },
+    "feature_flags": {
+      "title": "Feature flags",
+      "type": "object",
+      "additionalProperties": true
     }
   },
   "additionalProperties": false

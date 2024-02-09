@@ -133,18 +133,18 @@ func (mr *MockOAuth2ProviderMockRecorder) NewDeviceRequest(arg0, arg1 interface{
 }
 
 // NewDeviceResponse mocks base method.
-func (m *MockOAuth2Provider) NewDeviceResponse(arg0 context.Context, arg1 fosite.DeviceRequester) (fosite.DeviceResponder, error) {
+func (m *MockOAuth2Provider) NewDeviceResponse(arg0 context.Context, arg1 fosite.DeviceRequester, arg2 fosite.Session) (fosite.DeviceResponder, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NewDeviceResponse", arg0, arg1)
+	ret := m.ctrl.Call(m, "NewDeviceResponse", arg0, arg1, arg2)
 	ret0, _ := ret[0].(fosite.DeviceResponder)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // NewDeviceResponse indicates an expected call of NewDeviceResponse.
-func (mr *MockOAuth2ProviderMockRecorder) NewDeviceResponse(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockOAuth2ProviderMockRecorder) NewDeviceResponse(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewDeviceResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewDeviceResponse), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewDeviceResponse", reflect.TypeOf((*MockOAuth2Provider)(nil).NewDeviceResponse), arg0, arg1, arg2)
 }
 
 // NewIntrospectionRequest mocks base method.
@@ -207,7 +207,7 @@ func (mr *MockOAuth2ProviderMockRecorder) NewRevocationRequest(arg0, arg1 interf
 }
 
 // WriteAccessError mocks base method.
-func (m *MockOAuth2Provider) WriteAccessError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.AccessRequester, arg3 error) {
+func (m *MockOAuth2Provider) WriteAccessError(arg0 context.Context, arg1 http.ResponseWriter, arg2 fosite.Requester, arg3 error) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "WriteAccessError", arg0, arg1, arg2, arg3)
 }

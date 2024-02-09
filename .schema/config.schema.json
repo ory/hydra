@@ -464,6 +464,11 @@
               "description": "Sets the session cookie name. Use with care!",
               "type": "object",
               "properties": {
+                "device_csrf": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_device_csrf"
+                },
                 "login_csrf": {
                   "type": "string",
                   "title": "CSRF Cookie Name",
@@ -645,6 +650,14 @@
               "examples": [
                 "https://example.org/my-custom-userinfo-endpoint"
               ]
+            },
+            "device_authorization_url": {
+              "type": "string",
+              "description": "A URL of the device authorization endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's device authorizatoin endpoint at /oauth2/device/auth. Set this value if you want to handle this endpoint yourself.",
+              "format": "uri-reference",
+              "examples": [
+                "https://example.org/oauth2/device/auth"
+              ]
             }
           }
         }
@@ -803,6 +816,24 @@
             "/ui/logout"
           ]
         },
+        "device_verification": {
+          "type": "string",
+          "description": "Sets the device user code verification endpoint. Defaults to an internal fallback URL showing an error.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-logout.app/device_verification",
+            "/ui/device_verification"
+          ]
+        },
+        "post_device_done": {
+          "type": "string",
+          "description": "Sets the post device authentication endpoint. Defaults to an internal fallback URL showing an error.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-logout.app/device_done",
+            "/ui/device_done"
+          ]
+        },
         "error": {
           "type": "string",
           "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",
@@ -947,6 +978,15 @@
               "$ref": "#/definitions/duration"
             }
           ]
+        },
+        "device_user_code": {
+          "description": "Configures how long device and user codes are valid.",
+          "default": "15m",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
         }
       }
     },
@@ -1062,6 +1102,17 @@
                 false
               ]
             }
+          }
+        },
+        "device_authorization": {
+          "token_polling_interval": {
+            "description": "Sets the starting token polling interval.",
+            "default": "5s",
+            "allOf": [
+              {
+                "$ref": "#/definitions/duration"
+              }
+            ]
           }
         },
         "grant": {

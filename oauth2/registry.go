@@ -6,6 +6,7 @@ package oauth2
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
@@ -33,4 +34,5 @@ type Registry interface {
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 	AccessRequestHooks() []AccessRequestHook
 	OAuth2ProviderConfig() fosite.Configurator
+	RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy
 }

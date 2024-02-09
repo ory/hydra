@@ -59,6 +59,9 @@ const (
 	IntrospectPath   = "/oauth2/introspect"
 	RevocationPath   = "/oauth2/revoke"
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
+
+	// Device Grant Handler
+	DeviceAuthPath = "/oauth2/device/auth"
 )
 
 type Handler struct {
@@ -103,6 +106,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 
 	public.Handler("OPTIONS", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
+
+	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.performOAuth2DeviceFlow))
 
 	admin.POST(IntrospectPath, h.introspectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.deleteOAuth2Token)
@@ -685,6 +690,47 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
 		return
 	}
+}
+
+// swagger:route POST /oauth2/device/auth v0alpha2 performOAuth2DeviceFlow
+//
+// # The OAuth 2.0 Device Authorize Endpoint
+//
+// This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+// OAuth2 is a very popular protocol and a library for your programming language will exists.
+//
+// To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
+//
+//	Consumes:
+//	- application/x-www-form-urlencoded
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: deviceAuthorization
+//	  default: errorOAuth2
+func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
+	var ctx = r.Context()
+	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
+	if err != nil {
+		h.r.OAuth2Provider().WriteAccessError(ctx, w, request, err)
+		return
+	}
+
+	// TODO: We need to call the consent manager here to create a new loginFlow with the
+	// device_challenge and device_verifier
+	var session = &Session{
+		DefaultSession: &openid.DefaultSession{
+			Headers: &jwt.Headers{}},
+	}
+
+	resp, err := h.r.OAuth2Provider().NewDeviceResponse(ctx, request, session)
+	if err != nil {
+		h.r.OAuth2Provider().WriteAccessError(ctx, w, request, err)
+		return
+	}
+
+	h.r.OAuth2Provider().WriteDeviceResponse(ctx, w, request, resp)
 }
 
 // Revoke OAuth 2.0 Access or Refresh Token Request

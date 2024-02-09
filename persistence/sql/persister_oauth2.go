@@ -757,13 +757,14 @@ func (p *Persister) RotateRefreshToken(ctx context.Context, requestID string, re
 	return handleRetryError(p.strictRefreshRotation(ctx, requestID))
 }
 
+// CreateDeviceCodeSession creates a new device code session and stores it in the database
 func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
 	defer otelx.End(span, &err)
 	return p.createSession(ctx, signature, requester, sqlTableDeviceCode, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
 }
 
-// UpdateDeviceCodeSession updates a device code session by requestID
+// UpdateDeviceCodeSessionByRequestID updates a device code session by requestID
 func (p *Persister) UpdateDeviceCodeSessionByRequestID(ctx context.Context, requestID string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionByRequestID")
 	defer otelx.End(span, &err)
@@ -786,6 +787,7 @@ func (p *Persister) UpdateDeviceCodeSessionByRequestID(ctx context.Context, requ
 	)
 }
 
+// GetDeviceCodeSession returns a device code session from the database
 func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSession")
 	defer otelx.End(span, &err)
@@ -809,18 +811,21 @@ func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature s
 	)
 }
 
+// CreateUserCodeSession creates a new user code session and stores it in the database
 func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateUserCodeSession")
 	defer otelx.End(span, &err)
 	return p.createSession(ctx, signature, requester, sqlTableUserCode, requester.GetSession().GetExpiresAt(fosite.UserCode).UTC())
 }
 
+// GetUserCodeSession returns a user code session from the database
 func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
 	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTableUserCode)
 }
 
+// InvalidateUserCodeSession invalidates a user code session
 func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateUserCodeSession")
 	defer otelx.End(span, &err)

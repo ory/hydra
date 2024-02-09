@@ -1,0 +1,82 @@
+{
+  "ID": "challenge-0018",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "RequestedScope": [
+    "requested_scope-0018_1",
+    "requested_scope-0018_2"
+  ],
+  "RequestedAudience": [
+    "requested_audience-0018_1",
+    "requested_audience-0018_2"
+  ],
+  "LoginSkip": false,
+  "Subject": "subject-0018",
+  "OpenIDConnectContext": {},
+  "Client": null,
+  "ClientID": "",
+  "RequestURL": "http://request/0018",
+  "SessionID": "auth_session-0018",
+  "IdentityProviderSessionID": "identity_provider_session_id-0018",
+  "LoginVerifier": "verifier-0018",
+  "LoginCSRF": "csrf-0018",
+  "LoginInitializedAt": null,
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "State": 128,
+  "LoginRemember": true,
+  "LoginRememberFor": 15,
+  "LoginExtendSessionLifespan": true,
+  "ACR": "",
+  "AMR": [],
+  "ForceSubjectIdentifier": "",
+  "Context": {
+    "context": "0018"
+  },
+  "LoginWasUsed": true,
+  "LoginError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "LoginAuthenticatedAt": null,
+  "DeviceChallengeID": "challenge-0018",
+  "DeviceCodeRequestID": "request-0018",
+  "DeviceVerifier": "verifier-0018",
+  "DeviceCSRF": "csrf-0018",
+  "DeviceUserCodeAcceptedAt": "0001-01-01T00:00:00Z",
+  "DeviceWasUsed": true,
+  "DeviceHandledAt": "0001-01-01T00:00:00Z",
+  "DeviceError": null,
+  "ConsentChallengeID": "challenge-0018",
+  "ConsentSkip": true,
+  "ConsentVerifier": "verifier-0018",
+  "ConsentCSRF": "csrf-0018",
+  "GrantedScope": [
+    "granted_scope-0018_1",
+    "granted_scope-0018_2"
+  ],
+  "GrantedAudience": [
+    "granted_audience-0018_1",
+    "granted_audience-0018_2"
+  ],
+  "ConsentRemember": true,
+  "ConsentRememberFor": 15,
+  "ConsentHandledAt": null,
+  "ConsentWasHandled": true,
+  "ConsentError": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "SessionIDToken": {
+    "session_id_token-0018": "0018"
+  },
+  "SessionAccessToken": {
+    "session_access_token-0018": "0018"
+  }
+}

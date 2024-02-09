@@ -79,6 +79,7 @@ type Client struct {
 	// - OpenID Connect Implicit Grant (deprecated!): `implicit`
 	// - Refresh Token Grant: `refresh_token`
 	// - OAuth 2.0 Token Exchange: `urn:ietf:params:oauth:grant-type:jwt-bearer`
+	// - OAuth 2.0 Device Code Grant: `urn:ietf:params:oauth:grant-type:device_code`
 	GrantTypes sqlxx.StringSliceJSONFormat `json:"grant_types" db:"grant_types"`
 
 	// OAuth 2.0 Client Response Types

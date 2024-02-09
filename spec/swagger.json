@@ -2319,6 +2319,45 @@
         }
       }
     },
+    "deviceAuthorization": {
+      "description": "OAuth 2.0 Device Authorization endpoint",
+      "type": "object",
+      "title": "OAuth2 Device Flow",
+      "properties": {
+        "device_code": {
+          "description": "The device verification code.",
+          "type": "string",
+          "example": "ory_dc_smldfksmdfkl.mslkmlkmlk"
+        },
+        "expires_in": {
+          "description": "The lifetime in seconds of the \"device_code\" and \"user_code\".",
+          "type": "integer",
+          "format": "int64",
+          "example": 16830
+        },
+        "interval": {
+          "description": "The minimum amount of time in seconds that the client\nSHOULD wait between polling requests to the token endpoint.  If no\nvalue is provided, clients MUST use 5 as the default.",
+          "type": "integer",
+          "format": "int64",
+          "example": 5
+        },
+        "user_code": {
+          "description": "The end-user verification code.",
+          "type": "string",
+          "example": "AAAAAA"
+        },
+        "verification_uri": {
+          "description": "The end-user verification URI on the authorization\nserver.  The URI should be short and easy to remember as end users\nwill be asked to manually type it into their user agent.",
+          "type": "string",
+          "example": "https://auth.ory.sh/tv"
+        },
+        "verification_uri_complete": {
+          "description": "A verification URI that includes the \"user_code\" (or\nother information with the same function as the \"user_code\"),\nwhich is designed for non-textual transmission.",
+          "type": "string",
+          "example": "https://auth.ory.sh/tv?user_code=AAAAAA"
+        }
+      }
+    },
     "errorOAuth2": {
       "description": "Error",
       "type": "object",

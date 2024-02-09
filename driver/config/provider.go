@@ -399,10 +399,12 @@ func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host str
 	return &u
 }
 
+// GetDeviceAndUserCodeLifespan returns the device_code and user_code lifespan. Defaults to 15 minutes.
 func (p *DefaultProvider) GetDeviceAndUserCodeLifespan(ctx context.Context) time.Duration {
 	return p.p.DurationF(KeyDeviceAndUserCodeLifespan, time.Minute*15)
 }
 
+// GetDeviceAuthTokenPollingInterval returns device grant token endpoint polling interval. Defaults to 5 seconds.
 func (p *DefaultProvider) GetDeviceAuthTokenPollingInterval(ctx context.Context) time.Duration {
 	return p.p.DurationF(KeyDeviceAuthTokenPollingInterval, time.Second*5)
 }
@@ -437,6 +439,7 @@ func (p *DefaultProvider) ErrorURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).RequestURIF(KeyErrorURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/error")))
 }
 
+// DeviceVerificationURL returns user_code verification page URL. Defaults to "oauth2/fallbacks/device".
 func (p *DefaultProvider) DeviceVerificationURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).URIF(KeyDeviceVerificationURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device")))
 }
@@ -498,6 +501,7 @@ func (p *DefaultProvider) OAuth2AuthURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/auth"))
 }
 
+// OAuth2DeviceAuthorisationURL returns device authorization endpoint. Defaults to "/oauth2/device/auth".
 func (p *DefaultProvider) OAuth2DeviceAuthorisationURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyOAuth2DeviceAuthorisationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth"))
 }

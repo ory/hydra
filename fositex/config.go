@@ -119,6 +119,7 @@ func (c *Config) GetRevocationHandlers(context.Context) fosite.RevocationHandler
 	return c.revocationHandlers
 }
 
+// GetDeviceEndpointHandlers returns the deviceEndpointHandlers
 func (c *Config) GetDeviceEndpointHandlers(ctx context.Context) fosite.DeviceEndpointHandlers {
 	return c.deviceEndpointHandlers
 }
@@ -216,6 +217,7 @@ func (c *Config) GetTokenURLs(ctx context.Context) []string {
 	})
 }
 
+// GetDeviceVerificationURL returns the device verification url
 func (c *Config) GetDeviceVerificationURL(ctx context.Context) string {
 	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.DeviceAuthPath).String()
 }

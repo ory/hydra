@@ -188,6 +188,25 @@ type AcceptOAuth2ConsentRequest struct {
 	SessionAccessToken sqlxx.MapStringInterface `json:"-" faker:"-"`
 }
 
+func (r *AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
+	type Alias AcceptOAuth2ConsentRequest
+	alias := Alias(*r)
+
+	if alias.Context == nil {
+		alias.Context = []byte("{}")
+	}
+
+	if alias.GrantedScope == nil {
+		alias.GrantedScope = []string{}
+	}
+
+	if alias.GrantedAudience == nil {
+		alias.GrantedAudience = []string{}
+	}
+
+	return json.Marshal(alias)
+}
+
 func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
@@ -261,6 +280,25 @@ type OAuth2ConsentSession struct {
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
+}
+
+func (r *OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
+	type Alias OAuth2ConsentSession
+	alias := Alias(*r)
+
+	if alias.Context == nil {
+		alias.Context = []byte("{}")
+	}
+
+	if alias.GrantedScope == nil {
+		alias.GrantedScope = []string{}
+	}
+
+	if alias.GrantedAudience == nil {
+		alias.GrantedAudience = []string{}
+	}
+
+	return json.Marshal(alias)
 }
 
 // HandledLoginRequest is the request payload used to accept a login request.
@@ -345,6 +383,20 @@ type HandledLoginRequest struct {
 	AuthenticatedAt sqlxx.NullTime      `json:"-"`
 }
 
+func (r *HandledLoginRequest) MarshalJSON() ([]byte, error) {
+	type Alias HandledLoginRequest
+	alias := Alias(*r)
+	if alias.Context == nil {
+		alias.Context = []byte("{}")
+	}
+
+	if alias.AMR == nil {
+		alias.AMR = []string{}
+	}
+
+	return json.Marshal(alias)
+}
+
 func (r *HandledLoginRequest) HasError() bool {
 	return r.Error.IsError()
 }
@@ -390,6 +442,24 @@ type OAuth2ConsentRequestOpenIDConnectContext struct {
 	// and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a
 	// phone number in the format specified for the phone_number Claim. The use of this parameter is optional.
 	LoginHint string `json:"login_hint,omitempty"`
+}
+
+func (n *OAuth2ConsentRequestOpenIDConnectContext) MarshalJSON() ([]byte, error) {
+	type Alias OAuth2ConsentRequestOpenIDConnectContext
+	alias := Alias(*n)
+	if alias.IDTokenHintClaims == nil {
+		alias.IDTokenHintClaims = map[string]interface{}{}
+	}
+
+	if alias.ACRValues == nil {
+		alias.ACRValues = []string{}
+	}
+
+	if alias.UILocales == nil {
+		alias.UILocales = []string{}
+	}
+
+	return json.Marshal(alias)
 }
 
 func (n *OAuth2ConsentRequestOpenIDConnectContext) Scan(value interface{}) error {
@@ -539,6 +609,20 @@ type LoginRequest struct {
 	RequestedAt     time.Time      `json:"-"`
 }
 
+func (r *LoginRequest) MarshalJSON() ([]byte, error) {
+	type Alias LoginRequest
+	alias := Alias(*r)
+	if alias.RequestedScope == nil {
+		alias.RequestedScope = []string{}
+	}
+
+	if alias.RequestedAudience == nil {
+		alias.RequestedAudience = []string{}
+	}
+
+	return json.Marshal(alias)
+}
+
 // Contains information on an ongoing consent request.
 //
 // swagger:model oAuth2ConsentRequest
@@ -614,6 +698,24 @@ type OAuth2ConsentRequest struct {
 	RequestedAt            time.Time      `json:"-"`
 }
 
+func (r *OAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
+	type Alias OAuth2ConsentRequest
+	alias := Alias(*r)
+	if alias.RequestedScope == nil {
+		alias.RequestedScope = []string{}
+	}
+
+	if alias.RequestedAudience == nil {
+		alias.RequestedAudience = []string{}
+	}
+
+	if alias.AMR == nil {
+		alias.AMR = []string{}
+	}
+
+	return json.Marshal(alias)
+}
+
 // Pass session data to a consent request.
 //
 // swagger:model acceptOAuth2ConsentRequestSession
@@ -635,4 +737,17 @@ func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
 		AccessToken: map[string]interface{}{},
 		IDToken:     map[string]interface{}{},
 	}
+}
+
+func (r *AcceptOAuth2ConsentRequestSession) MarshalJSON() ([]byte, error) {
+	type Alias AcceptOAuth2ConsentRequestSession
+	alias := Alias(*r)
+	if alias.AccessToken == nil {
+		alias.AccessToken = map[string]interface{}{}
+	}
+
+	if alias.IDToken == nil {
+		alias.IDToken = map[string]interface{}{}
+	}
+	return json.Marshal(alias)
 }

@@ -364,6 +364,14 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
+	if request.RequestedScope == nil {
+		request.RequestedScope = []string{}
+	}
+
+	if request.RequestedAudience == nil {
+		request.RequestedAudience = []string{}
+	}
+
 	request.Client = sanitizeClient(request.Client)
 	h.r.Writer().Write(w, r, request)
 }

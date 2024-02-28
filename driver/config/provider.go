@@ -21,7 +21,6 @@ import (
 
 	"github.com/ory/x/otelx"
 
-	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/spec"
 	"github.com/ory/x/dbal"
 
@@ -509,11 +508,6 @@ func (p *DefaultProvider) OAuth2AuthURL(ctx context.Context) *url.URL {
 // OAuth2DeviceAuthorisationURL returns device authorization endpoint. Defaults to "/oauth2/device/auth".
 func (p *DefaultProvider) OAuth2DeviceAuthorisationURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyOAuth2DeviceAuthorisationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth"))
-}
-
-// OAuth2DeviceAuthorisationURL returns device verification endpoint.
-func (p *DefaultProvider) OAuth2DeviceVerificationURL(ctx context.Context) *url.URL {
-	return urlx.AppendPaths(p.PublicURL(ctx), oauth2.DeviceVerificationPath)
 }
 
 func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {

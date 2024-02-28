@@ -219,5 +219,5 @@ func (c *Config) GetTokenURLs(ctx context.Context) []string {
 
 // GetDeviceVerificationURL returns the device verification url
 func (c *Config) GetDeviceVerificationURL(ctx context.Context) string {
-	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.DeviceAuthPath).String()
+	return urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.DeviceVerificationPath).String()
 }

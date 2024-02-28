@@ -44,4 +44,12 @@ func TestUpdateClient(t *testing.T) {
 
 		snapshotx.SnapshotT(t, json.RawMessage(actual.Raw), snapshotExcludedClientFields...)
 	})
+
+	t.Run("case=clientID error", func(t *testing.T) {
+		actual := gjson.Parse(cmdx.ExecExpectedErr(t, c,
+			original.GetID(),
+			"--id", "new-id",
+		))
+		assert.Empty(t, actual)
+	})
 }

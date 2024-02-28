@@ -23,6 +23,7 @@ func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 		Audience:                          flagx.MustGetStringSlice(cmd, flagClientAudience),
 		BackchannelLogoutSessionRequired:  pointerx.Bool(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
 		BackchannelLogoutUri:              pointerx.String(flagx.MustGetString(cmd, flagClientBackchannelLogoutCallback)),
+		ClientId:                          pointerx.String(flagx.MustGetString(cmd, flagClientId)),
 		ClientName:                        pointerx.String(flagx.MustGetString(cmd, flagClientName)),
 		ClientSecret:                      pointerx.String(flagx.MustGetString(cmd, flagClientSecret)),
 		ClientUri:                         pointerx.String(flagx.MustGetString(cmd, flagClientClientURI)),
@@ -77,6 +78,7 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.String(flagClientLogoURI, "", "A URL string that references a logo for the client")
 	flags.StringSlice(flagClientAllowedCORSOrigin, []string{}, "The list of URLs allowed to make CORS requests. Requires CORS_ENABLED.")
 	flags.String(flagClientSubjectType, "public", "A identifier algorithm. Valid values are `public` and `pairwise`.")
+	flags.String(flagClientId, "", "Provide the client's id.")
 	flags.String(flagClientSecret, "", "Provide the client's secret.")
 	flags.String(flagClientName, "", "The client's name.")
 	flags.StringSlice(flagClientPostLogoutCallback, []string{}, "List of allowed URLs to be redirected to after a logout.")

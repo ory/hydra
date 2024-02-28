@@ -64,7 +64,8 @@ const (
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 
 	// Device authorization endpoint
-	DeviceAuthPath = "/oauth2/device/auth"
+	DeviceAuthPath         = "/oauth2/device/auth"
+	DeviceVerificationPath = "/oauth2/device/verify"
 )
 
 type Handler struct {
@@ -111,6 +112,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
 
 	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.oAuth2DeviceFlow))
+	public.GET(DeviceVerificationPath, h.performOAuth2DeviceVerificationFlow)
 
 	admin.POST(IntrospectPath, h.introspectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.deleteOAuth2Token)
@@ -693,6 +695,41 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
 		return
 	}
+}
+
+// swagger:route GET /oauth2/device/verify oauth performOAuth2DeviceVerificationFlow
+//
+// # OAuth 2.0 Device Verification Endpoint
+//
+// This is the device user verification endpoint. The user is redirected here when trying to login using the device flow.
+//
+//	Consumes:
+//	- application/x-www-form-urlencoded
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  302: emptyResponse
+//	  default: errorOAuth2
+func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ctx := r.Context()
+
+	_, flow, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
+	if errors.Is(err, consent.ErrAbortOAuth2Request) {
+		x.LogAudit(r, nil, h.r.AuditLogger())
+		// do nothing
+		return
+	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+		x.LogAudit(r, err, h.r.AuditLogger())
+		h.r.Writer().WriteError(w, r, err)
+		return
+	} else if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"consent_verifier": {string(flow.ConsentVerifier)}}).String(), http.StatusFound)
 }
 
 // OAuth2 Device Flow

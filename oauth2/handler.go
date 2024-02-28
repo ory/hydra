@@ -110,7 +110,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("OPTIONS", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
 
-	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.performOAuth2DeviceFlow))
+	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.oAuth2DeviceFlow))
 
 	admin.POST(IntrospectPath, h.introspectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.deleteOAuth2Token)
@@ -700,6 +700,8 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 // # Ory's OAuth 2.0 Device Authorization API
 //
 // swagger:model deviceAuthorization
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type deviceAuthorization struct {
 	// The device verification code.
 	//
@@ -738,7 +740,7 @@ type deviceAuthorization struct {
 	Interval int `json:"interval"`
 }
 
-// swagger:route POST /oauth2/device/auth oauth performOAuth2DeviceFlow
+// swagger:route POST /oauth2/device/auth oauth oAuth2DeviceFlow
 //
 // # The OAuth 2.0 Device Authorize Endpoint
 //
@@ -755,7 +757,7 @@ type deviceAuthorization struct {
 //	Responses:
 //	  200: deviceAuthorization
 //	  default: errorOAuth2
-func (h *Handler) performOAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
 	if err != nil {

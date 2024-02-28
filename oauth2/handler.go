@@ -19,6 +19,7 @@ import (
 
 	"github.com/pborman/uuid"
 
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/josex"
@@ -1163,7 +1164,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	session, flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
+	acceptConsentSession, flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -1178,83 +1179,14 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	for _, scope := range session.GrantedScope {
-		authorizeRequest.GrantScope(scope)
-	}
-
-	for _, audience := range session.GrantedAudience {
-		authorizeRequest.GrantAudience(audience)
-	}
-
-	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	session, err := h.updateSessionWithRequest(ctx, acceptConsentSession, flow, r, authorizeRequest)
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
-
-	var accessTokenKeyID string
-	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(authorizeRequest.GetClient())) == "jwt" {
-		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
-		if err != nil {
-			x.LogError(r, err, h.r.Logger())
-			h.writeAuthorizeError(w, r, authorizeRequest, err)
-			return
-		}
-	}
-
-	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
-	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogAudit(r, err, h.r.AuditLogger())
-		h.writeAuthorizeError(w, r, authorizeRequest, err)
-		return
-	} else if err != nil {
-		x.LogError(r, err, h.r.Logger())
-		h.writeAuthorizeError(w, r, authorizeRequest, err)
-		return
-	}
-
-	authorizeRequest.SetID(session.ConsentRequestID)
-	claims := &jwt.IDTokenClaims{
-		Subject:                             obfuscatedSubject,
-		Issuer:                              h.c.IssuerURL(ctx).String(),
-		AuthTime:                            time.Time(session.AuthenticatedAt),
-		RequestedAt:                         session.RequestedAt,
-		Extra:                               session.Session.IDToken,
-		AuthenticationContextClassReference: session.ConsentRequest.ACR,
-		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
-
-		// These are required for work around https://github.com/ory/fosite/issues/530
-		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),
-		Audience: []string{authorizeRequest.GetClient().GetID()},
-		IssuedAt: time.Now().Truncate(time.Second).UTC(),
-
-		// This is set by the fosite strategy
-		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
-	}
-	claims.Add("sid", session.ConsentRequest.LoginSessionID)
-
-	// done
 	var response fosite.AuthorizeResponder
 	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) (err error) {
-		response, err = h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
-			DefaultSession: &openid.DefaultSession{
-				Claims: claims,
-				Headers: &jwt.Headers{Extra: map[string]interface{}{
-					// required for lookup on jwk endpoint
-					"kid": openIDKeyID,
-				}},
-				Subject: session.ConsentRequest.Subject,
-			},
-			Extra:                 session.Session.AccessToken,
-			KID:                   accessTokenKeyID,
-			ClientID:              authorizeRequest.GetClient().GetID(),
-			ConsentChallenge:      session.ConsentRequestID,
-			ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
-			AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
-			MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
-			Flow:                  flow,
-		})
+		response, err = h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, session)
 		return err
 	}); err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -1324,6 +1256,81 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 	}
 
 	h.r.OAuth2Provider().WriteAuthorizeError(r.Context(), w, ar, err)
+}
+
+// updateSessionWithRequest takes a session and a fosite.request as input and returns a new session.
+// If any errors occur, they are logged.
+func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.AcceptOAuth2ConsentRequest, flow *flow.Flow, r *http.Request, request fosite.Requester) (*Session, error) {
+	for _, scope := range session.GrantedScope {
+		request.GrantScope(scope)
+	}
+
+	for _, audience := range session.GrantedAudience {
+		request.GrantAudience(audience)
+	}
+
+	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return nil, err
+	}
+
+	var accessTokenKeyID string
+	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(flow.Client)) == "jwt" {
+		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			return nil, err
+		}
+	}
+
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, flow.Client, session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+		x.LogAudit(r, err, h.r.AuditLogger())
+		return nil, err
+	} else if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		return nil, err
+	}
+
+	request.SetID(session.ConsentRequestID)
+	claims := &jwt.IDTokenClaims{
+		Subject:                             obfuscatedSubject,
+		Issuer:                              h.c.IssuerURL(ctx).String(),
+		AuthTime:                            time.Time(session.AuthenticatedAt),
+		RequestedAt:                         session.RequestedAt,
+		Extra:                               session.Session.IDToken,
+		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
+
+		// These are required for work around https://github.com/ory/fosite/issues/530
+		Nonce:    request.GetRequestForm().Get("nonce"),
+		Audience: []string{flow.Client.GetID()},
+		IssuedAt: time.Now().Truncate(time.Second).UTC(),
+
+		// This is set by the fosite strategy
+		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
+	}
+	claims.Add("sid", session.ConsentRequest.LoginSessionID)
+
+	return &Session{
+		DefaultSession: &openid.DefaultSession{
+			Claims: claims,
+			Headers: &jwt.Headers{Extra: map[string]interface{}{
+				// required for lookup on jwk endpoint
+				"kid": openIDKeyID,
+			}},
+			Subject: session.ConsentRequest.Subject,
+		},
+		Extra:                 session.Session.AccessToken,
+		KID:                   accessTokenKeyID,
+		ClientID:              flow.Client.GetID(),
+		ConsentChallenge:      session.ConsentRequestID,
+		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
+		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+		MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
+		Flow:                  flow,
+	}, nil
 }
 
 func (h *Handler) logOrAudit(err error, r *http.Request) {

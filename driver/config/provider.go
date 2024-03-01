@@ -87,6 +87,7 @@ const (
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
 	KeyDeviceVerificationURL                     = "urls.device_verification"
+	KeyDeviceDoneURL                             = "urls.post_device_done"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
@@ -448,6 +449,11 @@ func (p *DefaultProvider) DeviceVerificationURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).URIF(KeyDeviceVerificationURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device")))
 }
 
+// DeviceDoneURL returns the post device authorization URL. Defaults to "oauth2/fallbacks/device/done".
+func (p *DefaultProvider) DeviceDoneURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyDeviceDoneURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device/done")))
+}
+
 func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).RequestURIF(KeyPublicURL, p.IssuerURL(ctx)))
 }
@@ -698,6 +704,7 @@ func (p *DefaultProvider) CookieNameLoginCSRF(ctx context.Context) string {
 	return p.cookieSuffix(ctx, KeyCookieLoginCSRFName)
 }
 
+// CookieNameDeviceCSRF returns the device CSRF cookie name.
 func (p *DefaultProvider) CookieNameDeviceCSRF(ctx context.Context) string {
 	return p.cookieSuffix(ctx, KeyCookieDeviceCSRFName)
 }

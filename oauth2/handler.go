@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -47,6 +48,7 @@ const (
 	DefaultLoginPath      = "/oauth2/fallbacks/login"
 	DefaultConsentPath    = "/oauth2/fallbacks/consent"
 	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
+	DefaultPostDevicePath = "/oauth2/fallbacks/device/done"
 	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
 	DefaultErrorPath      = "/oauth2/fallbacks/error"
 	TokenPath             = "/oauth2/token" // #nosec G101
@@ -97,6 +99,12 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
 		http.StatusOK,
 		config.KeyLogoutRedirectURL,
+	))
+	public.GET(DefaultPostDevicePath, h.fallbackHandler(
+		"You successfully authenticated on your device!",
+		"The Default Post Device URL is not set which is why you are seeing this fallback page. Your device login request however succeeded.",
+		http.StatusOK,
+		config.KeyDeviceDoneURL,
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 
@@ -714,7 +722,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	_, flow, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
+	consentSession, flow, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -724,6 +732,24 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		h.r.Writer().WriteError(w, r, err)
 		return
 	} else if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	req := fosite.NewDeviceRequest()
+	req.Client = consentSession.ConsentRequest.Client
+	session, err := h.updateSessionWithRequest(ctx, consentSession, flow, r, req)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	req.SetSession(session)
+	// We update the device_code session with the claims that the user gave consent for, this
+	// marks it as ready to be used for the token endpoint
+	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestID(ctx, flow.DeviceCodeRequestID.String(), req)
+	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -796,6 +822,7 @@ type deviceAuthorization struct {
 //	  default: errorOAuth2
 func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
+
 	request, err := h.r.OAuth2Provider().NewDeviceRequest(ctx, r)
 	if err != nil {
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, request, err)
@@ -1316,7 +1343,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 	}
 
 	var accessTokenKeyID string
-	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(flow.Client)) == "jwt" {
+	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(request.GetClient())) == "jwt" {
 		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())
@@ -1324,7 +1351,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 		}
 	}
 
-	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, flow.Client, session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		return nil, err
@@ -1344,7 +1371,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    request.GetRequestForm().Get("nonce"),
-		Audience: []string{flow.Client.GetID()},
+		Audience: []string{request.GetClient().GetID()},
 		IssuedAt: time.Now().Truncate(time.Second).UTC(),
 
 		// This is set by the fosite strategy
@@ -1363,7 +1390,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 		},
 		Extra:                 session.Session.AccessToken,
 		KID:                   accessTokenKeyID,
-		ClientID:              flow.Client.GetID(),
+		ClientID:              request.GetClient().GetID(),
 		ConsentChallenge:      session.ID,
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),

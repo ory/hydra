@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x/events"
@@ -36,6 +37,7 @@ type Handler struct {
 
 const (
 	LoginPath    = "/oauth2/auth/requests/login"
+	DevicePath   = "/oauth2/auth/requests/device"
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
 	SessionsPath = "/oauth2/auth/sessions"
@@ -67,6 +69,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(LogoutPath, h.getOAuth2LogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.acceptOAuth2LogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.rejectOAuth2LogoutRequest)
+
+	admin.PUT(DevicePath+"/accept", h.acceptUserCodeRequest)
 }
 
 // Revoke OAuth 2.0 Consent Session Parameters
@@ -1047,6 +1051,133 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 	}
 
 	h.r.Writer().Write(w, r, request)
+}
+
+// Verify OAuth 2.0 User Code Request
+//
+// swagger:parameters acceptUserCodeRequest
+type verifyUserCodeRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"device_challenge"`
+
+	// in: body
+	Body flow.AcceptDeviceUserCodeRequest
+}
+
+// swagger:route PUT /admin/oauth2/auth/requests/device/accept oAuth2 acceptUserCodeRequest
+//
+// # Accepts a device grant user_code request
+//
+// Accepts a device grant user_code request
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: oAuth2RedirectTo
+//	  default: errorOAuth2
+func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	ctx := r.Context()
+
+	challenge := r.URL.Query().Get("device_challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'device_challenge' is not defined but should have been.`)))
+		return
+	}
+
+	var reqBody flow.AcceptDeviceUserCodeRequest
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&reqBody); err != nil {
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		return
+	}
+
+	if reqBody.UserCode == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
+		return
+	}
+
+	cr, err := h.r.ConsentManager().GetDeviceUserAuthRequest(ctx, challenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsDeviceChallenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	userCodeSignature, err := h.r.RFC8628HMACStrategy().UserCodeSignature(r.Context(), reqBody.UserCode)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHint(`'user_code' signature could not be computed`)))
+		return
+	}
+	userCodeRequest, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeSignature, nil)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithWrap(err).WithHint(`'user_code' session not found`)))
+		return
+	}
+	err = h.r.RFC8628HMACStrategy().ValidateUserCode(ctx, userCodeRequest, reqBody.UserCode)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrTokenExpired.WithWrap(err).WithHint(`'user_code' has expired`)))
+		return
+	}
+
+	p := flow.HandledDeviceUserAuthRequest{
+		ID:                  f.DeviceChallengeID.String(),
+		RequestedAt:         cr.RequestedAt,
+		HandledAt:           sqlxx.NullTime(time.Now().UTC()),
+		Client:              userCodeRequest.GetClient().(*client.Client),
+		DeviceCodeRequestID: userCodeRequest.GetID(),
+		RequestedScope:      []string(userCodeRequest.GetRequestedScopes()),
+		RequestedAudience:   []string(userCodeRequest.GetRequestedAudience()),
+	}
+
+	// Append the client_id to the original RequestURL, as it is needed for the login flow
+	reqURL, err := url.Parse(f.RequestURL)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+	if reqURL.Query().Get("client_id") == "" {
+		q := reqURL.Query()
+		q.Add("client_id", userCodeRequest.GetClient().GetID())
+		reqURL.RawQuery = q.Encode()
+	}
+	f.RequestURL = reqURL.String()
+
+	hr, err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, challenge, &p)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		return
+	}
+
+	ru, err := url.Parse(hr.RequestURL)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	verifier, err := f.ToDeviceVerifier(ctx, h.r)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	events.Trace(ctx, events.DeviceUserCodeAccepted, events.WithClientID(userCodeRequest.GetClient().GetID()))
+
+	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
+		RedirectTo: urlx.SetQuery(ru, url.Values{"device_verifier": {verifier}, "client_id": {userCodeRequest.GetClient().GetID()}}).String(),
+	})
 }
 
 func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flowctx.CodecOption) (*flow.Flow, error) {

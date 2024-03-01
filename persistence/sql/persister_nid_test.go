@@ -437,7 +437,7 @@ func (s *PersisterTestSuite) TestCreateLoginRequest() {
 			lr := flow.LoginRequest{ID: "lr-id", ClientID: client.ID, RequestedAt: time.Now()}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
+			f, err := r.ConsentManager().CreateLoginRequest(s.t1, nil, &lr)
 			require.NoError(t, err)
 			require.Equal(t, s.t1NID, f.NID)
 		})
@@ -1219,7 +1219,7 @@ func (s *PersisterTestSuite) TestGetLoginRequest() {
 			lr := flow.LoginRequest{ID: "lr-id", ClientID: client.ID, RequestedAt: time.Now()}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
+			f, err := r.ConsentManager().CreateLoginRequest(s.t1, nil, &lr)
 			require.NoError(t, err)
 			require.Equal(t, s.t1NID, f.NID)
 

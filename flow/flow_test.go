@@ -92,6 +92,94 @@ func (f *Flow) setHandledConsentRequest(r AcceptOAuth2ConsentRequest) {
 	}
 }
 
+func (f *Flow) setDeviceRequest(r *DeviceUserAuthRequest) {
+	f.DeviceChallengeID = sqlxx.NullString(r.ID)
+	f.DeviceCSRF = sqlxx.NullString(r.CSRF)
+	f.DeviceVerifier = sqlxx.NullString(r.Verifier)
+	f.Client = r.Client
+	f.RequestURL = r.RequestURL
+	f.RequestedAt = r.RequestedAt
+	f.RequestedScope = r.RequestedScope
+	f.RequestedAudience = r.RequestedAudience
+	f.DeviceWasUsed = sqlxx.NullBool{Bool: r.WasHandled, Valid: true}
+	f.DeviceHandledAt = r.HandledAt
+}
+
+func (f *Flow) setHandledDeviceRequest(r *HandledDeviceUserAuthRequest) {
+	f.DeviceChallengeID = sqlxx.NullString(r.ID)
+	f.Client = r.Client
+	f.RequestURL = r.RequestURL
+	f.RequestedAt = r.RequestedAt
+	f.RequestedScope = r.RequestedScope
+	f.RequestedAudience = r.RequestedAudience
+	f.DeviceError = r.Error
+	f.RequestedAt = r.RequestedAt
+	f.DeviceCodeRequestID = sqlxx.NullString(r.DeviceCodeRequestID)
+	f.DeviceWasUsed = sqlxx.NullBool{Bool: r.WasHandled, Valid: true}
+	f.DeviceHandledAt = r.HandledAt
+}
+
+func TestFlow_GetDeviceUserAuthRequest(t *testing.T) {
+	t.Run("GetDeviceUserAuthRequest should set all fields on its return value", func(t *testing.T) {
+		f := Flow{}
+		expected := DeviceUserAuthRequest{}
+		assert.NoError(t, faker.FakeData(&expected))
+		f.setDeviceRequest(&expected)
+		actual := f.GetDeviceUserAuthRequest()
+		assert.Equal(t, expected, *actual)
+	})
+}
+
+func TestFlow_GetHandledDeviceUserAuthRequest(t *testing.T) {
+	t.Run("GetHandledDeviceUserAuthRequest should set all fields on its return value", func(t *testing.T) {
+		f := Flow{}
+		expected := HandledDeviceUserAuthRequest{}
+		assert.NoError(t, faker.FakeData(&expected))
+		f.setHandledDeviceRequest(&expected)
+		actual := f.GetHandledDeviceUserAuthRequest()
+		assert.NotNil(t, actual.Request)
+		expected.Request = nil
+		actual.Request = nil
+		assert.Equal(t, expected, *actual)
+	})
+}
+
+func TestFlow_NewDeviceFlow(t *testing.T) {
+	t.Run("NewDeviceFlow and GetDeviceUserAuthRequest should use all DeviceUserAuthRequest fields", func(t *testing.T) {
+		expected := &DeviceUserAuthRequest{}
+		assert.NoError(t, faker.FakeData(expected))
+		actual := NewDeviceFlow(expected).GetDeviceUserAuthRequest()
+		assert.Equal(t, expected, actual)
+	})
+}
+
+func TestFlow_HandleDeviceUserAuthRequest(t *testing.T) {
+	t.Run(
+		"HandleDeviceUserAuthRequest should ignore RequestedAt in its argument and copy the other fields",
+		func(t *testing.T) {
+			f := Flow{}
+			assert.NoError(t, faker.FakeData(&f))
+			f.State = DeviceFlowStateInitialized
+
+			r := HandledDeviceUserAuthRequest{}
+			assert.NoError(t, faker.FakeData(&r))
+			r.ID = f.DeviceChallengeID.String()
+			f.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
+			f.RequestedAudience = r.RequestedAudience
+			f.RequestedScope = r.RequestedScope
+			f.RequestURL = r.RequestURL
+
+			assert.NoError(t, f.HandleDeviceUserAuthRequest(&r))
+
+			actual := f.GetHandledDeviceUserAuthRequest()
+			assert.NotEqual(t, r.RequestedAt, actual.RequestedAt)
+			r.Request = f.GetDeviceUserAuthRequest()
+			actual.RequestedAt = r.RequestedAt
+			assert.Equal(t, r, *actual)
+		},
+	)
+}
+
 func TestFlow_GetLoginRequest(t *testing.T) {
 	t.Run("GetLoginRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}

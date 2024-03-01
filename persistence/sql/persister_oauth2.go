@@ -821,6 +821,9 @@ func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string,
 func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
 	defer otelx.End(span, &err)
+	if session == nil {
+		session = oauth2.NewSession("")
+	}
 	return p.findSessionBySignature(ctx, signature, session, sqlTableUserCode)
 }
 
@@ -841,18 +844,20 @@ func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature str
 	)
 }
 
-// UpdateAndInvalidateUserCodeSession invalidates a user code session and connects it with the device flow challenge ID
-func (p *Persister) UpdateAndInvalidateUserCodeSession(ctx context.Context, signature, challenge_id string) (err error) {
+// UpdateAndInvalidateUserCodeSession invalidates a user code session and connects it with the device flow request ID
+func (p *Persister) UpdateAndInvalidateUserCodeSessionByRequestID(ctx context.Context, request_id, challenge_id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateAndInvalidateUserCodeSession")
 	defer otelx.End(span, &err)
 
+	// TODO(nsklikas): afaict this is supposed to return an error if no rows were updated, but this is not the actual behavior.
+	// We need to either fix this OR do a select -> check -> update (this would require 2 queries instead of 1).
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, challenge_id=? WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false, challenge_id=? WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
 				challenge_id,
-				signature,
+				request_id,
 				p.NetworkID(ctx),
 			).
 			Exec(),

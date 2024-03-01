@@ -45,7 +45,7 @@ type (
 		RevokeSubjectLoginSession(ctx context.Context, user string) error
 		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error
 
-		CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (*flow.Flow, error)
+		CreateLoginRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (*flow.Flow, error)
 		GetLoginRequest(ctx context.Context, challenge string) (*flow.LoginRequest, error)
 		HandleLoginRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledLoginRequest) (*flow.LoginRequest, error)
 		VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.HandledLoginRequest, error)

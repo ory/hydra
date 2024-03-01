@@ -561,9 +561,13 @@ func (s *DefaultStrategy) requestConsent(
 		// The OpenID Connect Test Tool fails if this returns `consent_required` when `prompt=none` is used.
 		// According to the quote above, it should be ok to allow https to skip consent.
 		//
+		// Device initiated flows are never allowed to skip consent, the user must always explicitly authorize the device.
+		//
 		// This is tracked as issue: https://github.com/ory/hydra/issues/866
 		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
-		if !(ar.GetRedirectURI().Scheme == "https" || (fosite.IsLocalhost(ar.GetRedirectURI()) && ar.GetRedirectURI().Scheme == "http")) {
+		if f.DeviceChallengeID != "" {
+			return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+		} else if !(ar.GetRedirectURI().Scheme == "https" || (fosite.IsLocalhost(ar.GetRedirectURI()) && ar.GetRedirectURI().Scheme == "http")) {
 			return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
 		}
 	}
@@ -1233,7 +1237,15 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 		ar.RequestedAudience = fosite.Arguments(deviceFlow.RequestedAudience)
 	}
 
+	// TODO(nsklikas): wrap these 2 function calls in a transaction (one persists the flow and the other invalidates the user_code)
 	consentSession, f, err := s.handleOAuth2AuthorizationRequest(ctx, w, r, ar, deviceFlow)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = s.r.OAuth2Storage().UpdateAndInvalidateUserCodeSessionByRequestID(r.Context(), string(f.DeviceCodeRequestID), f.ID)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return consentSession, f, err
 }
@@ -1342,7 +1354,7 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 	}
 
 	cookieNameDeviceCSRF := s.r.Config().CookieNameDeviceCSRF(ctx)
-	if err := validateCsrfSession(r, s.r.Config(), store, cookieNameDeviceCSRF, session.Request.CSRF); err != nil {
+	if err := ValidateCsrfSession(r, s.r.Config(), store, cookieNameDeviceCSRF, session.Request.CSRF, f); err != nil {
 		return nil, err
 	}
 

@@ -20,6 +20,8 @@ const (
 	// LoginRejected will be emitted when the login UI rejects a login request.
 	LoginRejected semconv.Event = "OAuth2LoginRejected"
 
+	DeviceUserCodeAccepted semconv.Event = "OAuth2DeviceUserCodeAccepted"
+
 	// ConsentAccepted will be emitted when the consent UI accepts a consent request.
 	ConsentAccepted semconv.Event = "OAuth2ConsentAccepted"
 

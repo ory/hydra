@@ -322,6 +322,7 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 	cookie.Options.Path = s.c.SessionCookiePath(ctx)
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
 	cookie.Options.Secure = s.c.CookieSecure(ctx)
+	cookie.Options.Secure = s.c.CookieSecure(ctx)
 	cookie.Options.Domain = s.c.CookieDomain(ctx)
 	cookie.Options.MaxAge = -1
 

@@ -62,6 +62,7 @@ const (
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
 	KeyCookieDomain                              = "serve.cookies.domain"
 	KeyCookieSecure                              = "serve.cookies.secure"
+	KeyCookiePartitioned                         = "serve.cookies.partitioned"
 	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
@@ -288,6 +289,13 @@ func (p *DefaultProvider) CookieSecure(ctx context.Context) bool {
 		return true
 	}
 	return p.getProvider(ctx).BoolF(KeyCookieSecure, false)
+}
+
+func (p *DefaultProvider) CookiePartitioned(ctx context.Context) bool {
+	if !p.IsDevelopmentMode(ctx) {
+		return false
+	}
+	return p.getProvider(ctx).BoolF(KeyCookiePartitioned, false)
 }
 
 func (p *DefaultProvider) CookieSameSiteMode(ctx context.Context) http.SameSite {

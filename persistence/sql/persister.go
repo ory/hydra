@@ -33,9 +33,13 @@ var _ persistence.Persister = new(Persister)
 var _ storage.Transactional = new(Persister)
 
 var (
-	ErrTransactionOpen   = errors.New("There is already a transaction in this context.")
-	ErrNoTransactionOpen = errors.New("There is no transaction in this context.")
+	ErrTransactionOpen   = errors.New("There is already a Transaction in this context.")
+	ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
 )
+
+type skipCommitContextKey int
+
+const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
@@ -65,7 +69,7 @@ func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) 
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
-		return ctx, errorsx.WithStack(ErrTransactionOpen)
+		return context.WithValue(ctx, skipCommitKey, true), nil // no-op
 	}
 
 	tx, err := p.conn.Store.TransactionContextOptions(ctx, &sql.TxOptions{
@@ -85,6 +89,10 @@ func (p *Persister) Commit(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
 	defer otelx.End(span, &err)
 
+	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
+		return nil // we skipped BeginTX, so we also skip Commit
+	}
+
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
 	if tx.TX == fallback.TX || tx.TX == nil {
@@ -97,6 +105,10 @@ func (p *Persister) Commit(ctx context.Context) (err error) {
 func (p *Persister) Rollback(ctx context.Context) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
 	defer otelx.End(span, &err)
+
+	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
+		return nil // we skipped BeginTX, so we also skip Rollback
+	}
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
@@ -184,6 +196,6 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 	return v
 }
 
-func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
+func (p *Persister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.conn, f)
 }

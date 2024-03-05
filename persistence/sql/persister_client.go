@@ -38,7 +38,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateClient")
 	defer otelx.End(span, &err)
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		o, err := p.GetConcreteClient(ctx, cl.GetID())
 		if err != nil {
 			return err

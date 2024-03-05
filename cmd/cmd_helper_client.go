@@ -18,6 +18,7 @@ import (
 
 func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 	return hydra.OAuth2Client{
+		AccessTokenStrategy:               pointerx.String(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
 		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, flagClientAllowedCORSOrigin),
 		Audience:                          flagx.MustGetStringSlice(cmd, flagClientAudience),
 		BackchannelLogoutSessionRequired:  pointerx.Bool(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
@@ -81,6 +82,7 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.StringSlice(flagClientPostLogoutCallback, []string{}, "List of allowed URLs to be redirected to after a logout.")
 	flags.Bool(flagClientSkipConsent, false, "Boolean flag specifying whether to skip the consent screen for this client. If omitted, the default value is false.")
 	flags.Bool(flagClientLogoutSkipConsent, false, "Boolean flag specifying whether to skip the logout consent screen for this client. If omitted, the default value is false.")
+	flags.String(flagClientAccessTokenStrategy, "", "The strategy used to generate access tokens. Valid options are `opaque` and `jwt`.")
 
 	// back-channel logout options
 	flags.Bool(flagClientBackChannelLogoutSessionRequired, false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the backchannel-logout-callback is used. If omitted, the default value is false.")

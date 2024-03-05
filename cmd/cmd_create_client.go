@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	flagClientAccessTokenStrategy               = "access-token-strategy"
 	flagClientAllowedCORSOrigin                 = "allowed-cors-origin"
 	flagClientAudience                          = "audience"
 	flagClientBackchannelLogoutCallback         = "backchannel-logout-callback"

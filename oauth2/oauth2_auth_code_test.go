@@ -981,10 +981,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
 					require.NotEmpty(t, hookReq.Session)
-					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{"foo": "bar"})
+					require.Equal(t, map[string]interface{}{"foo": "bar"}, hookReq.Session.Extra)
 					require.NotEmpty(t, hookReq.Request)
-					require.ElementsMatch(t, hookReq.Request.GrantedAudience, []string{})
-					require.Equal(t, hookReq.Request.Payload, map[string][]string{})
+					require.ElementsMatch(t, []string{}, hookReq.Request.GrantedAudience)
+					require.Equal(t, map[string][]string{"grant_type": {"authorization_code"}}, hookReq.Request.Payload)
 
 					claims := map[string]interface{}{
 						"hooked": true,

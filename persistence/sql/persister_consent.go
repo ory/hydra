@@ -35,14 +35,14 @@ func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectConsentSession")
 	defer span.End()
 
-	return p.transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
 }
 
 func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession")
 	defer span.End()
 
-	return p.transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
 }
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
@@ -117,7 +117,7 @@ func (p *Persister) CreateForcedObfuscatedLoginSession(ctx context.Context, sess
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateForcedObfuscatedLoginSession")
 	defer span.End()
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		nid := p.NetworkID(ctx)
 		if err := c.RawQuery(
 			"DELETE FROM hydra_oauth2_obfuscated_authentication_session WHERE nid = ? AND client_id = ? AND subject = ?",

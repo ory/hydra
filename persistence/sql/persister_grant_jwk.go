@@ -26,7 +26,7 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateGrant")
 	defer otelx.End(span, &err)
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
 		if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
 			if !errors.Is(err, sqlcon.ErrNoRows) {
@@ -59,7 +59,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteGrant")
 	defer otelx.End(span, &err)
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		grant, err := p.GetConcreteGrant(ctx, id)
 		if err != nil {
 			return sqlcon.HandleError(err)

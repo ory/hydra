@@ -64,7 +64,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey")
 	defer span.End()
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		for _, key := range keys.Keys {
 			out, err := json.Marshal(key)
 			if err != nil {
@@ -94,7 +94,7 @@ func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWeb
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKey")
 	defer span.End()
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
 			return err
 		}
@@ -110,7 +110,7 @@ func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.J
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKeySet")
 	defer span.End()
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKeySet(ctx, set); err != nil {
 			return err
 		}

@@ -825,6 +825,14 @@
             "/ui/device"
           ]
         },
+        "post_device_done": {
+          "type": "string",
+          "description": "When a user completes an authentication flow initiated by a device, they will be redirected to this url afterwards.",
+          "format": "uri-reference",
+          "examples": [
+            "https://my-app/device/post"
+          ]
+        },
         "error": {
           "type": "string",
           "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",

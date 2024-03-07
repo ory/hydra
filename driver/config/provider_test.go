@@ -306,6 +306,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://login/"), c.LoginURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://consent/"), c.ConsentURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://device/"), c.DeviceVerificationURL(ctx))
+	assert.Equal(t, urlx.ParseOrPanic("https://device/callback"), c.DeviceDoneURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://logout/"), c.LogoutURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://error/"), c.ErrorURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://post_logout/"), c.LogoutRedirectURL(ctx))

@@ -9,6 +9,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -21,9 +22,27 @@ import (
 	. "github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/urlx"
 )
+
+func checkAndAcceptDeviceHandler(t *testing.T, apiClient *hydra.APIClient) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userCode := r.URL.Query().Get("user_code")
+		payload := hydra.AcceptDeviceUserCodeRequest{
+			UserCode: &userCode,
+		}
+
+		v, _, err := apiClient.OAuth2API.AcceptUserCodeRequest(context.Background()).
+			DeviceChallenge(r.URL.Query().Get("device_challenge")).
+			AcceptDeviceUserCodeRequest(payload).
+			Execute()
+		require.NoError(t, err)
+		require.NotEmpty(t, v.RedirectTo)
+		http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+	}
+}
 
 func checkAndAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClient, subject string, cb func(*testing.T, *hydra.OAuth2LoginRequest, error) hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +86,46 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 	values.Add("client_id", oc.GetID())
 	values.Add("redirect_uri", oc.GetRedirectURIs()[0])
 	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), values).String())
+	require.NoError(t, err)
+	defer res.Body.Close()
+
+	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
+}
+
+func makeOAuth2DeviceAuthRequest(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, scope string) (gjson.Result, *http.Response) {
+	ctx := context.Background()
+	if hc == nil {
+		hc = testhelpers.NewEmptyJarClient(t)
+	}
+
+	data := url.Values{}
+	data.Set("scope", scope)
+	data.Set("client_id", oc.GetID())
+	req, err := http.NewRequest(
+		http.MethodPost,
+		reg.Config().OAuth2DeviceAuthorisationURL(ctx).String(),
+		strings.NewReader(data.Encode()),
+	)
+	require.NoError(t, err)
+	req.SetBasicAuth(oc.GetID(), oc.Secret)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	res, err := hc.Do(req)
+	require.NoError(t, err)
+
+	defer res.Body.Close()
+
+	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
+}
+
+func makeOAuth2DeviceVerificationRequest(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
+	ctx := context.Background()
+	if hc == nil {
+		hc = testhelpers.NewEmptyJarClient(t)
+	}
+
+	values.Add("client_id", oc.GetID())
+	res, err := hc.Get(urlx.CopyWithQuery(urlx.AppendPaths(reg.Config().PublicURL(ctx), oauth2.DeviceVerificationPath), values).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
 

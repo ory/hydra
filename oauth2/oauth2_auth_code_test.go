@@ -1667,7 +1667,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 										require.Equal(t, hookReq.Request.ClientID, oauthConfig.ClientID)
 										require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
 										require.ElementsMatch(t, hookReq.Request.GrantedAudience, []string{})
-										require.Equal(t, hookReq.Request.Payload, map[string][]string{})
+										require.Equal(t, hookReq.Request.Payload, map[string][]string{"grant_type": {"refresh_token"}})
 
 										snapshotx.SnapshotT(t, hookReq, snapshotx.ExceptPaths(exceptKeys...))
 									}

@@ -44,6 +44,10 @@
     "grant_types": [
       "refresh_token"
     ],
-    "payload": {}
+    "payload": {
+      "grant_type": [
+        "refresh_token"
+      ]
+    }
   }
 }

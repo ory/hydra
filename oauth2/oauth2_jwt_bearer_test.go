@@ -326,7 +326,11 @@ func TestJWTBearer(t *testing.T) {
 
 					expectedGrantedScopes := []string{client.Scope}
 					expectedGrantedAudience := []string{audience}
-					expectedPayload := map[string][]string(map[string][]string{"assertion": {token}})
+					expectedPayload := map[string][]string{
+						"assertion":  {token},
+						"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
+						"scope":      {"offline_access"},
+					}
 
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))

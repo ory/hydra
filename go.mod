@@ -12,7 +12,7 @@ require (
 	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/fatih/structs v1.1.0
 	github.com/go-faker/faker/v4 v4.1.1
-	github.com/go-jose/go-jose/v3 v3.0.1
+	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-swagger/go-swagger v0.30.5
 	github.com/gobuffalo/pop/v6 v6.1.2-0.20230318123913-c85387acc9a0
 	github.com/gobwas/glob v0.2.3

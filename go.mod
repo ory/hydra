@@ -23,7 +23,7 @@ require (
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.2.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
-	github.com/jackc/pgx/v4 v4.18.1
+	github.com/jackc/pgx/v4 v4.18.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/miekg/pkcs11 v1.1.1
@@ -149,10 +149,10 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/inhies/go-bytesize v0.0.0-20220417184213-4913239db9cf // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
-	github.com/jackc/pgconn v1.14.1 // indirect
+	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
+	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
 	github.com/jandelgado/gcov2lcov v1.0.5 // indirect

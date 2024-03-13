@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-03-05)](#000-2024-03-05)
+- [0.0.0 (2024-03-13)](#000-2024-03-13)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
@@ -710,11 +710,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-03-05)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-03-13)
 
 
 ### Bug Fixes
 
+* Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
 * Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))
 
 ### Features

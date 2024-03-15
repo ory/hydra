@@ -152,9 +152,9 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 				authCodeURL := conf.AuthCodeURL(
 					state,
-					oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
+					oauth2.SetAuthURLParam("audience", strings.Join(audience, " ")),
 					oauth2.SetAuthURLParam("nonce", string(nonce)),
-					oauth2.SetAuthURLParam("prompt", strings.Join(prompt, "+")),
+					oauth2.SetAuthURLParam("prompt", strings.Join(prompt, " ")),
 					oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
 				)
 				return authCodeURL, state

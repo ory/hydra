@@ -1714,7 +1714,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					TokenURL: ts.URL + "/oauth2/token",
 				},
 				RedirectURL: ts.URL + "/callback",
-				Scopes:      []string{"hydra.*", "offline", "openid"},
+				Scopes:      []string{"offline", "openid", "hydra.*"},
 			}
 
 			var code string

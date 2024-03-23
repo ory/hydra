@@ -47,5 +47,6 @@
     "zone",
     "login_session_id"
   ],
-  "mirror_top_level_claims": false
+  "mirror_top_level_claims": false,
+  "browser_flow_completed": false
 }

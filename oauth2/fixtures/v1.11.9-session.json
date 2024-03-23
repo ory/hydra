@@ -44,5 +44,6 @@
     "market",
     "zone",
     "login_session_id"
-  ]
+  ],
+  "browser_flow_completed": false
 }

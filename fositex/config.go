@@ -49,7 +49,8 @@ type Config struct {
 
 var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
 var defaultFactories = []Factory{
-	compose.OAuth2AuthorizeExplicitFactory,
+	compose.OAuth2AuthorizeExplicitAuthFactory,
+	compose.Oauth2AuthorizeExplicitTokenFactory,
 	compose.OAuth2AuthorizeImplicitFactory,
 	compose.OAuth2ClientCredentialsGrantFactory,
 	compose.OAuth2RefreshTokenGrantFactory,
@@ -63,6 +64,7 @@ var defaultFactories = []Factory{
 	compose.RFC7523AssertionGrantFactory,
 	compose.OIDCUserinfoVerifiableCredentialFactory,
 	compose.RFC8628DeviceFactory,
+	compose.RFC8628DeviceAuthorizationTokenFactory,
 }
 
 func NewConfig(deps configDependencies) *Config {

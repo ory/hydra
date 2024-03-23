@@ -63,6 +63,7 @@ var defaultFactories = []Factory{
 	compose.RFC7523AssertionGrantFactory,
 	compose.OIDCUserinfoVerifiableCredentialFactory,
 	compose.RFC8628DeviceFactory,
+	compose.RFC8628DeviceAuthorizationTokenFactory,
 }
 
 func NewConfig(deps configDependencies) *Config {

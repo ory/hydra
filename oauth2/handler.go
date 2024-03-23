@@ -829,11 +829,11 @@ func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: We need to call the consent manager here to create a new loginFlow with the
-	// device_challenge and device_verifier
 	var session = &Session{
 		DefaultSession: &openid.DefaultSession{
-			Headers: &jwt.Headers{}},
+			Headers: &jwt.Headers{},
+		},
+		BrowserFlowCompleted: false,
 	}
 
 	resp, err := h.r.OAuth2Provider().NewDeviceResponse(ctx, request, session)
@@ -1379,7 +1379,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 	}
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
-	return &Session{
+	s := &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: claims,
 			Headers: &jwt.Headers{Extra: map[string]interface{}{
@@ -1395,7 +1395,13 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
 		MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
 		Flow:                  flow,
-	}, nil
+	}
+
+	if _, ok := request.(*fosite.DeviceRequest); ok {
+		s.SetBrowserFlowCompleted(true)
+	}
+
+	return s, nil
 }
 
 func (h *Handler) logOrAudit(err error, r *http.Request) {

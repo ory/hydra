@@ -77,6 +77,7 @@ func TestUnmarshalSession(t *testing.T) {
 			"zone",
 			"login_session_id",
 		},
+		BrowserFlowCompleted: false,
 	}
 
 	t.Run("v1.11.8", func(t *testing.T) {

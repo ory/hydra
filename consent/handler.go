@@ -745,6 +745,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 
 	var p flow.AcceptOAuth2ConsentRequest
 	d := json.NewDecoder(r.Body)
+	d.UseNumber()
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))

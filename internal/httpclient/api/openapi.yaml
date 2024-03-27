@@ -2211,6 +2211,7 @@ components:
           description: Errors contains a list of errors that caused the not ready
             status.
           type: object
+      title: The not ready status of the service.
       type: object
     healthStatus:
       example:
@@ -2219,6 +2220,7 @@ components:
         status:
           description: Status always contains "ok".
           type: string
+      title: The health status of the service.
       type: object
     introspectedOAuth2Token:
       description: |-

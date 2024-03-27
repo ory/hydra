@@ -21,6 +21,7 @@ const (
 	flagClientAllowedCORSOrigin                 = "allowed-cors-origin"
 	flagClientAudience                          = "audience"
 	flagClientBackchannelLogoutCallback         = "backchannel-logout-callback"
+	flagClientId                                = "id"
 	flagClientName                              = "name"
 	flagClientClientURI                         = "client-uri"
 	flagClientContact                           = "contact"

@@ -791,8 +791,8 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 		}
 		defer res.Body.Close()
 
-		if res.StatusCode != http.StatusOK {
-			log.WithError(errors.Errorf("expected HTTP status code %d but got %d", http.StatusOK, res.StatusCode)).
+		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
+			log.WithError(errors.Errorf("expected HTTP status code %d or %d but got %d", http.StatusOK, http.StatusNoContent, res.StatusCode)).
 				Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
 		} else {

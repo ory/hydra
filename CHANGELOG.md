@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-04-04)](#000-2024-04-04)
+- [0.0.0 (2024-04-05)](#000-2024-04-05)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
@@ -710,7 +710,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-04-04)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-04-05)
 
 
 ### Bug Fixes
@@ -723,6 +723,7 @@
 ### Features
 
 * Add access token strategy parameter to cli ([#3718](https://github.com/ory/hydra/issues/3718)) ([7862dc3](https://github.com/ory/hydra/commit/7862dc337aba2899bdb945e94eb79d3ab3509202)), closes [#3717](https://github.com/ory/hydra/issues/3717)
+* Improve persistence logic ([#3756](https://github.com/ory/hydra/issues/3756)) ([50301e0](https://github.com/ory/hydra/commit/50301e0022ca64c9d0823544c7b664309620c70e))
 
 
 # [2.2.0](https://github.com/ory/hydra/compare/v2.2.0-pre.1...v2.2.0) (2024-02-12)

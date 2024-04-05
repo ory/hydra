@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/ory/x/assertx"
 	"net/url"
 	"testing"
 	"time"
@@ -76,16 +77,40 @@ type AssertionJWTReader interface {
 	SetClientAssertionJWTRaw(context.Context, *BlacklistedJTI) error
 }
 
+var defaultIgnoreKeys = []string{
+	"id",
+	"session",
+	"requested_scope",
+	"granted_scope",
+	"form",
+	"created_at",
+	"updated_at",
+	"client.created_at",
+	"client.updated_at",
+	"requestedAt",
+	"client.client_secret",
+}
+
 var defaultRequest = fosite.Request{
-	ID:                "blank",
-	RequestedAt:       time.Now().UTC().Round(time.Second),
-	Client:            &client.Client{ID: "foobar"},
+	ID:          "blank",
+	RequestedAt: time.Now().UTC().Round(time.Second),
+	Client: &client.Client{
+		ID:                 "foobar",
+		Contacts:           []string{},
+		RedirectURIs:       []string{},
+		Audience:           []string{},
+		AllowedCORSOrigins: []string{},
+		ResponseTypes:      []string{},
+		GrantTypes:         []string{},
+		JSONWebKeys:        &x.JoseJSONWebKeySet{},
+		Metadata:           sqlxx.JSONRawMessage("{}"),
+	},
 	RequestedScope:    fosite.Arguments{"fa", "ba"},
 	GrantedScope:      fosite.Arguments{"fa", "ba"},
 	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
 	GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
 	Form:              url.Values{"foo": []string{"bar", "baz"}},
-	Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+	Session:           NewSession("bar"),
 }
 
 var lifespan = time.Hour
@@ -209,7 +234,7 @@ func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.
 			ID:          requestId,
 			Client:      cl,
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     &Session{},
+			Session:     NewSession("bar"),
 		}
 
 		for i := 0; i < 4; i++ {
@@ -233,20 +258,20 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x InternalRegistry) func(t *t
 		m := x.OAuth2Storage()
 
 		ctx := context.Background()
-		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+		_, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: NewSession("bar")})
 		assert.NotNil(t, err)
 
 		err = m.CreateOpenIDConnectSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: &Session{}})
+		res, err := m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: NewSession("bar")})
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteOpenIDConnectSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{})
+		_, err = m.GetOpenIDConnectSession(ctx, "4321", &fosite.Request{Session: NewSession("bar")})
 		assert.NotNil(t, err)
 	}
 }
@@ -256,20 +281,20 @@ func testHelperCreateGetDeleteRefreshTokenSession(x InternalRegistry) func(t *te
 		m := x.OAuth2Storage()
 
 		ctx := context.Background()
-		_, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
+		_, err := m.GetRefreshTokenSession(ctx, "4321", NewSession("bar"))
 		assert.NotNil(t, err)
 
 		err = m.CreateRefreshTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetRefreshTokenSession(ctx, "4321", &Session{})
+		res, err := m.GetRefreshTokenSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteRefreshTokenSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "4321", &Session{})
+		_, err = m.GetRefreshTokenSession(ctx, "4321", NewSession("bar"))
 		assert.NotNil(t, err)
 	}
 }
@@ -279,7 +304,7 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		m := x.OAuth2Storage()
 
 		ctx := context.Background()
-		_, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
+		_, err := m.GetRefreshTokenSession(ctx, "1111", NewSession("bar"))
 		assert.Error(t, err)
 
 		reqIdOne := uuid.New()
@@ -292,17 +317,19 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 			ID:          reqIdOne,
 			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     &Session{}})
+			Session:     NewSession("user"),
+		})
 		require.NoError(t, err)
 
 		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{
 			ID:          reqIdTwo,
 			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     &Session{}})
+			Session:     NewSession("user"),
+		})
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
+		_, err = m.GetRefreshTokenSession(ctx, "1111", NewSession("bar"))
 		require.NoError(t, err)
 
 		err = m.RevokeRefreshToken(ctx, reqIdOne)
@@ -311,11 +338,11 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
-		req, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
+		req, err := m.GetRefreshTokenSession(ctx, "1111", NewSession("bar"))
 		assert.NotNil(t, req)
 		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
-		req, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
+		req, err = m.GetRefreshTokenSession(ctx, "1122", NewSession("bar"))
 		assert.NotNil(t, req)
 		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
@@ -329,21 +356,21 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 		mockRequestForeignKey(t, "blank", x, false)
 
 		ctx := context.Background()
-		res, err := m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
+		res, err := m.GetAuthorizeCodeSession(ctx, "4321", NewSession("bar"))
 		assert.Error(t, err)
 		assert.Nil(t, res)
 
 		err = m.CreateAuthorizeCodeSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.InvalidateAuthorizeCodeSession(ctx, "4321")
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, "4321", &Session{})
+		res, err = m.GetAuthorizeCodeSession(ctx, "4321", NewSession("bar"))
 		require.Error(t, err)
 		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
 		assert.NotNil(t, res)
@@ -364,7 +391,7 @@ func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 			RequestedAudience: fosite.Arguments{"ad1", "ad2"},
 			GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
 			Form:              url.Values{"foo": []string{"bar", "baz"}},
-			Session:           &Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+			Session:           NewSession("bar"),
 		})
 		require.NoError(t, err)
 	}
@@ -375,20 +402,20 @@ func testHelperCreateGetDeleteAccessTokenSession(x InternalRegistry) func(t *tes
 		m := x.OAuth2Storage()
 
 		ctx := context.Background()
-		_, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		_, err := m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		assert.Error(t, err)
 
 		err = m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		res, err := m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteAccessTokenSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
+		_, err = m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		assert.Error(t, err)
 	}
 }
@@ -401,13 +428,13 @@ func testHelperDeleteAccessTokens(x InternalRegistry) func(t *testing.T) {
 		err := m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
+		_, err = m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 
 		err = m.DeleteAccessTokens(ctx, defaultRequest.Client.GetID())
 		require.NoError(t, err)
 
-		req, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		req, err := m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
@@ -421,13 +448,13 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 		err := m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
+		_, err = m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 
 		err = m.RevokeAccessToken(ctx, defaultRequest.GetID())
 		require.NoError(t, err)
 
-		req, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		req, err := m.GetAccessTokenSession(ctx, "4321", NewSession("bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
@@ -438,20 +465,20 @@ func testHelperCreateGetDeletePKCERequestSession(x InternalRegistry) func(t *tes
 		m := x.OAuth2Storage()
 
 		ctx := context.Background()
-		_, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
+		_, err := m.GetPKCERequestSession(ctx, "4321", NewSession("bar"))
 		assert.NotNil(t, err)
 
 		err = m.CreatePKCERequestSession(ctx, "4321", &defaultRequest)
 		require.NoError(t, err)
 
-		res, err := m.GetPKCERequestSession(ctx, "4321", &Session{})
+		res, err := m.GetPKCERequestSession(ctx, "4321", NewSession("bar"))
 		require.NoError(t, err)
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeletePKCERequestSession(ctx, "4321")
 		require.NoError(t, err)
 
-		_, err = m.GetPKCERequestSession(ctx, "4321", &Session{})
+		_, err = m.GetPKCERequestSession(ctx, "4321", NewSession("bar"))
 		assert.NotNil(t, err)
 	}
 }
@@ -611,7 +638,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m InternalRegistry)
 		res, err := m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
 		// session should have been created successfully because Commit did not return an error
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		assertx.EqualAsJSONExcept(t, &defaultRequest, res, defaultIgnoreKeys)
 
 		// test delete within a transaction
 		ctx, err = txnStore.BeginTX(context.Background())
@@ -1046,10 +1073,11 @@ func doTestCommit(m InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	res, err := getFn(context.Background(), signature, &Session{})
+	res, err := getFn(context.Background(), signature, NewSession("bar"))
 	// token should have been created successfully because Commit did not return an error
 	require.NoError(t, err)
-	AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+	assertx.EqualAsJSONExcept(t, &defaultRequest, res, defaultIgnoreKeys)
+	// AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 	// testrevoke within a transaction
 	ctx, err = txnStore.BeginTX(context.Background())
@@ -1060,7 +1088,7 @@ func doTestCommit(m InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	_, err = getFn(context.Background(), signature, &Session{})
+	_, err = getFn(context.Background(), signature, NewSession("bar"))
 	// Since commit worked for revoke, we should get an error here.
 	require.Error(t, err)
 }
@@ -1084,7 +1112,7 @@ func doTestRollback(m InternalRegistry, t *testing.T,
 
 	// Require a new context, since the old one contains the transaction.
 	ctx = context.Background()
-	_, err = getFn(ctx, signature, &Session{})
+	_, err = getFn(ctx, signature, NewSession("bar"))
 	// Since we rolled back above, the token should not exist and getting it should result in an error
 	require.Error(t, err)
 
@@ -1092,7 +1120,7 @@ func doTestRollback(m InternalRegistry, t *testing.T,
 	signature2 := uuid.New()
 	err = createFn(ctx, signature2, createTestRequest(signature2))
 	require.NoError(t, err)
-	_, err = getFn(ctx, signature2, &Session{})
+	_, err = getFn(ctx, signature2, NewSession("bar"))
 	require.NoError(t, err)
 
 	ctx, err = txnStore.BeginTX(context.Background())
@@ -1102,7 +1130,7 @@ func doTestRollback(m InternalRegistry, t *testing.T,
 	err = txnStore.Rollback(ctx)
 	require.NoError(t, err)
 
-	_, err = getFn(context.Background(), signature2, &Session{})
+	_, err = getFn(context.Background(), signature2, NewSession("bar"))
 	require.NoError(t, err)
 }
 

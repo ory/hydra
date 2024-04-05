@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"github.com/ory/fosite/handler/openid"
 	"testing"
 	"time"
 
@@ -323,6 +324,7 @@ func (s *PersisterTestSuite) TestCreateAccessTokenSession() {
 			fr := fosite.NewRequest()
 
 			fr.Client = &fosite.DefaultClient{ID: c1.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, persistencesql.SignatureHash(sig)))
@@ -342,6 +344,7 @@ func (s *PersisterTestSuite) TestCreateAuthorizeCodeSession() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: c1.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 			actual := persistencesql.OAuth2RequestSQL{Table: "code"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
@@ -481,6 +484,7 @@ func (s *PersisterTestSuite) TestCreateOpenIDConnectSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, request))
@@ -501,6 +505,7 @@ func (s *PersisterTestSuite) TestCreatePKCERequestSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 
@@ -522,6 +527,7 @@ func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
@@ -560,6 +566,7 @@ func (s *PersisterTestSuite) DeleteAccessTokenSession() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			require.NoError(t, r.Persister().DeleteAccessTokenSession(s.t2, sig))
 
@@ -582,6 +589,7 @@ func (s *PersisterTestSuite) TestDeleteAccessTokens() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			require.NoError(t, r.Persister().DeleteAccessTokens(s.t2, client.ID))
 
@@ -667,6 +675,7 @@ func (s *PersisterTestSuite) TestDeleteOpenIDConnectSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, request))
@@ -690,9 +699,10 @@ func (s *PersisterTestSuite) TestDeletePKCERequestSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, request)
+			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "pkce"}
 
@@ -713,6 +723,7 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			signature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
@@ -833,6 +844,7 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 			fr := fosite.NewRequest()
 			fr.RequestedAt = time.Now().UTC().Add(-24 * time.Hour)
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
@@ -916,6 +928,7 @@ func (s *PersisterTestSuite) TestFlushInactiveRefreshTokens() {
 			request := fosite.NewRequest()
 			request.RequestedAt = time.Now().Add(-240 * 365 * time.Hour)
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			signature := uuid.Must(uuid.NewV4()).String()
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
@@ -940,6 +953,7 @@ func (s *PersisterTestSuite) TestGetAccessTokenSession() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 
 			actual, err := r.Persister().GetAccessTokenSession(s.t2, sig, &fosite.DefaultSession{})
@@ -961,6 +975,7 @@ func (s *PersisterTestSuite) TestGetAuthorizeCodeSession() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
 			actual, err := r.Persister().GetAuthorizeCodeSession(s.t2, sig, &fosite.DefaultSession{})
@@ -1250,6 +1265,7 @@ func (s *PersisterTestSuite) TestGetOpenIDConnectSession() {
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, request))
@@ -1273,6 +1289,7 @@ func (s *PersisterTestSuite) TestGetPKCERequestSession() {
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			sig := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, sig, request))
@@ -1369,6 +1386,7 @@ func (s *PersisterTestSuite) TestGetRefreshTokenSession() {
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			sig := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, sig, request))
@@ -1456,6 +1474,7 @@ func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: cl.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
 			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t2, sig))
@@ -1729,6 +1748,7 @@ func (s *PersisterTestSuite) TestRevokeAccessToken() {
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			require.NoError(t, r.Persister().RevokeAccessToken(s.t2, fr.ID))
 
@@ -1751,6 +1771,7 @@ func (s *PersisterTestSuite) TestRevokeRefreshToken() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			signature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
@@ -1776,6 +1797,7 @@ func (s *PersisterTestSuite) TestRevokeRefreshTokenMaybeGracePeriod() {
 
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
+			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			signature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))

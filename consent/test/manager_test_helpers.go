@@ -1,12 +1,15 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package consent
+package test
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/oauth2"
 	"testing"
 	"time"
 
@@ -178,7 +181,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 	return c, h, f
 }
 
-func SaneMockHandleConsentRequest(t *testing.T, m Manager, f *flow.Flow, c *flow.OAuth2ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *flow.AcceptOAuth2ConsentRequest {
+func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, c *flow.OAuth2ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *flow.AcceptOAuth2ConsentRequest {
 	var rde *flow.RequestDeniedError
 	if hasError {
 		rde = &flow.RequestDeniedError{
@@ -212,7 +215,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, f *flow.Flow, c *flow
 }
 
 // SaneMockConsentRequest does the same thing as MockConsentRequest but uses less insanity and implicit dependencies.
-func SaneMockConsentRequest(t *testing.T, m Manager, f *flow.Flow, skip bool) (c *flow.OAuth2ConsentRequest) {
+func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip bool) (c *flow.OAuth2ConsentRequest) {
 	c = &flow.OAuth2ConsentRequest{
 		RequestedScope:    []string{"scopea", "scopeb"},
 		RequestedAudience: []string{"auda", "audb"},
@@ -244,7 +247,7 @@ func SaneMockConsentRequest(t *testing.T, m Manager, f *flow.Flow, skip bool) (c
 }
 
 // SaneMockAuthRequest does the same thing as MockAuthRequest but uses less insanity and implicit dependencies.
-func SaneMockAuthRequest(t *testing.T, m Manager, ls *flow.LoginSession, cl *client.Client) (c *flow.LoginRequest) {
+func SaneMockAuthRequest(t *testing.T, m consent.Manager, ls *flow.LoginSession, cl *client.Client) (c *flow.LoginRequest) {
 	c = &flow.LoginRequest{
 		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1", "2"},
@@ -275,7 +278,7 @@ func makeID(base string, network string, key string) string {
 func TestHelperNID(r interface {
 	client.ManagerProvider
 	FlowCipher() *aead.XChaCha20Poly1305
-}, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
+}, t1ValidNID consent.Manager, t2InvalidNID consent.Manager) func(t *testing.T) {
 	testClient := client.Client{ID: "2022-03-11-client-nid-test-1"}
 	testLS := flow.LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
@@ -338,7 +341,7 @@ type Deps interface {
 	contextx.Provider
 }
 
-func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
+func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
 	lr := make(map[string]*flow.LoginRequest)
 
 	return func(t *testing.T) {
@@ -590,7 +593,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					rs, err := m.FindGrantedAndRememberedConsentRequests(ctx, "fk-client-"+tc.keyC, "subject"+tc.keyS)
 					if tc.expectedLength == 0 {
 						assert.Nil(t, rs)
-						assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
+						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
 						assert.Len(t, rs, tc.expectedLength)
@@ -674,22 +677,22 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
-				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
-				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now()},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 
 			for i, tc := range []struct {
@@ -800,7 +803,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					assert.Equal(t, len(tc.challenges), len(consents))
 
 					if len(tc.challenges) == 0 {
-						assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
+						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
 						for _, consent := range consents {
@@ -842,7 +845,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 					assert.Equal(t, len(tc.challenges), len(consents))
 
 					if len(tc.challenges) == 0 {
-						assert.EqualError(t, err, ErrNoPreviousConsentFound.Error())
+						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
 						for _, consent := range consents {
@@ -862,7 +865,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				_, err := m.GetForcedObfuscatedLoginSession(ctx, "fk-client-1", "obfuscated-1")
 				require.True(t, errors.Is(err, x.ErrNotFound))
 
-				expect := &ForcedObfuscatedLoginSession{
+				expect := &consent.ForcedObfuscatedLoginSession{
 					ClientID:          "fk-client-1",
 					Subject:           "subject-1",
 					SubjectObfuscated: "obfuscated-1",
@@ -875,7 +878,7 @@ func ManagerTests(deps Deps, m Manager, clientManager client.Manager, fositeMana
 				got.NID = gofrsuuid.Nil
 				assert.EqualValues(t, expect, got)
 
-				expect = &ForcedObfuscatedLoginSession{
+				expect = &consent.ForcedObfuscatedLoginSession{
 					ClientID:          "fk-client-1",
 					Subject:           "subject-1",
 					SubjectObfuscated: "obfuscated-2",

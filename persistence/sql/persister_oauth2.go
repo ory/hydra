@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/sqlxx"
 	"net/url"
 	"strings"
 	"time"
@@ -52,6 +53,8 @@ type (
 		Active            bool           `db:"active"`
 		Session           []byte         `db:"session_data"`
 		Table             tableName      `db:"-"`
+		// InternalExpiresAt denormalizes the expiry from the session to additionally store it as a row.
+		InternalExpiresAt sqlxx.NullTime `db:"expires_at" json:"-"`
 	}
 )
 
@@ -67,7 +70,7 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
-func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
+func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, r fosite.Requester, table tableName, expiresAt time.Time) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		p.l.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -103,6 +106,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		ConsentChallenge:  challenge,
 		ID:                signature,
 		RequestedAt:       r.GetRequestedAt(),
+		InternalExpiresAt: sqlxx.NullTime(expiresAt),
 		Client:            r.GetClient().GetID(),
 		Scopes:            strings.Join(r.GetRequestedScopes(), "|"),
 		GrantedScope:      strings.Join(r.GetGrantedScopes(), "|"),
@@ -148,8 +152,9 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	}
 
 	return &fosite.Request{
-		ID:                r.Request,
-		RequestedAt:       r.RequestedAt,
+		ID:          r.Request,
+		RequestedAt: r.RequestedAt,
+		// ExpiresAt does not need to be populated as we get the expiry time from the session.
 		Client:            c,
 		RequestedScope:    stringsx.Splitx(r.Scopes, "|"),
 		GrantedScope:      stringsx.Splitx(r.GrantedScope, "|"),
@@ -214,8 +219,8 @@ func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.Bl
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, jti))
 }
 
-func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
-	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
+func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName, expiresAt time.Time) error {
+	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table, expiresAt)
 	if err != nil {
 		return err
 	}
@@ -305,7 +310,7 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 
 func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
 	return otelx.WithSpan(ctx, "persistence.sql.CreateAuthorizeCodeSession", func(ctx context.Context) error {
-		return p.createSession(ctx, signature, requester, sqlTableCode)
+		return p.createSession(ctx, signature, requester, sqlTableCode, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode))
 	})
 }
 
@@ -346,7 +351,7 @@ func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature stri
 		append(toEventOptions(requester), events.WithGrantType(requester.GetRequestForm().Get("grant_type")))...,
 	)
 
-	return p.createSession(ctx, SignatureHash(signature), requester, sqlTableAccess)
+	return p.createSession(ctx, SignatureHash(signature), requester, sqlTableAccess, requester.GetSession().GetExpiresAt(fosite.AccessToken))
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
@@ -422,7 +427,7 @@ func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature str
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateRefreshTokenSession")
 	defer otelx.End(span, &err)
 	events.Trace(ctx, events.RefreshTokenIssued, toEventOptions(requester)...)
-	return p.createSession(ctx, signature, requester, sqlTableRefresh)
+	return p.createSession(ctx, signature, requester, sqlTableRefresh, requester.GetSession().GetExpiresAt(fosite.RefreshToken))
 }
 
 func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
@@ -441,7 +446,8 @@ func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature st
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateOpenIDConnectSession")
 	defer otelx.End(span, &err)
 	events.Trace(ctx, events.IdentityTokenIssued, toEventOptions(requester)...)
-	return p.createSession(ctx, signature, requester, sqlTableOpenID)
+	// The expiry of a PKCE session is equal to the expiry of the authorization code. If the code is invalid, so is this OIDC request.
+	return p.createSession(ctx, signature, requester, sqlTableOpenID, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode))
 }
 
 func (p *Persister) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (_ fosite.Requester, err error) {
@@ -465,7 +471,8 @@ func (p *Persister) GetPKCERequestSession(ctx context.Context, signature string,
 func (p *Persister) CreatePKCERequestSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreatePKCERequestSession")
 	defer otelx.End(span, &err)
-	return p.createSession(ctx, signature, requester, sqlTablePKCE)
+	// The expiry of a PKCE session is equal to the expiry of the authorization code. If the code is invalid, so is this PKCE request.
+	return p.createSession(ctx, signature, requester, sqlTablePKCE, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode))
 }
 
 func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature string) (err error) {

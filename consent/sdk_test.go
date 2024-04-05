@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/consent/test"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 	. "github.com/ory/hydra/v2/flow"
 
@@ -58,8 +60,8 @@ func TestSDK(t *testing.T) {
 		Subject: "subject1",
 	}))
 
-	ar1, _, _ := MockAuthRequest("1", false, network)
-	ar2, _, _ := MockAuthRequest("2", false, network)
+	ar1, _, _ := test.MockAuthRequest("1", false, network)
+	ar2, _, _ := test.MockAuthRequest("2", false, network)
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 		ID:      ar1.SessionID.String(),
 		Subject: ar1.Subject,
@@ -73,10 +75,10 @@ func TestSDK(t *testing.T) {
 	_, err = m.CreateLoginRequest(context.Background(), ar2)
 	require.NoError(t, err)
 
-	cr1, hcr1, _ := MockConsentRequest("1", false, 0, false, false, false, "fk-login-challenge", network)
-	cr2, hcr2, _ := MockConsentRequest("2", false, 0, false, false, false, "fk-login-challenge", network)
-	cr3, hcr3, _ := MockConsentRequest("3", true, 3600, false, false, false, "fk-login-challenge", network)
-	cr4, hcr4, _ := MockConsentRequest("4", true, 3600, false, false, false, "fk-login-challenge", network)
+	cr1, hcr1, _ := test.MockConsentRequest("1", false, 0, false, false, false, "fk-login-challenge", network)
+	cr2, hcr2, _ := test.MockConsentRequest("2", false, 0, false, false, false, "fk-login-challenge", network)
+	cr3, hcr3, _ := test.MockConsentRequest("3", true, 3600, false, false, false, "fk-login-challenge", network)
+	cr4, hcr4, _ := test.MockConsentRequest("4", true, 3600, false, false, false, "fk-login-challenge", network)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr1.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr2.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr3.Client))
@@ -144,11 +146,11 @@ func TestSDK(t *testing.T) {
 	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr4Flow))
 	require.NoError(t, err)
 
-	lur1 := MockLogoutRequest("testsdk-1", true, network)
+	lur1 := test.MockLogoutRequest("testsdk-1", true, network)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), lur1.Client))
 	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur1))
 
-	lur2 := MockLogoutRequest("testsdk-2", false, network)
+	lur2 := test.MockLogoutRequest("testsdk-2", false, network)
 	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
 
 	cr1.ID = consentChallenge(cr1Flow)

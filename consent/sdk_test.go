@@ -6,11 +6,12 @@ package consent_test
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/v2/consent/test"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/v2/consent/test"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	. "github.com/ory/hydra/v2/flow"

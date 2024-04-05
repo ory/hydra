@@ -7,10 +7,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"github.com/ory/x/assertx"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/ory/x/assertx"
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
@@ -209,6 +210,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 
 	}
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperCreateGetDeleteAuthorizeCodes(store))
+	t.Run(fmt.Sprintf("case=testHelperExpiryFields/db=%s", k), testHelperExpiryFields(store))
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAccessTokenSession/db=%s", k), testHelperCreateGetDeleteAccessTokenSession(store))
 	t.Run(fmt.Sprintf("case=testHelperNilAccessToken/db=%s", k), testHelperNilAccessToken(store))
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteOpenIDConnectSession/db=%s", k), testHelperCreateGetDeleteOpenIDConnectSession(store))
@@ -374,6 +376,96 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 		require.Error(t, err)
 		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
 		assert.NotNil(t, res)
+	}
+}
+
+type testHelperExpiryFieldsResult struct {
+	ExpiresAt time.Time `db:"expires_at"`
+	name      string
+}
+
+func (r testHelperExpiryFieldsResult) TableName() string {
+	return "hydra_oauth2_" + r.name
+}
+
+func testHelperExpiryFields(reg InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		m := reg.OAuth2Storage()
+		t.Parallel()
+
+		mockRequestForeignKey(t, "blank", reg, false)
+
+		ctx := context.Background()
+
+		s := NewSession("bar")
+		s.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Minute))
+		s.SetExpiresAt(fosite.RefreshToken, time.Now().Add(time.Hour*2).Round(time.Minute))
+		s.SetExpiresAt(fosite.AuthorizeCode, time.Now().Add(time.Hour*3).Round(time.Minute))
+		request := fosite.Request{
+			ID:          uuid.New(),
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Client: &client.Client{
+				ID:       "foobar",
+				Metadata: sqlxx.JSONRawMessage("{}"),
+			},
+			RequestedScope:    fosite.Arguments{"fa", "ba"},
+			GrantedScope:      fosite.Arguments{"fa", "ba"},
+			RequestedAudience: fosite.Arguments{"ad1", "ad2"},
+			GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
+			Form:              url.Values{"foo": []string{"bar", "baz"}},
+			Session:           s,
+		}
+
+		t.Run("case=CreateAccessTokenSession", func(t *testing.T) {
+			id := uuid.New()
+			err := m.CreateAccessTokenSession(ctx, id, &request)
+			require.NoError(t, err)
+
+			r := testHelperExpiryFieldsResult{name: "access"}
+			require.NoError(t, reg.Persister().Connection(ctx).Select("expires_at").Where("signature = ?", x.SignatureHash(id)).First(&r))
+
+			assert.EqualValues(t, s.GetExpiresAt(fosite.AccessToken).UTC(), r.ExpiresAt.UTC())
+		})
+
+		t.Run("case=CreateRefreshTokenSession", func(t *testing.T) {
+			id := uuid.New()
+			err := m.CreateRefreshTokenSession(ctx, id, &request)
+			require.NoError(t, err)
+
+			r := testHelperExpiryFieldsResult{name: "refresh"}
+			require.NoError(t, reg.Persister().Connection(ctx).Select("expires_at").Where("signature = ?", id).First(&r))
+			assert.EqualValues(t, s.GetExpiresAt(fosite.RefreshToken).UTC(), r.ExpiresAt.UTC())
+		})
+
+		t.Run("case=CreateAuthorizeCodeSession", func(t *testing.T) {
+			id := uuid.New()
+			err := m.CreateAuthorizeCodeSession(ctx, id, &request)
+			require.NoError(t, err)
+
+			r := testHelperExpiryFieldsResult{name: "code"}
+			require.NoError(t, reg.Persister().Connection(ctx).Select("expires_at").Where("signature = ?", id).First(&r))
+			assert.EqualValues(t, s.GetExpiresAt(fosite.AuthorizeCode).UTC(), r.ExpiresAt.UTC())
+		})
+
+		t.Run("case=CreatePKCERequestSession", func(t *testing.T) {
+			id := uuid.New()
+			err := m.CreatePKCERequestSession(ctx, id, &request)
+			require.NoError(t, err)
+
+			r := testHelperExpiryFieldsResult{name: "pkce"}
+			require.NoError(t, reg.Persister().Connection(ctx).Select("expires_at").Where("signature = ?", id).First(&r))
+			assert.EqualValues(t, s.GetExpiresAt(fosite.AuthorizeCode).UTC(), r.ExpiresAt.UTC())
+		})
+
+		t.Run("case=CreateOpenIDConnectSession", func(t *testing.T) {
+			id := uuid.New()
+			err := m.CreateOpenIDConnectSession(ctx, id, &request)
+			require.NoError(t, err)
+
+			r := testHelperExpiryFieldsResult{name: "oidc"}
+			require.NoError(t, reg.Persister().Connection(ctx).Select("expires_at").Where("signature = ?", id).First(&r))
+			assert.EqualValues(t, s.GetExpiresAt(fosite.AuthorizeCode).UTC(), r.ExpiresAt.UTC())
+		})
 	}
 }
 

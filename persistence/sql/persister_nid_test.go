@@ -7,9 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/ory/fosite/handler/openid"
 	"testing"
 	"time"
+
+	"github.com/ory/fosite/handler/openid"
 
 	"github.com/stretchr/testify/assert"
 

@@ -6,15 +6,17 @@ package sql
 import (
 	"context"
 	"crypto/sha256"
-	"crypto/sha512"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/sqlxx"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/v2/x"
+
+	"github.com/ory/x/sqlxx"
 
 	"go.opentelemetry.io/otel/trace"
 
@@ -337,12 +339,6 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 	)
 }
 
-// SignatureHash hashes the signature to prevent errors where the signature is
-// longer than 128 characters (and thus doesn't fit into the pk).
-func SignatureHash(signature string) string {
-	return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
-}
-
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateAccessTokenSession")
 	defer otelx.End(span, &err)
@@ -351,7 +347,7 @@ func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature stri
 		append(toEventOptions(requester), events.WithGrantType(requester.GetRequestForm().Get("grant_type")))...,
 	)
 
-	return p.createSession(ctx, SignatureHash(signature), requester, sqlTableAccess, requester.GetSession().GetExpiresAt(fosite.AccessToken))
+	return p.createSession(ctx, x.SignatureHash(signature), requester, sqlTableAccess, requester.GetSession().GetExpiresAt(fosite.AccessToken))
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
@@ -359,7 +355,7 @@ func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string,
 	defer otelx.End(span, &err)
 
 	r := OAuth2RequestSQL{Table: sqlTableAccess}
-	err = p.QueryWithNetwork(ctx).Where("signature = ?", SignatureHash(signature)).First(&r)
+	err = p.QueryWithNetwork(ctx).Where("signature = ?", x.SignatureHash(signature)).First(&r)
 	if errors.Is(err, sql.ErrNoRows) {
 		// Backwards compatibility: we previously did not always hash the
 		// signature before inserting. In case there are still very old (but
@@ -389,7 +385,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 
 	err = sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
-			Where("signature = ?", SignatureHash(signature)).
+			Where("signature = ?", x.SignatureHash(signature)).
 			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}))
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		// Backwards compatibility: we previously did not always hash the

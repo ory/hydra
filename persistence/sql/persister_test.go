@@ -5,9 +5,10 @@ package sql_test
 
 import (
 	"context"
-	"github.com/ory/hydra/v2/consent/test"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/v2/consent/test"
 
 	"github.com/go-jose/go-jose/v3"
 

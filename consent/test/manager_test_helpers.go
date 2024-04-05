@@ -7,11 +7,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/oauth2"
-	"testing"
-	"time"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/flow"

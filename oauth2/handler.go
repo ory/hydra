@@ -722,16 +722,19 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	consentSession, flow, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
+	consentSession, f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
-		// do nothing
 		return
-	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+	}
+
+	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		h.r.Writer().WriteError(w, r, err)
 		return
-	} else if err != nil {
+	}
+
+	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -739,23 +742,27 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 
 	req := fosite.NewDeviceRequest()
 	req.Client = consentSession.ConsentRequest.Client
-	session, err := h.updateSessionWithRequest(ctx, consentSession, flow, r, req)
+	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	req.SetSession(session)
-	// We update the device_code session with the claims that the user gave consent for, this
-	// marks it as ready to be used for the token endpoint
-	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestID(ctx, flow.DeviceCodeRequestID.String(), req)
+	// Update the device code session with
+	//   - the claims for which the user gave consent
+	//   - the granted scopes
+	//   - the granted audiences
+	// This marks it as ready to be used for the token exchange endpoint.
+	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), req)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"consent_verifier": {string(flow.ConsentVerifier)}}).String(), http.StatusFound)
+	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"consent_verifier": {string(f.ConsentVerifier)}}).String()
+	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 
 // OAuth2 Device Flow

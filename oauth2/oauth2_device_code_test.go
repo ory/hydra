@@ -9,6 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pborman/uuid"
+
+	"github.com/ory/fosite/token/jwt"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -27,22 +31,26 @@ func TestDeviceAuthRequest(t *testing.T) {
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	testhelpers.NewOAuth2Server(ctx, t, reg)
 
+	secret := uuid.New()
 	c := &client.Client{
-		ResponseTypes: []string{"id_token", "code", "token"},
+		ID:     "device-client",
+		Secret: secret,
 		GrantTypes: []string{
 			string(fosite.GrantTypeDeviceCode),
 		},
 		Scope:                   "hydra offline openid",
 		Audience:                []string{"https://api.ory.sh/"},
-		TokenEndpointAuthMethod: "none",
+		TokenEndpointAuthMethod: "client_secret_post",
 	}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, c))
 
 	oauthClient := &oauth2.Config{
-		ClientID: c.GetID(),
+		ClientID:     c.GetID(),
+		ClientSecret: secret,
 		Endpoint: oauth2.Endpoint{
 			DeviceAuthURL: reg.Config().OAuth2DeviceAuthorisationURL(ctx).String(),
 			TokenURL:      reg.Config().OAuth2TokenURL(ctx).String(),
+			AuthStyle:     oauth2.AuthStyleInParams,
 		},
 		Scopes: strings.Split(c.Scope, " "),
 	}
@@ -71,7 +79,7 @@ func TestDeviceAuthRequest(t *testing.T) {
 				testCase.setUp()
 			}
 
-			resp, err := oauthClient.DeviceAuth(context.Background())
+			resp, err := oauthClient.DeviceAuth(context.Background(), []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("client_secret", secret)}...)
 
 			if testCase.check != nil {
 				testCase.check(t, resp, err)
@@ -89,44 +97,52 @@ func TestDeviceTokenRequest(t *testing.T) {
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	testhelpers.NewOAuth2Server(ctx, t, reg)
 
+	secret := uuid.New()
 	c := &client.Client{
+		ID:     "device-client",
+		Secret: secret,
 		GrantTypes: []string{
 			string(fosite.GrantTypeDeviceCode),
+			string(fosite.GrantTypeRefreshToken),
 		},
-		Scope:                   "hydra offline openid",
-		Audience:                []string{"https://api.ory.sh/"},
-		TokenEndpointAuthMethod: "none",
+		Scope:    "hydra offline openid",
+		Audience: []string{"https://api.ory.sh/"},
 	}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, c))
 
 	oauthClient := &oauth2.Config{
-		ClientID: c.GetID(),
+		ClientID:     c.GetID(),
+		ClientSecret: secret,
 		Endpoint: oauth2.Endpoint{
 			DeviceAuthURL: reg.Config().OAuth2DeviceAuthorisationURL(ctx).String(),
 			TokenURL:      reg.Config().OAuth2TokenURL(ctx).String(),
+			AuthStyle:     oauth2.AuthStyleInHeader,
 		},
 		Scopes: strings.Split(c.Scope, " "),
 	}
 
-	var code, signature string
-	var err error
-	code, signature, err = reg.RFC8628HMACStrategy().GenerateDeviceCode(context.TODO())
-	require.NoError(t, err)
-
 	testCases := []struct {
 		description string
-		setUp       func()
+		setUp       func(signature string)
 		check       func(t *testing.T, token *oauth2.Token, err error)
 		cleanUp     func()
 	}{
 		{
-			description: "should pass",
-			setUp: func() {
+			description: "should pass with refresh token",
+			setUp: func(signature string) {
 				authreq := &fosite.DeviceRequest{
 					Request: fosite.Request{
-						Client: &fosite.DefaultClient{ID: c.GetID(), GrantTypes: []string{string(fosite.GrantTypeDeviceCode)}},
+						Client: &fosite.DefaultClient{
+							ID:         c.GetID(),
+							GrantTypes: []string{string(fosite.GrantTypeDeviceCode)},
+						},
+						RequestedScope: []string{"hydra", "offline"},
+						GrantedScope:   []string{"hydra", "offline"},
 						Session: &hydraoauth2.Session{
 							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "hydra",
+								},
 								ExpiresAt: map[fosite.TokenType]time.Time{
 									fosite.DeviceCode: time.Now().Add(time.Hour).UTC(),
 								},
@@ -141,14 +157,53 @@ func TestDeviceTokenRequest(t *testing.T) {
 			},
 			check: func(t *testing.T, token *oauth2.Token, err error) {
 				assert.NotEmpty(t, token.AccessToken)
+				assert.NotEmpty(t, token.RefreshToken)
+			},
+		},
+		{
+			description: "should pass with ID token",
+			setUp: func(signature string) {
+				authreq := &fosite.DeviceRequest{
+					Request: fosite.Request{
+						Client: &fosite.DefaultClient{
+							ID:         c.GetID(),
+							GrantTypes: []string{string(fosite.GrantTypeDeviceCode)},
+						},
+						RequestedScope: []string{"hydra", "offline", "openid"},
+						GrantedScope:   []string{"hydra", "offline", "openid"},
+						Session: &hydraoauth2.Session{
+							DefaultSession: &openid.DefaultSession{
+								Claims: &jwt.IDTokenClaims{
+									Subject: "hydra",
+								},
+								ExpiresAt: map[fosite.TokenType]time.Time{
+									fosite.DeviceCode: time.Now().Add(time.Hour).UTC(),
+								},
+							},
+							BrowserFlowCompleted: true,
+						},
+						RequestedAt: time.Now(),
+					},
+				}
+
+				require.NoError(t, reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), signature, authreq))
+				require.NoError(t, reg.OAuth2Storage().CreateOpenIDConnectSession(context.TODO(), signature, authreq))
+			},
+			check: func(t *testing.T, token *oauth2.Token, err error) {
+				assert.NotEmpty(t, token.AccessToken)
+				assert.NotEmpty(t, token.RefreshToken)
+				assert.NotEmpty(t, token.Extra("id_token"))
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run("case="+testCase.description, func(t *testing.T) {
+			code, signature, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(context.TODO())
+			require.NoError(t, err)
+
 			if testCase.setUp != nil {
-				testCase.setUp()
+				testCase.setUp(signature)
 			}
 
 			var token *oauth2.Token

@@ -64,6 +64,7 @@ var defaultFactories = []Factory{
 	compose.OIDCUserinfoVerifiableCredentialFactory,
 	compose.RFC8628DeviceFactory,
 	compose.RFC8628DeviceAuthorizationTokenFactory,
+	compose.OpenIDConnectDeviceFactory,
 }
 
 func NewConfig(deps configDependencies) *Config {

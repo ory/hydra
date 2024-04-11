@@ -771,20 +771,21 @@ func (p *Persister) UpdateDeviceCodeSessionByRequestID(ctx context.Context, requ
 
 	req, err := p.sqlSchemaFromRequest(ctx, requestID, requester, sqlTableDeviceCode, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
 	if err != nil {
-		return
+		return err
 	}
 
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("UPDATE %s SET session_data=? WHERE request_id=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableDeviceCode}.TableName()),
-				req.Session,
-				requestID,
-				p.NetworkID(ctx),
-			).
-			Exec(),
+	stmt := fmt.Sprintf(
+		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=? WHERE request_id=? AND nid = ?",
+		OAuth2RequestSQL{Table: sqlTableDeviceCode}.TableName(),
 	)
+
+	/* #nosec G201 table is static */
+	err = p.Connection(ctx).RawQuery(stmt, req.GrantedScope, req.GrantedAudience, req.Session, requestID, p.NetworkID(ctx)).Exec()
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
 }
 
 // GetDeviceCodeSession returns a device code session from the database

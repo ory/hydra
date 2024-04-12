@@ -761,6 +761,16 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		return
 	}
 
+	// Update the OpenID Connect session if "openid" scope is granted
+	if req.GetGrantedScopes().Has("openid") {
+		err = h.r.OAuth2Storage().UpdateOpenIDConnectSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), req)
+		if err != nil {
+			x.LogError(r, err, h.r.Logger())
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	}
+
 	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"consent_verifier": {string(f.ConsentVerifier)}}).String()
 	http.Redirect(w, r, redirectURL, http.StatusFound)
 }

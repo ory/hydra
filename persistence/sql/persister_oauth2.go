@@ -533,6 +533,30 @@ func (p *Persister) CreateOpenIDConnectSession(ctx context.Context, signature st
 	return p.createSession(ctx, signature, requester, sqlTableOpenID, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode).UTC())
 }
 
+// UpdateOpenIDConnectSessionByRequestID updates an OpenID session by requestID
+func (p *Persister) UpdateOpenIDConnectSessionByRequestID(ctx context.Context, requestID string, requester fosite.Requester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateOpenIDConnectSessionByRequestID")
+	defer otelx.End(span, &err)
+
+	req, err := p.sqlSchemaFromRequest(ctx, requestID, requester, sqlTableOpenID, requester.GetSession().GetExpiresAt(fosite.IDToken).UTC())
+	if err != nil {
+		return err
+	}
+
+	stmt := fmt.Sprintf(
+		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=? WHERE request_id=? AND nid = ?",
+		OAuth2RequestSQL{Table: sqlTableOpenID}.TableName(),
+	)
+
+	/* #nosec G201 table is static */
+	err = p.Connection(ctx).RawQuery(stmt, req.GrantedScope, req.GrantedAudience, req.Session, requestID, p.NetworkID(ctx)).Exec()
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
+}
+
 func (p *Persister) GetOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) (_ fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetOpenIDConnectSession")
 	defer otelx.End(span, &err)

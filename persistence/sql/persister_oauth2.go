@@ -286,6 +286,29 @@ func (p *Persister) findSessionBySignature(ctx context.Context, signature string
 	return r.toRequest(ctx, session, p)
 }
 
+func (p *Persister) findSessionByRequestID(ctx context.Context, requestID string, session fosite.Session, table tableName) (fosite.Requester, error) {
+	r := OAuth2RequestSQL{Table: table}
+	err := p.QueryWithNetwork(ctx).Where("request_id = ?", requestID).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errorsx.WithStack(fosite.ErrNotFound)
+	}
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+	if !r.Active {
+		fr, err := r.toRequest(ctx, session, p)
+		if err != nil {
+			return nil, err
+		}
+		if table == sqlTableCode {
+			return fr, errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+		}
+		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+	}
+
+	return r.toRequest(ctx, session, p)
+}
+
 func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
 	err := sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
@@ -817,6 +840,13 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSession")
 	defer otelx.End(span, &err)
 	return p.findSessionBySignature(ctx, signature, session, sqlTableDeviceCode)
+}
+
+// GetDeviceCodeSessionByRequestID returns a device code session from the database
+func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, requestID string, session fosite.Session) (_ fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSessionByRequestID")
+	defer otelx.End(span, &err)
+	return p.findSessionByRequestID(ctx, requestID, session, sqlTableDeviceCode)
 }
 
 // InvalidateDeviceCodeSession invalidates a device code session

@@ -740,13 +740,20 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		return
 	}
 
-	req := fosite.NewDeviceRequest()
-	req.Client = consentSession.ConsentRequest.Client
-	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req)
+	// TODO(nsklikas): We need to add a db transaction here
+	req, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), &Session{})
+	if err != nil {
+		x.LogError(r, err, h.r.Logger())
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	// TODO(nsklika): Can we refactor this so we don't have to pass in the session?
+	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req, req.GetSession().(*Session))
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	session.SetBrowserFlowCompleted(true)
 
 	req.SetSession(session)
 	// Update the device code session with
@@ -1263,7 +1270,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 	}
 
 	authorizeRequest.SetID(acceptConsentSession.ID)
-	session, err := h.updateSessionWithRequest(ctx, acceptConsentSession, flow, r, authorizeRequest)
+	session, err := h.updateSessionWithRequest(ctx, acceptConsentSession, flow, r, authorizeRequest, nil)
 	if err != nil {
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
@@ -1344,12 +1351,19 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 
 // updateSessionWithRequest takes a session and a fosite.request as input and returns a new session.
 // If any errors occur, they are logged.
-func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.AcceptOAuth2ConsentRequest, flow *flow.Flow, r *http.Request, request fosite.Requester) (*Session, error) {
-	for _, scope := range session.GrantedScope {
+func (h *Handler) updateSessionWithRequest(
+	ctx context.Context,
+	consent *flow.AcceptOAuth2ConsentRequest,
+	flow *flow.Flow,
+	r *http.Request,
+	request fosite.Requester,
+	session *Session,
+) (*Session, error) {
+	for _, scope := range consent.GrantedScope {
 		request.GrantScope(scope)
 	}
 
-	for _, audience := range session.GrantedAudience {
+	for _, audience := range consent.GrantedAudience {
 		request.GrantAudience(audience)
 	}
 
@@ -1368,7 +1382,7 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 		}
 	}
 
-	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), consent.ConsentRequest.Subject, consent.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		return nil, err
@@ -1380,11 +1394,11 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 	claims := &jwt.IDTokenClaims{
 		Subject:                             obfuscatedSubject,
 		Issuer:                              h.c.IssuerURL(ctx).String(),
-		AuthTime:                            time.Time(session.AuthenticatedAt),
-		RequestedAt:                         session.RequestedAt,
-		Extra:                               session.Session.IDToken,
-		AuthenticationContextClassReference: session.ConsentRequest.ACR,
-		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
+		AuthTime:                            time.Time(consent.AuthenticatedAt),
+		RequestedAt:                         consent.RequestedAt,
+		Extra:                               consent.Session.IDToken,
+		AuthenticationContextClassReference: consent.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     consent.ConsentRequest.AMR,
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    request.GetRequestForm().Get("nonce"),
@@ -1394,32 +1408,31 @@ func (h *Handler) updateSessionWithRequest(ctx context.Context, session *flow.Ac
 		// This is set by the fosite strategy
 		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
 	}
-	claims.Add("sid", session.ConsentRequest.LoginSessionID)
+	claims.Add("sid", consent.ConsentRequest.LoginSessionID)
 
-	s := &Session{
-		DefaultSession: &openid.DefaultSession{
-			Claims: claims,
-			Headers: &jwt.Headers{Extra: map[string]interface{}{
-				// required for lookup on jwk endpoint
-				"kid": openIDKeyID,
-			}},
-			Subject: session.ConsentRequest.Subject,
-		},
-		Extra:                 session.Session.AccessToken,
-		KID:                   accessTokenKeyID,
-		ClientID:              request.GetClient().GetID(),
-		ConsentChallenge:      session.ID,
-		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
-		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
-		MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
-		Flow:                  flow,
+	if session == nil {
+		session = &Session{}
 	}
 
-	if _, ok := request.(*fosite.DeviceRequest); ok {
-		s.SetBrowserFlowCompleted(true)
+	if session.DefaultSession == nil {
+		session.DefaultSession = &openid.DefaultSession{}
 	}
+	session.DefaultSession.Claims = claims
+	session.DefaultSession.Headers = &jwt.Headers{Extra: map[string]interface{}{
+		// required for lookup on jwk endpoint
+		"kid": openIDKeyID,
+	}}
+	session.DefaultSession.Subject = consent.ConsentRequest.Subject
+	session.Extra = consent.Session.AccessToken
+	session.KID = accessTokenKeyID
+	session.ClientID = request.GetClient().GetID()
+	session.ConsentChallenge = consent.ID
+	session.ExcludeNotBeforeClaim = h.c.ExcludeNotBeforeClaim(ctx)
+	session.AllowedTopLevelClaims = h.c.AllowedTopLevelClaims(ctx)
+	session.MirrorTopLevelClaims = h.c.MirrorTopLevelClaims(ctx)
+	session.Flow = flow
 
-	return s, nil
+	return session, nil
 }
 
 func (h *Handler) logOrAudit(err error, r *http.Request) {

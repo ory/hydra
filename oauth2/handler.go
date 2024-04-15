@@ -771,7 +771,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		}
 	}
 
-	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"consent_verifier": {string(f.ConsentVerifier)}}).String()
+	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"client_id": {f.Client.GetID()}}).String()
 	http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 

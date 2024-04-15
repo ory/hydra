@@ -1191,19 +1191,19 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 			resp, err := hc.Get(devResp.VerificationURIComplete)
 			require.NoError(t, err)
 			require.Contains(t, reg.Config().DeviceDoneURL(ctx).String(), resp.Request.URL.Path, "did not end up in post device URL")
+			require.Equal(t, resp.Request.URL.Query().Get("client_id"), c.ID)
 
 			conf := oauth2Config(t, c)
-			_, err = conf.DeviceAccessToken(ctx, devResp)
-			// TODO(nsklikas): Uncomment after the token endpoint is implemented
-			// require.NoError(t, err)
+			token, err := conf.DeviceAccessToken(ctx, devResp)
+			require.NoError(t, err)
 
-			// claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
-			// assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
+			claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+			assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
 
-			// idClaims := testhelpers.DecodeIDToken(t, token)
-			// assert.Equal(t, "baz", idClaims.Get("bar").String(), "%s", idClaims.Raw)
-			// sid = idClaims.Get("sid").String()
-			// assert.NotNil(t, sid)
+			idClaims := testhelpers.DecodeIDToken(t, token)
+			assert.Equal(t, "baz", idClaims.Get("bar").String(), "%s", idClaims.Raw)
+			sid := idClaims.Get("sid").String()
+			assert.NotNil(t, sid)
 		}
 
 		t.Run("perform first flow", run)

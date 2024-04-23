@@ -262,6 +262,12 @@ type oidcConfiguration struct {
 	// example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
 	AuthURL string `json:"authorization_endpoint"`
 
+	// OAuth 2.0 Device Authorization Endpoint URL
+	//
+	// required: true
+	// example: https://playground.ory.sh/ory-hydra/public/oauth2/device/oauth
+	DeviceAuthorizationURL string `json:"device_authorization_endpoint"`
+
 	// OpenID Connect Dynamic Client Registration Endpoint URL
 	//
 	// example: https://playground.ory.sh/ory-hydra/admin/client
@@ -499,6 +505,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 	h.r.Writer().Write(w, r, &oidcConfiguration{
 		Issuer:                                 h.c.IssuerURL(ctx).String(),
 		AuthURL:                                h.c.OAuth2AuthURL(ctx).String(),
+		DeviceAuthorizationURL:                 h.c.OAuth2DeviceAuthorisationURL(ctx).String(),
 		TokenURL:                               h.c.OAuth2TokenURL(ctx).String(),
 		JWKsURI:                                h.c.JWKSURL(ctx).String(),
 		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(ctx), RevocationPath).String(),
@@ -512,7 +519,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
 		IDTokenSignedResponseAlg:               []string{key.Algorithm},
 		UserinfoSignedResponseAlg:              []string{key.Algorithm},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
 		ResponseModesSupported:                 []string{"query", "fragment", "form_post"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,
@@ -705,7 +712,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// swagger:route GET /oauth2/device/verify oauth performOAuth2DeviceVerificationFlow
+// swagger:route GET /oauth2/device/verify oAuth2 performOAuth2DeviceVerificationFlow
 //
 // # OAuth 2.0 Device Verification Endpoint
 //
@@ -827,7 +834,7 @@ type deviceAuthorization struct {
 	Interval int `json:"interval"`
 }
 
-// swagger:route POST /oauth2/device/auth oauth oAuth2DeviceFlow
+// swagger:route POST /oauth2/device/auth oAuth2 oAuth2DeviceFlow
 //
 // # The OAuth 2.0 Device Authorize Endpoint
 //

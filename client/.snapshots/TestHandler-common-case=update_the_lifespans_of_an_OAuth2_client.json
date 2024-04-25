@@ -32,7 +32,10 @@
     "jwt_bearer_grant_access_token_lifespan": "37h0m0s",
     "refresh_token_grant_id_token_lifespan": "40h0m0s",
     "refresh_token_grant_access_token_lifespan": "41h0m0s",
-    "refresh_token_grant_refresh_token_lifespan": "42h0m0s"
+    "refresh_token_grant_refresh_token_lifespan": "42h0m0s",
+    "device_authorization_grant_id_token_lifespan": "45h0m0s",
+    "device_authorization_grant_access_token_lifespan": "46h0m0s",
+    "device_authorization_grant_refresh_token_lifespan": "47h0m0s"
   },
   "status": 200
 }

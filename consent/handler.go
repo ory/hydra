@@ -4,7 +4,6 @@
 package consent
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"time"
@@ -432,9 +431,9 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	var handledLoginRequest flow.HandledLoginRequest
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&handledLoginRequest); err != nil {
+
+	err := decodeRequestBody(r, &handledLoginRequest)
+	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
@@ -560,9 +559,9 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 
 	var p flow.RequestDeniedError
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+
+	err := decodeRequestBody(r, &p)
+	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
@@ -744,10 +743,9 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	}
 
 	var p flow.AcceptOAuth2ConsentRequest
-	d := json.NewDecoder(r.Body)
-	d.UseNumber()
-	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+
+	err := decodeRequestBody(r, &p)
+	if err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
 		return
 	}
@@ -854,9 +852,9 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	}
 
 	var p flow.RequestDeniedError
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+
+	err := decodeRequestBody(r, &p)
+	if err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
 		return
 	}

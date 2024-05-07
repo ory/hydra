@@ -1126,31 +1126,36 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 	claims.Add("sid", session.ConsentRequest.LoginSessionID)
 
 	// done
-	response, err := h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
-		DefaultSession: &openid.DefaultSession{
-			Claims: claims,
-			Headers: &jwt.Headers{Extra: map[string]interface{}{
-				// required for lookup on jwk endpoint
-				"kid": openIDKeyID,
-			}},
-			Subject: session.ConsentRequest.Subject,
-		},
-		Extra:                 session.Session.AccessToken,
-		KID:                   accessTokenKeyID,
-		ClientID:              authorizeRequest.GetClient().GetID(),
-		ConsentChallenge:      session.ID,
-		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
-		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
-		MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
-		Flow:                  flow,
-	})
-	if err != nil {
+	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+		response, err := h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
+			DefaultSession: &openid.DefaultSession{
+				Claims: claims,
+				Headers: &jwt.Headers{Extra: map[string]interface{}{
+					// required for lookup on jwk endpoint
+					"kid": openIDKeyID,
+				}},
+				Subject: session.ConsentRequest.Subject,
+			},
+			Extra:                 session.Session.AccessToken,
+			KID:                   accessTokenKeyID,
+			ClientID:              authorizeRequest.GetClient().GetID(),
+			ConsentChallenge:      session.ID,
+			ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
+			AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
+			MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),
+			Flow:                  flow,
+		})
+		if err != nil {
+			return err
+		}
+
+		h.r.OAuth2Provider().WriteAuthorizeResponse(ctx, w, authorizeRequest, response)
+		return nil
+	}); err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
-
-	h.r.OAuth2Provider().WriteAuthorizeResponse(ctx, w, authorizeRequest, response)
 }
 
 // Delete OAuth 2.0 Access Token Parameters

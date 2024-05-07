@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-04-26)](#000-2024-04-26)
+- [0.0.0 (2024-05-07)](#000-2024-05-07)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
@@ -710,7 +710,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-04-26)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-05-07)
 
 
 ### Bug Fixes
@@ -718,6 +718,7 @@
 * Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
 * Error log when RP responds with status code 204 ([#3731](https://github.com/ory/hydra/issues/3731)) ([153e4b5](https://github.com/ory/hydra/commit/153e4b56e6de645ee44e4e7833c32a3890e43c54))
 * Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
+* Wrap authorize response in transaction ([#3763](https://github.com/ory/hydra/issues/3763)) ([5b106aa](https://github.com/ory/hydra/commit/5b106aadb0e71add56e3cc68e5a9e33cdb81dd39))
 * Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))
 
 ### Features

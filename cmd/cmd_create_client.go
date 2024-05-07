@@ -17,9 +17,11 @@ import (
 )
 
 const (
+	flagClientAccessTokenStrategy               = "access-token-strategy"
 	flagClientAllowedCORSOrigin                 = "allowed-cors-origin"
 	flagClientAudience                          = "audience"
 	flagClientBackchannelLogoutCallback         = "backchannel-logout-callback"
+	flagClientId                                = "id"
 	flagClientName                              = "name"
 	flagClientClientURI                         = "client-uri"
 	flagClientContact                           = "contact"
@@ -85,8 +87,11 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			secret := flagx.MustGetString(cmd, flagClientSecret)
+			cl := clientFromFlags(cmd)
+			cl.ClientId = pointerx.Ptr(flagx.MustGetString(cmd, flagClientId))
+
 			//nolint:bodyclose
-			client, _, err := m.OAuth2Api.CreateOAuth2Client(cmd.Context()).OAuth2Client(clientFromFlags(cmd)).Execute()
+			client, _, err := m.OAuth2Api.CreateOAuth2Client(cmd.Context()).OAuth2Client(cl).Execute()
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
@@ -110,5 +115,6 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 		},
 	}
 	registerClientFlags(cmd.Flags())
+	cmd.Flags().String(flagClientId, "", "Provide the client's id.")
 	return cmd
 }

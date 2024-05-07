@@ -11,6 +11,7 @@ import (
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -21,6 +22,7 @@ type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryLogger
 	consent.Registry
+	persistence.Provider
 	Registry
 	FlowCipher() *aead.XChaCha20Poly1305
 }

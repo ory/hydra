@@ -326,7 +326,11 @@ func TestJWTBearer(t *testing.T) {
 
 					expectedGrantedScopes := []string{client.Scope}
 					expectedGrantedAudience := []string{audience}
-					expectedPayload := map[string][]string(map[string][]string{"assertion": {token}})
+					expectedPayload := map[string][]string{
+						"assertion":  {token},
+						"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
+						"scope":      {"offline_access"},
+					}
 
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
@@ -335,7 +339,7 @@ func TestJWTBearer(t *testing.T) {
 					require.NotEmpty(t, hookReq.Request)
 					require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
 					require.ElementsMatch(t, hookReq.Request.GrantedAudience, expectedGrantedAudience)
-					require.Equal(t, hookReq.Request.Payload, expectedPayload)
+					require.Equal(t, expectedPayload, hookReq.Request.Payload)
 
 					claims := map[string]interface{}{
 						"hooked": true,
@@ -401,7 +405,12 @@ func TestJWTBearer(t *testing.T) {
 
 					expectedGrantedScopes := []string{client.Scope}
 					expectedGrantedAudience := []string{audience}
-					expectedPayload := map[string][]string(map[string][]string{"assertion": {token}})
+					expectedPayload := map[string][]string{
+						"assertion":  {token},
+						"client_id":  {client.GetID()},
+						"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
+						"scope":      {"offline_access"},
+					}
 
 					var hookReq hydraoauth2.TokenHookRequest
 					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))

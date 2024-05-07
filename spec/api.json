@@ -374,6 +374,7 @@
             "type": "object"
           }
         },
+        "title": "The not ready status of the service.",
         "type": "object"
       },
       "healthStatus": {
@@ -383,6 +384,7 @@
             "type": "string"
           }
         },
+        "title": "The health status of the service.",
         "type": "object"
       },
       "introspectedOAuth2Token": {

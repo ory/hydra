@@ -7,6 +7,8 @@ import (
 	"context"
 	"io/fs"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/x/configx"
@@ -28,6 +30,7 @@ type (
 		extraMigrations  []fs.FS
 		goMigrations     []popx.Migration
 		fositexFactories []fositex.Factory
+		inspect          func(Registry) error
 	}
 	OptionsModifier func(*options)
 
@@ -102,6 +105,12 @@ func WithExtraFositeFactories(f ...fositex.Factory) OptionsModifier {
 	}
 }
 
+func Inspect(f func(Registry) error) OptionsModifier {
+	return func(o *options) {
+		o.inspect = f
+	}
+}
+
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
@@ -152,6 +161,11 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 		CallRegistry(ctx, r)
 	}
 
-	c.Source(ctx).SetTracer(ctx, r.Tracer(ctx))
+	if o.inspect != nil {
+		if err := o.inspect(r); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
 	return r, nil
 }

@@ -268,7 +268,10 @@ func TestClientCredentials(t *testing.T) {
 					require.NotEmpty(t, hookReq.Request)
 					require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
 					require.ElementsMatch(t, hookReq.Request.GrantedAudience, expectedGrantedAudience)
-					require.Equal(t, hookReq.Request.Payload, map[string][]string{})
+					require.Equal(t, hookReq.Request.Payload, map[string][]string{
+						"grant_type": {"client_credentials"},
+						"scope":      {"foobar"},
+					})
 
 					claims := map[string]interface{}{
 						"hooked": true,

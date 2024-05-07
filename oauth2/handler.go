@@ -4,6 +4,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/tidwall/gjson"
 
 	"github.com/pborman/uuid"
@@ -958,68 +960,71 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
-		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
-		var accessTokenKeyID string
-		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
-			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
-			if err != nil {
-				x.LogError(r, err, h.r.Logger())
-				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
-				return
+	err = h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+		var err error
+
+		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
+			accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
+			var accessTokenKeyID string
+			if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
+				accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+				if err != nil {
+					return err
+				}
+			}
+
+			// only for client_credentials, otherwise Authentication is included in session
+			if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
+				session.Subject = accessRequest.GetClient().GetID()
+			}
+			session.ClientID = accessRequest.GetClient().GetID()
+			session.KID = accessTokenKeyID
+			session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
+			session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
+
+			scopes := accessRequest.GetRequestedScopes()
+
+			// Added for compatibility with MITREid
+			if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
+				for _, scope := range accessRequest.GetClient().GetScopes() {
+					accessRequest.GrantScope(scope)
+				}
+			}
+
+			for _, scope := range scopes {
+				if h.r.Config().GetScopeStrategy(ctx)(accessRequest.GetClient().GetScopes(), scope) {
+					accessRequest.GrantScope(scope)
+				}
+			}
+
+			for _, audience := range accessRequest.GetRequestedAudience() {
+				if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
+					accessRequest.GrantAudience(audience)
+				}
 			}
 		}
 
-		// only for client_credentials, otherwise Authentication is included in session
-		if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
-			session.Subject = accessRequest.GetClient().GetID()
-		}
-		session.ClientID = accessRequest.GetClient().GetID()
-		session.KID = accessTokenKeyID
-		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
-		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
-
-		scopes := accessRequest.GetRequestedScopes()
-
-		// Added for compatibility with MITREid
-		if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
-			for _, scope := range accessRequest.GetClient().GetScopes() {
-				accessRequest.GrantScope(scope)
+		for _, hook := range h.r.AccessRequestHooks() {
+			if err = hook(ctx, accessRequest); err != nil {
+				return err
 			}
 		}
 
-		for _, scope := range scopes {
-			if h.r.Config().GetScopeStrategy(ctx)(accessRequest.GetClient().GetScopes(), scope) {
-				accessRequest.GrantScope(scope)
-			}
+		accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
+		if err != nil {
+			return err
 		}
 
-		for _, audience := range accessRequest.GetRequestedAudience() {
-			if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
-				accessRequest.GrantAudience(audience)
-			}
-		}
-	}
+		h.r.OAuth2Provider().WriteAccessResponse(ctx, w, accessRequest, accessResponse)
 
-	for _, hook := range h.r.AccessRequestHooks() {
-		if err := hook(ctx, accessRequest); err != nil {
-			h.logOrAudit(err, r)
-			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
-			return
-		}
-	}
+		return nil
+	})
 
-	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
-		return
+		events.Trace(ctx, events.TokenExchangeError)
 	}
-
-	h.r.OAuth2Provider().WriteAccessResponse(ctx, w, accessRequest, accessResponse)
 }
 
 // swagger:route GET /oauth2/auth oAuth2 oAuth2Authorize

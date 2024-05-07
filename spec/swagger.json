@@ -2393,6 +2393,7 @@
     },
     "healthNotReadyStatus": {
       "type": "object",
+      "title": "The not ready status of the service.",
       "properties": {
         "errors": {
           "description": "Errors contains a list of errors that caused the not ready status.",
@@ -2405,6 +2406,7 @@
     },
     "healthStatus": {
       "type": "object",
+      "title": "The health status of the service.",
       "properties": {
         "status": {
           "description": "Status always contains \"ok\".",

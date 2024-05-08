@@ -69,7 +69,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where(
 				fmt.Sprintf("request_id IN (%s)", params),
-				ids,
+				ids...,
 			).
 			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
@@ -80,7 +80,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where(
 				fmt.Sprintf("request_id IN (%s)", params),
-				ids,
+				ids...,
 			).
 			Delete(&OAuth2RequestSQL{Table: sqlTableRefresh}); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
@@ -93,7 +93,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			append(
 				[]interface{}{p.NetworkID(ctx)},
 				ids...,
-			),
+			)...,
 		).ExecWithCount()
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(x.ErrNotFound)

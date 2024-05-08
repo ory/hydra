@@ -51,42 +51,57 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where(whereStmt, whereArgs...).
 			Select("consent_challenge_id").
-			All(&fs); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-
+			All(&fs); errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		var count int
+		var args []string
+		var ids []interface{}
+
 		for _, f := range fs {
-			if err := p.RevokeAccessToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
-				// do nothing
-			} else if err != nil {
-				return err
-			}
-
-			if err := p.RevokeRefreshToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
-				// do nothing
-			} else if err != nil {
-				return err
-			}
-
-			localCount, err := c.RawQuery("DELETE FROM hydra_oauth2_flow WHERE consent_challenge_id = ? AND nid = ?", f.ConsentChallengeID, p.NetworkID(ctx)).ExecWithCount()
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return errorsx.WithStack(x.ErrNotFound)
-				}
-				return sqlcon.HandleError(err)
-			}
-
-			// If there are no sessions to revoke we should return an error to indicate to the caller
-			// that the request failed.
-			count += localCount
+			args = append(args, "?")
+			ids = append(ids, f.ConsentChallengeID.String())
 		}
 
-		if count == 0 {
+		params := strings.Join(args, ", ")
+		if err := p.QueryWithNetwork(ctx).
+			Where(
+				fmt.Sprintf("request_id IN (%s)", params),
+				ids,
+			).
+			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}); errors.Is(err, fosite.ErrNotFound) {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+
+		if err := p.QueryWithNetwork(ctx).
+			Where(
+				fmt.Sprintf("request_id IN (%s)", params),
+				ids,
+			).
+			Delete(&OAuth2RequestSQL{Table: sqlTableRefresh}); errors.Is(err, fosite.ErrNotFound) {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+
+		count, err := c.RawQuery(
+			fmt.Sprintf("DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)", params),
+			append(
+				[]interface{}{p.NetworkID(ctx)},
+				ids...,
+			),
+		).ExecWithCount()
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		} else if count == 0 {
+			// If there are no sessions to revoke we should return an error to indicate to the caller
+			// that the request failed.
 			return errorsx.WithStack(x.ErrNotFound)
 		}
 
@@ -642,7 +657,7 @@ SELECT DISTINCT c.* FROM hydra_client as c
 JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
 	f.subject=? AND
-	c.%schannel_logout_uri!='' AND
+	c.%schannel_logout_uri != '' AND
 	c.%schannel_logout_uri IS NOT NULL AND
 	f.login_session_id = ? AND
 	f.nid = ? AND

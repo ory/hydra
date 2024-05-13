@@ -59,18 +59,16 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 
 		var args []string
 		var ids []interface{}
+		nid := p.NetworkID(ctx)
 
 		for _, f := range fs {
 			args = append(args, "?")
 			ids = append(ids, f.ConsentChallengeID.String())
 		}
 
-		params := strings.Join(args, ", ")
 		if err := p.QueryWithNetwork(ctx).
-			Where(
-				fmt.Sprintf("request_id IN (%s)", params),
-				ids...,
-			).
+			Where("nid = ?", nid).
+			Where("request_id IN (?)", ids...).
 			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
@@ -78,10 +76,8 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		if err := p.QueryWithNetwork(ctx).
-			Where(
-				fmt.Sprintf("request_id IN (%s)", params),
-				ids...,
-			).
+			Where("nid = ?", nid).
+			Where("request_id IN (?)", ids...).
 			Delete(&OAuth2RequestSQL{Table: sqlTableRefresh}); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
@@ -89,7 +85,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		count, err := c.RawQuery(
-			fmt.Sprintf("DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)", params),
+			fmt.Sprintf("DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)", strings.Join(args, "?")),
 			append(
 				[]interface{}{p.NetworkID(ctx)},
 				ids...,

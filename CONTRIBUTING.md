@@ -144,10 +144,12 @@ checklist to contribute an example:
    not get mixed up.
 1. Add a descriptive prefix to commits. This ensures a uniform commit history
    and helps structure the changelog. Please refer to this
-   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
-   for an overview.
+   [Convential Commits configuration](https://github.com/ory/hydra/blob/master/.github/workflows/conventional_commits.yml)
+   for the list of accepted prefixes. You can read more about the Conventional
+   Commit specification
+   [at their site](https://www.conventionalcommits.org/en/v1.0.0/).
 1. Create a `README.md` that explains how to use the example. (Use
-   [the README template](https://github.com/ory/examples/blob/master/_common/README)).
+   [the README template](https://github.com/ory/examples/blob/master/_common/README.md)).
 1. Open a pull request and maintainers will review and merge your example.
 
 ## Contribute code
@@ -172,8 +174,10 @@ request, go through this checklist:
 1. Run `make format`
 1. Add a descriptive prefix to commits. This ensures a uniform commit history
    and helps structure the changelog. Please refer to this
-   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
-   for an overview.
+   [Convential Commits configuration](https://github.com/ory/hydra/blob/master/.github/workflows/conventional_commits.yml)
+   for the list of accepted prefixes. You can read more about the Conventional
+   Commit specification
+   [at their site](https://www.conventionalcommits.org/en/v1.0.0/).
 
 If a pull request is not ready to be reviewed yet
 [it should be marked as a "Draft"](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request).

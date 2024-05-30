@@ -18,9 +18,9 @@ func NewGetClientsCmd() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Get one or more OAuth 2.0 Clients by their ID(s)",
 		Long:    `This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`,
-		Example: `To get the OAuth 2.0 Client's secret, run:
+		Example: `To get the OAuth 2.0 Client's name, run:
 
-	{{ .CommandPath }} <your-client-id> --format json | jq -r '.client_secret'`,
+	{{ .CommandPath }} <your-client-id> --format json | jq -r '.client_name'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, _, err := cliclient.NewClient(cmd)
 			if err != nil {

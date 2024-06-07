@@ -7,9 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"strings"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"

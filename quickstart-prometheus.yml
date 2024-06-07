@@ -9,9 +9,6 @@
 # endpoint can only be used if you follow the steps in the tutorial.      #
 #                                                                         #
 ###########################################################################
-
-version: "3.7"
-
 services:
   prometheus:
     image: prom/prometheus:v2.12.0

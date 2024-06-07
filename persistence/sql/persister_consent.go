@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"strings"
 	"time"
 
@@ -85,7 +86,10 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		count, err := c.RawQuery(
-			fmt.Sprintf("DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)", strings.Join(args, ", ")),
+			fmt.Sprintf(
+				"DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)",
+				sqlx.Rebind(sqlx.BindType(c.Dialect.Name()), strings.Join(args, ", ")),
+			),
 			append(
 				[]interface{}{p.NetworkID(ctx)},
 				ids...,

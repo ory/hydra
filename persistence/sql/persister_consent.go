@@ -59,7 +59,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		nid := p.NetworkID(ctx)
 		for _, f := range fs {
 			ids = append(ids, f.ConsentChallengeID.String())
-			stringIDs = append(ids, f.ConsentChallengeID.String())
+			stringIDs = append(stringIDs, f.ConsentChallengeID.String())
 		}
 
 		if err := p.QueryWithNetwork(ctx).

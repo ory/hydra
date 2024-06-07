@@ -1834,7 +1834,7 @@ func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
 
 			actual := flow.Flow{}
 
-			require.Error(t, r.Persister().RevokeSubjectClientConsentSession(s.t2, "sub", client.ID))
+			require.NoError(t, r.Persister().RevokeSubjectClientConsentSession(s.t2, "sub", client.ID), "should not error if nothing was found")
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
 			require.NoError(t, r.Persister().RevokeSubjectClientConsentSession(s.t1, "sub", client.ID))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))

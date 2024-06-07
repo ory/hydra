@@ -69,7 +69,7 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:v22.1.10 start-single-node --insecure
+            cockroachdb/cockroach:v24.1.0 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
@@ -170,7 +170,7 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:v22.1.10 start-single-node --insecure
+            cockroachdb/cockroach:v24.1.0 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master

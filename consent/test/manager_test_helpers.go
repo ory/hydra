@@ -744,8 +744,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				})
 			}
 
-			require.EqualError(t, m.RevokeSubjectConsentSession(ctx, "i-do-not-exist"), x.ErrNotFound.Error())
-			require.EqualError(t, m.RevokeSubjectClientConsentSession(ctx, "i-do-not-exist", "i-do-not-exist"), x.ErrNotFound.Error())
+			require.NoError(t, m.RevokeSubjectConsentSession(ctx, "i-do-not-exist"))
+			require.NoError(t, m.RevokeSubjectClientConsentSession(ctx, "i-do-not-exist", "i-do-not-exist"))
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {

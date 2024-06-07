@@ -12,21 +12,18 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/x/otelx"
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/x/errorsx"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 var _ consent.Manager = &Persister{}
@@ -51,43 +48,47 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where(whereStmt, whereArgs...).
 			Select("consent_challenge_id").
-			All(&fs); err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-
+			All(&fs); errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		var count int
+		ids := make([]interface{}, 0, len(fs))
+		nid := p.NetworkID(ctx)
 		for _, f := range fs {
-			if err := p.RevokeAccessToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
-				// do nothing
-			} else if err != nil {
-				return err
-			}
-
-			if err := p.RevokeRefreshToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
-				// do nothing
-			} else if err != nil {
-				return err
-			}
-
-			localCount, err := c.RawQuery("DELETE FROM hydra_oauth2_flow WHERE consent_challenge_id = ? AND nid = ?", f.ConsentChallengeID, p.NetworkID(ctx)).ExecWithCount()
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return errorsx.WithStack(x.ErrNotFound)
-				}
-				return sqlcon.HandleError(err)
-			}
-
-			// If there are no sessions to revoke we should return an error to indicate to the caller
-			// that the request failed.
-			count += localCount
+			ids = append(ids, f.ConsentChallengeID.String())
 		}
 
-		if count == 0 {
+		if len(ids) == 0 {
+			return nil
+		}
+
+		if err := p.QueryWithNetwork(ctx).
+			Where("nid = ?", nid).
+			Where("request_id IN (?)", ids...).
+			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}); errors.Is(err, fosite.ErrNotFound) {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+
+		if err := p.QueryWithNetwork(ctx).
+			Where("nid = ?", nid).
+			Where("request_id IN (?)", ids...).
+			Delete(&OAuth2RequestSQL{Table: sqlTableRefresh}); errors.Is(err, fosite.ErrNotFound) {
+			// do nothing
+		} else if err != nil {
+			return err
+		}
+
+		if err := p.QueryWithNetwork(ctx).
+			Where("nid = ?", nid).
+			Where("consent_challenge_id IN (?)", ids...).
+			Delete(new(flow.Flow)); errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
 		}
 
 		return nil
@@ -642,7 +643,7 @@ SELECT DISTINCT c.* FROM hydra_client as c
 JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
 	f.subject=? AND
-	c.%schannel_logout_uri!='' AND
+	c.%schannel_logout_uri != '' AND
 	c.%schannel_logout_uri IS NOT NULL AND
 	f.login_session_id = ? AND
 	f.nid = ? AND

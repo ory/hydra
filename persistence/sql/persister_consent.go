@@ -55,11 +55,9 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		ids := make([]interface{}, 0, len(fs))
-		stringIDs := make([]string, 0, len(fs))
 		nid := p.NetworkID(ctx)
 		for _, f := range fs {
 			ids = append(ids, f.ConsentChallengeID.String())
-			stringIDs = append(stringIDs, f.ConsentChallengeID.String())
 		}
 
 		if err := p.QueryWithNetwork(ctx).
@@ -80,22 +78,13 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			return err
 		}
 
-		count, err := c.RawQuery(
-			fmt.Sprintf(
-				"DELETE FROM %s WHERE consent_challenge_id IN (?) AND nid = ?",
-				new(flow.Flow).TableName(),
-			),
-			stringIDs,
-			p.NetworkID(ctx),
-		).ExecWithCount()
-		if errors.Is(err, sql.ErrNoRows) {
+		if err := c.
+			Where("nid = ?", nid).
+			Where("consent_challenge_id IN (?)", ids...).
+			Delete(new(flow.Flow)); errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(x.ErrNotFound)
 		} else if err != nil {
 			return sqlcon.HandleError(err)
-		} else if count == 0 {
-			// If there are no sessions to revoke we should return an error to indicate to the caller
-			// that the request failed.
-			return errorsx.WithStack(x.ErrNotFound)
 		}
 
 		return nil

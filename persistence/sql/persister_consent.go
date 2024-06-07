@@ -83,13 +83,11 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 
 		count, err := c.RawQuery(
 			fmt.Sprintf(
-				"DELETE FROM hydra_oauth2_flow WHERE consent_challenge_id IN (%s) AND nid = ? ",
-				strings.Join(args, ", "),
+				"DELETE FROM %s WHERE consent_challenge_id IN (?) AND nid = ?",
+				new(flow.Flow).TableName(),
 			),
-			append(
-				ids,
-				p.NetworkID(ctx),
-			)...,
+			ids,
+			p.NetworkID(ctx),
 		).ExecWithCount()
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(x.ErrNotFound)

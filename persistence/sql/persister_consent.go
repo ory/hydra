@@ -54,10 +54,12 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			return sqlcon.HandleError(err)
 		}
 
-		ids := make([]string, 0, len(fs))
+		ids := make([]interface{}, 0, len(fs))
+		stringIDs := make([]string{}, 0, len(fs))
 		nid := p.NetworkID(ctx)
 		for _, f := range fs {
 			ids = append(ids, f.ConsentChallengeID.String())
+			stringIDs = append(ids, f.ConsentChallengeID.String())
 		}
 
 		if err := p.QueryWithNetwork(ctx).
@@ -83,7 +85,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 				"DELETE FROM %s WHERE consent_challenge_id IN (?) AND nid = ?",
 				new(flow.Flow).TableName(),
 			),
-			ids,
+			stringIDs,
 			p.NetworkID(ctx),
 		).ExecWithCount()
 		if errors.Is(err, sql.ErrNoRows) {

@@ -10,25 +10,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/x/otelx"
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/x/errorsx"
-
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 var _ consent.Manager = &Persister{}
@@ -87,9 +83,11 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		count, err := c.RawQuery(
-			fmt.Sprintf(
-				"DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)",
-				sqlx.Rebind(sqlx.BindType(c.Dialect.Name()), strings.Join(args, ", ")),
+			sqlx.Rebind(
+				sqlx.BindType(c.Dialect.Name()), fmt.Sprintf(
+					"DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)",
+					strings.Join(args, ", "),
+				),
 			),
 			append(
 				[]interface{}{p.NetworkID(ctx)},

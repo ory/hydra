@@ -9,19 +9,16 @@ import (
 	"testing"
 
 	"github.com/go-jose/go-jose/v3"
-
-	"github.com/ory/x/configx"
-
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/sqlcon/dockertest"
 )
 
 func resetConfig(p *config.DefaultProvider) {
@@ -87,7 +84,7 @@ func ConnectToPG(t testing.TB) string {
 }
 
 func ConnectToCRDB(t testing.TB) string {
-	return dockertest.RunTestCockroachDBWithVersion(t, "v22.1.2")
+	return dockertest.RunTestCockroachDBWithVersion(t, "v24.1.0")
 }
 
 func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {

@@ -12,7 +12,6 @@ import (
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -83,15 +82,13 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		count, err := c.RawQuery(
-			sqlx.Rebind(
-				sqlx.BindType(c.Dialect.Name()), fmt.Sprintf(
-					"DELETE FROM hydra_oauth2_flow WHERE nid = ? AND consent_challenge_id IN (%s)",
-					strings.Join(args, ", "),
-				),
+			fmt.Sprintf(
+				"DELETE FROM hydra_oauth2_flow WHERE consent_challenge_id IN (%s) AND nid = ? ",
+				strings.Join(args, ", "),
 			),
 			append(
-				[]interface{}{p.NetworkID(ctx)},
-				ids...,
+				ids,
+				p.NetworkID(ctx),
 			)...,
 		).ExecWithCount()
 		if errors.Is(err, sql.ErrNoRows) {

@@ -54,7 +54,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			return sqlcon.HandleError(err)
 		}
 
-		ids := make([]interface{}, 0, len(fs))
+		ids := make([]string, 0, len(fs))
 		nid := p.NetworkID(ctx)
 		for _, f := range fs {
 			ids = append(ids, f.ConsentChallengeID.String())

@@ -4,7 +4,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-06-06)](#000-2024-06-06)
+- [0.0.0 (2024-06-07)](#000-2024-06-07)
+  - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
@@ -27,7 +28,7 @@
     - [Code Generation](#code-generation-4)
     - [Features](#features-4)
 - [2.2.0-rc.1 (2023-06-12)](#220-rc1-2023-06-12)
-  - [Breaking Changes](#breaking-changes)
+  - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes-5)
     - [Code Generation](#code-generation-5)
     - [Features](#features-5)
@@ -67,7 +68,7 @@
     - [Code Generation](#code-generation-14)
     - [Documentation](#documentation-4)
 - [2.0.0 (2022-10-27)](#200-2022-10-27)
-  - [Breaking Changes](#breaking-changes-1)
+  - [Breaking Changes](#breaking-changes-2)
     - [Bug Fixes](#bug-fixes-13)
     - [Code Generation](#code-generation-15)
     - [Code Refactoring](#code-refactoring)
@@ -111,13 +112,13 @@
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-8)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
-  - [Breaking Changes](#breaking-changes-2)
+  - [Breaking Changes](#breaking-changes-3)
     - [Bug Fixes](#bug-fixes-22)
     - [Code Generation](#code-generation-26)
     - [Documentation](#documentation-9)
     - [Features](#features-13)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
-  - [Breaking Changes](#breaking-changes-3)
+  - [Breaking Changes](#breaking-changes-4)
     - [Bug Fixes](#bug-fixes-23)
     - [Code Generation](#code-generation-27)
     - [Code Refactoring](#code-refactoring-2)
@@ -139,7 +140,7 @@
     - [Documentation](#documentation-13)
     - [Features](#features-16)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
-  - [Breaking Changes](#breaking-changes-4)
+  - [Breaking Changes](#breaking-changes-5)
     - [Bug Fixes](#bug-fixes-27)
     - [Code Generation](#code-generation-31)
     - [Code Refactoring](#code-refactoring-4)
@@ -167,7 +168,7 @@
     - [Code Generation](#code-generation-37)
     - [Documentation](#documentation-17)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
-  - [Breaking Changes](#breaking-changes-5)
+  - [Breaking Changes](#breaking-changes-6)
     - [Bug Fixes](#bug-fixes-30)
     - [Code Generation](#code-generation-38)
     - [Code Refactoring](#code-refactoring-5)
@@ -195,7 +196,7 @@
     - [Code Generation](#code-generation-42)
     - [Features](#features-23)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
-  - [Breaking Changes](#breaking-changes-6)
+  - [Breaking Changes](#breaking-changes-7)
     - [Bug Fixes](#bug-fixes-34)
     - [Code Generation](#code-generation-43)
     - [Documentation](#documentation-21)
@@ -206,7 +207,7 @@
 - [1.7.3 (2020-08-31)](#173-2020-08-31)
     - [Code Generation](#code-generation-45)
 - [1.7.1 (2020-08-31)](#171-2020-08-31)
-  - [Breaking Changes](#breaking-changes-7)
+  - [Breaking Changes](#breaking-changes-8)
     - [Bug Fixes](#bug-fixes-36)
     - [Code Generation](#code-generation-46)
     - [Code Refactoring](#code-refactoring-7)
@@ -214,7 +215,7 @@
     - [Features](#features-25)
     - [Unclassified](#unclassified-4)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
-  - [Breaking Changes](#breaking-changes-8)
+  - [Breaking Changes](#breaking-changes-9)
     - [Bug Fixes](#bug-fixes-37)
     - [Code Generation](#code-generation-47)
     - [Code Refactoring](#code-refactoring-8)
@@ -251,7 +252,7 @@
     - [Code Refactoring](#code-refactoring-9)
     - [Documentation](#documentation-27)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
-  - [Breaking Changes](#breaking-changes-9)
+  - [Breaking Changes](#breaking-changes-10)
     - [Chores](#chores-4)
     - [Code Refactoring](#code-refactoring-10)
 - [1.4.10 (2020-04-30)](#1410-2020-04-30)
@@ -295,7 +296,7 @@
     - [Workarounds](#workarounds)
     - [References](#references)
     - [Upstream](#upstream)
-  - [Breaking Changes](#breaking-changes-10)
+  - [Breaking Changes](#breaking-changes-11)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66-1)
     - [Impact](#impact-1)
     - [Severity](#severity-1)
@@ -710,12 +711,20 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-06-06)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-06-07)
+## Breaking Changes
+
+Deleting consents no longer returns 404 in certain edge cases but instead always 204.
+
 
 
 ### Bug Fixes
 
 * Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
+* Do not iteratively delete records ([#3766](https://github.com/ory/hydra/issues/3766)) ([5ef20a2](https://github.com/ory/hydra/commit/5ef20a2a2bc91ccde79517667ae4bf4a36c833ba)):
+
+    Resolves performance issues on some databases when deleting consent.
+
 * Do not retry sending responses ([#3764](https://github.com/ory/hydra/issues/3764)) ([1bbfdb5](https://github.com/ory/hydra/commit/1bbfdb56e55525c5bc0526726fa901cf10af59e4))
 * Error log when RP responds with status code 204 ([#3731](https://github.com/ory/hydra/issues/3731)) ([153e4b5](https://github.com/ory/hydra/commit/153e4b56e6de645ee44e4e7833c32a3890e43c54))
 * Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))

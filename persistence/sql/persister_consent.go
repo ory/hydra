@@ -60,6 +60,10 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			ids = append(ids, f.ConsentChallengeID.String())
 		}
 
+		if len(ids) == 0 {
+			return nil
+		}
+
 		if err := p.QueryWithNetwork(ctx).
 			Where("nid = ?", nid).
 			Where("request_id IN (?)", ids...).
@@ -78,7 +82,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			return err
 		}
 
-		if err := c.
+		if err := p.QueryWithNetwork(ctx).
 			Where("nid = ?", nid).
 			Where("consent_challenge_id IN (?)", ids...).
 			Delete(new(flow.Flow)); errors.Is(err, sql.ErrNoRows) {

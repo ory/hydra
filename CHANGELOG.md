@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-06-11)](#000-2024-06-11)
+- [0.0.0 (2024-06-13)](#000-2024-06-13)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
@@ -712,7 +712,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-06-11)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-06-13)
 ## Breaking Changes
 
 Deleting consents no longer returns 404 in certain edge cases but instead always 204.
@@ -728,6 +728,7 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 
 * Do not retry sending responses ([#3764](https://github.com/ory/hydra/issues/3764)) ([1bbfdb5](https://github.com/ory/hydra/commit/1bbfdb56e55525c5bc0526726fa901cf10af59e4))
 * Error log when RP responds with status code 204 ([#3731](https://github.com/ory/hydra/issues/3731)) ([153e4b5](https://github.com/ory/hydra/commit/153e4b56e6de645ee44e4e7833c32a3890e43c54))
+* Incorrect indices ([#3778](https://github.com/ory/hydra/issues/3778)) ([cb0004b](https://github.com/ory/hydra/commit/cb0004b67b2818b3bca397e98c1bb5bcbb62296f))
 * Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
 * Wrap authorize response in transaction ([#3763](https://github.com/ory/hydra/issues/3763)) ([5b106aa](https://github.com/ory/hydra/commit/5b106aadb0e71add56e3cc68e5a9e33cdb81dd39))
 * Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))

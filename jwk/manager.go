@@ -5,8 +5,15 @@ package jwk
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/errorsx"
 
 	jose "github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
@@ -64,8 +71,38 @@ type (
 		CreatedAt    time.Time `db:"created_at"`
 		Key          string    `db:"keydata"`
 	}
+
+	SQLDataRows []SQLData
 )
 
 func (d SQLData) TableName() string {
 	return "hydra_jwk"
+}
+
+func (d SQLDataRows) ToJWK(ctx context.Context, r interface {
+	KeyCipher() *aead.AESGCM
+}) (keys *jose.JSONWebKeySet, err error) {
+	if len(d) == 0 {
+		return nil, errors.Wrap(x.ErrNotFound, "")
+	}
+
+	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+	for _, d := range d {
+		key, err := r.KeyCipher().Decrypt(ctx, d.Key, nil)
+		if err != nil {
+			return nil, errorsx.WithStack(err)
+		}
+
+		var c jose.JSONWebKey
+		if err := json.Unmarshal(key, &c); err != nil {
+			return nil, errorsx.WithStack(err)
+		}
+		keys.Keys = append(keys.Keys, c)
+	}
+
+	if len(keys.Keys) == 0 {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+
+	return keys, nil
 }

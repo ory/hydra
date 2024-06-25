@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/jwk"
+
 	"github.com/pkg/errors"
 
 	"github.com/go-jose/go-jose/v3"
@@ -140,7 +142,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 
 	grantsData := make([]trust.SQLData, 0)
 	query := p.QueryWithNetwork(ctx).
-		Select("key_set", "key_id").
+		Select("key_id").
 		Where(expiresAt).
 		Where("issuer = ?", issuer).
 		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
@@ -155,21 +157,38 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 		return &jose.JSONWebKeySet{}, nil
 	}
 
-	// because keys must be grouped by issuer, we can retrieve set name from first grant
-	keySet, err := p.GetKeySet(ctx, grantsData[0].KeySet)
-	if err != nil {
-		return nil, err
+	keyIDs := make([]interface{}, len(grantsData))
+	for k, d := range grantsData {
+		keyIDs[k] = d.KeyID
 	}
 
-	// find keys, that belong to grants
-	filteredKeySet := &jose.JSONWebKeySet{}
-	for _, data := range grantsData {
-		if keys := keySet.Key(data.KeyID); len(keys) > 0 {
-			filteredKeySet.Keys = append(filteredKeySet.Keys, keys...)
-		}
+	var js jwk.SQLDataRows
+	if err := p.QueryWithNetwork(ctx).
+		// key_set and issuer are set to the same value on creation:
+		//
+		//	grant := Grant{
+		//		ID:              uuid.New().String(),
+		//		Issuer:          grantRequest.Issuer,
+		//		Subject:         grantRequest.Subject,
+		//		AllowAnySubject: grantRequest.AllowAnySubject,
+		//		Scope:           grantRequest.Scope,
+		//		PublicKey: PublicKey{
+		//			Set:   grantRequest.Issuer, // group all keys by issuer, so set=issuer
+		//			KeyID: grantRequest.PublicKeyJWK.KeyID,
+		//		},
+		//		CreatedAt: time.Now().UTC().Round(time.Second),
+		//		ExpiresAt: grantRequest.ExpiresAt.UTC().Round(time.Second),
+		//	}
+		//
+		// Therefore it is fine if we only look for the issuer here instead of the key set id.
+		Where("sid = ?", issuer).
+		Where("kid IN (?)", keyIDs).
+		Order("created_at DESC").
+		All(&js); err != nil {
+		return nil, sqlcon.HandleError(err)
 	}
 
-	return filteredKeySet, nil
+	return js.ToJWK(ctx, p.r)
 }
 
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) (_ []string, err error) {

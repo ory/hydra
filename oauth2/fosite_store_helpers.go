@@ -932,14 +932,14 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		t.Run("case=only associated key returns", func(t *testing.T) {
 			keySetToNotReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "some-key", "sig")
 			require.NoError(t, err)
-			require.NoError(t, keyManager.AddKeySet(context.TODO(), "some-set", keySetToNotReturn), "adding a random key should not fail")
+			require.NoError(t, keyManager.AddKeySet(context.Background(), "some-set", keySetToNotReturn), "adding a random key should not fail")
 
 			issuer := "maria"
 			subject := "maria@example.com"
 
 			keySet1ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "maria-key-1", "sig")
 			require.NoError(t, err)
-			require.NoError(t, grantManager.CreateGrant(context.TODO(), trust.Grant{
+			require.NoError(t, grantManager.CreateGrant(context.Background(), trust.Grant{
 				ID:              uuid.New(),
 				Issuer:          issuer,
 				Subject:         subject,
@@ -963,21 +963,22 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}, keySet2ToReturn.Keys[0].Public()))
 
-			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			storedKeySet, err := grantStorage.GetPublicKeys(context.Background(), issuer, subject)
 			require.NoError(t, err)
-			assert.Len(t, storedKeySet.Keys, 2)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[0].KeyID)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[0].Use)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[0].Key)
-			assert.Equal(t, keySet2ToReturn.Keys[1].Public().KeyID, storedKeySet.Keys[0].KeyID)
-			assert.Equal(t, keySet2ToReturn.Keys[1].Public().Use, storedKeySet.Keys[0].Use)
-			assert.Equal(t, keySet2ToReturn.Keys[1].Public().Key, storedKeySet.Keys[0].Key)
+			require.Len(t, storedKeySet.Keys, 2)
+			// sorted by created_at DESC, so order is reverse
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[1].KeyID)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[1].Use)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[1].Key)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[0].KeyID)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Use, storedKeySet.Keys[0].Use)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Key, storedKeySet.Keys[0].Key)
 
-			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, "non-existing-subject")
+			storedKeySet, err = grantStorage.GetPublicKeys(context.Background(), issuer, "non-existing-subject")
 			require.NoError(t, err)
 			assert.Len(t, storedKeySet.Keys, 0)
 
-			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "non-existing-subject", keySet2ToReturn.Keys[1].Public().KeyID)
+			_, err = grantStorage.GetPublicKeyScopes(context.Background(), issuer, "non-existing-subject", keySet2ToReturn.Keys[0].Public().KeyID)
 			require.Error(t, err)
 		})
 

@@ -15,7 +15,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -152,7 +151,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet")
 	defer span.End()
 
-	var js []jwk.SQLData
+	var js jwk.SQLDataRows
 	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ?", set).
 		Order("created_at DESC").
@@ -160,29 +159,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 		return nil, sqlcon.HandleError(err)
 	}
 
-	if len(js) == 0 {
-		return nil, errors.Wrap(x.ErrNotFound, "")
-	}
-
-	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
-	for _, d := range js {
-		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key, nil)
-		if err != nil {
-			return nil, errorsx.WithStack(err)
-		}
-
-		var c jose.JSONWebKey
-		if err := json.Unmarshal(key, &c); err != nil {
-			return nil, errorsx.WithStack(err)
-		}
-		keys.Keys = append(keys.Keys, c)
-	}
-
-	if len(keys.Keys) == 0 {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	}
-
-	return keys, nil
+	return js.ToJWK(ctx, p.r)
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {

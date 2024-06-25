@@ -930,44 +930,54 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=only associated key returns", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "some-key", "sig")
+			keySetToNotReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "some-key", "sig")
 			require.NoError(t, err)
+			require.NoError(t, keyManager.AddKeySet(context.TODO(), "some-set", keySetToNotReturn), "adding a random key should not fail")
 
-			err = keyManager.AddKeySet(context.TODO(), "some-set", keySet)
-			require.NoError(t, err)
-
-			keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "maria-key", "sig")
-			require.NoError(t, err)
-
-			publicKey := keySet.Keys[0].Public()
 			issuer := "maria"
 			subject := "maria@example.com"
-			grant := trust.Grant{
+
+			keySet1ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "maria-key-1", "sig")
+			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(context.TODO(), trust.Grant{
 				ID:              uuid.New(),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
 				Scope:           []string{"openid"},
-				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: keySet1ToReturn.Keys[0].Public().KeyID},
 				CreatedAt:       time.Now().UTC().Round(time.Second),
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
-			}
+			}, keySet1ToReturn.Keys[0].Public()))
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			keySet2ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "maria-key-2", "sig")
 			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(context.TODO(), trust.Grant{
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: keySet2ToReturn.Keys[0].Public().KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}, keySet2ToReturn.Keys[0].Public()))
 
 			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
 			require.NoError(t, err)
-			assert.Len(t, storedKeySet.Keys, 1)
-			assert.Equal(t, publicKey.KeyID, storedKeySet.Keys[0].KeyID)
-			assert.Equal(t, publicKey.Use, storedKeySet.Keys[0].Use)
-			assert.Equal(t, publicKey.Key, storedKeySet.Keys[0].Key)
+			assert.Len(t, storedKeySet.Keys, 2)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[0].KeyID)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[0].Use)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[0].Key)
+			assert.Equal(t, keySet2ToReturn.Keys[1].Public().KeyID, storedKeySet.Keys[0].KeyID)
+			assert.Equal(t, keySet2ToReturn.Keys[1].Public().Use, storedKeySet.Keys[0].Use)
+			assert.Equal(t, keySet2ToReturn.Keys[1].Public().Key, storedKeySet.Keys[0].Key)
 
 			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, "non-existing-subject")
 			require.NoError(t, err)
 			assert.Len(t, storedKeySet.Keys, 0)
 
-			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "non-existing-subject", publicKey.KeyID)
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "non-existing-subject", keySet2ToReturn.Keys[1].Public().KeyID)
 			require.Error(t, err)
 		})
 

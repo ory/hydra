@@ -4,6 +4,9 @@
 package consent
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/flow"
@@ -37,4 +40,11 @@ func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []flow.Acce
 	}
 
 	return nil
+}
+
+func decodeRequestBody(r *http.Request, v interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	decoder.UseNumber()
+	return decoder.Decode(v)
 }

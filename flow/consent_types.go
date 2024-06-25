@@ -8,7 +8,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
@@ -742,8 +744,22 @@ func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
 func (r *AcceptOAuth2ConsentRequestSession) MarshalJSON() ([]byte, error) {
 	type Alias AcceptOAuth2ConsentRequestSession
 	alias := Alias(*r)
+
 	if alias.AccessToken == nil {
 		alias.AccessToken = map[string]interface{}{}
+	} else {
+		// ensure numbers are properly converted to their respective types instead of forcing float64
+		for key, value := range alias.AccessToken {
+		switch v := value.(type) {
+			case float64:
+				_, frac := math.Modf(v)
+				if frac == 0.0 {
+					alias.AccessToken[key] = json.Number(strconv.FormatInt(int64(v), 10))
+				} else {
+					alias.AccessToken[key] = json.Number(strconv.FormatFloat(v, 'f', -1, 64))
+				}
+			}
+		}
 	}
 
 	if alias.IDToken == nil {

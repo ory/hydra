@@ -1359,13 +1359,15 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			ks := newKeySet("ks-id", "use")
+			const issuer = "ks-id"
+			ks := newKeySet(issuer, "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
 				ExpiresAt: time.Now().Add(time.Hour),
-				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
+				Issuer:    issuer,
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
+			require.NoError(t, r.Persister().AddKeySet(s.t1, issuer, ks))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
 
 			actual, err := r.Persister().GetPublicKeys(s.t2, grant.Issuer, grant.Subject)

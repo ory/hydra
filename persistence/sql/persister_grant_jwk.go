@@ -182,7 +182,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 		//
 		// Therefore it is fine if we only look for the issuer here instead of the key set id.
 		Where("sid = ?", issuer).
-		Where("kid IN (?)", keyIDs...).
+		Where("kid IN (?)", keyIDs).
 		Order("created_at DESC").
 		All(&js); err != nil {
 		return nil, sqlcon.HandleError(err)

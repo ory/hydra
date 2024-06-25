@@ -1121,9 +1121,24 @@
               "$ref": "#/definitions/webhook_config"
             }
           ]
+        },
+        "refresh_token_rotation": {
+        "type": "object",
+        "properties": {
+          "grace_period": {
+            "title": "Refresh Token Rotation Grace Period",
+            "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is one hour.",
+            "default": "0h",
+            "allOf": [
+              {
+                "$ref": "#/definitions/duration"
+              }
+            ]
+          }
         }
       }
-    },
+    }
+  },
     "secrets": {
       "type": "object",
       "additionalProperties": false,

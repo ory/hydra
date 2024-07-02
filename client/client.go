@@ -580,3 +580,11 @@ type IDer interface{ GetID() string }
 func CookieSuffix(client IDer) string {
 	return strconv.Itoa(int(murmur3.Sum32([]byte(client.GetID()))))
 }
+
+func GetSanitizedCopy(c *Client) *Client {
+	cc := new(Client)
+	// Remove the hashed secret here
+	*cc = *c
+	cc.Secret = ""
+	return cc
+}

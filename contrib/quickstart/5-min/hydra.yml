@@ -20,3 +20,5 @@ oidc:
       - public
     pairwise:
       salt: youReallyNeedToChangeThis
+oauth2:
+  token_hook: http://localhost:8080

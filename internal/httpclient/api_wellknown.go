@@ -38,6 +38,9 @@ This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Toke
 if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
 [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 
+Adding custom keys requires first creating a keyset via the createJsonWebKeySet operation,
+and then configuring the webfinger.jwks.broadcast_keys configuration value to include the keyset name.
+
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiDiscoverJsonWebKeysRequest
 */

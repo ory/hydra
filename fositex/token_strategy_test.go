@@ -34,7 +34,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		}
 	})
 	t.Run("strategy=HMACStrategy", func(t *testing.T) {
-		strategy := new(oauth2.HMACSHAStrategy)
+		strategy := new(oauth2.BaseHMACSHAStrategy)
 		for _, tc := range []struct{ token string }{
 			{""},
 			{"foo"},

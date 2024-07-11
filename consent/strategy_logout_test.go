@@ -40,6 +40,7 @@ func TestLogoutFlows(t *testing.T) {
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
+
 	reg.WithKratos(fakeKratos)
 
 	defaultRedirectedMessage := "redirected to default server"

@@ -8,6 +8,7 @@ import (
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
+	enigma "github.com/ory/fosite/token/hmac"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 )
@@ -22,6 +23,7 @@ type Registry interface {
 	ClientManager() Manager
 	ClientHasher() fosite.Hasher
 	OpenIDJWTStrategy() jwk.JWTSigner
-	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
+	OAuth2HMACStrategy() foauth2.CoreStrategy
+	OAuth2EnigmaStrategy() *enigma.HMACStrategy
 	config.Provider
 }

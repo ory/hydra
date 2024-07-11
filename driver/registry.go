@@ -5,25 +5,17 @@ package driver
 
 import (
 	"context"
+	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/x/popx"
 	"io/fs"
 	"net/http"
 
-	"go.opentelemetry.io/otel/trace"
-
-	"github.com/ory/hydra/v2/fositex"
-	"github.com/ory/hydra/v2/internal/kratos"
-	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/popx"
-
 	"github.com/ory/hydra/v2/aead"
-	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/hydra/v2/oauth2/trust"
-
-	"github.com/pkg/errors"
-
-	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -47,21 +39,12 @@ import (
 
 type Registry interface {
 	dbal.Driver
+	WritableRegistry
 
 	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, extraMigrations []fs.FS, goMigrations []popx.Migration) error
 
-	WithBuildInfo(v, h, d string) Registry
-	WithConfig(c *config.DefaultProvider) Registry
-	WithContextualizer(ctxer contextx.Contextualizer) Registry
-	WithLogger(l *logrusx.Logger) Registry
-	WithTracer(t trace.Tracer) Registry
-	WithTracerWrapper(TracerWrapper) Registry
-	WithKratos(k kratos.Client) Registry
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
-
-	WithExtraFositeFactories(f []fositex.Factory) Registry
-	ExtraFositeFactories() []fositex.Factory
 
 	contextx.Provider
 	config.Provider
@@ -86,12 +69,10 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+	OAuth2EnigmaStrategy() *enigma.HMACStrategy
 	OAuth2AwareMiddleware() func(h http.Handler) http.Handler
 
-	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
-	WithOAuth2Provider(f fosite.OAuth2Provider)
-	WithConsentStrategy(c consent.Strategy)
-	WithHsmContext(h hsm.Context)
+	OAuth2HMACStrategy() foauth2.CoreStrategy
 }
 
 func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
@@ -99,22 +80,26 @@ func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logru
 	if err != nil {
 		return nil, err
 	}
+
 	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, nil, nil); err != nil {
 		return nil, err
 	}
+
 	return registry, nil
 }
 
 func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (Registry, error) {
-	driver, err := dbal.GetDriverFor(c.DSN())
-	if err != nil {
-		return nil, errorsx.WithStack(err)
+	registry := NewRegistrySQL(
+		c, l, config.Version, config.Commit, config.Date,
+	)
+
+	if !registry.CanHandle(c.DSN()) {
+		if dbal.IsSQLite(c.DSN()) {
+			return nil, dbal.ErrSQLiteSupportMissing
+		}
+
+		return nil, dbal.ErrNoResponsibleDriverFound
 	}
-	registry, ok := driver.(Registry)
-	if !ok {
-		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
-	}
-	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
 
 	return registry, nil
 }

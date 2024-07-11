@@ -12,7 +12,7 @@ import (
 )
 
 func Tokens(c fosite.Configurator, length int) (res [][]string) {
-	s := &oauth2.HMACSHAStrategy{BaseHMACSHAStrategy: &oauth2.BaseHMACSHAStrategy{Enigma: &hmac.HMACStrategy{Config: c}, Config: c}}
+	s := oauth2.NewHMACSHAStrategy(&hmac.HMACStrategy{Config: c}, c)
 
 	for i := 0; i < length; i++ {
 		tok, sig, _ := s.Enigma.Generate(context.Background())

@@ -5,6 +5,7 @@ package fositex
 
 import (
 	"context"
+	"github.com/ory/fosite/token/hmac"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,7 +35,7 @@ func TestAccessTokenSignature(t *testing.T) {
 		}
 	})
 	t.Run("strategy=HMACStrategy", func(t *testing.T) {
-		strategy := new(oauth2.BaseHMACSHAStrategy)
+		strategy := oauth2.NewHMACSHAStrategy(&hmac.HMACStrategy{}, nil)
 		for _, tc := range []struct{ token string }{
 			{""},
 			{"foo"},

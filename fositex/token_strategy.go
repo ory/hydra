@@ -18,12 +18,12 @@ var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)
 // TokenStrategy uses the correct token strategy (jwt, opaque) depending on the configuration.
 type TokenStrategy struct {
 	c    *config.DefaultProvider
-	hmac *foauth2.HMACSHAStrategy
-	jwt  *foauth2.DefaultJWTStrategy
+	hmac foauth2.CoreStrategy
+	jwt  foauth2.CoreStrategy
 }
 
 // NewTokenStrategy returns a new TokenStrategy.
-func NewTokenStrategy(c *config.DefaultProvider, hmac *foauth2.HMACSHAStrategy, jwt *foauth2.DefaultJWTStrategy) *TokenStrategy {
+func NewTokenStrategy(c *config.DefaultProvider, hmac foauth2.CoreStrategy, jwt *foauth2.DefaultJWTStrategy) *TokenStrategy {
 	return &TokenStrategy{c: c, hmac: hmac, jwt: jwt}
 }
 

@@ -41,11 +41,11 @@ func WithRegistryModifiers(f ...RegistryModifier) OptionsModifier {
 	}
 }
 
-func RegistryWithHMACSHAStrategy(s oauth2.CoreStrategy) RegistryModifier {
+func RegistryWithHMACSHAStrategy(s func(r Registry) oauth2.CoreStrategy) RegistryModifier {
 	return func(r Registry) error {
 		switch rt := r.(type) {
 		case *RegistrySQL:
-			rt.hmacs = s
+			rt.hmacs = s(r)
 		default:
 			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
 		}

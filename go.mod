@@ -6,8 +6,6 @@ toolchain go1.21.0
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
-replace github.com/ory/fosite => ../fosite
-
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.5
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
@@ -33,7 +31,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.46.2-0.20240709132642-e00e96d20589
+	github.com/ory/fosite v0.46.2-0.20240715141946-7c454207858e
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88

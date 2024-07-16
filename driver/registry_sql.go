@@ -39,7 +39,7 @@ import (
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/gobuffalo/pop/v6"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/luna-duclos/instrumentedsql"
 
 	"go.opentelemetry.io/otel/trace"

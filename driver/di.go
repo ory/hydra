@@ -57,61 +57,11 @@ func RegistryWithHMACSHAStrategy(s func(r Registry) oauth2.CoreStrategy) Registr
 	}
 }
 
-func RegistryWithKratos(k kratos.Client) RegistryModifier {
-	return func(r Registry) error {
-		switch rt := r.(type) {
-		case *RegistrySQL:
-			rt.kratos = k
-		default:
-			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
-		}
-		return nil
-	}
-}
-
-func RegistryWithOAuth2Provider(f fosite.OAuth2Provider) RegistryModifier {
-	return func(r Registry) error {
-		switch rt := r.(type) {
-		case *RegistrySQL:
-			rt.fop = f
-		default:
-			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
-		}
-		return nil
-	}
-}
-
-func RegistryWithConsentStrategy(c consent.Strategy) RegistryModifier {
-	return func(r Registry) error {
-		switch rt := r.(type) {
-		case *RegistrySQL:
-			rt.cos = c
-		default:
-			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
-		}
-		return nil
-	}
-}
-
 func RegistryWithHsmContext(h hsm.Context) RegistryModifier {
 	return func(r Registry) error {
 		switch rt := r.(type) {
 		case *RegistrySQL:
 			rt.hsm = h
-		default:
-			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
-		}
-		return nil
-	}
-}
-
-func RegistryWithBuildInfo(version, hash, date string) RegistryModifier {
-	return func(r Registry) error {
-		switch m := r.(type) {
-		case *RegistrySQL:
-			m.buildVersion = version
-			m.buildHash = hash
-			m.buildDate = date
 		default:
 			return errors.Errorf("unable to set HMAC strategy on registry of type %T", r)
 		}

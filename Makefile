@@ -64,9 +64,9 @@ test-resetdb: node_modules
 	docker rm --force --volumes hydra_test_database_mysql || true
 	docker rm --force --volumes hydra_test_database_postgres || true
 	docker rm --force --volumes hydra_test_database_cockroach || true
-	docker run --rm --name hydra_test_database_mysql  --platform linux/amd64 -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0.26
-	docker run --rm --name hydra_test_database_postgres --platform linux/amd64 -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:11.8
-	docker run --rm --name hydra_test_database_cockroach --platform linux/amd64 -p 3446:26257 -d cockroachdb/cockroach:v22.1.10 start-single-node --insecure
+	docker run --rm --name hydra_test_database_mysql  -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0
+	docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:16
+	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v24.1 start-single-node --insecure
 
 # Build local docker images
 .PHONY: docker

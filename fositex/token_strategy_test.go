@@ -5,8 +5,9 @@ package fositex
 
 import (
 	"context"
-	"github.com/ory/fosite/token/hmac"
 	"testing"
+
+	"github.com/ory/fosite/token/hmac"
 
 	"github.com/stretchr/testify/assert"
 

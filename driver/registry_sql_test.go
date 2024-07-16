@@ -24,10 +24,11 @@ import (
 
 	"errors"
 	"fmt"
-	"github.com/ory/x/randx"
 	"io"
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/ory/x/randx"
 
 	"github.com/ory/x/httpx"
 

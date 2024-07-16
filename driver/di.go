@@ -1,6 +1,12 @@
+// Copyright © 2024 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package driver
 
 import (
+	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/consent"
@@ -10,8 +16,6 @@ import (
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
-	"github.com/pkg/errors"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // WritableRegistry is a deprecated interface that should not be used anymore.

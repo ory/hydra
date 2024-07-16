@@ -7,8 +7,17 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"io/fs"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/cors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -28,17 +37,12 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	prometheus "github.com/ory/x/prometheusx"
-	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rs/cors"
-	"io/fs"
-	"net/http"
-	"strings"
-	"time"
 
 	"github.com/gobuffalo/pop/v6"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/luna-duclos/instrumentedsql"
+
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
@@ -54,7 +58,6 @@ import (
 	"github.com/ory/x/popx"
 	"github.com/ory/x/resilience"
 	"github.com/ory/x/sqlcon"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type RegistrySQL struct {

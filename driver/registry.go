@@ -5,10 +5,11 @@ package driver
 
 import (
 	"context"
-	enigma "github.com/ory/fosite/token/hmac"
-	"github.com/ory/x/popx"
 	"io/fs"
 	"net/http"
+
+	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/x/popx"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/internal/kratos"

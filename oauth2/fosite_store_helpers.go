@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/url"
+	"slices"
 	"testing"
 	"time"
 
@@ -966,13 +967,23 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			storedKeySet, err := grantStorage.GetPublicKeys(context.Background(), issuer, subject)
 			require.NoError(t, err)
 			require.Len(t, storedKeySet.Keys, 2)
-			// sorted by created_at DESC, so order is reverse
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[1].KeyID)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[1].Use)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[1].Key)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[0].KeyID)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Use, storedKeySet.Keys[0].Use)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Key, storedKeySet.Keys[0].Key)
+
+			// Cannot rely on sort order because the created_at timestamps may alias.
+			idx1 := slices.IndexFunc(storedKeySet.Keys, func(k jose.JSONWebKey) bool {
+				return k.KeyID == keySet1ToReturn.Keys[0].Public().KeyID
+			})
+			require.GreaterOrEqual(t, idx1, 0)
+			idx2 := slices.IndexFunc(storedKeySet.Keys, func(k jose.JSONWebKey) bool {
+				return k.KeyID == keySet2ToReturn.Keys[0].Public().KeyID
+			})
+			require.GreaterOrEqual(t, idx2, 0)
+
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[idx1].KeyID)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[idx1].Use)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[idx1].Key)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[idx2].KeyID)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Use, storedKeySet.Keys[idx2].Use)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Key, storedKeySet.Keys[idx2].Key)
 
 			storedKeySet, err = grantStorage.GetPublicKeys(context.Background(), issuer, "non-existing-subject")
 			require.NoError(t, err)

@@ -31,7 +31,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.46.1
+	github.com/ory/fosite v0.47.0
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
@@ -87,9 +87,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.3.5 // indirect
 	github.com/containerd/continuity v0.4.1 // indirect
-	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/cristalhq/jwt/v4 v4.0.2 // indirect
-	github.com/dave/jennifer v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
@@ -99,11 +97,9 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/ecordell/optgen v0.0.9 // indirect
 	github.com/elliotchance/orderedmap v1.5.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
-	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect

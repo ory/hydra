@@ -818,13 +818,26 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 	}
 
 	token := strings.TrimPrefix(fosite.AccessTokenFromRequest(r), "ory_at_")
-	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(r.Context(), token); err != nil {
+	if err := h.r.OAuth2HMACStrategy().ValidateAccessToken(
+		r.Context(),
+		// The strategy checks the expiry time of the token. Registration tokens don't expire (we don't have a way of
+		// rotating them) so we set the expiry time to a time in the future.
+		&fosite.Request{
+			Session: &fosite.DefaultSession{
+				ExpiresAt: map[fosite.TokenType]time.Time{
+					fosite.AccessToken: time.Now().Add(time.Hour),
+				},
+			},
+			RequestedAt: time.Now(),
+		},
+		token,
+	); err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
-	signature := h.r.OAuth2HMACStrategy().Enigma.Signature(token)
+	signature := h.r.OAuth2EnigmaStrategy().Signature(token)
 	if subtle.ConstantTimeCompare([]byte(c.RegistrationAccessTokenSignature), []byte(signature)) == 0 {
 		return nil, errors.WithStack(herodot.ErrUnauthorized.
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("Registration access tokens do not match."))

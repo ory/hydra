@@ -19,40 +19,45 @@ import (
 )
 
 type (
-	options struct {
+	Options struct {
 		preload  bool
 		validate bool
 		opts     []configx.OptionModifier
 		config   *config.DefaultProvider
 		// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
-		skipNetworkInit  bool
-		tracerWrapper    TracerWrapper
-		extraMigrations  []fs.FS
-		goMigrations     []popx.Migration
-		fositexFactories []fositex.Factory
-		inspect          func(Registry) error
+		skipNetworkInit   bool
+		tracerWrapper     TracerWrapper
+		extraMigrations   []fs.FS
+		goMigrations      []popx.Migration
+		fositexFactories  []fositex.Factory
+		registryModifiers []RegistryModifier
+		inspect           func(Registry) error
 	}
-	OptionsModifier func(*options)
+	OptionsModifier func(*Options)
 
 	TracerWrapper func(*otelx.Tracer) *otelx.Tracer
 )
 
-func newOptions() *options {
-	return &options{
+func NewOptions(opts []OptionsModifier) *Options {
+	o := &Options{
 		validate: true,
 		preload:  true,
 		opts:     []configx.OptionModifier{},
 	}
+	for _, f := range opts {
+		f(o)
+	}
+	return o
 }
 
 func WithConfig(config *config.DefaultProvider) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.config = config
 	}
 }
 
 func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.opts = append(o.opts, opts...)
 	}
 }
@@ -61,61 +66,58 @@ func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
 //
 // This does not affect schema validation!
 func DisableValidation() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.validate = false
 	}
 }
 
 // DisablePreloading will not preload the config.
 func DisablePreloading() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.preload = false
 	}
 }
 
 func SkipNetworkInit() OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.skipNetworkInit = true
 	}
 }
 
 // WithTracerWrapper sets a function that wraps the tracer.
 func WithTracerWrapper(wrapper TracerWrapper) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.tracerWrapper = wrapper
 	}
 }
 
 // WithExtraMigrations specifies additional database migration.
 func WithExtraMigrations(m ...fs.FS) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.extraMigrations = append(o.extraMigrations, m...)
 	}
 }
 
 func WithGoMigrations(m ...popx.Migration) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.goMigrations = append(o.goMigrations, m...)
 	}
 }
 
 func WithExtraFositeFactories(f ...fositex.Factory) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.fositexFactories = append(o.fositexFactories, f...)
 	}
 }
 
 func Inspect(f func(Registry) error) OptionsModifier {
-	return func(o *options) {
+	return func(o *Options) {
 		o.inspect = f
 	}
 }
 
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
-	o := newOptions()
-	for _, f := range opts {
-		f(o)
-	}
+	o := NewOptions(opts)
 
 	l := sl.Logger()
 	if l == nil {
@@ -150,6 +152,12 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 	}
 
 	r.WithExtraFositeFactories(o.fositexFactories)
+
+	for _, f := range o.registryModifiers {
+		if err := f(r); err != nil {
+			return nil, err
+		}
+	}
 
 	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")

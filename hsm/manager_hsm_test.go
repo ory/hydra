@@ -48,8 +48,10 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	c.MustSet(context.Background(), config.KeyDSN, "memory")
 	c.MustSet(context.Background(), config.HSMEnabled, "true")
-	reg := driver.NewRegistryWithoutInit(c, l)
-	assert.NoError(t, reg.Init(context.Background(), false, true, &contextx.TestContextualizer{}, driver.RegistryWithHsmContext(mockHsmContext)))
+	reg, err := driver.NewRegistryWithoutInit(c, l)
+	require.NoError(t, err)
+	reg.WithHsmContext(mockHsmContext)
+	assert.NoError(t, reg.Init(context.Background(), false, true, &contextx.TestContextualizer{}, nil, nil))
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }

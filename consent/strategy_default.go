@@ -63,6 +63,14 @@ var ErrNoPreviousConsentFound = stderrs.New("no previous OAuth 2.0 Consent could
 var ErrNoAuthenticationSessionFound = stderrs.New("no previous login session was found")
 var ErrHintDoesNotMatchAuthentication = stderrs.New("subject from hint does not match subject from session")
 
+type ErrChallengeExpired struct {
+	RedirectURL string
+}
+
+func (e *ErrChallengeExpired) Error() string {
+	return "challenge has expired"
+}
+
 func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject string, sessionSubject string) error {
 	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(ctx, c, sessionSubject, "")
 	if err != nil {

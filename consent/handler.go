@@ -354,6 +354,13 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 
 	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -447,6 +454,13 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	handledLoginRequest.ID = challenge
 	loginRequest, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	} else if loginRequest.Subject != "" && handledLoginRequest.Subject != loginRequest.Subject {
@@ -571,6 +585,13 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	p.SetDefaults(flow.LoginRequestDeniedErrorName)
 	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -661,6 +682,13 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 
 	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -753,6 +781,13 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 
 	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
@@ -864,6 +899,13 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.SetDefaults(flow.ConsentRequestDeniedErrorName)
 	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
+		var challengeExpired *ErrChallengeExpired
+		if errors.As(err, &challengeExpired) {
+			h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
+				RedirectTo: challengeExpired.RedirectURL,
+			})
+			return
+		}
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}

@@ -13,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver/config"
+
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -85,11 +87,13 @@ func TestGetLoginRequest(t *testing.T) {
 	for k, tc := range []struct {
 		exists  bool
 		handled bool
+		expired bool
 		status  int
 	}{
-		{false, false, http.StatusNotFound},
-		{true, false, http.StatusOK},
-		{true, true, http.StatusGone},
+		{false, false, false, http.StatusNotFound},
+		{true, false, false, http.StatusOK},
+		{true, true, false, http.StatusGone},
+		{true, false, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("exists=%v/handled=%v", tc.exists, tc.handled), func(t *testing.T) {
 			ctx := context.Background()
@@ -109,6 +113,10 @@ func TestGetLoginRequest(t *testing.T) {
 					RequestURL:  requestURL,
 					RequestedAt: time.Now(),
 				})
+				if tc.expired {
+					require.NoError(t, conf.Set(ctx, config.KeyConsentRequestMaxAge, time.Millisecond))
+					time.Sleep(time.Millisecond * 5)
+				}
 				require.NoError(t, err)
 				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
@@ -132,7 +140,7 @@ func TestGetLoginRequest(t *testing.T) {
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
-			if tc.handled {
+			if tc.handled || tc.expired {
 				var result flow.OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
@@ -151,11 +159,13 @@ func TestGetConsentRequest(t *testing.T) {
 	for k, tc := range []struct {
 		exists  bool
 		handled bool
+		expired bool
 		status  int
 	}{
-		{false, false, http.StatusNotFound},
-		{true, false, http.StatusOK},
-		{true, true, http.StatusGone},
+		{false, false, false, http.StatusNotFound},
+		{true, false, false, http.StatusOK},
+		{true, true, false, http.StatusGone},
+		{true, false, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			ctx := context.Background()
@@ -192,6 +202,10 @@ func TestGetConsentRequest(t *testing.T) {
 					CSRF:           challenge,
 					LoginChallenge: sqlxx.NullString(lr.ID),
 				}))
+				if tc.expired {
+					require.NoError(t, conf.Set(ctx, config.KeyConsentRequestMaxAge, time.Millisecond))
+					time.Sleep(time.Millisecond * 5)
+				}
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
@@ -217,7 +231,7 @@ func TestGetConsentRequest(t *testing.T) {
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
 
-			if tc.handled {
+			if tc.handled || tc.expired {
 				var result flow.OAuth2RedirectTo
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)

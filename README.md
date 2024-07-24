@@ -3,11 +3,11 @@
 <h4 align="center">
     <a href="https://www.ory.sh/chat">Chat</a> |
     <a href="https://github.com/ory/hydra/discussions">Discussions</a> |
-    <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
+    <a href="https://www.ory.sh/l/sign-up-newsletter">Newsletter</a><br/><br/>
     <a href="https://www.ory.sh/hydra/docs/index">Guide</a> |
     <a href="https://www.ory.sh/hydra/docs/reference/api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
-    <a href="https://opencollective.com/ory">Support this project!</a><br/><br/>
+    <a href="https://console.ory.sh/">Support this project!</a><br/><br/>
     <a href="https://www.ory.sh/jobs/">Work in Open Source, Ory is hiring!</a>
 </h4>
 

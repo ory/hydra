@@ -109,7 +109,7 @@ paths:
           minimum: 1
           type: string
         style: form
-      - description: The name of the clients to filter by.
+      - description: The name of the clients to filter by. Prefix "!=" to search by negation.
         explode: true
         in: query
         name: client_name
@@ -117,7 +117,7 @@ paths:
         schema:
           type: string
         style: form
-      - description: The owner of the clients to filter by.
+      - description: The owner of the clients to filter by. Prefix "!=" to search by negation.
         explode: true
         in: query
         name: owner

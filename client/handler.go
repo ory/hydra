@@ -511,8 +511,8 @@ func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, ps h
 	filters := Filter{
 		Limit:  itemsPerPage,
 		Offset: page * itemsPerPage,
-		Name:   r.URL.Query().Get("client_name"),
-		Owner:  r.URL.Query().Get("owner"),
+		Name:   field(r.URL.Query().Get("client_name")),
+		Owner:  field(r.URL.Query().Get("owner")),
 	}
 
 	c, err := h.r.ClientManager().GetClients(r.Context(), filters)

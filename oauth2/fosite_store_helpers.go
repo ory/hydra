@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/url"
+	"slices"
 	"testing"
 	"time"
 
@@ -145,7 +146,7 @@ var flushRequests = []*fosite.Request{
 	},
 }
 
-func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
+func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry) {
 	cl := &client.Client{ID: "foobar"}
 	cr := &flow.OAuth2ConsentRequest{
 		Client:               cl,
@@ -159,7 +160,7 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 	}
 
 	ctx := context.Background()
-	if createClient {
+	if _, err := x.ClientManager().GetClient(ctx, cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
 		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
 	}
 
@@ -229,7 +230,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
 		requestId := uuid.New()
-		mockRequestForeignKey(t, requestId, m, true)
+		mockRequestForeignKey(t, requestId, m)
 		cl := &client.Client{ID: "foobar"}
 
 		fositeRequest := &fosite.Request{
@@ -312,8 +313,8 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		reqIdOne := uuid.New()
 		reqIdTwo := uuid.New()
 
-		mockRequestForeignKey(t, reqIdOne, x, false)
-		mockRequestForeignKey(t, reqIdTwo, x, false)
+		mockRequestForeignKey(t, reqIdOne, x)
+		mockRequestForeignKey(t, reqIdTwo, x)
 
 		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{
 			ID:          reqIdOne,
@@ -355,7 +356,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		mockRequestForeignKey(t, "blank", x, false)
+		mockRequestForeignKey(t, "blank", x)
 
 		ctx := context.Background()
 		res, err := m.GetAuthorizeCodeSession(ctx, "4321", NewSession("bar"))
@@ -393,7 +394,7 @@ func testHelperExpiryFields(reg InternalRegistry) func(t *testing.T) {
 		m := reg.OAuth2Storage()
 		t.Parallel()
 
-		mockRequestForeignKey(t, "blank", reg, false)
+		mockRequestForeignKey(t, "blank", reg)
 
 		ctx := context.Background()
 
@@ -582,7 +583,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 	return func(t *testing.T) {
 		ctx := context.Background()
 		for _, r := range flushRequests {
-			mockRequestForeignKey(t, r.ID, x, false)
+			mockRequestForeignKey(t, r.ID, x)
 			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
 			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
 			require.NoError(t, err)
@@ -629,7 +630,7 @@ func testHelperFlushTokensWithLimitAndBatchSize(x InternalRegistry, limit int, b
 		for i := 0; i < totalCount; i++ {
 			r := createTestRequest(fmt.Sprintf("%s-%d", id, i+1))
 			r.RequestedAt = time.Now().Add(-2 * time.Hour)
-			mockRequestForeignKey(t, r.ID, x, false)
+			mockRequestForeignKey(t, r.ID, x)
 			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
 			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
 			require.NoError(t, err)
@@ -966,13 +967,23 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			storedKeySet, err := grantStorage.GetPublicKeys(context.Background(), issuer, subject)
 			require.NoError(t, err)
 			require.Len(t, storedKeySet.Keys, 2)
-			// sorted by created_at DESC, so order is reverse
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[1].KeyID)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[1].Use)
-			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[1].Key)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[0].KeyID)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Use, storedKeySet.Keys[0].Use)
-			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Key, storedKeySet.Keys[0].Key)
+
+			// Cannot rely on sort order because the created_at timestamps may alias.
+			idx1 := slices.IndexFunc(storedKeySet.Keys, func(k jose.JSONWebKey) bool {
+				return k.KeyID == keySet1ToReturn.Keys[0].Public().KeyID
+			})
+			require.GreaterOrEqual(t, idx1, 0)
+			idx2 := slices.IndexFunc(storedKeySet.Keys, func(k jose.JSONWebKey) bool {
+				return k.KeyID == keySet2ToReturn.Keys[0].Public().KeyID
+			})
+			require.GreaterOrEqual(t, idx2, 0)
+
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[idx1].KeyID)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Use, storedKeySet.Keys[idx1].Use)
+			assert.Equal(t, keySet1ToReturn.Keys[0].Public().Key, storedKeySet.Keys[idx1].Key)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().KeyID, storedKeySet.Keys[idx2].KeyID)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Use, storedKeySet.Keys[idx2].Use)
+			assert.Equal(t, keySet2ToReturn.Keys[0].Public().Key, storedKeySet.Keys[idx2].Key)
 
 			storedKeySet, err = grantStorage.GetPublicKeys(context.Background(), issuer, "non-existing-subject")
 			require.NoError(t, err)

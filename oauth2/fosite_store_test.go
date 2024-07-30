@@ -38,7 +38,7 @@ func setupRegistries(t *testing.T) {
 	if len(registries) == 0 && !testing.Short() {
 		// first time called and sql tests
 		var cleanSQL func(*testing.T)
-		registries["postgres"], _, _, cleanSQL = internal.ConnectDatabases(t, true, &contextx.Default{})
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, true, &contextx.Default{})
 		cleanMem := cleanRegistries
 		cleanMem(t)
 		cleanRegistries = func(t *testing.T) {

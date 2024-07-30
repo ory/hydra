@@ -6,6 +6,7 @@ package consent
 import (
 	"context"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/client"
@@ -66,6 +67,8 @@ type (
 		GetDeviceUserAuthRequest(ctx context.Context, challenge string) (*flow.DeviceUserAuthRequest, error)
 		HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (*flow.DeviceUserAuthRequest, error)
 		VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error)
+
+		Transaction(context.Context, func(ctx context.Context, c *pop.Connection) error) error
 	}
 
 	ManagerProvider interface {

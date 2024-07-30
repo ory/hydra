@@ -747,14 +747,12 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		return
 	}
 
-	// TODO(nsklikas): We need to add a db transaction here
 	req, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), &Session{})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	// TODO(nsklika): Can we refactor this so we don't have to pass in the session?
 	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req, req.GetSession().(*Session))
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

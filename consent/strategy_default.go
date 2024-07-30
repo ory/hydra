@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pborman/uuid"
@@ -39,8 +40,6 @@ import (
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
 )
-
-type ctxKey int
 
 const (
 	DeviceVerificationPath      = "/oauth2/device/verify"
@@ -1161,21 +1160,11 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2AuthorizationRequest")
 	defer otelx.End(span, &err)
 
-	return s.handleOAuth2AuthorizationRequest(ctx, w, r, req, nil)
-}
-
-func (s *DefaultStrategy) handleOAuth2AuthorizationRequest(
-	ctx context.Context,
-	w http.ResponseWriter,
-	r *http.Request,
-	req fosite.AuthorizeRequester,
-	f *flow.Flow,
-) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
 	loginVerifier := strings.TrimSpace(r.URL.Query().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(r.URL.Query().Get("consent_verifier"))
 	if loginVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to the original endpoint
-		return nil, nil, s.requestAuthentication(ctx, w, r, req, f)
+		return nil, nil, s.requestAuthentication(ctx, w, r, req, nil)
 	} else if loginVerifier != "" {
 		f, err := s.verifyAuthentication(ctx, w, r, req, loginVerifier)
 		if err != nil {
@@ -1199,7 +1188,10 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
-) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
+) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2DeviceAuthorizationRequest")
+	defer otelx.End(span, &err)
+
 	deviceVerifier := strings.TrimSpace(r.URL.Query().Get("device_verifier"))
 	loginVerifier := strings.TrimSpace(r.URL.Query().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(r.URL.Query().Get("consent_verifier"))
@@ -1237,15 +1229,31 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 		ar.RequestedAudience = fosite.Arguments(deviceFlow.RequestedAudience)
 	}
 
-	// TODO(nsklikas): wrap these 2 function calls in a transaction (one persists the flow and the other invalidates the user_code)
-	consentSession, f, err := s.handleOAuth2AuthorizationRequest(ctx, w, r, ar, deviceFlow)
-	if err != nil {
-		return nil, nil, err
+	if loginVerifier == "" && consentVerifier == "" {
+		// ok, we need to process this request and redirect to the authentication endpoint
+		return nil, nil, s.requestAuthentication(ctx, w, r, ar, deviceFlow)
+	} else if loginVerifier != "" {
+		f, err := s.verifyAuthentication(ctx, w, r, ar, loginVerifier)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		// ok, we need to process this request and redirect to consent endpoint
+		return nil, f, s.requestConsent(ctx, w, r, ar, f)
 	}
-	err = s.r.OAuth2Storage().UpdateAndInvalidateUserCodeSessionByRequestID(r.Context(), string(f.DeviceCodeRequestID), f.ID)
-	if err != nil {
-		return nil, nil, err
-	}
+
+	var consentSession *flow.AcceptOAuth2ConsentRequest
+	var f *flow.Flow
+
+	err = s.r.ConsentManager().Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		consentSession, f, err = s.verifyConsent(ctx, w, r, consentVerifier)
+		if err != nil {
+			return err
+		}
+		err = s.r.OAuth2Storage().UpdateAndInvalidateUserCodeSessionByRequestID(ctx, string(f.DeviceCodeRequestID), f.ID)
+
+		return err
+	})
 
 	return consentSession, f, err
 }
@@ -1327,7 +1335,7 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 }
 
 func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.Flow, err error) {
-	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyAuthentication")
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyDevice")
 	defer otelx.End(span, &err)
 
 	// We decode the flow from the cookie again because VerifyAndInvalidateDeviceRequest does not return the flow

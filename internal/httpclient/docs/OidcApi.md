@@ -1,17 +1,17 @@
-# \OidcApi
+# \OidcAPI
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateOidcDynamicClient**](OidcApi.md#CreateOidcDynamicClient) | **Post** /oauth2/register | Register OAuth2 Client using OpenID Dynamic Client Registration
-[**CreateVerifiableCredential**](OidcApi.md#CreateVerifiableCredential) | **Post** /credentials | Issues a Verifiable Credential
-[**DeleteOidcDynamicClient**](OidcApi.md#DeleteOidcDynamicClient) | **Delete** /oauth2/register/{id} | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
-[**DiscoverOidcConfiguration**](OidcApi.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-[**GetOidcDynamicClient**](OidcApi.md#GetOidcDynamicClient) | **Get** /oauth2/register/{id} | Get OAuth2 Client using OpenID Dynamic Client Registration
-[**GetOidcUserInfo**](OidcApi.md#GetOidcUserInfo) | **Get** /userinfo | OpenID Connect Userinfo
-[**RevokeOidcSession**](OidcApi.md#RevokeOidcSession) | **Get** /oauth2/sessions/logout | OpenID Connect Front- and Back-channel Enabled Logout
-[**SetOidcDynamicClient**](OidcApi.md#SetOidcDynamicClient) | **Put** /oauth2/register/{id} | Set OAuth2 Client using OpenID Dynamic Client Registration
+[**CreateOidcDynamicClient**](OidcAPI.md#CreateOidcDynamicClient) | **Post** /oauth2/register | Register OAuth2 Client using OpenID Dynamic Client Registration
+[**CreateVerifiableCredential**](OidcAPI.md#CreateVerifiableCredential) | **Post** /credentials | Issues a Verifiable Credential
+[**DeleteOidcDynamicClient**](OidcAPI.md#DeleteOidcDynamicClient) | **Delete** /oauth2/register/{id} | Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol
+[**DiscoverOidcConfiguration**](OidcAPI.md#DiscoverOidcConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
+[**GetOidcDynamicClient**](OidcAPI.md#GetOidcDynamicClient) | **Get** /oauth2/register/{id} | Get OAuth2 Client using OpenID Dynamic Client Registration
+[**GetOidcUserInfo**](OidcAPI.md#GetOidcUserInfo) | **Get** /userinfo | OpenID Connect Userinfo
+[**RevokeOidcSession**](OidcAPI.md#RevokeOidcSession) | **Get** /oauth2/sessions/logout | OpenID Connect Front- and Back-channel Enabled Logout
+[**SetOidcDynamicClient**](OidcAPI.md#SetOidcDynamicClient) | **Put** /oauth2/register/{id} | Set OAuth2 Client using OpenID Dynamic Client Registration
 
 
 
@@ -40,13 +40,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.CreateOidcDynamicClient(context.Background()).OAuth2Client(oAuth2Client).Execute()
+	resp, r, err := apiClient.OidcAPI.CreateOidcDynamicClient(context.Background()).OAuth2Client(oAuth2Client).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.CreateOidcDynamicClient``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.CreateOidcDynamicClient``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `CreateOidcDynamicClient`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.CreateOidcDynamicClient`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.CreateOidcDynamicClient`: %v\n", resp)
 }
 ```
 
@@ -106,13 +106,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.CreateVerifiableCredential(context.Background()).CreateVerifiableCredentialRequestBody(createVerifiableCredentialRequestBody).Execute()
+	resp, r, err := apiClient.OidcAPI.CreateVerifiableCredential(context.Background()).CreateVerifiableCredentialRequestBody(createVerifiableCredentialRequestBody).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.CreateVerifiableCredential``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.CreateVerifiableCredential``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `CreateVerifiableCredential`: VerifiableCredentialResponse
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.CreateVerifiableCredential`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.CreateVerifiableCredential`: %v\n", resp)
 }
 ```
 
@@ -172,9 +172,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OidcApi.DeleteOidcDynamicClient(context.Background(), id).Execute()
+	r, err := apiClient.OidcAPI.DeleteOidcDynamicClient(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.DeleteOidcDynamicClient``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.DeleteOidcDynamicClient``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -239,13 +239,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.DiscoverOidcConfiguration(context.Background()).Execute()
+	resp, r, err := apiClient.OidcAPI.DiscoverOidcConfiguration(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.DiscoverOidcConfiguration``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.DiscoverOidcConfiguration``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `DiscoverOidcConfiguration`: OidcConfiguration
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.DiscoverOidcConfiguration`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.DiscoverOidcConfiguration`: %v\n", resp)
 }
 ```
 
@@ -301,13 +301,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.GetOidcDynamicClient(context.Background(), id).Execute()
+	resp, r, err := apiClient.OidcAPI.GetOidcDynamicClient(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.GetOidcDynamicClient``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.GetOidcDynamicClient``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOidcDynamicClient`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.GetOidcDynamicClient`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.GetOidcDynamicClient`: %v\n", resp)
 }
 ```
 
@@ -370,13 +370,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.GetOidcUserInfo(context.Background()).Execute()
+	resp, r, err := apiClient.OidcAPI.GetOidcUserInfo(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.GetOidcUserInfo``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.GetOidcUserInfo``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOidcUserInfo`: OidcUserInfo
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.GetOidcUserInfo`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.GetOidcUserInfo`: %v\n", resp)
 }
 ```
 
@@ -431,9 +431,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OidcApi.RevokeOidcSession(context.Background()).Execute()
+	r, err := apiClient.OidcAPI.RevokeOidcSession(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.RevokeOidcSession``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.RevokeOidcSession``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -492,13 +492,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OidcApi.SetOidcDynamicClient(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+	resp, r, err := apiClient.OidcAPI.SetOidcDynamicClient(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OidcApi.SetOidcDynamicClient``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OidcAPI.SetOidcDynamicClient``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SetOidcDynamicClient`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OidcApi.SetOidcDynamicClient`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OidcAPI.SetOidcDynamicClient`: %v\n", resp)
 }
 ```
 

@@ -1,12 +1,12 @@
-# \MetadataApi
+# \MetadataAPI
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetVersion**](MetadataApi.md#GetVersion) | **Get** /version | Return Running Software Version.
-[**IsAlive**](MetadataApi.md#IsAlive) | **Get** /health/alive | Check HTTP Server Status
-[**IsReady**](MetadataApi.md#IsReady) | **Get** /health/ready | Check HTTP Server and Database Status
+[**GetVersion**](MetadataAPI.md#GetVersion) | **Get** /version | Return Running Software Version.
+[**IsAlive**](MetadataAPI.md#IsAlive) | **Get** /health/alive | Check HTTP Server Status
+[**IsReady**](MetadataAPI.md#IsReady) | **Get** /health/ready | Check HTTP Server and Database Status
 
 
 
@@ -34,13 +34,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MetadataApi.GetVersion(context.Background()).Execute()
+	resp, r, err := apiClient.MetadataAPI.GetVersion(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.GetVersion``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataAPI.GetVersion``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetVersion`: GetVersion200Response
-	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.GetVersion`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `MetadataAPI.GetVersion`: %v\n", resp)
 }
 ```
 
@@ -95,13 +95,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MetadataApi.IsAlive(context.Background()).Execute()
+	resp, r, err := apiClient.MetadataAPI.IsAlive(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsAlive``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataAPI.IsAlive``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `IsAlive`: HealthStatus
-	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsAlive`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `MetadataAPI.IsAlive`: %v\n", resp)
 }
 ```
 
@@ -156,13 +156,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.MetadataApi.IsReady(context.Background()).Execute()
+	resp, r, err := apiClient.MetadataAPI.IsReady(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsReady``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `MetadataAPI.IsReady``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `IsReady`: IsReady200Response
-	fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsReady`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `MetadataAPI.IsReady`: %v\n", resp)
 }
 ```
 

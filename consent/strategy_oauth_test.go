@@ -155,7 +155,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because the request was redirected but the login endpoint rejected the request", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
-			vr, _, err := adminClient.OAuth2Api.RejectOAuth2LoginRequest(context.Background()).
+			vr, _, err := adminClient.OAuth2API.RejectOAuth2LoginRequest(context.Background()).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				RejectOAuth2Request(hydra.RejectOAuth2Request{
 					Error:            pointerx.String(fosite.ErrInteractionRequired.ErrorField),
@@ -186,7 +186,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			func(w http.ResponseWriter, r *http.Request) {
-				vr, _, err := adminClient.OAuth2Api.RejectOAuth2ConsentRequest(context.Background()).
+				vr, _, err := adminClient.OAuth2API.RejectOAuth2ConsentRequest(context.Background()).
 					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 					RejectOAuth2Request(hydra.RejectOAuth2Request{
 						Error:            pointerx.String(fosite.ErrInteractionRequired.ErrorField),
@@ -208,13 +208,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
-				res, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).
+				res, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(ctx).
 					LoginChallenge(r.URL.Query().Get("login_challenge")).
 					Execute()
 				require.NoError(t, err)
 				loginChallenge = res.Challenge
 
-				v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+				v, _, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 					LoginChallenge(loginChallenge).
 					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
 					Execute()
@@ -223,13 +223,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 			},
 			func(w http.ResponseWriter, r *http.Request) {
-				res, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).
+				res, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).
 					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 					Execute()
 				require.NoError(t, err)
 				consentChallenge = res.Challenge
 
-				v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+				v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 					ConsentChallenge(consentChallenge).
 					AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
 					Execute()
@@ -241,7 +241,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		makeRequestAndExpectCode(t, hc, c, url.Values{})
 
 		t.Run("case=double-submit login verifier", func(t *testing.T) {
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+			v, _, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 				LoginChallenge(loginChallenge).
 				AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "aeneas-rekkas"}).
 				Execute()
@@ -255,7 +255,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		})
 
 		t.Run("case=double-submit consent verifier", func(t *testing.T) {
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 				ConsentChallenge(consentChallenge).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{}).
 				Execute()
@@ -712,7 +712,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
-				res, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+				res, _, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(context.Background()).
 					LoginChallenge(r.URL.Query().Get("login_challenge")).
 					AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
 						Subject: "not-aeneas-rekkas",

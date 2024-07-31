@@ -1,10 +1,10 @@
-# \WellknownApi
+# \WellknownAPI
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**DiscoverJsonWebKeys**](WellknownApi.md#DiscoverJsonWebKeys) | **Get** /.well-known/jwks.json | Discover Well-Known JSON Web Keys
+[**DiscoverJsonWebKeys**](WellknownAPI.md#DiscoverJsonWebKeys) | **Get** /.well-known/jwks.json | Discover Well-Known JSON Web Keys
 
 
 
@@ -32,13 +32,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.WellknownApi.DiscoverJsonWebKeys(context.Background()).Execute()
+	resp, r, err := apiClient.WellknownAPI.DiscoverJsonWebKeys(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `WellknownApi.DiscoverJsonWebKeys``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `WellknownAPI.DiscoverJsonWebKeys``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `DiscoverJsonWebKeys`: JsonWebKeySet
-	fmt.Fprintf(os.Stdout, "Response from `WellknownApi.DiscoverJsonWebKeys`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `WellknownAPI.DiscoverJsonWebKeys`: %v\n", resp)
 }
 ```
 

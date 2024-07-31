@@ -27,9 +27,9 @@ docs/IsReady503Response.md
 docs/JsonPatch.md
 docs/JsonWebKey.md
 docs/JsonWebKeySet.md
-docs/JwkApi.md
-docs/MetadataApi.md
-docs/OAuth2Api.md
+docs/JwkAPI.md
+docs/MetadataAPI.md
+docs/OAuth2API.md
 docs/OAuth2Client.md
 docs/OAuth2ClientTokenLifespans.md
 docs/OAuth2ConsentRequest.md
@@ -40,7 +40,7 @@ docs/OAuth2LoginRequest.md
 docs/OAuth2LogoutRequest.md
 docs/OAuth2RedirectTo.md
 docs/OAuth2TokenExchange.md
-docs/OidcApi.md
+docs/OidcAPI.md
 docs/OidcConfiguration.md
 docs/OidcUserInfo.md
 docs/Pagination.md
@@ -58,7 +58,7 @@ docs/VerifiableCredentialPrimingResponse.md
 docs/VerifiableCredentialProof.md
 docs/VerifiableCredentialResponse.md
 docs/Version.md
-docs/WellknownApi.md
+docs/WellknownAPI.md
 git_push.sh
 go.mod
 go.sum

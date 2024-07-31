@@ -36,7 +36,7 @@ To get the JSON Web Key Set as only public keys:
 
 			var sets outputJSONWebKeyCollection
 			for _, set := range args {
-				key, _, err := m.JwkApi.GetJsonWebKeySet(cmd.Context(), set).Execute() //nolint:bodyclose
+				key, _, err := m.JwkAPI.GetJsonWebKeySet(cmd.Context(), set).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}

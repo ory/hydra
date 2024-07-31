@@ -42,7 +42,7 @@ func TestJWKSDK(t *testing.T) {
 		t.Parallel()
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(context.Background(), "set-foo").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
+			resultKeys, _, err := sdk.JwkAPI.CreateJsonWebKeySet(context.Background(), "set-foo").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: "RS256",
 				Kid: "key-bar",
 				Use: "sig",
@@ -56,7 +56,7 @@ func TestJWKSDK(t *testing.T) {
 
 		var resultKeys *hydra.JsonWebKeySet
 		t.Run("GetJwkSetKey after create", func(t *testing.T) {
-			result, _, err := sdk.JwkApi.GetJsonWebKey(ctx, "set-foo", expectedKid).Execute()
+			result, _, err := sdk.JwkAPI.GetJsonWebKey(ctx, "set-foo", expectedKid).Execute()
 			require.NoError(t, err)
 			require.Len(t, result.Keys, 1)
 			require.Equal(t, expectedKid, result.Keys[0].Kid)
@@ -72,19 +72,19 @@ func TestJWKSDK(t *testing.T) {
 			require.Len(t, resultKeys.Keys, 1)
 			resultKeys.Keys[0].Alg = "ES256"
 
-			resultKey, _, err := sdk.JwkApi.SetJsonWebKey(ctx, "set-foo", expectedKid).JsonWebKey(resultKeys.Keys[0]).Execute()
+			resultKey, _, err := sdk.JwkAPI.SetJsonWebKey(ctx, "set-foo", expectedKid).JsonWebKey(resultKeys.Keys[0]).Execute()
 			require.NoError(t, err)
 			assert.Equal(t, expectedKid, resultKey.Kid)
 			assert.Equal(t, "ES256", resultKey.Alg)
 		})
 
 		t.Run("DeleteJwkSetKey after delete", func(t *testing.T) {
-			_, err := sdk.JwkApi.DeleteJsonWebKey(ctx, "set-foo", expectedKid).Execute()
+			_, err := sdk.JwkAPI.DeleteJsonWebKey(ctx, "set-foo", expectedKid).Execute()
 			require.NoError(t, err)
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, res, err := sdk.JwkApi.GetJsonWebKey(ctx, "set-foo", expectedKid).Execute()
+			_, res, err := sdk.JwkAPI.GetJsonWebKey(ctx, "set-foo", expectedKid).Execute()
 			require.Error(t, err)
 			assert.Equal(t, http.StatusNotFound, res.StatusCode)
 		})
@@ -94,7 +94,7 @@ func TestJWKSDK(t *testing.T) {
 	t.Run("JWK Set", func(t *testing.T) {
 		t.Parallel()
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
-			resultKeys, _, err := sdk.JwkApi.CreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
+			resultKeys, _, err := sdk.JwkAPI.CreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySet(hydra.CreateJsonWebKeySet{
 				Alg: "RS256",
 				Kid: "key-bar",
 				Use: "sig",
@@ -105,7 +105,7 @@ func TestJWKSDK(t *testing.T) {
 			assert.Equal(t, "RS256", resultKeys.Keys[0].Alg)
 		})
 
-		resultKeys, _, err := sdk.JwkApi.GetJsonWebKeySet(ctx, "set-foo2").Execute()
+		resultKeys, _, err := sdk.JwkAPI.GetJsonWebKeySet(ctx, "set-foo2").Execute()
 		t.Run("GetJwkSet after create", func(t *testing.T) {
 			require.NoError(t, err)
 			if conf.HSMEnabled() {
@@ -126,7 +126,7 @@ func TestJWKSDK(t *testing.T) {
 			require.Len(t, resultKeys.Keys, 1)
 			resultKeys.Keys[0].Alg = "ES256"
 
-			result, _, err := sdk.JwkApi.SetJsonWebKeySet(ctx, "set-foo2").JsonWebKeySet(*resultKeys).Execute()
+			result, _, err := sdk.JwkAPI.SetJsonWebKeySet(ctx, "set-foo2").JsonWebKeySet(*resultKeys).Execute()
 			require.NoError(t, err)
 			require.Len(t, result.Keys, 1)
 			assert.Equal(t, expectedKid, result.Keys[0].Kid)
@@ -134,18 +134,18 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("DeleteJwkSet", func(t *testing.T) {
-			_, err := sdk.JwkApi.DeleteJsonWebKeySet(ctx, "set-foo2").Execute()
+			_, err := sdk.JwkAPI.DeleteJsonWebKeySet(ctx, "set-foo2").Execute()
 			require.NoError(t, err)
 		})
 
 		t.Run("GetJwkSet after delete", func(t *testing.T) {
-			_, res, err := sdk.JwkApi.GetJsonWebKeySet(ctx, "set-foo2").Execute()
+			_, res, err := sdk.JwkAPI.GetJsonWebKeySet(ctx, "set-foo2").Execute()
 			require.Error(t, err)
 			assert.Equal(t, http.StatusNotFound, res.StatusCode)
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, res, err := sdk.JwkApi.GetJsonWebKey(ctx, "set-foo2", expectedKid).Execute()
+			_, res, err := sdk.JwkAPI.GetJsonWebKey(ctx, "set-foo2", expectedKid).Execute()
 			require.Error(t, err)
 			assert.Equal(t, http.StatusNotFound, res.StatusCode)
 		})

@@ -1,16 +1,16 @@
-# \JwkApi
+# \JwkAPI
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateJsonWebKeySet**](JwkApi.md#CreateJsonWebKeySet) | **Post** /admin/keys/{set} | Create JSON Web Key
-[**DeleteJsonWebKey**](JwkApi.md#DeleteJsonWebKey) | **Delete** /admin/keys/{set}/{kid} | Delete JSON Web Key
-[**DeleteJsonWebKeySet**](JwkApi.md#DeleteJsonWebKeySet) | **Delete** /admin/keys/{set} | Delete JSON Web Key Set
-[**GetJsonWebKey**](JwkApi.md#GetJsonWebKey) | **Get** /admin/keys/{set}/{kid} | Get JSON Web Key
-[**GetJsonWebKeySet**](JwkApi.md#GetJsonWebKeySet) | **Get** /admin/keys/{set} | Retrieve a JSON Web Key Set
-[**SetJsonWebKey**](JwkApi.md#SetJsonWebKey) | **Put** /admin/keys/{set}/{kid} | Set JSON Web Key
-[**SetJsonWebKeySet**](JwkApi.md#SetJsonWebKeySet) | **Put** /admin/keys/{set} | Update a JSON Web Key Set
+[**CreateJsonWebKeySet**](JwkAPI.md#CreateJsonWebKeySet) | **Post** /admin/keys/{set} | Create JSON Web Key
+[**DeleteJsonWebKey**](JwkAPI.md#DeleteJsonWebKey) | **Delete** /admin/keys/{set}/{kid} | Delete JSON Web Key
+[**DeleteJsonWebKeySet**](JwkAPI.md#DeleteJsonWebKeySet) | **Delete** /admin/keys/{set} | Delete JSON Web Key Set
+[**GetJsonWebKey**](JwkAPI.md#GetJsonWebKey) | **Get** /admin/keys/{set}/{kid} | Get JSON Web Key
+[**GetJsonWebKeySet**](JwkAPI.md#GetJsonWebKeySet) | **Get** /admin/keys/{set} | Retrieve a JSON Web Key Set
+[**SetJsonWebKey**](JwkAPI.md#SetJsonWebKey) | **Put** /admin/keys/{set}/{kid} | Set JSON Web Key
+[**SetJsonWebKeySet**](JwkAPI.md#SetJsonWebKeySet) | **Put** /admin/keys/{set} | Update a JSON Web Key Set
 
 
 
@@ -40,13 +40,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.JwkApi.CreateJsonWebKeySet(context.Background(), set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
+	resp, r, err := apiClient.JwkAPI.CreateJsonWebKeySet(context.Background(), set).CreateJsonWebKeySet(createJsonWebKeySet).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.CreateJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.CreateJsonWebKeySet``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `CreateJsonWebKeySet`: JsonWebKeySet
-	fmt.Fprintf(os.Stdout, "Response from `JwkApi.CreateJsonWebKeySet`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `JwkAPI.CreateJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -112,9 +112,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.JwkApi.DeleteJsonWebKey(context.Background(), set, kid).Execute()
+	r, err := apiClient.JwkAPI.DeleteJsonWebKey(context.Background(), set, kid).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.DeleteJsonWebKey``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -182,9 +182,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.JwkApi.DeleteJsonWebKeySet(context.Background(), set).Execute()
+	r, err := apiClient.JwkAPI.DeleteJsonWebKeySet(context.Background(), set).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.DeleteJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.DeleteJsonWebKeySet``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -251,13 +251,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.JwkApi.GetJsonWebKey(context.Background(), set, kid).Execute()
+	resp, r, err := apiClient.JwkAPI.GetJsonWebKey(context.Background(), set, kid).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.GetJsonWebKey``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetJsonWebKey`: JsonWebKeySet
-	fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKey`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `JwkAPI.GetJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -323,13 +323,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.JwkApi.GetJsonWebKeySet(context.Background(), set).Execute()
+	resp, r, err := apiClient.JwkAPI.GetJsonWebKeySet(context.Background(), set).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.GetJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.GetJsonWebKeySet``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetJsonWebKeySet`: JsonWebKeySet
-	fmt.Fprintf(os.Stdout, "Response from `JwkApi.GetJsonWebKeySet`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `JwkAPI.GetJsonWebKeySet`: %v\n", resp)
 }
 ```
 
@@ -395,13 +395,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.JwkApi.SetJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
+	resp, r, err := apiClient.JwkAPI.SetJsonWebKey(context.Background(), set, kid).JsonWebKey(jsonWebKey).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKey``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.SetJsonWebKey``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SetJsonWebKey`: JsonWebKey
-	fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKey`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `JwkAPI.SetJsonWebKey`: %v\n", resp)
 }
 ```
 
@@ -469,13 +469,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.JwkApi.SetJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
+	resp, r, err := apiClient.JwkAPI.SetJsonWebKeySet(context.Background(), set).JsonWebKeySet(jsonWebKeySet).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `JwkApi.SetJsonWebKeySet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `JwkAPI.SetJsonWebKeySet``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SetJsonWebKeySet`: JsonWebKeySet
-	fmt.Fprintf(os.Stdout, "Response from `JwkApi.SetJsonWebKeySet`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `JwkAPI.SetJsonWebKeySet`: %v\n", resp)
 }
 ```
 

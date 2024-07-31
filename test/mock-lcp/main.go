@@ -24,7 +24,7 @@ func init() {
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")
-	lr, resp, err := client.OAuth2Api.GetOAuth2LoginRequest(r.Context()).LoginChallenge(challenge).Execute()
+	lr, resp, err := client.OAuth2API.GetOAuth2LoginRequest(r.Context()).LoginChallenge(challenge).Execute()
 	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch clogin request: %s", err)
@@ -37,7 +37,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 			remember = true
 		}
 
-		vr, resp, err := client.OAuth2Api.AcceptOAuth2LoginRequest(r.Context()).
+		vr, resp, err := client.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
 			LoginChallenge(challenge).
 			AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{
 				Subject:  "the-subject",
@@ -49,7 +49,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 		}
 		redirectTo = vr.RedirectTo
 	} else {
-		vr, resp, err := client.OAuth2Api.RejectOAuth2LoginRequest(r.Context()).
+		vr, resp, err := client.OAuth2API.RejectOAuth2LoginRequest(r.Context()).
 			LoginChallenge(challenge).
 			RejectOAuth2Request(hydra.RejectOAuth2Request{
 				Error: pointerx.String("invalid_request"),
@@ -69,7 +69,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 func consent(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("consent_challenge")
 
-	o, resp, err := client.OAuth2Api.GetOAuth2ConsentRequest(r.Context()).ConsentChallenge(challenge).Execute()
+	o, resp, err := client.OAuth2API.GetOAuth2ConsentRequest(r.Context()).ConsentChallenge(challenge).Execute()
 	defer resp.Body.Close()
 	if err != nil {
 		log.Fatalf("Unable to fetch consent request: %s", err)
@@ -86,7 +86,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 			value = "rab"
 		}
 
-		v, resp, err := client.OAuth2Api.AcceptOAuth2ConsentRequest(r.Context()).
+		v, resp, err := client.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(challenge).
 			AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 				GrantScope: o.RequestedScope,
@@ -102,7 +102,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 		}
 		redirectTo = v.RedirectTo
 	} else {
-		v, resp, err := client.OAuth2Api.RejectOAuth2ConsentRequest(r.Context()).
+		v, resp, err := client.OAuth2API.RejectOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(challenge).
 			RejectOAuth2Request(hydra.RejectOAuth2Request{Error: pointerx.String("invalid_request")}).Execute()
 		defer resp.Body.Close()

@@ -19,12 +19,12 @@ import (
 	"net/url"
 )
 
-// MetadataApiService MetadataApi service
-type MetadataApiService service
+// MetadataAPIService MetadataAPI service
+type MetadataAPIService service
 
 type ApiGetVersionRequest struct {
 	ctx        context.Context
-	ApiService *MetadataApiService
+	ApiService *MetadataAPIService
 }
 
 func (r ApiGetVersionRequest) Execute() (*GetVersion200Response, *http.Response, error) {
@@ -45,7 +45,7 @@ refer to the cluster state, only to a single instance.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiGetVersionRequest
 */
-func (a *MetadataApiService) GetVersion(ctx context.Context) ApiGetVersionRequest {
+func (a *MetadataAPIService) GetVersion(ctx context.Context) ApiGetVersionRequest {
 	return ApiGetVersionRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -55,7 +55,7 @@ func (a *MetadataApiService) GetVersion(ctx context.Context) ApiGetVersionReques
 // Execute executes the request
 //
 //	@return GetVersion200Response
-func (a *MetadataApiService) GetVersionExecute(r ApiGetVersionRequest) (*GetVersion200Response, *http.Response, error) {
+func (a *MetadataAPIService) GetVersionExecute(r ApiGetVersionRequest) (*GetVersion200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -63,7 +63,7 @@ func (a *MetadataApiService) GetVersionExecute(r ApiGetVersionRequest) (*GetVers
 		localVarReturnValue *GetVersion200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataApiService.GetVersion")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataAPIService.GetVersion")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -130,7 +130,7 @@ func (a *MetadataApiService) GetVersionExecute(r ApiGetVersionRequest) (*GetVers
 
 type ApiIsAliveRequest struct {
 	ctx        context.Context
-	ApiService *MetadataApiService
+	ApiService *MetadataAPIService
 }
 
 func (r ApiIsAliveRequest) Execute() (*HealthStatus, *http.Response, error) {
@@ -152,7 +152,7 @@ refer to the cluster state, only to a single instance.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiIsAliveRequest
 */
-func (a *MetadataApiService) IsAlive(ctx context.Context) ApiIsAliveRequest {
+func (a *MetadataAPIService) IsAlive(ctx context.Context) ApiIsAliveRequest {
 	return ApiIsAliveRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -162,7 +162,7 @@ func (a *MetadataApiService) IsAlive(ctx context.Context) ApiIsAliveRequest {
 // Execute executes the request
 //
 //	@return HealthStatus
-func (a *MetadataApiService) IsAliveExecute(r ApiIsAliveRequest) (*HealthStatus, *http.Response, error) {
+func (a *MetadataAPIService) IsAliveExecute(r ApiIsAliveRequest) (*HealthStatus, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -170,7 +170,7 @@ func (a *MetadataApiService) IsAliveExecute(r ApiIsAliveRequest) (*HealthStatus,
 		localVarReturnValue *HealthStatus
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataApiService.IsAlive")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataAPIService.IsAlive")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -247,7 +247,7 @@ func (a *MetadataApiService) IsAliveExecute(r ApiIsAliveRequest) (*HealthStatus,
 
 type ApiIsReadyRequest struct {
 	ctx        context.Context
-	ApiService *MetadataApiService
+	ApiService *MetadataAPIService
 }
 
 func (r ApiIsReadyRequest) Execute() (*IsReady200Response, *http.Response, error) {
@@ -269,7 +269,7 @@ refer to the cluster state, only to a single instance.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiIsReadyRequest
 */
-func (a *MetadataApiService) IsReady(ctx context.Context) ApiIsReadyRequest {
+func (a *MetadataAPIService) IsReady(ctx context.Context) ApiIsReadyRequest {
 	return ApiIsReadyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -279,7 +279,7 @@ func (a *MetadataApiService) IsReady(ctx context.Context) ApiIsReadyRequest {
 // Execute executes the request
 //
 //	@return IsReady200Response
-func (a *MetadataApiService) IsReadyExecute(r ApiIsReadyRequest) (*IsReady200Response, *http.Response, error) {
+func (a *MetadataAPIService) IsReadyExecute(r ApiIsReadyRequest) (*IsReady200Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -287,7 +287,7 @@ func (a *MetadataApiService) IsReadyExecute(r ApiIsReadyRequest) (*IsReady200Res
 		localVarReturnValue *IsReady200Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataApiService.IsReady")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "MetadataAPIService.IsReady")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

@@ -20,12 +20,12 @@ import (
 	"strings"
 )
 
-// OidcApiService OidcApi service
-type OidcApiService service
+// OidcAPIService OidcAPI service
+type OidcAPIService service
 
 type ApiCreateOidcDynamicClientRequest struct {
 	ctx          context.Context
-	ApiService   *OidcApiService
+	ApiService   *OidcAPIService
 	oAuth2Client *OAuth2Client
 }
 
@@ -57,7 +57,7 @@ Write the secret down and keep it somewhere safe.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiCreateOidcDynamicClientRequest
 */
-func (a *OidcApiService) CreateOidcDynamicClient(ctx context.Context) ApiCreateOidcDynamicClientRequest {
+func (a *OidcAPIService) CreateOidcDynamicClient(ctx context.Context) ApiCreateOidcDynamicClientRequest {
 	return ApiCreateOidcDynamicClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -67,7 +67,7 @@ func (a *OidcApiService) CreateOidcDynamicClient(ctx context.Context) ApiCreateO
 // Execute executes the request
 //
 //	@return OAuth2Client
-func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *OidcAPIService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -75,7 +75,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.CreateOidcDynamicClient")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.CreateOidcDynamicClient")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -166,7 +166,7 @@ func (a *OidcApiService) CreateOidcDynamicClientExecute(r ApiCreateOidcDynamicCl
 
 type ApiCreateVerifiableCredentialRequest struct {
 	ctx                                   context.Context
-	ApiService                            *OidcApiService
+	ApiService                            *OidcAPIService
 	createVerifiableCredentialRequestBody *CreateVerifiableCredentialRequestBody
 }
 
@@ -192,7 +192,7 @@ https://openid.net/specs/openid-connect-userinfo-vc-1_0.html.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiCreateVerifiableCredentialRequest
 */
-func (a *OidcApiService) CreateVerifiableCredential(ctx context.Context) ApiCreateVerifiableCredentialRequest {
+func (a *OidcAPIService) CreateVerifiableCredential(ctx context.Context) ApiCreateVerifiableCredentialRequest {
 	return ApiCreateVerifiableCredentialRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -202,7 +202,7 @@ func (a *OidcApiService) CreateVerifiableCredential(ctx context.Context) ApiCrea
 // Execute executes the request
 //
 //	@return VerifiableCredentialResponse
-func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiableCredentialRequest) (*VerifiableCredentialResponse, *http.Response, error) {
+func (a *OidcAPIService) CreateVerifiableCredentialExecute(r ApiCreateVerifiableCredentialRequest) (*VerifiableCredentialResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -210,7 +210,7 @@ func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiable
 		localVarReturnValue *VerifiableCredentialResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.CreateVerifiableCredential")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.CreateVerifiableCredential")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -298,7 +298,7 @@ func (a *OidcApiService) CreateVerifiableCredentialExecute(r ApiCreateVerifiable
 
 type ApiDeleteOidcDynamicClientRequest struct {
 	ctx        context.Context
-	ApiService *OidcApiService
+	ApiService *OidcAPIService
 	id         string
 }
 
@@ -325,7 +325,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
 	@param id The id of the OAuth 2.0 Client.
 	@return ApiDeleteOidcDynamicClientRequest
 */
-func (a *OidcApiService) DeleteOidcDynamicClient(ctx context.Context, id string) ApiDeleteOidcDynamicClientRequest {
+func (a *OidcAPIService) DeleteOidcDynamicClient(ctx context.Context, id string) ApiDeleteOidcDynamicClientRequest {
 	return ApiDeleteOidcDynamicClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -334,14 +334,14 @@ func (a *OidcApiService) DeleteOidcDynamicClient(ctx context.Context, id string)
 }
 
 // Execute executes the request
-func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicClientRequest) (*http.Response, error) {
+func (a *OidcAPIService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicClientRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.DeleteOidcDynamicClient")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.DeleteOidcDynamicClient")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -408,7 +408,7 @@ func (a *OidcApiService) DeleteOidcDynamicClientExecute(r ApiDeleteOidcDynamicCl
 
 type ApiDiscoverOidcConfigurationRequest struct {
 	ctx        context.Context
-	ApiService *OidcApiService
+	ApiService *OidcAPIService
 }
 
 func (r ApiDiscoverOidcConfigurationRequest) Execute() (*OidcConfiguration, *http.Response, error) {
@@ -426,7 +426,7 @@ For a full list of clients go here: https://openid.net/developers/certified/
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiDiscoverOidcConfigurationRequest
 */
-func (a *OidcApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscoverOidcConfigurationRequest {
+func (a *OidcAPIService) DiscoverOidcConfiguration(ctx context.Context) ApiDiscoverOidcConfigurationRequest {
 	return ApiDiscoverOidcConfigurationRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -436,7 +436,7 @@ func (a *OidcApiService) DiscoverOidcConfiguration(ctx context.Context) ApiDisco
 // Execute executes the request
 //
 //	@return OidcConfiguration
-func (a *OidcApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigurationRequest) (*OidcConfiguration, *http.Response, error) {
+func (a *OidcAPIService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfigurationRequest) (*OidcConfiguration, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -444,7 +444,7 @@ func (a *OidcApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfi
 		localVarReturnValue *OidcConfiguration
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.DiscoverOidcConfiguration")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.DiscoverOidcConfiguration")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -519,7 +519,7 @@ func (a *OidcApiService) DiscoverOidcConfigurationExecute(r ApiDiscoverOidcConfi
 
 type ApiGetOidcDynamicClientRequest struct {
 	ctx        context.Context
-	ApiService *OidcApiService
+	ApiService *OidcAPIService
 	id         string
 }
 
@@ -542,7 +542,7 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 	@param id The id of the OAuth 2.0 Client.
 	@return ApiGetOidcDynamicClientRequest
 */
-func (a *OidcApiService) GetOidcDynamicClient(ctx context.Context, id string) ApiGetOidcDynamicClientRequest {
+func (a *OidcAPIService) GetOidcDynamicClient(ctx context.Context, id string) ApiGetOidcDynamicClientRequest {
 	return ApiGetOidcDynamicClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -553,7 +553,7 @@ func (a *OidcApiService) GetOidcDynamicClient(ctx context.Context, id string) Ap
 // Execute executes the request
 //
 //	@return OAuth2Client
-func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *OidcAPIService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -561,7 +561,7 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.GetOidcDynamicClient")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.GetOidcDynamicClient")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -637,7 +637,7 @@ func (a *OidcApiService) GetOidcDynamicClientExecute(r ApiGetOidcDynamicClientRe
 
 type ApiGetOidcUserInfoRequest struct {
 	ctx        context.Context
-	ApiService *OidcApiService
+	ApiService *OidcAPIService
 }
 
 func (r ApiGetOidcUserInfoRequest) Execute() (*OidcUserInfo, *http.Response, error) {
@@ -657,7 +657,7 @@ for more details about header format.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiGetOidcUserInfoRequest
 */
-func (a *OidcApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRequest {
+func (a *OidcAPIService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfoRequest {
 	return ApiGetOidcUserInfoRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -667,7 +667,7 @@ func (a *OidcApiService) GetOidcUserInfo(ctx context.Context) ApiGetOidcUserInfo
 // Execute executes the request
 //
 //	@return OidcUserInfo
-func (a *OidcApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*OidcUserInfo, *http.Response, error) {
+func (a *OidcAPIService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*OidcUserInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -675,7 +675,7 @@ func (a *OidcApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*O
 		localVarReturnValue *OidcUserInfo
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.GetOidcUserInfo")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.GetOidcUserInfo")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -750,7 +750,7 @@ func (a *OidcApiService) GetOidcUserInfoExecute(r ApiGetOidcUserInfoRequest) (*O
 
 type ApiRevokeOidcSessionRequest struct {
 	ctx        context.Context
-	ApiService *OidcApiService
+	ApiService *OidcAPIService
 }
 
 func (r ApiRevokeOidcSessionRequest) Execute() (*http.Response, error) {
@@ -770,7 +770,7 @@ Back-channel logout is performed asynchronously and does not affect logout flow.
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiRevokeOidcSessionRequest
 */
-func (a *OidcApiService) RevokeOidcSession(ctx context.Context) ApiRevokeOidcSessionRequest {
+func (a *OidcAPIService) RevokeOidcSession(ctx context.Context) ApiRevokeOidcSessionRequest {
 	return ApiRevokeOidcSessionRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -778,14 +778,14 @@ func (a *OidcApiService) RevokeOidcSession(ctx context.Context) ApiRevokeOidcSes
 }
 
 // Execute executes the request
-func (a *OidcApiService) RevokeOidcSessionExecute(r ApiRevokeOidcSessionRequest) (*http.Response, error) {
+func (a *OidcAPIService) RevokeOidcSessionExecute(r ApiRevokeOidcSessionRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodGet
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.RevokeOidcSession")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.RevokeOidcSession")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -843,7 +843,7 @@ func (a *OidcApiService) RevokeOidcSessionExecute(r ApiRevokeOidcSessionRequest)
 
 type ApiSetOidcDynamicClientRequest struct {
 	ctx          context.Context
-	ApiService   *OidcApiService
+	ApiService   *OidcAPIService
 	id           string
 	oAuth2Client *OAuth2Client
 }
@@ -881,7 +881,7 @@ generated for applications which want to consume your OAuth 2.0 or OpenID Connec
 	@param id OAuth 2.0 Client ID
 	@return ApiSetOidcDynamicClientRequest
 */
-func (a *OidcApiService) SetOidcDynamicClient(ctx context.Context, id string) ApiSetOidcDynamicClientRequest {
+func (a *OidcAPIService) SetOidcDynamicClient(ctx context.Context, id string) ApiSetOidcDynamicClientRequest {
 	return ApiSetOidcDynamicClientRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -892,7 +892,7 @@ func (a *OidcApiService) SetOidcDynamicClient(ctx context.Context, id string) Ap
 // Execute executes the request
 //
 //	@return OAuth2Client
-func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
+func (a *OidcAPIService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRequest) (*OAuth2Client, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -900,7 +900,7 @@ func (a *OidcApiService) SetOidcDynamicClientExecute(r ApiSetOidcDynamicClientRe
 		localVarReturnValue *OAuth2Client
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcApiService.SetOidcDynamicClient")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "OidcAPIService.SetOidcDynamicClient")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

@@ -1,37 +1,37 @@
-# \OAuth2Api
+# \OAuth2API
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AcceptOAuth2ConsentRequest**](OAuth2Api.md#AcceptOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/accept | Accept OAuth 2.0 Consent Request
-[**AcceptOAuth2LoginRequest**](OAuth2Api.md#AcceptOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/accept | Accept OAuth 2.0 Login Request
-[**AcceptOAuth2LogoutRequest**](OAuth2Api.md#AcceptOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/accept | Accept OAuth 2.0 Session Logout Request
-[**CreateOAuth2Client**](OAuth2Api.md#CreateOAuth2Client) | **Post** /admin/clients | Create OAuth 2.0 Client
-[**DeleteOAuth2Client**](OAuth2Api.md#DeleteOAuth2Client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
-[**DeleteOAuth2Token**](OAuth2Api.md#DeleteOAuth2Token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
-[**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
-[**GetOAuth2Client**](OAuth2Api.md#GetOAuth2Client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
-[**GetOAuth2ConsentRequest**](OAuth2Api.md#GetOAuth2ConsentRequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request
-[**GetOAuth2LoginRequest**](OAuth2Api.md#GetOAuth2LoginRequest) | **Get** /admin/oauth2/auth/requests/login | Get OAuth 2.0 Login Request
-[**GetOAuth2LogoutRequest**](OAuth2Api.md#GetOAuth2LogoutRequest) | **Get** /admin/oauth2/auth/requests/logout | Get OAuth 2.0 Session Logout Request
-[**GetTrustedOAuth2JwtGrantIssuer**](OAuth2Api.md#GetTrustedOAuth2JwtGrantIssuer) | **Get** /admin/trust/grants/jwt-bearer/issuers/{id} | Get Trusted OAuth2 JWT Bearer Grant Type Issuer
-[**IntrospectOAuth2Token**](OAuth2Api.md#IntrospectOAuth2Token) | **Post** /admin/oauth2/introspect | Introspect OAuth2 Access and Refresh Tokens
-[**ListOAuth2Clients**](OAuth2Api.md#ListOAuth2Clients) | **Get** /admin/clients | List OAuth 2.0 Clients
-[**ListOAuth2ConsentSessions**](OAuth2Api.md#ListOAuth2ConsentSessions) | **Get** /admin/oauth2/auth/sessions/consent | List OAuth 2.0 Consent Sessions of a Subject
-[**ListTrustedOAuth2JwtGrantIssuers**](OAuth2Api.md#ListTrustedOAuth2JwtGrantIssuers) | **Get** /admin/trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
-[**OAuth2Authorize**](OAuth2Api.md#OAuth2Authorize) | **Get** /oauth2/auth | OAuth 2.0 Authorize Endpoint
-[**Oauth2TokenExchange**](OAuth2Api.md#Oauth2TokenExchange) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
-[**PatchOAuth2Client**](OAuth2Api.md#PatchOAuth2Client) | **Patch** /admin/clients/{id} | Patch OAuth 2.0 Client
-[**RejectOAuth2ConsentRequest**](OAuth2Api.md#RejectOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/reject | Reject OAuth 2.0 Consent Request
-[**RejectOAuth2LoginRequest**](OAuth2Api.md#RejectOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject OAuth 2.0 Login Request
-[**RejectOAuth2LogoutRequest**](OAuth2Api.md#RejectOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject OAuth 2.0 Session Logout Request
-[**RevokeOAuth2ConsentSessions**](OAuth2Api.md#RevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
-[**RevokeOAuth2LoginSessions**](OAuth2Api.md#RevokeOAuth2LoginSessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
-[**RevokeOAuth2Token**](OAuth2Api.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
-[**SetOAuth2Client**](OAuth2Api.md#SetOAuth2Client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
-[**SetOAuth2ClientLifespans**](OAuth2Api.md#SetOAuth2ClientLifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans
-[**TrustOAuth2JwtGrantIssuer**](OAuth2Api.md#TrustOAuth2JwtGrantIssuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer
+[**AcceptOAuth2ConsentRequest**](OAuth2API.md#AcceptOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/accept | Accept OAuth 2.0 Consent Request
+[**AcceptOAuth2LoginRequest**](OAuth2API.md#AcceptOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/accept | Accept OAuth 2.0 Login Request
+[**AcceptOAuth2LogoutRequest**](OAuth2API.md#AcceptOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/accept | Accept OAuth 2.0 Session Logout Request
+[**CreateOAuth2Client**](OAuth2API.md#CreateOAuth2Client) | **Post** /admin/clients | Create OAuth 2.0 Client
+[**DeleteOAuth2Client**](OAuth2API.md#DeleteOAuth2Client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
+[**DeleteOAuth2Token**](OAuth2API.md#DeleteOAuth2Token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
+[**DeleteTrustedOAuth2JwtGrantIssuer**](OAuth2API.md#DeleteTrustedOAuth2JwtGrantIssuer) | **Delete** /admin/trust/grants/jwt-bearer/issuers/{id} | Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**GetOAuth2Client**](OAuth2API.md#GetOAuth2Client) | **Get** /admin/clients/{id} | Get an OAuth 2.0 Client
+[**GetOAuth2ConsentRequest**](OAuth2API.md#GetOAuth2ConsentRequest) | **Get** /admin/oauth2/auth/requests/consent | Get OAuth 2.0 Consent Request
+[**GetOAuth2LoginRequest**](OAuth2API.md#GetOAuth2LoginRequest) | **Get** /admin/oauth2/auth/requests/login | Get OAuth 2.0 Login Request
+[**GetOAuth2LogoutRequest**](OAuth2API.md#GetOAuth2LogoutRequest) | **Get** /admin/oauth2/auth/requests/logout | Get OAuth 2.0 Session Logout Request
+[**GetTrustedOAuth2JwtGrantIssuer**](OAuth2API.md#GetTrustedOAuth2JwtGrantIssuer) | **Get** /admin/trust/grants/jwt-bearer/issuers/{id} | Get Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**IntrospectOAuth2Token**](OAuth2API.md#IntrospectOAuth2Token) | **Post** /admin/oauth2/introspect | Introspect OAuth2 Access and Refresh Tokens
+[**ListOAuth2Clients**](OAuth2API.md#ListOAuth2Clients) | **Get** /admin/clients | List OAuth 2.0 Clients
+[**ListOAuth2ConsentSessions**](OAuth2API.md#ListOAuth2ConsentSessions) | **Get** /admin/oauth2/auth/sessions/consent | List OAuth 2.0 Consent Sessions of a Subject
+[**ListTrustedOAuth2JwtGrantIssuers**](OAuth2API.md#ListTrustedOAuth2JwtGrantIssuers) | **Get** /admin/trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
+[**OAuth2Authorize**](OAuth2API.md#OAuth2Authorize) | **Get** /oauth2/auth | OAuth 2.0 Authorize Endpoint
+[**Oauth2TokenExchange**](OAuth2API.md#Oauth2TokenExchange) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
+[**PatchOAuth2Client**](OAuth2API.md#PatchOAuth2Client) | **Patch** /admin/clients/{id} | Patch OAuth 2.0 Client
+[**RejectOAuth2ConsentRequest**](OAuth2API.md#RejectOAuth2ConsentRequest) | **Put** /admin/oauth2/auth/requests/consent/reject | Reject OAuth 2.0 Consent Request
+[**RejectOAuth2LoginRequest**](OAuth2API.md#RejectOAuth2LoginRequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject OAuth 2.0 Login Request
+[**RejectOAuth2LogoutRequest**](OAuth2API.md#RejectOAuth2LogoutRequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject OAuth 2.0 Session Logout Request
+[**RevokeOAuth2ConsentSessions**](OAuth2API.md#RevokeOAuth2ConsentSessions) | **Delete** /admin/oauth2/auth/sessions/consent | Revoke OAuth 2.0 Consent Sessions of a Subject
+[**RevokeOAuth2LoginSessions**](OAuth2API.md#RevokeOAuth2LoginSessions) | **Delete** /admin/oauth2/auth/sessions/login | Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
+[**RevokeOAuth2Token**](OAuth2API.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth 2.0 Access or Refresh Token
+[**SetOAuth2Client**](OAuth2API.md#SetOAuth2Client) | **Put** /admin/clients/{id} | Set OAuth 2.0 Client
+[**SetOAuth2ClientLifespans**](OAuth2API.md#SetOAuth2ClientLifespans) | **Put** /admin/clients/{id}/lifespans | Set OAuth2 Client Token Lifespans
+[**TrustOAuth2JwtGrantIssuer**](OAuth2API.md#TrustOAuth2JwtGrantIssuer) | **Post** /admin/trust/grants/jwt-bearer/issuers | Trust OAuth2 JWT Bearer Grant Type Issuer
 
 
 
@@ -61,13 +61,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
+	resp, r, err := apiClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).AcceptOAuth2ConsentRequest(acceptOAuth2ConsentRequest).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.AcceptOAuth2ConsentRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `AcceptOAuth2ConsentRequest`: OAuth2RedirectTo
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2ConsentRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.AcceptOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -129,13 +129,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
+	resp, r, err := apiClient.OAuth2API.AcceptOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).AcceptOAuth2LoginRequest(acceptOAuth2LoginRequest).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.AcceptOAuth2LoginRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `AcceptOAuth2LoginRequest`: OAuth2RedirectTo
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LoginRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.AcceptOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -196,13 +196,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.AcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	resp, r, err := apiClient.OAuth2API.AcceptOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.AcceptOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.AcceptOAuth2LogoutRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `AcceptOAuth2LogoutRequest`: OAuth2RedirectTo
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.AcceptOAuth2LogoutRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.AcceptOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -262,13 +262,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
+	resp, r, err := apiClient.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.CreateOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.CreateOAuth2Client``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `CreateOAuth2Client`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.CreateOAuth2Client`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.CreateOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -328,9 +328,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.DeleteOAuth2Client(context.Background(), id).Execute()
+	r, err := apiClient.OAuth2API.DeleteOAuth2Client(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.DeleteOAuth2Client``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -396,9 +396,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.DeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
+	r, err := apiClient.OAuth2API.DeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.DeleteOAuth2Token``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -460,9 +460,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+	r, err := apiClient.OAuth2API.DeleteTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.DeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.DeleteTrustedOAuth2JwtGrantIssuer``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -528,13 +528,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.GetOAuth2Client(context.Background(), id).Execute()
+	resp, r, err := apiClient.OAuth2API.GetOAuth2Client(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.GetOAuth2Client``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOAuth2Client`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2Client`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.GetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -598,13 +598,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
+	resp, r, err := apiClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.GetOAuth2ConsentRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOAuth2ConsentRequest`: OAuth2ConsentRequest
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2ConsentRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.GetOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -664,13 +664,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
+	resp, r, err := apiClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.GetOAuth2LoginRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOAuth2LoginRequest`: OAuth2LoginRequest
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LoginRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.GetOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -730,13 +730,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.GetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	resp, r, err := apiClient.OAuth2API.GetOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.GetOAuth2LogoutRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetOAuth2LogoutRequest`: OAuth2LogoutRequest
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetOAuth2LogoutRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.GetOAuth2LogoutRequest`: %v\n", resp)
 }
 ```
 
@@ -796,13 +796,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.GetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
+	resp, r, err := apiClient.OAuth2API.GetTrustedOAuth2JwtGrantIssuer(context.Background(), id).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.GetTrustedOAuth2JwtGrantIssuer``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `GetTrustedOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.GetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.GetTrustedOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 
@@ -867,13 +867,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.IntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
+	resp, r, err := apiClient.OAuth2API.IntrospectOAuth2Token(context.Background()).Token(token).Scope(scope).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.IntrospectOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.IntrospectOAuth2Token``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `IntrospectOAuth2Token`: IntrospectedOAuth2Token
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.IntrospectOAuth2Token`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.IntrospectOAuth2Token`: %v\n", resp)
 }
 ```
 
@@ -937,13 +937,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
+	resp, r, err := apiClient.OAuth2API.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2Clients``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.ListOAuth2Clients``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `ListOAuth2Clients`: []OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2Clients`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.ListOAuth2Clients`: %v\n", resp)
 }
 ```
 
@@ -1009,13 +1009,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
+	resp, r, err := apiClient.OAuth2API.ListOAuth2ConsentSessions(context.Background()).Subject(subject).PageSize(pageSize).PageToken(pageToken).LoginSessionId(loginSessionId).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListOAuth2ConsentSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.ListOAuth2ConsentSessions``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `ListOAuth2ConsentSessions`: []OAuth2ConsentSession
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListOAuth2ConsentSessions`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.ListOAuth2ConsentSessions`: %v\n", resp)
 }
 ```
 
@@ -1080,13 +1080,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.ListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
+	resp, r, err := apiClient.OAuth2API.ListTrustedOAuth2JwtGrantIssuers(context.Background()).MaxItems(maxItems).DefaultItems(defaultItems).Issuer(issuer).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.ListTrustedOAuth2JwtGrantIssuers``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `ListTrustedOAuth2JwtGrantIssuers`: []TrustedOAuth2JwtGrantIssuer
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.ListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.ListTrustedOAuth2JwtGrantIssuers`: %v\n", resp)
 }
 ```
 
@@ -1147,13 +1147,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.OAuth2Authorize(context.Background()).Execute()
+	resp, r, err := apiClient.OAuth2API.OAuth2Authorize(context.Background()).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.OAuth2Authorize``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.OAuth2Authorize``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `OAuth2Authorize`: ErrorOAuth2
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.OAuth2Authorize`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.OAuth2Authorize`: %v\n", resp)
 }
 ```
 
@@ -1213,13 +1213,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
+	resp, r, err := apiClient.OAuth2API.Oauth2TokenExchange(context.Background()).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.Oauth2TokenExchange``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.Oauth2TokenExchange``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `Oauth2TokenExchange`: OAuth2TokenExchange
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.Oauth2TokenExchange`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.Oauth2TokenExchange`: %v\n", resp)
 }
 ```
 
@@ -1284,13 +1284,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
+	resp, r, err := apiClient.OAuth2API.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.PatchOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.PatchOAuth2Client``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `PatchOAuth2Client`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.PatchOAuth2Client`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.PatchOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -1356,13 +1356,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.RejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+	resp, r, err := apiClient.OAuth2API.RejectOAuth2ConsentRequest(context.Background()).ConsentChallenge(consentChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2ConsentRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RejectOAuth2ConsentRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `RejectOAuth2ConsentRequest`: OAuth2RedirectTo
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2ConsentRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.RejectOAuth2ConsentRequest`: %v\n", resp)
 }
 ```
 
@@ -1424,13 +1424,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.RejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
+	resp, r, err := apiClient.OAuth2API.RejectOAuth2LoginRequest(context.Background()).LoginChallenge(loginChallenge).RejectOAuth2Request(rejectOAuth2Request).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LoginRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RejectOAuth2LoginRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `RejectOAuth2LoginRequest`: OAuth2RedirectTo
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.RejectOAuth2LoginRequest`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.RejectOAuth2LoginRequest`: %v\n", resp)
 }
 ```
 
@@ -1491,9 +1491,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.RejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
+	r, err := apiClient.OAuth2API.RejectOAuth2LogoutRequest(context.Background()).LogoutChallenge(logoutChallenge).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RejectOAuth2LogoutRequest``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RejectOAuth2LogoutRequest``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -1557,9 +1557,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
+	r, err := apiClient.OAuth2API.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2ConsentSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RevokeOAuth2ConsentSessions``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -1624,9 +1624,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.RevokeOAuth2LoginSessions(context.Background()).Subject(subject).Sid(sid).Execute()
+	r, err := apiClient.OAuth2API.RevokeOAuth2LoginSessions(context.Background()).Subject(subject).Sid(sid).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2LoginSessions``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RevokeOAuth2LoginSessions``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -1691,9 +1691,9 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2Api.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
+	r, err := apiClient.OAuth2API.RevokeOAuth2Token(context.Background()).Token(token).ClientId(clientId).ClientSecret(clientSecret).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.RevokeOAuth2Token``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RevokeOAuth2Token``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 }
@@ -1758,13 +1758,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.SetOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
+	resp, r, err := apiClient.OAuth2API.SetOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2Client``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.SetOAuth2Client``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SetOAuth2Client`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2Client`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.SetOAuth2Client`: %v\n", resp)
 }
 ```
 
@@ -1830,13 +1830,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.SetOAuth2ClientLifespans(context.Background(), id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
+	resp, r, err := apiClient.OAuth2API.SetOAuth2ClientLifespans(context.Background(), id).OAuth2ClientTokenLifespans(oAuth2ClientTokenLifespans).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.SetOAuth2ClientLifespans``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.SetOAuth2ClientLifespans``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `SetOAuth2ClientLifespans`: OAuth2Client
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.SetOAuth2ClientLifespans`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.SetOAuth2ClientLifespans`: %v\n", resp)
 }
 ```
 
@@ -1902,13 +1902,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.OAuth2Api.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
+	resp, r, err := apiClient.OAuth2API.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(trustOAuth2JwtGrantIssuer).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2Api.TrustOAuth2JwtGrantIssuer``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.TrustOAuth2JwtGrantIssuer``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
 	// response from `TrustOAuth2JwtGrantIssuer`: TrustedOAuth2JwtGrantIssuer
-	fmt.Fprintf(os.Stdout, "Response from `OAuth2Api.TrustOAuth2JwtGrantIssuer`: %v\n", resp)
+	fmt.Fprintf(os.Stdout, "Response from `OAuth2API.TrustOAuth2JwtGrantIssuer`: %v\n", resp)
 }
 ```
 

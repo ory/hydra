@@ -57,12 +57,12 @@ func (k *Default) Authenticate(ctx context.Context, name, secret string) (err er
 
 	kratos := k.newKratosClient(ctx, publicURL)
 
-	flow, _, err := kratos.FrontendApi.CreateNativeLoginFlow(ctx).Execute()
+	flow, _, err := kratos.FrontendAPI.CreateNativeLoginFlow(ctx).Execute()
 	if err != nil {
 		return err
 	}
 
-	_, _, err = kratos.FrontendApi.UpdateLoginFlow(ctx).Flow(flow.Id).UpdateLoginFlowBody(client.UpdateLoginFlowBody{
+	_, _, err = kratos.FrontendAPI.UpdateLoginFlow(ctx).Flow(flow.Id).UpdateLoginFlowBody(client.UpdateLoginFlowBody{
 		UpdateLoginFlowWithPasswordMethod: &client.UpdateLoginFlowWithPasswordMethod{
 			Method:     "password",
 			Identifier: name,
@@ -101,7 +101,7 @@ func (k *Default) DisableSession(ctx context.Context, identityProviderSessionID 
 		configuration.HTTPClient.Transport = httpx.WrapTransportWithHeader(configuration.HTTPClient.Transport, header)
 	}
 	kratos := client.NewAPIClient(configuration)
-	_, err = kratos.IdentityApi.DisableSession(ctx, identityProviderSessionID).Execute()
+	_, err = kratos.IdentityAPI.DisableSession(ctx, identityProviderSessionID).Execute()
 
 	return err
 }

@@ -146,7 +146,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	acceptLoginHandler := func(b *testing.B, c *hc.Client, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			rr, _, err := adminClient.OAuth2Api.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(ctx).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(b, err)
 
 			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
@@ -171,7 +171,7 @@ func BenchmarkAuthCode(b *testing.B) {
 				}
 			}
 
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2LoginRequest(ctx).
+			v, _, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 				LoginChallenge(r.URL.Query().Get("login_challenge")).
 				AcceptOAuth2LoginRequest(acceptBody).
 				Execute()
@@ -184,7 +184,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	acceptConsentHandler := func(b *testing.B, c *hc.Client, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return otelhttp.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			rr, _, err := adminClient.OAuth2Api.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+			rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(b, err)
 
 			assert.EqualValues(b, c.GetID(), pointerx.Deref(rr.Client.ClientId))
@@ -201,7 +201,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			}
 
 			assert.Equal(b, map[string]interface{}{"context": "bar"}, rr.Context)
-			v, _, err := adminClient.OAuth2Api.AcceptOAuth2ConsentRequest(ctx).
+			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
 					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),

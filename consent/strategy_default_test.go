@@ -27,11 +27,11 @@ import (
 
 func checkAndAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClient, subject string, cb func(*testing.T, *hydra.OAuth2LoginRequest, error) hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := apiClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+		res, _, err := apiClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 		payload := cb(t, res, err)
 		payload.Subject = subject
 
-		v, _, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+		v, _, err := apiClient.OAuth2API.AcceptOAuth2LoginRequest(context.Background()).
 			LoginChallenge(r.URL.Query().Get("login_challenge")).
 			AcceptOAuth2LoginRequest(payload).
 			Execute()
@@ -43,10 +43,10 @@ func checkAndAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClient, subjec
 
 func checkAndAcceptConsentHandler(t *testing.T, apiClient *hydra.APIClient, cb func(*testing.T, *hydra.OAuth2ConsentRequest, error) hydra.AcceptOAuth2ConsentRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+		res, _, err := apiClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 		payload := cb(t, res, err)
 
-		v, _, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
+		v, _, err := apiClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 			AcceptOAuth2ConsentRequest(payload).
 			Execute()
@@ -110,18 +110,18 @@ func genIDToken(t *testing.T, reg driver.Registry, c jwt.MapClaims) string {
 
 func checkAndDuplicateAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClient, subject string, cb func(*testing.T, *hydra.OAuth2LoginRequest, error) hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := apiClient.OAuth2Api.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+		res, _, err := apiClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 		payload := cb(t, res, err)
 		payload.Subject = subject
 
-		v, _, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+		v, _, err := apiClient.OAuth2API.AcceptOAuth2LoginRequest(context.Background()).
 			LoginChallenge(r.URL.Query().Get("login_challenge")).
 			AcceptOAuth2LoginRequest(payload).
 			Execute()
 		require.NoError(t, err)
 		require.NotEmpty(t, v.RedirectTo)
 
-		v2, _, err := apiClient.OAuth2Api.AcceptOAuth2LoginRequest(context.Background()).
+		v2, _, err := apiClient.OAuth2API.AcceptOAuth2LoginRequest(context.Background()).
 			LoginChallenge(r.URL.Query().Get("login_challenge")).
 			AcceptOAuth2LoginRequest(payload).
 			Execute()
@@ -133,22 +133,22 @@ func checkAndDuplicateAcceptLoginHandler(t *testing.T, apiClient *hydra.APIClien
 
 func checkAndDuplicateAcceptConsentHandler(t *testing.T, apiClient *hydra.APIClient, cb func(*testing.T, *hydra.OAuth2ConsentRequest, error) hydra.AcceptOAuth2ConsentRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		res, _, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).
+		res, _, err := apiClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).
 			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 			Execute()
 		payload := cb(t, res, err)
 
-		v, _, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
+		v, _, err := apiClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 			AcceptOAuth2ConsentRequest(payload).
 			Execute()
 		require.NoError(t, err)
 		require.NotEmpty(t, v.RedirectTo)
 
-		res2, _, err := apiClient.OAuth2Api.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+		res2, _, err := apiClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 		payload2 := cb(t, res2, err)
 
-		v2, _, err := apiClient.OAuth2Api.AcceptOAuth2ConsentRequest(context.Background()).
+		v2, _, err := apiClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 			AcceptOAuth2ConsentRequest(payload2).
 			Execute()

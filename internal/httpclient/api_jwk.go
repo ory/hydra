@@ -20,12 +20,12 @@ import (
 	"strings"
 )
 
-// JwkApiService JwkApi service
-type JwkApiService service
+// JwkAPIService JwkAPI service
+type JwkAPIService service
 
 type ApiCreateJsonWebKeySetRequest struct {
 	ctx                 context.Context
-	ApiService          *JwkApiService
+	ApiService          *JwkAPIService
 	set                 string
 	createJsonWebKeySet *CreateJsonWebKeySet
 }
@@ -50,7 +50,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 	@param set The JSON Web Key Set ID
 	@return ApiCreateJsonWebKeySetRequest
 */
-func (a *JwkApiService) CreateJsonWebKeySet(ctx context.Context, set string) ApiCreateJsonWebKeySetRequest {
+func (a *JwkAPIService) CreateJsonWebKeySet(ctx context.Context, set string) ApiCreateJsonWebKeySetRequest {
 	return ApiCreateJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -61,7 +61,7 @@ func (a *JwkApiService) CreateJsonWebKeySet(ctx context.Context, set string) Api
 // Execute executes the request
 //
 //	@return JsonWebKeySet
-func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *JwkAPIService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -69,7 +69,7 @@ func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.CreateJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.CreateJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -150,7 +150,7 @@ func (a *JwkApiService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 
 type ApiDeleteJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *JwkApiService
+	ApiService *JwkAPIService
 	set        string
 	kid        string
 }
@@ -174,7 +174,7 @@ and allows storing user-defined keys as well.
 	@param kid The JSON Web Key ID (kid)
 	@return ApiDeleteJsonWebKeyRequest
 */
-func (a *JwkApiService) DeleteJsonWebKey(ctx context.Context, set string, kid string) ApiDeleteJsonWebKeyRequest {
+func (a *JwkAPIService) DeleteJsonWebKey(ctx context.Context, set string, kid string) ApiDeleteJsonWebKeyRequest {
 	return ApiDeleteJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -184,14 +184,14 @@ func (a *JwkApiService) DeleteJsonWebKey(ctx context.Context, set string, kid st
 }
 
 // Execute executes the request
-func (a *JwkApiService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*http.Response, error) {
+func (a *JwkAPIService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.DeleteJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.DeleteJsonWebKey")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -259,7 +259,7 @@ func (a *JwkApiService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*
 
 type ApiDeleteJsonWebKeySetRequest struct {
 	ctx        context.Context
-	ApiService *JwkApiService
+	ApiService *JwkAPIService
 	set        string
 }
 
@@ -278,7 +278,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 	@param set The JSON Web Key Set
 	@return ApiDeleteJsonWebKeySetRequest
 */
-func (a *JwkApiService) DeleteJsonWebKeySet(ctx context.Context, set string) ApiDeleteJsonWebKeySetRequest {
+func (a *JwkAPIService) DeleteJsonWebKeySet(ctx context.Context, set string) ApiDeleteJsonWebKeySetRequest {
 	return ApiDeleteJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -287,14 +287,14 @@ func (a *JwkApiService) DeleteJsonWebKeySet(ctx context.Context, set string) Api
 }
 
 // Execute executes the request
-func (a *JwkApiService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetRequest) (*http.Response, error) {
+func (a *JwkAPIService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod = http.MethodDelete
 		localVarPostBody   interface{}
 		formFiles          []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.DeleteJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.DeleteJsonWebKeySet")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -361,7 +361,7 @@ func (a *JwkApiService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetReque
 
 type ApiGetJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *JwkApiService
+	ApiService *JwkAPIService
 	set        string
 	kid        string
 }
@@ -380,7 +380,7 @@ This endpoint returns a singular JSON Web Key contained in a set. It is identifi
 	@param kid JSON Web Key ID
 	@return ApiGetJsonWebKeyRequest
 */
-func (a *JwkApiService) GetJsonWebKey(ctx context.Context, set string, kid string) ApiGetJsonWebKeyRequest {
+func (a *JwkAPIService) GetJsonWebKey(ctx context.Context, set string, kid string) ApiGetJsonWebKeyRequest {
 	return ApiGetJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -392,7 +392,7 @@ func (a *JwkApiService) GetJsonWebKey(ctx context.Context, set string, kid strin
 // Execute executes the request
 //
 //	@return JsonWebKeySet
-func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *JwkAPIService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -400,7 +400,7 @@ func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.GetJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.GetJsonWebKey")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -477,7 +477,7 @@ func (a *JwkApiService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 
 type ApiGetJsonWebKeySetRequest struct {
 	ctx        context.Context
-	ApiService *JwkApiService
+	ApiService *JwkAPIService
 	set        string
 }
 
@@ -496,7 +496,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 	@param set JSON Web Key Set ID
 	@return ApiGetJsonWebKeySetRequest
 */
-func (a *JwkApiService) GetJsonWebKeySet(ctx context.Context, set string) ApiGetJsonWebKeySetRequest {
+func (a *JwkAPIService) GetJsonWebKeySet(ctx context.Context, set string) ApiGetJsonWebKeySetRequest {
 	return ApiGetJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -507,7 +507,7 @@ func (a *JwkApiService) GetJsonWebKeySet(ctx context.Context, set string) ApiGet
 // Execute executes the request
 //
 //	@return JsonWebKeySet
-func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *JwkAPIService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -515,7 +515,7 @@ func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.GetJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.GetJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -591,7 +591,7 @@ func (a *JwkApiService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 
 type ApiSetJsonWebKeyRequest struct {
 	ctx        context.Context
-	ApiService *JwkApiService
+	ApiService *JwkAPIService
 	set        string
 	kid        string
 	jsonWebKey *JsonWebKey
@@ -618,7 +618,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 	@param kid JSON Web Key ID
 	@return ApiSetJsonWebKeyRequest
 */
-func (a *JwkApiService) SetJsonWebKey(ctx context.Context, set string, kid string) ApiSetJsonWebKeyRequest {
+func (a *JwkAPIService) SetJsonWebKey(ctx context.Context, set string, kid string) ApiSetJsonWebKeyRequest {
 	return ApiSetJsonWebKeyRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -630,7 +630,7 @@ func (a *JwkApiService) SetJsonWebKey(ctx context.Context, set string, kid strin
 // Execute executes the request
 //
 //	@return JsonWebKey
-func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
+func (a *JwkAPIService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -638,7 +638,7 @@ func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 		localVarReturnValue *JsonWebKey
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.SetJsonWebKey")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.SetJsonWebKey")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -717,7 +717,7 @@ func (a *JwkApiService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 
 type ApiSetJsonWebKeySetRequest struct {
 	ctx           context.Context
-	ApiService    *JwkApiService
+	ApiService    *JwkAPIService
 	set           string
 	jsonWebKeySet *JsonWebKeySet
 }
@@ -742,7 +742,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 	@param set The JSON Web Key Set ID
 	@return ApiSetJsonWebKeySetRequest
 */
-func (a *JwkApiService) SetJsonWebKeySet(ctx context.Context, set string) ApiSetJsonWebKeySetRequest {
+func (a *JwkAPIService) SetJsonWebKeySet(ctx context.Context, set string) ApiSetJsonWebKeySetRequest {
 	return ApiSetJsonWebKeySetRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -753,7 +753,7 @@ func (a *JwkApiService) SetJsonWebKeySet(ctx context.Context, set string) ApiSet
 // Execute executes the request
 //
 //	@return JsonWebKeySet
-func (a *JwkApiService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+func (a *JwkAPIService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPut
 		localVarPostBody    interface{}
@@ -761,7 +761,7 @@ func (a *JwkApiService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*
 		localVarReturnValue *JsonWebKeySet
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkApiService.SetJsonWebKeySet")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "JwkAPIService.SetJsonWebKeySet")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

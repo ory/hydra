@@ -91,13 +91,13 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			cl.ClientId = pointerx.Ptr(flagx.MustGetString(cmd, flagClientId))
 
 			//nolint:bodyclose
-			client, _, err := m.OAuth2Api.CreateOAuth2Client(cmd.Context()).OAuth2Client(cl).Execute()
+			client, _, err := m.OAuth2API.CreateOAuth2Client(cmd.Context()).OAuth2Client(cl).Execute()
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
 
 			if client.ClientSecret == nil && len(secret) > 0 {
-				client.ClientSecret = pointerx.String(secret)
+				client.ClientSecret = pointerx.Ptr(secret)
 			}
 
 			if encryptSecret && client.ClientSecret != nil {
@@ -107,7 +107,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 					return cmdx.FailSilently(cmd)
 				}
 
-				client.ClientSecret = pointerx.String(enc.Base64Encode())
+				client.ClientSecret = pointerx.Ptr(enc.Base64Encode())
 			}
 
 			cmdx.PrintRow(cmd, (*outputOAuth2Client)(client))

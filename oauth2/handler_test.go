@@ -77,7 +77,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
 
 	_, err := c.
-		OAuth2Api.DeleteOAuth2Token(context.Background()).
+		OAuth2API.DeleteOAuth2Token(context.Background()).
 		ClientId("foobar").Execute()
 	require.NoError(t, err)
 

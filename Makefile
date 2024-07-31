@@ -147,7 +147,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		--git-user-id ory \
 		--git-repo-id hydra-client-go/v2 \
 		--git-host github.com \
-		--api-name-suffix "Api" \
+		--api-name-suffix "API" \
 		--global-property apiTests=false
 
 	make format

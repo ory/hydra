@@ -51,15 +51,15 @@ type APIClient struct {
 
 	// API Services
 
-	JwkApi *JwkApiService
+	JwkAPI *JwkAPIService
 
-	MetadataApi *MetadataApiService
+	MetadataAPI *MetadataAPIService
 
-	OAuth2Api *OAuth2ApiService
+	OAuth2API *OAuth2APIService
 
-	OidcApi *OidcApiService
+	OidcAPI *OidcAPIService
 
-	WellknownApi *WellknownApiService
+	WellknownAPI *WellknownAPIService
 }
 
 type service struct {
@@ -78,11 +78,11 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
-	c.JwkApi = (*JwkApiService)(&c.common)
-	c.MetadataApi = (*MetadataApiService)(&c.common)
-	c.OAuth2Api = (*OAuth2ApiService)(&c.common)
-	c.OidcApi = (*OidcApiService)(&c.common)
-	c.WellknownApi = (*WellknownApiService)(&c.common)
+	c.JwkAPI = (*JwkAPIService)(&c.common)
+	c.MetadataAPI = (*MetadataAPIService)(&c.common)
+	c.OAuth2API = (*OAuth2APIService)(&c.common)
+	c.OidcAPI = (*OidcAPIService)(&c.common)
+	c.WellknownAPI = (*WellknownAPIService)(&c.common)
 
 	return c
 }

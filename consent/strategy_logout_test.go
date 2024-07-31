@@ -164,14 +164,14 @@ func TestLogoutFlows(t *testing.T) {
 				defer wg.Done()
 			}
 
-			res, _, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			res, _, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
 			if cb != nil {
 				cb(t, res, err)
 			} else {
 				require.NoError(t, err)
 			}
 
-			v, _, err := adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
 			require.NoError(t, err)
 			require.NotEmpty(t, v.RedirectTo)
 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
@@ -288,10 +288,10 @@ func TestLogoutFlows(t *testing.T) {
 		logoutAndExpectPostLogoutPage(t, browser, http.MethodGet, url.Values{}, defaultRedirectedMessage)
 
 		// run again to ensure that the logout challenge is invalid
-		_, _, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
+		_, _, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
 		assert.Error(t, err)
 
-		v, _, err := adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
+		v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
 		require.NoError(t, err)
 		require.NotEmpty(t, v.RedirectTo)
 
@@ -301,15 +301,15 @@ func TestLogoutFlows(t *testing.T) {
 	})
 
 	t.Run("case=should handle an invalid logout challenge", func(t *testing.T) {
-		_, res, err := adminApi.OAuth2Api.GetOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		_, res, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
 		assert.Error(t, err)
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 
-		_, res, err = adminApi.OAuth2Api.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		_, res, err = adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
 		assert.Error(t, err)
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 
-		res, err = adminApi.OAuth2Api.RejectOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
+		res, err = adminApi.OAuth2API.RejectOAuth2LogoutRequest(ctx).LogoutChallenge("some-invalid-challenge").Execute()
 		assert.Error(t, err)
 		assert.Equal(t, http.StatusNotFound, res.StatusCode)
 	})

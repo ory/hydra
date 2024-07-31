@@ -1,4 +1,4 @@
-FROM golang:1.21 AS builder
+FROM golang:1.22 AS builder
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \

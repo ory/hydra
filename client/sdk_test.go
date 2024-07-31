@@ -80,11 +80,11 @@ func TestClientSDK(t *testing.T) {
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
 
 	t.Run("case=client default scopes are set", func(t *testing.T) {
-		result, _, err := c.OAuth2Api.CreateOAuth2Client(ctx).OAuth2Client(hydra.OAuth2Client{}).Execute()
+		result, _, err := c.OAuth2API.CreateOAuth2Client(ctx).OAuth2Client(hydra.OAuth2Client{}).Execute()
 		require.NoError(t, err)
 		assert.EqualValues(t, conf.DefaultClientScope(ctx), strings.Split(*result.Scope, " "))
 
-		_, err = c.OAuth2Api.DeleteOAuth2Client(ctx, *result.ClientId).Execute()
+		_, err = c.OAuth2API.DeleteOAuth2Client(ctx, *result.ClientId).Execute()
 		require.NoError(t, err)
 	})
 
@@ -95,7 +95,7 @@ func TestClientSDK(t *testing.T) {
 		// 		createClient.SecretExpiresAt = 10
 
 		// returned client is correct on Create
-		result, _, err := c.OAuth2Api.CreateOAuth2Client(ctx).OAuth2Client(createClient).Execute()
+		result, _, err := c.OAuth2API.CreateOAuth2Client(ctx).OAuth2Client(createClient).Execute()
 		require.NoError(t, err)
 		assert.NotEmpty(t, result.UpdatedAt)
 		assert.NotEmpty(t, result.CreatedAt)
@@ -109,31 +109,31 @@ func TestClientSDK(t *testing.T) {
 
 		// secret is not returned on GetOAuth2Client
 		compareClient.ClientSecret = pointerx.Ptr("")
-		gresult, _, err := c.OAuth2Api.GetOAuth2Client(context.Background(), *createClient.ClientId).Execute()
+		gresult, _, err := c.OAuth2API.GetOAuth2Client(context.Background(), *createClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
 
 		// get client will return The request could not be authorized
-		gresult, _, err = c.OAuth2Api.GetOAuth2Client(context.Background(), "unknown").Execute()
+		gresult, _, err = c.OAuth2API.GetOAuth2Client(context.Background(), "unknown").Execute()
 		require.Error(t, err)
 		assert.Empty(t, gresult)
 		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
-		results, _, err := c.OAuth2Api.ListOAuth2Clients(context.Background()).PageSize(100).Execute()
+		results, _, err := c.OAuth2API.ListOAuth2Clients(context.Background()).PageSize(100).Execute()
 		require.NoError(t, err)
 		assert.Len(t, results, 1)
 		assertx.EqualAsJSONExcept(t, compareClient, results[0], append(defaultIgnoreFields, "client_secret"))
 
 		// SecretExpiresAt gets overwritten with 0 on Update
 		compareClient.ClientSecret = createClient.ClientSecret
-		uresult, _, err := c.OAuth2Api.SetOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(createClient).Execute()
+		uresult, _, err := c.OAuth2API.SetOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(createClient).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, uresult, append(defaultIgnoreFields, "client_secret"))
 
 		// create another client
 		updateClient := createTestClient("foo")
-		uresult, _, err = c.OAuth2Api.SetOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(updateClient).Execute()
+		uresult, _, err = c.OAuth2API.SetOAuth2Client(context.Background(), *createClient.ClientId).OAuth2Client(updateClient).Execute()
 		require.NoError(t, err)
 		assert.NotEqual(t, updateClient.ClientId, uresult.ClientId)
 		updateClient.ClientId = uresult.ClientId
@@ -142,27 +142,27 @@ func TestClientSDK(t *testing.T) {
 		// again, test if secret is not returned on Get
 		compareClient = updateClient
 		compareClient.ClientSecret = pointerx.Ptr("")
-		gresult, _, err = c.OAuth2Api.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
+		gresult, _, err = c.OAuth2API.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, compareClient, gresult, append(defaultIgnoreFields, "client_secret"))
 
 		// client can not be found after being deleted
-		_, err = c.OAuth2Api.DeleteOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
+		_, err = c.OAuth2API.DeleteOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.NoError(t, err)
 
-		_, _, err = c.OAuth2Api.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
+		_, _, err = c.OAuth2API.GetOAuth2Client(context.Background(), *updateClient.ClientId).Execute()
 		require.Error(t, err)
 	})
 
 	t.Run("case=public client is transmitted without secret", func(t *testing.T) {
-		result, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{
+		result, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{
 			TokenEndpointAuthMethod: pointerx.Ptr("none"),
 		}).Execute()
 		require.NoError(t, err)
 
 		assert.Equal(t, "", pointerx.Deref(result.ClientSecret))
 
-		result, _, err = c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
+		result, _, err = c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
 		require.NoError(t, err)
 
 		assert.Equal(t, "secret", pointerx.Deref(result.ClientSecret))
@@ -170,7 +170,7 @@ func TestClientSDK(t *testing.T) {
 
 	t.Run("case=id can be set", func(t *testing.T) {
 		id := uuidx.NewV4().String()
-		result, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: pointerx.Ptr(id)}).Execute()
+		result, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(hydra.OAuth2Client{ClientId: pointerx.Ptr(id)}).Execute()
 		require.NoError(t, err)
 
 		assert.Equal(t, id, pointerx.Deref(result.ClientId))
@@ -182,14 +182,14 @@ func TestClientSDK(t *testing.T) {
 		value := "http://foo.bar"
 
 		cl := createTestClient("")
-		created, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(cl).Execute()
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(cl).Execute()
 		require.NoError(t, err)
 		cl.ClientId = created.ClientId
 
 		expected := deepcopy.Copy(cl).(hydra.OAuth2Client)
 		expected.RedirectUris = append(expected.RedirectUris, value)
 
-		result, _, err := c.OAuth2Api.PatchOAuth2Client(context.Background(), *cl.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		result, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *cl.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
 		expected.CreatedAt = result.CreatedAt
 		expected.UpdatedAt = result.UpdatedAt
@@ -204,11 +204,11 @@ func TestClientSDK(t *testing.T) {
 		value := "foo"
 
 		client := createTestClient("")
-		created, res, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		created, res, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
 		require.NoError(t, err, "%s", ioutilx.MustReadAll(res.Body))
 		client.ClientId = created.ClientId
 
-		_, _, err = c.OAuth2Api.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		_, _, err = c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.Error(t, err)
 	})
 
@@ -218,13 +218,13 @@ func TestClientSDK(t *testing.T) {
 		value := "http://foo.bar"
 
 		client := createTestClient("")
-		created, _, err := c.OAuth2Api.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
 		require.NoError(t, err)
 		client.ClientId = created.ClientId
 
-		result1, _, err := c.OAuth2Api.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		result1, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
-		result2, _, err := c.OAuth2Api.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		result2, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
 
 		// secret hashes shouldn't change between these PUT calls

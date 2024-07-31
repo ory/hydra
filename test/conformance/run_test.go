@@ -219,7 +219,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 				t.Skipf("Test module 'oidcc-server-rotate-keys' can not run in parallel tests and was skipped...")
 				return
 			} else if module != "oidcc-server-rotate-keys" && !isParallel {
-				t.Skipf("Without paralleism only test module 'oidcc-server-rotate-keys' will be executed.")
+				t.Skipf("Without parallelism only test module 'oidcc-server-rotate-keys' will be executed.")
 				return
 			}
 

@@ -70,7 +70,7 @@
 ### Request duration
 ###! Tells the rails application how long it has to complete a request
 ###! This value needs to be lower than the worker timeout set in unicorn/puma.
-###! By default, we'll allow 95% of the the worker timeout
+###! By default, we'll allow 95% of the worker timeout
 # gitlab_rails['max_request_duration_seconds'] = 57
 
 ### Email Settings

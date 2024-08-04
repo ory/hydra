@@ -280,7 +280,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 	}
 
 	var baseURL *url.URL
-	if stringslice.Has(prompt, "registration") {
+	if stringslice.Has(prompt, "registration") || stringslice.Has(prompt, "create") {
 		baseURL = s.c.RegistrationURL(ctx)
 	} else {
 		baseURL = s.c.LoginURL(ctx)

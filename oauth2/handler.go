@@ -427,6 +427,11 @@ type oidcConfiguration struct {
 	//
 	// JSON array containing a list of the Verifiable Credentials supported by this authorization server.
 	CredentialsSupportedDraft00 []CredentialSupportedDraft00 `json:"credentials_supported_draft_00"`
+
+	// Initiating User Registration via OpenID Connect 1.0
+	//
+	// JSON array containing the list of prompt values that this OP supports.
+	PromptValuesSupported []string `json:"prompt_values_supported"`
 }
 
 // Verifiable Credentials Metadata (Draft 00)
@@ -521,6 +526,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 				"EdDSA",
 			},
 		}},
+		PromptValuesSupported: []string{"none", "login", "consent", "select_account", "create"},
 	})
 }
 

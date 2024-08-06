@@ -20,4 +20,3 @@ fi
 DC+=" up --build"
 
 $DC
-

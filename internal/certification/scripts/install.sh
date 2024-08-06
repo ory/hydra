@@ -36,14 +36,13 @@ sudo add-apt-repository \
    $(lsb_release -cs) \
    stable"
 sudo apt-get update
-sudo apt-get -y install docker-ce python-pip
+sudo apt-get -y install docker-ce
 
 # Dockerize
 export DOCKERIZE_VERSION=v0.6.1
 wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-sudo pip install docker-compose
 
 git clone https://github.com/ory/hydra-login-consent-node.git
 

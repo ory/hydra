@@ -224,6 +224,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 	t.Run(fmt.Sprintf("case=testHelperRevokeAccessToken/db=%s", k), testHelperRevokeAccessToken(store))
 	t.Run(fmt.Sprintf("case=testFositeJWTBearerGrantStorage/db=%s", k), testFositeJWTBearerGrantStorage(store))
+	t.Run(fmt.Sprintf("case=testHelperRevokeRefreshTokenMaybeGracePeriod/db=%s", k), testHelperRevokeRefreshTokenMaybeGracePeriod(store))
 }
 
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
@@ -550,6 +551,63 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
+}
+
+func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
+
+	return func(t *testing.T) {
+		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
+			// SETUP
+			m := x.OAuth2Storage()
+			ctx := context.Background()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			assert.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
+			assert.NoError(t, err)
+
+			tmpSession := new(fosite.Session)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
+
+			// ASSERT
+			// a revoked refresh token returns an error when getting the token again
+			assert.Error(t, err)
+			assert.True(t, errors.Is(err, fosite.ErrInactiveToken))
+		})
+
+		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
+			ctx := context.Background()
+
+			// SETUP
+			x.Config().Set(ctx, "oauth2.refresh_token_rotation.grace_period", "1m")
+
+			// always reset back to the default
+			defer x.Config().Set(ctx, "oauth2.refresh_token_rotation.grace_period", "0m")
+
+			m := x.OAuth2Storage()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d_with_grace_period", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			assert.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
+
+			assert.NoError(t, err)
+
+			tmpSession := new(fosite.Session)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
+
+			// ASSERT
+			// when grace period is configured the refresh token can be obtained within
+			// the grace period without error
+			assert.NoError(t, err)
+		})
+	}
+
 }
 
 func testHelperCreateGetDeletePKCERequestSession(x InternalRegistry) func(t *testing.T) {

@@ -4,7 +4,7 @@ DB=${DB:-postgres}
 TRACING=${TRACING:-false}
 PROMETHEUS=${PROMETHEUS:-false}
 
-DC="docker-compose -f quickstart.yml"
+DC="docker compose -f quickstart.yml"
 if [[ $DB == "mysql" ]]; then
     DC+=" -f quickstart-mysql.yml"
 fi

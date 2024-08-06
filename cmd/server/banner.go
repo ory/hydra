@@ -8,5 +8,5 @@ func banner(version string) string {
 
 Take security seriously and subscribe to the Ory Security Newsletter. Stay on top of new patches and security insights.
 
->> Subscribe now: http://eepurl.com/di390P <<`
+>> Subscribe now: https://www.ory.sh/l/sign-up-newsletter <<`
 }

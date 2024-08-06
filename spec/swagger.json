@@ -1687,7 +1687,7 @@
     },
     "/oauth2/auth": {
       "get": {
-        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries at https://oauth.net/code/\n\nThe Ory SDK is not yet able to this endpoint properly.",
+        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries at https://oauth.net/code/\n\nThis endpoint should not be used via the Ory SDK and is only included for technical reasons.\nInstead, use one of the libraries linked above.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1981,7 +1981,7 @@
             "oauth2": []
           }
         ],
-        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries here https://oauth.net/code/\n\nThe Ory SDK is not yet able to this endpoint properly.",
+        "description": "Use open source libraries to perform OAuth 2.0 and OpenID Connect\navailable for any programming language. You can find a list of libraries here https://oauth.net/code/\n\nThis endpoint should not be used via the Ory SDK and is only included for technical reasons.\nInstead, use one of the libraries linked above.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],

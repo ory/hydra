@@ -931,7 +931,8 @@ type oAuth2TokenExchange struct {
 // Use open source libraries to perform OAuth 2.0 and OpenID Connect
 // available for any programming language. You can find a list of libraries here https://oauth.net/code/
 //
-// The Ory SDK is not yet able to this endpoint properly.
+// This endpoint should not be used via the Ory SDK and is only included for technical reasons.
+// Instead, use one of the libraries linked above.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -1035,16 +1036,18 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 // Use open source libraries to perform OAuth 2.0 and OpenID Connect
 // available for any programming language. You can find a list of libraries at https://oauth.net/code/
 //
-// The Ory SDK is not yet able to this endpoint properly.
+// This endpoint should not be used via the Ory SDK and is only included for technical reasons.
+// Instead, use one of the libraries linked above.
 //
-//	Consumes:
-//	- application/x-www-form-urlencoded
+// Consumes:
+// - application/x-www-form-urlencoded
 //
-//	Schemes: http, https
+// Schemes: http, https
 //
-//	Responses:
-//	  302: emptyResponse
-//	  default: errorOAuth2
+// Responses:
+//
+//	302: emptyResponse
+//	default: errorOAuth2
 func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 

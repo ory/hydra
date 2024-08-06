@@ -147,10 +147,18 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []
 		Order("id")
 
 	if filters.Name != "" {
-		query.Where("client_name = ?", filters.Name)
+		stmt := "client_name = ?"
+		if filters.Name.IsNegated() {
+			stmt = "client_name != ?"
+		}
+		query.Where(stmt, filters.Name.Value())
 	}
 	if filters.Owner != "" {
-		query.Where("owner = ?", filters.Owner)
+		stmt := "owner = ?"
+		if filters.Owner.IsNegated() {
+			stmt = "owner != ?"
+		}
+		query.Where(stmt, filters.Owner.Value())
 	}
 
 	if err := query.All(&cs); err != nil {

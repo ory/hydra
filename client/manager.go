@@ -5,6 +5,7 @@ package client
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ory/fosite"
 )
@@ -21,11 +22,24 @@ type Filter struct {
 
 	// The name of the clients to filter by.
 	// in: query
-	Name string `json:"client_name"`
+	Name field `json:"client_name"`
 
 	// The owner of the clients to filter by.
 	// in: query
-	Owner string `json:"owner"`
+	Owner field `json:"owner"`
+}
+
+type field string
+
+func (f field) Value() string {
+	if f.IsNegated() {
+		return string(f[2:])
+	}
+	return string(f)
+}
+
+func (f field) IsNegated() bool {
+	return strings.HasPrefix(string(f), "!=")
 }
 
 type Manager interface {

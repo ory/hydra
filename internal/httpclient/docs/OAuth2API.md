@@ -960,8 +960,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **pageSize** | **int64** | Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to 250]
  **pageToken** | **string** | Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination). | [default to &quot;1&quot;]
- **clientName** | **string** | The name of the clients to filter by. | 
- **owner** | **string** | The owner of the clients to filter by. | 
+ **clientName** | **string** | The name of the clients to filter by. Prefix with "!=" to filter with negative matching. | 
+ **owner** | **string** | The owner of the clients to filter by. Prefix with "!=" to filter with negative matching. | 
 
 ### Return type
 

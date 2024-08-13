@@ -49,7 +49,8 @@ func TestUnmarshalSession(t *testing.T) {
 				AuthenticationMethodsReferences:     []string{},
 				CodeHash:                            "",
 				Extra: map[string]interface{}{
-					"sid": "177e1f44-a1e9-415c-bfa3-8b62280b182d",
+					"sid":       "177e1f44-a1e9-415c-bfa3-8b62280b182d",
+					"timestamp": 1723546027,
 				},
 			},
 			Headers: &jwt.Headers{Extra: map[string]interface{}{
@@ -85,7 +86,7 @@ func TestUnmarshalSession(t *testing.T) {
 		snapshotx.SnapshotTExcept(t, &actual, nil)
 	})
 
-	t.Run("v1.11.9", func(t *testing.T) {
+	t.Run("v1.11.9" /* and later versions */, func(t *testing.T) {
 		var actual Session
 		require.NoError(t, json.Unmarshal(v1119Session, &actual))
 		assertx.EqualAsJSON(t, expect, &actual)

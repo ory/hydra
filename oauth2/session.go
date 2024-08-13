@@ -4,22 +4,21 @@
 package oauth2
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"time"
 
+	jjson "github.com/go-jose/go-jose/v3/json"
+	"github.com/mohae/deepcopy"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-
-	"github.com/mohae/deepcopy"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
-
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/stringslice"
 )
@@ -60,25 +59,25 @@ func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, 
 }
 
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
-	//a slice of claims that are reserved and should not be overridden
-	var reservedClaims = []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
+	// a slice of claims that are reserved and should not be overridden
+	reservedClaims := []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
 
-	//remove any reserved claims from the custom claims
+	// remove any reserved claims from the custom claims
 	allowedClaimsFromConfigWithoutReserved := stringslice.Filter(s.AllowedTopLevelClaims, func(s string) bool {
 		return stringslice.Has(reservedClaims, s)
 	})
 
-	//our new extra map which will be added to the jwt
-	var topLevelExtraWithMirrorExt = map[string]interface{}{}
+	// our new extra map which will be added to the jwt
+	topLevelExtraWithMirrorExt := map[string]interface{}{}
 
-	//setting every allowed claim top level in jwt with respective value
+	// setting every allowed claim top level in jwt with respective value
 	for _, allowedClaim := range allowedClaimsFromConfigWithoutReserved {
 		if cl, ok := s.Extra[allowedClaim]; ok {
 			topLevelExtraWithMirrorExt[allowedClaim] = cl
 		}
 	}
 
-	//for every other claim that was already reserved and for mirroring, add original extra under "ext"
+	// for every other claim that was already reserved and for mirroring, add original extra under "ext"
 	if s.MirrorTopLevelClaims {
 		topLevelExtraWithMirrorExt["ext"] = s.Extra
 	}
@@ -86,7 +85,7 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	claims := &jwt.JWTClaims{
 		Subject: s.Subject,
 		Issuer:  s.DefaultSession.Claims.Issuer,
-		//set our custom extra map as claims.Extra
+		// set our custom extra map as claims.Extra
 		Extra:     topLevelExtraWithMirrorExt,
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
@@ -185,8 +184,11 @@ func (s *Session) UnmarshalJSON(original []byte) (err error) {
 		}
 	}
 
+	// https://github.com/go-jose/go-jose/issues/144
+	dec := jjson.NewDecoder(bytes.NewReader(transformed))
+	dec.SetNumberType(jjson.UnmarshalIntOrFloat)
 	type t Session
-	if err := json.Unmarshal(transformed, (*t)(s)); err != nil {
+	if err := dec.Decode((*t)(s)); err != nil {
 		return errors.WithStack(err)
 	}
 

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-08-12)](#000-2024-08-12)
+- [0.0.0 (2024-08-14)](#000-2024-08-14)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
@@ -712,7 +712,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-08-12)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-08-14)
 ## Breaking Changes
 
 Deleting consents no longer returns 404 in certain edge cases but instead always 204.
@@ -720,6 +720,15 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 
 
 ### Bug Fixes
+
+* Broken JSON round-tripping for custom claims ([b36b701](https://github.com/ory/hydra/commit/b36b701026d7d7324b0b04529f134d3ed1eb9eb7)):
+
+    Adding custom claims with numerical types (think JavaScript Number) previously did not
+    round-trip through Hydra correctly. For example, passing UNIX timestamps in custom claims
+    would end up as floating points in exponential notation in the final token. That, in turn,
+    confused or broke downstream consumers of the token, including Kratos.
+    
+    Ref https://github.com/go-jose/go-jose/issues/144
 
 * Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
 * Do not iteratively delete records ([#3766](https://github.com/ory/hydra/issues/3766)) ([5ef20a2](https://github.com/ory/hydra/commit/5ef20a2a2bc91ccde79517667ae4bf4a36c833ba)):
@@ -735,6 +744,7 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
     
     
 
+* Incorrect context passthru ([fa50e3e](https://github.com/ory/hydra/commit/fa50e3e999ef962fb522dfa2f9a1f6ffa20848bf))
 * Incorrect indices ([#3778](https://github.com/ory/hydra/issues/3778)) ([cb0004b](https://github.com/ory/hydra/commit/cb0004b67b2818b3bca397e98c1bb5bcbb62296f))
 * Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
 * Use docker compose rather than docker-compose ([#3815](https://github.com/ory/hydra/issues/3815)) ([ffdfb73](https://github.com/ory/hydra/commit/ffdfb7362a8de6f6f0608879bf034602f01ea250))

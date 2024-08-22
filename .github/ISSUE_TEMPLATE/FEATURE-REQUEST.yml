@@ -32,7 +32,7 @@ body:
             "I have joined the [Ory Community Slack](https://slack.ory.sh)."
         - label:
             "I am signed up to the [Ory Security Patch
-            Newsletter](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)."
+            Newsletter](https://www.ory.sh/l/sign-up-newsletter)."
     id: checklist
     type: checkboxes
   - attributes:

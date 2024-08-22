@@ -64,7 +64,7 @@ won't clash with Ory Hydra's direction. A great way to do this is via
   [a Contributors License Agreement?](https://cla-assistant.io/ory/hydra)
 
 - I would like updates about new versions of Ory Hydra.
-  [How are new releases announced?](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)
+  [How are new releases announced?](https://www.ory.sh/l/sign-up-newsletter)
 
 ## How can I contribute?
 

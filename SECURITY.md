@@ -48,7 +48,6 @@ SLAs and process.
 
 ## Reporting a Vulnerability
 
-If you suspect a security vulnerability, please report it to
-**[security@ory.sh](mailto:security@ory.sh)**. We will respond within 48 hours.
-If confirmed, we will work to release a patch as soon as possible, typically
-within a few days depending on the issue's complexity.
+Please head over to our
+[security policy](https://www.ory.sh/docs/ecosystem/security) to learn more
+about reporting security vulnerabilities.

@@ -8,6 +8,9 @@
 This security policy outlines the security support commitments for different
 types of Ory users.
 
+[Get in touch](https://www.ory.sh/contact/) to learn more about Ory's security
+SLAs and process.
+
 ## Apache 2.0 License Users
 
 - **Security SLA:** No security Service Level Agreement (SLA) is provided.
@@ -42,9 +45,6 @@ types of Ory users.
 - **Release Schedule:** Updates are automatically deployed to Ory Network as
   soon as vulnerabilities are resolved, adhering to the above SLA.
 - **Version Support:** Ory Network always runs the most current version.
-
-[Get in touch](https://www.ory.sh/contact/) to learn more about Ory's security
-SLAs and process.
 
 ## Reporting a Vulnerability
 

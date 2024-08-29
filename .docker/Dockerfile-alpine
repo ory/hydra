@@ -1,8 +1,9 @@
 FROM alpine:3.20
 
 RUN addgroup -S ory; \
-    adduser -S ory -G ory -D -H -s /bin/nologin
-RUN apk --no-cache --upgrade add ca-certificates
+    adduser -S ory -G ory -D -H -s /bin/nologin && \
+    apk upgrade --no-cache && \
+    apk add --no-cache --upgrade ca-certificates
 
 COPY hydra /usr/bin/hydra
 

@@ -10,7 +10,8 @@ FROM alpine:3.20
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
     chown -R ory:ory /home/ory && \
-    apk --no-cache --upgrade --latest add ca-certificates sqlite
+    apk upgrade --no-cache && \
+    apk add --no-cache --upgrade --latest ca-certificates sqlite
 
 WORKDIR /home/ory
 

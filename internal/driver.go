@@ -76,15 +76,15 @@ func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 }
 
 func ConnectToMySQL(t testing.TB) string {
-	return dockertest.RunTestMySQLWithVersion(t, "8.0.26")
+	return dockertest.RunTestMySQLWithVersion(t, "8.0")
 }
 
 func ConnectToPG(t testing.TB) string {
-	return dockertest.RunTestPostgreSQLWithVersion(t, "11.8")
+	return dockertest.RunTestPostgreSQLWithVersion(t, "16")
 }
 
 func ConnectToCRDB(t testing.TB) string {
-	return dockertest.RunTestCockroachDBWithVersion(t, "v24.1.0")
+	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v24.1")
 }
 
 func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {

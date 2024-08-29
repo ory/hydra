@@ -96,7 +96,7 @@ function dump_cockroach {
 	sleep 4
 	go run . migrate sql "$TEST_DATABASE_COCKROACHDB" --yes > /dev/null || true
 	hydra::util::parse-connection-url "${TEST_DATABASE_COCKROACHDB}"
-	docker run --rm --net=host -it cockroachdb/cockroach:v20.2.6 dump --dump-all --dump-mode=schema --insecure --user="${DB_USER}" --host="${DB_HOST}" --port="${DB_PORT}"
+	docker run --rm --net=host -it cockroachdb/cockroach:latest-v24.1 dump --dump-all --dump-mode=schema --insecure --user="${DB_USER}" --host="${DB_HOST}" --port="${DB_PORT}"
 }
 
 function dump_sqlite {

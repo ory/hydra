@@ -49,7 +49,7 @@ jobs:
       - sdk-generate
     services:
       postgres:
-        image: postgres:11.8
+        image: postgres:16
         env:
           POSTGRES_DB: postgres
           POSTGRES_PASSWORD: test
@@ -57,7 +57,7 @@ jobs:
         ports:
           - 5432:5432
       mysql:
-        image: mysql:8.0.26
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: test
         ports:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:v24.1.0 start-single-node --insecure
+            cockroachdb/cockroach:latest-v24.1 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
@@ -150,7 +150,7 @@ jobs:
         args: ["", "--jwt"]
     services:
       postgres:
-        image: postgres:11.8
+        image: postgres:16
         env:
           POSTGRES_DB: postgres
           POSTGRES_PASSWORD: test
@@ -158,7 +158,7 @@ jobs:
         ports:
           - 5432:5432
       mysql:
-        image: mysql:8.0.26
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: test
         ports:
@@ -170,7 +170,7 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:v24.1.0 start-single-node --insecure
+            cockroachdb/cockroach:latest-v24.1 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master

@@ -849,24 +849,24 @@ It is recommended to use the make file to run your tests using `make quicktest`
 **Please note**:
 
 All tests run against a sqlite in-memory database, thus it is required to use
-the `-tags sqlite,json1` build tag.
+the `-tags sqlite` build tag.
 
 Short tests run fairly quickly. You can either test all of the code at once:
 
 ```shell script
-go test -v -failfast -short -tags sqlite,json1 ./...
+go test -v -failfast -short -tags sqlite ./...
 ```
 
 or test just a specific module:
 
 ```shell script
-go test -v -failfast -short -tags sqlite,json1 ./client
+go test -v -failfast -short -tags sqlite ./client
 ```
 
 or a specific test:
 
 ```shell script
-go test -v -failfast -short -tags sqlite,json1 -run ^TestName$ ./...
+go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
 ```
 
 ##### Regular Tests

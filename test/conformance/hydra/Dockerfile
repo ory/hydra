@@ -18,7 +18,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -tags sqlite,json1 -o /usr/bin/hydra
+RUN go build -tags sqlite -o /usr/bin/hydra
 
 VOLUME /var/lib/sqlite
 

@@ -53,7 +53,7 @@ lint: .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
 .PHONY: test
 test: .bin/go-acc
 	make test-resetdb
-	source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite,json1,sqlite_omit_load_extension
+	source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension
 	docker rm -f hydra_test_database_mysql
 	docker rm -f hydra_test_database_postgres
 	docker rm -f hydra_test_database_cockroach
@@ -84,7 +84,7 @@ e2e: node_modules test-resetdb
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-	go test -failfast -short -tags sqlite,json1,sqlite_omit_load_extension ./...
+	go test -failfast -short -tags sqlite,sqlite_omit_load_extension ./...
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
@@ -92,7 +92,7 @@ quicktest-hsm:
 
 .PHONY: refresh
 refresh:
-	UPDATE_SNAPSHOTS=true go test -failfast -short -tags sqlite,json1,sqlite_omit_load_extension ./...
+	UPDATE_SNAPSHOTS=true go test -failfast -short -tags sqlite,sqlite_omit_load_extension ./...
 
 authors:  # updates the AUTHORS file
 	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
@@ -178,14 +178,14 @@ install-stable:
 	HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 	git checkout $$HYDRA_LATEST
 	go install \
-		-tags sqlite,json1,sqlite_omit_load_extension \
+		-tags sqlite,sqlite_omit_load_extension \
 		-ldflags "-X github.com/ory/hydra/v2/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/v2/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/v2/driver/config.Commit=`git rev-parse HEAD`" \
 		.
 	git checkout master
 
 .PHONY: install
 install:
-	go install -tags sqlite,json1,sqlite_omit_load_extension .
+	go install -tags sqlite,sqlite_omit_load_extension .
 
 .PHONY: post-release
 post-release: .bin/yq

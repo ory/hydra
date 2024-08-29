@@ -26,7 +26,7 @@ if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 
-(cd ../../; go build -tags sqlite,json1 -o test/e2e/hydra . )
+(cd ../../; go build -tags sqlite -o test/e2e/hydra . )
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then

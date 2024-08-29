@@ -14,7 +14,7 @@ ENV CGO_ENABLED=1
 RUN go mod download
 
 COPY . .
-RUN go build -ldflags="-extldflags=-static" -tags sqlite,json1,sqlite_omit_load_extension -o /usr/bin/hydra
+RUN go build -ldflags="-extldflags=-static" -tags sqlite,sqlite_omit_load_extension -o /usr/bin/hydra
 
 #########################
 

@@ -9,17 +9,16 @@ RUN apt-get update && apt-get upgrade -y &&\
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 
-ENV GO111MODULE on
-ENV CGO_ENABLED 1
+ENV CGO_ENABLED=1
 
 RUN go mod download
 
 COPY . .
-RUN go build -tags sqlite,json1 -o /usr/bin/hydra
+RUN go build -ldflags="-extldflags=-static" -tags sqlite,json1,sqlite_omit_load_extension -o /usr/bin/hydra
 
 #########################
 
-FROM gcr.io/distroless/base-nossl-debian12:nonroot AS runner
+FROM gcr.io/distroless/static-debian12:nonroot AS runner
 
 COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra

@@ -18,7 +18,7 @@ COPY . .
 ###############################
 
 FROM builder as build-hydra
-RUN go build -tags sqlite,json1,hsm -o /usr/bin/hydra
+RUN go build -tags sqlite,hsm -o /usr/bin/hydra
 
 ###############################
 

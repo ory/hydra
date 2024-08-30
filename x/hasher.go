@@ -66,7 +66,7 @@ func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
 }
 
 func (b *Hasher) Compare(ctx context.Context, hash, data []byte) error {
-	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
+	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Compare")
 	defer span.End()
 
 	if err := hasherx.Compare(ctx, data, hash); err != nil {

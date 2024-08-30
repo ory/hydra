@@ -124,7 +124,7 @@ func (m ManagerStrategy) GetKeySet(ctx context.Context, set string) (*jose.JSONW
 }
 
 func (m ManagerStrategy) DeleteKey(ctx context.Context, set, kid string) error {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.DeleteKey")
 	defer span.End()
 	attrs := map[string]string{
 		"set": set,

@@ -21,7 +21,7 @@ import (
 var _ jwk.Manager = &Persister{}
 
 func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKey")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKeySet")
 	defer span.End()
 
 	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
@@ -60,7 +60,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 }
 
 func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKeySet")
 	defer span.End()
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {

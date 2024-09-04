@@ -112,11 +112,7 @@ func TestJWKSDK(t *testing.T) {
 				require.Len(t, resultKeys.Keys, 1)
 				assert.Equal(t, expectedKid, resultKeys.Keys[0].Kid)
 				assert.Equal(t, "RS256", resultKeys.Keys[0].Alg)
-			} else {
-				require.Len(t, resultKeys.Keys, 1)
-				assert.Equal(t, expectedKid, resultKeys.Keys[0].Kid)
-				assert.Equal(t, "RS256", resultKeys.Keys[0].Alg)
-			}
+			} 
 		})
 
 		t.Run("UpdateJwkSet", func(t *testing.T) {

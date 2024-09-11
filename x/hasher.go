@@ -8,8 +8,11 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/hasherx"
+	"github.com/ory/x/otelx"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/x/errorsx"
 )
@@ -51,11 +54,14 @@ func NewHasher(c config) *Hasher {
 	}
 }
 
-func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
-	defer span.End()
+func (b *Hasher) Hash(ctx context.Context, data []byte) (_ []byte, err error) {
+	h := b.c.GetHasherAlgorithm(ctx)
 
-	switch b.c.GetHasherAlgorithm(ctx) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash",
+		trace.WithAttributes(attribute.Stringer("algorithm", h)))
+	defer otelx.End(span, &err)
+
+	switch h {
 	case HashAlgorithmBCrypt:
 		return b.bcrypt.Generate(ctx, data)
 	case HashAlgorithmPBKDF2:
@@ -65,9 +71,9 @@ func (b *Hasher) Hash(ctx context.Context, data []byte) ([]byte, error) {
 	}
 }
 
-func (b *Hasher) Compare(ctx context.Context, hash, data []byte) error {
-	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Compare")
-	defer span.End()
+func (b *Hasher) Compare(ctx context.Context, hash, data []byte) (err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Compare")
+	defer otelx.End(span, &err)
 
 	if err := hasherx.Compare(ctx, data, hash); err != nil {
 		return errorsx.WithStack(err)

@@ -9,8 +9,11 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/otelx"
 
 	"github.com/pkg/errors"
 
@@ -20,9 +23,13 @@ import (
 
 var _ jwk.Manager = &Persister{}
 
-func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKeySet")
-	defer span.End()
+func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKeySet",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", kid),
+			attribute.String("alg", alg)))
+	defer otelx.End(span, &err)
 
 	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
 	if err != nil {
@@ -37,9 +44,13 @@ func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg,
 	return keys, nil
 }
 
-func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey")
-	defer span.End()
+func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", key.KeyID)))
+
+	defer otelx.End(span, &err)
 
 	out, err := json.Marshal(key)
 	if err != nil {
@@ -59,9 +70,9 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 	}))
 }
 
-func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKeySet")
-	defer span.End()
+func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKeySet", trace.WithAttributes(attribute.String("set", set)))
+	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		for _, key := range keys.Keys {
@@ -89,9 +100,12 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 }
 
 // UpdateKey updates or creates the key.
-func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKey")
-	defer span.End()
+func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKey",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", key.KeyID)))
+	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
@@ -105,9 +119,9 @@ func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWeb
 }
 
 // UpdateKeySet updates or creates the key set.
-func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKeySet")
-	defer span.End()
+func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKeySet", trace.WithAttributes(attribute.String("set", set)))
+	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := p.DeleteKeySet(ctx, set); err != nil {
@@ -120,9 +134,12 @@ func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.J
 	})
 }
 
-func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKey")
-	defer span.End()
+func (p *Persister) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKey",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", kid)))
+	defer otelx.End(span, &err)
 
 	var j jwk.SQLData
 	if err := p.QueryWithNetwork(ctx).
@@ -148,8 +165,8 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 }
 
 func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONWebKeySet, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet")
-	defer span.End()
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet", trace.WithAttributes(attribute.String("set", set)))
+	defer otelx.End(span, &err)
 
 	var js jwk.SQLDataRows
 	if err := p.QueryWithNetwork(ctx).
@@ -162,18 +179,21 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONW
 	return js.ToJWK(ctx, p.r)
 }
 
-func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKey")
-	defer span.End()
+func (p *Persister) DeleteKey(ctx context.Context, set, kid string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKey",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", kid)))
+	defer otelx.End(span, &err)
 
-	err := p.QueryWithNetwork(ctx).Where("sid=? AND kid=?", set, kid).Delete(&jwk.SQLData{})
+	err = p.QueryWithNetwork(ctx).Where("sid=? AND kid=?", set, kid).Delete(&jwk.SQLData{})
 	return sqlcon.HandleError(err)
 }
 
-func (p *Persister) DeleteKeySet(ctx context.Context, set string) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKeySet")
-	defer span.End()
+func (p *Persister) DeleteKeySet(ctx context.Context, set string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKeySet", trace.WithAttributes(attribute.String("set", set)))
+	defer otelx.End(span, &err)
 
-	err := p.QueryWithNetwork(ctx).Where("sid=?", set).Delete(&jwk.SQLData{})
+	err = p.QueryWithNetwork(ctx).Where("sid=?", set).Delete(&jwk.SQLData{})
 	return sqlcon.HandleError(err)
 }

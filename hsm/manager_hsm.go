@@ -34,6 +34,8 @@ import (
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const tracingComponent = "github.com/ory/hydra/hsm"
@@ -58,23 +60,21 @@ func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	}
 }
 
-func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GenerateAndPersistKeySet")
-	defer span.End()
-	attrs := map[string]string{
-		"set": set,
-		"kid": kid,
-		"alg": alg,
-		"use": use,
-	}
-	span.SetAttributes(otelx.StringAttrs(attrs)...)
+func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GenerateAndPersistKeySet",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", kid),
+			attribute.String("alg", alg),
+			attribute.String("use", use)))
+	defer otelx.End(span, &err)
 
 	m.Lock()
 	defer m.Unlock()
 
 	set = m.prefixKeySet(set)
 
-	err := m.deleteExistingKeySet(set)
+	err = m.deleteExistingKeySet(set)
 	if err != nil {
 		return nil, err
 	}
@@ -119,14 +119,10 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 	}
 }
 
-func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKey")
-	defer span.End()
-	attrs := map[string]string{
-		"set": set,
-		"kid": kid,
-	}
-	span.SetAttributes(otelx.StringAttrs(attrs)...)
+func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKey",
+		trace.WithAttributes(attribute.String("set", set), attribute.String("kid", kid)))
+	defer otelx.End(span, &err)
 
 	m.RLock()
 	defer m.RUnlock()
@@ -150,13 +146,9 @@ func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 	return createKeySet(keyPair, id, alg, use)
 }
 
-func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
-	defer span.End()
-	attrs := map[string]string{
-		"set": set,
-	}
-	span.SetAttributes(otelx.StringAttrs(attrs)...)
+func (m *KeyManager) GetKeySet(ctx context.Context, set string) (_ *jose.JSONWebKeySet, err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet", trace.WithAttributes(attribute.String("set", set)))
+	otelx.End(span, &err)
 
 	m.RLock()
 	defer m.RUnlock()
@@ -186,14 +178,12 @@ func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKe
 	}, nil
 }
 
-func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKey")
-	defer span.End()
-	attrs := map[string]string{
-		"set": set,
-		"kid": kid,
-	}
-	span.SetAttributes(otelx.StringAttrs(attrs)...)
+func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) (err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKey",
+		trace.WithAttributes(
+			attribute.String("set", set),
+			attribute.String("kid", kid)))
+	defer otelx.End(span, &err)
 
 	m.Lock()
 	defer m.Unlock()
@@ -216,13 +206,9 @@ func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
 	return nil
 }
 
-func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) error {
-	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKeySet")
-	defer span.End()
-	attrs := map[string]string{
-		"set": set,
-	}
-	span.SetAttributes(otelx.StringAttrs(attrs)...)
+func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) (err error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.DeleteKeySet", trace.WithAttributes(attribute.String("set", set)))
+	defer otelx.End(span, &err)
 
 	m.Lock()
 	defer m.Unlock()

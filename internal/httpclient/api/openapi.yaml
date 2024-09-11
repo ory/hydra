@@ -201,7 +201,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -402,7 +402,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -549,7 +549,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1008,7 +1008,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1062,7 +1062,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1166,9 +1166,9 @@ paths:
           type: string
         style: form
       - description: |-
-          OAuth 2.0 Subject
+          Login Session ID
 
-          The subject to revoke authentication sessions for.
+          The login session to revoke.
         explode: true
         in: query
         name: sid
@@ -1180,7 +1180,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1236,7 +1236,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1342,7 +1342,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1489,7 +1489,7 @@ paths:
         "302":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1572,7 +1572,7 @@ paths:
         "204":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1698,7 +1698,7 @@ paths:
         "200":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
         default:
           content:
             application/json:
@@ -1725,7 +1725,7 @@ paths:
         "302":
           description: |-
             Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
+            typically 204.
       summary: OpenID Connect Front- and Back-channel Enabled Logout
       tags:
       - oidc
@@ -1816,7 +1816,7 @@ components:
     emptyResponse:
       description: |-
         Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-        typically 201.
+        typically 204.
     errorOAuth2BadRequest:
       content:
         application/json:

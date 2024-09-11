@@ -3021,7 +3021,7 @@ func (r ApiRevokeOAuth2LoginSessionsRequest) Subject(subject string) ApiRevokeOA
 	return r
 }
 
-// OAuth 2.0 Subject  The subject to revoke authentication sessions for.
+// Login Session ID  The login session to revoke.
 func (r ApiRevokeOAuth2LoginSessionsRequest) Sid(sid string) ApiRevokeOAuth2LoginSessionsRequest {
 	r.sid = &sid
 	return r

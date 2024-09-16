@@ -1,0 +1,10 @@
+{
+  "challenge": "challenge-20240916105610000001",
+  "subject": "subject-0014",
+  "sid": "session_id-0014",
+  "request_url": "http://request/0014",
+  "rp_initiated": true,
+  "expires_at": "2022-02-15T22:20:20Z",
+  "requested_at": "2022-02-15T22:20:20Z",
+  "client": null
+}

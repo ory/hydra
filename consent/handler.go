@@ -243,9 +243,9 @@ type revokeOAuth2LoginSessions struct {
 	// in: query
 	Subject string `json:"subject"`
 
-	// OAuth 2.0 Subject
+	// Login Session ID
 	//
-	// The subject to revoke authentication sessions for.
+	// The login session to revoke.
 	//
 	// in: query
 	SessionID string `json:"sid"`

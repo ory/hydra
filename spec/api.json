@@ -2,7 +2,7 @@
   "components": {
     "responses": {
       "emptyResponse": {
-        "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+        "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 204."
       },
       "errorOAuth2BadRequest": {
         "content": {
@@ -3017,7 +3017,7 @@
             }
           },
           {
-            "description": "OAuth 2.0 Subject\n\nThe subject to revoke authentication sessions for.",
+            "description": "Login Session ID\n\nThe login session to revoke.",
             "in": "query",
             "name": "sid",
             "schema": {

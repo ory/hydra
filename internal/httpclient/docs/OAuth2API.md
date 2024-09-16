@@ -1620,7 +1620,7 @@ import (
 
 func main() {
 	subject := "subject_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
-	sid := "sid_example" // string | OAuth 2.0 Subject  The subject to revoke authentication sessions for. (optional)
+	sid := "sid_example" // string | Login Session ID  The login session to revoke. (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -1644,7 +1644,7 @@ Other parameters are passed through a pointer to a apiRevokeOAuth2LoginSessionsR
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **subject** | **string** | OAuth 2.0 Subject  The subject to revoke authentication sessions for. | 
- **sid** | **string** | OAuth 2.0 Subject  The subject to revoke authentication sessions for. | 
+ **sid** | **string** | Login Session ID  The login session to revoke. | 
 
 ### Return type
 

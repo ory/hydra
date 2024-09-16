@@ -860,6 +860,8 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 			Subject:     session.Subject,
 			SessionID:   session.ID,
 			Verifier:    uuid.New(),
+			RequestedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second)),
+			ExpiresAt:   sqlxx.NullTime(time.Now().UTC().Round(time.Second).Add(s.c.ConsentRequestMaxAge(ctx))),
 			RPInitiated: false,
 
 			// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()

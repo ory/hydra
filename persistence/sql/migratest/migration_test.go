@@ -170,7 +170,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
 					lrs := []flow.LogoutRequest{}
 					c.All(&lrs)
-					require.Equal(t, 6, len(lrs))
+					require.Equal(t, 7, len(lrs))
 
 					for _, s := range lrs {
 						testhelpersuuid.AssertUUID(t, s.NID)

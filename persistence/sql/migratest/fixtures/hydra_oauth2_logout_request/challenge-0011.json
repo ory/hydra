@@ -4,5 +4,7 @@
   "sid": "session_id-0011",
   "request_url": "http://request/0011",
   "rp_initiated": true,
+  "expires_at": null,
+  "requested_at": null,
   "client": null
 }

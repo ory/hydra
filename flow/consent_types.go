@@ -507,6 +507,8 @@ type LogoutRequest struct {
 	Accepted              bool           `json:"-" db:"accepted"`
 	Rejected              bool           `db:"rejected" json:"-"`
 	ClientID              sql.NullString `json:"-" db:"client_id"`
+	ExpiresAt             sqlxx.NullTime `json:"expires_at" db:"expires_at"`
+	RequestedAt           sqlxx.NullTime `json:"requested_at" db:"requested_at"`
 	Client                *client.Client `json:"client" db:"-"`
 }
 

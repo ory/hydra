@@ -735,6 +735,13 @@ WHERE nid = ?
 		return nil, err
 	}
 
+	if expiry := time.Time(lr.ExpiresAt);
+	// If the expiry is unset, we are in a legacy use case (allow logout).
+	// TODO: Remove this in the future.
+	!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
+		return nil, errorsx.WithStack(flow.ErrorLogoutFlowExpired)
+	}
+
 	return &lr, nil
 }
 

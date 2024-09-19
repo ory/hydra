@@ -648,6 +648,27 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 	})
+	t.Run("case=perform flow with prompt=create", func(t *testing.T) {
+		c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+
+		regUI := httptest.NewServer(acceptLoginHandler(t, c, subject, nil))
+		t.Cleanup(regUI.Close)
+		reg.Config().MustSet(ctx, config.KeyRegistrationURL, regUI.URL)
+
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			nil,
+			acceptConsentHandler(t, c, subject, nil))
+
+		code, _ := getAuthorizeCode(t, conf, nil,
+			oauth2.SetAuthURLParam("prompt", "create"),
+			oauth2.SetAuthURLParam("nonce", nonce))
+		require.NotEmpty(t, code)
+
+		token, err := conf.Exchange(context.Background(), code)
+		require.NoError(t, err)
+
+		assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
+	})
 
 	t.Run("case=perform flow with audience", func(t *testing.T) {
 		expectAud := "https://api.ory.sh/"

@@ -359,9 +359,10 @@ func (rt *router) loginGET(w http.ResponseWriter, r *http.Request, _ httprouter.
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer raw.Body.Close() // to satisfy linter
 
 	if rt.skip && req.GetSkip() {
-		req, _, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
+		req, res, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
 			LoginChallenge(req.Challenge).
 			AcceptOAuth2LoginRequest(openapi.AcceptOAuth2LoginRequest{Subject: req.Subject}).
 			Execute()
@@ -369,6 +370,7 @@ func (rt *router) loginGET(w http.ResponseWriter, r *http.Request, _ httprouter.
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 		return
 	}
@@ -397,7 +399,7 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter
 		return
 	}
 	if r.FormValue("revoke-consents") == "on" {
-		_, err := rt.cl.OAuth2API.RevokeOAuth2ConsentSessions(r.Context()).
+		res, err := rt.cl.OAuth2API.RevokeOAuth2ConsentSessions(r.Context()).
 			Subject(r.FormValue("username")).
 			All(true).
 			Execute()
@@ -406,11 +408,12 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter
 		} else {
 			fmt.Fprintln(rt.cmd.ErrOrStderr(), "Revoked all previous consents")
 		}
+		defer res.Body.Close() // to satisfy linter
 	}
 	switch r.FormValue("action") {
 	case "accept":
 
-		req, _, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
+		req, res, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
 			LoginChallenge(r.FormValue("ls")).
 			AcceptOAuth2LoginRequest(openapi.AcceptOAuth2LoginRequest{
 				Subject:     r.FormValue("username"),
@@ -424,14 +427,16 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	case "deny":
-		req, _, err := rt.cl.OAuth2API.RejectOAuth2LoginRequest(r.Context()).LoginChallenge(r.FormValue("ls")).Execute()
+		req, res, err := rt.cl.OAuth2API.RejectOAuth2LoginRequest(r.Context()).LoginChallenge(r.FormValue("ls")).Execute()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	default:
@@ -447,9 +452,10 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httproute
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer raw.Body.Close() // to satisfy linter
 
 	if rt.skip && req.GetSkip() {
-		req, _, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
+		req, res, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(req.Challenge).
 			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
 				GrantScope:               req.GetRequestedScope(),
@@ -469,6 +475,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httproute
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 		return
 	}
@@ -487,6 +494,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httproute
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer raw.Body.Close() // to satisfy linter
 	prettyPrevConsent, err := prettyJSON(raw.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -518,7 +526,7 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 	switch r.FormValue("action") {
 	case "accept":
-		req, _, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
+		req, res, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(r.FormValue("cs")).
 			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
 				GrantScope:               r.Form["scope"],
@@ -538,16 +546,18 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprout
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	case "deny":
-		req, _, err := rt.cl.OAuth2API.RejectOAuth2ConsentRequest(r.Context()).
+		req, res, err := rt.cl.OAuth2API.RejectOAuth2ConsentRequest(r.Context()).
 			ConsentChallenge(r.FormValue("cs")).
 			Execute()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		defer res.Body.Close() // to satisfy linter
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	default:

@@ -40,7 +40,7 @@
         },
         "mode": {
           "type": "integer",
-          "description": "Mode of unix socket in numeric form",
+          "description": "Mode of unix socket in numeric form, base 10.",
           "default": 493,
           "minimum": 0,
           "maximum": 511

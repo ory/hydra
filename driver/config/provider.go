@@ -6,6 +6,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -134,15 +135,34 @@ func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) x.HashAlgorith
 }
 
 func (p *DefaultProvider) HasherBcryptConfig(ctx context.Context) *hasherx.BCryptConfig {
+	var cost uint32
+	costInt := p.GetBCryptCost(ctx)
+	if costInt < 0 {
+		cost = 10
+	} else if costInt > math.MaxUint32 {
+		cost = math.MaxUint32
+	} else {
+		cost = uint32(costInt)
+	}
 	return &hasherx.BCryptConfig{
-		Cost: uint32(p.GetBCryptCost(ctx)),
+		Cost: cost,
 	}
 }
 
 func (p *DefaultProvider) HasherPBKDF2Config(ctx context.Context) *hasherx.PBKDF2Config {
+	var iters uint32
+	itersInt := p.getProvider(ctx).Int(KeyPBKDF2Iterations)
+	if itersInt < 1 {
+		iters = 1
+	} else if itersInt > math.MaxUint32 {
+		iters = math.MaxUint32
+	} else {
+		iters = uint32(itersInt)
+	}
+
 	return &hasherx.PBKDF2Config{
 		Algorithm:  "sha256",
-		Iterations: uint32(p.getProvider(ctx).Int(KeyPBKDF2Iterations)),
+		Iterations: iters,
 		SaltLength: 16,
 		KeyLength:  32,
 	}

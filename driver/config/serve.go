@@ -6,7 +6,8 @@ package config
 import (
 	"context"
 	"fmt"
-	"os"
+	"io/fs"
+	"math"
 	"strings"
 
 	"github.com/ory/x/contextx"
@@ -63,10 +64,19 @@ func (p *DefaultProvider) ListenOn(iface ServeInterface) string {
 }
 
 func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPermission {
+	var mode fs.FileMode
+	modeInt := p.getProvider(contextx.RootContext).IntF(iface.Key(KeySuffixSocketMode), 0755)
+	if modeInt < 0 {
+		mode = 0
+	} else if modeInt > math.MaxUint32 {
+		mode = 0777
+	} else {
+		mode = fs.FileMode(modeInt)
+	}
 	return &configx.UnixPermission{
 		Owner: p.getProvider(contextx.RootContext).String(iface.Key(KeySuffixSocketOwner)),
 		Group: p.getProvider(contextx.RootContext).String(iface.Key(KeySuffixSocketGroup)),
-		Mode:  os.FileMode(p.getProvider(contextx.RootContext).IntF(iface.Key(KeySuffixSocketMode), 0755)),
+		Mode:  mode,
 	}
 }
 

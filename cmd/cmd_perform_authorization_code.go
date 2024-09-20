@@ -4,18 +4,22 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	openapi "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/cmd/cliclient"
 
 	"github.com/pkg/errors"
@@ -29,14 +33,79 @@ import (
 
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
+	"github.com/ory/x/pointerx"
 	"github.com/ory/x/randx"
 	"github.com/ory/x/tlsx"
 	"github.com/ory/x/urlx"
 )
 
+var tokenUserLogin = template.Must(template.New("").Parse(`<html>
+<body>
+<h1>Login step</h1>
+<form action="/login" method="post">
+	<input type="hidden" name="ls" value="{{ .LoginChallenge }}">
+	<input type="text" name="username" value="Username" required>
+	<input type="checkbox" name="remember" checked>Remember login<br>
+	<input type="checkbox" name="revoke-consents">Revoke previous consents<br>
+	<button type="submit" name="action" value="accept">Submit</button>
+	<button type="submit" name="action" value="deny">Cancel</button>
+</form>
+{{ if .Skip }}
+	<b>user authenticated, could skip login UI.</b>
+{{ else }}
+	User unknown.
+{{ end }}
+<hr>
+<h2>Complete login request</h2>
+<pre>{{ .Raw }}</pre>
+</body>
+</html>`))
+
+var tokenUserConsent = template.Must(template.New("").Parse(`<html>
+<body>
+<h1>Consent step</h1>
+<form action="/consent" method="post">
+	<input type="hidden" name="cs" value="{{ .ConsentChallenge }}">
+	{{ if not .Audiences }}
+		No token audiences requested.
+	{{ else }}
+		<h2>Requested audiences:</h2>
+		<ul>
+		{{ range .Audiences }}
+			<li><input type="hidden" name="audience" value="{{ . }}">{{ . }}</li>
+		{{ end }}
+		</ul>
+	{{ end }}
+	{{ if not .Scopes }}
+		No scopes requested.
+	{{ else }}
+		<h2>Requested scopes:</h2>
+		{{ range .Scopes }}
+		<input type="checkbox" name="scope" value="{{ . }}" checked>{{ . }}<br>
+		{{ end }}
+	{{ end }}
+	<br>
+	<input type="checkbox" name="remember" checked>Remember consent<br>
+	<button type="submit" name="action" value="accept">Submit</button>
+	<button type="submit" name="action" value="deny">Cancel</button>
+</form>
+{{ if .Skip }}
+	<b>Consent established, could skip consent UI.</b>
+{{ else }}
+	No previous matching consent found, or client has requested re-consent.
+{{ end }}
+<hr>
+<h2>Previous consents for this login session ({{ .SessionID }})</h2>
+<pre>{{ .PreviousConsents }}</pre>
+<hr>
+<h2>Complete consent request</h2>
+<pre>{{ .Raw }}</pre>
+</body>
+</html>`))
+
 var tokenUserWelcome = template.Must(template.New("").Parse(`<html>
 <body>
-<h1>Welcome to the exemplary OAuth 2.0 Consumer!</h1>
+<h1>Welcome to the example OAuth 2.0 Consumer!</h1>
 <p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
     application and would use an <a href="https://oauth.net/code/">OAuth 2.0</a> or <a href="https://oauth.net/code/">OpenID
         Connect</a> library.</p>
@@ -76,8 +145,8 @@ func NewPerformAuthorizationCodeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "authorization-code",
 		Example: "{{ .CommandPath }} --client-id ... --client-secret ...",
-		Short:   "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
-		Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
+		Short:   "Example OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
+		Long: `Starts an example web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
 This command will help you to see if Ory Hydra has been configured properly.
 
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
@@ -90,7 +159,6 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			endpoint = cliclient.GetOAuth2URLOverride(cmd, endpoint)
 
-			ctx := context.WithValue(cmd.Context(), oauth2.HTTPClient, client)
 			isSSL := flagx.MustGetBool(cmd, "https")
 			port := flagx.MustGetInt(cmd, "port")
 			scopes := flagx.MustGetStringSlice(cmd, "scope")
@@ -101,6 +169,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 			tokenUrl := flagx.MustGetString(cmd, "token-url")
 			audience := flagx.MustGetStringSlice(cmd, "audience")
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
+			skip := flagx.MustGetBool(cmd, "skip")
 
 			clientID := flagx.MustGetString(cmd, "client-id")
 			if clientID == "" {
@@ -150,32 +219,28 @@ and success, unless if the --no-shutdown flag is provided.`,
 				nonce, err := randx.RuneSequence(24, randx.AlphaLower)
 				cmdx.Must(err, "Could not generate random state: %s", err)
 
-				authCodeURL := conf.AuthCodeURL(
-					state,
-					oauth2.SetAuthURLParam("audience", strings.Join(audience, " ")),
-					oauth2.SetAuthURLParam("nonce", string(nonce)),
-					oauth2.SetAuthURLParam("prompt", strings.Join(prompt, " ")),
-					oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
-				)
+				opts := []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("nonce", string(nonce))}
+				if len(audience) > 0 {
+					opts = append(opts, oauth2.SetAuthURLParam("audience", strings.Join(audience, " ")))
+				}
+				if len(prompt) > 0 {
+					opts = append(opts, oauth2.SetAuthURLParam("prompt", strings.Join(prompt, " ")))
+				}
+				if maxAge >= 0 {
+					opts = append(opts, oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)))
+				}
+
+				authCodeURL := conf.AuthCodeURL(state, opts...)
 				return authCodeURL, state
 			}
 			authCodeURL, state := generateAuthCodeURL()
-
-			if !flagx.MustGetBool(cmd, "no-open") {
-				_ = webbrowser.Open(serverLocation) // ignore errors
-			}
-
-			_, _ = fmt.Fprintln(os.Stderr, "Setting up home route on "+serverLocation)
-			_, _ = fmt.Fprintln(os.Stderr, "Setting up callback listener on "+serverLocation+"callback")
-			_, _ = fmt.Fprintln(os.Stderr, "Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
-			_, _ = fmt.Fprintf(os.Stderr, "If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 			r := httprouter.New()
 			var tlsc *tls.Config
 			if isSSL {
 				key, err := rsa.GenerateKey(rand.Reader, 2048)
 				if err != nil {
-					_, _ = fmt.Fprintf(os.Stderr, "Unable to generate RSA key pair: %s", err)
+					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Unable to generate RSA key pair: %s", err)
 					return cmdx.FailSilently(cmd)
 				}
 
@@ -196,14 +261,6 @@ and success, unless if the --no-shutdown flag is provided.`,
 				defer cancel()
 				_ = server.Shutdown(ctx)
 			}
-			var onDone = func() {
-				if !noShutdown {
-					go shutdown()
-				} else {
-					// regenerate because we don't want to shutdown and we don't want to reuse nonce & state
-					authCodeURL, state = generateAuthCodeURL()
-				}
-			}
 
 			r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
@@ -213,72 +270,38 @@ and success, unless if the --no-shutdown flag is provided.`,
 				http.Redirect(w, r, authCodeURL, http.StatusFound)
 			})
 
-			type ed struct {
-				Name        string
-				Description string
-				Hint        string
-				Debug       string
+			rt := router{
+				cl:    client,
+				skip:  skip,
+				cmd:   cmd,
+				state: &state,
+				conf:  &conf,
+				onDone: func() {
+					if !noShutdown {
+						go shutdown()
+					} else {
+						// regenerate because we don't want to shutdown and we don't want to reuse nonce & state
+						authCodeURL, state = generateAuthCodeURL()
+					}
+				},
+				serverLocation: serverLocation,
+				noShutdown:     noShutdown,
 			}
 
-			r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-				if len(r.URL.Query().Get("error")) > 0 {
-					_, _ = fmt.Fprintf(os.Stderr, "Got error: %s\n", r.URL.Query().Get("error_description"))
+			r.GET("/login", rt.loginGET)
+			r.POST("/login", rt.loginPOST)
+			r.GET("/consent", rt.consentGET)
+			r.POST("/consent", rt.consentPOST)
+			r.GET("/callback", rt.callback)
 
-					w.WriteHeader(http.StatusInternalServerError)
-					_ = tokenUserError.Execute(w, &ed{
-						Name:        r.URL.Query().Get("error"),
-						Description: r.URL.Query().Get("error_description"),
-						Hint:        r.URL.Query().Get("error_hint"),
-						Debug:       r.URL.Query().Get("error_debug"),
-					})
+			if !flagx.MustGetBool(cmd, "no-open") {
+				_ = webbrowser.Open(serverLocation) // ignore errors
+			}
 
-					onDone()
-					return
-				}
-
-				if r.URL.Query().Get("state") != string(state) {
-					_, _ = fmt.Fprintf(os.Stderr, "States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
-
-					w.WriteHeader(http.StatusInternalServerError)
-					_ = tokenUserError.Execute(w, &ed{
-						Name:        "States do not match",
-						Description: "Expected state " + string(state) + " but got " + r.URL.Query().Get("state"),
-					})
-					onDone()
-					return
-				}
-
-				code := r.URL.Query().Get("code")
-				token, err := conf.Exchange(ctx, code)
-				if err != nil {
-					_, _ = fmt.Fprintf(os.Stderr, "Unable to exchange code for token: %s\n", err)
-
-					w.WriteHeader(http.StatusInternalServerError)
-					_ = tokenUserError.Execute(w, &ed{
-						Name: err.Error(),
-					})
-					onDone()
-					return
-				}
-
-				cmdx.PrintRow(cmd, outputOAuth2Token(*token))
-				_ = tokenUserResult.Execute(w, struct {
-					AccessToken       string
-					RefreshToken      string
-					Expiry            string
-					IDToken           string
-					BackURL           string
-					DisplayBackButton bool
-				}{
-					AccessToken:       token.AccessToken,
-					RefreshToken:      token.RefreshToken,
-					Expiry:            token.Expiry.Format(time.RFC1123),
-					IDToken:           fmt.Sprintf("%s", token.Extra("id_token")),
-					BackURL:           serverLocation,
-					DisplayBackButton: noShutdown,
-				})
-				onDone()
-			})
+			_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), "Setting up home route on "+serverLocation)
+			_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), "Setting up callback listener on "+serverLocation+"callback")
+			_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), "Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
+			_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 			if isSSL {
 				err = server.ListenAndServeTLS("", "")
@@ -300,7 +323,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().IntP("port", "p", 4446, "The port on which the server should run")
 	cmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
 	cmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
-	cmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
+	cmd.Flags().Int("max-age", -1, "Set the OpenID Connect max_age parameter. -1 means no max_age parameter will be used.")
 	cmd.Flags().Bool("no-shutdown", false, "Do not terminate on success/error. State and nonce will be regenerated when auth flow has completed (either due to an error or success).")
 
 	cmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
@@ -312,6 +335,302 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	cmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	cmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
+	cmd.Flags().Bool("skip", false, "Skip login and/or consent steps if possible. Only effective if you have configured the Login and Consent UI URLs to point to this server.")
 
 	return cmd
+}
+
+type router struct {
+	cl             *openapi.APIClient
+	skip           bool
+	cmd            *cobra.Command
+	state          *string
+	conf           *oauth2.Config
+	onDone         func()
+	serverLocation string
+	noShutdown     bool
+}
+
+func (rt *router) loginGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	req, raw, err := rt.cl.OAuth2API.GetOAuth2LoginRequest(r.Context()).
+		LoginChallenge(r.URL.Query().Get("login_challenge")).
+		Execute()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if rt.skip && req.GetSkip() {
+		req, _, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
+			LoginChallenge(req.Challenge).
+			AcceptOAuth2LoginRequest(openapi.AcceptOAuth2LoginRequest{Subject: req.Subject}).
+			Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+		return
+	}
+
+	pretty, err := prettyJSON(raw.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = tokenUserLogin.Execute(w, struct {
+		LoginChallenge string
+		Skip           bool
+		SessionID      string
+		Raw            string
+	}{
+		LoginChallenge: req.Challenge,
+		Skip:           req.GetSkip(),
+		SessionID:      req.GetSessionId(),
+		Raw:            pretty,
+	})
+}
+
+func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if r.FormValue("revoke-consents") == "on" {
+		_, err := rt.cl.OAuth2API.RevokeOAuth2ConsentSessions(r.Context()).
+			Subject(r.FormValue("username")).
+			All(true).
+			Execute()
+		if err != nil {
+			fmt.Fprintln(rt.cmd.ErrOrStderr(), "Error revoking previous consents:", err)
+		} else {
+			fmt.Fprintln(rt.cmd.ErrOrStderr(), "Revoked all previous consents")
+		}
+	}
+	switch r.FormValue("action") {
+	case "accept":
+
+		req, _, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
+			LoginChallenge(r.FormValue("ls")).
+			AcceptOAuth2LoginRequest(openapi.AcceptOAuth2LoginRequest{
+				Subject:     r.FormValue("username"),
+				Remember:    pointerx.Ptr(r.FormValue("remember") == "on"),
+				RememberFor: pointerx.Int64(3600),
+				Context: map[string]string{
+					"context from": "login step",
+				},
+			}).Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+
+	case "deny":
+		req, _, err := rt.cl.OAuth2API.RejectOAuth2LoginRequest(r.Context()).LoginChallenge(r.FormValue("ls")).Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+
+	default:
+		http.Error(w, "Invalid action", http.StatusBadRequest)
+	}
+}
+
+func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	req, raw, err := rt.cl.OAuth2API.GetOAuth2ConsentRequest(r.Context()).
+		ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+		Execute()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if rt.skip && req.GetSkip() {
+		req, _, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
+			ConsentChallenge(req.Challenge).
+			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
+				GrantScope:               req.GetRequestedScope(),
+				GrantAccessTokenAudience: req.GetRequestedAccessTokenAudience(),
+				Remember:                 pointerx.Ptr(true),
+				RememberFor:              pointerx.Int64(3600),
+				Session: &openapi.AcceptOAuth2ConsentRequestSession{
+					AccessToken: map[string]string{
+						"foo": "bar",
+					},
+					IdToken: map[string]string{
+						"baz": "bar",
+					},
+				},
+			}).Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+		return
+	}
+
+	pretty, err := prettyJSON(raw.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, raw, err = rt.cl.OAuth2API.ListOAuth2ConsentSessions(r.Context()).
+		Subject(req.GetSubject()).
+		LoginSessionId(req.GetLoginSessionId()).
+		Execute()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	prettyPrevConsent, err := prettyJSON(raw.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = tokenUserConsent.Execute(w, struct {
+		ConsentChallenge string
+		Audiences        []string
+		Scopes           []string
+		Skip             bool
+		SessionID        string
+		PreviousConsents string
+		Raw              string
+	}{
+		ConsentChallenge: req.Challenge,
+		Audiences:        req.RequestedAccessTokenAudience,
+		Scopes:           req.RequestedScope,
+		Skip:             req.GetSkip(),
+		SessionID:        req.GetLoginSessionId(),
+		PreviousConsents: prettyPrevConsent,
+		Raw:              pretty,
+	})
+}
+
+func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	switch r.FormValue("action") {
+	case "accept":
+		req, _, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
+			ConsentChallenge(r.FormValue("cs")).
+			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
+				GrantScope:               r.Form["scope"],
+				GrantAccessTokenAudience: r.Form["audience"],
+				Remember:                 pointerx.Ptr(r.FormValue("remember") == "on"),
+				RememberFor:              pointerx.Int64(3600),
+				Session: &openapi.AcceptOAuth2ConsentRequestSession{
+					AccessToken: map[string]string{
+						"foo": "bar",
+					},
+					IdToken: map[string]string{
+						"baz": "bar",
+					},
+				},
+			}).Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+
+	case "deny":
+		req, _, err := rt.cl.OAuth2API.RejectOAuth2ConsentRequest(r.Context()).
+			ConsentChallenge(r.FormValue("cs")).
+			Execute()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
+
+	default:
+		http.Error(w, "Invalid action", http.StatusBadRequest)
+	}
+}
+
+func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if len(r.URL.Query().Get("error")) > 0 {
+		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "Got error: %s\n", r.URL.Query().Get("error_description"))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = tokenUserError.Execute(w, &ed{
+			Name:        r.URL.Query().Get("error"),
+			Description: r.URL.Query().Get("error_description"),
+			Hint:        r.URL.Query().Get("error_hint"),
+			Debug:       r.URL.Query().Get("error_debug"),
+		})
+
+		rt.onDone()
+		return
+	}
+
+	if r.URL.Query().Get("state") != *rt.state {
+		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "States do not match. Expected %s, got %s\n", *rt.state, r.URL.Query().Get("state"))
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = tokenUserError.Execute(w, &ed{
+			Name:        "States do not match",
+			Description: "Expected state " + *rt.state + " but got " + r.URL.Query().Get("state"),
+		})
+		rt.onDone()
+		return
+	}
+
+	code := r.URL.Query().Get("code")
+	ctx := context.WithValue(rt.cmd.Context(), oauth2.HTTPClient, rt.cl)
+	token, err := rt.conf.Exchange(ctx, code)
+	if err != nil {
+		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "Unable to exchange code for token: %s\n", err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = tokenUserError.Execute(w, &ed{
+			Name: err.Error(),
+		})
+		rt.onDone()
+		return
+	}
+
+	cmdx.PrintRow(rt.cmd, outputOAuth2Token(*token))
+	_ = tokenUserResult.Execute(w, struct {
+		AccessToken       string
+		RefreshToken      string
+		Expiry            string
+		IDToken           string
+		BackURL           string
+		DisplayBackButton bool
+	}{
+		AccessToken:       token.AccessToken,
+		RefreshToken:      token.RefreshToken,
+		Expiry:            token.Expiry.Format(time.RFC1123),
+		IDToken:           fmt.Sprintf("%s", token.Extra("id_token")),
+		BackURL:           rt.serverLocation,
+		DisplayBackButton: rt.noShutdown,
+	})
+	rt.onDone()
+}
+
+type ed struct {
+	Name        string
+	Description string
+	Hint        string
+	Debug       string
+}
+
+func prettyJSON(r io.Reader) (string, error) {
+	contentsRaw, err := io.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := json.Indent(&buf, contentsRaw, "", "  "); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

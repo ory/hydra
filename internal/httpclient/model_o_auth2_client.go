@@ -50,6 +50,12 @@ type OAuth2Client struct {
 	Contacts  []string `json:"contacts,omitempty"`
 	// OAuth 2.0 Client Creation Date  CreatedAt returns the timestamp of the client's creation.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
+	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	DeviceAuthorizationGrantAccessTokenLifespan *string `json:"device_authorization_grant_access_token_lifespan,omitempty"`
+	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	DeviceAuthorizationGrantIdTokenLifespan *string `json:"device_authorization_grant_id_token_lifespan,omitempty"`
+	// Specify a time duration in milliseconds, seconds, minutes, hours.
+	DeviceAuthorizationGrantRefreshTokenLifespan *string `json:"device_authorization_grant_refresh_token_lifespan,omitempty"`
 	// OpenID Connect Front-Channel Logout Session Required  Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
 	FrontchannelLogoutSessionRequired *bool `json:"frontchannel_logout_session_required,omitempty"`
 	// OpenID Connect Front-Channel Logout URI  RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.
@@ -641,6 +647,102 @@ func (o *OAuth2Client) HasCreatedAt() bool {
 // SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
 func (o *OAuth2Client) SetCreatedAt(v time.Time) {
 	o.CreatedAt = &v
+}
+
+// GetDeviceAuthorizationGrantAccessTokenLifespan returns the DeviceAuthorizationGrantAccessTokenLifespan field value if set, zero value otherwise.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantAccessTokenLifespan() string {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantAccessTokenLifespan) {
+		var ret string
+		return ret
+	}
+	return *o.DeviceAuthorizationGrantAccessTokenLifespan
+}
+
+// GetDeviceAuthorizationGrantAccessTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantAccessTokenLifespan field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantAccessTokenLifespanOk() (*string, bool) {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantAccessTokenLifespan) {
+		return nil, false
+	}
+	return o.DeviceAuthorizationGrantAccessTokenLifespan, true
+}
+
+// HasDeviceAuthorizationGrantAccessTokenLifespan returns a boolean if a field has been set.
+func (o *OAuth2Client) HasDeviceAuthorizationGrantAccessTokenLifespan() bool {
+	if o != nil && !IsNil(o.DeviceAuthorizationGrantAccessTokenLifespan) {
+		return true
+	}
+
+	return false
+}
+
+// SetDeviceAuthorizationGrantAccessTokenLifespan gets a reference to the given string and assigns it to the DeviceAuthorizationGrantAccessTokenLifespan field.
+func (o *OAuth2Client) SetDeviceAuthorizationGrantAccessTokenLifespan(v string) {
+	o.DeviceAuthorizationGrantAccessTokenLifespan = &v
+}
+
+// GetDeviceAuthorizationGrantIdTokenLifespan returns the DeviceAuthorizationGrantIdTokenLifespan field value if set, zero value otherwise.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantIdTokenLifespan() string {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantIdTokenLifespan) {
+		var ret string
+		return ret
+	}
+	return *o.DeviceAuthorizationGrantIdTokenLifespan
+}
+
+// GetDeviceAuthorizationGrantIdTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantIdTokenLifespan field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantIdTokenLifespanOk() (*string, bool) {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantIdTokenLifespan) {
+		return nil, false
+	}
+	return o.DeviceAuthorizationGrantIdTokenLifespan, true
+}
+
+// HasDeviceAuthorizationGrantIdTokenLifespan returns a boolean if a field has been set.
+func (o *OAuth2Client) HasDeviceAuthorizationGrantIdTokenLifespan() bool {
+	if o != nil && !IsNil(o.DeviceAuthorizationGrantIdTokenLifespan) {
+		return true
+	}
+
+	return false
+}
+
+// SetDeviceAuthorizationGrantIdTokenLifespan gets a reference to the given string and assigns it to the DeviceAuthorizationGrantIdTokenLifespan field.
+func (o *OAuth2Client) SetDeviceAuthorizationGrantIdTokenLifespan(v string) {
+	o.DeviceAuthorizationGrantIdTokenLifespan = &v
+}
+
+// GetDeviceAuthorizationGrantRefreshTokenLifespan returns the DeviceAuthorizationGrantRefreshTokenLifespan field value if set, zero value otherwise.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantRefreshTokenLifespan() string {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantRefreshTokenLifespan) {
+		var ret string
+		return ret
+	}
+	return *o.DeviceAuthorizationGrantRefreshTokenLifespan
+}
+
+// GetDeviceAuthorizationGrantRefreshTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantRefreshTokenLifespan field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2Client) GetDeviceAuthorizationGrantRefreshTokenLifespanOk() (*string, bool) {
+	if o == nil || IsNil(o.DeviceAuthorizationGrantRefreshTokenLifespan) {
+		return nil, false
+	}
+	return o.DeviceAuthorizationGrantRefreshTokenLifespan, true
+}
+
+// HasDeviceAuthorizationGrantRefreshTokenLifespan returns a boolean if a field has been set.
+func (o *OAuth2Client) HasDeviceAuthorizationGrantRefreshTokenLifespan() bool {
+	if o != nil && !IsNil(o.DeviceAuthorizationGrantRefreshTokenLifespan) {
+		return true
+	}
+
+	return false
+}
+
+// SetDeviceAuthorizationGrantRefreshTokenLifespan gets a reference to the given string and assigns it to the DeviceAuthorizationGrantRefreshTokenLifespan field.
+func (o *OAuth2Client) SetDeviceAuthorizationGrantRefreshTokenLifespan(v string) {
+	o.DeviceAuthorizationGrantRefreshTokenLifespan = &v
 }
 
 // GetFrontchannelLogoutSessionRequired returns the FrontchannelLogoutSessionRequired field value if set, zero value otherwise.
@@ -1726,6 +1828,15 @@ func (o OAuth2Client) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.CreatedAt) {
 		toSerialize["created_at"] = o.CreatedAt
+	}
+	if !IsNil(o.DeviceAuthorizationGrantAccessTokenLifespan) {
+		toSerialize["device_authorization_grant_access_token_lifespan"] = o.DeviceAuthorizationGrantAccessTokenLifespan
+	}
+	if !IsNil(o.DeviceAuthorizationGrantIdTokenLifespan) {
+		toSerialize["device_authorization_grant_id_token_lifespan"] = o.DeviceAuthorizationGrantIdTokenLifespan
+	}
+	if !IsNil(o.DeviceAuthorizationGrantRefreshTokenLifespan) {
+		toSerialize["device_authorization_grant_refresh_token_lifespan"] = o.DeviceAuthorizationGrantRefreshTokenLifespan
 	}
 	if !IsNil(o.FrontchannelLogoutSessionRequired) {
 		toSerialize["frontchannel_logout_session_required"] = o.FrontchannelLogoutSessionRequired

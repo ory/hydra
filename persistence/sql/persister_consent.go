@@ -224,11 +224,105 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ 
 	return f.GetConsentRequest(challenge), nil
 }
 
-func (p *Persister) CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (_ *flow.Flow, err error) {
+// CreateDeviceUserAuthRequest creates a new flow from a DeviceUserAuthRequest.
+func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (*flow.Flow, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceUserAuthRequest")
+	defer span.End()
+
+	nid := p.NetworkID(ctx)
+	if nid == uuid.Nil {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+	f := flow.NewDeviceFlow(req)
+	f.NID = nid
+
+	return f, nil
+}
+
+// GetDeviceUserAuthRequest decodes a challenge into a new DeviceUserAuthRequest.
+func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge string) (*flow.DeviceUserAuthRequest, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceUserAuthRequest")
+	defer span.End()
+
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsDeviceChallenge)
+	if err != nil {
+		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired, please try again."))
+	}
+	dr := f.GetDeviceUserAuthRequest()
+
+	return dr, nil
+}
+
+// HandleDeviceUserAuthRequest uses a HandledDeviceUserAuthRequest to update the flow and returns a DeviceUserAuthRequest.
+func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (*flow.DeviceUserAuthRequest, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleDeviceUserAuthRequest")
+	defer span.End()
+
+	if f == nil {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+	err := f.HandleDeviceUserAuthRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.GetDeviceUserAuthRequest(ctx, challenge)
+}
+
+// VerifyAndInvalidateDeviceUserAuthRequest verifies a verifier and invalidates the flow.
+func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateDeviceUserAuthRequest")
+	defer span.End()
+
+	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsDeviceVerifier)
+	if err != nil {
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
+	}
+	if f.NID != p.NetworkID(ctx) {
+		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+	}
+
+	if err = f.InvalidateDeviceRequest(); err != nil {
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	}
+
+	return f.GetHandledDeviceUserAuthRequest(), nil
+}
+
+func (p *Persister) CreateLoginRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequest")
 	defer otelx.End(span, &err)
 
-	f := flow.NewFlow(req)
+	if f == nil {
+		f = flow.NewFlow(req)
+	} else {
+		f.ID = req.ID
+		f.RequestedScope = req.RequestedScope
+		f.RequestedAudience = req.RequestedAudience
+		f.LoginSkip = req.Skip
+		f.Subject = req.Subject
+		f.OpenIDConnectContext = req.OpenIDConnectContext
+		f.Client = req.Client
+		f.ClientID = req.ClientID
+		f.RequestURL = req.RequestURL
+		f.SessionID = req.SessionID
+		f.LoginWasUsed = req.WasHandled
+		f.ForceSubjectIdentifier = req.ForceSubjectIdentifier
+		f.LoginVerifier = req.Verifier
+		f.LoginCSRF = req.CSRF
+		f.LoginAuthenticatedAt = req.AuthenticatedAt
+		f.RequestedAt = req.RequestedAt
+		f.State = flow.FlowStateLoginInitialized
+	}
 	nid := p.NetworkID(ctx)
 	if nid == uuid.Nil {
 		return nil, errorsx.WithStack(x.ErrNotFound)

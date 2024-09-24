@@ -66,6 +66,7 @@ const (
 	KeyCookieDomain                              = "serve.cookies.domain"
 	KeyCookieSecure                              = "serve.cookies.secure"
 	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
+	KeyCookieDeviceCSRFName                      = "serve.cookies.names.device_csrf"
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
 	KeyCookieSessionPath                         = "serve.cookies.paths.session"
@@ -691,6 +692,10 @@ func (p *DefaultProvider) SessionCookiePath(ctx context.Context) string {
 
 func (p *DefaultProvider) CookieNameLoginCSRF(ctx context.Context) string {
 	return p.cookieSuffix(ctx, KeyCookieLoginCSRFName)
+}
+
+func (p *DefaultProvider) CookieNameDeviceCSRF(ctx context.Context) string {
+	return p.cookieSuffix(ctx, KeyCookieDeviceCSRFName)
 }
 
 func (p *DefaultProvider) CookieNameConsentCSRF(ctx context.Context) string {

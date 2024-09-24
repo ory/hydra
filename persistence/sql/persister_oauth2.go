@@ -61,11 +61,13 @@ type (
 )
 
 const (
-	sqlTableOpenID  tableName = "oidc"
-	sqlTableAccess  tableName = "access"
-	sqlTableRefresh tableName = "refresh"
-	sqlTableCode    tableName = "code"
-	sqlTablePKCE    tableName = "pkce"
+	sqlTableOpenID     tableName = "oidc"
+	sqlTableAccess     tableName = "access"
+	sqlTableRefresh    tableName = "refresh"
+	sqlTableCode       tableName = "code"
+	sqlTablePKCE       tableName = "pkce"
+	sqlTableDeviceCode tableName = "device_code"
+	sqlTableUserCode   tableName = "user_code"
 )
 
 func (r OAuth2RequestSQL) TableName() string {
@@ -547,5 +549,103 @@ func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) (er
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).Where("client_id=?", clientID).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
+	)
+}
+
+func (p *Persister) CreateDeviceCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
+	defer otelx.End(span, &err)
+	return p.createSession(ctx, signature, requester, sqlTableDeviceCode, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
+}
+
+// UpdateDeviceCodeSession updates a device code session by requestID
+func (p *Persister) UpdateDeviceCodeSessionByRequestID(ctx context.Context, requestID string, requester fosite.Requester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionByRequestID")
+	defer otelx.End(span, &err)
+
+	req, err := p.sqlSchemaFromRequest(ctx, requestID, requester, sqlTableDeviceCode, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
+	if err != nil {
+		return
+	}
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET session_data=? WHERE request_id=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableDeviceCode}.TableName()),
+				req.Session,
+				requestID,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
+}
+
+func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSession")
+	defer otelx.End(span, &err)
+	return p.findSessionBySignature(ctx, signature, session, sqlTableDeviceCode)
+}
+
+// InvalidateDeviceCodeSession invalidates a device code session
+func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateDeviceCodeSession")
+	defer otelx.End(span, &err)
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableDeviceCode}.TableName()),
+				signature,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
+}
+
+func (p *Persister) CreateUserCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateUserCodeSession")
+	defer otelx.End(span, &err)
+	return p.createSession(ctx, signature, requester, sqlTableUserCode, requester.GetSession().GetExpiresAt(fosite.UserCode).UTC())
+}
+
+func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
+	defer otelx.End(span, &err)
+	return p.findSessionBySignature(ctx, signature, session, sqlTableUserCode)
+}
+
+func (p *Persister) InvalidateUserCodeSession(ctx context.Context, signature string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateUserCodeSession")
+	defer otelx.End(span, &err)
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+				signature,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
+}
+
+// UpdateAndInvalidateUserCodeSession invalidates a user code session and connects it with the device flow challenge ID
+func (p *Persister) UpdateAndInvalidateUserCodeSession(ctx context.Context, signature, challenge_id string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateAndInvalidateUserCodeSession")
+	defer otelx.End(span, &err)
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false, challenge_id=? WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+				challenge_id,
+				signature,
+				p.NetworkID(ctx),
+			).
+			Exec(),
 	)
 }

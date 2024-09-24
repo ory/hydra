@@ -891,6 +891,55 @@
         }
       }
     },
+    "/admin/oauth2/auth/requests/device/accept": {
+      "put": {
+        "description": "Accepts a device grant user_code request",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "Accepts a device grant user_code request",
+        "operationId": "acceptUserCodeRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "device_challenge",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/acceptDeviceUserCodeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2RedirectTo",
+            "schema": {
+              "$ref": "#/definitions/oAuth2RedirectTo"
+            }
+          },
+          "default": {
+            "description": "errorOAuth2",
+            "schema": {
+              "$ref": "#/definitions/errorOAuth2"
+            }
+          }
+        }
+      }
+    },
     "/admin/oauth2/auth/requests/login": {
       "get": {
         "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory asks the login provider\nto authenticate the subject and then tell the Ory OAuth2 Service about it.\n\nPer default, the login provider is Ory itself. You may use a different login provider which needs to be a web-app\nyou write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
@@ -1718,6 +1767,65 @@
         }
       }
     },
+    "/oauth2/device/auth": {
+      "post": {
+        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "The OAuth 2.0 Device Authorize Endpoint",
+        "operationId": "oAuth2DeviceFlow",
+        "responses": {
+          "200": {
+            "description": "deviceAuthorization",
+            "schema": {
+              "$ref": "#/definitions/deviceAuthorization"
+            }
+          },
+          "default": {
+            "description": "errorOAuth2",
+            "schema": {
+              "$ref": "#/definitions/errorOAuth2"
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/device/verify": {
+      "get": {
+        "description": "This is the device user verification endpoint. The user is redirected here when trying to login using the device flow.",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "oAuth2"
+        ],
+        "summary": "OAuth 2.0 Device Verification Endpoint",
+        "operationId": "performOAuth2DeviceVerificationFlow",
+        "responses": {
+          "302": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "default": {
+            "description": "errorOAuth2",
+            "schema": {
+              "$ref": "#/definitions/errorOAuth2"
+            }
+          }
+        }
+      }
+    },
     "/oauth2/register": {
       "post": {
         "description": "This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nPlease note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those\nvalues will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or\n`client_secret_post`.\n\nThe `client_secret` will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somewhere safe.",
@@ -2124,6 +2232,35 @@
       }
     },
     "DefaultError": {},
+    "DeviceUserAuthRequest": {
+      "type": "object",
+      "title": "Contains information on an ongoing device grant request.",
+      "required": [
+        "challenge"
+      ],
+      "properties": {
+        "challenge": {
+          "description": "ID is the identifier (\"device challenge\") of the device grant request. It is used to\nidentify the session.",
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "request_url": {
+          "description": "RequestURL is the original Device Authorization URL requested.",
+          "type": "string"
+        },
+        "requested_access_token_audience": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
+        },
+        "requested_scope": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
+        }
+      }
+    },
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -2170,6 +2307,15 @@
           "type": "string"
         },
         "proof_type": {
+          "type": "string"
+        }
+      }
+    },
+    "acceptDeviceUserCodeRequest": {
+      "description": "Contains information on an device verification",
+      "type": "object",
+      "properties": {
+        "user_code": {
           "type": "string"
         }
       }
@@ -2320,7 +2466,7 @@
       }
     },
     "deviceAuthorization": {
-      "description": "OAuth 2.0 Device Authorization endpoint",
+      "description": "# Ory's OAuth 2.0 Device Authorization API",
       "type": "object",
       "title": "OAuth2 Device Flow",
       "properties": {
@@ -2734,6 +2880,15 @@
           "type": "string",
           "format": "date-time"
         },
+        "device_authorization_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "device_authorization_grant_id_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "device_authorization_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
         "frontchannel_logout_session_required": {
           "description": "OpenID Connect Front-Channel Logout Session Required\n\nBoolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be\nincluded to identify the RP session with the OP when the frontchannel_logout_uri is used.\nIf omitted, the default value is false.",
           "type": "boolean"
@@ -2871,6 +3026,15 @@
         "client_credentials_grant_access_token_lifespan": {
           "$ref": "#/definitions/NullDuration"
         },
+        "device_authorization_grant_access_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "device_authorization_grant_id_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
+        "device_authorization_grant_refresh_token_lifespan": {
+          "$ref": "#/definitions/NullDuration"
+        },
         "implicit_grant_access_token_lifespan": {
           "$ref": "#/definitions/NullDuration"
         },
@@ -2918,6 +3082,10 @@
         },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
+        },
+        "device_challenge_id": {
+          "description": "DeviceChallenge is the device challenge this consent challenge belongs to, if this flow was initiated by a device.",
+          "type": "string"
         },
         "login_challenge": {
           "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
@@ -3160,6 +3328,7 @@
       "required": [
         "issuer",
         "authorization_endpoint",
+        "device_authorization_endpoint",
         "token_endpoint",
         "jwks_uri",
         "subject_types_supported",
@@ -3210,6 +3379,11 @@
           "items": {
             "$ref": "#/definitions/credentialSupportedDraft00"
           }
+        },
+        "device_authorization_endpoint": {
+          "description": "OAuth 2.0 Device Authorization Endpoint URL",
+          "type": "string",
+          "example": "https://playground.ory.sh/ory-hydra/public/oauth2/device/oauth"
         },
         "end_session_endpoint": {
           "description": "OpenID Connect End-Session Endpoint\n\nURL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
@@ -3713,6 +3887,35 @@
         },
         "format": {
           "type": "string"
+        }
+      }
+    },
+    "verifyUserCodeRequest": {
+      "type": "object",
+      "title": "HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.",
+      "properties": {
+        "challenge": {
+          "description": "ID is the identifier (\"device challenge\") of the device request. It is used to\nidentify the session.",
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
+        "device_code_request_id": {
+          "type": "string"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "request_url": {
+          "description": "RequestURL is the original Device Authorization URL requested.",
+          "type": "string"
+        },
+        "requested_access_token_audience": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
+        },
+        "requested_scope": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
         }
       }
     },

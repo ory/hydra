@@ -823,7 +823,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		makeRequestAndExpectCode(t, hc, c, url.Values{})
 
 		// Make request with additional scope and prompt none, which fails
-		makeRequestAndExpectError(t, hc, c, url.Values{"prompt": {"none"}, "scope": {"openid"}},
+		makeRequestAndExpectError(t, hc, c, url.Values{"prompt": {"none"}, "scope": {"openid"}, "redirect_uri": c.RedirectURIs},
 			"Prompt 'none' was requested, but no previous consent was found")
 	})
 

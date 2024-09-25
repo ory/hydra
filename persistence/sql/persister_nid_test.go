@@ -2176,7 +2176,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 
 			t.Run("case=logout request that expired returns error", func(t *testing.T) {
 				lr := newLogoutRequest()
-				lr.ExpiresAt = sqlxx.NullTime(time.Now().Add(-time.Hour))
+				lr.ExpiresAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Hour))
 				lr.Verifier = uuid.Must(uuid.NewV4()).String()
 				lr.Accepted = true
 				lr.Rejected = false

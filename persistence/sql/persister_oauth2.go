@@ -575,4 +575,3 @@ func unescapeDelimiter(scopes string) []string {
 	}
 	return updatedScopes
 }
-

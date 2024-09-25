@@ -153,13 +153,23 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 		return nil, errorsx.WithStack(err)
 	}
 
+	scopes, err := unescapeDelimiter(r.Scopes)
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
+	grantedScopes, err := unescapeDelimiter(r.GrantedScope)
+	if err != nil {
+		return nil, errorsx.WithStack(err)
+	}
+
 	return &fosite.Request{
 		ID:          r.Request,
 		RequestedAt: r.RequestedAt,
 		// ExpiresAt does not need to be populated as we get the expiry time from the session.
 		Client:            c,
-		RequestedScope:    unescapeDelimiter(r.Scopes),
-		GrantedScope:      unescapeDelimiter(r.GrantedScope),
+		RequestedScope:    scopes,
+		GrantedScope:      grantedScopes,
 		RequestedAudience: stringsx.Splitx(r.RequestedAudience, "|"),
 		GrantedAudience:   stringsx.Splitx(r.GrantedAudience, "|"),
 		Form:              val,
@@ -562,16 +572,16 @@ func escapeDelimiter(scopes []string) []string {
 	return escapedScopes
 }
 
-func unescapeDelimiter(scopes string) []string {
+func unescapeDelimiter(scopes string) ([]string, error) {
 	updatedScopes := stringsx.Splitx(scopes, "|")
 	if strings.Contains(scopes, "%26") {
 		for i, scope := range updatedScopes {
 			unescapedScope, err := url.QueryUnescape(scope)
 			if err != nil {
-				errors.Errorf("Error while url unescaping scope: %s", scope)
+				return nil, errors.Errorf("Error while url unescaping scope: %s", scope)
 			}
 			updatedScopes[i] = unescapedScope
 		}
 	}
-	return updatedScopes
+	return updatedScopes, nil
 }

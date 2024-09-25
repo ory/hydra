@@ -47,8 +47,13 @@ github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dR
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0 h1:any4BmKE+jGIaMpnU8YgH/I2LPiLBufr6oMMlVBbn9M=
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0/go.mod h1:bm7JXdkRd4BHJk9HpwqAI8BoAY1lps46Enkdqw6aRX0=
 github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
+<<<<<<< HEAD
 github.com/canonical/fosite v0.0.0-20241206120051-a5ad00e080fa h1:bb/ZMA3nR7/iLaKSmRv8K5WZv4gI8snjYQ3yr7sLxd8=
 github.com/canonical/fosite v0.0.0-20241206120051-a5ad00e080fa/go.mod h1:A8nrQ4txReSzKzg/QRCBL13Agy61kt65EJb3iH/vRE0=
+=======
+github.com/canonical/fosite v0.0.0-20241118093308-ae6e4e3654c5 h1:jaKZL299cY0juQKGJ3tdHDl8evDbAGevfN6EGoTgR/E=
+github.com/canonical/fosite v0.0.0-20241118093308-ae6e4e3654c5/go.mod h1:A8nrQ4txReSzKzg/QRCBL13Agy61kt65EJb3iH/vRE0=
+>>>>>>> ce85ce85 (chore: update go.mod)
 github.com/cenkalti/backoff/v3 v3.2.2 h1:cfUAAO3yvKMYKPrvhDuHSwQnhZNk/RMHKdZqKTxfm6M=
 github.com/cenkalti/backoff/v3 v3.2.2/go.mod h1:cIeZDE3IrqwwJl6VUwCN6trj1oXrTS4rc0ij+ULvLYs=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=

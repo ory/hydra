@@ -65,6 +65,7 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 	values.Add("response_type", "code")
 	values.Add("state", uuid.New().String())
 	values.Add("client_id", oc.GetID())
+	values.Add("redirect_uri", oc.GetRedirectURIs()[0])
 	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), values).String())
 	require.NoError(t, err)
 	defer res.Body.Close()

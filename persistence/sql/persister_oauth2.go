@@ -904,17 +904,15 @@ func (p *Persister) UpdateAndInvalidateUserCodeSessionByRequestID(ctx context.Co
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateAndInvalidateUserCodeSession")
 	defer otelx.End(span, &err)
 
-	// TODO(nsklikas): afaict this is supposed to return an error if no rows were updated, but this is not the actual behavior.
-	// We need to either fix this OR do a select -> check -> update (this would require 2 queries instead of 1).
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, challenge_id=? WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
-				challenge_id,
-				request_id,
-				p.NetworkID(ctx),
-			).
-			Exec(),
-	)
+	if count, err := p.Connection(ctx).RawQuery(
+		fmt.Sprintf("UPDATE %s SET active=false, challenge_id=? WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: sqlTableUserCode}.TableName()),
+		challenge_id,
+		request_id,
+		p.NetworkID(ctx),
+	).ExecWithCount(); count == 0 && err == nil {
+		return errorsx.WithStack(x.ErrNotFound)
+	} else if err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
 }

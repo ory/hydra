@@ -256,7 +256,7 @@ type revokeOAuth2LoginSessions struct {
 // # Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
 //
 // This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject
-// has to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.
+// has to re-authenticate at the Ory OAuth2 Provider. It also invalidates all associated OAuth 2.0 Access Tokens.
 //
 // If you send the subject in a query param, all authentication sessions that belong to that subject are revoked.
 // No OpenID Connect Front- or Back-channel logout is performed in this case.

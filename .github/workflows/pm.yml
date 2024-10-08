@@ -1,0 +1,29 @@
+name: Synchronize with product board
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+
+jobs:
+  automate:
+    if: github.event.pull_request.head.repo.fork == false
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: ory-corp/planning-automation-action@main
+        with:
+          organization: ory-corp
+          project: 5
+          token: ${{ secrets.ORY_BOT_PAT }}
+          todo_label: "Needs Triage"
+          statusName: Status
+          statusValue: "Needs Triage"
+          includeEffort: "false"
+          monthlyMilestoneName: Roadmap Monthly
+          quarterlyMilestoneName: Roadmap

@@ -1,38 +1,33 @@
 {
-  "ID": "challenge-0011",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "i": "challenge-0011",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0011_1"
   ],
-  "RequestedAudience": [
+  "ra": [
     "requested_audience-0011_1"
   ],
-  "LoginSkip": true,
-  "Subject": "subject-0011",
-  "OpenIDConnectContext": {
+  "ls": true,
+  "s": "subject-0011",
+  "oc": {
     "display": "display-0011"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0011",
-  "SessionID": "auth_session-0011",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0011",
-  "LoginCSRF": "csrf-0011",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 11,
-  "LoginExtendSessionLifespan": false,
-  "ACR": "acr-0011",
-  "AMR": [],
-  "ForceSubjectIdentifier": "force_subject_id-0011",
-  "Context": {
+  "r": "http://request/0011",
+  "si": "auth_session-0011",
+  "lv": "verifier-0011",
+  "lc": "csrf-0011",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "lr": true,
+  "lf": 11,
+  "a": "acr-0011",
+  "fs": "force_subject_id-0011",
+  "ct": {
     "context": "0011"
   },
-  "LoginWasUsed": true,
-  "LoginError": {
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -40,22 +35,22 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0011",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0011",
-  "ConsentCSRF": "csrf-0011",
-  "GrantedScope": [
+  "la": null,
+  "cc": "challenge-0011",
+  "cs": true,
+  "cv": "verifier-0011",
+  "cr": "csrf-0011",
+  "gs": [
     "granted_scope-0011_1"
   ],
-  "GrantedAudience": [
+  "ga": [
     "granted_audience-0011_1"
   ],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 11,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ce": true,
+  "cf": 11,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -63,10 +58,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "st": {
     "session_id_token-0011": "0011"
   },
-  "SessionAccessToken": {
+  "sa": {
     "session_access_token-0011": "0011"
   }
 }

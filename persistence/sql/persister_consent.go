@@ -198,6 +198,10 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
+	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
+	if err != nil {
+		return nil, err
+	}
 
 	return f, nil
 }
@@ -262,6 +266,10 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
 	}
+	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
+	if err != nil {
+		return nil, err
+	}
 	lr := f.GetLoginRequest()
 	// Restore the short challenge ID, which was previously sent to the encoded flow,
 	// to make sure that the challenge ID in the returned flow matches the param.
@@ -300,6 +308,10 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+	}
+	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
+	if err != nil {
+		return nil, err
 	}
 
 	if err = f.InvalidateConsentRequest(); err != nil {
@@ -346,6 +358,10 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	}
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+	}
+	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := f.InvalidateLoginRequest(); err != nil {

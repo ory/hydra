@@ -1,43 +1,40 @@
 {
-  "ID": "challenge-0016",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "i": "challenge-0016",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0016_1",
     "requested_scope-0016_2"
   ],
-  "RequestedAudience": [
+  "ra": [
     "requested_audience-0016_1",
     "requested_audience-0016_2"
   ],
-  "LoginSkip": true,
-  "Subject": "subject-0016",
-  "OpenIDConnectContext": {
+  "ls": true,
+  "s": "subject-0016",
+  "oc": {
     "display": "display-0016"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0016",
-  "SessionID": "auth_session-0016",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0016",
-  "LoginCSRF": "csrf-0016",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 15,
-  "LoginExtendSessionLifespan": true,
-  "ACR": "acr-0016",
-  "AMR": [
+  "r": "http://request/0016",
+  "si": "auth_session-0016",
+  "lv": "verifier-0016",
+  "lc": "csrf-0016",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "lr": true,
+  "lf": 15,
+  "ll": true,
+  "a": "acr-0016",
+  "am": [
     "amr-0016-1",
     "amr-0016-2"
   ],
-  "ForceSubjectIdentifier": "force_subject_id-0016",
-  "Context": {
+  "fs": "force_subject_id-0016",
+  "ct": {
     "context": "0016"
   },
-  "LoginWasUsed": true,
-  "LoginError": {
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -45,24 +42,24 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0016",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0016",
-  "ConsentCSRF": "csrf-0016",
-  "GrantedScope": [
+  "la": null,
+  "cc": "challenge-0016",
+  "cs": true,
+  "cv": "verifier-0016",
+  "cr": "csrf-0016",
+  "gs": [
     "granted_scope-0016_1",
     "granted_scope-0016_2"
   ],
-  "GrantedAudience": [
+  "ga": [
     "granted_audience-0016_1",
     "granted_audience-0016_2"
   ],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 15,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ce": true,
+  "cf": 15,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -70,10 +67,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "st": {
     "session_id_token-0016": "0016"
   },
-  "SessionAccessToken": {
+  "sa": {
     "session_access_token-0016": "0016"
   }
 }

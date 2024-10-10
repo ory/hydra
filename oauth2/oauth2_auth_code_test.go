@@ -1345,7 +1345,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					TokenURL: ts.URL + "/oauth2/token",
 				},
 				RedirectURL: ts.URL + "/callback",
-				Scopes:      []string{"hydra.*", "offline", "openid"},
+				Scopes:      []string{"offline", "openid", "hydra.*"},
 			}
 
 			var code string
@@ -1937,6 +1937,7 @@ func newOAuth2Client(
 	return c, &oauth2.Config{
 		ClientID:     c.GetID(),
 		ClientSecret: secret,
+		RedirectURL:  callbackURL,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
 			TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),

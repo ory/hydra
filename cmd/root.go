@@ -62,6 +62,7 @@ func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Op
 	performCmd.AddCommand(
 		NewPerformClientCredentialsCmd(),
 		NewPerformAuthorizationCodeCmd(),
+		NewPerformDeviceCodeCmd(),
 	)
 
 	revokeCmd := NewRevokeCmd()

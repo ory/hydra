@@ -31,7 +31,8 @@
     "consent_challenge": "",
     "exclude_not_before_claim": false,
     "allowed_top_level_claims": [],
-    "mirror_top_level_claims": true
+    "mirror_top_level_claims": true,
+    "browser_flow_completed": false
   },
   "request": {
     "client_id": "app-client",

@@ -464,6 +464,11 @@
               "description": "Sets the session cookie name. Use with care!",
               "type": "object",
               "properties": {
+                "device_csrf": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_device_csrf"
+                },
                 "login_csrf": {
                   "type": "string",
                   "title": "CSRF Cookie Name",

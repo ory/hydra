@@ -1,41 +1,41 @@
 {
-  "a": "challenge-0017",
-  "b": "00000000-0000-0000-0000-000000000000",
-  "c": [
+  "i": "challenge-0017",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0016_1",
     "requested_scope-0016_2"
   ],
-  "d": [
+  "ra": [
     "requested_audience-0016_1",
     "requested_audience-0016_2"
   ],
-  "e": true,
-  "f": "subject-0017",
-  "g": {
+  "ls": true,
+  "s": "subject-0017",
+  "oc": {
     "display": "display-0017"
   },
-  "j": "http://request/0017",
-  "k": "auth_session-0017",
-  "l": "identity_provider_session_id-0017",
-  "m": "verifier-0017",
-  "n": "csrf-0017",
-  "o": null,
-  "p": "0001-01-01T00:00:00Z",
+  "r": "http://request/0017",
+  "si": "auth_session-0017",
+  "is": "identity_provider_session_id-0017",
+  "lv": "verifier-0017",
+  "lc": "csrf-0017",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
   "q": 128,
-  "r": true,
-  "s": 15,
-  "t": true,
-  "u": "acr-0017",
-  "v": [
+  "lr": true,
+  "lf": 15,
+  "ll": true,
+  "a": "acr-0017",
+  "am": [
     "amr-0017-1",
     "amr-0017-2"
   ],
-  "w": "force_subject_id-0017",
-  "x": {
+  "fs": "force_subject_id-0017",
+  "ct": {
     "context": "0017"
   },
-  "y": true,
-  "z": {
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -43,24 +43,24 @@
     "error_debug": "",
     "valid": false
   },
-  "aa": null,
-  "ab": "challenge-0017",
-  "ac": true,
-  "ad": "verifier-0017",
-  "ae": "csrf-0017",
-  "af": [
+  "la": null,
+  "cc": "challenge-0017",
+  "cs": true,
+  "cv": "verifier-0017",
+  "cr": "csrf-0017",
+  "gs": [
     "granted_scope-0016_1",
     "granted_scope-0016_2"
   ],
-  "ag": [
+  "ga": [
     "granted_audience-0016_1",
     "granted_audience-0016_2"
   ],
-  "ah": true,
-  "ai": 15,
-  "aj": null,
-  "ak": true,
-  "al": {
+  "ce": true,
+  "cf": 15,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -68,10 +68,10 @@
     "error_debug": "",
     "valid": false
   },
-  "am": {
+  "st": {
     "session_id_token-0017": "0017"
   },
-  "an": {
+  "sa": {
     "session_access_token-0017": "0017"
   }
 }

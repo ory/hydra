@@ -1,33 +1,33 @@
 {
-  "a": "challenge-0013",
-  "b": "00000000-0000-0000-0000-000000000000",
-  "c": [
+  "i": "challenge-0013",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0013_1"
   ],
-  "d": [
+  "ra": [
     "requested_audience-0013_1"
   ],
-  "e": true,
-  "f": "subject-0013",
-  "g": {
+  "ls": true,
+  "s": "subject-0013",
+  "oc": {
     "display": "display-0013"
   },
-  "j": "http://request/0013",
-  "k": "auth_session-0013",
-  "m": "verifier-0013",
-  "n": "csrf-0013",
-  "o": null,
-  "p": "0001-01-01T00:00:00Z",
+  "r": "http://request/0013",
+  "si": "auth_session-0013",
+  "lv": "verifier-0013",
+  "lc": "csrf-0013",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
   "q": 128,
-  "r": true,
-  "s": 13,
-  "u": "acr-0013",
-  "w": "force_subject_id-0013",
-  "x": {
+  "lr": true,
+  "lf": 13,
+  "a": "acr-0013",
+  "fs": "force_subject_id-0013",
+  "ct": {
     "context": "0013"
   },
-  "y": true,
-  "z": {
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -35,22 +35,22 @@
     "error_debug": "",
     "valid": false
   },
-  "aa": null,
-  "ab": "challenge-0013",
-  "ac": true,
-  "ad": "verifier-0013",
-  "ae": "csrf-0013",
-  "af": [
+  "la": null,
+  "cc": "challenge-0013",
+  "cs": true,
+  "cv": "verifier-0013",
+  "cr": "csrf-0013",
+  "gs": [
     "granted_scope-0013_1"
   ],
-  "ag": [
+  "ga": [
     "granted_audience-0013_1"
   ],
-  "ah": true,
-  "ai": 13,
-  "aj": null,
-  "ak": true,
-  "al": {
+  "ce": true,
+  "cf": 13,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -58,10 +58,10 @@
     "error_debug": "",
     "valid": false
   },
-  "am": {
+  "st": {
     "session_id_token-0013": "0013"
   },
-  "an": {
+  "sa": {
     "session_access_token-0013": "0013"
   }
 }

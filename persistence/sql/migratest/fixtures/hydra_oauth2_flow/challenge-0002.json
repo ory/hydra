@@ -1,27 +1,27 @@
 {
-  "a": "challenge-0002",
-  "b": "00000000-0000-0000-0000-000000000000",
-  "c": [
+  "i": "challenge-0002",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0002_1"
   ],
-  "e": true,
-  "f": "subject-0002",
-  "g": {
+  "ls": true,
+  "s": "subject-0002",
+  "oc": {
     "display": "display-0002"
   },
-  "j": "http://request/0002",
-  "m": "verifier-0002",
-  "n": "csrf-0002",
-  "o": null,
-  "p": "0001-01-01T00:00:00Z",
+  "r": "http://request/0002",
+  "lv": "verifier-0002",
+  "lc": "csrf-0002",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
   "q": 128,
-  "r": true,
-  "s": 2,
-  "u": "acr-0002",
-  "w": "force_subject_id-0002",
-  "x": {},
-  "y": true,
-  "z": {
+  "lr": true,
+  "lf": 2,
+  "a": "acr-0002",
+  "fs": "force_subject_id-0002",
+  "ct": {},
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -29,19 +29,19 @@
     "error_debug": "",
     "valid": false
   },
-  "aa": null,
-  "ab": "challenge-0002",
-  "ac": true,
-  "ad": "verifier-0002",
-  "ae": "csrf-0002",
-  "af": [
+  "la": null,
+  "cc": "challenge-0002",
+  "cs": true,
+  "cv": "verifier-0002",
+  "cr": "csrf-0002",
+  "gs": [
     "granted_scope-0002_1"
   ],
-  "ah": true,
-  "ai": 2,
-  "aj": null,
-  "ak": true,
-  "al": {
+  "ce": true,
+  "cf": 2,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -49,10 +49,10 @@
     "error_debug": "",
     "valid": false
   },
-  "am": {
+  "st": {
     "session_id_token-0002": "0002"
   },
-  "an": {
+  "sa": {
     "session_access_token-0002": "0002"
   }
 }

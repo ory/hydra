@@ -1,39 +1,39 @@
 {
-  "a": "challenge-0015",
-  "b": "00000000-0000-0000-0000-000000000000",
-  "c": [
+  "i": "challenge-0015",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0015_1",
     "requested_scope-0015_2"
   ],
-  "d": [
+  "ra": [
     "requested_audience-0015_1",
     "requested_audience-0015_2"
   ],
-  "e": true,
-  "f": "subject-0015",
-  "g": {
+  "ls": true,
+  "s": "subject-0015",
+  "oc": {
     "display": "display-0015"
   },
-  "j": "http://request/0015",
-  "k": "auth_session-0015",
-  "m": "verifier-0015",
-  "n": "csrf-0015",
-  "o": null,
-  "p": "0001-01-01T00:00:00Z",
+  "r": "http://request/0015",
+  "si": "auth_session-0015",
+  "lv": "verifier-0015",
+  "lc": "csrf-0015",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
   "q": 128,
-  "r": true,
-  "s": 15,
-  "u": "acr-0015",
-  "v": [
+  "lr": true,
+  "lf": 15,
+  "a": "acr-0015",
+  "am": [
     "amr-0015-1",
     "amr-0015-2"
   ],
-  "w": "force_subject_id-0015",
-  "x": {
+  "fs": "force_subject_id-0015",
+  "ct": {
     "context": "0015"
   },
-  "y": true,
-  "z": {
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -41,24 +41,24 @@
     "error_debug": "",
     "valid": false
   },
-  "aa": null,
-  "ab": "challenge-0015",
-  "ac": true,
-  "ad": "verifier-0015",
-  "ae": "csrf-0015",
-  "af": [
+  "la": null,
+  "cc": "challenge-0015",
+  "cs": true,
+  "cv": "verifier-0015",
+  "cr": "csrf-0015",
+  "gs": [
     "granted_scope-0015_1",
     "granted_scope-0015_2"
   ],
-  "ag": [
+  "ga": [
     "granted_audience-0015_1",
     "granted_audience-0015_2"
   ],
-  "ah": true,
-  "ai": 15,
-  "aj": null,
-  "ak": true,
-  "al": {
+  "ce": true,
+  "cf": 15,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -66,10 +66,10 @@
     "error_debug": "",
     "valid": false
   },
-  "am": {
+  "st": {
     "session_id_token-0015": "0015"
   },
-  "an": {
+  "sa": {
     "session_access_token-0015": "0015"
   }
 }

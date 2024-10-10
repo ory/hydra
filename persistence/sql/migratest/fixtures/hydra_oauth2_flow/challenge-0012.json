@@ -1,38 +1,33 @@
 {
-  "ID": "challenge-0012",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "a": "challenge-0012",
+  "b": "00000000-0000-0000-0000-000000000000",
+  "c": [
     "requested_scope-0012_1"
   ],
-  "RequestedAudience": [
+  "d": [
     "requested_audience-0012_1"
   ],
-  "LoginSkip": true,
-  "Subject": "subject-0012",
-  "OpenIDConnectContext": {
+  "e": true,
+  "f": "subject-0012",
+  "g": {
     "display": "display-0012"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0012",
-  "SessionID": "auth_session-0012",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0012",
-  "LoginCSRF": "csrf-0012",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 12,
-  "LoginExtendSessionLifespan": false,
-  "ACR": "acr-0012",
-  "AMR": [],
-  "ForceSubjectIdentifier": "force_subject_id-0012",
-  "Context": {
+  "j": "http://request/0012",
+  "k": "auth_session-0012",
+  "m": "verifier-0012",
+  "n": "csrf-0012",
+  "o": null,
+  "p": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "r": true,
+  "s": 12,
+  "u": "acr-0012",
+  "w": "force_subject_id-0012",
+  "x": {
     "context": "0012"
   },
-  "LoginWasUsed": true,
-  "LoginError": {
+  "y": true,
+  "z": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -40,22 +35,22 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0012",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0012",
-  "ConsentCSRF": "csrf-0012",
-  "GrantedScope": [
+  "aa": null,
+  "ab": "challenge-0012",
+  "ac": true,
+  "ad": "verifier-0012",
+  "ae": "csrf-0012",
+  "af": [
     "granted_scope-0012_1"
   ],
-  "GrantedAudience": [
+  "ag": [
     "granted_audience-0012_1"
   ],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 12,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ah": true,
+  "ai": 12,
+  "aj": null,
+  "ak": true,
+  "al": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -63,10 +58,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "am": {
     "session_id_token-0012": "0012"
   },
-  "SessionAccessToken": {
+  "an": {
     "session_access_token-0012": "0012"
   }
 }

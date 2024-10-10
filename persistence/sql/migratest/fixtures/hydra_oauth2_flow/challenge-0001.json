@@ -1,34 +1,26 @@
 {
-  "ID": "challenge-0001",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "a": "challenge-0001",
+  "b": "00000000-0000-0000-0000-000000000000",
+  "c": [
     "requested_scope-0001_1"
   ],
-  "RequestedAudience": [],
-  "LoginSkip": true,
-  "Subject": "subject-0001",
-  "OpenIDConnectContext": {
+  "e": true,
+  "f": "subject-0001",
+  "g": {
     "display": "display-0001"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0001",
-  "SessionID": "",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0001",
-  "LoginCSRF": "csrf-0001",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 1,
-  "LoginExtendSessionLifespan": false,
-  "ACR": "acr-0001",
-  "AMR": [],
-  "ForceSubjectIdentifier": "",
-  "Context": {},
-  "LoginWasUsed": true,
-  "LoginError": {
+  "j": "http://request/0001",
+  "m": "verifier-0001",
+  "n": "csrf-0001",
+  "o": null,
+  "p": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "r": true,
+  "s": 1,
+  "u": "acr-0001",
+  "x": {},
+  "y": true,
+  "z": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -36,20 +28,19 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0001",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0001",
-  "ConsentCSRF": "csrf-0001",
-  "GrantedScope": [
+  "aa": null,
+  "ab": "challenge-0001",
+  "ac": true,
+  "ad": "verifier-0001",
+  "ae": "csrf-0001",
+  "af": [
     "granted_scope-0001_1"
   ],
-  "GrantedAudience": [],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 1,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ah": true,
+  "ai": 1,
+  "aj": null,
+  "ak": true,
+  "al": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -57,10 +48,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "am": {
     "session_id_token-0001": "0001"
   },
-  "SessionAccessToken": {
+  "an": {
     "session_access_token-0001": "0001"
   }
 }

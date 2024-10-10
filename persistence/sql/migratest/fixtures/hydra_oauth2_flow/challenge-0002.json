@@ -1,34 +1,27 @@
 {
-  "ID": "challenge-0002",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "a": "challenge-0002",
+  "b": "00000000-0000-0000-0000-000000000000",
+  "c": [
     "requested_scope-0002_1"
   ],
-  "RequestedAudience": [],
-  "LoginSkip": true,
-  "Subject": "subject-0002",
-  "OpenIDConnectContext": {
+  "e": true,
+  "f": "subject-0002",
+  "g": {
     "display": "display-0002"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0002",
-  "SessionID": "",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0002",
-  "LoginCSRF": "csrf-0002",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 2,
-  "LoginExtendSessionLifespan": false,
-  "ACR": "acr-0002",
-  "AMR": [],
-  "ForceSubjectIdentifier": "force_subject_id-0002",
-  "Context": {},
-  "LoginWasUsed": true,
-  "LoginError": {
+  "j": "http://request/0002",
+  "m": "verifier-0002",
+  "n": "csrf-0002",
+  "o": null,
+  "p": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "r": true,
+  "s": 2,
+  "u": "acr-0002",
+  "w": "force_subject_id-0002",
+  "x": {},
+  "y": true,
+  "z": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -36,20 +29,19 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0002",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0002",
-  "ConsentCSRF": "csrf-0002",
-  "GrantedScope": [
+  "aa": null,
+  "ab": "challenge-0002",
+  "ac": true,
+  "ad": "verifier-0002",
+  "ae": "csrf-0002",
+  "af": [
     "granted_scope-0002_1"
   ],
-  "GrantedAudience": [],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 2,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ah": true,
+  "ai": 2,
+  "aj": null,
+  "ak": true,
+  "al": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -57,10 +49,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "am": {
     "session_id_token-0002": "0002"
   },
-  "SessionAccessToken": {
+  "an": {
     "session_access_token-0002": "0002"
   }
 }

@@ -1,43 +1,41 @@
 {
-  "ID": "challenge-0017",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "a": "challenge-0017",
+  "b": "00000000-0000-0000-0000-000000000000",
+  "c": [
     "requested_scope-0016_1",
     "requested_scope-0016_2"
   ],
-  "RequestedAudience": [
+  "d": [
     "requested_audience-0016_1",
     "requested_audience-0016_2"
   ],
-  "LoginSkip": true,
-  "Subject": "subject-0017",
-  "OpenIDConnectContext": {
+  "e": true,
+  "f": "subject-0017",
+  "g": {
     "display": "display-0017"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0017",
-  "SessionID": "auth_session-0017",
-  "IdentityProviderSessionID": "identity_provider_session_id-0017",
-  "LoginVerifier": "verifier-0017",
-  "LoginCSRF": "csrf-0017",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 15,
-  "LoginExtendSessionLifespan": true,
-  "ACR": "acr-0017",
-  "AMR": [
+  "j": "http://request/0017",
+  "k": "auth_session-0017",
+  "l": "identity_provider_session_id-0017",
+  "m": "verifier-0017",
+  "n": "csrf-0017",
+  "o": null,
+  "p": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "r": true,
+  "s": 15,
+  "t": true,
+  "u": "acr-0017",
+  "v": [
     "amr-0017-1",
     "amr-0017-2"
   ],
-  "ForceSubjectIdentifier": "force_subject_id-0017",
-  "Context": {
+  "w": "force_subject_id-0017",
+  "x": {
     "context": "0017"
   },
-  "LoginWasUsed": true,
-  "LoginError": {
+  "y": true,
+  "z": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -45,24 +43,24 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0017",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0017",
-  "ConsentCSRF": "csrf-0017",
-  "GrantedScope": [
+  "aa": null,
+  "ab": "challenge-0017",
+  "ac": true,
+  "ad": "verifier-0017",
+  "ae": "csrf-0017",
+  "af": [
     "granted_scope-0016_1",
     "granted_scope-0016_2"
   ],
-  "GrantedAudience": [
+  "ag": [
     "granted_audience-0016_1",
     "granted_audience-0016_2"
   ],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 15,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ah": true,
+  "ai": 15,
+  "aj": null,
+  "ak": true,
+  "al": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -70,10 +68,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "am": {
     "session_id_token-0017": "0017"
   },
-  "SessionAccessToken": {
+  "an": {
     "session_access_token-0017": "0017"
   }
 }

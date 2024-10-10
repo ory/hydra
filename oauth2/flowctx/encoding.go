@@ -8,11 +8,9 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
-	"net/http"
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/aead"
 )
 
@@ -83,7 +81,7 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 	// Steps:
 	// 1. Encode to JSON
 	// 2. GZIP
-	// 3. Encrypt with AEAD (AES-GCM) + Base64 URL-encode
+	// 3. Encrypt with AEAD (XChaCha20-Poly1305) + Base64 URL-encode
 	var b bytes.Buffer
 
 	gz, err := gzip.NewWriterLevel(&b, gzip.BestCompression)
@@ -100,14 +98,4 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 	}
 
 	return cipher.Encrypt(ctx, b.Bytes(), additionalDataFromOpts(opts...))
-}
-
-// FromCookie looks up the value stored in the cookie and decodes it.
-func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string, opts ...CodecOption) (*T, error) {
-	cookie, err := r.Cookie(cookieName)
-	if err != nil {
-		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("No cookie found for this request. Please initiate a new flow and retry."))
-	}
-
-	return Decode[T](ctx, cipher, cookie.Value, opts...)
 }

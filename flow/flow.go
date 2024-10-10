@@ -119,7 +119,7 @@ type Flow struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client   *client.Client `db:"-" json:"-"`
+	Client   *client.Client `db:"-" json:"client,omitempty"`
 	ClientID string         `db:"client_id" json:"ci,omitempty"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -510,33 +510,37 @@ type CipherProvider interface {
 }
 
 // ToLoginChallenge converts the flow into a login challenge.
-func (f *Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
+	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginChallenge)
 }
 
 // ToLoginVerifier converts the flow into a login verifier.
-func (f *Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
+	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginVerifier)
 }
 
 // ToConsentChallenge converts the flow into a consent challenge.
-func (f *Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
+	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentChallenge)
 }
 
 // ToConsentVerifier converts the flow into a consent verifier.
-func (f *Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
+	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
 }

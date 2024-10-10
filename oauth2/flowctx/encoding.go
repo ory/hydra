@@ -87,11 +87,15 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 	// 3. Encrypt with AEAD (AES-GCM) + Base64 URL-encode
 	var b bytes.Buffer
 
-	gz := gzip.NewWriter(&b)
+	gz, err := gzip.NewWriterLevel(&b, gzip.BestCompression)
+	if err != nil {
+		return "", err
+	}
 
 	if err = json.NewEncoder(gz).Encode(val); err != nil {
 		return "", err
 	}
+
 	if err = gz.Close(); err != nil {
 		return "", err
 	}

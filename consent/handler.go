@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/hydra/v2/client"
+
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x/events"
@@ -212,7 +214,7 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 
 	var a []flow.OAuth2ConsentSession
 	for _, session := range s {
-		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
+		session.ConsentRequest.Client = client.GetSanitizedCopy(session.ConsentRequest.Client)
 		a = append(a, flow.OAuth2ConsentSession(session))
 	}
 
@@ -372,7 +374,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, 
 		request.RequestedAudience = []string{}
 	}
 
-	request.Client = sanitizeClient(request.Client)
+	request.Client = client.GetSanitizedCopy(request.Client)
 	h.r.Writer().Write(w, r, request)
 }
 
@@ -679,7 +681,7 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 		request.RequestedAudience = []string{}
 	}
 
-	request.Client = sanitizeClient(request.Client)
+	request.Client = client.GetSanitizedCopy(request.Client)
 	h.r.Writer().Write(w, r, request)
 }
 

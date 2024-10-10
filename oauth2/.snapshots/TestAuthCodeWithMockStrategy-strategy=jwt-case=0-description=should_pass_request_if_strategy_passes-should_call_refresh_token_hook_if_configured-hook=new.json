@@ -35,6 +35,49 @@
   },
   "request": {
     "client_id": "app-client",
+    "client": {
+      "client_id": "app-client",
+      "client_name": "",
+      "grant_types": [
+        "implicit",
+        "refresh_token",
+        "authorization_code",
+        "password",
+        "client_credentials"
+      ],
+      "response_types": [
+        "id_token",
+        "code",
+        "token"
+      ],
+      "scope": "hydra.* offline openid",
+      "audience": [],
+      "owner": "",
+      "policy_uri": "",
+      "allowed_cors_origins": [],
+      "tos_uri": "",
+      "client_uri": "",
+      "logo_uri": "",
+      "contacts": [],
+      "client_secret_expires_at": 0,
+      "subject_type": "",
+      "jwks": {},
+      "metadata": {
+        "some-meta-key": "some-meta-value"
+      },
+      "skip_consent": false,
+      "skip_logout_consent": false,
+      "authorization_code_grant_access_token_lifespan": null,
+      "authorization_code_grant_id_token_lifespan": null,
+      "authorization_code_grant_refresh_token_lifespan": null,
+      "client_credentials_grant_access_token_lifespan": null,
+      "implicit_grant_access_token_lifespan": null,
+      "implicit_grant_id_token_lifespan": null,
+      "jwt_bearer_grant_access_token_lifespan": null,
+      "refresh_token_grant_id_token_lifespan": null,
+      "refresh_token_grant_access_token_lifespan": null,
+      "refresh_token_grant_refresh_token_lifespan": null
+    },
     "granted_scopes": [
       "offline",
       "openid",

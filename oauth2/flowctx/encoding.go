@@ -14,7 +14,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/aead"
-	"github.com/ory/hydra/v2/driver/config"
 )
 
 type (
@@ -101,29 +100,6 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 	}
 
 	return cipher.Encrypt(ctx, b.Bytes(), additionalDataFromOpts(opts...))
-}
-
-// SetCookie encrypts the given value and sets it in a cookie.
-func SetCookie(ctx context.Context, w http.ResponseWriter, reg interface {
-	FlowCipher() *aead.XChaCha20Poly1305
-	config.Provider
-}, cookieName string, value any, opts ...CodecOption) error {
-	cipher := reg.FlowCipher()
-	cookie, err := Encode(ctx, cipher, value, opts...)
-	if err != nil {
-		return err
-	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    cookie,
-		HttpOnly: true,
-		Domain:   reg.Config().CookieDomain(ctx),
-		Secure:   reg.Config().CookieSecure(ctx),
-		SameSite: reg.Config().CookieSameSiteMode(ctx),
-	})
-
-	return nil
 }
 
 // FromCookie looks up the value stored in the cookie and decodes it.

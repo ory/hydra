@@ -165,7 +165,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
-						IdToken:     map[string]interface{}{"bar": "baz"},
+						IdToken:     map[string]interface{}{"bar": "baz", "email": "my-email@example.org"},
 					},
 				}).
 				Execute()
@@ -206,6 +206,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.EqualValues(t, expectedSubject, claims.Get("sub").String(), "%s", claims)
 		assert.EqualValues(t, expectedNonce, claims.Get("nonce").String(), "%s", claims)
 		assert.EqualValues(t, `baz`, claims.Get("bar").String(), "%s", claims)
+		assert.EqualValues(t, `my-email@example.org`, claims.Get("email").String(), "%s", claims)
+		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
 
 		return claims
 	}

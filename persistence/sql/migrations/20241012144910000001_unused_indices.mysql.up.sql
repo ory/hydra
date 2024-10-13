@@ -1,4 +1,4 @@
-DROP INDEX hydra_oauth2_access_client_id_subject_idx ON hydra_oauth2_access;
+-- DROP INDEX hydra_oauth2_access_client_id_subject_idx ON hydra_oauth2_access;
 DROP INDEX hydra_oauth2_access_expires_at_v2_idx ON hydra_oauth2_access; -- janitor still uses requested_at index
 
 DROP INDEX hydra_oauth2_refresh_client_id_subject_idx ON hydra_oauth2_refresh;

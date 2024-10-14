@@ -196,7 +196,11 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
+		return nil, errorsx.WithStack(
+			fosite.ErrRequestUnauthorized.
+				WithHint("The consent request has expired, please try again.").
+				WithWrap(&consent.ErrChallengeExpired{RedirectURL: f.RequestURL}),
+		)
 	}
 	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
 	if err != nil {
@@ -264,7 +268,11 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
+		return nil, errorsx.WithStack(
+			fosite.ErrRequestUnauthorized.
+				WithHint("The login request has expired, please try again.").
+				WithWrap(&consent.ErrChallengeExpired{RedirectURL: f.RequestURL}),
+		)
 	}
 	f.Client, err = p.GetConcreteClient(ctx, f.ClientID)
 	if err != nil {

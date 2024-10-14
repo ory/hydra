@@ -97,5 +97,11 @@
   "userinfo_signing_alg_values_supported": [
     "none",
     "RS256"
+  ],
+  "prompt_values_supported": [
+    "none",
+    "login",
+    "consent",
+    "select_account"
   ]
 }

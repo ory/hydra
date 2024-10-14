@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/x/sqlxx"
@@ -120,6 +121,24 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		Active:            true,
 		Table:             table,
 	}, nil
+}
+
+func (p *Persister) marshalSession(ctx context.Context, session fosite.Session) ([]byte, error) {
+	sessionBytes, err := json.Marshal(session)
+	if err != nil {
+		return nil, err
+	}
+
+	if !p.config.EncryptSessionData(ctx) {
+		return sessionBytes, nil
+	}
+
+	ciphertext, err := p.r.KeyCipher().Encrypt(ctx, sessionBytes, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(ciphertext), nil
 }
 
 func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (_ *fosite.Request, err error) {
@@ -235,6 +254,30 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
+func (p *Persister) updateRefreshSession(ctx context.Context, requestId string, session fosite.Session, inGracePeriod bool) error {
+	_, ok := session.(*oauth2.Session)
+	if !ok && session != nil {
+		return errors.Errorf("expected session to be of type *oauth2.Session but got: %T", session)
+	}
+	sessionBytes, err := p.marshalSession(ctx, session)
+	if err != nil {
+		return err
+	}
+
+	updateSql := fmt.Sprintf("UPDATE %s SET session_data = ?, in_grace_period = ? WHERE request_id = ?",
+		OAuth2RequestSQL{Table: sqlTableRefresh}.TableName())
+
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := p.Connection(ctx).RawQuery(updateSql, sessionBytes, inGracePeriod, requestId).Exec()
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return nil
+	})
+}
+
 func (p *Persister) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	r := OAuth2RequestSQL{Table: table}
 	err := p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
@@ -302,12 +345,29 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: table}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false, in_grace_period=false WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: table}.TableName()),
 				id,
 				p.NetworkID(ctx),
 			).
 			Exec(),
 	)
+}
+
+func (p *Persister) getRefreshTokenGracePeriodStatusBySignature(ctx context.Context, signature string) (_ bool, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.getRefreshTokenGracePeriodStatusBySignature")
+	defer otelx.End(span, &err)
+
+	var inGracePeriod bool
+	return inGracePeriod, p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		query := fmt.Sprintf("SELECT in_grace_period FROM %s WHERE signature = ?", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName())
+		err := p.Connection(ctx).RawQuery(query, signature).First(&inGracePeriod)
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return err
+	})
 }
 
 func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
@@ -483,10 +543,39 @@ func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) (err erro
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
-func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) (err error) {
+func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, signature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshTokenMaybeGracePeriod")
 	defer otelx.End(span, &err)
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+
+	gracePeriod := p.config.RefreshTokenRotationGracePeriod()
+	if gracePeriod <= 0 {
+		return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+	}
+
+	var requester fosite.Requester
+	session := new(oauth2.Session)
+	if requester, err = p.GetRefreshTokenSession(ctx, signature, session); err != nil {
+		p.l.Errorf("signature: %s not found. grace period not applied", id)
+		return errors.WithStack(err)
+	}
+
+	var inGracePeriod bool
+	if inGracePeriod, err = p.getRefreshTokenGracePeriodStatusBySignature(ctx, signature); err != nil {
+		p.l.Errorf("signature: %s in_grace_period status not found. grace period not applied", id)
+		return errors.WithStack(err)
+	}
+
+	requesterSession := requester.GetSession()
+	if !inGracePeriod {
+		requesterSession.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
+		if err = p.updateRefreshSession(ctx, id, requesterSession, true); err != nil {
+			p.l.Errorf("failed to update session with signature: %s", id)
+			return errors.WithStack(err)
+		}
+	} else {
+		p.l.Tracef("request_id: %s is in the grace period", id)
+	}
+	return nil
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) (err error) {

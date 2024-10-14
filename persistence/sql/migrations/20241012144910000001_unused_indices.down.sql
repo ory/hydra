@@ -1,4 +1,4 @@
-CREATE INDEX IF NOT EXISTS hydra_oauth2_access_client_id_subject_idx ON hydra_oauth2_access (client_id ASC, subject ASC, nid ASC);
+-- CREATE INDEX IF NOT EXISTS hydra_oauth2_access_client_id_subject_idx ON hydra_oauth2_access (client_id ASC, subject ASC, nid ASC);
 CREATE INDEX IF NOT EXISTS hydra_oauth2_access_expires_at_v2_idx ON hydra_oauth2_access (expires_at ASC);
 
 CREATE INDEX IF NOT EXISTS hydra_oauth2_refresh_client_id_subject_idx ON hydra_oauth2_refresh (client_id ASC, subject ASC);

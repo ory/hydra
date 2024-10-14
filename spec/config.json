@@ -453,6 +453,12 @@
               "description": "Sets the cookie domain for session and CSRF cookies. Useful when dealing with subdomains. Use with care!",
               "type": "string"
             },
+            "partitioned": {
+              "title": "HTTP Cookie Partitioning",
+              "description": "Sets the cookie partitioning. Recommended to be enabled in production mode. Can not be used with development mode.",
+              "type": "boolean",
+              "default": false
+            },
             "secure": {
               "title": "HTTP Cookie Secure Flag in Development Mode",
               "description": "Sets the HTTP Cookie secure flag in development mode. HTTP Cookies always have the secure flag in production mode.",

@@ -9,9 +9,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
 
-	"github.com/hashicorp/go-retryablehttp"
+	"github.com/ory/hydra/v2/client"
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
@@ -29,7 +30,8 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 // swagger:ignore
 type Request struct {
 	// ClientID is the identifier of the OAuth 2.0 client.
-	ClientID string `json:"client_id"`
+	ClientID string         `json:"client_id"`
+	Client   *client.Client `json:"client"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
 	GrantedScopes []string `json:"granted_scopes"`
 	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
@@ -166,8 +168,14 @@ func TokenHook(reg interface {
 			return nil
 		}
 
+		var oauthClient *client.Client
+		if hydraClient, ok := requester.GetClient().(*client.Client); ok {
+			oauthClient = client.GetSanitizedCopy(hydraClient)
+		}
+
 		request := Request{
 			ClientID:        requester.GetClient().GetID(),
+			Client:          oauthClient,
 			GrantedScopes:   requester.GetGrantedScopes(),
 			GrantedAudience: requester.GetGrantedAudience(),
 			GrantTypes:      requester.GetGrantTypes(),

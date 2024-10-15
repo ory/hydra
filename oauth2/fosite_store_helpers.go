@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver/config"
+
 	"github.com/ory/x/assertx"
 
 	"github.com/ory/hydra/v2/flow"
@@ -555,7 +557,6 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 }
 
 func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
-
 	return func(t *testing.T) {
 		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
 			// SETUP
@@ -583,11 +584,11 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 			ctx := context.Background()
 
 			// SETUP
-			x.Config().MustSet(ctx, "oauth2.refresh_token_rotation.grace_period", "1m")
+			x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
 
 			// always reset back to the default
 			t.Cleanup(func() {
-				x.Config().MustSet(ctx, "oauth2.refresh_token_rotation.grace_period", "0m")
+				x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "0m")
 			})
 
 			m := x.OAuth2Storage()

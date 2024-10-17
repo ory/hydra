@@ -565,7 +565,7 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 
 			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
 			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
-			assert.NoError(t, err, "precondition failed: could not create refresh token session")
+			require.NoError(t, err, "precondition failed: could not create refresh token session")
 
 			// ACT
 			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)

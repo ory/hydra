@@ -402,6 +402,18 @@ oauth2:
   session:
     # store encrypted data in database, default true
     encrypt_at_rest: true
+    ## refresh_token_rotation
+  # By default Refresh Tokens are rotated and invalidated with each use. See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2 for more details
+  refresh_token_rotation:
+    #
+    ## grace_period
+    #
+    # Set the grace period for refresh tokens to be reused. Such reused tokens will result in multiple refresh tokens being issued.
+    #
+    # Examples:
+    # - 5s
+    # - 1m
+    grace_period: 0s
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
 # for more information on this topic navigate to:

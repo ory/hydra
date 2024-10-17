@@ -475,14 +475,14 @@ func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string
 
 	if gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx); gracePeriod > 0 && r.FirstUsedAt.Valid {
 		if r.FirstUsedAt.Time.Add(gracePeriod).Before(time.Now()) {
-			return fositeRequest, errorsx.WithStack(fosite.ErrInactiveToken)
+			return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
 		}
 
 		r.Active = true                     // We set active to true because we are in the grace period.
 		return r.toRequest(ctx, session, p) // And re-generate the request
 	}
 
-	return fositeRequest, errorsx.WithStack(fosite.ErrInactiveToken)
+	return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
 }
 
 func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature string) (err error) {
@@ -536,20 +536,15 @@ func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) (err erro
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
-func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, signature string) (err error) {
+func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshTokenMaybeGracePeriod")
 	defer otelx.End(span, &err)
-
-	gracePeriod := p.config.RefreshTokenRotationGracePeriod(ctx)
-	if gracePeriod <= 0 {
-		return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
-	}
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, first_used_at = CURRENT_TIMESTAMP WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false, first_used_at = CURRENT_TIMESTAMP WHERE request_id=? AND nid = ? AND active", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
 				id,
 				p.NetworkID(ctx),
 			).

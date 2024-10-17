@@ -408,8 +408,7 @@ oauth2:
     #
     ## grace_period
     #
-    # Set the grace period for a refresh token to allow it to be used for the duration of this configuration after its
-    #	first use. New refresh tokens will continue to be issued.
+    # Set the grace period for refresh tokens to be reused. Such reused tokens will result in multiple refresh tokens being issued.
     #
     # Examples:
     # - 5s

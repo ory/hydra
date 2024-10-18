@@ -409,6 +409,42 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				})
 			})
 
+			t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
+				start := time.Now()
+
+				token := issueTokens(t)
+				var first, second *oauth2.Token
+				t.Run("followup=first refresh", func(t *testing.T) {
+					first = refreshTokens(t, token)
+				})
+
+				t.Run("followup=second refresh", func(t *testing.T) {
+					second = refreshTokens(t, token)
+				})
+
+				// Sleep until the grace period is over
+				time.Sleep(time.Until(start.Add(5*time.Second + time.Millisecond*10)))
+				t.Run("followup=revoking consent revokes all tokens", func(t *testing.T) {
+					err := reg.ConsentManager().RevokeSubjectConsentSession(context.Background(), subject)
+					require.NoError(t, err)
+
+					_, err = conf.TokenSource(context.Background(), token).Token()
+					assert.Error(t, err)
+
+					i := testhelpers.IntrospectToken(t, conf, first.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, first.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+				})
+			})
+
 			t.Run("followup=graceful refresh tokens are all refreshed", func(t *testing.T) {
 				start := time.Now()
 				token := issueTokens(t)

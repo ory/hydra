@@ -38,6 +38,8 @@ type OidcConfiguration struct {
 	CredentialsEndpointDraft00 *string `json:"credentials_endpoint_draft_00,omitempty"`
 	// OpenID Connect Verifiable Credentials Supported  JSON array containing a list of the Verifiable Credentials supported by this authorization server.
 	CredentialsSupportedDraft00 []CredentialSupportedDraft00 `json:"credentials_supported_draft_00,omitempty"`
+	// OAuth 2.0 Device Authorization Endpoint URL
+	DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint"`
 	// OpenID Connect End-Session Endpoint  URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint *string `json:"end_session_endpoint,omitempty"`
 	// OpenID Connect Front-Channel Logout Session Required  Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.
@@ -92,9 +94,10 @@ type _OidcConfiguration OidcConfiguration
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewOidcConfiguration(authorizationEndpoint string, idTokenSignedResponseAlg []string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string, userinfoSignedResponseAlg []string) *OidcConfiguration {
+func NewOidcConfiguration(authorizationEndpoint string, deviceAuthorizationEndpoint string, idTokenSignedResponseAlg []string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string, userinfoSignedResponseAlg []string) *OidcConfiguration {
 	this := OidcConfiguration{}
 	this.AuthorizationEndpoint = authorizationEndpoint
+	this.DeviceAuthorizationEndpoint = deviceAuthorizationEndpoint
 	this.IdTokenSignedResponseAlg = idTokenSignedResponseAlg
 	this.IdTokenSigningAlgValuesSupported = idTokenSigningAlgValuesSupported
 	this.Issuer = issuer
@@ -360,6 +363,30 @@ func (o *OidcConfiguration) HasCredentialsSupportedDraft00() bool {
 // SetCredentialsSupportedDraft00 gets a reference to the given []CredentialSupportedDraft00 and assigns it to the CredentialsSupportedDraft00 field.
 func (o *OidcConfiguration) SetCredentialsSupportedDraft00(v []CredentialSupportedDraft00) {
 	o.CredentialsSupportedDraft00 = v
+}
+
+// GetDeviceAuthorizationEndpoint returns the DeviceAuthorizationEndpoint field value
+func (o *OidcConfiguration) GetDeviceAuthorizationEndpoint() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.DeviceAuthorizationEndpoint
+}
+
+// GetDeviceAuthorizationEndpointOk returns a tuple with the DeviceAuthorizationEndpoint field value
+// and a boolean to check if the value has been set.
+func (o *OidcConfiguration) GetDeviceAuthorizationEndpointOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.DeviceAuthorizationEndpoint, true
+}
+
+// SetDeviceAuthorizationEndpoint sets field value
+func (o *OidcConfiguration) SetDeviceAuthorizationEndpoint(v string) {
+	o.DeviceAuthorizationEndpoint = v
 }
 
 // GetEndSessionEndpoint returns the EndSessionEndpoint field value if set, zero value otherwise.
@@ -1066,6 +1093,7 @@ func (o OidcConfiguration) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.CredentialsSupportedDraft00) {
 		toSerialize["credentials_supported_draft_00"] = o.CredentialsSupportedDraft00
 	}
+	toSerialize["device_authorization_endpoint"] = o.DeviceAuthorizationEndpoint
 	if !IsNil(o.EndSessionEndpoint) {
 		toSerialize["end_session_endpoint"] = o.EndSessionEndpoint
 	}
@@ -1128,6 +1156,7 @@ func (o *OidcConfiguration) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"authorization_endpoint",
+		"device_authorization_endpoint",
 		"id_token_signed_response_alg",
 		"id_token_signing_alg_values_supported",
 		"issuer",

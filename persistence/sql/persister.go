@@ -60,6 +60,7 @@ type (
 		contextx.Provider
 		x.RegistryLogger
 		x.TracingProvider
+		config.Provider
 	}
 )
 

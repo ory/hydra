@@ -102,6 +102,7 @@ const (
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -668,4 +669,12 @@ func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
 	}
 
 	return p.getProvider(ctx).String(key) + suffix
+}
+
+func (p *DefaultProvider) RefreshTokenRotationGracePeriod(ctx context.Context) time.Duration {
+	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if gracePeriod > time.Hour {
+		return time.Hour
+	}
+	return gracePeriod
 }

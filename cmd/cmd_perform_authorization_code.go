@@ -14,23 +14,21 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	openapi "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/v2/cmd/cliclient"
-
-	"github.com/pkg/errors"
-
-	"github.com/ory/graceful"
-
 	"github.com/julienschmidt/httprouter"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
 	"golang.org/x/oauth2"
 
+	"github.com/ory/graceful"
+	openapi "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
@@ -132,7 +130,7 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
 <ul>
     <li>Access Token: <code>{{ .AccessToken }}</code></li>
     <li>Refresh Token: <code>{{ .RefreshToken }}</code></li>
-    <li>Expires in: <code>{{ .Expiry }}</code></li>
+    <li>Expires at: <code>{{ .Expiry }}</code></li>
     <li>ID Token: <code>{{ .IDToken }}</code></li>
 </ul>
 {{ if .DisplayBackButton }}
@@ -170,6 +168,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 			audience := flagx.MustGetStringSlice(cmd, "audience")
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 			skip := flagx.MustGetBool(cmd, "skip")
+			responseMode := flagx.MustGetString(cmd, "response-mode")
 
 			clientID := flagx.MustGetString(cmd, "client-id")
 			if clientID == "" {
@@ -228,6 +227,9 @@ and success, unless if the --no-shutdown flag is provided.`,
 				}
 				if maxAge >= 0 {
 					opts = append(opts, oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)))
+				}
+				if responseMode != "" {
+					opts = append(opts, oauth2.SetAuthURLParam("response_mode", responseMode))
 				}
 
 				authCodeURL := conf.AuthCodeURL(state, opts...)
@@ -293,6 +295,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 			r.GET("/consent", rt.consentGET)
 			r.POST("/consent", rt.consentPOST)
 			r.GET("/callback", rt.callback)
+			r.POST("/callback", rt.callbackPOSTForm)
 
 			if !flagx.MustGetBool(cmd, "no-open") {
 				_ = webbrowser.Open(serverLocation) // ignore errors
@@ -336,6 +339,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
 	cmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
 	cmd.Flags().Bool("skip", false, "Skip login and/or consent steps if possible. Only effective if you have configured the Login and Consent UI URLs to point to this server.")
+	cmd.Flags().String("response-mode", "", "Set the response mode. Can be query (default) or form_post.")
 
 	return cmd
 }
@@ -566,6 +570,8 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprout
 }
 
 func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	defer rt.onDone()
+
 	if len(r.URL.Query().Get("error")) > 0 {
 		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "Got error: %s\n", r.URL.Query().Get("error_description"))
 
@@ -576,20 +582,18 @@ func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.
 			Hint:        r.URL.Query().Get("error_hint"),
 			Debug:       r.URL.Query().Get("error_debug"),
 		})
-
-		rt.onDone()
 		return
 	}
 
 	if r.URL.Query().Get("state") != *rt.state {
-		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "States do not match. Expected %s, got %s\n", *rt.state, r.URL.Query().Get("state"))
+		descr := fmt.Sprintf("States do not match. Expected %q, got %q.", *rt.state, r.URL.Query().Get("state"))
+		_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), descr)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = tokenUserError.Execute(w, &ed{
 			Name:        "States do not match",
-			Description: "Expected state " + *rt.state + " but got " + r.URL.Query().Get("state"),
+			Description: descr,
 		})
-		rt.onDone()
 		return
 	}
 
@@ -603,7 +607,6 @@ func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.
 		_ = tokenUserError.Execute(w, &ed{
 			Name: err.Error(),
 		})
-		rt.onDone()
 		return
 	}
 
@@ -623,7 +626,18 @@ func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.
 		BackURL:           rt.serverLocation,
 		DisplayBackButton: rt.noShutdown,
 	})
-	rt.onDone()
+}
+
+func (rt *router) callbackPOSTForm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	u := url.URL{
+		Path:     r.URL.Path,
+		RawQuery: r.PostForm.Encode(),
+	}
+	http.Redirect(w, r, u.String(), http.StatusFound)
 }
 
 type ed struct {

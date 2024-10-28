@@ -962,7 +962,8 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
-		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
@@ -975,8 +976,12 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// only for client_credentials, otherwise Authentication is included in session
-		if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
+		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) {
 			session.Subject = accessRequest.GetClient().GetID()
+		}
+		// only for password grant, otherwise Authentication is included in session
+		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
+			session.Subject = accessRequest.GetRequestForm().Get("username")
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID

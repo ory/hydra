@@ -33,7 +33,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.47.0
+	github.com/ory/fosite v0.47.1-0.20241028132122-b35b62fed16e
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88
@@ -68,8 +68,6 @@ require (
 	golang.org/x/sync v0.7.0
 	golang.org/x/tools v0.23.0
 )
-
-require github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 
 require (
 	code.dny.dev/ssrf v0.2.0 // indirect
@@ -147,6 +145,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect

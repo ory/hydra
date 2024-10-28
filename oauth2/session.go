@@ -194,3 +194,17 @@ func (s *Session) UnmarshalJSON(original []byte) (err error) {
 
 	return nil
 }
+
+// GetExtraClaims implements ExtraClaimsSession for Session.
+// The returned value can be modified in-place.
+func (s *Session) GetExtraClaims() map[string]interface{} {
+	if s == nil {
+		return nil
+	}
+
+	if s.Extra == nil {
+		s.Extra = make(map[string]interface{})
+	}
+
+	return s.Extra
+}

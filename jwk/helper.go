@@ -12,6 +12,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"sync"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 
@@ -25,6 +26,15 @@ import (
 	"github.com/pkg/errors"
 )
 
+var locks = map[string]*sync.Mutex{}
+
+func getLock(set string) *sync.Mutex {
+	if _, ok := locks[set]; !ok {
+		locks[set] = new(sync.Mutex)
+	}
+	return locks[set]
+}
+
 func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg, set string) error {
 	_, err := GetOrGenerateKeys(ctx, r, r.KeyManager(), set, set, alg)
 	return err
@@ -35,6 +45,10 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+
+		getLock(set).Lock()
+		defer getLock(set).Unlock()
+
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
 			return nil, err
@@ -48,6 +62,10 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		return privKey, nil
 	} else {
 		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+
+		getLock(set).Lock()
+		defer getLock(set).Unlock()
+
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
 			return nil, err

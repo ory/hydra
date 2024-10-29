@@ -46,13 +46,15 @@ func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg,
 func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (private *jose.JSONWebKey, err error) {
 	keys, err := m.GetKeySet(ctx, set)
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
-		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
-		getLock(set).Lock()
-		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
-		getLock(set).Unlock()
-
-		if err != nil {
-			return nil, err
+		if lock := getLock(set); lock.TryLock() {
+			r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+			keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
+			lock.Unlock()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 		}
 	} else if err != nil {
 		return nil, err
@@ -63,20 +65,22 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		return privKey, nil
 	}
 
-	r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+	if lock := getLock(set); lock.TryLock() {
+		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
 
-	getLock(set).Lock()
-	keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
-	getLock(set).Unlock()
-	if err != nil {
-		return nil, err
-	}
+		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
+		lock.Unlock()
+		if err != nil {
+			return nil, err
+		}
 
-	privKey, err = FindPrivateKey(keys)
-	if err != nil {
-		return nil, err
+		privKey, err = FindPrivateKey(keys)
+		if err != nil {
+			return nil, err
+		}
+		return privKey, nil
 	}
-	return privKey, nil
+	return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 }
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {

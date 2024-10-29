@@ -61,22 +61,22 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 	privKey, privKeyErr := FindPrivateKey(keys)
 	if privKeyErr == nil {
 		return privKey, nil
-	} else {
-		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
-
-		getLock(set).Lock()
-		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
-		getLock(set).Unlock()
-		if err != nil {
-			return nil, err
-		}
-
-		privKey, err := FindPrivateKey(keys)
-		if err != nil {
-			return nil, err
-		}
-		return privKey, nil
 	}
+
+	r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+
+	getLock(set).Lock()
+	keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
+	getLock(set).Unlock()
+	if err != nil {
+		return nil, err
+	}
+
+	privKey, err := FindPrivateKey(keys)
+	if err != nil {
+		return nil, err
+	}
+	return privKey, nil
 }
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {

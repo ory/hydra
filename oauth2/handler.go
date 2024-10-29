@@ -988,6 +988,10 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 				session.DefaultSession.Username = accessRequest.GetRequestForm().Get("username")
 			}
 
+			// Also add audience claims
+			for _, aud := range accessRequest.GetClient().GetAudience() {
+				accessRequest.GrantAudience(aud)
+			}
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID

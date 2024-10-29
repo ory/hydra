@@ -28,6 +28,7 @@ import (
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/sqlxx"
 )
 
 func TestResourceOwnerPasswordGrant(t *testing.T) {
@@ -39,10 +40,12 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.New().String()
+	audience := "https://aud.example.com"
 	client := &hydra.Client{
 		Secret:     secret,
 		GrantTypes: []string{"password", "refresh_token"},
 		Scope:      "offline",
+		Audience:   sqlxx.StringSliceJSONFormat{audience},
 		Lifespans: hydra.Lifespans{
 			PasswordGrantAccessTokenLifespan:  x.NullDuration{Duration: 1 * time.Hour, Valid: true},
 			PasswordGrantRefreshTokenLifespan: x.NullDuration{Duration: 1 * time.Hour, Valid: true},
@@ -116,6 +119,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 		assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])
 		assert.Equal(t, publicTS.URL, jwtAT.Claims["iss"])
 		assert.True(t, jwtAT.Claims["ext"].(map[string]any)["hooked"].(bool))
+		assert.Equal(t, oauth2Config.ClientID, audience, jwtAT.Claims["aud"])
 
 		t.Run("case=introspect token", func(t *testing.T) {
 			// Introspected token should have hook and identity_id claims

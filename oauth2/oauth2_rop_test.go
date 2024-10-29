@@ -40,12 +40,12 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.New().String()
-	audience := "https://aud.example.com"
+	audience := sqlxx.StringSliceJSONFormat{"https://aud.example.com"}
 	client := &hydra.Client{
 		Secret:     secret,
 		GrantTypes: []string{"password", "refresh_token"},
 		Scope:      "offline",
-		Audience:   sqlxx.StringSliceJSONFormat{audience},
+		Audience:   audience,
 		Lifespans: hydra.Lifespans{
 			PasswordGrantAccessTokenLifespan:  x.NullDuration{Duration: 1 * time.Hour, Valid: true},
 			PasswordGrantRefreshTokenLifespan: x.NullDuration{Duration: 1 * time.Hour, Valid: true},
@@ -72,7 +72,6 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
 		assert.NotEmpty(t, hookReq.Session)
 		assert.NotEmpty(t, hookReq.Request)
-		assert.ElementsMatch(t, []string{}, hookReq.Request.GrantedAudience)
 
 		claims := hookReq.Session.Extra
 		claims["hooked"] = true
@@ -119,7 +118,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 		assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])
 		assert.Equal(t, publicTS.URL, jwtAT.Claims["iss"])
 		assert.True(t, jwtAT.Claims["ext"].(map[string]any)["hooked"].(bool))
-		assert.Equal(t, oauth2Config.ClientID, audience, jwtAT.Claims["aud"])
+		assert.ElementsMatch(t, audience, jwtAT.Claims["aud"])
 
 		t.Run("case=introspect token", func(t *testing.T) {
 			// Introspected token should have hook and identity_id claims

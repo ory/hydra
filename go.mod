@@ -4,8 +4,6 @@ go 1.22
 
 toolchain go1.22.5
 
-replace github.com/ory/fosite => ../fosite
-
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0
@@ -35,7 +33,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.47.1-0.20241028132122-b35b62fed16e
+	github.com/ory/fosite v0.47.1-0.20241028135452-199f8ab66014
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88

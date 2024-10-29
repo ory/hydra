@@ -26,9 +26,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+var mapLock sync.Mutex
 var locks = map[string]*sync.Mutex{}
 
 func getLock(set string) *sync.Mutex {
+	mapLock.Lock()
+	defer mapLock.Unlock()
 	if _, ok := locks[set]; !ok {
 		locks[set] = new(sync.Mutex)
 	}
@@ -46,8 +49,8 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
 
-		getLock(set).Lock()
-		defer getLock(set).Unlock()
+		l := getLock(set)
+		defer l.Lock()
 
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
@@ -63,8 +66,8 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 	} else {
 		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
 
-		getLock(set).Lock()
-		defer getLock(set).Unlock()
+		l := getLock(set)
+		defer l.Lock()
 
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {

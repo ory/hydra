@@ -45,10 +45,6 @@ func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg,
 
 func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (private *jose.JSONWebKey, err error) {
 	keys, err := m.GetKeySet(ctx, set)
-	if err == nil && keys != nil && len(keys.Keys) > 0 {
-		return FindPrivateKey(keys)
-	}
-
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
 		getLock(set).Lock()

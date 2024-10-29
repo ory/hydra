@@ -72,7 +72,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		return nil, err
 	}
 
-	privKey, err := FindPrivateKey(keys)
+	privKey, err = FindPrivateKey(keys)
 	if err != nil {
 		return nil, err
 	}

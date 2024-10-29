@@ -983,8 +983,6 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
 			if sess, ok := accessRequest.GetSession().(fosite.ExtraClaimsSession); ok {
 				sess.GetExtraClaims()["username"] = accessRequest.GetRequestForm().Get("username")
-				session.Subject = sess.GetExtraClaims()["identity_id"].(string)
-				delete(sess.GetExtraClaims(), "identity_id")
 				session.DefaultSession.Username = accessRequest.GetRequestForm().Get("username")
 			}
 

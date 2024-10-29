@@ -981,7 +981,13 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 		// only for password grant, otherwise Authentication is included in session
 		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
-			session.Subject = accessRequest.GetRequestForm().Get("username")
+			if sess, ok := accessRequest.GetSession().(fosite.ExtraClaimsSession); ok {
+				sess.GetExtraClaims()["username"] = accessRequest.GetRequestForm().Get("username")
+				session.Subject = sess.GetExtraClaims()["identity_id"].(string)
+				delete(sess.GetExtraClaims(), "identity_id")
+				session.DefaultSession.Username = accessRequest.GetRequestForm().Get("username")
+			}
+
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID

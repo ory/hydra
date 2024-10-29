@@ -4,6 +4,8 @@ go 1.22
 
 toolchain go1.22.5
 
+replace github.com/ory/fosite => ../fosite
+
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0

@@ -36,7 +36,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	reg.WithKratos(fakeKratos)
 	reg.WithExtraFositeFactories([]fositex.Factory{compose.OAuth2ResourceOwnerPasswordCredentialsFactory})
-	_, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
+	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.New().String()
 	client := &hydra.Client{
@@ -67,15 +67,12 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 		var hookReq hydraoauth2.TokenHookRequest
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
-		require.NotEmpty(t, hookReq.Session)
-		require.Equal(t, kratos.FakeIdentityID, hookReq.Session.Extra["identity_id"])
-		require.NotEmpty(t, hookReq.Request)
-		require.ElementsMatch(t, []string{}, hookReq.Request.GrantedAudience)
+		assert.NotEmpty(t, hookReq.Session)
+		assert.NotEmpty(t, hookReq.Request)
+		assert.ElementsMatch(t, []string{}, hookReq.Request.GrantedAudience)
 
-		claims := map[string]interface{}{
-			"hooked":      true,
-			"identity_id": kratos.FakeIdentityID,
-		}
+		claims := hookReq.Session.Extra
+		claims["hooked"] = true
 		if hookReq.Request.GrantTypes[0] == "refresh_token" {
 			claims["refreshed"] = true
 		}
@@ -115,16 +112,17 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 			return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
 		})
 		require.NoError(t, err)
-		assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["sub"])
-		assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["ext"].(map[string]any)["identity_id"].(string))
+		assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["ext"].(map[string]any)["username"])
+		assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])
+		assert.Equal(t, publicTS.URL, jwtAT.Claims["iss"])
 		assert.True(t, jwtAT.Claims["ext"].(map[string]any)["hooked"].(bool))
 
 		t.Run("case=introspect token", func(t *testing.T) {
 			// Introspected token should have hook and identity_id claims
 			i := testhelpers.IntrospectToken(t, oauth2Config, token.AccessToken, adminTS)
 			assert.True(t, i.Get("active").Bool(), "%s", i)
-			assert.Equal(t, kratos.FakeUsername, i.Get("sub").String(), "%s", i)
-			assert.Equal(t, kratos.FakeIdentityID, i.Get("ext.identity_id").String(), "%s", i)
+			assert.Equal(t, kratos.FakeUsername, i.Get("ext.username").String(), "%s", i)
+			assert.Equal(t, kratos.FakeIdentityID, i.Get("sub").String(), "%s", i)
 			assert.True(t, i.Get("ext.hooked").Bool(), "%s", i)
 			assert.EqualValues(t, oauth2Config.ClientID, i.Get("client_id").String(), "%s", i)
 		})
@@ -143,8 +141,8 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 				return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
 			})
 			require.NoError(t, err)
-			assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["sub"])
-			assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["ext"].(map[string]any)["identity_id"].(string))
+			assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])
+			assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["ext"].(map[string]any)["username"])
 			assert.True(t, jwtAT.Claims["ext"].(map[string]any)["hooked"].(bool))
 			assert.True(t, jwtAT.Claims["ext"].(map[string]any)["refreshed"].(bool))
 		})

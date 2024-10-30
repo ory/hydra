@@ -8,6 +8,10 @@ replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0
 
+// Bump Fosite to https://github.com/ory/fosite/tree/hperl/v0.47.0%2B168636f, which contains
+// https://github.com/ory/fosite/commit/b40b1cbb1997e2160eaaf97fb6f73960db4c6118 on top of the latest release.
+replace github.com/ory/fosite => github.com/ory/fosite v0.47.1-0.20241030092116-b40b1cbb1997
+
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.5
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
@@ -33,7 +37,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.47.1-0.20241029134014-168636ff33c7
+	github.com/ory/fosite v0.47.0
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.3-0.20230626083119-d7e5192f0d88

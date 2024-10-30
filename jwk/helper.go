@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"sync"
+	"time"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 
@@ -28,6 +29,7 @@ import (
 
 var mapLock sync.RWMutex
 var locks = map[string]*sync.RWMutex{}
+var lockDelay = 3 * time.Millisecond
 
 func getLock(set string) *sync.RWMutex {
 	mapLock.Lock()
@@ -54,6 +56,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 				return nil, err
 			}
 		} else {
+			time.Sleep(lockDelay)
 			return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 		}
 	} else if err != nil {
@@ -80,6 +83,8 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		}
 		return privKey, nil
 	}
+
+	time.Sleep(lockDelay)
 	return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 }
 

@@ -8,10 +8,12 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"math/big"
 	"sync"
 	"time"
 
@@ -29,7 +31,13 @@ import (
 
 var mapLock sync.RWMutex
 var locks = map[string]*sync.RWMutex{}
-var lockDelay = 3 * time.Millisecond
+
+func lockDelay() (duration time.Duration) {
+	if n, err := rand.Int(rand.Reader, big.NewInt(3)); err == nil {
+		duration = time.Duration(n.Int64()) * time.Millisecond
+	}
+	return
+}
 
 func getLock(set string) *sync.RWMutex {
 	mapLock.Lock()
@@ -56,7 +64,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 				return nil, err
 			}
 		} else {
-			time.Sleep(lockDelay)
+			time.Sleep(lockDelay())
 			return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 		}
 	} else if err != nil {
@@ -84,7 +92,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		return privKey, nil
 	}
 
-	time.Sleep(lockDelay)
+	time.Sleep(lockDelay())
 	return GetOrGenerateKeys(ctx, r, m, set, kid, alg)
 }
 

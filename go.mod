@@ -8,6 +8,10 @@ replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0
 
+// Bump Fosite to https://github.com/ory/fosite/tree/hperl/v0.47.0%2B168636f, which contains
+// https://github.com/ory/fosite/commit/b40b1cbb1997e2160eaaf97fb6f73960db4c6118 on top of the latest release.
+replace github.com/ory/fosite => github.com/ory/fosite v0.47.1-0.20241030092116-b40b1cbb1997
+
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.5
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
@@ -68,8 +72,6 @@ require (
 	golang.org/x/sync v0.7.0
 	golang.org/x/tools v0.23.0
 )
-
-require github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 
 require (
 	code.dny.dev/ssrf v0.2.0 // indirect
@@ -147,6 +149,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect

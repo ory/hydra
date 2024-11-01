@@ -33,10 +33,10 @@ services:
 
   httpd:
     image: oryd/hydra-oidc-httpd:latest
-    #    build:
-    #      # When running with `run.sh` the cwd is the project's root.
-    #      context: ./test/conformance
-    #      dockerfile: httpd/Dockerfile
+    build:
+      # When running with `run.sh` the cwd is the project's root.
+      context: ./test/conformance
+      dockerfile: httpd/Dockerfile
     ports:
       - "8443:8443"
     depends_on:
@@ -47,10 +47,10 @@ services:
 
   server:
     image: oryd/hydra-oidc-server:latest
-    #    build:
-    #      # When running with `run.sh` the cwd is the project's root.
-    #      context: ./test/conformance
-    #      dockerfile: Dockerfile
+    build:
+      # When running with `run.sh` the cwd is the project's root.
+      context: ./test/conformance
+      dockerfile: Dockerfile
     depends_on:
       - mongodb
     logging:

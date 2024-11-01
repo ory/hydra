@@ -9,8 +9,11 @@ replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0
 
 // Bump Fosite to https://github.com/ory/fosite/tree/hperl/v0.47.0%2B168636f, which contains
-// https://github.com/ory/fosite/commit/b40b1cbb1997e2160eaaf97fb6f73960db4c6118 on top of the latest release.
-replace github.com/ory/fosite => github.com/ory/fosite v0.47.1-0.20241030092116-b40b1cbb1997
+// https://github.com/ory/fosite/commit/b40b1cbb1997e2160eaaf97fb6f73960db4c6118 and https://github.com/ory/fosite/pull/833/commits/eab241e153a4c97abe2e4c6e654f20b9ae206473 on top of the latest release.
+//
+// This is needed until we release the next version of the master branch, as that branch already contains the redirect URI validation fix, which
+// may be breaking for some users.
+replace github.com/ory/fosite => github.com/ory/fosite v0.47.1-0.20241101073333-eab241e153a4
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.5
@@ -44,7 +47,7 @@ require (
 	github.com/ory/hydra-client-go/v2 v2.2.1
 	github.com/ory/jsonschema/v3 v3.0.8
 	github.com/ory/kratos-client-go v1.2.1
-	github.com/ory/x v0.0.647
+	github.com/ory/x v0.0.665
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.1
@@ -93,13 +96,13 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.3.5 // indirect
 	github.com/containerd/continuity v0.4.3 // indirect
 	github.com/cristalhq/jwt/v4 v4.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
+	github.com/dgraph-io/ristretto v1.0.0 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v26.1.4+incompatible // indirect
@@ -140,7 +143,6 @@ require (
 	github.com/goccy/go-yaml v1.11.3 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/glog v1.2.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/pprof v0.0.0-20230808223545-4887780b67fb // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
@@ -240,7 +242,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094 // indirect

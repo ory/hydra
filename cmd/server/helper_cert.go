@@ -58,7 +58,7 @@ func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, iface con
 	}
 
 	// no certificates configured: self-sign a new cert
-	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
+	priv, err := jwk.GetOrGenerateKeySetPrivateKey(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 		return nil // in case Fatal is hooked

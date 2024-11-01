@@ -1,6 +1,6 @@
 FROM debian:bookworm
 RUN apt-get update \
-	&& apt-get install -y apache2 apache2 ssl-cert ca-certificates \
+	&& apt-get install -y apache2 ssl-cert ca-certificates \
 	&& apt-get clean
 RUN \
 	echo 'Listen 8443' > /etc/apache2/ports.conf \

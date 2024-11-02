@@ -21,7 +21,7 @@ services:
         target: /etc/config/hydra
 
   mongodb:
-    image: mongo:4.2
+    image: mongo:5.0
     networks:
       - intranet
     volumes:
@@ -39,6 +39,7 @@ services:
       dockerfile: httpd/Dockerfile
     ports:
       - "8443:8443"
+      - "8444:8444"
     depends_on:
       - server
     networks:

@@ -1,4 +1,4 @@
-FROM maven:3-jdk-11
+FROM maven:3-openjdk-17-slim
 
 WORKDIR /usr/src/mymaven
 RUN apt-get update && apt-get install -y \
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     redir \
     ca-certificates
 
-ARG CONFORMANCE_SUITE_VERSION=v4.1.45
+ARG CONFORMANCE_SUITE_VERSION=v5.1.24
 RUN wget https://gitlab.com/openid/conformance-suite/-/archive/release-${CONFORMANCE_SUITE_VERSION}/conformance-suite-release-${CONFORMANCE_SUITE_VERSION}.zip && \
   unzip conformance-suite-release-${CONFORMANCE_SUITE_VERSION}.zip -d . && \
   rm conformance-suite-release-${CONFORMANCE_SUITE_VERSION}.zip && \

@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:buster
 RUN apt-get update \
 	&& apt-get install -y apache2 ssl-cert ca-certificates \
 	&& apt-get clean

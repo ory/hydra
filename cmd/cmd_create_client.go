@@ -17,6 +17,8 @@ import (
 )
 
 const (
+	flagFile = "file"
+
 	flagClientAccessTokenStrategy               = "access-token-strategy"
 	flagClientAllowedCORSOrigin                 = "allowed-cors-origin"
 	flagClientAudience                          = "audience"
@@ -87,7 +89,10 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			secret := flagx.MustGetString(cmd, flagClientSecret)
-			cl := clientFromFlags(cmd)
+			cl, err := clientFromFlags(cmd)
+			if err != nil {
+				return err
+			}
 			cl.ClientId = pointerx.Ptr(flagx.MustGetString(cmd, flagClientId))
 
 			//nolint:bodyclose

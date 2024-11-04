@@ -8,11 +8,9 @@ linters:
     - goimports
   disable:
     - ineffassign
-    - deadcode
     - unused
-    - structcheck
 
-run:
-  skip-files:
+issues:
+  exclude-files:
     - ".+_test.go"
     - ".+_test_.+.go"

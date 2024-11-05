@@ -8,10 +8,13 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"net/http"
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/driver/config"
 )
 
 type (
@@ -81,21 +84,50 @@ func Encode(ctx context.Context, cipher aead.Cipher, val any, opts ...CodecOptio
 	// Steps:
 	// 1. Encode to JSON
 	// 2. GZIP
-	// 3. Encrypt with AEAD (XChaCha20-Poly1305) + Base64 URL-encode
+	// 3. Encrypt with AEAD (AES-GCM) + Base64 URL-encode
 	var b bytes.Buffer
 
-	gz, err := gzip.NewWriterLevel(&b, gzip.BestCompression)
-	if err != nil {
-		return "", err
-	}
+	gz := gzip.NewWriter(&b)
 
 	if err = json.NewEncoder(gz).Encode(val); err != nil {
 		return "", err
 	}
-
 	if err = gz.Close(); err != nil {
 		return "", err
 	}
 
 	return cipher.Encrypt(ctx, b.Bytes(), additionalDataFromOpts(opts...))
+}
+
+// SetCookie encrypts the given value and sets it in a cookie.
+func SetCookie(ctx context.Context, w http.ResponseWriter, reg interface {
+	FlowCipher() *aead.XChaCha20Poly1305
+	config.Provider
+}, cookieName string, value any, opts ...CodecOption) error {
+	cipher := reg.FlowCipher()
+	cookie, err := Encode(ctx, cipher, value, opts...)
+	if err != nil {
+		return err
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieName,
+		Value:    cookie,
+		HttpOnly: true,
+		Domain:   reg.Config().CookieDomain(ctx),
+		Secure:   reg.Config().CookieSecure(ctx),
+		SameSite: reg.Config().CookieSameSiteMode(ctx),
+	})
+
+	return nil
+}
+
+// FromCookie looks up the value stored in the cookie and decodes it.
+func FromCookie[T any](ctx context.Context, r *http.Request, cipher aead.Cipher, cookieName string, opts ...CodecOption) (*T, error) {
+	cookie, err := r.Cookie(cookieName)
+	if err != nil {
+		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("No cookie found for this request. Please initiate a new flow and retry."))
+	}
+
+	return Decode[T](ctx, cipher, cookie.Value, opts...)
 }

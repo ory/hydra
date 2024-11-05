@@ -1,31 +1,36 @@
 {
-  "i": "challenge-0007",
-  "n": "00000000-0000-0000-0000-000000000000",
-  "rs": [
+  "ID": "challenge-0007",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "RequestedScope": [
     "requested_scope-0007_1"
   ],
-  "ra": [
+  "RequestedAudience": [
     "requested_audience-0007_1"
   ],
-  "ls": true,
-  "s": "subject-0007",
-  "oc": {
+  "LoginSkip": true,
+  "Subject": "subject-0007",
+  "OpenIDConnectContext": {
     "display": "display-0007"
   },
-  "r": "http://request/0007",
-  "si": "auth_session-0007",
-  "lv": "verifier-0007",
-  "lc": "csrf-0007",
-  "li": null,
-  "ia": "0001-01-01T00:00:00Z",
-  "q": 128,
-  "lr": true,
-  "lf": 7,
-  "a": "acr-0007",
-  "fs": "force_subject_id-0007",
-  "ct": {},
-  "lu": true,
-  "le": {
+  "Client": null,
+  "ClientID": "",
+  "RequestURL": "http://request/0007",
+  "SessionID": "auth_session-0007",
+  "IdentityProviderSessionID": "",
+  "LoginVerifier": "verifier-0007",
+  "LoginCSRF": "csrf-0007",
+  "LoginInitializedAt": null,
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "State": 128,
+  "LoginRemember": true,
+  "LoginRememberFor": 7,
+  "LoginExtendSessionLifespan": false,
+  "ACR": "acr-0007",
+  "AMR": [],
+  "ForceSubjectIdentifier": "force_subject_id-0007",
+  "Context": {},
+  "LoginWasUsed": true,
+  "LoginError": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -33,22 +38,22 @@
     "error_debug": "",
     "valid": false
   },
-  "la": null,
-  "cc": "challenge-0007",
-  "cs": true,
-  "cv": "verifier-0007",
-  "cr": "csrf-0007",
-  "gs": [
+  "LoginAuthenticatedAt": null,
+  "ConsentChallengeID": "challenge-0007",
+  "ConsentSkip": true,
+  "ConsentVerifier": "verifier-0007",
+  "ConsentCSRF": "csrf-0007",
+  "GrantedScope": [
     "granted_scope-0007_1"
   ],
-  "ga": [
+  "GrantedAudience": [
     "granted_audience-0007_1"
   ],
-  "ce": true,
-  "cf": 7,
-  "ch": null,
-  "cw": true,
-  "cx": {
+  "ConsentRemember": true,
+  "ConsentRememberFor": 7,
+  "ConsentHandledAt": null,
+  "ConsentWasHandled": true,
+  "ConsentError": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -56,10 +61,10 @@
     "error_debug": "",
     "valid": false
   },
-  "st": {
+  "SessionIDToken": {
     "session_id_token-0007": "0007"
   },
-  "sa": {
+  "SessionAccessToken": {
     "session_access_token-0007": "0007"
   }
 }

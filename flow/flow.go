@@ -84,18 +84,18 @@ type Flow struct {
 	// identify the session.
 	//
 	// required: true
-	ID  string    `db:"login_challenge" json:"i"`
-	NID uuid.UUID `db:"nid" json:"n"`
+	ID  string    `db:"login_challenge"`
+	NID uuid.UUID `db:"nid"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedScope sqlxx.StringSliceJSONFormat `db:"requested_scope" json:"rs,omitempty"`
+	RequestedScope sqlxx.StringSliceJSONFormat `db:"requested_scope"`
 
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedAudience sqlxx.StringSliceJSONFormat `db:"requested_at_audience" json:"ra,omitempty"`
+	RequestedAudience sqlxx.StringSliceJSONFormat `db:"requested_at_audience"`
 
 	// LoginSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
@@ -103,72 +103,73 @@ type Flow struct {
 	// This feature allows you to update / set session information.
 	//
 	// required: true
-	LoginSkip bool `db:"login_skip" json:"ls,omitempty"`
+	LoginSkip bool `db:"login_skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
 	//
 	// required: true
-	Subject string `db:"subject" json:"s,omitempty"`
+	Subject string `db:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `db:"oidc_context" json:"oc"`
+	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client   *client.Client `db:"-" json:"client,omitempty"`
-	ClientID string         `db:"client_id" json:"ci,omitempty"`
+	Client *client.Client `db:"-"`
+
+	ClientID string `db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
 	//
 	// required: true
-	RequestURL string `db:"request_url" json:"r,omitempty"`
+	RequestURL string `db:"request_url"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. Its value can generally be used to associate consecutive login requests by a certain user.
-	SessionID sqlxx.NullString `db:"login_session_id" json:"si,omitempty"`
+	SessionID sqlxx.NullString `db:"login_session_id"`
 
 	// IdentityProviderSessionID is the session ID of the end-user that authenticated.
 	// If specified, we will use this value to propagate the logout.
-	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id" json:"is,omitempty"`
+	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id"`
 
-	LoginVerifier string `db:"login_verifier" json:"lv,omitempty"`
-	LoginCSRF     string `db:"login_csrf" json:"lc,omitempty"`
+	LoginVerifier string `db:"login_verifier"`
+	LoginCSRF     string `db:"login_csrf"`
 
-	LoginInitializedAt sqlxx.NullTime `db:"login_initialized_at" json:"li,omitempty"`
-	RequestedAt        time.Time      `db:"requested_at" json:"ia,omitempty"`
+	LoginInitializedAt sqlxx.NullTime `db:"login_initialized_at"`
+	RequestedAt        time.Time      `db:"requested_at"`
 
-	State int16 `db:"state" json:"q,omitempty"`
+	State int16 `db:"state"`
 
 	// LoginRemember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
-	LoginRemember bool `db:"login_remember" json:"lr,omitempty"`
+	LoginRemember bool `db:"login_remember"`
 
 	// LoginRememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
-	LoginRememberFor int `db:"login_remember_for" json:"lf,omitempty"`
+	LoginRememberFor int `db:"login_remember_for"`
 
 	// LoginExtendSessionLifespan, if set to true, session cookie expiry time will be updated when session is
 	// refreshed (login skip=true).
-	LoginExtendSessionLifespan bool `db:"login_extend_session_lifespan" json:"ll,omitempty"`
+	LoginExtendSessionLifespan bool `db:"login_extend_session_lifespan"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `db:"acr" json:"a,omitempty"`
+	ACR string `db:"acr"`
 
 	// AMR sets the Authentication Methods References value for this
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSliceJSONFormat `db:"amr" json:"am,omitempty"`
+	AMR sqlxx.StringSliceJSONFormat `db:"amr"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -187,58 +188,58 @@ type Flow struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `db:"forced_subject_identifier" json:"fs,omitempty"`
+	ForceSubjectIdentifier string `db:"forced_subject_identifier"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context sqlxx.JSONRawMessage `db:"context" json:"ct"`
+	Context sqlxx.JSONRawMessage `db:"context"`
 
 	// LoginWasUsed set to true means that the login request was already handled.
 	// This can happen on form double-submit or other errors. If this is set we
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
-	LoginWasUsed bool `db:"login_was_used" json:"lu,omitempty"`
+	LoginWasUsed bool `db:"login_was_used"`
 
-	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
-	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at" json:"la,omitempty"`
+	LoginError           *RequestDeniedError `db:"login_error"`
+	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at"`
 
 	// ConsentChallengeID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
 	//
 	// required: true
-	ConsentChallengeID sqlxx.NullString `db:"consent_challenge_id" json:"cc,omitempty"`
+	ConsentChallengeID sqlxx.NullString `db:"consent_challenge_id"`
 
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
-	ConsentSkip     bool             `db:"consent_skip" json:"cs,omitempty"`
-	ConsentVerifier sqlxx.NullString `db:"consent_verifier" json:"cv,omitempty"`
-	ConsentCSRF     sqlxx.NullString `db:"consent_csrf" json:"cr,omitempty"`
+	ConsentSkip     bool             `db:"consent_skip"`
+	ConsentVerifier sqlxx.NullString `db:"consent_verifier"`
+	ConsentCSRF     sqlxx.NullString `db:"consent_csrf"`
 
 	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSliceJSONFormat `db:"granted_scope" json:"gs,omitempty"`
+	GrantedScope sqlxx.StringSliceJSONFormat `db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSliceJSONFormat `db:"granted_at_audience" json:"ga,omitempty"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `db:"granted_at_audience"`
 
 	// ConsentRemember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
-	ConsentRemember bool `db:"consent_remember" json:"ce,omitempty"`
+	ConsentRemember bool `db:"consent_remember"`
 
 	// ConsentRememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	ConsentRememberFor *int `db:"consent_remember_for" json:"cf"`
+	ConsentRememberFor *int `db:"consent_remember_for"`
 
 	// ConsentHandledAt contains the timestamp the consent request was handled.
-	ConsentHandledAt sqlxx.NullTime `db:"consent_handled_at" json:"ch,omitempty"`
+	ConsentHandledAt sqlxx.NullTime `db:"consent_handled_at"`
 
 	// ConsentWasHandled set to true means that the request was already handled.
 	// This can happen on form double-submit or other errors. If this is set we
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
-	ConsentWasHandled  bool                     `db:"consent_was_used" json:"cw,omitempty"`
-	ConsentError       *RequestDeniedError      `db:"consent_error" json:"cx"`
-	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-" json:"st"`
-	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-" json:"sa"`
+	ConsentWasHandled  bool                     `db:"consent_was_used"`
+	ConsentError       *RequestDeniedError      `db:"consent_error"`
+	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-"`
 }
 
 func NewFlow(r *LoginRequest) *Flow {
@@ -510,37 +511,21 @@ type CipherProvider interface {
 }
 
 // ToLoginChallenge converts the flow into a login challenge.
-func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	if f.Client != nil {
-		f.ClientID = f.Client.GetID()
-	}
-	f.Client = nil
+func (f *Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginChallenge)
 }
 
 // ToLoginVerifier converts the flow into a login verifier.
-func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	if f.Client != nil {
-		f.ClientID = f.Client.GetID()
-	}
-	f.Client = nil
+func (f *Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginVerifier)
 }
 
 // ToConsentChallenge converts the flow into a consent challenge.
-func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	if f.Client != nil {
-		f.ClientID = f.Client.GetID()
-	}
-	f.Client = nil
+func (f *Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentChallenge)
 }
 
 // ToConsentVerifier converts the flow into a consent verifier.
-func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	if f.Client != nil {
-		f.ClientID = f.Client.GetID()
-	}
-	f.Client = nil
+func (f *Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
 }

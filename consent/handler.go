@@ -1053,10 +1053,5 @@ func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, op
 		return nil, err
 	}
 
-	f.Client, err = h.r.ClientManager().GetConcreteClient(ctx, f.ClientID)
-	if err != nil {
-		return nil, err
-	}
-
 	return f, nil
 }

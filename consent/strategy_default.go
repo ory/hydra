@@ -348,11 +348,6 @@ func (s *DefaultStrategy) verifyAuthentication(
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier is invalid."))
 	}
 
-	f.Client, err = s.r.ClientManager().GetConcreteClient(ctx, f.ClientID)
-	if err != nil {
-		return nil, err
-	}
-
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
@@ -657,12 +652,6 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	if err != nil {
 		return nil, nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
-
-	f.Client, err = s.r.ClientManager().GetConcreteClient(ctx, f.ClientID)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	if f.Client.GetID() != r.URL.Query().Get("client_id") {
 		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}

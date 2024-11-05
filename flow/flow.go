@@ -119,7 +119,7 @@ type Flow struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client   *client.Client `db:"-" json:"client,omitempty"`
+	Client   *client.Client `db:"-" json:"c,omitempty"`
 	ClientID string         `db:"client_id" json:"ci,omitempty"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -514,7 +514,6 @@ func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvide
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginChallenge)
 }
 
@@ -523,7 +522,6 @@ func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginVerifier)
 }
 
@@ -532,7 +530,6 @@ func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvi
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentChallenge)
 }
 
@@ -541,6 +538,5 @@ func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvid
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	f.Client = nil
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
 }

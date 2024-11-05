@@ -1170,13 +1170,3 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 	}
 	return subject, nil
 }
-
-func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) *flow.LoginSession {
-	clientID := r.URL.Query().Get("client_id")
-	if clientID == "" {
-		return nil
-	}
-	ls, _ := flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.FlowCipher(), flowctx.LoginSessionCookie(flowctx.SuffixFromStatic(clientID)))
-
-	return ls
-}

@@ -119,7 +119,7 @@ type Flow struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client   *client.Client `db:"c" json:"client,omitempty"`
+	Client   *client.Client `db:"-" json:"c,omitempty"`
 	ClientID string         `db:"client_id" json:"ci,omitempty"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which

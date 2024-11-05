@@ -12,67 +12,69 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-
-	"golang.org/x/sync/singleflight"
+	"sync"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/x/josex"
 
 	"github.com/ory/x/errorsx"
 
+	"github.com/ory/hydra/v2/x"
+
 	jose "github.com/go-jose/go-jose/v3"
 	"github.com/pkg/errors"
 )
 
-var jwkGenFlightGroup singleflight.Group
+var mapLock sync.RWMutex
+var locks = map[string]*sync.RWMutex{}
+
+func getLock(set string) *sync.RWMutex {
+	mapLock.Lock()
+	defer mapLock.Unlock()
+	if _, ok := locks[set]; !ok {
+		locks[set] = new(sync.RWMutex)
+	}
+	return locks[set]
+}
 
 func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg, set string) error {
-	_, err := GetOrGenerateKeySetPrivateKey(ctx, r, r.KeyManager(), set, set, alg)
+	_, err := GetOrGenerateKeys(ctx, r, r.KeyManager(), set, set, alg)
 	return err
 }
 
-func GetOrGenerateKeySetPrivateKey(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (private *jose.JSONWebKey, err error) {
-	keySet, err := GetOrGenerateKeySet(ctx, r, m, set, kid, alg)
-	if err != nil {
+func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (private *jose.JSONWebKey, err error) {
+	getLock(set).Lock()
+	defer getLock(set).Unlock()
+
+	keys, err := m.GetKeySet(ctx, set)
+	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
+		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
+		if err != nil {
+			return nil, err
+		}
+	} else if err != nil {
 		return nil, err
 	}
 
-	privKey, err := FindPrivateKey(keySet)
-	if err == nil {
+	privKey, privKeyErr := FindPrivateKey(keys)
+	if privKeyErr == nil {
+		return privKey, nil
+	} else {
+		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+
+		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
+		if err != nil {
+			return nil, err
+		}
+
+		privKey, err := FindPrivateKey(keys)
+		if err != nil {
+			return nil, err
+		}
 		return privKey, nil
 	}
-
-	keySet, err = generateKeySet(ctx, r, m, set, kid, alg)
-	if err != nil {
-		return nil, err
-	}
-
-	return FindPrivateKey(keySet)
-}
-
-func GetOrGenerateKeySet(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (*jose.JSONWebKeySet, error) {
-	keys, err := m.GetKeySet(ctx, set)
-	if err != nil && !errors.Is(err, x.ErrNotFound) {
-		return nil, err
-	} else if keys != nil && len(keys.Keys) > 0 {
-		return keys, nil
-	}
-
-	return generateKeySet(ctx, r, m, set, kid, alg)
-}
-
-func generateKeySet(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (*jose.JSONWebKeySet, error) {
-	// Suppress duplicate key set generation jobs where the set+alg match.
-	keysResult, err, _ := jwkGenFlightGroup.Do(set+alg, func() (any, error) {
-		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
-		return m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
-	})
-	if err != nil {
-		return nil, err
-	}
-	return keysResult.(*jose.JSONWebKeySet), nil
 }
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {

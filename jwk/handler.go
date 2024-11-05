@@ -13,6 +13,7 @@ import (
 	"github.com/ory/x/httprouterx"
 
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 
 	"github.com/ory/x/urlx"
 
@@ -100,11 +101,17 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	for _, set := range wellKnownKeys {
 		set := set
 		eg.Go(func() error {
-			keySet, err := GetOrGenerateKeySet(ctx, h.r, h.r.KeyManager(), set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256))
-			if err != nil {
+			k, err := h.r.KeyManager().GetKeySet(ctx, set)
+			if errors.Is(err, x.ErrNotFound) {
+				h.r.Logger().Warnf("JSON Web Key Set %q does not exist yet, generating new key pair...", set)
+				k, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
+				if err != nil {
+					return err
+				}
+			} else if err != nil {
 				return err
 			}
-			keys <- ExcludePrivateKeys(keySet)
+			keys <- ExcludePrivateKeys(k)
 			return nil
 		})
 	}

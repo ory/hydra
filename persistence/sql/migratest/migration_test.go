@@ -13,8 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/x/contextx"
+
+	"github.com/ory/hydra/v2/internal"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"
@@ -28,10 +29,11 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 
+	"github.com/ory/x/popx"
+
 	"github.com/ory/hydra/v2/flow"
 	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/hydra/v2/persistence/sql"
-	"github.com/ory/x/popx"
 
 	"github.com/ory/x/sqlcon/dockertest"
 

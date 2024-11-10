@@ -17,20 +17,19 @@ import (
 	"strings"
 	"testing"
 
+	gomock "github.com/golang/mock/gomock"
+	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
-	"github.com/golang/mock/gomock"
-	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
 )
 
 type fakeSigner struct {
@@ -210,7 +209,6 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 
 func TestGetOrGenerateKeys(t *testing.T) {
 	t.Parallel()
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 
 	setId := uuid.NewUUID().String()
 	keyId := uuid.NewUUID().String()
@@ -226,46 +224,46 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		return NewMockManager(ctrl)
 	}
 
-	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GetKeySetError", func(t *testing.T) {
+	t.Run("Test_Helper/Run_GetOrGenerateKeySetPrivateKey_With_GetKeySetError", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setId)).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setId, keyId, "RS256")
+		privKey, err := jwk.GetOrGenerateKeySetPrivateKey(context.TODO(), keyManager, setId, keyId, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
 
-	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GenerateAndPersistKeySetError", func(t *testing.T) {
+	t.Run("Test_Helper/Run_GetOrGenerateKeySetPrivateKey_With_GenerateAndPersistKeySetError", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setId)).Return(nil, errors.Wrap(x.ErrNotFound, ""))
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setId), gomock.Eq(keyId), gomock.Eq("RS256"), gomock.Eq("sig")).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setId, keyId, "RS256")
+		privKey, err := jwk.GetOrGenerateKeySetPrivateKey(context.TODO(), keyManager, setId, keyId, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
 
-	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GenerateAndPersistKeySetError", func(t *testing.T) {
+	t.Run("Test_Helper/Run_GetOrGenerateKeySetPrivateKey_With_GenerateAndPersistKeySetError", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setId)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setId), gomock.Eq(keyId), gomock.Eq("RS256"), gomock.Eq("sig")).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setId, keyId, "RS256")
+		privKey, err := jwk.GetOrGenerateKeySetPrivateKey(context.TODO(), keyManager, setId, keyId, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
 
-	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GetKeySet_ContainsMissingPrivateKey", func(t *testing.T) {
+	t.Run("Test_Helper/Run_GetOrGenerateKeySetPrivateKey_With_GetKeySet_ContainsMissingPrivateKey", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setId)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setId), gomock.Eq(keyId), gomock.Eq("RS256"), gomock.Eq("sig")).Return(keySet, nil)
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setId, keyId, "RS256")
+		privKey, err := jwk.GetOrGenerateKeySetPrivateKey(context.TODO(), keyManager, setId, keyId, "RS256")
 		assert.NoError(t, err)
 		assert.Equal(t, privKey, &keySet.Keys[0])
 	})
 
-	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GenerateAndPersistKeySet_ContainsMissingPrivateKey", func(t *testing.T) {
+	t.Run("Test_Helper/Run_GetOrGenerateKeySetPrivateKey_With_GenerateAndPersistKeySet_ContainsMissingPrivateKey", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setId)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setId), gomock.Eq(keyId), gomock.Eq("RS256"), gomock.Eq("sig")).Return(keySetWithoutPrivateKey, nil).Times(1)
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setId, keyId, "RS256")
+		privKey, err := jwk.GetOrGenerateKeySetPrivateKey(context.TODO(), keyManager, setId, keyId, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "key not found")
 	})

@@ -109,6 +109,7 @@ format: .bin/goimports .bin/ory node_modules
 mocks: .bin/mockgen
 	mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
 	mockgen -package jwk_test -destination jwk/registry_mock_test.go -source=jwk/registry.go
+	mockgen -package jwk_test -destination jwk/manager_mock_test.go -source=jwk/manager.go
 	go generate ./...
 
 # Generates the SDKs

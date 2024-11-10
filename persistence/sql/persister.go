@@ -12,14 +12,10 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
-	"github.com/ory/hydra/v2/aead"
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal/kratos"
-	"github.com/ory/hydra/v2/persistence"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/fsx"
@@ -27,6 +23,12 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
+
+	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/kratos"
+	"github.com/ory/hydra/v2/persistence"
+	"github.com/ory/hydra/v2/x"
 )
 
 var _ persistence.Persister = new(Persister)
@@ -43,14 +45,15 @@ const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
-		conn        *pop.Connection
-		mb          *popx.MigrationBox
-		mbs         popx.MigrationStatuses
-		r           Dependencies
-		config      *config.DefaultProvider
-		l           *logrusx.Logger
-		fallbackNID uuid.UUID
-		p           *networkx.Manager
+		conn              *pop.Connection
+		mb                *popx.MigrationBox
+		mbs               popx.MigrationStatuses
+		r                 Dependencies
+		config            *config.DefaultProvider
+		l                 *logrusx.Logger
+		fallbackNID       uuid.UUID
+		p                 *networkx.Manager
+		jwkGenFlightGroup *singleflight.Group
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -130,12 +133,13 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 	}
 
 	return &Persister{
-		conn:   c,
-		mb:     mb,
-		r:      r,
-		config: config,
-		l:      r.Logger(),
-		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		conn:              c,
+		mb:                mb,
+		r:                 r,
+		config:            config,
+		l:                 r.Logger(),
+		p:                 networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		jwkGenFlightGroup: new(singleflight.Group),
 	}, nil
 }
 

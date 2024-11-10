@@ -16,14 +16,16 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/otelx"
+
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/pkg/errors"
 
 	"github.com/pborman/uuid"
 
 	"github.com/ory/fosite"
+
 	"github.com/ory/hydra/v2/jwk"
 
 	"github.com/miekg/pkcs11"

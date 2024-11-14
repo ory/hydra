@@ -137,7 +137,7 @@ func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) x.HashAlgorith
 
 func (p *DefaultProvider) HasherBcryptConfig(ctx context.Context) *hasherx.BCryptConfig {
 	var cost uint32
-	costInt := p.GetBCryptCost(ctx)
+	costInt := int64(p.GetBCryptCost(ctx))
 	if costInt < 0 {
 		cost = 10
 	} else if costInt > math.MaxUint32 {
@@ -152,10 +152,10 @@ func (p *DefaultProvider) HasherBcryptConfig(ctx context.Context) *hasherx.BCryp
 
 func (p *DefaultProvider) HasherPBKDF2Config(ctx context.Context) *hasherx.PBKDF2Config {
 	var iters uint32
-	itersInt := p.getProvider(ctx).Int(KeyPBKDF2Iterations)
+	itersInt := p.getProvider(ctx).Int64(KeyPBKDF2Iterations)
 	if itersInt < 1 {
 		iters = 1
-	} else if itersInt > math.MaxUint32 {
+	} else if int64(itersInt) > math.MaxUint32 {
 		iters = math.MaxUint32
 	} else {
 		iters = uint32(itersInt)

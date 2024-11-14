@@ -64,8 +64,11 @@ func (p *DefaultProvider) ListenOn(iface ServeInterface) string {
 }
 
 func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPermission {
-	var mode fs.FileMode
-	modeInt := p.getProvider(contextx.RootContext).IntF(iface.Key(KeySuffixSocketMode), 0755)
+	modeInt := int64(0o755)
+	if p.getProvider(contextx.RootContext).Exists(iface.Key(KeySuffixSocketMode)) {
+		modeInt = int64(p.getProvider(contextx.RootContext).Int(iface.Key(KeySuffixSocketMode)))
+	}
+	mode := fs.FileMode(0)
 	if modeInt < 0 {
 		mode = 0
 	} else if modeInt > math.MaxUint32 {

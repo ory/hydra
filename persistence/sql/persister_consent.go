@@ -388,8 +388,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.
 		return p.mySQLConfirmLoginSession(ctx, loginSession)
 	}
 
-	err = p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
-		res, err := tx.TX.NamedExec(`
+	res, err := p.Connection(ctx).Store.NamedExecContext(ctx, `
 INSERT INTO hydra_oauth2_authentication_session (id, nid, authenticated_at, subject, remember, identity_provider_session_id)
 VALUES (:id, :nid, :authenticated_at, :subject, :remember, :identity_provider_session_id)
 ON CONFLICT(id) DO
@@ -400,22 +399,16 @@ UPDATE SET
 	identity_provider_session_id = :identity_provider_session_id
 WHERE hydra_oauth2_authentication_session.id = :id AND hydra_oauth2_authentication_session.nid = :nid
 `, loginSession)
-		if err != nil {
-			return sqlcon.HandleError(err)
-		}
-		n, err := res.RowsAffected()
-		if err != nil {
-			return sqlcon.HandleError(err)
-		}
-		if n == 0 {
-			return errorsx.WithStack(x.ErrNotFound)
-		}
-		return nil
-	})
 	if err != nil {
-		return errors.WithStack(err)
+		return sqlcon.HandleError(err)
 	}
-
+	n, err := res.RowsAffected()
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+	if n == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
+	}
 	return nil
 }
 

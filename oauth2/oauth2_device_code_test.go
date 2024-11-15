@@ -128,14 +128,15 @@ func TestDeviceTokenRequest(t *testing.T) {
 
 	testCases := []struct {
 		description string
-		setUp       func(signature string)
+		setUp       func(signature, userCodeSignature string)
 		check       func(t *testing.T, token *oauth2.Token, err error)
 		cleanUp     func()
 	}{
 		{
 			description: "should pass with refresh token",
-			setUp: func(signature string) {
+			setUp: func(signature, userCodeSignature string) {
 				authreq := &fosite.DeviceRequest{
+					UserCodeState: fosite.UserCodeAccepted,
 					Request: fosite.Request{
 						Client: &fosite.DefaultClient{
 							ID:         c.GetID(),
@@ -152,13 +153,12 @@ func TestDeviceTokenRequest(t *testing.T) {
 									fosite.DeviceCode: time.Now().Add(time.Hour).UTC(),
 								},
 							},
-							BrowserFlowCompleted: true,
 						},
 						RequestedAt: time.Now(),
 					},
 				}
 
-				require.NoError(t, reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), signature, authreq))
+				require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(context.TODO(), signature, userCodeSignature, authreq))
 			},
 			check: func(t *testing.T, token *oauth2.Token, err error) {
 				assert.NotEmpty(t, token.AccessToken)
@@ -167,8 +167,9 @@ func TestDeviceTokenRequest(t *testing.T) {
 		},
 		{
 			description: "should pass with ID token",
-			setUp: func(signature string) {
+			setUp: func(signature, userCodeSignature string) {
 				authreq := &fosite.DeviceRequest{
+					UserCodeState: fosite.UserCodeAccepted,
 					Request: fosite.Request{
 						Client: &fosite.DefaultClient{
 							ID:         c.GetID(),
@@ -185,13 +186,12 @@ func TestDeviceTokenRequest(t *testing.T) {
 									fosite.DeviceCode: time.Now().Add(time.Hour).UTC(),
 								},
 							},
-							BrowserFlowCompleted: true,
 						},
 						RequestedAt: time.Now(),
 					},
 				}
 
-				require.NoError(t, reg.OAuth2Storage().CreateDeviceCodeSession(context.TODO(), signature, authreq))
+				require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(context.TODO(), signature, userCodeSignature, authreq))
 				require.NoError(t, reg.OAuth2Storage().CreateOpenIDConnectSession(context.TODO(), signature, authreq))
 			},
 			check: func(t *testing.T, token *oauth2.Token, err error) {
@@ -205,10 +205,11 @@ func TestDeviceTokenRequest(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run("case="+testCase.description, func(t *testing.T) {
 			code, signature, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(context.TODO())
+			_, userCodeSignature, err := reg.RFC8628HMACStrategy().GenerateUserCode(context.TODO())
 			require.NoError(t, err)
 
 			if testCase.setUp != nil {
-				testCase.setUp(signature)
+				testCase.setUp(signature, userCodeSignature)
 			}
 
 			var token *oauth2.Token

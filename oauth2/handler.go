@@ -729,6 +729,15 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
+	// When this endpoint is called with a valid consent_verifier (meaning that the login flow completed successfully)
+	// there are 3 writes happening to the database:
+	// - The flow is created
+	// - The device auth session is updated (user_code is marked as accepted)
+	// - The OpenID session is created
+	// If there were multiple flows created for the same user_code then we may end up with multiple flow objects
+	// persisted to the database, while only one of them was actually used to validate the user_code
+	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
+	// TODO: We should wrap these queries in a transaction
 	consentSession, f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
@@ -747,26 +756,26 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		return
 	}
 
-	req, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), &Session{})
+	req, sig, err := h.r.OAuth2Storage().GetDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), &Session{})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	req.SetUserCodeState(fosite.UserCodeAccepted)
 	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req, req.GetSession().(*Session))
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	session.SetBrowserFlowCompleted(true)
-
 	req.SetSession(session)
 	// Update the device code session with
 	//   - the claims for which the user gave consent
 	//   - the granted scopes
 	//   - the granted audiences
+	//   - the user_code_state set to accepted
 	// This marks it as ready to be used for the token exchange endpoint.
-	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), req)
+	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionBySignature(ctx, sig, req)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
@@ -775,7 +784,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 
 	// Update the OpenID Connect session if "openid" scope is granted
 	if req.GetGrantedScopes().Has("openid") {
-		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, req.GetID(), req.Sanitize([]string{"grant_type",
+		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, sig, req.Sanitize([]string{"grant_type",
 			"max_age",
 			"prompt",
 			"acr_values",
@@ -868,7 +877,6 @@ func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 		DefaultSession: &openid.DefaultSession{
 			Headers: &jwt.Headers{},
 		},
-		BrowserFlowCompleted: false,
 	}
 
 	resp, err := h.r.OAuth2Provider().NewDeviceResponse(ctx, request, session)

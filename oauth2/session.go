@@ -33,7 +33,6 @@ type Session struct {
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
 	AllowedTopLevelClaims  []string               `json:"allowed_top_level_claims"`
 	MirrorTopLevelClaims   bool                   `json:"mirror_top_level_claims"`
-	BrowserFlowCompleted   bool                   `json:"browser_flow_completed"`
 
 	Flow *flow.Flow `json:"-"`
 }
@@ -208,12 +207,4 @@ func (s *Session) GetExtraClaims() map[string]interface{} {
 	}
 
 	return s.Extra
-}
-
-func (s *Session) GetBrowserFlowCompleted() bool {
-	return s.BrowserFlowCompleted
-}
-
-func (s *Session) SetBrowserFlowCompleted(flag bool) {
-	s.BrowserFlowCompleted = flag
 }

@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pborman/uuid"
@@ -1245,15 +1244,10 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	var consentSession *flow.AcceptOAuth2ConsentRequest
 	var f *flow.Flow
 
-	err = s.r.ConsentManager().Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		consentSession, f, err = s.verifyConsent(ctx, w, r, consentVerifier)
-		if err != nil {
-			return err
-		}
-		err = s.r.OAuth2Storage().UpdateAndInvalidateUserCodeSessionByRequestID(ctx, string(f.DeviceCodeRequestID), f.ID)
-
-		return err
-	})
+	consentSession, f, err = s.verifyConsent(ctx, w, r, consentVerifier)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return consentSession, f, err
 }

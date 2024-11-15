@@ -30,8 +30,7 @@
     "consent_challenge": "",
     "exclude_not_before_claim": false,
     "allowed_top_level_claims": [],
-    "mirror_top_level_claims": true,
-    "browser_flow_completed": false
+    "mirror_top_level_claims": true
   },
   "requester": {
     "client_id": "app-client",

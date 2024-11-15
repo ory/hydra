@@ -340,12 +340,13 @@ func TestAcceptDeviceRequest(t *testing.T) {
 			DefaultSession: &openid.DefaultSession{
 				Headers: &jwt.Headers{},
 			},
-			BrowserFlowCompleted: false,
 		},
 	)
+	_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(ctx)
+	require.NoError(t, err)
 	userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
 	require.NoError(t, err)
-	reg.OAuth2Storage().CreateUserCodeSession(ctx, sig, deviceRequest)
+	reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
 	require.NoError(t, err)
 
 	acceptUserCode := &hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode}
@@ -408,12 +409,13 @@ func TestAcceptDuplicateDeviceRequest(t *testing.T) {
 			DefaultSession: &openid.DefaultSession{
 				Headers: &jwt.Headers{},
 			},
-			BrowserFlowCompleted: false,
 		},
 	)
+	_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(ctx)
+	require.NoError(t, err)
 	userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
 	require.NoError(t, err)
-	reg.OAuth2Storage().CreateUserCodeSession(ctx, sig, deviceRequest)
+	reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
 	require.NoError(t, err)
 
 	acceptUserCode := &hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode}
@@ -499,7 +501,6 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
@@ -523,7 +524,6 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				userCode := ""
@@ -546,7 +546,6 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
@@ -570,7 +569,6 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
@@ -594,9 +592,10 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
+				_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(ctx)
+				require.NoError(t, err)
 				userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
 				require.NoError(t, err)
 				deviceRequest.SetSession(
@@ -604,12 +603,11 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				exp := time.Now().UTC()
 				deviceRequest.Session.SetExpiresAt(fosite.UserCode, exp)
-				err = reg.OAuth2Storage().CreateUserCodeSession(ctx, sig, deviceRequest)
+				err = reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
 				require.NoError(t, err)
 				return json.Marshal(&hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode})
 			},
@@ -633,7 +631,6 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 						DefaultSession: &openid.DefaultSession{
 							Headers: &jwt.Headers{},
 						},
-						BrowserFlowCompleted: false,
 					},
 				)
 				userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)

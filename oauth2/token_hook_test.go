@@ -1,3 +1,6 @@
+// Copyright © 2024 Ory Corp
+// SPDX-License-Identifier: Apache-2.0
+
 package oauth2
 
 import (
@@ -75,9 +78,12 @@ func TestUpdateExtraClaims(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := updateExtraClaims(tt.priorExtraClaims, tt.webhookExtraClaims)
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("updateExtraClaims() = %v, want %v", result, tt.expected)
+			// Act
+			updateExtraClaims(tt.priorExtraClaims, tt.webhookExtraClaims)
+
+			// Assert
+			if !reflect.DeepEqual(tt.priorExtraClaims, tt.expected) {
+				t.Errorf("claimsToUpdate = %v, want %v", tt.priorExtraClaims, tt.expected)
 			}
 		})
 	}

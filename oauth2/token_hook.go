@@ -144,22 +144,16 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 	}
 
 	// Update existing session data (extra claims).
-	session.Extra = updateExtraClaims(session.Extra, respBody.Session.AccessToken)
+	updateExtraClaims(session.Extra, respBody.Session.AccessToken)
 	idTokenClaims := session.IDTokenClaims()
-	idTokenClaims.Extra = updateExtraClaims(idTokenClaims.Extra, respBody.Session.IDToken)
+	updateExtraClaims(idTokenClaims.Extra, respBody.Session.IDToken)
 	return nil
 }
 
-func updateExtraClaims(priorExtraClaims, webhookExtraClaims map[string]interface{}) map[string]interface{} {
-	updatedClaims := make(map[string]interface{})
-	for key, value := range priorExtraClaims {
-		updatedClaims[key] = value
-	}
+func updateExtraClaims(claimsToUpdate, webhookExtraClaims map[string]interface{}) {
 	for key, value := range webhookExtraClaims {
-		updatedClaims[key] = value
+		claimsToUpdate[key] = value
 	}
-
-	return updatedClaims
 }
 
 // TokenHook is an AccessRequestHook called for all grant types.

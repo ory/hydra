@@ -40,8 +40,6 @@ type FositeStorer interface {
 
 	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 
-	UpdateOpenIDConnectSessionByRequestID(ctx context.Context, requestID string, requester fosite.Requester) error
-
 	// DeleteOpenIDConnectSession deletes an OpenID Connect session.
 	// This is duplicated from Ory Fosite to help against deprecation linting errors.
 	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error

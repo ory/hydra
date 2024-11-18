@@ -775,7 +775,13 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 
 	// Update the OpenID Connect session if "openid" scope is granted
 	if req.GetGrantedScopes().Has("openid") {
-		err = h.r.OAuth2Storage().UpdateOpenIDConnectSessionByRequestID(ctx, f.DeviceCodeRequestID.String(), req)
+		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, req.GetID(), req.Sanitize([]string{"grant_type",
+			"max_age",
+			"prompt",
+			"acr_values",
+			"id_token_hint",
+			"nonce",
+		}))
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())
 			h.r.Writer().WriteError(w, r, err)

@@ -247,8 +247,12 @@ func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
 	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 
+func (m *RegistrySQL) PingContext(ctx context.Context) error {
+	return m.Persister().Ping(ctx)
+}
+
 func (m *RegistrySQL) Ping() error {
-	return m.Persister().Ping()
+	return m.PingContext(context.Background())
 }
 
 func (m *RegistrySQL) ClientManager() client.Manager {
@@ -439,8 +443,8 @@ func (m *RegistrySQL) GrantValidator() *trust.GrantValidator {
 func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
 		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
-			"database": func(_ *http.Request) error {
-				return m.Ping()
+			"database": func(r *http.Request) error {
+				return m.PingContext(r.Context())
 			},
 			"migrations": func(r *http.Request) error {
 				if m.migrationStatus != nil && !m.migrationStatus.HasPending() {

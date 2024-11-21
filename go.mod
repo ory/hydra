@@ -6,7 +6,7 @@ toolchain go1.22.5
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
-replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.0
+replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b
 
 // Bump Fosite to https://github.com/ory/fosite/tree/hperl/v0.47.0%2B168636f, which contains
 // https://github.com/ory/fosite/commit/b40b1cbb1997e2160eaaf97fb6f73960db4c6118 and https://github.com/ory/fosite/pull/833/commits/eab241e153a4c97abe2e4c6e654f20b9ae206473 on top of the latest release.

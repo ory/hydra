@@ -178,9 +178,8 @@ func (p *Persister) Connection(ctx context.Context) *pop.Connection {
 	return popx.GetConnection(ctx, p.conn)
 }
 
-func (p *Persister) Ping() error {
-	type pinger interface{ Ping() error }
-	return p.conn.Store.(pinger).Ping()
+func (p *Persister) Ping(ctx context.Context) error {
+	return p.conn.Store.SQLDB().PingContext(ctx)
 }
 
 func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {

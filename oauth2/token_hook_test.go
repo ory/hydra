@@ -74,15 +74,36 @@ func TestUpdateExtraClaims(t *testing.T) {
 			webhookExtraClaims: map[string]interface{}{},
 			expected:           map[string]interface{}{},
 		},
+		{
+			name:               "Nil webhook claims",
+			priorExtraClaims:   map[string]interface{}{"claim1": "value1"},
+			webhookExtraClaims: nil,
+			expected:           map[string]interface{}{"claim1": "value1"},
+		},
+		{
+			name:               "Nil prior claims",
+			priorExtraClaims:   nil,
+			webhookExtraClaims: map[string]interface{}{"claim1": "value1"},
+			expected:           map[string]interface{}{"claim1": "value1"},
+		},
+		{
+			name:               "Both maps nil",
+			priorExtraClaims:   nil,
+			webhookExtraClaims: nil,
+			expected:           nil,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Act
-			updateExtraClaims(tt.priorExtraClaims, tt.webhookExtraClaims)
+			if tt.priorExtraClaims == nil {
+				tt.priorExtraClaims = nil // Explicitly ensure nil for this test case
+			}
+			actual := updateExtraClaims(tt.priorExtraClaims, tt.webhookExtraClaims)
 
 			// Assert
-			if !reflect.DeepEqual(tt.priorExtraClaims, tt.expected) {
+			if !reflect.DeepEqual(actual, tt.expected) {
 				t.Errorf("claimsToUpdate = %v, want %v", tt.priorExtraClaims, tt.expected)
 			}
 		})

@@ -34,7 +34,7 @@ type (
 		PrepareMigration(context.Context) error
 		Connection(context.Context) *pop.Connection
 		Transaction(context.Context, func(ctx context.Context, c *pop.Connection) error) error
-		Ping() error
+		Ping(context.Context) error
 		Networker
 	}
 	Provider interface {

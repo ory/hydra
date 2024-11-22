@@ -5,7 +5,7 @@ services:
     image: oryd/hydra:e2e
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
-    command: migrate sql -e --yes
+    command: migrate sql up -e --yes
     restart: on-failure
 
   hydra:

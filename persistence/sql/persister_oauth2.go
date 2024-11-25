@@ -254,7 +254,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	}
 
 	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		return fosite.ErrSerializationFailure.WithWrap(err)
 	} else if err != nil {
 		return err
 	}
@@ -293,7 +293,7 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 		return errorsx.WithStack(fosite.ErrNotFound)
 	}
 	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		return fosite.ErrSerializationFailure.WithWrap(err)
 	}
 	return err
 }
@@ -310,7 +310,7 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 	}
 	if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+			return fosite.ErrSerializationFailure.WithWrap(err)
 		}
 		if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
@@ -426,7 +426,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 		}
 	}
 	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		return fosite.ErrSerializationFailure.WithWrap(err)
 	}
 	return err
 }

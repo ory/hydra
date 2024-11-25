@@ -172,8 +172,10 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									"RETRY_WRITE_TOO_OLD",
 									// refresh token reuse detection
 									"token_inactive",
+									// Failed to refresh token because of multiple concurrent requests using the same token which is not allowed.
+									"multiple concurrent requests",
 								} {
-									if strings.Contains(e.DebugField, errSubstr) {
+									if strings.Contains(e.DebugField+e.HintField, errSubstr) {
 										matched = true
 										break
 									}

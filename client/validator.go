@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"strings"
 
@@ -233,6 +234,7 @@ func (v *Validator) ValidateSectorIdentifierURL(ctx context.Context, location st
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}
 	defer response.Body.Close()
+	response.Body = io.NopCloser(io.LimitReader(response.Body, 5<<20 /* 5 MiB */))
 
 	var urls []string
 	if err := json.NewDecoder(response.Body).Decode(&urls); err != nil {

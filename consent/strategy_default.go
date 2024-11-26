@@ -7,6 +7,7 @@ import (
 	"context"
 	stderrs "errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -790,6 +791,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 			return
 		}
 		defer res.Body.Close()
+		res.Body = io.NopCloser(io.LimitReader(res.Body, 1<<20 /* 1 MB */)) // in case we ever start to read this response
 
 		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 			log.WithError(errors.Errorf("expected HTTP status code %d or %d but got %d", http.StatusOK, http.StatusNoContent, res.StatusCode)).

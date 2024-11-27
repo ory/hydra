@@ -727,11 +727,14 @@ type revokeOAuth2Token struct {
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	events.Trace(ctx, events.AccessTokenRevoked)
 
-	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
+	err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+		return h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
+	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
+	} else {
+		events.Trace(ctx, events.AccessTokenRevoked)
 	}
 
 	h.r.OAuth2Provider().WriteRevocationResponse(ctx, w, err)

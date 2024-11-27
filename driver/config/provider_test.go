@@ -296,7 +296,7 @@ func TestViperProviderValidates(t *testing.T) {
 	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, "1s"))
 	assert.Equal(t, time.Second, c.RefreshTokenRotationGracePeriod(ctx))
 	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, "2h"))
-	assert.Equal(t, time.Hour, c.RefreshTokenRotationGracePeriod(ctx))
+	assert.Equal(t, time.Minute*5, c.RefreshTokenRotationGracePeriod(ctx))
 
 	// urls
 	assert.Equal(t, urlx.ParseOrPanic("https://issuer"), c.IssuerURL(ctx))

@@ -22,7 +22,6 @@ import (
 
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
@@ -36,7 +35,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
-	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 

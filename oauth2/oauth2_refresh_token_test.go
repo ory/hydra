@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +24,6 @@ import (
 	"github.com/ory/fosite"
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
@@ -89,12 +90,12 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		}
 		net := &networkx.Network{}
 		require.NoError(t, dbRegistry.Persister().Connection(context.Background()).First(net))
-		dbRegistry.WithContextualizer(&contextx.Static{NID: net.ID, C: internal.NewConfigurationWithDefaults().Source(context.Background())})
+		dbRegistry.WithContextualizer(&contextx.Static{NID: net.ID, C: testhelpers.NewConfigurationWithDefaults().Source(context.Background())})
 
 		ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 		t.Cleanup(cancel)
 		require.NoError(t, dbRegistry.OAuth2Storage().(clientCreator).CreateClient(ctx, &testClient))
-		require.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
+		require.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, "", request))
 		_, err := dbRegistry.OAuth2Storage().GetRefreshTokenSession(ctx, tokenSignature, nil)
 		require.NoError(t, err)
 		provider := dbRegistry.OAuth2Provider()
@@ -250,7 +251,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 
 			// reset state for the next test iteration
 			assert.NoError(t, dbRegistry.OAuth2Storage().DeleteRefreshTokenSession(ctx, tokenSignature))
-			assert.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
+			assert.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, "", request))
 		}
 	}
 }

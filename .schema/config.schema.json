@@ -1101,11 +1101,11 @@
           "examples": ["https://my-example.app/token-refresh-hook"],
           "oneOf": [
             {
-              "type": "string",
-              "format": "uri"
+              "$ref": "#/definitions/webhook_config"
             },
             {
-              "$ref": "#/definitions/webhook_config"
+              "type": "string",
+              "format": "uri"
             }
           ]
         },
@@ -1114,11 +1114,11 @@
           "examples": ["https://my-example.app/token-hook"],
           "oneOf": [
             {
-              "type": "string",
-              "format": "uri"
+              "$ref": "#/definitions/webhook_config"
             },
             {
-              "$ref": "#/definitions/webhook_config"
+              "type": "string",
+              "format": "uri"
             }
           ]
         }

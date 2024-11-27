@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/x/cmdx"
 
 	"github.com/ory/hydra/v2/driver"
@@ -72,7 +74,7 @@ func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Op
 
 	migrateCmd := NewMigrateCmd()
 	migrateCmd.AddCommand(NewMigrateGenCmd())
-	migrateCmd.AddCommand(NewMigrateSqlCmd(slOpts, dOpts, cOpts))
+	migrateCmd.AddCommand(NewMigrateSQLCmd(slOpts, dOpts, cOpts))
 	migrateCmd.AddCommand(NewMigrateStatusCmd(slOpts, dOpts, cOpts))
 
 	serveCmd := NewServeCmd()
@@ -99,8 +101,11 @@ func RegisterCommandRecursive(parent *cobra.Command, slOpts []servicelocatorx.Op
 
 // Execute adds all child commands to the root command sets flags appropriately.
 func Execute() {
-	if err := NewRootCmd(nil, nil, nil).Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+	c := NewRootCmd(nil, nil, nil)
+	if err := c.Execute(); err != nil {
+		if !errors.Is(err, cmdx.ErrNoPrintButFail) {
+			_, _ = fmt.Fprintln(c.ErrOrStderr(), err)
+		}
+		os.Exit(1)
 	}
 }

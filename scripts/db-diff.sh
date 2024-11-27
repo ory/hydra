@@ -81,7 +81,7 @@ function dump_pg {
 
 	make test-resetdb >/dev/null 2>&1
 	sleep 4
-  go run . migrate sql "$TEST_DATABASE_POSTGRESQL" --yes >&2 || true
+  go run . migrate sql up "$TEST_DATABASE_POSTGRESQL" --yes >&2 || true
 	sleep 1
 	pg_dump -s "$TEST_DATABASE_POSTGRESQL" | sed '/^--/d'
 }
@@ -94,7 +94,7 @@ function dump_cockroach {
 
 	make test-resetdb >/dev/null 2>&1
 	sleep 4
-	go run . migrate sql "$TEST_DATABASE_COCKROACHDB" --yes > /dev/null || true
+	go run . migrate sql up "$TEST_DATABASE_COCKROACHDB" --yes > /dev/null || true
 	hydra::util::parse-connection-url "${TEST_DATABASE_COCKROACHDB}"
 	docker run --rm --net=host -it cockroachdb/cockroach:latest-v24.1 dump --dump-all --dump-mode=schema --insecure --user="${DB_USER}" --host="${DB_HOST}" --port="${DB_PORT}"
 }
@@ -107,7 +107,7 @@ function dump_sqlite {
 	hydra::util::ensure-sqlite
 
 	rm "$SQLITE_PATH" > /dev/null 2>&1 || true
-	go run -tags sqlite,sqlite_omit_load_extension . migrate sql "sqlite://$SQLITE_PATH?_fk=true" --yes > /dev/null 2>&1 || true
+	go run -tags sqlite,sqlite_omit_load_extension . migrate sql up "sqlite://$SQLITE_PATH?_fk=true" --yes > /dev/null 2>&1 || true
 	echo '.dump' | sqlite3 "$SQLITE_PATH"
 }
 
@@ -120,7 +120,7 @@ function dump_mysql {
 	hydra::util::ensure-mysqldump
 	make test-resetdb >/dev/null 2>&1
 	sleep 10
-	go run . migrate sql "$TEST_DATABASE_MYSQL" --yes > /dev/null || true
+	go run . migrate sql up "$TEST_DATABASE_MYSQL" --yes > /dev/null || true
 	hydra::util::parse-connection-url "${TEST_DATABASE_MYSQL}"
 	mysqldump --user="$DB_USER" --password="$DB_PASSWORD" --host="$DB_HOST" --port="$DB_PORT" "$DB_DB" --no-data
 }

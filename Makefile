@@ -90,9 +90,10 @@ quicktest:
 quicktest-hsm:
 	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm -t oryd/hydra:${IMAGE_TAG} --target test-hsm .
 
-.PHONY: refresh
-refresh:
+.PHONY: test-refresh
+test-refresh:
 	UPDATE_SNAPSHOTS=true go test -failfast -short -tags sqlite,sqlite_omit_load_extension ./...
+	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-hsm --target test-refresh-hsm -t oryd/hydra:${IMAGE_TAG} --target test-refresh-hsm .
 
 authors:  # updates the AUTHORS file
 	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash

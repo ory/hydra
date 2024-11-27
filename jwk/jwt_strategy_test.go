@@ -9,12 +9,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/v2/internal"
 	. "github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/contextx"
 )
@@ -22,8 +23,8 @@ import (
 func TestJWTStrategy(t *testing.T) {
 	for _, alg := range []string{"RS256", "ES256", "ES512"} {
 		t.Run("case="+alg, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			conf := testhelpers.NewConfigurationWithDefaults()
+			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 			m := reg.KeyManager()
 
 			_, err := m.GenerateAndPersistKeySet(context.Background(), "foo-set", "foo", alg, "sig")

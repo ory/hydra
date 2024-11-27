@@ -15,6 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/go-jose/go-jose/v3"
 	"github.com/tidwall/gjson"
 
@@ -33,7 +35,6 @@ import (
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -50,10 +51,10 @@ type HandlerTestSuite struct {
 
 // Setup will run before the tests in the suite are run.
 func (s *HandlerTestSuite) SetupSuite() {
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(context.Background(), config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(context.Background(), config.KeyDefaultClientScope, []string{"foo", "bar"})
-	s.registry = internal.NewRegistryMemory(s.T(), conf, &contextx.Default{})
+	s.registry = testhelpers.NewRegistryMemory(s.T(), conf, &contextx.Default{})
 
 	router := x.NewRouterAdmin(conf.AdminURL)
 	handler := trust.NewHandler(s.registry)
@@ -80,7 +81,7 @@ func (s *HandlerTestSuite) TearDownSuite() {
 
 // Will run after each test in the suite.
 func (s *HandlerTestSuite) TearDownTest() {
-	internal.CleanAndMigrate(s.registry)(s.T())
+	testhelpers.CleanAndMigrate(s.registry)(s.T())
 }
 
 // In order for 'go test' to run this suite, we need to create

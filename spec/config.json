@@ -1071,9 +1071,9 @@
             "refresh_token": {
               "type": "object",
               "properties": {
-                "grace_period": {
+                "rotation_grace_period": {
                   "title": "Refresh Token Rotation Grace Period",
-                  "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is one hour.",
+                  "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is 5 minutes.",
                   "default": "0s",
                   "allOf": [
                     {

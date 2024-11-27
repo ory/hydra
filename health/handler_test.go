@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/x/contextx"
@@ -16,7 +18,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/healthx"
 )
@@ -71,12 +72,12 @@ func TestPublicHealthHandler(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults()
+			conf := testhelpers.NewConfigurationWithDefaults()
 			for k, v := range tc.config {
 				conf.MustSet(ctx, config.PublicInterface.Key(k), v)
 			}
 
-			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			public := x.NewRouterPublic()
 			reg.RegisterRoutes(ctx, x.NewRouterAdmin(conf.AdminURL), public)

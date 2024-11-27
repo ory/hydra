@@ -254,9 +254,6 @@ func (m *RegistrySQL) PingContext(ctx context.Context) error {
 func (m *RegistrySQL) Ping() error {
 	return m.PingContext(context.Background())
 }
-func (m *RegistrySQL) PingContext(ctx context.Context) error {
-	return m.Persister().PingContext(ctx)
-}
 
 func (m *RegistrySQL) ClientManager() client.Manager {
 	return m.Persister()

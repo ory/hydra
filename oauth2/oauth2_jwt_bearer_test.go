@@ -35,13 +35,12 @@ import (
 
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 )
 
 func TestJWTBearer(t *testing.T) {
 	ctx := context.Background()
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 

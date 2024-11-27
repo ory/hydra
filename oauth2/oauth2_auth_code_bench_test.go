@@ -33,7 +33,6 @@ import (
 	hydra "github.com/ory/hydra-client-go/v2"
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
@@ -79,7 +78,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	dsn := stringsx.Coalesce(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
 	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
-	reg := internal.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
 	reg.Config().MustSet(ctx, config.KeyLogLevel, "error")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")

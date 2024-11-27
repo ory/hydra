@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/fosite/handler/openid"
 
 	"github.com/stretchr/testify/assert"
@@ -29,7 +31,6 @@ import (
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -57,11 +58,11 @@ var _ interface {
 
 func (s *PersisterTestSuite) SetupSuite() {
 	s.registries = map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true, &contextx.Default{}),
+		"memory": testhelpers.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true, &contextx.Default{}),
 	}
 
 	if !testing.Short() {
-		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], _ = internal.ConnectDatabases(s.T(), true, &contextx.Default{})
+		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], _ = testhelpers.ConnectDatabases(s.T(), true, &contextx.Default{})
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -533,7 +534,7 @@ func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, authorizeCode, request))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, authorizeCode, "", request))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
@@ -727,7 +728,7 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			signature := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
 
@@ -933,7 +934,7 @@ func (s *PersisterTestSuite) TestFlushInactiveRefreshTokens() {
 			signature := uuid.Must(uuid.NewV4()).String()
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
 
@@ -1392,7 +1393,7 @@ func (s *PersisterTestSuite) TestGetRefreshTokenSession() {
 			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			sig := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, sig, request))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, sig, "", request))
 
 			actual, err := r.Persister().GetRefreshTokenSession(s.t2, sig, &fosite.DefaultSession{})
 			require.Error(t, err)
@@ -1777,47 +1778,114 @@ func (s *PersisterTestSuite) TestRevokeRefreshToken() {
 			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			signature := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request))
 
-			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
-
+			var actualt2 persistencesql.OAuth2RefreshTable
 			require.NoError(t, r.Persister().RevokeRefreshToken(s.t2, request.ID))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
-			require.Equal(t, true, actual.Active)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actualt2, signature))
+			require.Equal(t, true, actualt2.Active)
+
 			require.NoError(t, r.Persister().RevokeRefreshToken(s.t1, request.ID))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
-			require.Equal(t, false, actual.Active)
+			require.ErrorIs(t, r.Persister().Connection(context.Background()).Find(new(persistencesql.OAuth2RefreshTable), signature), sql.ErrNoRows)
 		})
 	}
 }
 
-func (s *PersisterTestSuite) TestRevokeRefreshTokenMaybeGracePeriod() {
+func (s *PersisterTestSuite) TestRotateRefreshToken() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			client := &client.Client{ID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			t.Run("with access signature", func(t *testing.T) {
+				clientID := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateClient(s.t1, &client.Client{ID: clientID}))
+				require.NoError(t, r.Persister().CreateClient(s.t2, &client.Client{ID: clientID}))
 
-			request := fosite.NewRequest()
-			request.Client = &fosite.DefaultClient{ID: "client-id"}
-			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
+				request := fosite.NewRequest()
+				request.Client = &fosite.DefaultClient{ID: clientID}
+				request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
-			signature := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+				// Create token T1
+				signatureT1 := uuid.Must(uuid.NewV4()).String()
+				accessSignatureT1 := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, accessSignatureT1, request))
+				require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signatureT1, accessSignatureT1, request))
 
-			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+				// Create token T2
+				signatureT2 := uuid.Must(uuid.NewV4()).String()
+				accessSignatureT2 := uuid.Must(uuid.NewV4()).String()
+				require.ErrorIs(t, r.Persister().RotateRefreshToken(s.t2, request.ID, signatureT2), fosite.ErrNotFound, "Rotation fails as token is non-existent.")
+				require.NoError(t, r.Persister().CreateAccessTokenSession(s.t2, accessSignatureT2, request))
+				require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t2, signatureT2, accessSignatureT2, request))
 
-			store, ok := r.Persister().(*persistencesql.Persister)
-			if !ok {
-				t.Fatal("type assertion failed")
-			}
+				accessT2 := persistencesql.OAuth2RequestSQL{Table: "access"}
+				assert.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", x.SignatureHash(accessSignatureT2)).First(&accessT2))
+				require.Equal(t, true, accessT2.Active)
 
-			require.NoError(t, store.RevokeRefreshTokenMaybeGracePeriod(s.t2, request.ID, signature))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
-			require.Equal(t, true, actual.Active)
-			require.NoError(t, store.RevokeRefreshTokenMaybeGracePeriod(s.t1, request.ID, signature))
-			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
-			require.Equal(t, false, actual.Active)
+				accessT1 := persistencesql.OAuth2RequestSQL{Table: "access"}
+				assert.NoError(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignatureT1)).First(&accessT1))
+				require.Equal(t, true, accessT2.Active)
+
+				// Rotate token T1
+				require.NoError(t, r.Persister().RotateRefreshToken(s.t1, request.ID, signatureT1))
+				{
+					refreshT1 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					require.NoError(t, r.Persister().Connection(s.t1).Where("signature = ?", signatureT1).First(&refreshT1))
+					require.Equal(t, false, refreshT1.Active)
+
+					accessT1 := persistencesql.OAuth2RequestSQL{Table: "access"}
+					require.ErrorIs(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignatureT1)).First(&accessT1), sql.ErrNoRows)
+
+					refreshT2 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					require.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", signatureT2).First(&refreshT2))
+					require.Equal(t, true, refreshT2.Active)
+
+					accessT2 := persistencesql.OAuth2RequestSQL{Table: "access"}
+					require.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", x.SignatureHash(accessSignatureT2)).First(&accessT2))
+					require.Equal(t, true, accessT2.Active)
+				}
+
+				require.NoError(t, r.Persister().RotateRefreshToken(s.t2, request.ID, signatureT2))
+				{
+					refreshT2 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					require.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", signatureT2).First(&refreshT2))
+					require.Equal(t, false, refreshT2.Active)
+
+					accessT2 := persistencesql.OAuth2RequestSQL{Table: "access"}
+					require.ErrorIs(t, r.Persister().Connection(s.t2).Where("signature = ?", x.SignatureHash(accessSignatureT2)).First(&accessT2), sql.ErrNoRows)
+					require.Equal(t, false, accessT2.Active)
+				}
+			})
+
+			t.Run("without access signature", func(t *testing.T) {
+				clientID := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateClient(s.t1, &client.Client{ID: clientID}))
+
+				request1 := fosite.NewRequest()
+				request1.Client = &fosite.DefaultClient{ID: clientID}
+				request1.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
+
+				signature := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request1))
+
+				accessSignature1 := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, accessSignature1, request1))
+
+				accessSignature2 := uuid.Must(uuid.NewV4()).String()
+				require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, accessSignature2, request1))
+
+				require.NoError(t, r.Persister().RotateRefreshToken(s.t1, request1.ID, signature))
+				{
+					accessT1 := persistencesql.OAuth2RequestSQL{Table: "access"}
+					require.ErrorIs(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignature1)).First(&accessT1), sql.ErrNoRows)
+
+					refresh := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					require.NoError(t, r.Persister().Connection(s.t1).Where("signature = ?", signature).First(&refresh))
+					require.Equal(t, false, refresh.Active)
+
+					accessT2 := persistencesql.OAuth2RequestSQL{Table: "access"}
+					require.ErrorIs(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignature2)).First(&accessT2), sql.ErrNoRows)
+				}
+			})
 		})
 	}
 }

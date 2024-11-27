@@ -33,7 +33,6 @@ var _ persistence.Persister = new(Persister)
 var _ storage.Transactional = new(Persister)
 
 var (
-	ErrTransactionOpen   = errors.New("There is already a Transaction in this context.")
 	ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
 )
 

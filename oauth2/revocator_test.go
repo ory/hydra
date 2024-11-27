@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/x/httprouterx"
@@ -60,10 +62,10 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 }
 
 func TestRevoke(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	conf := testhelpers.NewConfigurationWithDefaults()
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	internal.MustEnsureRegistryKeys(context.Background(), reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(context.Background(), reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)

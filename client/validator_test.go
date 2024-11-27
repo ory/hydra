@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/ory/fosite"
@@ -24,17 +26,16 @@ import (
 
 	. "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 )
 
 func TestValidate(t *testing.T) {
 	ctx := context.Background()
-	c := internal.NewConfigurationWithDefaults()
+	c := testhelpers.NewConfigurationWithDefaults()
 	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
-	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 	v := NewValidator(reg)
 
 	testCtx := context.TODO()
@@ -186,7 +187,7 @@ func (f *fakeHTTP) HTTPClient(ctx context.Context, opts ...httpx.ResilientOption
 }
 
 func TestValidateSectorIdentifierURL(t *testing.T) {
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	var payload string
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -268,8 +269,8 @@ const validJWKS = `
 
 func TestValidateIPRanges(t *testing.T) {
 	ctx := context.Background()
-	c := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	c := testhelpers.NewConfigurationWithDefaults()
+	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 
 	v := NewValidator(reg)
 	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, true)
@@ -287,10 +288,10 @@ func TestValidateIPRanges(t *testing.T) {
 
 func TestValidateDynamicRegistration(t *testing.T) {
 	ctx := context.Background()
-	c := internal.NewConfigurationWithDefaults()
+	c := testhelpers.NewConfigurationWithDefaults()
 	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
-	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 
 	testCtx := context.TODO()
 	v := NewValidator(reg)

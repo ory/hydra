@@ -14,23 +14,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/v2/x"
-
-	"github.com/ory/x/sqlxx"
-
-	"go.opentelemetry.io/otel/trace"
-
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 )
 
@@ -60,7 +59,8 @@ type (
 	}
 	OAuth2RefreshTable struct {
 		OAuth2RequestSQL
-		FirstUsedAt sql.NullTime `db:"first_used_at"`
+		FirstUsedAt          sql.NullTime   `db:"first_used_at"`
+		AccessTokenSignature sql.NullString `db:"access_token_signature"`
 	}
 )
 
@@ -445,41 +445,61 @@ func toEventOptions(requester fosite.Requester) []trace.EventOption {
 	}
 }
 
-func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, accessTokenSignature string, requester fosite.Requester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateRefreshTokenSession")
 	defer otelx.End(span, &err)
 	events.Trace(ctx, events.RefreshTokenIssued, toEventOptions(requester)...)
-	return p.createSession(ctx, signature, requester, sqlTableRefresh, requester.GetSession().GetExpiresAt(fosite.RefreshToken).UTC())
+
+	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, sqlTableRefresh, requester.GetSession().GetExpiresAt(fosite.RefreshToken).UTC())
+	if err != nil {
+		return err
+	}
+
+	var sig sql.NullString
+	if len(accessTokenSignature) > 0 {
+		sig = sql.NullString{
+			Valid:  true,
+			String: x.SignatureHash(accessTokenSignature),
+		}
+	}
+
+	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, &OAuth2RefreshTable{
+		OAuth2RequestSQL:     *req,
+		AccessTokenSignature: sig,
+	})); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return fosite.ErrSerializationFailure.WithWrap(err)
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRefreshTokenSession")
 	defer otelx.End(span, &err)
 
-	r := OAuth2RefreshTable{OAuth2RequestSQL: OAuth2RequestSQL{Table: sqlTableRefresh}}
-	err = p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
-	if errors.Is(err, sql.ErrNoRows) {
+	var row OAuth2RefreshTable
+	if err := p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&row); errors.Is(err, sql.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	fositeRequest, err := r.toRequest(ctx, session, p)
+	gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx)
+	if row.Active {
+		// Token is active
+		return row.toRequest(ctx, session, p)
+	} else if gracePeriod > 0 &&
+		row.FirstUsedAt.Valid &&
+		row.FirstUsedAt.Time.Add(gracePeriod).After(time.Now()) {
+		// We return the request as is, which indicates that the token is active (because we are in the grace period still).
+		return row.toRequest(ctx, session, p)
+	}
+
+	fositeRequest, err := row.toRequest(ctx, session, p)
 	if err != nil {
 		return nil, err
-	}
-
-	if r.Active {
-		return fositeRequest, nil
-	}
-
-	if gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx); gracePeriod > 0 && r.FirstUsedAt.Valid {
-		if r.FirstUsedAt.Time.Add(gracePeriod).Before(time.Now()) {
-			return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
-		}
-
-		r.Active = true                     // We set active to true because we are in the grace period.
-		return r.toRequest(ctx, session, p) // And re-generate the request
 	}
 
 	return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
@@ -533,23 +553,7 @@ func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature stri
 func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshToken")
 	defer otelx.End(span, &err)
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
-}
-
-func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshTokenMaybeGracePeriod")
-	defer otelx.End(span, &err)
-
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, first_used_at = CURRENT_TIMESTAMP WHERE request_id=? AND nid = ? AND active", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
-				id,
-				p.NetworkID(ctx),
-			).
-			Exec(),
-	)
+	return p.deleteSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) (err error) {
@@ -611,4 +615,124 @@ func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) (er
 	return sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).Where("client_id=?", clientID).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
 	)
+}
+
+func handleRetryError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return fosite.ErrSerializationFailure.WithWrap(err)
+	}
+	if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	}
+	return err
+}
+
+// strictRefreshRotation implements the strict refresh token rotation strategy. In strict rotation, we disable all
+// refresh and access tokens associated with a request ID and subsequently create the only valid, new token pair.
+func (p *Persister) strictRefreshRotation(ctx context.Context, requestID string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.strictRefreshRotation",
+		trace.WithAttributes(
+			attribute.String("request_id", requestID),
+			attribute.String("network_id", p.NetworkID(ctx).String())))
+	defer otelx.End(span, &err)
+
+	c := p.Connection(ctx)
+
+	// In strict rotation we only have one token chain for every request. Therefore, we remove all
+	// access tokens associated with the request ID.
+	if err := p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess); err != nil {
+		return err
+	}
+
+	// The same applies to refresh tokens in strict mode. We disable all old refresh tokens when rotating.
+	count, err := c.RawQuery(
+		"UPDATE hydra_oauth2_refresh SET active=false WHERE request_id=? AND nid = ? AND active",
+		requestID,
+		p.NetworkID(ctx),
+	).ExecWithCount()
+	if err != nil {
+		return sqlcon.HandleError(err)
+	} else if count == 0 {
+		return errorsx.WithStack(fosite.ErrNotFound)
+	}
+
+	return nil
+}
+
+func (p *Persister) gracefulRefreshRotation(ctx context.Context, requestID string, refreshSignature string, period time.Duration) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.gracefulRefreshRotation",
+		trace.WithAttributes(
+			attribute.String("request_id", requestID),
+			attribute.String("network_id", p.NetworkID(ctx).String())))
+	defer otelx.End(span, &err)
+
+	c := p.Connection(ctx)
+	now := time.Now().UTC().Round(time.Millisecond)
+
+	var accessTokenSignature sql.NullString
+	if p.conn.Dialect.Name() == dbal.DriverMySQL {
+		// MySQL does not support returning values from an update query, so we need to do two queries.
+		var tokenToRevoke OAuth2RefreshTable
+		if err := c.
+			Select("access_token_signature").
+			// Filtering by "active" status would break graceful token rotation. We know and trust (with tests)
+			// that Fosite is dealing with the refresh token reuse detection business logic without
+			// relying on the active filter her.
+			Where("signature=? AND nid = ?", refreshSignature, p.NetworkID(ctx)).
+			First(&tokenToRevoke); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		if count, err := c.RawQuery(
+			// Signature is the primary key so no limit needed. We only update first_used_at if it is not set yet (otherwise
+			// we would "refresh" the grace period again and again, and the refresh token would never "expire").
+			`UPDATE hydra_oauth2_refresh SET active=false, first_used_at = COALESCE(first_used_at, ?) WHERE signature=? AND nid = ?`,
+			now, refreshSignature, p.NetworkID(ctx),
+		).ExecWithCount(); err != nil {
+			return sqlcon.HandleError(err)
+		} else if count == 0 {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		}
+
+		accessTokenSignature = tokenToRevoke.AccessTokenSignature
+	} else {
+		var tokenToRevoke OAuth2RefreshTable
+		if err := c.RawQuery(
+			// Same query like in the MySQL case, but we can return the access token signature directly.
+			`UPDATE hydra_oauth2_refresh SET active=false, first_used_at = COALESCE(first_used_at, ?) WHERE signature=? AND nid = ? RETURNING access_token_signature`,
+			now, refreshSignature, p.NetworkID(ctx),
+		).First(&tokenToRevoke); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		accessTokenSignature = tokenToRevoke.AccessTokenSignature
+	}
+
+	if !accessTokenSignature.Valid {
+		// If the access token is not found, we fall back to deleting all access tokens associated with the request ID.
+		if err := p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// We have the signature and we will only remove that specific access token as part of the rotation.
+	return p.deleteSessionBySignature(ctx, accessTokenSignature.String, sqlTableAccess)
+}
+
+func (p *Persister) RotateRefreshToken(ctx context.Context, requestID string, refreshTokenSignature string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RotateRefreshToken")
+	defer otelx.End(span, &err)
+
+	// If we end up here, we have a valid refresh token and can proceed with the rotation.
+	gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx)
+	if gracePeriod > 0 {
+		return handleRetryError(p.gracefulRefreshRotation(ctx, requestID, refreshTokenSignature, gracePeriod))
+	}
+
+	return handleRetryError(p.strictRefreshRotation(ctx, requestID))
 }

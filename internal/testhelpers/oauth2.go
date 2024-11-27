@@ -32,7 +32,6 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -67,8 +66,8 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (pu
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
-	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
-	internal.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
+	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
 	reg.RegisterRoutes(ctx, admin, public)
 
@@ -106,6 +105,20 @@ func IntrospectToken(t testing.TB, conf *oauth2.Config, token string, adminTS *h
 
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
 	res, err := adminTS.Client().Do(req)
+	require.NoError(t, err)
+	defer res.Body.Close()
+	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
+}
+
+func RevokeToken(t testing.TB, conf *oauth2.Config, token string, publicTS *httptest.Server) gjson.Result {
+	require.NotEmpty(t, token)
+
+	req := httpx.MustNewRequest("POST", publicTS.URL+"/oauth2/revoke",
+		strings.NewReader((url.Values{"token": {token}}).Encode()),
+		"application/x-www-form-urlencoded")
+
+	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
+	res, err := publicTS.Client().Do(req)
 	require.NoError(t, err)
 	defer res.Body.Close()
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))

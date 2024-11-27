@@ -6,6 +6,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/ory/x/popx"
+
 	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/configx"
@@ -41,4 +43,16 @@ Before running this command on an existing database, create a back up!`,
 	cmd.AddCommand(NewMigrateSQLStatusCmd(slOpts, dOpts, cOpts))
 
 	return cmd
+}
+
+func NewMigrateSQLDownCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
+	return popx.NewMigrateSQLDownCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLDown)
+}
+
+func NewMigrateSQLStatusCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
+	return popx.NewMigrateSQLStatusCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateStatus)
+}
+
+func NewMigrateSQLUpCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
+	return popx.NewMigrateSQLUpCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLUp)
 }

@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,14 +24,12 @@ import (
 
 func writeTempFile(t *testing.T, contents interface{}) string {
 	t.Helper()
-	ij, err := json.Marshal(contents)
+	fn := filepath.Join(t.TempDir(), "content.json")
+	f, err := os.Create(fn)
 	require.NoError(t, err)
-	f, err := os.CreateTemp(t.TempDir(), "")
-	require.NoError(t, err)
-	_, err = f.Write(ij)
-	require.NoError(t, err)
+	require.NoError(t, json.NewEncoder(f).Encode(contents))
 	require.NoError(t, f.Close())
-	return f.Name()
+	return fn
 }
 
 func TestImportClient(t *testing.T) {
@@ -38,8 +37,8 @@ func TestImportClient(t *testing.T) {
 	c := cmd.NewImportClientCmd()
 	reg := setup(t, c)
 
-	file1 := writeTempFile(t, []hydra.OAuth2Client{{Scope: pointerx.String("foo")}, {Scope: pointerx.String("bar"), ClientSecret: pointerx.String("some-secret")}})
-	file2 := writeTempFile(t, []hydra.OAuth2Client{{Scope: pointerx.String("baz")}, {Scope: pointerx.String("zab"), ClientSecret: pointerx.String("some-secret")}})
+	file1 := writeTempFile(t, []hydra.OAuth2Client{{Scope: pointerx.Ptr("foo")}, {Scope: pointerx.Ptr("bar"), ClientSecret: pointerx.Ptr("some-secret")}})
+	file2 := writeTempFile(t, []hydra.OAuth2Client{{Scope: pointerx.Ptr("baz")}, {Scope: pointerx.Ptr("zab"), ClientSecret: pointerx.Ptr("some-secret")}})
 
 	t.Run("case=imports clients from single file", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, file1))
@@ -77,7 +76,7 @@ func TestImportClient(t *testing.T) {
 
 	t.Run("case=imports clients from multiple files and stdin", func(t *testing.T) {
 		var stdin bytes.Buffer
-		require.NoError(t, json.NewEncoder(&stdin).Encode([]hydra.OAuth2Client{{Scope: pointerx.String("oof")}, {Scope: pointerx.String("rab"), ClientSecret: pointerx.String("some-secret")}}))
+		require.NoError(t, json.NewEncoder(&stdin).Encode([]hydra.OAuth2Client{{Scope: pointerx.Ptr("oof")}, {Scope: pointerx.Ptr("rab"), ClientSecret: pointerx.Ptr("some-secret")}}))
 
 		stdout, _, err := cmdx.Exec(t, c, &stdin, file1, file2)
 		require.NoError(t, err)
@@ -93,7 +92,7 @@ func TestImportClient(t *testing.T) {
 	})
 
 	t.Run("case=performs appropriate error reporting", func(t *testing.T) {
-		file3 := writeTempFile(t, []hydra.OAuth2Client{{ClientSecret: pointerx.String("short")}})
+		file3 := writeTempFile(t, []hydra.OAuth2Client{{ClientSecret: pointerx.Ptr("short")}})
 		stdout, stderr, err := cmdx.Exec(t, c, nil, file1, file3)
 		require.Error(t, err)
 		actual := gjson.Parse(stdout)

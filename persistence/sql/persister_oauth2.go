@@ -58,6 +58,10 @@ type (
 		// InternalExpiresAt denormalizes the expiry from the session to additionally store it as a row.
 		InternalExpiresAt sqlxx.NullTime `db:"expires_at" json:"-"`
 	}
+	OAuth2RefreshTable struct {
+		OAuth2RequestSQL
+		FirstUsedAt sql.NullTime `db:"first_used_at"`
+	}
 )
 
 const (
@@ -70,6 +74,10 @@ const (
 
 func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
+}
+
+func (r OAuth2RefreshTable) TableName() string {
+	return "hydra_oauth2_refresh"
 }
 
 func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, r fosite.Requester, table tableName, expiresAt time.Time) (*OAuth2RequestSQL, error) {
@@ -120,6 +128,24 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		Active:            true,
 		Table:             table,
 	}, nil
+}
+
+func (p *Persister) marshalSession(ctx context.Context, session fosite.Session) ([]byte, error) {
+	sessionBytes, err := json.Marshal(session)
+	if err != nil {
+		return nil, err
+	}
+
+	if !p.config.EncryptSessionData(ctx) {
+		return sessionBytes, nil
+	}
+
+	ciphertext, err := p.r.KeyCipher().Encrypt(ctx, sessionBytes, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(ciphertext), nil
 }
 
 func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (_ *fosite.Request, err error) {
@@ -439,7 +465,34 @@ func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature str
 func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRefreshTokenSession")
 	defer otelx.End(span, &err)
-	return p.findSessionBySignature(ctx, signature, session, sqlTableRefresh)
+
+	r := OAuth2RefreshTable{OAuth2RequestSQL: OAuth2RequestSQL{Table: sqlTableRefresh}}
+	err = p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errorsx.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	fositeRequest, err := r.toRequest(ctx, session, p)
+	if err != nil {
+		return nil, err
+	}
+
+	if r.Active {
+		return fositeRequest, nil
+	}
+
+	if gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx); gracePeriod > 0 && r.FirstUsedAt.Valid {
+		if r.FirstUsedAt.Time.Add(gracePeriod).Before(time.Now()) {
+			return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
+		}
+
+		r.Active = true                     // We set active to true because we are in the grace period.
+		return r.toRequest(ctx, session, p) // And re-generate the request
+	}
+
+	return fositeRequest, errors.WithStack(fosite.ErrInactiveToken)
 }
 
 func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature string) (err error) {
@@ -496,7 +549,17 @@ func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) (err erro
 func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshTokenMaybeGracePeriod")
 	defer otelx.End(span, &err)
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(
+				fmt.Sprintf("UPDATE %s SET active=false, first_used_at = CURRENT_TIMESTAMP WHERE request_id=? AND nid = ? AND active", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+				id,
+				p.NetworkID(ctx),
+			).
+			Exec(),
+	)
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) (err error) {

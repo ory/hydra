@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/ory/fosite"
+	client "github.com/ory/kratos-client-go"
 )
 
 type (
@@ -17,9 +18,10 @@ type (
 )
 
 const (
-	FakeSessionID = "fake-kratos-session-id"
-	FakeUsername  = "fake-kratos-username"
-	FakePassword  = "fake-kratos-password" // nolint: gosec
+	FakeSessionID  = "fake-kratos-session-id"
+	FakeUsername   = "fake-kratos-username"
+	FakePassword   = "fake-kratos-password" // nolint: gosec
+	FakeIdentityID = "fake-kratos-identity-id"
 )
 
 var _ Client = new(FakeKratos)
@@ -35,11 +37,11 @@ func (f *FakeKratos) DisableSession(_ context.Context, identityProviderSessionID
 	return nil
 }
 
-func (f *FakeKratos) Authenticate(_ context.Context, username, password string) error {
+func (f *FakeKratos) Authenticate(_ context.Context, username, password string) (*client.Session, error) {
 	if username == FakeUsername && password == FakePassword {
-		return nil
+		return &client.Session{Identity: &client.Identity{Id: FakeIdentityID}}, nil
 	}
-	return fosite.ErrNotFound
+	return nil, fosite.ErrNotFound
 }
 
 func (f *FakeKratos) Reset() {

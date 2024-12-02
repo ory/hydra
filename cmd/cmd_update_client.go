@@ -42,7 +42,10 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			id := args[0]
-			cc := clientFromFlags(cmd)
+			cc, err := clientFromFlags(cmd)
+			if err != nil {
+				return err
+			}
 
 			client, _, err := m.OAuth2API.SetOAuth2Client(context.Background(), id).OAuth2Client(cc).Execute() //nolint:bodyclose
 			if err != nil {
@@ -50,7 +53,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 			}
 
 			if client.ClientSecret == nil && len(secret) > 0 {
-				client.ClientSecret = pointerx.String(secret)
+				client.ClientSecret = pointerx.Ptr(secret)
 			}
 
 			if encryptSecret && client.ClientSecret != nil {
@@ -60,7 +63,7 @@ To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" +
 					return cmdx.FailSilently(cmd)
 				}
 
-				client.ClientSecret = pointerx.String(enc.Base64Encode())
+				client.ClientSecret = pointerx.Ptr(enc.Base64Encode())
 			}
 
 			cmdx.PrintRow(cmd, (*outputOAuth2Client)(client))

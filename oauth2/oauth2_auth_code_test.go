@@ -165,7 +165,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
-						IdToken:     map[string]interface{}{"bar": "baz"},
+						IdToken:     map[string]interface{}{"bar": "baz", "email": "foo@bar.com"},
 					},
 				}).
 				Execute()
@@ -176,8 +176,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
-		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
-		require.NoError(t, err)
+		introspect := testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS)
+		actualExp, err := strconv.ParseInt(introspect.Get("exp").String(), 10, 64)
+		require.NoError(t, err, "%s", introspect)
 		requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
 	}
 
@@ -206,6 +207,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.EqualValues(t, expectedSubject, claims.Get("sub").String(), "%s", claims)
 		assert.EqualValues(t, expectedNonce, claims.Get("nonce").String(), "%s", claims)
 		assert.EqualValues(t, `baz`, claims.Get("bar").String(), "%s", claims)
+		assert.EqualValues(t, `foo@bar.com`, claims.Get("email").String(), "%s", claims)
+		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
 
 		return claims
 	}
@@ -315,6 +318,186 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					refreshedToken.Expiry = refreshedToken.Expiry.Add(-time.Hour * 24)
 					_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
 					require.Error(t, err)
+				})
+			})
+		}
+
+		t.Run("strategy=jwt", func(t *testing.T) {
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
+			run(t, "jwt")
+		})
+
+		t.Run("strategy=opaque", func(t *testing.T) {
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+			run(t, "opaque")
+		})
+	})
+
+	t.Run("case=graceful token rotation", func(t *testing.T) {
+		run := func(t *testing.T, strategy string) {
+			reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "5s")
+			t.Cleanup(func() {
+				reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, nil)
+			})
+
+			c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
+				acceptLoginHandler(t, c, subject, nil),
+				acceptConsentHandler(t, c, subject, nil),
+			)
+
+			issueTokens := func(t *testing.T) *oauth2.Token {
+				code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+				token, err := conf.Exchange(context.Background(), code)
+				iat := time.Now()
+				require.NoError(t, err)
+
+				introspectAccessToken(t, conf, token, subject)
+				assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
+				assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+				assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+				return token
+			}
+
+			refreshTokens := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
+				require.NotEmpty(t, token.RefreshToken)
+				token.Expiry = token.Expiry.Add(-time.Hour * 24)
+				iat := time.Now()
+				refreshedToken, err := conf.TokenSource(context.Background(), token).Token()
+				require.NoError(t, err)
+
+				require.NotEqual(t, token.AccessToken, refreshedToken.AccessToken)
+				require.NotEqual(t, token.RefreshToken, refreshedToken.RefreshToken)
+				require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
+
+				introspectAccessToken(t, conf, refreshedToken, subject)
+				assertJWTAccessToken(t, strategy, conf, refreshedToken, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
+				assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+				assertRefreshToken(t, refreshedToken, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+				return refreshedToken
+			}
+
+			t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
+				start := time.Now()
+
+				token := issueTokens(t)
+				var first, second *oauth2.Token
+				t.Run("followup=first refresh", func(t *testing.T) {
+					first = refreshTokens(t, token)
+				})
+
+				t.Run("followup=second refresh", func(t *testing.T) {
+					second = refreshTokens(t, token)
+				})
+
+				// Sleep until the grace period is over
+				time.Sleep(time.Until(start.Add(5*time.Second + time.Millisecond*10)))
+				t.Run("followup=refresh failure invalidates all tokens", func(t *testing.T) {
+					_, err := conf.TokenSource(context.Background(), token).Token()
+					assert.Error(t, err)
+
+					i := testhelpers.IntrospectToken(t, conf, first.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, first.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+				})
+			})
+
+			t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
+				start := time.Now()
+
+				token := issueTokens(t)
+				var first, second *oauth2.Token
+				t.Run("followup=first refresh", func(t *testing.T) {
+					first = refreshTokens(t, token)
+				})
+
+				t.Run("followup=second refresh", func(t *testing.T) {
+					second = refreshTokens(t, token)
+				})
+
+				// Sleep until the grace period is over
+				time.Sleep(time.Until(start.Add(5*time.Second + time.Millisecond*10)))
+				t.Run("followup=revoking consent revokes all tokens", func(t *testing.T) {
+					err := reg.ConsentManager().RevokeSubjectConsentSession(context.Background(), subject)
+					require.NoError(t, err)
+
+					_, err = conf.TokenSource(context.Background(), token).Token()
+					assert.Error(t, err)
+
+					i := testhelpers.IntrospectToken(t, conf, first.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.AccessToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, first.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+
+					i = testhelpers.IntrospectToken(t, conf, second.RefreshToken, adminTS)
+					assert.False(t, i.Get("active").Bool(), "%s", i)
+				})
+			})
+
+			t.Run("followup=graceful refresh tokens are all refreshed", func(t *testing.T) {
+				start := time.Now()
+				token := issueTokens(t)
+				var a1Refresh, b1Refresh, a2RefreshA, a2RefreshB, b2RefreshA, b2RefreshB *oauth2.Token
+				t.Run("followup=first refresh", func(t *testing.T) {
+					a1Refresh = refreshTokens(t, token)
+				})
+
+				t.Run("followup=second refresh", func(t *testing.T) {
+					b1Refresh = refreshTokens(t, token)
+				})
+
+				t.Run("followup=first refresh from first refresh", func(t *testing.T) {
+					a2RefreshA = refreshTokens(t, a1Refresh)
+				})
+
+				t.Run("followup=second refresh from first refresh", func(t *testing.T) {
+					a2RefreshB = refreshTokens(t, a1Refresh)
+				})
+
+				t.Run("followup=first refresh from second refresh", func(t *testing.T) {
+					b2RefreshA = refreshTokens(t, b1Refresh)
+				})
+
+				t.Run("followup=second refresh from second refresh", func(t *testing.T) {
+					b2RefreshB = refreshTokens(t, b1Refresh)
+				})
+
+				// Sleep until the grace period is over
+				time.Sleep(time.Until(start.Add(5*time.Second + time.Millisecond*10)))
+				t.Run("followup=refresh failure invalidates all tokens", func(t *testing.T) {
+					_, err := conf.TokenSource(context.Background(), token).Token()
+					assert.Error(t, err)
+
+					for k, token := range []*oauth2.Token{
+						a1Refresh, b1Refresh, a2RefreshA, a2RefreshB, b2RefreshA, b2RefreshB,
+					} {
+						t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+							i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+							assert.False(t, i.Get("active").Bool(), "%s", i)
+
+							i = testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+							assert.False(t, i.Get("active").Bool(), "%s", i)
+
+							i = testhelpers.IntrospectToken(t, conf, token.RefreshToken, adminTS)
+							assert.False(t, i.Get("active").Bool(), "%s", i)
+
+							i = testhelpers.IntrospectToken(t, conf, token.RefreshToken, adminTS)
+							assert.False(t, i.Get("active").Bool(), "%s", i)
+						})
+					}
 				})
 			})
 		}

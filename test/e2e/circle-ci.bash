@@ -92,7 +92,7 @@ case $i in
 esac
 done
 
-./hydra migrate sql --yes $TEST_DATABASE > ./hydra-migrate.e2e.log 2>&1
+./hydra migrate sql up --yes $TEST_DATABASE > ./hydra-migrate.e2e.log 2>&1
     DSN=$TEST_DATABASE \
     ./hydra serve all --dev --sqa-opt-out > ./hydra.e2e.log 2>&1 &
 

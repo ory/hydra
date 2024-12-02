@@ -7,6 +7,7 @@ import (
 	"context"
 	stderrs "errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -790,6 +791,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 			return
 		}
 		defer res.Body.Close()
+		res.Body = io.NopCloser(io.LimitReader(res.Body, 1<<20 /* 1 MB */)) // in case we ever start to read this response
 
 		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {
 			log.WithError(errors.Errorf("expected HTTP status code %d or %d but got %d", http.StatusOK, http.StatusNoContent, res.StatusCode)).
@@ -1169,14 +1171,4 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
 	}
 	return subject, nil
-}
-
-func (s *DefaultStrategy) loginSessionFromCookie(r *http.Request) *flow.LoginSession {
-	clientID := r.URL.Query().Get("client_id")
-	if clientID == "" {
-		return nil
-	}
-	ls, _ := flowctx.FromCookie[flow.LoginSession](r.Context(), r, s.r.FlowCipher(), flowctx.LoginSessionCookie(flowctx.SuffixFromStatic(clientID)))
-
-	return ls
 }

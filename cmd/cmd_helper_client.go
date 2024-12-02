@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,7 +18,24 @@ import (
 	"github.com/ory/x/pointerx"
 )
 
-func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
+func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
+	if filename := flagx.MustGetString(cmd, flagFile); filename != "" {
+		src := cmd.InOrStdin()
+		if filename != "-" {
+			f, err := os.Open(filename)
+			if err != nil {
+				return hydra.OAuth2Client{}, fmt.Errorf("unable to open file %q: %w", filename, err)
+			}
+			defer f.Close()
+			src = f
+		}
+		client := hydra.OAuth2Client{}
+		if err := json.NewDecoder(src).Decode(&client); err != nil {
+			return hydra.OAuth2Client{}, fmt.Errorf("unable to decode JSON: %w", err)
+		}
+		return client, nil
+	}
+
 	return hydra.OAuth2Client{
 		AccessTokenStrategy:               pointerx.Ptr(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
 		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, flagClientAllowedCORSOrigin),
@@ -47,7 +66,7 @@ func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 		SubjectType:                       pointerx.Ptr(flagx.MustGetString(cmd, flagClientSubjectType)),
 		TokenEndpointAuthMethod:           pointerx.Ptr(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
 		TosUri:                            pointerx.Ptr(flagx.MustGetString(cmd, flagClientTOSURI)),
-	}
+	}, nil
 }
 
 func registerEncryptFlags(flags *pflag.FlagSet) {
@@ -58,6 +77,8 @@ func registerEncryptFlags(flags *pflag.FlagSet) {
 }
 
 func registerClientFlags(flags *pflag.FlagSet) {
+	flags.String(flagFile, "", "Read a JSON file representing a client from this location. If set, the other client flags are ignored.")
+
 	flags.String(flagClientMetadata, "{}", "Metadata is an arbitrary JSON String of your choosing.")
 	flags.String(flagClientOwner, "", "The owner of this client, typically email addresses or a user ID.")
 	flags.StringSlice(flagClientContact, nil, "A list representing ways to contact people responsible for this client, typically email addresses.")

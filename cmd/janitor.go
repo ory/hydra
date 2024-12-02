@@ -15,9 +15,9 @@ import (
 
 func NewJanitorCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "janitor [<database-url>]",
+		Use:     "janitor [[database_url]]",
 		Short:   "This command cleans up stale database rows.",
-		Example: `hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m <database-url>`,
+		Example: `hydra janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m [database_url]`,
 		Long: `This command cleans up stale database rows. This will select records to delete with a limit
 and delete records in batch to ensure that no table locking issues arise in big production
 databases.

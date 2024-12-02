@@ -53,7 +53,7 @@ func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKe
 
 	return nil, errors.WithStack(fosite.ErrServerError.
 		WithWrap(err).
-		WithHintf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql..`, j.setID))
+		WithHintf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql up -e".`, j.setID))
 }
 
 func (j *DefaultJWTSigner) GetPublicKeyID(ctx context.Context) (string, error) {

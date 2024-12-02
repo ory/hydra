@@ -1,36 +1,31 @@
 {
-  "ID": "challenge-0005",
-  "NID": "00000000-0000-0000-0000-000000000000",
-  "RequestedScope": [
+  "i": "challenge-0005",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
     "requested_scope-0005_1"
   ],
-  "RequestedAudience": [
+  "ra": [
     "requested_audience-0005_1"
   ],
-  "LoginSkip": true,
-  "Subject": "subject-0005",
-  "OpenIDConnectContext": {
+  "ls": true,
+  "s": "subject-0005",
+  "oc": {
     "display": "display-0005"
   },
-  "Client": null,
-  "ClientID": "",
-  "RequestURL": "http://request/0005",
-  "SessionID": "auth_session-0005",
-  "IdentityProviderSessionID": "",
-  "LoginVerifier": "verifier-0005",
-  "LoginCSRF": "csrf-0005",
-  "LoginInitializedAt": null,
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "State": 128,
-  "LoginRemember": true,
-  "LoginRememberFor": 5,
-  "LoginExtendSessionLifespan": false,
-  "ACR": "acr-0005",
-  "AMR": [],
-  "ForceSubjectIdentifier": "force_subject_id-0005",
-  "Context": {},
-  "LoginWasUsed": true,
-  "LoginError": {
+  "r": "http://request/0005",
+  "si": "auth_session-0005",
+  "lv": "verifier-0005",
+  "lc": "csrf-0005",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "lr": true,
+  "lf": 5,
+  "a": "acr-0005",
+  "fs": "force_subject_id-0005",
+  "ct": {},
+  "lu": true,
+  "le": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -38,22 +33,22 @@
     "error_debug": "",
     "valid": false
   },
-  "LoginAuthenticatedAt": null,
-  "ConsentChallengeID": "challenge-0005",
-  "ConsentSkip": true,
-  "ConsentVerifier": "verifier-0005",
-  "ConsentCSRF": "csrf-0005",
-  "GrantedScope": [
+  "la": null,
+  "cc": "challenge-0005",
+  "cs": true,
+  "cv": "verifier-0005",
+  "cr": "csrf-0005",
+  "gs": [
     "granted_scope-0005_1"
   ],
-  "GrantedAudience": [
+  "ga": [
     "granted_audience-0005_1"
   ],
-  "ConsentRemember": true,
-  "ConsentRememberFor": 5,
-  "ConsentHandledAt": null,
-  "ConsentWasHandled": true,
-  "ConsentError": {
+  "ce": true,
+  "cf": 5,
+  "ch": null,
+  "cw": true,
+  "cx": {
     "error": "",
     "error_description": "",
     "error_hint": "",
@@ -61,10 +56,10 @@
     "error_debug": "",
     "valid": false
   },
-  "SessionIDToken": {
+  "st": {
     "session_id_token-0005": "0005"
   },
-  "SessionAccessToken": {
+  "sa": {
     "session_access_token-0005": "0005"
   }
 }

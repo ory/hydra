@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -112,6 +113,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 		)
 	}
 	defer resp.Body.Close()
+	resp.Body = io.NopCloser(io.LimitReader(resp.Body, 5<<20 /* 5 MiB */))
 
 	switch resp.StatusCode {
 	case http.StatusOK:

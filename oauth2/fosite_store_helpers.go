@@ -25,6 +25,7 @@ import (
 
 	"github.com/ory/hydra/v2/oauth2/trust"
 
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 
 	"github.com/ory/fosite/storage"
@@ -225,16 +226,18 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 	t.Run(fmt.Sprintf("case=testHelperRevokeAccessToken/db=%s", k), testHelperRevokeAccessToken(store))
 	t.Run(fmt.Sprintf("case=testFositeJWTBearerGrantStorage/db=%s", k), testFositeJWTBearerGrantStorage(store))
+	t.Run(fmt.Sprintf("case=testHelperRevokeRefreshTokenMaybeGracePeriod/db=%s", k), testHelperRevokeRefreshTokenMaybeGracePeriod(store))
 }
 
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
-		requestId := uuid.New()
-		mockRequestForeignKey(t, requestId, m)
+		ctx := context.Background()
+		requestID := uuid.New()
+		mockRequestForeignKey(t, requestID, m)
 		cl := &client.Client{ID: "foobar"}
 
 		fositeRequest := &fosite.Request{
-			ID:          requestId,
+			ID:          requestID,
 			Client:      cl,
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Session:     NewSession("bar"),
@@ -242,15 +245,15 @@ func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.
 
 		for i := 0; i < 4; i++ {
 			signature := uuid.New()
-			err := m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signature, fositeRequest)
+			err := m.OAuth2Storage().CreateRefreshTokenSession(ctx, signature, fositeRequest)
 			assert.NoError(t, err)
-			err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signature, fositeRequest)
+			err = m.OAuth2Storage().CreateAccessTokenSession(ctx, signature, fositeRequest)
 			assert.NoError(t, err)
-			err = m.OAuth2Storage().CreateOpenIDConnectSession(context.TODO(), signature, fositeRequest)
+			err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, fositeRequest)
 			assert.NoError(t, err)
-			err = m.OAuth2Storage().CreatePKCERequestSession(context.TODO(), signature, fositeRequest)
+			err = m.OAuth2Storage().CreatePKCERequestSession(ctx, signature, fositeRequest)
 			assert.NoError(t, err)
-			err = m.OAuth2Storage().CreateAuthorizeCodeSession(context.TODO(), signature, fositeRequest)
+			err = m.OAuth2Storage().CreateAuthorizeCodeSession(ctx, signature, fositeRequest)
 			assert.NoError(t, err)
 		}
 	}
@@ -475,7 +478,7 @@ func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 		m := x.OAuth2Storage()
 		c := &client.Client{ID: "nil-request-client-id-123"}
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
-		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
+		err := m.CreateAccessTokenSession(context.Background(), "nil-request-id", &fosite.Request{
 			ID:                "",
 			RequestedAt:       time.Now().UTC().Round(time.Second),
 			Client:            c,
@@ -551,6 +554,63 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
+}
+
+func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+
+		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
+			// SETUP
+			m := x.OAuth2Storage()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			require.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
+			require.NoError(t, err)
+
+			tmpSession := new(fosite.Session)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
+
+			// ASSERT
+			// a revoked refresh token returns an error when getting the token again
+			assert.ErrorIs(t, err, fosite.ErrInactiveToken)
+		})
+
+		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
+			// SETUP
+			x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
+
+			// always reset back to the default
+			t.Cleanup(func() {
+				x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "0m")
+			})
+
+			m := x.OAuth2Storage()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d_with_grace_period", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			require.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			require.NoError(t, m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession))
+			require.NoError(t, m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession))
+			require.NoError(t, m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession))
+
+			req, err := m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+
+			// ASSERT
+			// when grace period is configured the refresh token can be obtained within
+			// the grace period without error
+			assert.NoError(t, err)
+
+			assert.Equal(t, defaultRequest.GetID(), req.GetID())
+		})
+	}
+
 }
 
 func testHelperCreateGetDeletePKCERequestSession(x InternalRegistry) func(t *testing.T) {
@@ -880,6 +940,7 @@ func testFositeStoreClientAssertionJWTValid(m InternalRegistry) func(*testing.T)
 
 func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
+		ctx := context.Background()
 		grantManager := x.GrantManager()
 		keyManager := x.KeyManager()
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
@@ -902,28 +963,28 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			storedKeySet, err := grantStorage.GetPublicKeys(ctx, issuer, subject)
 			require.NoError(t, err)
 			require.Len(t, storedKeySet.Keys, 0)
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
-			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			storedKeySet, err = grantStorage.GetPublicKeys(ctx, issuer, subject)
 			require.NoError(t, err)
 			assert.Len(t, storedKeySet.Keys, 1)
 
-			storedKey, err := grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			storedKey, err := grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
 			assert.Equal(t, publicKey.KeyID, storedKey.KeyID)
 			assert.Equal(t, publicKey.Use, storedKey.Use)
 			assert.Equal(t, publicKey.Key, storedKey.Key)
 
-			storedScopes, err := grantStorage.GetPublicKeyScopes(context.TODO(), issuer, subject, publicKey.KeyID)
+			storedScopes, err := grantStorage.GetPublicKeyScopes(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
 			assert.Equal(t, grant.Scope, storedScopes)
 
-			storedKeySet, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			storedKeySet, err = keyManager.GetKey(ctx, issuer, publicKey.KeyID)
 			require.NoError(t, err)
 			assert.Equal(t, publicKey.KeyID, storedKeySet.Keys[0].KeyID)
 			assert.Equal(t, publicKey.Use, storedKeySet.Keys[0].Use)
@@ -953,7 +1014,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 
 			keySet2ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, "maria-key-2", "sig")
 			require.NoError(t, err)
-			require.NoError(t, grantManager.CreateGrant(context.TODO(), trust.Grant{
+			require.NoError(t, grantManager.CreateGrant(ctx, trust.Grant{
 				ID:              uuid.New(),
 				Issuer:          issuer,
 				Subject:         subject,
@@ -1011,22 +1072,22 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, grant.PublicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, grant.PublicKey.KeyID)
 			require.NoError(t, err)
 
-			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			_, err = keyManager.GetKey(ctx, issuer, publicKey.KeyID)
 			require.NoError(t, err)
 
-			err = grantManager.DeleteGrant(context.TODO(), grant.ID)
+			err = grantManager.DeleteGrant(ctx, grant.ID)
 			require.NoError(t, err)
 
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
 			assert.Error(t, err)
 
-			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			_, err = keyManager.GetKey(ctx, issuer, publicKey.KeyID)
 			assert.Error(t, err)
 		})
 
@@ -1048,22 +1109,22 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
 
-			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			_, err = keyManager.GetKey(ctx, issuer, publicKey.KeyID)
 			require.NoError(t, err)
 
-			err = keyManager.DeleteKey(context.TODO(), issuer, publicKey.KeyID)
+			err = keyManager.DeleteKey(ctx, issuer, publicKey.KeyID)
 			require.NoError(t, err)
 
-			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			_, err = keyManager.GetKey(ctx, issuer, publicKey.KeyID)
 			assert.Error(t, err)
 
-			_, err = grantManager.GetConcreteGrant(context.TODO(), grant.ID)
+			_, err = grantManager.GetConcreteGrant(ctx, grant.ID)
 			assert.Error(t, err)
 		})
 
@@ -1085,25 +1146,25 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
 			// All three get methods should only return the public key when using the valid subject
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, "any-subject-1", publicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, "any-subject-1", publicKey.KeyID)
 			require.Error(t, err)
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
 
-			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "any-subject-2", publicKey.KeyID)
+			_, err = grantStorage.GetPublicKeyScopes(ctx, issuer, "any-subject-2", publicKey.KeyID)
 			require.Error(t, err)
-			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, subject, publicKey.KeyID)
+			_, err = grantStorage.GetPublicKeyScopes(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
 
-			jwks, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			jwks, err := grantStorage.GetPublicKeys(ctx, issuer, "any-subject-3")
 			require.NoError(t, err)
 			require.NotNil(t, jwks)
 			require.Empty(t, jwks.Keys)
-			jwks, err = grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			jwks, err = grantStorage.GetPublicKeys(ctx, issuer, subject)
 			require.NoError(t, err)
 			require.NotNil(t, jwks)
 			require.NotEmpty(t, jwks.Keys)
@@ -1126,17 +1187,17 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
 			// All three get methods should always return the public key
-			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, "any-subject-1", publicKey.KeyID)
+			_, err = grantStorage.GetPublicKey(ctx, issuer, "any-subject-1", publicKey.KeyID)
 			require.NoError(t, err)
 
-			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "any-subject-2", publicKey.KeyID)
+			_, err = grantStorage.GetPublicKeyScopes(ctx, issuer, "any-subject-2", publicKey.KeyID)
 			require.NoError(t, err)
 
-			jwks, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			jwks, err := grantStorage.GetPublicKeys(ctx, issuer, "any-subject-3")
 			require.NoError(t, err)
 			require.NotNil(t, jwks)
 			require.NotEmpty(t, jwks.Keys)
@@ -1159,10 +1220,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(-1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			err = grantManager.CreateGrant(ctx, grant, publicKey)
 			require.NoError(t, err)
 
-			keys, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			keys, err := grantStorage.GetPublicKeys(ctx, issuer, "any-subject-3")
 			require.NoError(t, err)
 			assert.Len(t, keys.Keys, 0)
 		})

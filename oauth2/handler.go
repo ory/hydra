@@ -497,7 +497,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		IDTokenSignedResponseAlg:               []string{key.Algorithm},
 		UserinfoSignedResponseAlg:              []string{key.Algorithm},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
-		ResponseModesSupported:                 []string{"query", "fragment"},
+		ResponseModesSupported:                 []string{"query", "fragment", "form_post"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,
 		RequestURIParameterSupported:           true,
@@ -962,7 +962,8 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
-		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) {
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
@@ -975,8 +976,20 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// only for client_credentials, otherwise Authentication is included in session
-		if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
+		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) {
 			session.Subject = accessRequest.GetClient().GetID()
+		}
+		// only for password grant, otherwise Authentication is included in session
+		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
+			if sess, ok := accessRequest.GetSession().(fosite.ExtraClaimsSession); ok {
+				sess.GetExtraClaims()["username"] = accessRequest.GetRequestForm().Get("username")
+				session.DefaultSession.Username = accessRequest.GetRequestForm().Get("username")
+			}
+
+			// Also add audience claims
+			for _, aud := range accessRequest.GetClient().GetAudience() {
+				accessRequest.GrantAudience(aud)
+			}
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID

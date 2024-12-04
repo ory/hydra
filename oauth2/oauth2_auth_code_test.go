@@ -2120,6 +2120,7 @@ func newOAuth2Client(
 	return c, &oauth2.Config{
 		ClientID:     c.GetID(),
 		ClientSecret: secret,
+		RedirectURL:  callbackURL,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
 			TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),

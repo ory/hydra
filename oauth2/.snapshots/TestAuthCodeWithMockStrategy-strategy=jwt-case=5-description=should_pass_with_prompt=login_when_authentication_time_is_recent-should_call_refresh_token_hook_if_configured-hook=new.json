@@ -35,6 +35,11 @@
   },
   "request": {
     "client_id": "app-client",
+    "requested_scopes": [
+      "hydra.*",
+      "offline",
+      "openid"
+    ],
     "granted_scopes": [
       "offline",
       "openid",

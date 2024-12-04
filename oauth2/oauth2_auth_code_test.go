@@ -20,6 +20,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/julienschmidt/httprouter"
@@ -1512,12 +1514,14 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &client.Client{
-				ID:            "app-client",
-				Secret:        "secret",
-				RedirectURIs:  []string{ts.URL + "/callback"},
-				ResponseTypes: []string{"id_token", "code", "token"},
-				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-				Scope:         "hydra.* offline openid",
+				ID:                "app-client",
+				Secret:            "secret",
+				RedirectURIs:      []string{ts.URL + "/callback"},
+				ResponseTypes:     []string{"id_token", "code", "token"},
+				GrantTypes:        []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+				Scope:             "hydra.* offline openid",
+				Metadata:          sqlxx.JSONRawMessage(`{"some-meta-key":"some-meta-value"}`),
+				SkipLogoutConsent: sqlxx.NullBool{Bool: false, Valid: true},
 			}))
 
 			oauthConfig := &oauth2.Config{
@@ -1823,6 +1827,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 										"session.id_token.id_token_claims.exp",
 										"session.id_token.id_token_claims.rat",
 										"session.id_token.id_token_claims.auth_time",
+										"request.client.nid",
+										"request.client.redirect_uris",
+										"request.client.client_secret",
+										"request.client.created_at",
+										"request.client.updated_at",
 									}
 
 									if hookType == "legacy" {

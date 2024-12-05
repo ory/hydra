@@ -19,7 +19,6 @@ import (
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/contextx"
@@ -40,7 +39,7 @@ func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	cmdx.RegisterHTTPClientFlags(cmd.Flags())

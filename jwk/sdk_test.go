@@ -9,12 +9,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	. "github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
@@ -23,8 +24,8 @@ import (
 func TestJWKSDK(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	conf := testhelpers.NewConfigurationWithDefaults()
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	router := x.NewRouterAdmin(conf.AdminURL)
 	h := NewHandler(reg)

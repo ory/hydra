@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/x/contextx"
 
@@ -24,13 +26,12 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/oauth2"
 )
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	ctx := context.Background()
-	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.Default{})
+	r := testhelpers.NewRegistryMemory(t, testhelpers.NewConfigurationWithDefaults(), &contextx.Default{})
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(ctx, nil)
 
 	for k, tc := range []struct {
@@ -275,7 +276,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-			r.WithConfig(internal.NewConfigurationWithDefaults())
+			r.WithConfig(testhelpers.NewConfigurationWithDefaults())
 
 			if tc.prep != nil {
 				tc.prep(t, r)

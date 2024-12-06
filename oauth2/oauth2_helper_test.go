@@ -46,6 +46,27 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w ht
 	}, nil, nil
 }
 
+func (c *consentMock) HandleOAuth2DeviceAuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.AcceptOAuth2ConsentRequest, *flow.Flow, error) {
+	if c.deny {
+		return nil, nil, fosite.ErrRequestForbidden
+	}
+
+	return &flow.AcceptOAuth2ConsentRequest{
+		ConsentRequest: &flow.OAuth2ConsentRequest{
+			Subject:         "foo",
+			ACR:             "1",
+			DeviceChallenge: "12345",
+		},
+		AuthenticatedAt: sqlxx.NullTime(c.authTime),
+		GrantedScope:    []string{"offline", "openid", "hydra.*"},
+		Session: &flow.AcceptOAuth2ConsentRequestSession{
+			AccessToken: map[string]interface{}{},
+			IDToken:     map[string]interface{}{},
+		},
+		RequestedAt: c.requestTime,
+	}, nil, nil
+}
+
 func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error) {
 	panic("not implemented")
 }

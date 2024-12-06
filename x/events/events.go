@@ -58,11 +58,14 @@ const (
 )
 
 const (
-	attributeKeyOAuth2ClientName  = "OAuth2ClientName"
-	attributeKeyOAuth2ClientID    = "OAuth2ClientID"
-	attributeKeyOAuth2Subject     = "OAuth2Subject"
-	attributeKeyOAuth2GrantType   = "OAuth2GrantType"
-	attributeKeyOAuth2TokenFormat = "OAuth2TokenFormat" //nolint:gosec
+	attributeKeyOAuth2ClientName            = "OAuth2ClientName"
+	attributeKeyOAuth2ClientID              = "OAuth2ClientID"
+	attributeKeyOAuth2Subject               = "OAuth2Subject"
+	attributeKeyOAuth2GrantType             = "OAuth2GrantType"
+	attributeKeyOAuth2ConsentRequestID      = "OAuth2ConsentRequestID"
+	attributeKeyOAuth2TokenFormat           = "OAuth2TokenFormat"           //nolint:gosec
+	attributeKeyOAuth2RefreshTokenSignature = "OAuth2RefreshTokenSignature" //nolint:gosec
+	attributeKeyOAuth2AccessTokenSignature  = "OAuth2AccessTokenSignature"  //nolint:gosec
 )
 
 // WithTokenFormat emits the token format as part of the event.
@@ -75,9 +78,25 @@ func WithGrantType(grantType string) trace.EventOption {
 	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2GrantType, grantType))
 }
 
+func ClientID(clientID string) otelattr.KeyValue {
+	return otelattr.String(attributeKeyOAuth2ClientID, clientID)
+}
+
+func RefreshTokenSignature(signature string) otelattr.KeyValue {
+	return otelattr.String(attributeKeyOAuth2RefreshTokenSignature, signature)
+}
+
+func AccessTokenSignature(signature string) otelattr.KeyValue {
+	return otelattr.String(attributeKeyOAuth2AccessTokenSignature, signature)
+}
+
+func ConsentRequestID(id string) otelattr.KeyValue {
+	return otelattr.String(attributeKeyOAuth2ConsentRequestID, id)
+}
+
 // WithClientID emits the client ID as part of the event.
 func WithClientID(clientID string) trace.EventOption {
-	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2ClientID, clientID))
+	return trace.WithAttributes(ClientID(clientID))
 }
 
 // WithClientName emits the client name as part of the event.

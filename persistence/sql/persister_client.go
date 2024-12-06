@@ -6,6 +6,8 @@ package sql
 import (
 	"context"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/hydra/v2/x/events"
 
 	"github.com/gobuffalo/pop/v6"
@@ -20,7 +22,9 @@ import (
 )
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (c *client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteClient")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteClient",
+		trace.WithAttributes(events.ClientID(id)),
+	)
 	defer otelx.End(span, &err)
 
 	var cl client.Client
@@ -35,7 +39,9 @@ func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, er
 }
 
 func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateClient")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateClient",
+		trace.WithAttributes(events.ClientID(cl.ID)),
+	)
 	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
@@ -77,7 +83,9 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 }
 
 func (p *Persister) AuthenticateClient(ctx context.Context, id string, secret []byte) (_ *client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AuthenticateClient")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AuthenticateClient",
+		trace.WithAttributes(events.ClientID(id)),
+	)
 	defer otelx.End(span, &err)
 
 	c, err := p.GetConcreteClient(ctx, id)
@@ -117,7 +125,9 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) (err err
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteClient")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteClient",
+		trace.WithAttributes(events.ClientID(id)),
+	)
 	defer otelx.End(span, &err)
 
 	c, err := p.GetConcreteClient(ctx, id)

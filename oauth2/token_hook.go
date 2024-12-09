@@ -31,6 +31,8 @@ type AccessRequestHook func(ctx context.Context, requester fosite.AccessRequeste
 type Request struct {
 	// ClientID is the identifier of the OAuth 2.0 client.
 	ClientID string `json:"client_id"`
+	// RequestedScopes is the list of scopes requested to the OAuth 2.0 client.
+	RequestedScopes []string `json:"requested_scopes"`
 	// GrantedScopes is the list of scopes granted to the OAuth 2.0 client.
 	GrantedScopes []string `json:"granted_scopes"`
 	// GrantedAudience is the list of audiences granted to the OAuth 2.0 client.
@@ -170,6 +172,7 @@ func TokenHook(reg interface {
 
 		request := Request{
 			ClientID:        requester.GetClient().GetID(),
+			RequestedScopes: requester.GetRequestedScopes(),
 			GrantedScopes:   requester.GetGrantedScopes(),
 			GrantedAudience: requester.GetGrantedAudience(),
 			GrantTypes:      requester.GetGrantTypes(),

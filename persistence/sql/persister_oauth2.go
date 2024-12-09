@@ -366,7 +366,9 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateAccessTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateAccessTokenSession",
+		trace.WithAttributes(events.AccessTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 
 	events.Trace(ctx, events.AccessTokenIssued,
@@ -377,7 +379,9 @@ func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature stri
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAccessTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAccessTokenSession",
+		trace.WithAttributes(events.AccessTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 
 	r := OAuth2RequestSQL{Table: sqlTableAccess}
@@ -406,7 +410,9 @@ func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string,
 }
 
 func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteAccessTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteAccessTokenSession",
+		trace.WithAttributes(events.AccessTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 
 	err = sqlcon.HandleError(
@@ -446,14 +452,18 @@ func toEventOptions(requester fosite.Requester) []trace.EventOption {
 }
 
 func (p *Persister) CreateRefreshTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateRefreshTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateRefreshTokenSession",
+		trace.WithAttributes(events.RefreshTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 	events.Trace(ctx, events.RefreshTokenIssued, toEventOptions(requester)...)
 	return p.createSession(ctx, signature, requester, sqlTableRefresh, requester.GetSession().GetExpiresAt(fosite.RefreshToken).UTC())
 }
 
 func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRefreshTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRefreshTokenSession",
+		trace.WithAttributes(events.RefreshTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 
 	r := OAuth2RefreshTable{OAuth2RequestSQL: OAuth2RequestSQL{Table: sqlTableRefresh}}
@@ -486,7 +496,9 @@ func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string
 }
 
 func (p *Persister) DeleteRefreshTokenSession(ctx context.Context, signature string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteRefreshTokenSession")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteRefreshTokenSession",
+		trace.WithAttributes(events.RefreshTokenSignature(signature)),
+	)
 	defer otelx.End(span, &err)
 	return p.deleteSessionBySignature(ctx, signature, sqlTableRefresh)
 }
@@ -531,7 +543,9 @@ func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature stri
 }
 
 func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshToken")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeRefreshToken",
+		trace.WithAttributes(events.ConsentRequestID(id)),
+	)
 	defer otelx.End(span, &err)
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
@@ -553,7 +567,9 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id s
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeAccessToken")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeAccessToken",
+		trace.WithAttributes(events.ConsentRequestID(id)),
+	)
 	defer otelx.End(span, &err)
 	return p.deleteSessionByRequestID(ctx, id, sqlTableAccess)
 }
@@ -605,7 +621,9 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 }
 
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteAccessTokens")
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteAccessTokens",
+		trace.WithAttributes(events.ClientID(clientID)),
+	)
 	defer otelx.End(span, &err)
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(

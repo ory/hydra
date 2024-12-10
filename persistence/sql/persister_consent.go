@@ -221,14 +221,11 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ 
 }
 
 // CreateDeviceUserAuthRequest creates a new flow from a DeviceUserAuthRequest.
-func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (*flow.Flow, error) {
+func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceUserAuthRequest")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	nid := p.NetworkID(ctx)
-	if nid == uuid.Nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	}
 	f := flow.NewDeviceFlow(req)
 	f.NID = nid
 
@@ -236,9 +233,9 @@ func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.D
 }
 
 // GetDeviceUserAuthRequest decodes a challenge into a new DeviceUserAuthRequest.
-func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge string) (*flow.DeviceUserAuthRequest, error) {
+func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge string) (_ *flow.DeviceUserAuthRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceUserAuthRequest")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsDeviceChallenge)
 	if err != nil {
@@ -256,9 +253,9 @@ func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge stri
 }
 
 // HandleDeviceUserAuthRequest uses a HandledDeviceUserAuthRequest to update the flow and returns a DeviceUserAuthRequest.
-func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (*flow.DeviceUserAuthRequest, error) {
+func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (_ *flow.DeviceUserAuthRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleDeviceUserAuthRequest")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	if f == nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
@@ -266,7 +263,7 @@ func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flo
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
-	err := f.HandleDeviceUserAuthRequest(r)
+	err = f.HandleDeviceUserAuthRequest(r)
 	if err != nil {
 		return nil, err
 	}
@@ -275,9 +272,9 @@ func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flo
 }
 
 // VerifyAndInvalidateDeviceUserAuthRequest verifies a verifier and invalidates the flow.
-func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error) {
+func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (_ *flow.HandledDeviceUserAuthRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateDeviceUserAuthRequest")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsDeviceVerifier)
 	if err != nil {

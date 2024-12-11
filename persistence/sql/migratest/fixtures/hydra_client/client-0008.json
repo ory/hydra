@@ -38,6 +38,18 @@
       "Duration": 0,
       "Valid": false
     },
+    "DeviceAuthorizationGrantAccessTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "DeviceAuthorizationGrantIDTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
+    "DeviceAuthorizationGrantRefreshTokenLifespan": {
+      "Duration": 0,
+      "Valid": false
+    },
     "ImplicitGrantAccessTokenLifespan": {
       "Duration": 0,
       "Valid": false

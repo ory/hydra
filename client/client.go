@@ -304,7 +304,7 @@ type Client struct {
 	//
 	// AccessTokenStrategy is the strategy used to generate access tokens.
 	// Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token
-	// Setting the stragegy here overrides the global setting in `strategies.access_token`.
+	// Setting the strategy here overrides the global setting in `strategies.access_token`.
 	AccessTokenStrategy string `json:"access_token_strategy,omitempty" db:"access_token_strategy" faker:"-"`
 
 	// SkipConsent skips the consent screen for this client. This field can only

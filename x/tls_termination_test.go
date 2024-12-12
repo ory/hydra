@@ -10,10 +10,11 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	. "github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 )
@@ -27,8 +28,8 @@ func noopHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestDoesRequestSatisfyTermination(t *testing.T) {
-	c := internal.NewConfigurationWithDefaultsAndHTTPS()
-	r := internal.NewRegistryMemory(t, c, &contextx.Default{})
+	c := testhelpers.NewConfigurationWithDefaultsAndHTTPS()
+	r := testhelpers.NewRegistryMemory(t, c, &contextx.Default{})
 
 	t.Run("case=tls-termination-disabled", func(t *testing.T) {
 		c.MustSet(context.Background(), config.KeyTLSAllowTerminationFrom, "")
@@ -178,7 +179,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// test: in case http is forced request should be accepted
 	t.Run("case=forced-http", func(t *testing.T) {
-		c := internal.NewConfigurationWithDefaults()
+		c := testhelpers.NewConfigurationWithDefaults()
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c.TLS(context.Background(), config.PublicInterface))(res, &http.Request{Header: http.Header{}, URL: new(url.URL)}, noopHandler)
 		assert.EqualValues(t, http.StatusNoContent, res.Code)

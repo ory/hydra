@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/hydra/v2/consent/test"
 
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -23,7 +25,6 @@ import (
 
 	. "github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 )
@@ -35,10 +36,10 @@ func makeID(base string, network string, key string) string {
 func TestSDK(t *testing.T) {
 	ctx := context.Background()
 	network := "t1"
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyIssuerURL, "https://www.ory.sh")
 	conf.MustSet(ctx, config.KeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	consentChallenge := func(f *Flow) string { return x.Must(f.ToConsentChallenge(ctx, reg)) }
 	consentVerifier := func(f *Flow) string { return x.Must(f.ToConsentVerifier(ctx, reg)) }

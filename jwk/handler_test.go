@@ -10,6 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/hydra/v2/jwk"
@@ -20,15 +22,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	conf := testhelpers.NewConfigurationWithDefaults()
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()

@@ -7,16 +7,13 @@ import (
 	"context"
 	"flag"
 	"testing"
+	"time"
 
-	"github.com/stretchr/testify/require"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 
-	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
-	. "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -29,7 +26,7 @@ func TestMain(m *testing.M) {
 
 var registries = make(map[string]driver.Registry)
 var cleanRegistries = func(t *testing.T) {
-	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.Default{})
+	registries["memory"] = testhelpers.NewRegistryMemory(t, testhelpers.NewConfigurationWithDefaults(), &contextx.Default{})
 }
 
 // returns clean registries that can safely be used for one test
@@ -38,7 +35,7 @@ func setupRegistries(t *testing.T) {
 	if len(registries) == 0 && !testing.Short() {
 		// first time called and sql tests
 		var cleanSQL func(*testing.T)
-		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, true, &contextx.Default{})
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = testhelpers.ConnectDatabases(t, false, &contextx.Default{})
 		cleanMem := cleanRegistries
 		cleanMem(t)
 		cleanRegistries = func(t *testing.T) {
@@ -52,6 +49,8 @@ func setupRegistries(t *testing.T) {
 }
 
 func TestManagers(t *testing.T) {
+	setupRegistries(t)
+
 	ctx := context.Background()
 	tests := []struct {
 		name                   string
@@ -68,18 +67,43 @@ func TestManagers(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("suite="+tc.name, func(t *testing.T) {
-			setupRegistries(t)
+			for k, r := range registries {
+				t.Run("database="+k, func(t *testing.T) {
+					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true, &contextx.Default{})
+					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
 
-			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{ID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+					if k != "memory" {
+						t.Run("testHelperUniqueConstraints", testHelperRequestIDMultiples(store, k))
+						t.Run("case=testFositeSqlStoreTransactionsCommitAccessToken", testFositeSqlStoreTransactionCommitAccessToken(store))
+						t.Run("case=testFositeSqlStoreTransactionsRollbackAccessToken", testFositeSqlStoreTransactionRollbackAccessToken(store))
+						t.Run("case=testFositeSqlStoreTransactionCommitRefreshToken", testFositeSqlStoreTransactionCommitRefreshToken(store))
+						t.Run("case=testFositeSqlStoreTransactionRollbackRefreshToken", testFositeSqlStoreTransactionRollbackRefreshToken(store))
+						t.Run("case=testFositeSqlStoreTransactionCommitAuthorizeCode", testFositeSqlStoreTransactionCommitAuthorizeCode(store))
+						t.Run("case=testFositeSqlStoreTransactionRollbackAuthorizeCode", testFositeSqlStoreTransactionRollbackAuthorizeCode(store))
+						t.Run("case=testFositeSqlStoreTransactionCommitPKCERequest", testFositeSqlStoreTransactionCommitPKCERequest(store))
+						t.Run("case=testFositeSqlStoreTransactionRollbackPKCERequest", testFositeSqlStoreTransactionRollbackPKCERequest(store))
+						t.Run("case=testFositeSqlStoreTransactionCommitOpenIdConnectSession", testFositeSqlStoreTransactionCommitOpenIdConnectSession(store))
+						t.Run("case=testFositeSqlStoreTransactionRollbackOpenIdConnectSession", testFositeSqlStoreTransactionRollbackOpenIdConnectSession(store))
+					}
 
-			for k, store := range registries {
-				net := &networkx.Network{}
-				require.NoError(t, store.Persister().Connection(context.Background()).First(net))
-				store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
-				store.WithContextualizer(&contextx.Static{NID: net.ID, C: store.Config().Source(ctx)})
-				TestHelperRunner(t, store, k)
+					t.Run("testHelperCreateGetDeleteAuthorizeCodes", testHelperCreateGetDeleteAuthorizeCodes(store))
+					t.Run("testHelperExpiryFields", testHelperExpiryFields(store))
+					t.Run("testHelperCreateGetDeleteAccessTokenSession", testHelperCreateGetDeleteAccessTokenSession(store))
+					t.Run("testHelperNilAccessToken", testHelperNilAccessToken(store))
+					t.Run("testHelperCreateGetDeleteOpenIDConnectSession", testHelperCreateGetDeleteOpenIDConnectSession(store))
+					t.Run("testHelperCreateGetDeleteRefreshTokenSession", testHelperCreateGetDeleteRefreshTokenSession(store))
+					t.Run("testHelperRevokeRefreshToken", testHelperRevokeRefreshToken(store))
+					t.Run("testHelperCreateGetDeletePKCERequestSession", testHelperCreateGetDeletePKCERequestSession(store))
+					t.Run("testHelperFlushTokens", testHelperFlushTokens(store, time.Hour))
+					t.Run("testHelperFlushTokensWithLimitAndBatchSize", testHelperFlushTokensWithLimitAndBatchSize(store, 3, 2))
+					t.Run("testFositeStoreSetClientAssertionJWT", testFositeStoreSetClientAssertionJWT(store))
+					t.Run("testFositeStoreClientAssertionJWTValid", testFositeStoreClientAssertionJWTValid(store))
+					t.Run("testHelperDeleteAccessTokens", testHelperDeleteAccessTokens(store))
+					t.Run("testHelperRevokeAccessToken", testHelperRevokeAccessToken(store))
+					t.Run("testFositeJWTBearerGrantStorage", testFositeJWTBearerGrantStorage(store))
+					t.Run("testHelperRotateRefreshToken", testHelperRotateRefreshToken(store))
+				})
 			}
 		})
-
 	}
 }

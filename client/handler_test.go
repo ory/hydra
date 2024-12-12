@@ -35,7 +35,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/internal"
 )
 
 type responseSnapshot struct {
@@ -56,7 +55,7 @@ func getClientID(body string) string {
 
 func TestHandler(t *testing.T) {
 	ctx := context.Background()
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	h := client.NewHandler(reg)
 	reg.WithContextualizer(&contextx.TestContextualizer{})
 

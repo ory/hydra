@@ -15,6 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/httprouterx"
@@ -31,13 +33,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/oauth2"
 )
 
@@ -45,9 +45,9 @@ var lifespan = time.Hour
 
 func TestHandlerDeleteHandler(t *testing.T) {
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -88,12 +88,12 @@ func TestHandlerDeleteHandler(t *testing.T) {
 
 func TestUserinfo(t *testing.T) {
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyScopeStrategy, "")
 	conf.MustSet(ctx, config.KeyAuthCodeLifespan, lifespan)
 	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
-	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
@@ -340,7 +340,7 @@ func TestUserinfo(t *testing.T) {
 
 func TestHandlerWellKnown(t *testing.T) {
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {
 		conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 		conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
@@ -348,7 +348,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
 		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 		h := oauth2.NewHandler(reg, conf)
 

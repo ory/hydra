@@ -13,13 +13,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
@@ -42,8 +43,8 @@ func TestGetLogoutRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			conf := testhelpers.NewConfigurationWithDefaults()
+			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -97,8 +98,8 @@ func TestGetLoginRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			conf := testhelpers.NewConfigurationWithDefaults()
+			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -163,8 +164,8 @@ func TestGetConsentRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+			conf := testhelpers.NewConfigurationWithDefaults()
+			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -238,8 +239,8 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		challenge := "challenge"
 		requestURL := "http://192.0.2.1"
 
-		conf := internal.NewConfigurationWithDefaults()
-		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		conf := testhelpers.NewConfigurationWithDefaults()
+		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 		cl := &client.Client{ID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))

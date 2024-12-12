@@ -303,7 +303,7 @@ type Client struct {
 	// OAuth 2.0 Access Token Strategy
 	//
 	// AccessTokenStrategy is the strategy used to generate access tokens.
-	// Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+	// Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token
 	// Setting the stragegy here overrides the global setting in `strategies.access_token`.
 	AccessTokenStrategy string `json:"access_token_strategy,omitempty" db:"access_token_strategy" faker:"-"`
 

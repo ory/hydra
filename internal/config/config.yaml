@@ -365,7 +365,7 @@ strategies:
   # You may use JSON Web Tokens as access tokens.
   #
   # But seriously. Don't do that. It's not a great idea and has a ton of caveats and subtle security implications. Read more:
-  # -> https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+  # -> https://www.ory.sh/docs/oauth2-oidc/jwt-access-token
   #
   #  access_token: jwt
 

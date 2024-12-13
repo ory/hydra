@@ -266,6 +266,7 @@
           "required": ["type", "config"],
           "properties": {
             "type": {
+              "type": "string",
               "const": "api_key"
             },
             "config": {
@@ -274,6 +275,7 @@
               "required": ["name", "value"],
               "properties": {
                 "in": {
+                  "type": "string",
                   "enum": ["header", "cookie"]
                 },
                 "name": {
@@ -700,6 +702,7 @@
                 "properties": {
                   "supported_types": {
                     "contains": {
+                      "type": "string",
                       "const": "pairwise"
                     }
                   }

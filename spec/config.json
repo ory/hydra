@@ -940,6 +940,7 @@
         "login_consent_request": {
           "description": "Configures how long a user login and consent flow may take.",
           "default": "30m",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -949,6 +950,7 @@
         "access_token": {
           "description": "Configures how long access tokens are valid.",
           "default": "1h",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -958,6 +960,7 @@
         "refresh_token": {
           "description": "Configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.",
           "default": "720h",
+          "type": "string",
           "oneOf": [
             {
               "$ref": "#/definitions/duration"
@@ -973,6 +976,7 @@
         "id_token": {
           "description": "Configures how long id tokens are valid.",
           "default": "1h",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -982,6 +986,7 @@
         "auth_code": {
           "description": "Configures how long auth codes are valid.",
           "default": "10m",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"

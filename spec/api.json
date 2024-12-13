@@ -774,6 +774,7 @@
             "$ref": "#/components/schemas/NullDuration"
           },
           "jwks": {
+            "$ref": "#/components/schemas/jsonWebKeySet",
             "description": "OAuth 2.0 Client JSON Web Key Set\n\nClient's JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as\nthe jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter\nis intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for\ninstance, by native applications that might not have a location to host the contents of the JWK Set. If a Client\ncan use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation\n(which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks\nparameters MUST NOT be used together."
           },
           "jwks_uri": {

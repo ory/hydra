@@ -28,7 +28,7 @@ Name | Type | Description | Notes
 **GrantTypes** | Pointer to **[]string** |  | [optional] 
 **ImplicitGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **ImplicitGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
-**Jwks** | Pointer to **interface{}** | OAuth 2.0 Client JSON Web Key Set  Client&#39;s JSON Web Key Set [JWK] document, passed by value. The semantics of the jwks parameter are the same as the jwks_uri parameter, other than that the JWK Set is passed by value, rather than by reference. This parameter is intended only to be used by Clients that, for some reason, are unable to use the jwks_uri parameter, for instance, by native applications that might not have a location to host the contents of the JWK Set. If a Client can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks parameters MUST NOT be used together. | [optional] 
+**Jwks** | Pointer to [**JsonWebKeySet**](JsonWebKeySet.md) |  | [optional] 
 **JwksUri** | Pointer to **string** | OAuth 2.0 Client JSON Web Key Set URL  URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
 **JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **LogoUri** | Pointer to **string** | OAuth 2.0 Client Logo URI  A URL string referencing the client&#39;s logo. | [optional] 
@@ -677,20 +677,20 @@ HasImplicitGrantIdTokenLifespan returns a boolean if a field has been set.
 
 ### GetJwks
 
-`func (o *OAuth2Client) GetJwks() interface{}`
+`func (o *OAuth2Client) GetJwks() JsonWebKeySet`
 
 GetJwks returns the Jwks field if non-nil, zero value otherwise.
 
 ### GetJwksOk
 
-`func (o *OAuth2Client) GetJwksOk() (*interface{}, bool)`
+`func (o *OAuth2Client) GetJwksOk() (*JsonWebKeySet, bool)`
 
 GetJwksOk returns a tuple with the Jwks field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetJwks
 
-`func (o *OAuth2Client) SetJwks(v interface{})`
+`func (o *OAuth2Client) SetJwks(v JsonWebKeySet)`
 
 SetJwks sets Jwks field to given value.
 
@@ -700,16 +700,6 @@ SetJwks sets Jwks field to given value.
 
 HasJwks returns a boolean if a field has been set.
 
-### SetJwksNil
-
-`func (o *OAuth2Client) SetJwksNil(b bool)`
-
- SetJwksNil sets the value for Jwks to be an explicit nil
-
-### UnsetJwks
-`func (o *OAuth2Client) UnsetJwks()`
-
-UnsetJwks ensures that no value is present for Jwks, not even an explicit nil
 ### GetJwksUri
 
 `func (o *OAuth2Client) GetJwksUri() string`

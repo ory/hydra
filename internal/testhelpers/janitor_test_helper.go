@@ -21,7 +21,6 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
@@ -50,7 +49,7 @@ type createGrantRequest struct {
 const lifespan = time.Hour
 
 func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
-	conf := internal.NewConfigurationWithDefaults()
+	conf := NewConfigurationWithDefaults()
 	conf.MustSet(context.Background(), config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	conf.MustSet(context.Background(), config.KeyIssuerURL, "http://hydra.localhost")
 	conf.MustSet(context.Background(), config.KeyAccessTokenLifespan, lifespan)
@@ -126,7 +125,7 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterSetup(ctx context.Context
 		// Create refresh token clients and session
 		for _, fr := range j.flushRefreshRequests {
 			require.NoError(t, cl.CreateClient(ctx, fr.Client.(*client.Client)))
-			require.NoError(t, store.CreateRefreshTokenSession(ctx, fr.ID, fr))
+			require.NoError(t, store.CreateRefreshTokenSession(ctx, fr.ID, "", fr))
 		}
 	}
 }

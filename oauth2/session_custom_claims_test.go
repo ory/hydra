@@ -7,11 +7,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/oauth2"
 
 	"github.com/stretchr/testify/assert"
@@ -39,7 +40,7 @@ func createSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvide
 
 func TestCustomClaimsInSession(t *testing.T) {
 	ctx := context.Background()
-	c := internal.NewConfigurationWithDefaults()
+	c := testhelpers.NewConfigurationWithDefaults()
 
 	t.Run("no_custom_claims", func(t *testing.T) {
 		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{})

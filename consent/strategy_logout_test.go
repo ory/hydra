@@ -28,7 +28,6 @@ import (
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/ioutilx"
@@ -37,7 +36,7 @@ import (
 func TestLogoutFlows(t *testing.T) {
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
 

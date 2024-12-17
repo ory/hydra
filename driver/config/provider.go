@@ -213,6 +213,10 @@ func (p *DefaultProvider) MustSet(ctx context.Context, key string, value interfa
 	}
 }
 
+func (p *DefaultProvider) Delete(ctx context.Context, key string) {
+	p.getProvider(ctx).Delete(key)
+}
+
 func (p *DefaultProvider) Source(ctx context.Context) *configx.Provider {
 	return p.getProvider(ctx)
 }
@@ -517,6 +521,10 @@ type (
 )
 
 func (p *DefaultProvider) getHookConfig(ctx context.Context, key string) *HookConfig {
+	if p.getProvider(ctx).String(key) == "" {
+		return nil
+	}
+
 	if hookURL := p.getProvider(ctx).RequestURIF(key, nil); hookURL != nil {
 		return &HookConfig{
 			URL: hookURL.String(),
@@ -673,8 +681,8 @@ func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
 
 func (p *DefaultProvider) RefreshTokenRotationGracePeriod(ctx context.Context) time.Duration {
 	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
-	if gracePeriod > time.Hour {
-		return time.Hour
+	if gracePeriod > time.Minute*5 {
+		return time.Minute * 5
 	}
 	return gracePeriod
 }

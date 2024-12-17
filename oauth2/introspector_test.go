@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/httprouterx"
@@ -30,12 +32,12 @@ import (
 
 func TestIntrospectorSDK(t *testing.T) {
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyScopeStrategy, "wildcard")
 	conf.MustSet(ctx, config.KeyIssuerURL, "https://foobariss")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	internal.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)

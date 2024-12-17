@@ -28,14 +28,13 @@ import (
 
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/requirex"
 )
 
 func TestClientCredentials(t *testing.T) {
 	ctx := context.Background()
-	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 

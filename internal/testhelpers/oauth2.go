@@ -182,6 +182,17 @@ func NewLoginConsentUI(t testing.TB, c *config.DefaultProvider, login, consent h
 	c.MustSet(context.Background(), config.KeyConsentURL, ct.URL)
 }
 
+func NewDeviceLoginConsentUI(t testing.TB, c *config.DefaultProvider, device, login, consent http.HandlerFunc) {
+	if device == nil {
+		device = HTTPServerNotImplementedHandler
+	}
+	dt := httptest.NewServer(device)
+	t.Cleanup(dt.Close)
+	c.MustSet(context.Background(), config.KeyDeviceVerificationURL, dt.URL)
+
+	NewLoginConsentUI(t, c, login, consent)
+}
+
 func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 	if h == nil {
 		h = HTTPServerNotImplementedHandler

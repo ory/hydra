@@ -14,7 +14,8 @@
         "amr": null,
         "c_hash": "",
         "ext": {
-          "hooked": "legacy"
+          "hooked": "legacy",
+          "sid": ""
         }
       },
       "headers": {

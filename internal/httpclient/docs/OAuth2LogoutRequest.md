@@ -6,7 +6,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Challenge** | Pointer to **string** | Challenge is the identifier (\&quot;logout challenge\&quot;) of the logout authentication request. It is used to identify the session. | [optional] 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
+**ExpiresAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Logout URL requested. | [optional] 
+**RequestedAt** | Pointer to **time.Time** |  | [optional] 
 **RpInitiated** | Pointer to **bool** | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client. | [optional] 
 **Sid** | Pointer to **string** | SessionID is the login session ID that was requested to log out. | [optional] 
 **Subject** | Pointer to **string** | Subject is the user for whom the logout was request. | [optional] 
@@ -80,6 +82,31 @@ SetClient sets Client field to given value.
 
 HasClient returns a boolean if a field has been set.
 
+### GetExpiresAt
+
+`func (o *OAuth2LogoutRequest) GetExpiresAt() time.Time`
+
+GetExpiresAt returns the ExpiresAt field if non-nil, zero value otherwise.
+
+### GetExpiresAtOk
+
+`func (o *OAuth2LogoutRequest) GetExpiresAtOk() (*time.Time, bool)`
+
+GetExpiresAtOk returns a tuple with the ExpiresAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExpiresAt
+
+`func (o *OAuth2LogoutRequest) SetExpiresAt(v time.Time)`
+
+SetExpiresAt sets ExpiresAt field to given value.
+
+### HasExpiresAt
+
+`func (o *OAuth2LogoutRequest) HasExpiresAt() bool`
+
+HasExpiresAt returns a boolean if a field has been set.
+
 ### GetRequestUrl
 
 `func (o *OAuth2LogoutRequest) GetRequestUrl() string`
@@ -104,6 +131,31 @@ SetRequestUrl sets RequestUrl field to given value.
 `func (o *OAuth2LogoutRequest) HasRequestUrl() bool`
 
 HasRequestUrl returns a boolean if a field has been set.
+
+### GetRequestedAt
+
+`func (o *OAuth2LogoutRequest) GetRequestedAt() time.Time`
+
+GetRequestedAt returns the RequestedAt field if non-nil, zero value otherwise.
+
+### GetRequestedAtOk
+
+`func (o *OAuth2LogoutRequest) GetRequestedAtOk() (*time.Time, bool)`
+
+GetRequestedAtOk returns a tuple with the RequestedAt field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetRequestedAt
+
+`func (o *OAuth2LogoutRequest) SetRequestedAt(v time.Time)`
+
+SetRequestedAt sets RequestedAt field to given value.
+
+### HasRequestedAt
+
+`func (o *OAuth2LogoutRequest) HasRequestedAt() bool`
+
+HasRequestedAt returns a boolean if a field has been set.
 
 ### GetRpInitiated
 

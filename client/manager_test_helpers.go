@@ -298,6 +298,12 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Name, "name")
 
+		// get by name negated prefix
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "!=name"})
+		assert.NoError(t, err)
+		assert.Len(t, ds, 1)
+		assert.Equal(t, ds[0].GetID(), "2-1234")
+
 		// get by name not exist
 		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "bad name"})
 		assert.NoError(t, err)
@@ -308,6 +314,12 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Owner, "aeneas")
+
+		// get by owner negated prefix
+		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Owner: "!=aeneas"})
+		assert.NoError(t, err)
+		assert.Len(t, ds, 1)
+		assert.Equal(t, ds[0].GetID(), "2-1234")
 
 		testHelperUpdateClient(t, ctx, t1, k)
 		testHelperUpdateClient(t, ctx, t2, k)

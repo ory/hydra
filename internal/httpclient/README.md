@@ -92,6 +92,7 @@ Class | Method | HTTP request | Description
 *OAuth2API* | [**AcceptOAuth2ConsentRequest**](docs/OAuth2API.md#acceptoauth2consentrequest) | **Put** /admin/oauth2/auth/requests/consent/accept | Accept OAuth 2.0 Consent Request
 *OAuth2API* | [**AcceptOAuth2LoginRequest**](docs/OAuth2API.md#acceptoauth2loginrequest) | **Put** /admin/oauth2/auth/requests/login/accept | Accept OAuth 2.0 Login Request
 *OAuth2API* | [**AcceptOAuth2LogoutRequest**](docs/OAuth2API.md#acceptoauth2logoutrequest) | **Put** /admin/oauth2/auth/requests/logout/accept | Accept OAuth 2.0 Session Logout Request
+*OAuth2API* | [**AcceptUserCodeRequest**](docs/OAuth2API.md#acceptusercoderequest) | **Put** /admin/oauth2/auth/requests/device/accept | Accepts a device grant user_code request
 *OAuth2API* | [**CreateOAuth2Client**](docs/OAuth2API.md#createoauth2client) | **Post** /admin/clients | Create OAuth 2.0 Client
 *OAuth2API* | [**DeleteOAuth2Client**](docs/OAuth2API.md#deleteoauth2client) | **Delete** /admin/clients/{id} | Delete OAuth 2.0 Client
 *OAuth2API* | [**DeleteOAuth2Token**](docs/OAuth2API.md#deleteoauth2token) | **Delete** /admin/oauth2/tokens | Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
@@ -106,8 +107,10 @@ Class | Method | HTTP request | Description
 *OAuth2API* | [**ListOAuth2ConsentSessions**](docs/OAuth2API.md#listoauth2consentsessions) | **Get** /admin/oauth2/auth/sessions/consent | List OAuth 2.0 Consent Sessions of a Subject
 *OAuth2API* | [**ListTrustedOAuth2JwtGrantIssuers**](docs/OAuth2API.md#listtrustedoauth2jwtgrantissuers) | **Get** /admin/trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
 *OAuth2API* | [**OAuth2Authorize**](docs/OAuth2API.md#oauth2authorize) | **Get** /oauth2/auth | OAuth 2.0 Authorize Endpoint
+*OAuth2API* | [**OAuth2DeviceFlow**](docs/OAuth2API.md#oauth2deviceflow) | **Post** /oauth2/device/auth | The OAuth 2.0 Device Authorize Endpoint
 *OAuth2API* | [**Oauth2TokenExchange**](docs/OAuth2API.md#oauth2tokenexchange) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
 *OAuth2API* | [**PatchOAuth2Client**](docs/OAuth2API.md#patchoauth2client) | **Patch** /admin/clients/{id} | Patch OAuth 2.0 Client
+*OAuth2API* | [**PerformOAuth2DeviceVerificationFlow**](docs/OAuth2API.md#performoauth2deviceverificationflow) | **Get** /oauth2/device/verify | OAuth 2.0 Device Verification Endpoint
 *OAuth2API* | [**RejectOAuth2ConsentRequest**](docs/OAuth2API.md#rejectoauth2consentrequest) | **Put** /admin/oauth2/auth/requests/consent/reject | Reject OAuth 2.0 Consent Request
 *OAuth2API* | [**RejectOAuth2LoginRequest**](docs/OAuth2API.md#rejectoauth2loginrequest) | **Put** /admin/oauth2/auth/requests/login/reject | Reject OAuth 2.0 Login Request
 *OAuth2API* | [**RejectOAuth2LogoutRequest**](docs/OAuth2API.md#rejectoauth2logoutrequest) | **Put** /admin/oauth2/auth/requests/logout/reject | Reject OAuth 2.0 Session Logout Request
@@ -130,12 +133,15 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AcceptDeviceUserCodeRequest](docs/AcceptDeviceUserCodeRequest.md)
  - [AcceptOAuth2ConsentRequest](docs/AcceptOAuth2ConsentRequest.md)
  - [AcceptOAuth2ConsentRequestSession](docs/AcceptOAuth2ConsentRequestSession.md)
  - [AcceptOAuth2LoginRequest](docs/AcceptOAuth2LoginRequest.md)
  - [CreateJsonWebKeySet](docs/CreateJsonWebKeySet.md)
  - [CreateVerifiableCredentialRequestBody](docs/CreateVerifiableCredentialRequestBody.md)
  - [CredentialSupportedDraft00](docs/CredentialSupportedDraft00.md)
+ - [DeviceAuthorization](docs/DeviceAuthorization.md)
+ - [DeviceUserAuthRequest](docs/DeviceUserAuthRequest.md)
  - [ErrorOAuth2](docs/ErrorOAuth2.md)
  - [GenericError](docs/GenericError.md)
  - [GetVersion200Response](docs/GetVersion200Response.md)
@@ -173,6 +179,7 @@ Class | Method | HTTP request | Description
  - [VerifiableCredentialPrimingResponse](docs/VerifiableCredentialPrimingResponse.md)
  - [VerifiableCredentialProof](docs/VerifiableCredentialProof.md)
  - [VerifiableCredentialResponse](docs/VerifiableCredentialResponse.md)
+ - [VerifyUserCodeRequest](docs/VerifyUserCodeRequest.md)
  - [Version](docs/Version.md)
 
 

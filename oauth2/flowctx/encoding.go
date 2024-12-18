@@ -25,6 +25,8 @@ type (
 const (
 	loginChallenge purpose = iota
 	loginVerifier
+	deviceChallenge
+	deviceVerifier
 	consentChallenge
 	consentVerifier
 )
@@ -34,6 +36,8 @@ func withPurpose(purpose purpose) CodecOption { return func(ad *data) { ad.Purpo
 var (
 	AsLoginChallenge   = withPurpose(loginChallenge)
 	AsLoginVerifier    = withPurpose(loginVerifier)
+	AsDeviceChallenge  = withPurpose(deviceChallenge)
+	AsDeviceVerifier   = withPurpose(deviceVerifier)
 	AsConsentChallenge = withPurpose(consentChallenge)
 	AsConsentVerifier  = withPurpose(consentVerifier)
 )

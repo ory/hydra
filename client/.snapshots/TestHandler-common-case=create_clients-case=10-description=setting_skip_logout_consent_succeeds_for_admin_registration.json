@@ -32,5 +32,8 @@
   "jwt_bearer_grant_access_token_lifespan": null,
   "refresh_token_grant_id_token_lifespan": null,
   "refresh_token_grant_access_token_lifespan": null,
-  "refresh_token_grant_refresh_token_lifespan": null
+  "refresh_token_grant_refresh_token_lifespan": null,
+  "device_authorization_grant_id_token_lifespan": null,
+  "device_authorization_grant_access_token_lifespan": null,
+  "device_authorization_grant_refresh_token_lifespan": null
 }

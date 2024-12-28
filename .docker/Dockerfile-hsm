@@ -53,20 +53,32 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
+# NOTE: This is broken already. Even though this image provides a shell, you'd need to configure it with
+# `SHELL ["/busybox/sh", "-c"]`, however `apt-get` does not exist either in a distroless image.
+# This was original an Alpine image, the refactoring was not verified properly in this commit:
+# https://github.com/ory/hydra/commit/c1e1a569621d88365dceee7372ca49ecd119f939#diff-ae54bef08e3587b28ad8e93eb253a9a5cd9ea6f4251977e35b88dc6b42329e25L31
 RUN apt-get -y install softhsm opensc &&\
     pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL"
 
-RUN addgroup -S ory; \
-    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
-    chown -R ory:ory /home/ory; \
+RUN <<HEREDOC
+    # Add a user/group for Ory with a stable UID + GID:
+    addgroup --system --gid 500 ory
+    adduser --system --uid 500 \
+        --gecos "Ory User" \
+        --home /home/ory \
+        --ingroup ory \
+        --shell /sbin/nologin \
+        ory
+
+    # Create the sqlite directory with ownership to that user and group:
+    # NOTE: This is required for read/write by SQLite.
+    install --owner ory --group ory --directory /var/lib/sqlite
+
+    # NOTE: Presumably this was already created by the prior RUN directive
     chown -R ory:ory /var/lib/softhsm/tokens
+HEREDOC
 
 COPY --from=build-hydra /usr/bin/hydra /usr/bin/hydra
-
-# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
-# is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite && \
-    chown ory:ory /var/lib/sqlite
 
 VOLUME /var/lib/sqlite
 
@@ -76,7 +88,6 @@ VOLUME /home/ory
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 
-USER ory
-
 ENTRYPOINT ["hydra"]
 CMD ["serve"]
+USER ory

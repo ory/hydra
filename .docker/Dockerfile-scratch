@@ -1,20 +1,28 @@
-FROM alpine:3.20
+FROM alpine:3.20 AS base-files
 
-RUN apk upgrade --no-cache && \
+RUN <<HEREDOC
+    apk upgrade --no-cache
     apk add --no-cache --upgrade ca-certificates
 
-RUN addgroup -S ory; \
-    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin;
+    # Add a user/group for Ory with a stable UID + GID:
+    addgroup --system --gid 500 ory
+    adduser --system --uid 500 \
+      --gecos "Ory User" \
+      --home /home/ory \
+      --ingroup ory \
+      --shell /sbin/nologin \
+      ory
 
-RUN mkdir -p /var/lib/sqlite && \
-    chown -R ory:ory /var/lib/sqlite
+    # Create the sqlite directory with ownership to that user and group:
+    install --owner ory --group ory --directory /var/lib/sqlite
+HEREDOC
 
 FROM scratch
-
-COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=0 /etc/nsswitch.conf /etc/nsswitch.conf
-COPY --from=0 /etc/passwd /etc/passwd
-COPY --from=0 /var/lib/sqlite /var/lib/sqlite
+COPY --from=base-files /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=base-files /etc/nsswitch.conf /etc/nsswitch.conf
+# NOTE: /etc/group and /etc/shadow were not copied over, only user lookup is valid for `USER`:
+COPY --from=base-files /etc/passwd /etc/passwd
+COPY --from=base-files /var/lib/sqlite /var/lib/sqlite
 
 COPY hydra /usr/bin/hydra
 

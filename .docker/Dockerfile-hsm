@@ -80,11 +80,6 @@ HEREDOC
 
 COPY --from=build-hydra /usr/bin/hydra /usr/bin/hydra
 
-VOLUME /var/lib/sqlite
-
-# Exposing the ory home directory
-VOLUME /home/ory
-
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 

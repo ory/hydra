@@ -1,16 +1,24 @@
 FROM alpine:3.20
 
-RUN addgroup -S ory; \
-    adduser -S ory -G ory -D -H -s /bin/nologin && \
-    apk upgrade --no-cache && \
+RUN <<HEREDOC
+    apk upgrade --no-cache
     apk add --no-cache --upgrade ca-certificates
 
-COPY hydra /usr/bin/hydra
+    # Add a user/group for Ory with a stable UID + GID:
+    addgroup --system --gid 500 ory
+    adduser --system --uid 500 \
+      --gecos "Ory User" \
+      --home /home/ory \
+      --ingroup ory \
+      --shell /sbin/nologin \
+      ory
 
-# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
-# is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite && \
-    chown ory:ory /var/lib/sqlite
+    # Create the sqlite directory with ownership to that user and group:
+    # NOTE: This is required for read/write by SQLite.
+    install --owner ory --group ory --directory /var/lib/sqlite
+HEREDOC
+
+COPY hydra /usr/bin/hydra
 
 USER ory
 

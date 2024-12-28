@@ -23,8 +23,6 @@ FROM gcr.io/distroless/static-debian12:nonroot AS runner
 COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 
-VOLUME /var/lib/sqlite
-
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 

@@ -21,7 +21,7 @@ jobs:
           token: ${{ secrets.ORY_BOT_PAT || secrets.GITHUB_TOKEN }}
       - name: Check licenses
         uses: ory/ci/licenses/check@master
-      - name: Write licenses
+      - name: Write, commit, push licenses
         uses: ory/ci/licenses/write@master
         if:
           ${{ github.ref == 'refs/heads/main' || github.ref ==

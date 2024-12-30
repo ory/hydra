@@ -3555,6 +3555,7 @@ components:
       type: object
     oAuth2LogoutRequest:
       example:
+        expires_at: 2000-01-23T04:56:07.000+00:00
         subject: subject
         challenge: challenge
         client:
@@ -3624,6 +3625,7 @@ components:
           - response_types
         rp_initiated: true
         request_url: request_url
+        requested_at: 2000-01-23T04:56:07.000+00:00
         sid: sid
       properties:
         challenge:
@@ -3633,8 +3635,16 @@ components:
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'
+        expires_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
         request_url:
           description: RequestURL is the original Logout URL requested.
+          type: string
+        requested_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
           type: string
         rp_initiated:
           description: "RPInitiated is set to true if the request was initiated by\

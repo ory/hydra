@@ -1037,9 +1037,15 @@
           "client": {
             "$ref": "#/components/schemas/oAuth2Client"
           },
+          "expires_at": {
+            "$ref": "#/components/schemas/nullTime"
+          },
           "request_url": {
             "description": "RequestURL is the original Logout URL requested.",
             "type": "string"
+          },
+          "requested_at": {
+            "$ref": "#/components/schemas/nullTime"
           },
           "rp_initiated": {
             "description": "RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.",

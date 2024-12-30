@@ -13,6 +13,7 @@ package openapi
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // checks if the OAuth2LogoutRequest type satisfies the MappedNullable interface at compile time
@@ -23,8 +24,10 @@ type OAuth2LogoutRequest struct {
 	// Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to identify the session.
 	Challenge *string       `json:"challenge,omitempty"`
 	Client    *OAuth2Client `json:"client,omitempty"`
+	ExpiresAt *time.Time    `json:"expires_at,omitempty"`
 	// RequestURL is the original Logout URL requested.
-	RequestUrl *string `json:"request_url,omitempty"`
+	RequestUrl  *string    `json:"request_url,omitempty"`
+	RequestedAt *time.Time `json:"requested_at,omitempty"`
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
 	RpInitiated *bool `json:"rp_initiated,omitempty"`
 	// SessionID is the login session ID that was requested to log out.
@@ -114,6 +117,38 @@ func (o *OAuth2LogoutRequest) SetClient(v OAuth2Client) {
 	o.Client = &v
 }
 
+// GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
+func (o *OAuth2LogoutRequest) GetExpiresAt() time.Time {
+	if o == nil || IsNil(o.ExpiresAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.ExpiresAt
+}
+
+// GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2LogoutRequest) GetExpiresAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.ExpiresAt) {
+		return nil, false
+	}
+	return o.ExpiresAt, true
+}
+
+// HasExpiresAt returns a boolean if a field has been set.
+func (o *OAuth2LogoutRequest) HasExpiresAt() bool {
+	if o != nil && !IsNil(o.ExpiresAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetExpiresAt gets a reference to the given time.Time and assigns it to the ExpiresAt field.
+func (o *OAuth2LogoutRequest) SetExpiresAt(v time.Time) {
+	o.ExpiresAt = &v
+}
+
 // GetRequestUrl returns the RequestUrl field value if set, zero value otherwise.
 func (o *OAuth2LogoutRequest) GetRequestUrl() string {
 	if o == nil || IsNil(o.RequestUrl) {
@@ -144,6 +179,38 @@ func (o *OAuth2LogoutRequest) HasRequestUrl() bool {
 // SetRequestUrl gets a reference to the given string and assigns it to the RequestUrl field.
 func (o *OAuth2LogoutRequest) SetRequestUrl(v string) {
 	o.RequestUrl = &v
+}
+
+// GetRequestedAt returns the RequestedAt field value if set, zero value otherwise.
+func (o *OAuth2LogoutRequest) GetRequestedAt() time.Time {
+	if o == nil || IsNil(o.RequestedAt) {
+		var ret time.Time
+		return ret
+	}
+	return *o.RequestedAt
+}
+
+// GetRequestedAtOk returns a tuple with the RequestedAt field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2LogoutRequest) GetRequestedAtOk() (*time.Time, bool) {
+	if o == nil || IsNil(o.RequestedAt) {
+		return nil, false
+	}
+	return o.RequestedAt, true
+}
+
+// HasRequestedAt returns a boolean if a field has been set.
+func (o *OAuth2LogoutRequest) HasRequestedAt() bool {
+	if o != nil && !IsNil(o.RequestedAt) {
+		return true
+	}
+
+	return false
+}
+
+// SetRequestedAt gets a reference to the given time.Time and assigns it to the RequestedAt field.
+func (o *OAuth2LogoutRequest) SetRequestedAt(v time.Time) {
+	o.RequestedAt = &v
 }
 
 // GetRpInitiated returns the RpInitiated field value if set, zero value otherwise.
@@ -258,8 +325,14 @@ func (o OAuth2LogoutRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Client) {
 		toSerialize["client"] = o.Client
 	}
+	if !IsNil(o.ExpiresAt) {
+		toSerialize["expires_at"] = o.ExpiresAt
+	}
 	if !IsNil(o.RequestUrl) {
 		toSerialize["request_url"] = o.RequestUrl
+	}
+	if !IsNil(o.RequestedAt) {
+		toSerialize["requested_at"] = o.RequestedAt
 	}
 	if !IsNil(o.RpInitiated) {
 		toSerialize["rp_initiated"] = o.RpInitiated

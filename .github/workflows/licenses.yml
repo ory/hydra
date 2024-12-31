@@ -26,3 +26,9 @@ jobs:
         if:
           ${{ github.ref == 'refs/heads/main' || github.ref ==
           'refs/heads/master' }}
+        with:
+          author-email:
+            ${{ secrets.ORY_BOT_PAT &&
+            '60093411+ory-bot@users.noreply.github.com' || github.actor +
+            '@users.noreply.github.com' }}
+          author-name: ${{ secrets.ORY_BOT_PAT && 'ory-bot' || github.actor }}

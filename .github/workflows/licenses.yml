@@ -29,6 +29,6 @@ jobs:
         with:
           author-email:
             ${{ secrets.ORY_BOT_PAT &&
-            '60093411+ory-bot@users.noreply.github.com' || github.actor +
-            '@users.noreply.github.com' }}
+            '60093411+ory-bot@users.noreply.github.com' ||
+            format('{0}@users.noreply.github.com', github.actor) }}
           author-name: ${{ secrets.ORY_BOT_PAT && 'ory-bot' || github.actor }}

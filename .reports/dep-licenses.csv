@@ -488,3 +488,4 @@
 "go.opentelemetry.io/otel/trace","Apache-2.0"
 "go.uber.org/automaxprocs","MIT"
 "golang.org/x/oauth2","BSD-3-Clause"
+

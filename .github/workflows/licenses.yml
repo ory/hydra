@@ -25,7 +25,7 @@ jobs:
         uses: ory/ci/licenses/write@master
         if:
           ${{ github.ref == 'refs/heads/main' || github.ref ==
-          'refs/heads/master' }}
+          'refs/heads/master' || github.ref == 'refs/heads/v3' }}
         with:
           author-email:
             ${{ secrets.ORY_BOT_PAT &&

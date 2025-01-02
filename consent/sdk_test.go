@@ -71,9 +71,9 @@ func TestSDK(t *testing.T) {
 		ID:      ar2.SessionID.String(),
 		Subject: ar2.Subject,
 	}))
-	_, err := m.CreateLoginRequest(context.Background(), ar1)
+	_, err := m.CreateLoginRequest(context.Background(), nil, ar1)
 	require.NoError(t, err)
-	_, err = m.CreateLoginRequest(context.Background(), ar2)
+	_, err = m.CreateLoginRequest(context.Background(), nil, ar2)
 	require.NoError(t, err)
 
 	cr1, hcr1, _ := test.MockConsentRequest("1", false, 0, false, false, false, "fk-login-challenge", network)
@@ -85,7 +85,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr3.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
 
-	cr1Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
+	cr1Flow, err := m.CreateLoginRequest(context.Background(), nil, &LoginRequest{
 		ID:          cr1.LoginChallenge.String(),
 		Subject:     cr1.Subject,
 		Client:      cr1.Client,
@@ -95,7 +95,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	cr1Flow.LoginSkip = ar1.Skip
 
-	cr2Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
+	cr2Flow, err := m.CreateLoginRequest(context.Background(), nil, &LoginRequest{
 		ID:          cr2.LoginChallenge.String(),
 		Subject:     cr2.Subject,
 		Client:      cr2.Client,
@@ -108,7 +108,7 @@ func TestSDK(t *testing.T) {
 	loginSession3 := &LoginSession{ID: cr3.LoginSessionID.String()}
 	require.NoError(t, m.CreateLoginSession(context.Background(), loginSession3))
 	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession3))
-	cr3Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
+	cr3Flow, err := m.CreateLoginRequest(context.Background(), nil, &LoginRequest{
 		ID:          cr3.LoginChallenge.String(),
 		Subject:     cr3.Subject,
 		Client:      cr3.Client,
@@ -121,7 +121,7 @@ func TestSDK(t *testing.T) {
 	loginSession4 := &LoginSession{ID: cr4.LoginSessionID.String()}
 	require.NoError(t, m.CreateLoginSession(context.Background(), loginSession4))
 	require.NoError(t, m.ConfirmLoginSession(context.Background(), loginSession4))
-	cr4Flow, err := m.CreateLoginRequest(context.Background(), &LoginRequest{
+	cr4Flow, err := m.CreateLoginRequest(context.Background(), nil, &LoginRequest{
 		ID:        cr4.LoginChallenge.String(),
 		Client:    cr4.Client,
 		Verifier:  cr4.ID,

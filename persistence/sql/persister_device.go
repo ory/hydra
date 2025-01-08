@@ -161,6 +161,8 @@ func (p *Persister) createDeviceAuthSession(ctx context.Context, deviceCodeSigna
 
 	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if errors.Is(err, sqlcon.ErrUniqueViolation) {
+		return errors.Wrap(fosite.ErrExistingUserCodeSignature, err.Error())
 	} else if err != nil {
 		return err
 	}

@@ -23,14 +23,14 @@ services:
     volumes:
       - type: volume
         source: hydra-sqlite
-        target: /var/lib/sqlite
+        target: /etc/sqlite
         read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     pull_policy: missing
     environment:
-      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+      - DSN=sqlite:///etc/sqlite/db.sqlite?_fk=true
     restart: unless-stopped
     user: 500:500
     depends_on:
@@ -43,14 +43,14 @@ services:
       context: .
       dockerfile: .docker/Dockerfile-build
     environment:
-      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
-    command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+      - DSN=sqlite:///etc/sqlite/db.sqlite?_fk=true
+    command: migrate -c /etc/config/hydra/hydra.yml sql up -e --yes
     user: 500:500
     pull_policy: missing
     volumes:
       - type: volume
         source: hydra-sqlite
-        target: /var/lib/sqlite
+        target: /etc/sqlite
         read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min

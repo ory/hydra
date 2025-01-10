@@ -13,13 +13,6 @@ RUN <<HEREDOC
       --ingroup ory \
       --shell /sbin/nologin \
       ory
-
-    # Create the sqlite directory with ownership to that user and group:
-    # NOTE: This is required for read/write by SQLite.
-    # - Path may be a default value somewhere, or only explicitly provided via DSN?
-    # - Owner/Group is only relevant to permissions allowing the hydra process to read/write to the location.
-    # - Bind mount volumes will replace the ownership with that of the host directory, requiring correction.
-    install --owner ory --group ory --directory /var/lib/sqlite
 HEREDOC
 
 COPY hydra /usr/bin/hydra

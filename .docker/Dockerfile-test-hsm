@@ -20,7 +20,7 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
-RUN apt-get -y install softhsm opensc
+RUN apk add --no-cache softhsm opensc
 RUN pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL"
 
 FROM builder as test-hsm

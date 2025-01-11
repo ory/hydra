@@ -3,20 +3,20 @@ FROM alpine:3.20
 RUN <<HEREDOC
     apk add --no-cache --upgrade ca-certificates
 
-    # Add a user/group for Ory with a stable UID + GID. Values are from nonroot from distroless
+    # Add a user/group for nonroot with a stable UID + GID. Values are from nonroot from distroless
     # for interoperability with other containers.
-    addgroup --system --gid 65532 ory
+    addgroup --system --gid 65532 nonroot
     adduser --system --uid 65532 \
-      --gecos "Ory User" \
-      --home /home/ory \
-      --ingroup ory \
+      --gecos "nonroot User" \
+      --home /home/nonroot \
+      --ingroup nonroot \
       --shell /sbin/nologin \
-      ory
+      nonroot
 HEREDOC
 
 COPY hydra /usr/bin/hydra
 
-USER ory
+USER nonroot
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

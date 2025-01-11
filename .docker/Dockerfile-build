@@ -17,14 +17,12 @@ RUN go build -ldflags="-extldflags=-static" -tags sqlite,sqlite_omit_load_extens
 
 #########################
 
-FROM gcr.io/distroless/static-debian12:debug-nonroot AS runner
+FROM gcr.io/distroless/static-debian12:nonroot AS runner
 
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
-
-USER nonroot
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

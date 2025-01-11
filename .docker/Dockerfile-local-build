@@ -24,5 +24,7 @@ COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 
+USER nonroot
+
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

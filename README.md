@@ -609,7 +609,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://pinniped.dev/">pinniped.dev</a></td>
-        </tr>
+        </tr>         
         <tr>
             <td>Adopter *</td>
             <td>Pvotal</td>
@@ -835,9 +835,7 @@ make quicktest
 
 # regular tests
 make test
-
-# updates all snapshots
-make test-refresh
+test-resetdb
 
 # end-to-end tests
 make e2e
@@ -979,11 +977,9 @@ If you wish to check your code changes against any of the docker-compose
 quickstart files, run:
 
 ```shell script
-docker compose -f quickstart.yml up --build # ....
+make docker
+docker compose -f quickstart.yml up # ....
 ```
-
-Warning, this will override your local image tag with the latest build and can
-lead to unexpected or confusing behavior.
 
 #### Add a new migration
 

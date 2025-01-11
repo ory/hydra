@@ -982,11 +982,8 @@ quickstart files, run:
 docker compose -f quickstart.yml up --build # ....
 ```
 
-> [!WARNING] If you already have a production image (e.g. `oryd/hydra:v2.2.0`)
-> pulled, the above `make docker` command will replace it with a local build of
-> the image that is more equivalent to the `-distroless` variant on Docker Hub.
->
-> You can pull the production image any time using `docker pull`
+Warning, this will override your local image tag with the latest build and can
+lead to unexpected or confusing behavior.
 
 #### Add a new migration
 

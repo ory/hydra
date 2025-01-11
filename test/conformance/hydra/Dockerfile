@@ -20,7 +20,7 @@ COPY . .
 
 RUN go build -tags sqlite -o /usr/bin/hydra
 
-VOLUME /mnt/sqlite
+VOLUME /var/lib/sqlite
 
 # Exposing the ory home directory
 VOLUME /home/ory

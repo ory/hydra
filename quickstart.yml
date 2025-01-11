@@ -10,11 +10,6 @@
 #                                                                         #
 ###########################################################################
 services:
-  sqlite:
-    image: busybox
-    volumes:
-      - hydra-sqlite:/mnt/sqlite
-    command: "chmod -R 777 /mnt/sqlite"
   hydra:
     image: oryd/hydra:v2.2.0
     build:
@@ -26,17 +21,19 @@ services:
       - "5555:5555" # Port for hydra token user
     command: serve -c /etc/config/hydra/hydra.yml all --dev
     volumes:
-      - hydra-sqlite:/mnt/sqlite:rw
+      - type: volume
+        source: hydra-sqlite
+        target: /mount/sqlite
+        read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     pull_policy: missing
     environment:
-      - DSN=sqlite:///mnt/sqlite/db.sqlite?_fk=true&mode=rwc
+      - DSN=sqlite:///mount/sqlite/db.sqlite?_fk=true
     restart: unless-stopped
     depends_on:
       - hydra-migrate
-      - sqlite
     networks:
       - intranet
   hydra-migrate:
@@ -45,19 +42,20 @@ services:
       context: .
       dockerfile: .docker/Dockerfile-local-build
     environment:
-      - DSN=sqlite:///mnt/sqlite/db.sqlite?_fk=true&mode=rwc
+      - DSN=sqlite:///mount/sqlite/db.sqlite?_fk=true
     command: migrate -c /etc/config/hydra/hydra.yml sql up -e --yes
     pull_policy: missing
     volumes:
-      - hydra-sqlite:/mnt/sqlite:rw
+      - type: volume
+        source: hydra-sqlite
+        target: /mount/sqlite
+        read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     restart: on-failure
     networks:
       - intranet
-    depends_on:
-      - sqlite
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445

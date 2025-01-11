@@ -1,6 +1,6 @@
 FROM golang:1.23-alpine3.21 AS builder
 
-RUN apk add --no-cache build-base git gcc bash
+RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
 WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient

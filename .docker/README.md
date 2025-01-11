@@ -1,3 +1,3 @@
-This directory contains Dockerfiles for various targets:
-- `Dockerfile-distroless` and `Dockerfile-alpine` are published to Docker Hub via GoReleaser.
-- The other `Dockerfile` variants are intended only for local development and tests.
+This directory contains Dockerfiles for various targets. Only
+`Dockerfile-distroless` and `Dockerfile-alpine` are being published to Docker
+Hub. The other Dockerfiles are for local development and testing.

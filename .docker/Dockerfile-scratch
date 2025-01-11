@@ -14,7 +14,6 @@ RUN <<HEREDOC
       ory
 
     # Create the sqlite directory with ownership to that user and group:
-    # NOTE: This is required for read/write by SQLite.
     install --owner ory --group ory --directory /var/lib/sqlite
 HEREDOC
 
@@ -23,11 +22,11 @@ COPY --from=base-files /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=base-files /etc/nsswitch.conf /etc/nsswitch.conf
 # NOTE: /etc/group and /etc/shadow were not copied over, only user lookup is valid for `USER`:
 COPY --from=base-files /etc/passwd /etc/passwd
-# NOTE: This COPY defaults to 0:0 for ownership, voiding the requirement conveyed above
 COPY --from=base-files /var/lib/sqlite /var/lib/sqlite
 
 COPY hydra /usr/bin/hydra
 
+USER ory
+
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]
-USER ory

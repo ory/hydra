@@ -1,8 +1,3 @@
-# TODO: Remove this file in favor of distroless-static variant:
-# https://github.com/ory/hydra/blob/master/.docker/Dockerfile-distroless-static
-# However if published to any registry, continue to publish the variant tag but as an alias to `-distroless` tags:
-# https://github.com/ory/hydra/pull/3914#pullrequestreview-2527315326
-
 FROM alpine:3.20 AS base-files
 
 RUN <<HEREDOC
@@ -10,7 +5,6 @@ RUN <<HEREDOC
     apk add --no-cache --upgrade ca-certificates
 
     # Add a user/group for Ory with a stable UID + GID:
-    # NOTE: This only appears relevant for supporting hydra as non-root, otherwise unnecessary.
     addgroup --system --gid 500 ory
     adduser --system --uid 500 \
       --gecos "Ory User" \
@@ -21,8 +15,6 @@ RUN <<HEREDOC
 
     # Create the sqlite directory with ownership to that user and group:
     # NOTE: This is required for read/write by SQLite.
-    # - Path may be a default value somewhere, or only explicitly provided via DSN?
-    # - Owner/Group is only relevant to permissions allowing the hydra process to read/write to the location.
     install --owner ory --group ory --directory /var/lib/sqlite
 HEREDOC
 

@@ -3,8 +3,8 @@ FROM alpine:3.20
 RUN <<HEREDOC
     apk add --no-cache --upgrade ca-certificates
 
-    # Add a user/group for Ory with a stable UID + GID:
-    # NOTE: This only appears relevant for supporting hydra as non-root, otherwise unnecessary.
+    # Add a user/group for Ory with a stable UID + GID. Values are from nonroot from distroless
+    # for interoperability with other containers.
     addgroup --system --gid 65532 ory
     adduser --system --uid 65532 \
       --gecos "Ory User" \

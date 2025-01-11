@@ -3,7 +3,6 @@ FROM golang:1.22 AS builder
 WORKDIR /go/src/github.com/ory/hydra
 
 RUN apt-get update && apt-get upgrade -y &&\
-    mkdir -p /var/lib/sqlite &&\
     mkdir -p ./internal/httpclient
 
 COPY go.mod go.sum ./
@@ -18,12 +17,9 @@ RUN go build -ldflags="-extldflags=-static" -tags sqlite,sqlite_omit_load_extens
 
 #########################
 
-FROM gcr.io/distroless/static-debian12:nonroot AS runner
+FROM gcr.io/distroless/static-debian12:debug-nonroot AS runner
 
-COPY --from=builder --chown=nonroot:nonroot /var/lib/sqlite /var/lib/sqlite
 COPY --from=builder /usr/bin/hydra /usr/bin/hydra
-
-VOLUME /var/lib/sqlite
 
 # Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445

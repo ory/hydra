@@ -13,7 +13,7 @@ ENV CGO_ENABLED 1
 RUN go mod download
 COPY . .
 
-RUN go build -tags sqlite,json1,hsm -o /usr/bin/hydra
+RUN go build -tags sqlite,hsm -o /usr/bin/hydra
 
 ENV HSM_ENABLED=true
 ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so

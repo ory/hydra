@@ -128,7 +128,7 @@ jobs:
           go-version: "1.22"
       - name: Setup HSM libs and packages
         run: |
-          sudo apt install -y softhsm2 opensc
+          sudo apt install -y softhsm opensc
           sudo rm -rf /var/lib/softhsm/tokens
           sudo mkdir -p /var/lib/softhsm/tokens
           sudo chmod -R a+rwx /var/lib/softhsm

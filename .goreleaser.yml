@@ -1,5 +1,3 @@
-version: 2
-
 includes:
   - from_url:
       url: https://raw.githubusercontent.com/ory/xgoreleaser/master/build.tmpl.yml

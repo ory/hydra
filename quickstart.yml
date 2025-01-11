@@ -14,7 +14,7 @@ services:
     image: oryd/hydra:v2.2.0
     build:
       context: .
-      dockerfile: .docker/Dockerfile-local-build
+      dockerfile: .docker/Dockerfile-build
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
@@ -23,15 +23,16 @@ services:
     volumes:
       - type: volume
         source: hydra-sqlite
-        target: /mount/sqlite
+        target: /etc/sqlite
         read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     pull_policy: missing
     environment:
-      - DSN=sqlite:///mount/sqlite/db.sqlite?_fk=true
+      - DSN=sqlite:///etc/sqlite/db.sqlite?_fk=true
     restart: unless-stopped
+    user: 500:500
     depends_on:
       - hydra-migrate
     networks:
@@ -40,15 +41,16 @@ services:
     image: oryd/hydra:v2.2.0
     build:
       context: .
-      dockerfile: .docker/Dockerfile-local-build
+      dockerfile: .docker/Dockerfile-build
     environment:
-      - DSN=sqlite:///mount/sqlite/db.sqlite?_fk=true
+      - DSN=sqlite:///etc/sqlite/db.sqlite?_fk=true
     command: migrate -c /etc/config/hydra/hydra.yml sql up -e --yes
+    user: 500:500
     pull_policy: missing
     volumes:
       - type: volume
         source: hydra-sqlite
-        target: /mount/sqlite
+        target: /etc/sqlite
         read_only: false
       - type: bind
         source: ./contrib/quickstart/5-min

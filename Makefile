@@ -71,8 +71,7 @@ test-resetdb: node_modules
 # Build local docker images
 .PHONY: docker
 docker:
-	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-local-build -t oryd/hydra:${IMAGE_TAG} .
-	echo "Local development image has been built."
+	DOCKER_BUILDKIT=1 DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:${IMAGE_TAG} .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb

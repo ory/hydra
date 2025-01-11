@@ -24,6 +24,7 @@ HEREDOC
 
 COPY hydra /usr/bin/hydra
 
+USER ory
+
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]
-USER ory

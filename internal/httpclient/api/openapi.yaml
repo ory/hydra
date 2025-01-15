@@ -1032,7 +1032,7 @@ paths:
         explode: true
         in: query
         name: subject
-        required: true
+        required: false
         schema:
           type: string
         style: form
@@ -1043,6 +1043,17 @@ paths:
         explode: true
         in: query
         name: client
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          Consent Challenge ID
+
+          If set, revoke all token chains derived from this particular consent request ID.
+        explode: true
+        in: query
+        name: consent_challenge_id
         required: false
         schema:
           type: string
@@ -3127,9 +3138,7 @@ components:
             \ JSON for SQL storage."
           type: array
         challenge:
-          description: |-
-            ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
-            identify the session.
+          description: ID is the identifier of the consent authorization request.
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'
@@ -3501,9 +3510,7 @@ components:
         - requested_scope
       properties:
         challenge:
-          description: |-
-            ID is the identifier ("login challenge") of the login request. It is used to
-            identify the session.
+          description: ID is the identifier of the login request.
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'
@@ -3631,9 +3638,7 @@ components:
         sid: sid
       properties:
         challenge:
-          description: |-
-            Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
-            identify the session.
+          description: Challenge is the identifier of the logout authentication request.
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'

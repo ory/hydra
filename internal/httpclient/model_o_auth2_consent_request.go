@@ -25,7 +25,7 @@ type OAuth2ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication.
 	Acr *string  `json:"acr,omitempty"`
 	Amr []string `json:"amr,omitempty"`
-	// ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to identify the session.
+	// ID is the identifier of the consent authorization request.
 	Challenge string        `json:"challenge"`
 	Client    *OAuth2Client `json:"client,omitempty"`
 	Context   interface{}   `json:"context,omitempty"`

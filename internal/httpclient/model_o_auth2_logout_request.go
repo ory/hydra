@@ -21,7 +21,7 @@ var _ MappedNullable = &OAuth2LogoutRequest{}
 
 // OAuth2LogoutRequest struct for OAuth2LogoutRequest
 type OAuth2LogoutRequest struct {
-	// Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to identify the session.
+	// Challenge is the identifier of the logout authentication request.
 	Challenge *string       `json:"challenge,omitempty"`
 	Client    *OAuth2Client `json:"client,omitempty"`
 	ExpiresAt *time.Time    `json:"expires_at,omitempty"`

@@ -1249,13 +1249,18 @@
             "type": "string",
             "description": "OAuth 2.0 Consent Subject\n\nThe subject whose consent sessions should be deleted.",
             "name": "subject",
-            "in": "query",
-            "required": true
+            "in": "query"
           },
           {
             "type": "string",
             "description": "OAuth 2.0 Client ID\n\nIf set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID.",
             "name": "client",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Consent Challenge ID\n\nIf set, revoke all token chains derived from this particular consent request ID.",
+            "name": "consent_challenge_id",
             "in": "query"
           },
           {
@@ -2862,7 +2867,7 @@
           "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "challenge": {
-          "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
+          "description": "ID is the identifier of the consent authorization request.",
           "type": "string"
         },
         "client": {
@@ -2988,7 +2993,7 @@
       ],
       "properties": {
         "challenge": {
-          "description": "ID is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
+          "description": "ID is the identifier of the login request.",
           "type": "string"
         },
         "client": {
@@ -3026,7 +3031,7 @@
       "title": "Contains information about an ongoing logout request.",
       "properties": {
         "challenge": {
-          "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
+          "description": "Challenge is the identifier of the logout authentication request.",
           "type": "string"
         },
         "client": {

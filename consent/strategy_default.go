@@ -585,13 +585,13 @@ func (s *DefaultStrategy) forwardConsentRequest(
 
 	// Set up csrf/challenge/verifier values
 	verifier := strings.Replace(uuid.New(), "-", "", -1)
-	challenge := strings.Replace(uuid.New(), "-", "", -1)
+	consentChallengeID := strings.Replace(uuid.New(), "-", "", -1)
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	cl := sanitizeClientFromRequest(ar)
 
 	consentRequest := &flow.OAuth2ConsentRequest{
-		ID:                     challenge,
+		ID:                     consentChallengeID,
 		ACR:                    as.ACR,
 		AMR:                    as.AMR,
 		Verifier:               verifier,

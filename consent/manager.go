@@ -30,6 +30,7 @@ type (
 		HandleConsentRequest(ctx context.Context, f *flow.Flow, r *flow.AcceptOAuth2ConsentRequest) (*flow.OAuth2ConsentRequest, error)
 		RevokeSubjectConsentSession(ctx context.Context, user string) error
 		RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
+		RevokeConsentSessionByID(ctx context.Context, consentChallengeID string) error
 
 		VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.AcceptOAuth2ConsentRequest, error)
 		FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]flow.AcceptOAuth2ConsentRequest, error)

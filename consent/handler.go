@@ -1095,7 +1095,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&reqBody); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode request body: %s", err.Error())))
 		return
 	}
 
@@ -1106,7 +1106,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 
 	cr, err := h.r.ConsentManager().GetDeviceUserAuthRequest(ctx, challenge)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -1118,17 +1118,18 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 
 	userCodeSignature, err := h.r.RFC8628HMACStrategy().UserCodeSignature(r.Context(), reqBody.UserCode)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHint(`'user_code' signature could not be computed`)))
+		h.r.Writer().WriteError(w, r, fosite.ErrServerError.WithWrap(err).WithHint(`The 'user_code' signature could not be computed.`))
 		return
 	}
+
 	userCodeRequest, err := h.r.OAuth2Storage().GetUserCodeSession(r.Context(), userCodeSignature, nil)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrNotFound.WithWrap(err).WithHint(`'user_code' session not found`)))
+		h.r.Writer().WriteError(w, r, fosite.ErrInvalidRequest.WithWrap(err).WithHint(`The 'user_code' session could not be found or has expired or is otherwise malformed.`))
 		return
 	}
-	err = h.r.RFC8628HMACStrategy().ValidateUserCode(ctx, userCodeRequest, reqBody.UserCode)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrTokenExpired.WithWrap(err).WithHint(`'user_code' has expired`)))
+
+	if err := h.r.RFC8628HMACStrategy().ValidateUserCode(ctx, userCodeRequest, reqBody.UserCode); err != nil {
+		h.r.Writer().WriteError(w, r, fosite.ErrInvalidRequest.WithWrap(err).WithHint(`The 'user_code' session could not be found or has expired or is otherwise malformed.`))
 		return
 	}
 
@@ -1148,22 +1149,24 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
+
 	if reqURL.Query().Get("client_id") == "" {
 		q := reqURL.Query()
 		q.Add("client_id", userCodeRequest.GetClient().GetID())
 		reqURL.RawQuery = q.Encode()
 	}
+
 	f.RequestURL = reqURL.String()
 
 	hr, err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, challenge, &p)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	ru, err := url.Parse(hr.RequestURL)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, fosite.ErrInvalidRequest.WithWrap(err).WithHint(`Unable to parse the request_url.`))
 		return
 	}
 

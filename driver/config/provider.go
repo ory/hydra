@@ -87,7 +87,7 @@ const (
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
 	KeyDeviceVerificationURL                     = "urls.device_verification"
-	KeyDeviceDoneURL                             = "urls.post_device_done"
+	KeyDeviceDoneURL                             = "urls.device_verification_success"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"

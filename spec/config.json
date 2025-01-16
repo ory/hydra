@@ -825,7 +825,7 @@
             "/ui/device"
           ]
         },
-        "post_device_done": {
+        "device_verification_success": {
           "type": "string",
           "description": "When a user completes an authentication flow initiated by a device, they will be redirected to this url afterwards.",
           "format": "uri-reference",

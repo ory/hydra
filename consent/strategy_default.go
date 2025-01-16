@@ -1212,11 +1212,11 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	// Validate client_id
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
-		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHintf(`client_id query parameter is missing`))
+		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHintf(`Query parameter 'client_id' is missing.`))
 	}
 	c, err := s.r.ClientManager().GetConcreteClient(r.Context(), clientID)
 	if errors.Is(err, x.ErrNotFound) {
-		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithHintf(`Unknown client_id %s`, clientID))
+		return nil, nil, errorsx.WithStack(fosite.ErrInvalidClient.WithWrap(err).WithHintf(`Client does not exist`))
 	} else if err != nil {
 		return nil, nil, err
 	}

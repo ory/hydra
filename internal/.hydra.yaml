@@ -102,7 +102,7 @@ urls:
   logout: https://logout
   error: https://error
   device_verification: https://device
-  post_device_done: https://device/callback
+  device_verification_success: https://device/callback
   post_logout_redirect: https://post_logout
 
 strategies:

@@ -9,7 +9,7 @@ urls:
   login: http://127.0.0.1:3000/login
   logout: http://127.0.0.1:3000/logout
   device_verification: http://127.0.0.1:3000/device_code
-  post_device_done: http://127.0.0.1:3000/device_complete
+  device_verification_success: http://127.0.0.1:3000/device_complete
 
 secrets:
   system:

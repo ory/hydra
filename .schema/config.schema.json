@@ -645,7 +645,7 @@
             },
             "userinfo_url": {
               "type": "string",
-              "description": "A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.",
+              "description": "A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint `/.well-known/openid-configuration`. Defaults to Ory Hydra's userinfo endpoint at `/userinfo`. Set this value if you want to handle this endpoint yourself.",
               "format": "uri-reference",
               "examples": [
                 "https://example.org/my-custom-userinfo-endpoint"
@@ -653,7 +653,7 @@
             },
             "device_authorization_url": {
               "type": "string",
-              "description": "A URL of the device authorization endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's device authorizatoin endpoint at /oauth2/device/auth. Set this value if you want to handle this endpoint yourself.",
+              "description": "A URL of the device authorization endpoint to be advertised at the OpenID Connect Discovery endpoint `/.well-known/openid-configuration`. Defaults to Ory Hydra's device authorization endpoint at `/oauth2/device/auth`. Set this value if you want to handle this endpoint yourself.",
               "format": "uri-reference",
               "examples": [
                 "https://example.org/oauth2/device/auth"
@@ -825,7 +825,7 @@
             "/ui/device_verification"
           ]
         },
-        "post_device_done": {
+        "device_verification_success": {
           "type": "string",
           "description": "Sets the post device authentication endpoint. Defaults to an internal fallback URL showing an error.",
           "format": "uri-reference",

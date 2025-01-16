@@ -3043,6 +3043,8 @@ No OpenID Connect Front- or Back-channel logout is performed in this case.
 Alternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected
 to that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.
 
+If the login session was issued by a login provider, the login provider is asked to invalidate its session as well.
+
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiRevokeOAuth2LoginSessionsRequest
 */

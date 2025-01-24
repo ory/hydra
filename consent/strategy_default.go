@@ -1159,8 +1159,8 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2AuthorizationRequest")
 	defer otelx.End(span, &err)
 
-	loginVerifier := strings.TrimSpace(r.URL.Query().Get("login_verifier"))
-	consentVerifier := strings.TrimSpace(r.URL.Query().Get("consent_verifier"))
+	loginVerifier := strings.TrimSpace(req.GetRequestForm().Get("login_verifier"))
+	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
 	if loginVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to the original endpoint
 		return nil, nil, s.requestAuthentication(ctx, w, r, req, nil)

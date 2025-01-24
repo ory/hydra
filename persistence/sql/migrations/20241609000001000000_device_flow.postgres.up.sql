@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
 
     FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE,
     FOREIGN KEY (nid) REFERENCES networks(id) ON UPDATE RESTRICT ON DELETE CASCADE,
+    FOREIGN KEY (challenge_id) REFERENCES hydra_oauth2_flow(consent_challenge_id) ON DELETE CASCADE,
     PRIMARY KEY (device_code_signature, nid)
 );
 

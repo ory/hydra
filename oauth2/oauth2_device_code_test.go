@@ -276,7 +276,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		}
 	}
 
-	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
+	acceptLoginHandler := func(t *testing.T, c *client.Client, subject string, scopes []string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 			require.NoError(t, err)
@@ -286,7 +286,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
 			assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.EqualValues(t, scopes, rr.RequestedScope)
 			assert.Contains(t, rr.RequestUrl, hydraoauth2.DeviceVerificationPath)
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
@@ -312,7 +312,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		}
 	}
 
-	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
+	acceptConsentHandler := func(t *testing.T, c *client.Client, subject string, scopes []string, checkRequestPayload func(*hydra.OAuth2ConsentRequest)) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
 			require.NoError(t, err)
@@ -322,7 +322,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			assert.EqualValues(t, c.GrantTypes, rr.Client.GrantTypes)
 			assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(t, subject, pointerx.Deref(rr.Subject))
-			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+			assert.EqualValues(t, scopes, rr.RequestedScope)
 			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 			assert.Contains(t, *rr.RequestUrl, hydraoauth2.DeviceVerificationPath)
 			if checkRequestPayload != nil {
@@ -333,7 +333,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
+					GrantScope: scopes, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
@@ -433,13 +433,90 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 
 	subject := "aeneas-rekkas"
 	nonce := uuid.New()
+	t.Run("case=perform device flow without ID and refresh tokens", func(t *testing.T) {
+
+		c, conf := newDeviceClient(t, reg)
+		conf.Scopes = []string{"hydra"}
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			acceptDeviceHandler(t, c),
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+		loginFlowResp := acceptUserCode(t, conf, nil, resp)
+		require.NotNil(t, loginFlowResp)
+		token, err := conf.DeviceAccessToken(context.Background(), resp)
+		require.NoError(t, err)
+
+		assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
+		assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
+		introspectAccessToken(t, conf, token, subject)
+		assert.Empty(t, token.Extra("id_token"))
+		assert.Empty(t, token.RefreshToken)
+	})
+	t.Run("case=perform device flow with ID token", func(t *testing.T) {
+
+		c, conf := newDeviceClient(t, reg)
+		conf.Scopes = []string{"openid", "hydra"}
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			acceptDeviceHandler(t, c),
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+		loginFlowResp := acceptUserCode(t, conf, nil, resp)
+		require.NotNil(t, loginFlowResp)
+		token, err := conf.DeviceAccessToken(context.Background(), resp)
+		iat := time.Now()
+		require.NoError(t, err)
+
+		assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
+		assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
+		introspectAccessToken(t, conf, token, subject)
+		assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+		assert.Empty(t, token.RefreshToken)
+	})
+	t.Run("case=perform device flow with refresh token", func(t *testing.T) {
+
+		c, conf := newDeviceClient(t, reg)
+		conf.Scopes = []string{"hydra", "offline"}
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			acceptDeviceHandler(t, c),
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+		loginFlowResp := acceptUserCode(t, conf, nil, resp)
+		require.NotNil(t, loginFlowResp)
+		token, err := conf.DeviceAccessToken(context.Background(), resp)
+		iat := time.Now()
+		require.NoError(t, err)
+
+		assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
+		assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
+		introspectAccessToken(t, conf, token, subject)
+		assert.Empty(t, token.Extra("id_token"))
+		assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+	})
 	t.Run("case=perform device flow with ID token and refresh tokens", func(t *testing.T) {
 		run := func(t *testing.T, strategy string) {
 			c, conf := newDeviceClient(t, reg)
 			testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
 				acceptDeviceHandler(t, c),
-				acceptLoginHandler(t, c, subject, nil),
-				acceptConsentHandler(t, c, subject, nil),
+				acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+				acceptConsentHandler(t, c, subject, conf.Scopes, nil),
 			)
 
 			resp, err := getDeviceCode(t, conf, nil)
@@ -515,12 +592,12 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			t,
 			reg.Config(),
 			acceptDeviceHandler(t, c),
-			acceptLoginHandler(t, c, subject, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
+			acceptLoginHandler(t, c, subject, conf.Scopes, func(r *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest {
 				assert.False(t, r.Skip)
 				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 				return nil
 			}),
-			acceptConsentHandler(t, c, subject, func(r *hydra.OAuth2ConsentRequest) {
+			acceptConsentHandler(t, c, subject, conf.Scopes, func(r *hydra.OAuth2ConsentRequest) {
 				assert.False(t, *r.Skip)
 				assert.EqualValues(t, []string{expectAud}, r.RequestedAccessTokenAudience)
 			}),
@@ -550,8 +627,8 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 				t,
 				reg.Config(),
 				acceptDeviceHandler(t, c),
-				acceptLoginHandler(t, c, subject, nil),
-				acceptConsentHandler(t, c, subject, nil),
+				acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+				acceptConsentHandler(t, c, subject, conf.Scopes, nil),
 			)
 
 			resp, err := getDeviceCode(t, conf, nil)
@@ -655,6 +732,50 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			}
 			run(t, "opaque", c, conf, expectedLifespans)
 		})
+	})
+	t.Run("case=cannot reuse user_code", func(t *testing.T) {
+		c, conf := newDeviceClient(t, reg)
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			func(w http.ResponseWriter, r *http.Request) {
+				userCode := r.URL.Query().Get("user_code")
+				payload := hydra.AcceptDeviceUserCodeRequest{
+					UserCode: &userCode,
+				}
+
+				v, _, err := adminClient.OAuth2API.AcceptUserCodeRequest(context.Background()).
+					DeviceChallenge(r.URL.Query().Get("device_challenge")).
+					AcceptDeviceUserCodeRequest(payload).
+					Execute()
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			},
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+		loginFlowResp := acceptUserCode(t, conf, nil, resp)
+		require.NotNil(t, loginFlowResp)
+		token, err := conf.DeviceAccessToken(context.Background(), resp)
+		iat := time.Now()
+		require.NoError(t, err)
+
+		introspectAccessToken(t, conf, token, subject)
+		assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+		assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		loginFlowResp2, err := hc.Get(resp.VerificationURIComplete)
+		require.NoError(t, err)
+		require.Equal(t, loginFlowResp2.StatusCode, http.StatusBadRequest)
 	})
 }
 

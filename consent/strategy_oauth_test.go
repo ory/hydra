@@ -1134,6 +1134,7 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 		}
 	}
 
+	now := 1723546027 // Unix timestamps must round-trip through Hydra without converting to floats or similar
 	acceptDeviceHandler := func(t *testing.T) http.HandlerFunc {
 		return checkAndAcceptDeviceHandler(t, adminClient)
 	}
@@ -1172,13 +1173,20 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 				Remember:   pointerx.Bool(true),
 				GrantScope: []string{"openid"},
 				Session: &hydra.AcceptOAuth2ConsentRequestSession{
-					AccessToken: map[string]interface{}{"foo": "bar"},
-					IdToken:     map[string]interface{}{"bar": "baz"},
+					AccessToken: map[string]interface{}{
+						"foo": "bar",
+						"ts1": now,
+					},
+					IdToken: map[string]interface{}{
+						"bar": "baz",
+						"ts1": now,
+					},
 				},
 			}))
 
 		hc := testhelpers.NewEmptyJarClient(t)
 
+		var sid string
 		var run = func(t *testing.T) {
 			res, resp := makeOAuth2DeviceAuthRequest(t, reg, hc, c, "openid")
 			assert.EqualValues(t, http.StatusOK, resp.StatusCode)
@@ -1200,11 +1208,94 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 
 			idClaims := testhelpers.DecodeIDToken(t, token)
 			assert.Equal(t, "baz", idClaims.Get("bar").String(), "%s", idClaims.Raw)
-			sid := idClaims.Get("sid").String()
+			sid = idClaims.Get("sid").String()
 			assert.NotNil(t, sid)
 		}
 
 		t.Run("perform first flow", run)
+
+		t.Run("perform follow up flows and check if session values are set", func(t *testing.T) {
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
+				checkAndAcceptLoginHandler(t, adminClient, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
+					require.NoError(t, err)
+					assert.True(t, res.Skip)
+					assert.Equal(t, sid, *res.SessionId)
+					assert.Equal(t, subject, res.Subject)
+					assert.Empty(t, pointerx.StringR(res.Client.ClientSecret))
+					return hydra.AcceptOAuth2LoginRequest{
+						Subject: subject,
+						Context: map[string]interface{}{"xyz": "abc"},
+					}
+				}),
+				checkAndAcceptConsentHandler(t, adminClient, func(t *testing.T, req *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
+					require.NoError(t, err)
+					assert.True(t, *req.Skip)
+					assert.Equal(t, sid, *req.LoginSessionId)
+					assert.Equal(t, subject, *req.Subject)
+					assert.Empty(t, pointerx.StringR(req.Client.ClientSecret))
+					assert.Equal(t, map[string]interface{}{"xyz": "abc"}, req.Context)
+					return hydra.AcceptOAuth2ConsentRequest{
+						Remember:   pointerx.Bool(true),
+						GrantScope: []string{"openid"},
+						Session: &hydra.AcceptOAuth2ConsentRequestSession{
+							AccessToken: map[string]interface{}{
+								"foo": "bar",
+								"ts1": now,
+							},
+							IdToken: map[string]interface{}{
+								"bar": "baz",
+								"ts2": now,
+							},
+						},
+					}
+				}))
+
+			for k := 0; k < 3; k++ {
+				t.Run(fmt.Sprintf("case=%d", k), run)
+			}
+		})
+	})
+	t.Run("case=should fail because we are reusing the same verifier", func(t *testing.T) {
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			acceptDeviceHandler(t),
+			acceptLoginHandler(t, subject, &hydra.AcceptOAuth2LoginRequest{
+				Remember: pointerx.Bool(true),
+			}),
+			acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{
+				Remember:   pointerx.Bool(true),
+				GrantScope: []string{"openid"},
+				Session: &hydra.AcceptOAuth2ConsentRequestSession{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IdToken:     map[string]interface{}{"bar": "baz"},
+				},
+			}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		res, resp := makeOAuth2DeviceAuthRequest(t, reg, hc, c, "openid")
+		assert.EqualValues(t, http.StatusOK, resp.StatusCode)
+
+		devResp := new(oauth2.DeviceAuthResponse)
+		require.NoError(t, json.Unmarshal([]byte(res.Raw), devResp))
+
+		resp, err := hc.Get(devResp.VerificationURIComplete)
+		require.NoError(t, err)
+		require.Contains(t, reg.Config().DeviceDoneURL(ctx).String(), resp.Request.URL.Path, "did not end up in post device URL")
+		require.Equal(t, resp.Request.URL.Query().Get("client_id"), c.ID)
+
+		conf := oauth2Config(t, c)
+		token, err := conf.DeviceAccessToken(ctx, devResp)
+		require.NoError(t, err)
+
+		claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+		assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
+
+		idClaims := testhelpers.DecodeIDToken(t, token)
+		assert.Equal(t, "baz", idClaims.Get("bar").String(), "%s", idClaims.Raw)
+		sid := idClaims.Get("sid").String()
+		assert.NotNil(t, sid)
 
 	})
 	t.Run("case=should fail because a device verifier was given that doesn't exist in the store", func(t *testing.T) {

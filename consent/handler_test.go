@@ -502,7 +502,7 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 				return ts.URL + "/admin" + DevicePath + "/accept?device_challenge=" + challenge
 			},
 			validateResponse: func(resp *http.Response) {
-				require.EqualValues(t, http.StatusNotFound, resp.StatusCode)
+				require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
 			},
 		},
 		{
@@ -606,10 +606,90 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 				return ts.URL + "/admin" + DevicePath + "/accept?device_challenge=" + challenge
 			},
 			validateResponse: func(resp *http.Response) {
-				require.EqualValues(t, http.StatusUnauthorized, resp.StatusCode)
+				require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
 				result := &fosite.RFC6749Error{}
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-				require.EqualValues(t, result.ErrorField, fosite.ErrTokenExpired.ErrorField)
+				require.EqualValues(t, result.ErrorField, fosite.ErrInvalidRequest.ErrorField)
+			},
+		},
+		{
+			desc: "accepted user_code",
+			getBody: func() ([]byte, error) {
+				deviceRequest := fosite.NewDeviceRequest()
+				deviceRequest.Client = cl
+				deviceRequest.SetSession(
+					&oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Headers: &jwt.Headers{},
+						},
+					},
+				)
+				_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(ctx)
+				require.NoError(t, err)
+				userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
+				require.NoError(t, err)
+				deviceRequest.SetSession(
+					&oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Headers: &jwt.Headers{},
+						},
+					},
+				)
+				exp := time.Now().UTC()
+				deviceRequest.Session.SetExpiresAt(fosite.UserCode, exp)
+				err = reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
+				require.NoError(t, err)
+				deviceRequest.UserCodeState = fosite.UserCodeAccepted
+				return json.Marshal(&hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode})
+			},
+			getURL: func() string {
+				return ts.URL + "/admin" + DevicePath + "/accept?device_challenge=" + challenge
+			},
+			validateResponse: func(resp *http.Response) {
+				require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
+				result := &fosite.RFC6749Error{}
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.EqualValues(t, result.ErrorField, fosite.ErrInvalidRequest.ErrorField)
+			},
+		},
+		{
+			desc: "rejected user_code",
+			getBody: func() ([]byte, error) {
+				deviceRequest := fosite.NewDeviceRequest()
+				deviceRequest.Client = cl
+				deviceRequest.SetSession(
+					&oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Headers: &jwt.Headers{},
+						},
+					},
+				)
+				_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(ctx)
+				require.NoError(t, err)
+				userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
+				require.NoError(t, err)
+				deviceRequest.SetSession(
+					&oauth2.Session{
+						DefaultSession: &openid.DefaultSession{
+							Headers: &jwt.Headers{},
+						},
+					},
+				)
+				exp := time.Now().UTC()
+				deviceRequest.Session.SetExpiresAt(fosite.UserCode, exp)
+				err = reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
+				require.NoError(t, err)
+				deviceRequest.UserCodeState = fosite.UserCodeRejected
+				return json.Marshal(&hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode})
+			},
+			getURL: func() string {
+				return ts.URL + "/admin" + DevicePath + "/accept?device_challenge=" + challenge
+			},
+			validateResponse: func(resp *http.Response) {
+				require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
+				result := &fosite.RFC6749Error{}
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.EqualValues(t, result.ErrorField, fosite.ErrInvalidRequest.ErrorField)
 			},
 		},
 		{

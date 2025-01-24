@@ -187,12 +187,12 @@ func (p *Persister) UpdateDeviceCodeSessionBySignature(ctx context.Context, sign
 	}
 
 	stmt := fmt.Sprintf(
-		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=?, user_code_state=? WHERE device_code_signature=? AND nid = ?",
+		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=?, user_code_state=?, subject=?, challenge_id=? WHERE device_code_signature=? AND nid = ?",
 		sqlTableDeviceAuthCodes,
 	)
 
 	/* #nosec G201 table is static */
-	err = p.Connection(ctx).RawQuery(stmt, req.GrantedScope, req.GrantedAudience, req.Session, req.UserCodeState, signature, p.NetworkID(ctx)).Exec()
+	err = p.Connection(ctx).RawQuery(stmt, req.GrantedScope, req.GrantedAudience, req.Session, req.UserCodeState, req.Subject, req.ConsentChallenge, signature, p.NetworkID(ctx)).Exec()
 	if err != nil {
 		return sqlcon.HandleError(err)
 	}

@@ -100,6 +100,7 @@ const (
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyDeviceAuthTokenPollingInterval            = "oauth2.device_authorization.token_polling_interval" // #nosec G101
+	KeyDeviceAuthUserCodeEntropy                 = "oauth2.device_authorization.user_code_entropy"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
@@ -119,6 +120,15 @@ const (
 )
 
 const DSNMemory = "memory"
+
+var userCodeEtropy = map[string]struct {
+	Length  int
+	Symbols []rune
+}{
+	"high":   {Length: 8, Symbols: []rune(randx.AlphaNumNoAmbiguous)},
+	"medium": {Length: 8, Symbols: []rune(randx.AlphaUpper)},
+	"low":    {Length: 9, Symbols: []rune(randx.Numeric)},
+}
 
 var (
 	_ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
@@ -415,13 +425,35 @@ func (p *DefaultProvider) GetDeviceAuthTokenPollingInterval(ctx context.Context)
 }
 
 // GetUserCodeLength returns configured user_code length
-func (c *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
-	return 8
+func (p *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
+	profile, ok := userCodeEtropy[k]
+	if !ok {
+		keys := []string{}
+		for k := range userCodeEtropy {
+			keys = append(keys, k)
+		}
+
+		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
+		return 0
+	}
+	return profile.Length
 }
 
 // GetDeviceAuthTokenPollingInterval returns configured user_code allowed symbols
-func (c *DefaultProvider) GetUserCodeSymbols(ctx context.Context) []rune {
-	return []rune(randx.AlphaUpper)
+func (p *DefaultProvider) GetUserCodeSymbols(ctx context.Context) []rune {
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
+	profile, ok := userCodeEtropy[k]
+	if !ok {
+		keys := []string{}
+		for k := range userCodeEtropy {
+			keys = append(keys, k)
+		}
+
+		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
+		return nil
+	}
+	return profile.Symbols
 }
 
 func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {

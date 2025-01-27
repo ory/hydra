@@ -1113,6 +1113,12 @@
                 "$ref": "#/definitions/duration"
               }
             ]
+          },
+          "user_code_entropy": {
+            "type": "string",
+            "description": "Sets the entropy for the user codes.",
+            "default": "medium",
+            "enum": ["high", "medium", "low"]
           }
         },
         "grant": {

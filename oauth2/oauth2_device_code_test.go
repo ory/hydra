@@ -777,6 +777,73 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, loginFlowResp2.StatusCode, http.StatusBadRequest)
 	})
+	t.Run("case=cannot reuse device_challenge", func(t *testing.T) {
+		var deviceChallenge string
+		c, conf := newDeviceClient(t, reg)
+		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
+			func(w http.ResponseWriter, r *http.Request) {
+				userCode := r.URL.Query().Get("user_code")
+				payload := hydra.AcceptDeviceUserCodeRequest{
+					UserCode: &userCode,
+				}
+
+				if deviceChallenge == "" {
+					deviceChallenge = r.URL.Query().Get("device_challenge")
+				}
+				v, _, err := adminClient.OAuth2API.AcceptUserCodeRequest(context.Background()).
+					DeviceChallenge(deviceChallenge).
+					AcceptDeviceUserCodeRequest(payload).
+					Execute()
+				if err != nil {
+					w.WriteHeader(http.StatusBadRequest)
+					return
+				}
+				require.NoError(t, err)
+				require.NotEmpty(t, v.RedirectTo)
+				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			},
+			acceptLoginHandler(t, c, subject, conf.Scopes, nil),
+			acceptConsentHandler(t, c, subject, conf.Scopes, nil),
+		)
+
+		resp, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp.DeviceCode)
+		require.NotEmpty(t, resp.UserCode)
+
+		hc := testhelpers.NewEmptyJarClient(t)
+		loginFlowResp := acceptUserCode(t, conf, hc, resp)
+		require.NoError(t, err)
+		require.Contains(t, reg.Config().DeviceDoneURL(ctx).String(), loginFlowResp.Request.URL.Path, "did not end up in post device URL")
+		require.Equal(t, loginFlowResp.Request.URL.Query().Get("client_id"), conf.ClientID)
+
+		require.NotNil(t, loginFlowResp)
+		token, err := conf.DeviceAccessToken(context.Background(), resp)
+		iat := time.Now()
+		require.NoError(t, err)
+
+		introspectAccessToken(t, conf, token, subject)
+		assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+		assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+
+		resp2, err := getDeviceCode(t, conf, nil)
+		require.NoError(t, err)
+		require.NotEmpty(t, resp2.DeviceCode)
+		require.NotEmpty(t, resp2.UserCode)
+
+		payload := hydra.AcceptDeviceUserCodeRequest{
+			UserCode: &resp2.UserCode,
+		}
+
+		acceptResp, _, err := adminClient.OAuth2API.AcceptUserCodeRequest(context.Background()).
+			DeviceChallenge(deviceChallenge).
+			AcceptDeviceUserCodeRequest(payload).
+			Execute()
+
+		loginFlowResp2, err := hc.Get(acceptResp.RedirectTo)
+		require.NoError(t, err)
+		require.Equal(t, http.StatusForbidden, loginFlowResp2.StatusCode)
+	})
 }
 
 func newDeviceClient(

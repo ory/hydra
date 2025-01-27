@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
 CREATE INDEX hydra_oauth2_device_auth_codes_request_id_idx ON hydra_oauth2_device_auth_codes (request_id, nid);
 CREATE INDEX hydra_oauth2_device_auth_codes_client_id_idx ON hydra_oauth2_device_auth_codes (client_id, nid);
 CREATE INDEX hydra_oauth2_device_auth_codes_challenge_id_idx ON hydra_oauth2_device_auth_codes (challenge_id);
-CREATE UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx ON hydra_oauth2_device_auth_codes (user_code_signature, nid);
+CREATE UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx ON hydra_oauth2_device_auth_codes (nid, user_code_signature);
 
 ALTER TABLE hydra_oauth2_flow ADD COLUMN device_challenge_id VARCHAR(255) NULL;
 ALTER TABLE hydra_oauth2_flow ADD COLUMN device_code_request_id VARCHAR(255) NULL;
@@ -35,7 +35,7 @@ ALTER TABLE hydra_oauth2_flow ADD COLUMN device_was_used BOOLEAN NULL;
 ALTER TABLE hydra_oauth2_flow ADD COLUMN device_handled_at TIMESTAMP NULL;
 ALTER TABLE hydra_oauth2_flow ADD COLUMN device_error TEXT NULL;
 
-CREATE INDEX hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
+CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
 
 ALTER TABLE hydra_client ADD COLUMN device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL;
 ALTER TABLE hydra_client ADD COLUMN device_authorization_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;

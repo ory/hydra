@@ -47,8 +47,6 @@ github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dR
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0 h1:any4BmKE+jGIaMpnU8YgH/I2LPiLBufr6oMMlVBbn9M=
 github.com/bradleyjkemp/cupaloy/v2 v2.8.0/go.mod h1:bm7JXdkRd4BHJk9HpwqAI8BoAY1lps46Enkdqw6aRX0=
 github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
-github.com/canonical/fosite v0.0.0-20250124155649-b77efc392574 h1:ZH9mv26aX0FTVXM6jenoVZfsBBxKxnjiq8c44sMMAUE=
-github.com/canonical/fosite v0.0.0-20250124155649-b77efc392574/go.mod h1:rwKPYm0bLjxRQ+J7/CVAIwpnwRMaRrwRzdGqgbjwNK8=
 github.com/cenkalti/backoff/v3 v3.2.2 h1:cfUAAO3yvKMYKPrvhDuHSwQnhZNk/RMHKdZqKTxfm6M=
 github.com/cenkalti/backoff/v3 v3.2.2/go.mod h1:cIeZDE3IrqwwJl6VUwCN6trj1oXrTS4rc0ij+ULvLYs=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
@@ -380,6 +378,8 @@ github.com/ory/analytics-go/v5 v5.0.1 h1:LX8T5B9FN8KZXOtxgN+R3I4THRRVB6+28IKgKBp
 github.com/ory/analytics-go/v5 v5.0.1/go.mod h1:lWCiCjAaJkKfgR/BN5DCLMol8BjKS1x+4jxBxff/FF0=
 github.com/ory/dockertest/v3 v3.10.1-0.20240704115616-d229e74b748d h1:By96ZSVuH5LyjXLVVMfvJoLVGHaT96LdOnwgFSLVf0E=
 github.com/ory/dockertest/v3 v3.10.1-0.20240704115616-d229e74b748d/go.mod h1:F2FIjwwAk6CsNAs//B8+aPFQF0t84pbM8oliyNXwQrk=
+github.com/ory/fosite v0.49.1-0.20250203124447-75b904ddbee4 h1:VnazT+N30kfg5TxJQ2bg4Fa1pCWT7A1i3FffmX0fhAA=
+github.com/ory/fosite v0.49.1-0.20250203124447-75b904ddbee4/go.mod h1:IhAwHrxwNgB3smKB75jkMVQjFTHq9HveITItLGX8/GU=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe h1:rvu4obdvqR0fkSIJ8IfgzKOWwZ5kOT2UNfLq81Qk7rc=
 github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe/go.mod h1:z4n3u6as84LbV4YmgjHhnwtccQqzf4cZlSk9f1FhygI=
 github.com/ory/go-convenience v0.1.0 h1:zouLKfF2GoSGnJwGq+PE/nJAE6dj2Zj5QlTgmMTsTS8=
@@ -394,8 +394,8 @@ github.com/ory/kratos-client-go v1.2.1 h1:Q3T/adfAfAkHFcV1LGLnwz4QkY6ghBdX9zde5T
 github.com/ory/kratos-client-go v1.2.1/go.mod h1:WiQYlrqW4Atj6Js7oDN5ArbZxo0nTO2u/e1XaDv2yMI=
 github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b h1:BIzoOe2/wynZBQak1po0tzgvARseIKsR2bF6b+SZoKE=
 github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b/go.mod h1:okVAYKGtgunD/wbW3NGhZTndJCS+6FqO+cA89rQ4doc=
-github.com/ory/x v0.0.677 h1:ZulzE4EBhNBXNotWmGSmGsVNbgbZpIr4snMURRkski0=
-github.com/ory/x v0.0.677/go.mod h1:zJmnDtKje2FCP4EeFvRsKk94XXiqKCSGJMZcirAfhUs=
+github.com/ory/x v0.0.694 h1:by3cFPttn9K8LsTWbzLLBJQlJWGr2fd+4ksHEv3onG8=
+github.com/ory/x v0.0.694/go.mod h1:CLnDxtKBkO2MoOYRbQe9HASUlqTBl7AP9r7YcmyD1CY=
 github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
 github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.9.5 h1:4yBQzkHv+7BHq2PQUZF3Mx0IYxG7LsP222s7Agd3ve8=

@@ -124,6 +124,7 @@ oauth2:
       cost: 20
   device_authorization:
     token_polling_interval: 2h
+    user_code_entropy: medium
   pkce:
     enforced: true
     enforced_for_public_clients: true

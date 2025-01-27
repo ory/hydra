@@ -1176,6 +1176,12 @@
               "default": "5s",
               "description": "configure how often a non-interactive device should poll the device token endpoint",
               "examples": ["5s", "15s", "1m"]
+            },
+            "user_code_entropy": {
+              "type": "string",
+              "description": "Sets the entropy for the user codes.",
+              "default": "medium",
+              "enum": ["high", "medium", "low"]
             }
           }
         },

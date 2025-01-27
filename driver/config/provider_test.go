@@ -17,6 +17,7 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/randx"
 
 	"github.com/rs/cors"
 	"github.com/stretchr/testify/assert"
@@ -332,6 +333,8 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, true, c.GetEnforcePKCE(ctx))
 	assert.Equal(t, true, c.GetEnforcePKCEForPublicClients(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetDeviceAuthTokenPollingInterval(ctx))
+	assert.Equal(t, 8, c.GetUserCodeLength(ctx))
+	assert.Equal(t, []rune(randx.AlphaUpper), c.GetUserCodeSymbols(ctx))
 
 	// secrets
 	secret, err := c.GetGlobalSecret(ctx)

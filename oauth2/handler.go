@@ -70,6 +70,15 @@ const (
 	DeviceVerificationPath = "/oauth2/device/verify"
 )
 
+// Taken from https://github.com/ory/fosite/blob/049ed1924cd0b41f12357b0fe617530c264421ac/handler/openid/flow_explicit_auth.go#L29
+var oidcParameters = []string{"grant_type",
+	"max_age",
+	"prompt",
+	"acr_values",
+	"id_token_hint",
+	"nonce",
+}
+
 type Handler struct {
 	r InternalRegistry
 	c *config.DefaultProvider
@@ -784,13 +793,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 
 	// Update the OpenID Connect session if "openid" scope is granted
 	if req.GetGrantedScopes().Has("openid") {
-		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, sig, req.Sanitize([]string{"grant_type",
-			"max_age",
-			"prompt",
-			"acr_values",
-			"id_token_hint",
-			"nonce",
-		}))
+		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, sig, req.Sanitize(oidcParameters))
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())
 			h.r.Writer().WriteError(w, r, err)

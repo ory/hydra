@@ -17,8 +17,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	hydra "github.com/ory/hydra-client-go/v2"
 
 	"github.com/go-jose/go-jose/v3"
@@ -31,7 +29,6 @@ import (
 
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
 )
 
 type fakeSigner struct {
@@ -211,7 +208,6 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 
 func TestGetOrGenerateKeys(t *testing.T) {
 	t.Parallel()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 
 	setId := uuid.NewUUID().String()
 	keyId := uuid.NewUUID().String()

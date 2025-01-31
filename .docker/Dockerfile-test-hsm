@@ -1,0 +1,32 @@
+FROM golang:1.23-alpine3.21 AS builder
+
+RUN apk add --no-cache build-base git gcc bash
+
+WORKDIR /go/src/github.com/ory/hydra
+RUN mkdir -p ./internal/httpclient
+
+COPY go.mod go.sum ./
+COPY internal/httpclient/go.* ./internal/httpclient
+
+ENV CGO_ENABLED 1
+
+RUN go mod download
+COPY . .
+
+RUN go build -tags sqlite,hsm -o /usr/bin/hydra
+
+ENV HSM_ENABLED=true
+ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
+ENV HSM_TOKEN_LABEL=hydra
+ENV HSM_PIN=1234
+
+RUN apk add --no-cache softhsm opensc
+RUN pkcs11-tool --module "$HSM_LIBRARY" --slot 0 --init-token --so-pin 0000 --init-pin --pin "$HSM_PIN" --label "$HSM_TOKEN_LABEL"
+
+FROM builder as test-hsm
+
+RUN go test -p 1 -failfast -short -tags=sqlite,hsm ./...
+
+FROM builder AS test-refresh-hsm
+
+RUN UPDATE_SNAPSHOTS=true go test -p 1 -failfast -short -tags=sqlite,hsm,refresh ./...

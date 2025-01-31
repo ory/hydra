@@ -1280,7 +1280,7 @@
     },
     "/admin/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpenID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.",
+        "description": "This endpoint invalidates authentication sessions. After revoking the authentication session(s), the subject\nhas to re-authenticate at the Ory OAuth2 Provider. This endpoint does not invalidate any tokens.\n\nIf you send the subject in a query param, all authentication sessions that belong to that subject are revoked.\nNo OpenID Connect Front- or Back-channel logout is performed in this case.\n\nAlternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected\nto that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.\n\nWhen using Ory for the identity provider, the login provider will also invalidate the session cookie.",
         "consumes": [
           "application/json"
         ],
@@ -3032,9 +3032,15 @@
         "client": {
           "$ref": "#/definitions/oAuth2Client"
         },
+        "expires_at": {
+          "$ref": "#/definitions/nullTime"
+        },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
           "type": "string"
+        },
+        "requested_at": {
+          "$ref": "#/definitions/nullTime"
         },
         "rp_initiated": {
           "description": "RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.",

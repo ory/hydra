@@ -5,7 +5,6 @@ package cli
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -13,7 +12,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/ory/x/popx"
 	"github.com/ory/x/servicelocatorx"
@@ -21,8 +19,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/configx"
-
-	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/cmdx"
 
@@ -317,54 +313,20 @@ func (h *MigrateHandler) makePersister(cmd *cobra.Command, args []string) (p per
 	return d.Persister(), nil
 }
 
-func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) (err error) {
+func (h *MigrateHandler) MigrateSQLUp(cmd *cobra.Command, args []string) (err error) {
 	p, err := h.makePersister(cmd, args)
 	if err != nil {
 		return err
 	}
-	conn := p.Connection(context.Background())
-	if conn == nil {
-		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
-		return cmdx.FailSilently(cmd)
-	}
+	return popx.MigrateSQLUp(cmd, p)
+}
 
-	if err := conn.Open(); err != nil {
-		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open the database connection:\n%+v\n", err)
-		return cmdx.FailSilently(cmd)
-	}
-
-	// convert migration tables
-	if err := p.PrepareMigration(context.Background()); err != nil {
-		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not convert the migration table:\n%+v\n", err)
-		return cmdx.FailSilently(cmd)
-	}
-
-	// print migration status
-	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "The following migration is planned:")
-
-	status, err := p.MigrationStatus(context.Background())
+func (h *MigrateHandler) MigrateSQLDown(cmd *cobra.Command, args []string) (err error) {
+	p, err := h.makePersister(cmd, args)
 	if err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
-		return cmdx.FailSilently(cmd)
+		return err
 	}
-	_ = status.Write(os.Stdout)
-
-	if !flagx.MustGetBool(cmd, "yes") {
-		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "To skip the next question use flag --yes (at your own risk).")
-		if !cmdx.AskForConfirmation("Do you wish to execute this migration plan?", nil, nil) {
-			_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Migration aborted.")
-			return nil
-		}
-	}
-
-	// apply migrations
-	if err := p.MigrateUp(context.Background()); err != nil {
-		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not apply migrations:\n%+v\n", errorsx.WithStack(err))
-		return cmdx.FailSilently(cmd)
-	}
-
-	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!")
-	return nil
+	return popx.MigrateSQLDown(cmd, p)
 }
 
 func (h *MigrateHandler) MigrateStatus(cmd *cobra.Command, args []string) error {
@@ -372,41 +334,5 @@ func (h *MigrateHandler) MigrateStatus(cmd *cobra.Command, args []string) error 
 	if err != nil {
 		return err
 	}
-	conn := p.Connection(context.Background())
-	if conn == nil {
-		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be checked against a SQL-compatible driver but DSN is not a SQL source.")
-		return cmdx.FailSilently(cmd)
-	}
-
-	if err := conn.Open(); err != nil {
-		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open the database connection:\n%+v\n", err)
-		return cmdx.FailSilently(cmd)
-	}
-
-	block := flagx.MustGetBool(cmd, "block")
-	ctx := cmd.Context()
-	s, err := p.MigrationStatus(ctx)
-	if err != nil {
-		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not get migration status: %+v\n", err)
-		return cmdx.FailSilently(cmd)
-	}
-
-	for block && s.HasPending() {
-		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Waiting for migrations to finish...\n")
-		for _, m := range s {
-			if m.State == popx.Pending {
-				_, _ = fmt.Fprintf(cmd.OutOrStdout(), " - %s\n", m.Name)
-			}
-		}
-		time.Sleep(time.Second)
-		s, err = p.MigrationStatus(ctx)
-		if err != nil {
-			_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not get migration status: %+v\n", err)
-			return cmdx.FailSilently(cmd)
-		}
-	}
-
-	cmdx.PrintTable(cmd, s)
-	return nil
-
+	return popx.MigrateStatus(cmd, p)
 }

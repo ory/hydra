@@ -609,7 +609,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://pinniped.dev/">pinniped.dev</a></td>
-        </tr>         
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Pvotal</td>
@@ -835,7 +835,9 @@ make quicktest
 
 # regular tests
 make test
-test-resetdb
+
+# updates all snapshots
+make test-refresh
 
 # end-to-end tests
 make e2e
@@ -977,9 +979,14 @@ If you wish to check your code changes against any of the docker-compose
 quickstart files, run:
 
 ```shell script
-make docker
-docker compose -f quickstart.yml up # ....
+docker compose -f quickstart.yml up --build # ....
 ```
+
+> [!WARNING] If you already have a production image (e.g. `oryd/hydra:v2.2.0`)
+> pulled, the above `make docker` command will replace it with a local build of
+> the image that is more equivalent to the `-distroless` variant on Docker Hub.
+>
+> You can pull the production image any time using `docker pull`
 
 #### Add a new migration
 

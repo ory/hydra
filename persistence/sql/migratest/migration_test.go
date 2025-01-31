@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/contextx"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 
-	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/x/contextx"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"
@@ -29,11 +29,10 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/x/popx"
-
 	"github.com/ory/hydra/v2/flow"
 	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/hydra/v2/persistence/sql"
+	"github.com/ory/x/popx"
 
 	"github.com/ory/x/sqlcon/dockertest"
 
@@ -66,7 +65,7 @@ func TestMigrations(t *testing.T) {
 	connections := make(map[string]*pop.Connection, 1)
 
 	if testing.Short() {
-		reg := internal.NewMockedRegistry(t, &contextx.Default{})
+		reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
 		c := reg.Persister().Connection(context.Background())
 		connections["sqlite"] = c

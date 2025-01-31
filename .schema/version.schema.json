@@ -7,6 +7,23 @@
                 {
                     "properties": {
                         "version": {
+                            "const": "v2.3.0"
+                        }
+                    },
+                    "required": [
+                        "version"
+                    ]
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v2.3.0/.schema/config.schema.json"
+                }
+            ]
+        },
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
                             "const": "v2.2.0"
                         }
                     },

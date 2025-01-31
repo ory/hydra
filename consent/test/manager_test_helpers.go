@@ -683,6 +683,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
+				"",
 				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
@@ -693,6 +694,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
+				"",
 				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 

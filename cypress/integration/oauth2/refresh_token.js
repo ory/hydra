@@ -87,13 +87,13 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
                 return cy
                   .refreshTokenBrowser(client, originalToken)
                   .then((response) => {
-                    expect(response.status).to.eq(401)
-                    expect(response.body.error).to.eq("token_inactive")
+                    expect(response.status).to.eq(400)
+                    expect(response.body.error).to.eq("invalid_grant")
                   })
                   .then(() => cy.refreshTokenBrowser(client, refreshedToken))
                   .then((response) => {
-                    expect(response.status).to.eq(401)
-                    expect(response.body.error).to.eq("token_inactive")
+                    expect(response.status).to.eq(400)
+                    expect(response.body.error).to.eq("invalid_grant")
                   })
               },
             )

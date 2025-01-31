@@ -265,6 +265,8 @@ type revokeOAuth2LoginSessions struct {
 // Alternatively, you can send a SessionID via `sid` query param, in which case, only the session that is connected
 // to that SessionID is revoked. OpenID Connect Back-channel logout is performed in this case.
 //
+// When using Ory for the identity provider, the login provider will also invalidate the session cookie.
+//
 //	Consumes:
 //	- application/json
 //

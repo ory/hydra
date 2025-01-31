@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/hydra/v2/internal/testhelpers"
+
 	"github.com/ory/x/assertx"
 
 	"github.com/ory/x/ioutilx"
@@ -25,8 +27,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/v2/internal"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
@@ -63,11 +63,11 @@ var defaultIgnoreFields = []string{"client_id", "registration_access_token", "re
 
 func TestClientSDK(t *testing.T) {
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
+	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(ctx, config.KeyDefaultClientScope, []string{"foo", "bar"})
 	conf.MustSet(ctx, config.KeyPublicAllowDynamicRegistration, true)
-	r := internal.NewRegistryMemory(t, conf, &contextx.Static{C: conf.Source(ctx)})
+	r := testhelpers.NewRegistryMemory(t, conf, &contextx.Static{C: conf.Source(ctx)})
 
 	routerAdmin := x.NewRouterAdmin(conf.AdminURL)
 	routerPublic := x.NewRouterPublic()

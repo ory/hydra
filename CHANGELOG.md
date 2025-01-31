@@ -4,291 +4,300 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2024-08-22)](#000-2024-08-22)
-  - [Breaking Changes](#breaking-changes)
+- [0.0.0 (2025-01-16)](#000-2025-01-16)
+    - [Documentation](#documentation)
+- [2.3.0-pre.1 (2025-01-15)](#230-pre1-2025-01-15)
     - [Bug Fixes](#bug-fixes)
+    - [Code Generation](#code-generation)
+    - [Reverts](#reverts)
+- [2.3.0-pre.0 (2025-01-08)](#230-pre0-2025-01-08)
+  - [Breaking Changes](#breaking-changes)
+    - [Bug Fixes](#bug-fixes-1)
+    - [Code Generation](#code-generation-1)
     - [Features](#features)
+    - [Reverts](#reverts-1)
+    - [Tests](#tests)
     - [Unclassified](#unclassified)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
-    - [Bug Fixes](#bug-fixes-1)
-    - [Code Generation](#code-generation)
-- [2.2.0-pre.1 (2024-02-01)](#220-pre1-2024-02-01)
     - [Bug Fixes](#bug-fixes-2)
-    - [Code Generation](#code-generation-1)
-    - [Documentation](#documentation)
+    - [Code Generation](#code-generation-2)
+- [2.2.0-pre.1 (2024-02-01)](#220-pre1-2024-02-01)
+    - [Bug Fixes](#bug-fixes-3)
+    - [Code Generation](#code-generation-3)
+    - [Documentation](#documentation-1)
     - [Features](#features-1)
 - [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
-    - [Bug Fixes](#bug-fixes-3)
-    - [Code Generation](#code-generation-2)
-    - [Features](#features-2)
-- [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
-    - [Code Generation](#code-generation-3)
-    - [Features](#features-3)
-- [2.2.0-rc.2 (2023-06-13)](#220-rc2-2023-06-13)
     - [Bug Fixes](#bug-fixes-4)
     - [Code Generation](#code-generation-4)
+    - [Features](#features-2)
+- [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
+    - [Code Generation](#code-generation-5)
+    - [Features](#features-3)
+- [2.2.0-rc.2 (2023-06-13)](#220-rc2-2023-06-13)
+    - [Bug Fixes](#bug-fixes-5)
+    - [Code Generation](#code-generation-6)
     - [Features](#features-4)
 - [2.2.0-rc.1 (2023-06-12)](#220-rc1-2023-06-12)
   - [Breaking Changes](#breaking-changes-1)
-    - [Bug Fixes](#bug-fixes-5)
-    - [Code Generation](#code-generation-5)
+    - [Bug Fixes](#bug-fixes-6)
+    - [Code Generation](#code-generation-7)
     - [Features](#features-5)
     - [Unclassified](#unclassified-1)
 - [2.1.2 (2023-05-24)](#212-2023-05-24)
-    - [Bug Fixes](#bug-fixes-6)
-    - [Code Generation](#code-generation-6)
-    - [Documentation](#documentation-1)
+    - [Bug Fixes](#bug-fixes-7)
+    - [Code Generation](#code-generation-8)
+    - [Documentation](#documentation-2)
     - [Features](#features-6)
 - [2.1.1 (2023-04-11)](#211-2023-04-11)
-    - [Bug Fixes](#bug-fixes-7)
-    - [Code Generation](#code-generation-7)
-- [2.1.0 (2023-04-06)](#210-2023-04-06)
     - [Bug Fixes](#bug-fixes-8)
-    - [Code Generation](#code-generation-8)
-- [2.1.0-pre.2 (2023-04-03)](#210-pre2-2023-04-03)
     - [Code Generation](#code-generation-9)
-- [2.1.0-pre.1 (2023-04-03)](#210-pre1-2023-04-03)
-    - [Code Generation](#code-generation-10)
-- [2.1.0-pre.0 (2023-03-31)](#210-pre0-2023-03-31)
+- [2.1.0 (2023-04-06)](#210-2023-04-06)
     - [Bug Fixes](#bug-fixes-9)
+    - [Code Generation](#code-generation-10)
+- [2.1.0-pre.2 (2023-04-03)](#210-pre2-2023-04-03)
     - [Code Generation](#code-generation-11)
-    - [Documentation](#documentation-2)
-    - [Features](#features-7)
-- [2.0.3 (2022-12-08)](#203-2022-12-08)
-    - [Bug Fixes](#bug-fixes-10)
+- [2.1.0-pre.1 (2023-04-03)](#210-pre1-2023-04-03)
     - [Code Generation](#code-generation-12)
-    - [Features](#features-8)
-- [2.0.2 (2022-11-10)](#202-2022-11-10)
-    - [Bug Fixes](#bug-fixes-11)
+- [2.1.0-pre.0 (2023-03-31)](#210-pre0-2023-03-31)
+    - [Bug Fixes](#bug-fixes-10)
     - [Code Generation](#code-generation-13)
     - [Documentation](#documentation-3)
-    - [Features](#features-9)
-    - [Tests](#tests)
-- [2.0.1 (2022-10-27)](#201-2022-10-27)
-    - [Bug Fixes](#bug-fixes-12)
+    - [Features](#features-7)
+- [2.0.3 (2022-12-08)](#203-2022-12-08)
+    - [Bug Fixes](#bug-fixes-11)
     - [Code Generation](#code-generation-14)
+    - [Features](#features-8)
+- [2.0.2 (2022-11-10)](#202-2022-11-10)
+    - [Bug Fixes](#bug-fixes-12)
+    - [Code Generation](#code-generation-15)
     - [Documentation](#documentation-4)
+    - [Features](#features-9)
+    - [Tests](#tests-1)
+- [2.0.1 (2022-10-27)](#201-2022-10-27)
+    - [Bug Fixes](#bug-fixes-13)
+    - [Code Generation](#code-generation-16)
+    - [Documentation](#documentation-5)
 - [2.0.0 (2022-10-27)](#200-2022-10-27)
   - [Breaking Changes](#breaking-changes-2)
-    - [Bug Fixes](#bug-fixes-13)
-    - [Code Generation](#code-generation-15)
+    - [Bug Fixes](#bug-fixes-14)
+    - [Code Generation](#code-generation-17)
     - [Code Refactoring](#code-refactoring)
-    - [Documentation](#documentation-5)
+    - [Documentation](#documentation-6)
     - [Features](#features-10)
-    - [Tests](#tests-1)
+    - [Tests](#tests-2)
     - [Unclassified](#unclassified-2)
 - [1.11.10 (2022-08-25)](#11110-2022-08-25)
-    - [Bug Fixes](#bug-fixes-14)
-    - [Code Generation](#code-generation-16)
-- [1.11.9 (2022-08-01)](#1119-2022-08-01)
     - [Bug Fixes](#bug-fixes-15)
-    - [Code Generation](#code-generation-17)
-    - [Documentation](#documentation-6)
+    - [Code Generation](#code-generation-18)
+- [1.11.9 (2022-08-01)](#1119-2022-08-01)
+    - [Bug Fixes](#bug-fixes-16)
+    - [Code Generation](#code-generation-19)
+    - [Documentation](#documentation-7)
     - [Features](#features-11)
 - [1.11.8 (2022-05-04)](#1118-2022-05-04)
-    - [Bug Fixes](#bug-fixes-16)
-    - [Code Generation](#code-generation-18)
-    - [Documentation](#documentation-7)
-    - [Features](#features-12)
-    - [Tests](#tests-2)
-- [1.11.7 (2022-02-23)](#1117-2022-02-23)
-    - [Code Generation](#code-generation-19)
-- [1.11.6 (2022-02-23)](#1116-2022-02-23)
     - [Bug Fixes](#bug-fixes-17)
     - [Code Generation](#code-generation-20)
-- [1.11.5 (2022-02-21)](#1115-2022-02-21)
-    - [Bug Fixes](#bug-fixes-18)
+    - [Documentation](#documentation-8)
+    - [Features](#features-12)
+    - [Tests](#tests-3)
+- [1.11.7 (2022-02-23)](#1117-2022-02-23)
     - [Code Generation](#code-generation-21)
-- [1.11.4 (2022-02-16)](#1114-2022-02-16)
-    - [Bug Fixes](#bug-fixes-19)
+- [1.11.6 (2022-02-23)](#1116-2022-02-23)
+    - [Bug Fixes](#bug-fixes-18)
     - [Code Generation](#code-generation-22)
-- [1.11.3 (2022-02-15)](#1113-2022-02-15)
-    - [Bug Fixes](#bug-fixes-20)
+- [1.11.5 (2022-02-21)](#1115-2022-02-21)
+    - [Bug Fixes](#bug-fixes-19)
     - [Code Generation](#code-generation-23)
-- [1.11.2 (2022-02-11)](#1112-2022-02-11)
+- [1.11.4 (2022-02-16)](#1114-2022-02-16)
+    - [Bug Fixes](#bug-fixes-20)
     - [Code Generation](#code-generation-24)
-- [1.11.1 (2022-02-11)](#1111-2022-02-11)
+- [1.11.3 (2022-02-15)](#1113-2022-02-15)
     - [Bug Fixes](#bug-fixes-21)
     - [Code Generation](#code-generation-25)
+- [1.11.2 (2022-02-11)](#1112-2022-02-11)
+    - [Code Generation](#code-generation-26)
+- [1.11.1 (2022-02-11)](#1111-2022-02-11)
+    - [Bug Fixes](#bug-fixes-22)
+    - [Code Generation](#code-generation-27)
     - [Code Refactoring](#code-refactoring-1)
-    - [Documentation](#documentation-8)
+    - [Documentation](#documentation-9)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
   - [Breaking Changes](#breaking-changes-3)
-    - [Bug Fixes](#bug-fixes-22)
-    - [Code Generation](#code-generation-26)
-    - [Documentation](#documentation-9)
+    - [Bug Fixes](#bug-fixes-23)
+    - [Code Generation](#code-generation-28)
+    - [Documentation](#documentation-10)
     - [Features](#features-13)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-4)
-    - [Bug Fixes](#bug-fixes-23)
-    - [Code Generation](#code-generation-27)
+    - [Bug Fixes](#bug-fixes-24)
+    - [Code Generation](#code-generation-29)
     - [Code Refactoring](#code-refactoring-2)
-    - [Documentation](#documentation-10)
+    - [Documentation](#documentation-11)
     - [Features](#features-14)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
-    - [Bug Fixes](#bug-fixes-24)
-    - [Code Generation](#code-generation-28)
-    - [Documentation](#documentation-11)
-- [1.10.5 (2021-08-13)](#1105-2021-08-13)
     - [Bug Fixes](#bug-fixes-25)
-    - [Code Generation](#code-generation-29)
+    - [Code Generation](#code-generation-30)
     - [Documentation](#documentation-12)
+- [1.10.5 (2021-08-13)](#1105-2021-08-13)
+    - [Bug Fixes](#bug-fixes-26)
+    - [Code Generation](#code-generation-31)
+    - [Documentation](#documentation-13)
     - [Features](#features-15)
 - [1.10.3 (2021-07-14)](#1103-2021-07-14)
-    - [Bug Fixes](#bug-fixes-26)
-    - [Code Generation](#code-generation-30)
+    - [Bug Fixes](#bug-fixes-27)
+    - [Code Generation](#code-generation-32)
     - [Code Refactoring](#code-refactoring-3)
-    - [Documentation](#documentation-13)
+    - [Documentation](#documentation-14)
     - [Features](#features-16)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-5)
-    - [Bug Fixes](#bug-fixes-27)
-    - [Code Generation](#code-generation-31)
+    - [Bug Fixes](#bug-fixes-28)
+    - [Code Generation](#code-generation-33)
     - [Code Refactoring](#code-refactoring-4)
-    - [Documentation](#documentation-14)
+    - [Documentation](#documentation-15)
     - [Features](#features-17)
 - [1.10.1 (2021-03-25)](#1101-2021-03-25)
-    - [Bug Fixes](#bug-fixes-28)
-    - [Code Generation](#code-generation-32)
-    - [Documentation](#documentation-15)
-    - [Features](#features-18)
-    - [Tests](#tests-3)
-    - [Unclassified](#unclassified-3)
-- [1.9.2 (2021-01-29)](#192-2021-01-29)
-    - [Code Generation](#code-generation-33)
-    - [Features](#features-19)
-- [1.9.1 (2021-01-27)](#191-2021-01-27)
+    - [Bug Fixes](#bug-fixes-29)
     - [Code Generation](#code-generation-34)
     - [Documentation](#documentation-16)
-- [1.9.0 (2021-01-12)](#190-2021-01-12)
+    - [Features](#features-18)
+    - [Tests](#tests-4)
+    - [Unclassified](#unclassified-3)
+- [1.9.2 (2021-01-29)](#192-2021-01-29)
     - [Code Generation](#code-generation-35)
-- [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
+    - [Features](#features-19)
+- [1.9.1 (2021-01-27)](#191-2021-01-27)
     - [Code Generation](#code-generation-36)
-- [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
-    - [Bug Fixes](#bug-fixes-29)
-    - [Code Generation](#code-generation-37)
     - [Documentation](#documentation-17)
+- [1.9.0 (2021-01-12)](#190-2021-01-12)
+    - [Code Generation](#code-generation-37)
+- [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
+    - [Code Generation](#code-generation-38)
+- [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
+    - [Bug Fixes](#bug-fixes-30)
+    - [Code Generation](#code-generation-39)
+    - [Documentation](#documentation-18)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
   - [Breaking Changes](#breaking-changes-6)
-    - [Bug Fixes](#bug-fixes-30)
-    - [Code Generation](#code-generation-38)
+    - [Bug Fixes](#bug-fixes-31)
+    - [Code Generation](#code-generation-40)
     - [Code Refactoring](#code-refactoring-5)
-    - [Documentation](#documentation-18)
+    - [Documentation](#documentation-19)
     - [Features](#features-20)
-    - [Tests](#tests-4)
+    - [Tests](#tests-5)
     - [Unclassified](#unclassified-4)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
-    - [Bug Fixes](#bug-fixes-31)
-    - [Code Generation](#code-generation-39)
-    - [Documentation](#documentation-19)
-    - [Features](#features-21)
-    - [Tests](#tests-5)
-- [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
     - [Bug Fixes](#bug-fixes-32)
-    - [Code Generation](#code-generation-40)
-    - [Code Refactoring](#code-refactoring-6)
-    - [Documentation](#documentation-20)
-    - [Features](#features-22)
-    - [Tests](#tests-6)
-- [1.8.5 (2020-10-03)](#185-2020-10-03)
     - [Code Generation](#code-generation-41)
-- [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
+    - [Documentation](#documentation-20)
+    - [Features](#features-21)
+    - [Tests](#tests-6)
+- [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
     - [Bug Fixes](#bug-fixes-33)
     - [Code Generation](#code-generation-42)
+    - [Code Refactoring](#code-refactoring-6)
+    - [Documentation](#documentation-21)
+    - [Features](#features-22)
+    - [Tests](#tests-7)
+- [1.8.5 (2020-10-03)](#185-2020-10-03)
+    - [Code Generation](#code-generation-43)
+- [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
+    - [Bug Fixes](#bug-fixes-34)
+    - [Code Generation](#code-generation-44)
     - [Features](#features-23)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-7)
-    - [Bug Fixes](#bug-fixes-34)
-    - [Code Generation](#code-generation-43)
-    - [Documentation](#documentation-21)
+    - [Bug Fixes](#bug-fixes-35)
+    - [Code Generation](#code-generation-45)
+    - [Documentation](#documentation-22)
     - [Features](#features-24)
 - [1.7.4 (2020-08-31)](#174-2020-08-31)
-    - [Bug Fixes](#bug-fixes-35)
-    - [Code Generation](#code-generation-44)
-- [1.7.3 (2020-08-31)](#173-2020-08-31)
-    - [Code Generation](#code-generation-45)
-- [1.7.1 (2020-08-31)](#171-2020-08-31)
-  - [Breaking Changes](#breaking-changes-8)
     - [Bug Fixes](#bug-fixes-36)
     - [Code Generation](#code-generation-46)
+- [1.7.3 (2020-08-31)](#173-2020-08-31)
+    - [Code Generation](#code-generation-47)
+- [1.7.1 (2020-08-31)](#171-2020-08-31)
+  - [Breaking Changes](#breaking-changes-8)
+    - [Bug Fixes](#bug-fixes-37)
+    - [Code Generation](#code-generation-48)
     - [Code Refactoring](#code-refactoring-7)
-    - [Documentation](#documentation-22)
+    - [Documentation](#documentation-23)
     - [Features](#features-25)
     - [Unclassified](#unclassified-5)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-9)
-    - [Bug Fixes](#bug-fixes-37)
-    - [Code Generation](#code-generation-47)
+    - [Bug Fixes](#bug-fixes-38)
+    - [Code Generation](#code-generation-49)
     - [Code Refactoring](#code-refactoring-8)
-    - [Documentation](#documentation-23)
+    - [Documentation](#documentation-24)
     - [Features](#features-26)
     - [Unclassified](#unclassified-6)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
-    - [Bug Fixes](#bug-fixes-38)
-    - [Code Generation](#code-generation-48)
-    - [Documentation](#documentation-24)
+    - [Bug Fixes](#bug-fixes-39)
+    - [Code Generation](#code-generation-50)
+    - [Documentation](#documentation-25)
     - [Unclassified](#unclassified-7)
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
-    - [Bug Fixes](#bug-fixes-39)
-    - [Code Generation](#code-generation-49)
+    - [Bug Fixes](#bug-fixes-40)
+    - [Code Generation](#code-generation-51)
     - [Features](#features-27)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
-    - [Code Generation](#code-generation-50)
+    - [Code Generation](#code-generation-52)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
-    - [Bug Fixes](#bug-fixes-40)
+    - [Bug Fixes](#bug-fixes-41)
     - [Chores](#chores)
-    - [Documentation](#documentation-25)
+    - [Documentation](#documentation-26)
     - [Features](#features-28)
     - [Unclassified](#unclassified-8)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
-    - [Bug Fixes](#bug-fixes-41)
+    - [Bug Fixes](#bug-fixes-42)
     - [Chores](#chores-1)
-    - [Documentation](#documentation-26)
+    - [Documentation](#documentation-27)
     - [Features](#features-29)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
     - [Chores](#chores-2)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
-    - [Bug Fixes](#bug-fixes-42)
+    - [Bug Fixes](#bug-fixes-43)
     - [Chores](#chores-3)
     - [Code Refactoring](#code-refactoring-9)
-    - [Documentation](#documentation-27)
+    - [Documentation](#documentation-28)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
   - [Breaking Changes](#breaking-changes-10)
     - [Chores](#chores-4)
     - [Code Refactoring](#code-refactoring-10)
 - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes-43)
+    - [Bug Fixes](#bug-fixes-44)
     - [Chores](#chores-5)
-    - [Documentation](#documentation-28)
+    - [Documentation](#documentation-29)
     - [Unclassified](#unclassified-9)
 - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-44)
+    - [Bug Fixes](#bug-fixes-45)
     - [Chores](#chores-6)
 - [1.4.8 (2020-04-24)](#148-2020-04-24)
-    - [Bug Fixes](#bug-fixes-45)
+    - [Bug Fixes](#bug-fixes-46)
     - [Chores](#chores-7)
-    - [Documentation](#documentation-29)
+    - [Documentation](#documentation-30)
     - [Features](#features-30)
 - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-46)
-    - [Chores](#chores-8)
-    - [Documentation](#documentation-30)
-- [1.4.6 (2020-04-17)](#146-2020-04-17)
     - [Bug Fixes](#bug-fixes-47)
+    - [Chores](#chores-8)
     - [Documentation](#documentation-31)
-- [1.4.5 (2020-04-16)](#145-2020-04-16)
+- [1.4.6 (2020-04-17)](#146-2020-04-17)
     - [Bug Fixes](#bug-fixes-48)
     - [Documentation](#documentation-32)
-- [1.4.3 (2020-04-16)](#143-2020-04-16)
+- [1.4.5 (2020-04-16)](#145-2020-04-16)
     - [Bug Fixes](#bug-fixes-49)
-    - [Code Refactoring](#code-refactoring-11)
     - [Documentation](#documentation-33)
+- [1.4.3 (2020-04-16)](#143-2020-04-16)
+    - [Bug Fixes](#bug-fixes-50)
+    - [Code Refactoring](#code-refactoring-11)
+    - [Documentation](#documentation-34)
     - [Features](#features-31)
 - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Chores](#chores-9)
-    - [Documentation](#documentation-34)
+    - [Documentation](#documentation-35)
 - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-50)
+    - [Bug Fixes](#bug-fixes-51)
 - [1.4.0 (2020-04-02)](#140-2020-04-02)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
     - [Impact](#impact)
@@ -305,26 +314,26 @@
     - [Workarounds](#workarounds-1)
     - [References](#references-1)
     - [Upstream](#upstream-1)
-    - [Bug Fixes](#bug-fixes-51)
+    - [Bug Fixes](#bug-fixes-52)
     - [Code Refactoring](#code-refactoring-12)
-    - [Documentation](#documentation-35)
+    - [Documentation](#documentation-36)
     - [Features](#features-32)
     - [Unclassified](#unclassified-10)
 - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-52)
+    - [Bug Fixes](#bug-fixes-53)
     - [Chores](#chores-10)
-    - [Documentation](#documentation-36)
+    - [Documentation](#documentation-37)
 - [1.3.1 (2020-02-16)](#131-2020-02-16)
     - [Continuous Integration](#continuous-integration)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-53)
-    - [Documentation](#documentation-37)
+    - [Bug Fixes](#bug-fixes-54)
+    - [Documentation](#documentation-38)
     - [Features](#features-33)
     - [Unclassified](#unclassified-11)
 - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-12)
 - [1.2.2 (2020-01-23)](#122-2020-01-23)
-    - [Documentation](#documentation-38)
+    - [Documentation](#documentation-39)
     - [Unclassified](#unclassified-13)
 - [1.2.1 (2020-01-15)](#121-2020-01-15)
     - [Unclassified](#unclassified-14)
@@ -335,16 +344,16 @@
 - [1.2.0-alpha.2 (2020-01-08)](#120-alpha2-2020-01-08)
     - [Continuous Integration](#continuous-integration-1)
 - [1.2.0-alpha.1 (2020-01-07)](#120-alpha1-2020-01-07)
-    - [Documentation](#documentation-39)
+    - [Documentation](#documentation-40)
     - [Unclassified](#unclassified-17)
 - [1.1.1 (2019-12-19)](#111-2019-12-19)
-    - [Documentation](#documentation-40)
+    - [Documentation](#documentation-41)
     - [Unclassified](#unclassified-18)
 - [1.1.0 (2019-12-16)](#110-2019-12-16)
-    - [Documentation](#documentation-41)
+    - [Documentation](#documentation-42)
     - [Unclassified](#unclassified-19)
 - [1.0.9 (2019-11-02)](#109-2019-11-02)
-    - [Documentation](#documentation-42)
+    - [Documentation](#documentation-43)
     - [Unclassified](#unclassified-20)
 - [1.0.8 (2019-10-04)](#108-2019-10-04)
     - [Unclassified](#unclassified-21)
@@ -361,93 +370,93 @@
 - [1.0.2 (2019-09-18)](#102-2019-09-18)
     - [Unclassified](#unclassified-24)
 - [1.0.1 (2019-09-04)](#101-2019-09-04)
-    - [Documentation](#documentation-43)
+    - [Documentation](#documentation-44)
     - [Unclassified](#unclassified-25)
 - [1.0.0 (2019-06-24)](#100-2019-06-24)
-    - [Documentation](#documentation-44)
+    - [Documentation](#documentation-45)
     - [Unclassified](#unclassified-26)
 - [1.0.0-rc.16 (2019-06-13)](#100-rc16-2019-06-13)
-    - [Documentation](#documentation-45)
+    - [Documentation](#documentation-46)
     - [Unclassified](#unclassified-27)
 - [1.0.0-rc.15 (2019-06-05)](#100-rc15-2019-06-05)
-    - [Documentation](#documentation-46)
+    - [Documentation](#documentation-47)
     - [Unclassified](#unclassified-28)
 - [1.0.0-rc.14 (2019-05-18)](#100-rc14-2019-05-18)
     - [Continuous Integration](#continuous-integration-5)
-    - [Documentation](#documentation-47)
+    - [Documentation](#documentation-48)
     - [Unclassified](#unclassified-29)
 - [1.0.0-rc.12 (2019-05-10)](#100-rc12-2019-05-10)
     - [Unclassified](#unclassified-30)
 - [0.0.1 (2019-05-08)](#001-2019-05-08)
-    - [Documentation](#documentation-48)
+    - [Documentation](#documentation-49)
     - [Unclassified](#unclassified-31)
 - [1.0.0-rc.11 (2019-05-02)](#100-rc11-2019-05-02)
-    - [Documentation](#documentation-49)
+    - [Documentation](#documentation-50)
     - [Unclassified](#unclassified-32)
 - [1.0.0-rc.10 (2019-04-29)](#100-rc10-2019-04-29)
-    - [Documentation](#documentation-50)
+    - [Documentation](#documentation-51)
     - [Unclassified](#unclassified-33)
 - [1.0.0-rc.9+oryOS.10 (2019-04-18)](#100-rc9oryos10-2019-04-18)
-    - [Documentation](#documentation-51)
+    - [Documentation](#documentation-52)
     - [Unclassified](#unclassified-34)
 - [1.0.0-rc.8+oryOS.10 (2019-04-03)](#100-rc8oryos10-2019-04-03)
     - [Continuous Integration](#continuous-integration-6)
-    - [Documentation](#documentation-52)
+    - [Documentation](#documentation-53)
 - [1.0.0-rc.7+oryOS.10 (2019-04-02)](#100-rc7oryos10-2019-04-02)
     - [Continuous Integration](#continuous-integration-7)
-    - [Documentation](#documentation-53)
+    - [Documentation](#documentation-54)
     - [Unclassified](#unclassified-35)
 - [1.0.0-rc.6+oryOS.10 (2018-12-18)](#100-rc6oryos10-2018-12-18)
-    - [Documentation](#documentation-54)
+    - [Documentation](#documentation-55)
     - [Unclassified](#unclassified-36)
 - [1.0.0-rc.5+oryOS.10 (2018-12-13)](#100-rc5oryos10-2018-12-13)
-    - [Documentation](#documentation-55)
+    - [Documentation](#documentation-56)
     - [Unclassified](#unclassified-37)
 - [1.0.0-rc.4+oryOS.9 (2018-12-12)](#100-rc4oryos9-2018-12-12)
-    - [Documentation](#documentation-56)
+    - [Documentation](#documentation-57)
     - [Unclassified](#unclassified-38)
 - [1.0.0-rc.3+oryOS.9 (2018-12-06)](#100-rc3oryos9-2018-12-06)
-    - [Documentation](#documentation-57)
+    - [Documentation](#documentation-58)
     - [Unclassified](#unclassified-39)
 - [1.0.0-rc.2+oryOS.9 (2018-11-21)](#100-rc2oryos9-2018-11-21)
-    - [Documentation](#documentation-58)
+    - [Documentation](#documentation-59)
     - [Unclassified](#unclassified-40)
 - [1.0.0-rc.1+oryOS.9 (2018-11-21)](#100-rc1oryos9-2018-11-21)
     - [Build System](#build-system)
-    - [Documentation](#documentation-59)
+    - [Documentation](#documentation-60)
     - [Unclassified](#unclassified-41)
 - [1.0.0-beta.9 (2018-09-01)](#100-beta9-2018-09-01)
-    - [Documentation](#documentation-60)
+    - [Documentation](#documentation-61)
     - [Unclassified](#unclassified-42)
 - [1.0.0-beta.8 (2018-08-10)](#100-beta8-2018-08-10)
-    - [Documentation](#documentation-61)
+    - [Documentation](#documentation-62)
     - [Unclassified](#unclassified-43)
 - [1.0.0-beta.7 (2018-07-16)](#100-beta7-2018-07-16)
-    - [Documentation](#documentation-62)
+    - [Documentation](#documentation-63)
     - [Unclassified](#unclassified-44)
 - [1.0.0-beta.6 (2018-07-11)](#100-beta6-2018-07-11)
-    - [Documentation](#documentation-63)
+    - [Documentation](#documentation-64)
     - [Unclassified](#unclassified-45)
 - [1.0.0-beta.5 (2018-07-07)](#100-beta5-2018-07-07)
-    - [Documentation](#documentation-64)
+    - [Documentation](#documentation-65)
     - [Unclassified](#unclassified-46)
 - [1.0.0-beta.4 (2018-06-13)](#100-beta4-2018-06-13)
-    - [Documentation](#documentation-65)
+    - [Documentation](#documentation-66)
 - [1.0.0-beta.3 (2018-06-13)](#100-beta3-2018-06-13)
     - [Continuous Integration](#continuous-integration-8)
-    - [Documentation](#documentation-66)
+    - [Documentation](#documentation-67)
     - [Unclassified](#unclassified-47)
 - [1.0.0-beta.2 (2018-05-29)](#100-beta2-2018-05-29)
     - [Continuous Integration](#continuous-integration-9)
 - [1.0.0-beta.1 (2018-05-29)](#100-beta1-2018-05-29)
     - [Build System](#build-system-1)
-    - [Documentation](#documentation-67)
+    - [Documentation](#documentation-68)
     - [Unclassified](#unclassified-48)
 - [0.11.10 (2018-03-19)](#01110-2018-03-19)
-    - [Documentation](#documentation-68)
+    - [Documentation](#documentation-69)
     - [Unclassified](#unclassified-49)
 - [0.11.12 (2018-04-08)](#01112-2018-04-08)
-    - [Documentation](#documentation-69)
+    - [Documentation](#documentation-70)
     - [Unclassified](#unclassified-50)
 - [0.11.9 (2018-03-10)](#0119-2018-03-10)
     - [Unclassified](#unclassified-51)
@@ -456,7 +465,7 @@
 - [0.11.6 (2018-02-07)](#0116-2018-02-07)
     - [Unclassified](#unclassified-53)
 - [0.11.10 (2018-03-19)](#01110-2018-03-19-1)
-    - [Documentation](#documentation-70)
+    - [Documentation](#documentation-71)
     - [Unclassified](#unclassified-54)
 - [0.11.9 (2018-03-10)](#0119-2018-03-10-1)
     - [Unclassified](#unclassified-55)
@@ -465,53 +474,53 @@
 - [0.11.6 (2018-02-07)](#0116-2018-02-07-1)
     - [Unclassified](#unclassified-57)
 - [0.11.4 (2018-01-23)](#0114-2018-01-23)
-    - [Documentation](#documentation-71)
-- [0.11.3 (2018-01-23)](#0113-2018-01-23)
     - [Documentation](#documentation-72)
+- [0.11.3 (2018-01-23)](#0113-2018-01-23)
+    - [Documentation](#documentation-73)
     - [Unclassified](#unclassified-58)
 - [0.11.2 (2018-01-22)](#0112-2018-01-22)
     - [Unclassified](#unclassified-59)
 - [0.11.1 (2018-01-18)](#0111-2018-01-18)
     - [Unclassified](#unclassified-60)
 - [0.11.0 (2018-01-08)](#0110-2018-01-08)
-    - [Documentation](#documentation-73)
+    - [Documentation](#documentation-74)
     - [Unclassified](#unclassified-61)
 - [0.10.10 (2017-12-16)](#01010-2017-12-16)
-    - [Documentation](#documentation-74)
+    - [Documentation](#documentation-75)
     - [Unclassified](#unclassified-62)
 - [0.10.9 (2017-12-13)](#0109-2017-12-13)
-    - [Documentation](#documentation-75)
+    - [Documentation](#documentation-76)
     - [Unclassified](#unclassified-63)
 - [0.10.8 (2017-12-12)](#0108-2017-12-12)
-    - [Documentation](#documentation-76)
+    - [Documentation](#documentation-77)
     - [Unclassified](#unclassified-64)
 - [0.10.7 (2017-12-09)](#0107-2017-12-09)
-    - [Documentation](#documentation-77)
+    - [Documentation](#documentation-78)
     - [Unclassified](#unclassified-65)
 - [0.10.6 (2017-12-09)](#0106-2017-12-09)
     - [Unclassified](#unclassified-66)
 - [0.10.5 (2017-12-09)](#0105-2017-12-09)
-    - [Documentation](#documentation-78)
+    - [Documentation](#documentation-79)
     - [Unclassified](#unclassified-67)
 - [0.10.4 (2017-12-09)](#0104-2017-12-09)
-    - [Documentation](#documentation-79)
+    - [Documentation](#documentation-80)
     - [Unclassified](#unclassified-68)
 - [0.10.3 (2017-12-08)](#0103-2017-12-08)
-    - [Documentation](#documentation-80)
+    - [Documentation](#documentation-81)
 - [0.10.2 (2017-12-08)](#0102-2017-12-08)
     - [Continuous Integration](#continuous-integration-10)
 - [0.10.1 (2017-12-08)](#0101-2017-12-08)
     - [Continuous Integration](#continuous-integration-11)
 - [0.10.0 (2017-12-08)](#0100-2017-12-08)
     - [Continuous Integration](#continuous-integration-12)
-    - [Documentation](#documentation-81)
+    - [Documentation](#documentation-82)
     - [Unclassified](#unclassified-69)
 - [0.10.0-alpha.21 (2017-11-27)](#0100-alpha21-2017-11-27)
     - [Unclassified](#unclassified-70)
 - [0.10.0-alpha.20 (2017-11-26)](#0100-alpha20-2017-11-26)
     - [Unclassified](#unclassified-71)
 - [0.10.0-alpha.19 (2017-11-26)](#0100-alpha19-2017-11-26)
-    - [Documentation](#documentation-82)
+    - [Documentation](#documentation-83)
     - [Unclassified](#unclassified-72)
 - [0.10.0-alpha.18 (2017-11-06)](#0100-alpha18-2017-11-06)
     - [Continuous Integration](#continuous-integration-13)
@@ -519,7 +528,7 @@
     - [Continuous Integration](#continuous-integration-14)
 - [0.10.0-alpha.16 (2017-11-06)](#0100-alpha16-2017-11-06)
     - [Continuous Integration](#continuous-integration-15)
-    - [Documentation](#documentation-83)
+    - [Documentation](#documentation-84)
     - [Unclassified](#unclassified-73)
 - [0.10.0-alpha.15 (2017-11-06)](#0100-alpha15-2017-11-06)
     - [Unclassified](#unclassified-74)
@@ -528,19 +537,19 @@
 - [0.10.0-alpha.13 (2017-11-06)](#0100-alpha13-2017-11-06)
     - [Unclassified](#unclassified-76)
 - [0.10.0-alpha.12 (2017-11-06)](#0100-alpha12-2017-11-06)
-    - [Documentation](#documentation-84)
+    - [Documentation](#documentation-85)
     - [Unclassified](#unclassified-77)
 - [0.10.0-alpha.10 (2017-10-26)](#0100-alpha10-2017-10-26)
     - [Continuous Integration](#continuous-integration-16)
-    - [Documentation](#documentation-85)
-- [0.10.0-alpha.9 (2017-10-25)](#0100-alpha9-2017-10-25)
     - [Documentation](#documentation-86)
+- [0.10.0-alpha.9 (2017-10-25)](#0100-alpha9-2017-10-25)
+    - [Documentation](#documentation-87)
     - [Unclassified](#unclassified-78)
 - [0.10.0-alpha.8 (2017-10-18)](#0100-alpha8-2017-10-18)
-    - [Documentation](#documentation-87)
+    - [Documentation](#documentation-88)
     - [Unclassified](#unclassified-79)
 - [0.9.14 (2017-10-06)](#0914-2017-10-06)
-    - [Documentation](#documentation-88)
+    - [Documentation](#documentation-89)
     - [Unclassified](#unclassified-80)
 - [0.10.0-alpha.7 (2017-10-06)](#0100-alpha7-2017-10-06)
     - [Unclassified](#unclassified-81)
@@ -553,60 +562,60 @@
 - [0.10.0-alpha.3 (2017-10-05)](#0100-alpha3-2017-10-05)
     - [Unclassified](#unclassified-85)
 - [0.10.0-alpha.2 (2017-10-05)](#0100-alpha2-2017-10-05)
-    - [Documentation](#documentation-89)
+    - [Documentation](#documentation-90)
     - [Unclassified](#unclassified-86)
 - [0.10.0-alpha.1 (2017-10-05)](#0100-alpha1-2017-10-05)
-    - [Documentation](#documentation-90)
+    - [Documentation](#documentation-91)
     - [Unclassified](#unclassified-87)
 - [0.9.13 (2017-09-26)](#0913-2017-09-26)
-    - [Documentation](#documentation-91)
+    - [Documentation](#documentation-92)
     - [Unclassified](#unclassified-88)
 - [0.9.12 (2017-07-06)](#0912-2017-07-06)
-    - [Documentation](#documentation-92)
+    - [Documentation](#documentation-93)
     - [Unclassified](#unclassified-89)
 - [0.9.11 (2017-06-30)](#0911-2017-06-30)
-    - [Documentation](#documentation-93)
+    - [Documentation](#documentation-94)
     - [Unclassified](#unclassified-90)
 - [0.9.10 (2017-06-29)](#0910-2017-06-29)
-    - [Documentation](#documentation-94)
+    - [Documentation](#documentation-95)
     - [Unclassified](#unclassified-91)
 - [0.9.9 (2017-06-17)](#099-2017-06-17)
     - [Unclassified](#unclassified-92)
 - [0.9.8 (2017-06-17)](#098-2017-06-17)
-    - [Documentation](#documentation-95)
+    - [Documentation](#documentation-96)
     - [Unclassified](#unclassified-93)
 - [0.9.7 (2017-06-16)](#097-2017-06-16)
-    - [Documentation](#documentation-96)
+    - [Documentation](#documentation-97)
     - [Unclassified](#unclassified-94)
 - [0.9.6 (2017-06-15)](#096-2017-06-15)
     - [Unclassified](#unclassified-95)
 - [0.9.5 (2017-06-15)](#095-2017-06-15)
     - [Unclassified](#unclassified-96)
 - [0.9.4 (2017-06-14)](#094-2017-06-14)
-    - [Documentation](#documentation-97)
+    - [Documentation](#documentation-98)
     - [Unclassified](#unclassified-97)
 - [0.9.3 (2017-06-14)](#093-2017-06-14)
-    - [Documentation](#documentation-98)
+    - [Documentation](#documentation-99)
     - [Unclassified](#unclassified-98)
 - [0.9.2 (2017-06-13)](#092-2017-06-13)
     - [Unclassified](#unclassified-99)
 - [0.9.1 (2017-06-12)](#091-2017-06-12)
     - [Unclassified](#unclassified-100)
 - [0.9.0 (2017-06-07)](#090-2017-06-07)
-    - [Documentation](#documentation-99)
+    - [Documentation](#documentation-100)
     - [Unclassified](#unclassified-101)
 - [0.8.7 (2017-06-05)](#087-2017-06-05)
     - [Unclassified](#unclassified-102)
 - [0.8.6 (2017-06-05)](#086-2017-06-05)
-    - [Documentation](#documentation-100)
+    - [Documentation](#documentation-101)
     - [Unclassified](#unclassified-103)
 - [0.8.5 (2017-06-01)](#085-2017-06-01)
     - [Unclassified](#unclassified-104)
 - [0.8.4 (2017-05-24)](#084-2017-05-24)
-    - [Documentation](#documentation-101)
+    - [Documentation](#documentation-102)
     - [Unclassified](#unclassified-105)
 - [0.8.3 (2017-05-23)](#083-2017-05-23)
-    - [Documentation](#documentation-102)
+    - [Documentation](#documentation-103)
     - [Unclassified](#unclassified-106)
 - [0.8.2 (2017-05-10)](#082-2017-05-10)
     - [Unclassified](#unclassified-107)
@@ -614,22 +623,22 @@
     - [Continuous Integration](#continuous-integration-17)
 - [0.8.0 (2017-05-07)](#080-2017-05-07)
     - [Continuous Integration](#continuous-integration-18)
-    - [Documentation](#documentation-103)
+    - [Documentation](#documentation-104)
     - [Unclassified](#unclassified-108)
 - [0.7.13 (2017-05-03)](#0713-2017-05-03)
-    - [Documentation](#documentation-104)
+    - [Documentation](#documentation-105)
     - [Unclassified](#unclassified-109)
 - [0.7.12 (2017-04-30)](#0712-2017-04-30)
     - [Unclassified](#unclassified-110)
 - [0.7.11 (2017-04-28)](#0711-2017-04-28)
     - [Unclassified](#unclassified-111)
 - [0.7.10 (2017-04-14)](#0710-2017-04-14)
-    - [Documentation](#documentation-105)
+    - [Documentation](#documentation-106)
     - [Unclassified](#unclassified-112)
 - [0.7.9 (2017-04-02)](#079-2017-04-02)
     - [Unclassified](#unclassified-113)
 - [0.7.8 (2017-03-24)](#078-2017-03-24)
-    - [Documentation](#documentation-106)
+    - [Documentation](#documentation-107)
     - [Unclassified](#unclassified-114)
 - [0.7.7 (2017-02-11)](#077-2017-02-11)
     - [Unclassified](#unclassified-115)
@@ -642,31 +651,31 @@
 - [0.7.1 (2016-12-30)](#071-2016-12-30)
     - [Unclassified](#unclassified-119)
 - [0.7.0 (2016-12-30)](#070-2016-12-30)
-    - [Documentation](#documentation-107)
+    - [Documentation](#documentation-108)
     - [Unclassified](#unclassified-120)
 - [0.6.10 (2016-12-26)](#0610-2016-12-26)
     - [Unclassified](#unclassified-121)
 - [0.6.9 (2016-12-20)](#069-2016-12-20)
-    - [Documentation](#documentation-108)
+    - [Documentation](#documentation-109)
     - [Unclassified](#unclassified-122)
 - [0.6.8 (2016-12-06)](#068-2016-12-06)
     - [Unclassified](#unclassified-123)
 - [0.6.7 (2016-12-04)](#067-2016-12-04)
     - [Unclassified](#unclassified-124)
 - [0.6.6 (2016-12-04)](#066-2016-12-04)
-    - [Documentation](#documentation-109)
+    - [Documentation](#documentation-110)
     - [Unclassified](#unclassified-125)
 - [0.6.5 (2016-11-28)](#065-2016-11-28)
     - [Unclassified](#unclassified-126)
 - [0.6.4 (2016-11-22)](#064-2016-11-22)
     - [Unclassified](#unclassified-127)
 - [0.6.3 (2016-11-17)](#063-2016-11-17)
-    - [Documentation](#documentation-110)
+    - [Documentation](#documentation-111)
     - [Unclassified](#unclassified-128)
 - [0.6.2 (2016-11-05)](#062-2016-11-05)
     - [Unclassified](#unclassified-129)
 - [0.6.1 (2016-10-26)](#061-2016-10-26)
-    - [Documentation](#documentation-111)
+    - [Documentation](#documentation-112)
     - [Unclassified](#unclassified-130)
 - [0.6.0 (2016-10-25)](#060-2016-10-25)
     - [Unclassified](#unclassified-131)
@@ -681,12 +690,12 @@
 - [0.5.4 (2016-09-29)](#054-2016-09-29)
     - [Unclassified](#unclassified-136)
 - [0.5.3 (2016-09-29)](#053-2016-09-29)
-    - [Documentation](#documentation-112)
+    - [Documentation](#documentation-113)
     - [Unclassified](#unclassified-137)
 - [0.5.2 (2016-09-23)](#052-2016-09-23)
     - [Unclassified](#unclassified-138)
 - [0.5.1 (2016-09-22)](#051-2016-09-22)
-    - [Documentation](#documentation-113)
+    - [Documentation](#documentation-114)
     - [Unclassified](#unclassified-139)
 - [0.4.3 (2016-09-03)](#043-2016-09-03)
     - [Unclassified](#unclassified-140)
@@ -697,23 +706,161 @@
 - [0.4.2-alpha.1 (2016-09-01)](#042-alpha1-2016-09-01)
     - [Unclassified](#unclassified-143)
 - [0.4.2-alpha (2016-09-01)](#042-alpha-2016-09-01)
-    - [Documentation](#documentation-114)
+    - [Documentation](#documentation-115)
     - [Unclassified](#unclassified-144)
 - [0.4.1 (2016-08-18)](#041-2016-08-18)
     - [Unclassified](#unclassified-145)
 - [0.3.1 (2016-08-17)](#031-2016-08-17)
-    - [Documentation](#documentation-115)
+    - [Documentation](#documentation-116)
     - [Unclassified](#unclassified-146)
 - [0.3.0 (2016-08-09)](#030-2016-08-09)
     - [Unclassified](#unclassified-147)
 - [0.2.0 (2016-08-09)](#020-2016-08-09)
-    - [Documentation](#documentation-116)
+    - [Documentation](#documentation-117)
     - [Unclassified](#unclassified-148)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.2.0...v0.0.0) (2024-08-22)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0-pre.1...v0.0.0) (2025-01-16)
+
+
+### Documentation
+
+* Update clarification ([#3929](https://github.com/ory/hydra/issues/3929)) ([ce7616c](https://github.com/ory/hydra/commit/ce7616cf6c600dc4f2303167fbf6b2ed81105ba5))
+
+
+# [2.3.0-pre.1](https://github.com/ory/hydra/compare/v2.3.0-pre.0...v2.3.0-pre.1) (2025-01-15)
+
+autogen: pin v2.3.0-pre.1 release commit
+
+
+
+
+
+### Bug Fixes
+
+* Improve docker set up ([#3924](https://github.com/ory/hydra/issues/3924)) ([8ca6cbd](https://github.com/ory/hydra/commit/8ca6cbd1ab4fe659a0a9feff82766961de6c1d77)), closes [#3914](https://github.com/ory/hydra/issues/3914) [#3683](https://github.com/ory/hydra/issues/3683):
+
+    Improves the docker set up and removes some unused files.
+
+
+### Code Generation
+
+* Pin v2.3.0-pre.1 release commit ([bad64b9](https://github.com/ory/hydra/commit/bad64b9a7ced3268b16dc742463e0e8ce2772b4a))
+
+### Reverts
+
+* Revert "chore/remove-nsswitch-hosts" ([a9930c0](https://github.com/ory/hydra/commit/a9930c07f60e81aa795ec0809466f34a22e54f4f)):
+
+    This reverts commit 12b08de4c75a25a4b73e89fb9543560ae5483038.
+
+* Revert "chore: Revise scratch image" ([de90d0b](https://github.com/ory/hydra/commit/de90d0b4118950c1270258a3923992c71c53bb18)):
+
+    This reverts commit 19ce7f1addff17558ffcb735d1605fb5400f1bb6.
+
+* Revert "chore: Revise alpine images" ([471d9b7](https://github.com/ory/hydra/commit/471d9b7545d5dacfd50e372ca8346c37cff95055)):
+
+    This reverts commit 583e1ebd4fb243d380a330ee4867f4d435d7e138.
+
+* Revert "chore: Use the same busybox commands with distroless" ([7f59ed4](https://github.com/ory/hydra/commit/7f59ed44b488aaf1abc2dd4628bcfd16fd1d4d24)):
+
+    This reverts commit 9d4f6d7e94c29a84252597b2c9bfae955cbf3e5b.
+
+* Revert "chore: Remove redundant `VOLUME` directives" ([cd1f4f2](https://github.com/ory/hydra/commit/cd1f4f284a516bc77797cc08f1bc06ba1246f695)):
+
+    This reverts commit dc1a58461b66adaccf7720f4ac83e3e74b8d292f.
+
+* Revert "chore: `Dockerfile-scratch` - Add commentary" ([37782bd](https://github.com/ory/hydra/commit/37782bd23d85329dba7b4b51da9959af4a87fb8d)):
+
+    This reverts commit 12926f43d12d23f964c93bdcf75a32cb73a68f2c.
+
+* Revert "chore: `Dockerfile-sqlite` - Add commentary" ([5ad3469](https://github.com/ory/hydra/commit/5ad3469c99ea962baf9eb7a2901d280d472fcc78)):
+
+    This reverts commit 8a50bbbc529763fd8ccc7a183935fceda5ed9a19.
+
+* Revert "chore: `Dockerfile-alpine` - Add commentary" ([a7e6dd5](https://github.com/ory/hydra/commit/a7e6dd56a567f020ef35e15c371692d1f85bd58f)):
+
+    This reverts commit b2f202c4d9d176abb7178ce6e0714c7d40c05b59.
+
+* Revert "fix: improve docker set up" ([350ad6a](https://github.com/ory/hydra/commit/350ad6ac1a6c5a081073eb2bbe155e90c2f95e02)):
+
+    This reverts commit 9378b07518cd2e673983e42e52100216647656b5.
+
+* Revert "chore: synchronize workspaces" ([c3e4d59](https://github.com/ory/hydra/commit/c3e4d595f883a69a545fec3dc91c66121bc44a7c)):
+
+    This reverts commit 79a834de96912983f4d847b4e2bc87799a64c266.
+
+* Revert "chore: synchronize workspaces" ([ef5b536](https://github.com/ory/hydra/commit/ef5b5362e238d6cab2cf027cf5a975dd8cac13e5)):
+
+    This reverts commit 80c92d4fb74566b88abd789e09e3e60dc4835f3a.
+
+* Revert "chore: synchronize workspaces" ([b86f58e](https://github.com/ory/hydra/commit/b86f58e33f3009e4a93ff57bbfb5bfd9b2ee70ba)):
+
+    This reverts commit 889f9598824c9dd5d6e9613dbb3d74adea29b003.
+
+* Revert "chore: synchronize workspaces" ([d354a28](https://github.com/ory/hydra/commit/d354a289923065880bf3bfaf870588129566275c)):
+
+    This reverts commit 9a7a23b8a81e0fae6bdc2e45f651e23d720a265c.
+
+* Revert "chore: synchronize workspaces" ([2c29083](https://github.com/ory/hydra/commit/2c2908379b19354844f8bc97d5f6afdd873261b0)):
+
+    This reverts commit e65bd7782b3673d438db0c8814a1738803e9688a.
+
+* Revert "chore: synchronize workspaces" ([87bd67f](https://github.com/ory/hydra/commit/87bd67fe72956939a99a5d99dbd26c7e1cda47ec)):
+
+    This reverts commit d1020baa448766268021ac50c8354b88b781427a.
+
+* Revert "chore: synchronize workspaces" ([91e55ad](https://github.com/ory/hydra/commit/91e55adc4959bd8bc7d9ffb3871f1e672fe5ae1c)):
+
+    This reverts commit 3e263ba550209fa4055e396887cb8e8798f1a50b.
+
+* Revert "chore: synchronize workspaces" ([78c5247](https://github.com/ory/hydra/commit/78c52477ccc7b988c4bbead069fd44dc4c5b5e4f)):
+
+    This reverts commit 0d85446596fc37ff9f134c61eacc230560a3985b.
+
+* Revert "chore: synchronize workspaces" ([5b4b4f1](https://github.com/ory/hydra/commit/5b4b4f145f33a7602e85317f74a62618ed290b31)):
+
+    This reverts commit ef6f0a84ea2c7ab2f60cc21608c736bba0b3288d.
+
+* Revert "chore: synchronize workspaces" ([185e54d](https://github.com/ory/hydra/commit/185e54d7aa6cc0206a87c67663aa41fe728ab062)):
+
+    This reverts commit 9d222e5f57e930c76e4fcae0278f98743051f913.
+
+* Revert "Update .docker/README.md" ([47f6115](https://github.com/ory/hydra/commit/47f6115122d6df3230ccfb83c9b88de09287e2c6)):
+
+    This reverts commit d9f4fab98a3d9891d79d2a8b11c53ab3f935e8ae.
+
+* Revert "Update .docker/Dockerfile-local-build" ([ea0b6e1](https://github.com/ory/hydra/commit/ea0b6e1ff652b62379fe6b04158095ebb560139c)):
+
+    This reverts commit ba9196e9cd0b1261e3872d9c86f5a6ca64dbbbbd.
+
+* Revert "chore: synchronize workspaces" ([995b4be](https://github.com/ory/hydra/commit/995b4be68e91554007c7d9fd188fe76c16e6ee5e)):
+
+    This reverts commit 5377e536fd0fd22dd0da6a5955e98429ec8ed837.
+
+* Revert "chore: synchronize workspaces" ([075af5f](https://github.com/ory/hydra/commit/075af5f9ee747db97860271cf9ac380c1446b708)):
+
+    This reverts commit ac31212182bc43c88b9eccc75358bd3e3be69dfa.
+
+* Revert "chore: synchronize workspaces" ([512ba18](https://github.com/ory/hydra/commit/512ba1806241cb2832d36364ecb9a17dd29856ac)):
+
+    This reverts commit 05b1495575c1977efcf2298ffc8b406b6e1b6fd8.
+
+* Revert "chore: synchronize workspaces" ([148612b](https://github.com/ory/hydra/commit/148612bcb6cc9755bd8eaf8430fae0f74a45a821)):
+
+    This reverts commit 6c359c356b53838a47ddddb7cc3168336131776e.
+
+
+
+# [2.3.0-pre.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0-pre.0) (2025-01-08)
+
+autogen: pin v2.3.0-pre.0 release commit
+
+
+
 ## Breaking Changes
+
+Going forward, OAuth2 Clients requesting an OpenID Connect flow **must** include the `redirect_uri` parameter or the request will be rejected.
 
 Deleting consents no longer returns 404 in certain edge cases but instead always 204.
 
@@ -721,6 +868,7 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 
 ### Bug Fixes
 
+* Advertise support for response_mode=form_post in OIDC discovery document ([#3861](https://github.com/ory/hydra/issues/3861)) ([9cc5f28](https://github.com/ory/hydra/commit/9cc5f28825bb80398a9830d4fcb220147f74504c))
 * Broken JSON round-tripping for custom claims ([b36b701](https://github.com/ory/hydra/commit/b36b701026d7d7324b0b04529f134d3ed1eb9eb7)):
 
     Adding custom claims with numerical types (think JavaScript Number) previously did not
@@ -730,7 +878,19 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
     
     Ref https://github.com/go-jose/go-jose/issues/144
 
+* Change comment on revokeOAuth2LoginSessions ([#3853](https://github.com/ory/hydra/issues/3853)) ([6d829dd](https://github.com/ory/hydra/commit/6d829ddb251f9e9f1a49a91438c1bd684e827021))
+* Change index name in down migration ([#3911](https://github.com/ory/hydra/issues/3911)) ([3a09db2](https://github.com/ory/hydra/commit/3a09db2abb978df91d875333b1eca70014cdcd10))
+* Correct span names ([554238b](https://github.com/ory/hydra/commit/554238b6da4e1d8ad690b1bf359e532382571884))
 * Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
+* Cpu contention when reading JWKs and suppress generating duplicate JWKs ([#3870](https://github.com/ory/hydra/issues/3870)) ([d5f65c5](https://github.com/ory/hydra/commit/d5f65c570a02a999867f323630d2a5d099526054)):
+
+    Previously each concurrent caller would need to lock a shared mutex when reading or writing a given JWK set.
+    The read path now doesn't require locking a mutex at all and instead returns valid query results directly.
+    
+    The write path is now protected by a concurrency control mechanism (using x/sync/singleflight) to ensure only one JWK set is generated and persisted.
+    
+    Note: Duplicate JWK sets may still be improperly generated if running more than one Hydra instance in a high traffic environment.
+
 * Do not iteratively delete records ([#3766](https://github.com/ory/hydra/issues/3766)) ([5ef20a2](https://github.com/ory/hydra/commit/5ef20a2a2bc91ccde79517667ae4bf4a36c833ba)):
 
     Resolves performance issues on some databases when deleting consent.
@@ -746,23 +906,112 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 
 * Incorrect context passthru ([fa50e3e](https://github.com/ory/hydra/commit/fa50e3e999ef962fb522dfa2f9a1f6ffa20848bf))
 * Incorrect indices ([#3778](https://github.com/ory/hydra/issues/3778)) ([cb0004b](https://github.com/ory/hydra/commit/cb0004b67b2818b3bca397e98c1bb5bcbb62296f))
+* Limit HTTP response size ([2559819](https://github.com/ory/hydra/commit/25598191ee862b764ff160755b79fab0e95e5136))
+* Omit explicit transaction in ConfirmLoginSession and add tracing ([#3886](https://github.com/ory/hydra/issues/3886)) ([a5b2d75](https://github.com/ory/hydra/commit/a5b2d75d4eeab6f26561f7a63cec24ccc7ed1127))
+* Pass context to database ping ([fa21711](https://github.com/ory/hydra/commit/fa217119494e56b043810cd5ba8e8e230a24ea94))
+* Require `redirect_uri` in openid requests ([#3900](https://github.com/ory/hydra/issues/3900)) ([5caa629](https://github.com/ory/hydra/commit/5caa6293b155a0ebe069d64d7db056ae8e5aa4b0)):
+
+    Resolves a deviation from the OpenID Connect spec, where the `redirect_uri` was not required when performing flows with `scope=openid`.
+
+* Untyped int build issues on 32bit architectures ([#3885](https://github.com/ory/hydra/issues/3885)) ([68aa167](https://github.com/ory/hydra/commit/68aa16725f529136d3f7d0282158ff8c9b11bd22))
 * Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
 * Use docker compose rather than docker-compose ([#3815](https://github.com/ory/hydra/issues/3815)) ([ffdfb73](https://github.com/ory/hydra/commit/ffdfb7362a8de6f6f0608879bf034602f01ea250))
 * Wrap authorize response in transaction ([#3763](https://github.com/ory/hydra/issues/3763)) ([5b106aa](https://github.com/ory/hydra/commit/5b106aadb0e71add56e3cc68e5a9e33cdb81dd39))
 * Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))
 
+### Code Generation
+
+* Pin v2.3.0-pre.0 release commit ([7d861bd](https://github.com/ory/hydra/commit/7d861bda2257b9e9e9ce59418d534fb17685397b))
+
 ### Features
 
 * Add access token strategy parameter to cli ([#3718](https://github.com/ory/hydra/issues/3718)) ([7862dc3](https://github.com/ory/hydra/commit/7862dc337aba2899bdb945e94eb79d3ab3509202)), closes [#3717](https://github.com/ory/hydra/issues/3717)
+* Add expiry and requested times to logout table ([#3837](https://github.com/ory/hydra/issues/3837)) ([f83193f](https://github.com/ory/hydra/commit/f83193f90814691d10d88493eb6357cf37565115))
 * Add id parameter to create oauth2-client cli ([#3725](https://github.com/ory/hydra/issues/3725)) ([b372fd2](https://github.com/ory/hydra/commit/b372fd20169156efd7c34710f823e0c5b5dbf183)):
 
     Fixes https://github.com/ory/hydra/issues/3724
 
 * Add Inspect option to registry ([2013450](https://github.com/ory/hydra/commit/2013450a9a55af26523554c3aa01fc5243573f2c))
+* Add migrate sql up|down|status ([#3894](https://github.com/ory/hydra/issues/3894)) ([d27882f](https://github.com/ory/hydra/commit/d27882faf16cd8997c15d8facc1c190dff620a8e)):
+
+    This patch adds the ability to execute down migrations using:
+    
+    ```
+    hydra migrate sql down -e --steps {num_of_steps}
+    ```
+    
+    Please read `hydra migrate sql down --help` carefully.
+    
+    Going forward, please use the following commands
+    
+    ```
+    hydra migrate sql up ...
+    hydra migrate sql status ...
+    ```
+    
+    instead of the previous, now deprecated
+    
+    ```
+    hydra migrate sql ...
+    hydra migrate status ...
+    ```
+    
+    commands.
+    
+    See https://github.com/ory-corp/cloud/issues/7350
+
+* Built-in login/consent UI for `hydra perform authorization-code` ([#3845](https://github.com/ory/hydra/issues/3845)) ([7f8bd90](https://github.com/ory/hydra/commit/7f8bd90c2ccbf8be553d526890459f85940c8e99))
+* Graceful refresh token rotation ([#3860](https://github.com/ory/hydra/issues/3860)) ([e278b40](https://github.com/ory/hydra/commit/e278b405e53f6e00f3012a49f14938443d6e7882)), closes [#1831](https://github.com/ory/hydra/issues/1831) [#3770](https://github.com/ory/hydra/issues/3770):
+
+    This patch adds a configuration flag which enables graceful refresh token rotation. Previously, refresh tokens could only be used once. On reuse, all tokens of that chain would be revoked.
+    
+    This is particularly challenging in environments, where it's difficult to make guarantees on synchronization. This could lead to refresh tokens being sent twice due to some parallel execution.
+    
+    To resolve this, refresh tokens can now be graceful by changing `oauth2.grant.refresh_token.grace_period=10s` (example value). During this time, a refresh token can be used multiple times to generate new refresh, ID, and access tokens.
+    
+    All tokens will correctly be invalidated, when the refresh token is re-used after the grace period expires, or when the delete consent endpoint is used.
+
+* Handle concurrent refreshes and improve graceful refreshing ([#3895](https://github.com/ory/hydra/issues/3895)) ([0a6c966](https://github.com/ory/hydra/commit/0a6c96620674e880cfbff2e077f7faf12ca0e446)):
+
+    This patch improves Ory Hydra's ability to deal with refresh flows which, for example, concurrently refresh the same token. Furthermore, graceful token refresh has been improved to handle a variety of edge cases and scenarios.
+    
+    Additionally, serializability errors in CockroachDB are now correctly retried.
+    
+    See https://github.com/ory-corp/cloud/issues/7311
+    Closes https://github.com/ory/hydra/pull/3895
+
 * Improve persistence logic ([#3756](https://github.com/ory/hydra/issues/3756)) ([50301e0](https://github.com/ory/hydra/commit/50301e0022ca64c9d0823544c7b664309620c70e))
+* Reduce size of verifiers ([#3857](https://github.com/ory/hydra/issues/3857)) ([0cd00dc](https://github.com/ory/hydra/commit/0cd00dcb0e1390165ae94631fef3980f5b8df40e))
+* Remove unused indices ([#3859](https://github.com/ory/hydra/issues/3859)) ([56fc3da](https://github.com/ory/hydra/commit/56fc3da6297eab16e2aa65818dd149104557b332))
+* Support more claims in password grant ([#3864](https://github.com/ory/hydra/issues/3864)) ([41476ec](https://github.com/ory/hydra/commit/41476ec06275bc348ed4117e9e0223d04bdebfa5)):
+
+    For the resource owner password grant, the Kratos identity ID is now written to the sub claim, and the username is written to the ext.username claim. Further, token hooks are called for the initial token issuance as well as refresh flows for access tokens issued via the resource owner password grant, allowing users to customize the fields present in the access token (for the jwt strategy) as well as on introspection.
+
+* Update clients from files through the CLI ([#3874](https://github.com/ory/hydra/issues/3874)) ([f777fd1](https://github.com/ory/hydra/commit/f777fd1ac1047575624924d9243f6e532af4f538))
+* Upgrade to jackc/pgx/v5 ([#3798](https://github.com/ory/hydra/issues/3798)) ([cd7e7ef](https://github.com/ory/hydra/commit/cd7e7eff910441f40382f7b71b3fbfae26b6641a))
+
+### Reverts
+
+* Change comment on revokeOAuth2LoginSessions ([#3853](https://github.com/ory/hydra/issues/3853)) ([#3858](https://github.com/ory/hydra/issues/3858)) ([8263ef4](https://github.com/ory/hydra/commit/8263ef4fc9130d26e0e6d165f76cf0d8b2d1474a)):
+
+    See https://github.com/orgs/ory/discussions/118
+
+* Cpu contention when reading JWKs and suppress generating duplicates ([#3876](https://github.com/ory/hydra/issues/3876)) ([0ce9d7a](https://github.com/ory/hydra/commit/0ce9d7a0d479222951fdf1cde3367e7b91228a45)):
+
+    This reverts commit d5f65c570a02a999867f323630d2a5d099526054.
+
+* Reduce size of verifiers ([#3875](https://github.com/ory/hydra/issues/3875)) ([7b82361](https://github.com/ory/hydra/commit/7b82361a2099ab9cbc7c9b3d5b32e9b599ea24eb)):
+
+    feat: store client in challenge/verified and reduce DB load.
+
+
+### Tests
+
+* Patch oauth2 snapshot ([#3867](https://github.com/ory/hydra/issues/3867)) ([db095de](https://github.com/ory/hydra/commit/db095decd2168125c92fa7fb9d68cc276432e6e9))
 
 ### Unclassified
 
+* Include Requested Scopes in Webhook Requests (#3891) ([c3ff306](https://github.com/ory/hydra/commit/c3ff3061318f34fe43d71235aff035346f2c51b3)), closes [#3891](https://github.com/ory/hydra/issues/3891)
 * update doc example for get oauth2-client ([5e70cde](https://github.com/ory/hydra/commit/5e70cde872f74758e22e89466c5b41e54d475533))
 
 

@@ -1,22 +1,22 @@
 FROM alpine:3.20
 
-RUN addgroup -S ory; \
-    adduser -S ory -G ory -D -H -s /bin/nologin && \
-    apk upgrade --no-cache && \
+RUN <<HEREDOC
     apk add --no-cache --upgrade ca-certificates
+
+    # Add a user/group for nonroot with a stable UID + GID. Values are from nonroot from distroless
+    # for interoperability with other containers.
+    addgroup --system --gid 65532 nonroot
+    adduser --system --uid 65532 \
+      --gecos "nonroot User" \
+      --home /home/nonroot \
+      --ingroup nonroot \
+      --shell /sbin/nologin \
+      nonroot
+HEREDOC
 
 COPY hydra /usr/bin/hydra
 
-# set up nsswitch.conf for Go's "netgo" implementation
-# - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
-RUN echo 'hosts: files dns' > /etc/nsswitch.conf
-
-# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
-# is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite && \
-    chown ory:ory /var/lib/sqlite
-
-USER ory
+USER nonroot
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

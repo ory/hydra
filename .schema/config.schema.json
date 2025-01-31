@@ -1068,6 +1068,21 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
+            "refresh_token": {
+              "type": "object",
+              "properties": {
+                "rotation_grace_period": {
+                  "title": "Refresh Token Rotation Grace Period",
+                  "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is 5 minutes.",
+                  "default": "0s",
+                  "allOf": [
+                    {
+                      "$ref": "#/definitions/duration"
+                    }
+                  ]
+                }
+              }
+            },
             "jwt": {
               "type": "object",
               "additionalProperties": false,
@@ -1122,8 +1137,8 @@
             }
           ]
         }
-      }
-    },
+    }
+  },
     "secrets": {
       "type": "object",
       "additionalProperties": false,
@@ -1168,7 +1183,7 @@
       "examples": ["cpu"]
     },
     "tracing": {
-      "$ref": "https://raw.githubusercontent.com/ory/x/v0.0.612/otelx/config.schema.json"
+      "$ref": "https://raw.githubusercontent.com/ory/x/v0.0.675/otelx/config.schema.json"
     },
     "sqa": {
       "type": "object",

@@ -618,49 +618,72 @@ func (p *Persister) filterExpiredConsentRequests(ctx context.Context, requests [
 	return result, nil
 }
 
-func (p *Persister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithFrontChannelLogout")
-	defer otelx.End(span, &err)
-
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "front")
-}
-
-func (p *Persister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithBackChannelLogout")
-	defer otelx.End(span, &err)
-
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "back")
-}
-
-func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) (cs []client.Client, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.listUserAuthenticatedClients",
+func (p *Persister) ListClientsWithLogoutURLsForSubjectAndSID(ctx context.Context, subject, sid string) (withFrontChannelURL, withBackChannelURL []client.Client, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListClientsWithLogoutURLsForSubjectAndSID",
 		trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
-	if err := p.Connection(ctx).RawQuery(
-		/* #nosec G201 - channel can either be "front" or "back" */
-		fmt.Sprintf(`
-SELECT DISTINCT c.* FROM hydra_client as c
-JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
-WHERE
-	f.subject=? AND
-	c.%schannel_logout_uri != '' AND
-	c.%schannel_logout_uri IS NOT NULL AND
-	f.login_session_id = ? AND
-	f.nid = ? AND
-	c.nid = ?`,
-			channel,
-			channel,
-		),
-		subject,
-		sid,
-		p.NetworkID(ctx),
-		p.NetworkID(ctx),
-	).All(&cs); err != nil {
-		return nil, sqlcon.HandleError(err)
+	defer func() {
+		span.SetAttributes(
+			attribute.Int("withFrontChannelURL", len(withFrontChannelURL)),
+			attribute.Int("withBackChannelURL", len(withBackChannelURL)))
+	}()
+
+	var (
+		cols                   = pop.NewModel(new(client.Client), ctx).Columns().Readable()
+		clientTable, flowTable = p.clientFlowTableNamesWithQueryHint(p.Connection(ctx).Dialect.Name())
+
+		q = fmt.Sprintf(`
+		SELECT %s FROM %s c
+		WHERE id IN (
+			SELECT DISTINCT client_id
+			FROM %s f
+			WHERE
+				f.nid = ?
+				AND f.login_session_id = ?
+				AND f.subject = ?
+		)
+		AND	c.nid = ?
+		AND (
+			(c.frontchannel_logout_uri IS NOT NULL AND c.frontchannel_logout_uri != '')
+			OR c.backchannel_logout_uri != ''
+		)`,
+			cols.QuotedString(p.Connection(ctx).Dialect),
+			clientTable,
+			flowTable)
+
+		nid = p.NetworkID(ctx)
+		cs  []client.Client
+	)
+
+	err = p.Connection(ctx).RawQuery(q, nid, sid, subject, nid).All(&cs)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil, nil
+	}
+	if err != nil {
+		return nil, nil, sqlcon.HandleError(err)
 	}
 
-	return cs, nil
+	for _, c := range cs {
+		if c.FrontChannelLogoutURI != "" {
+			withFrontChannelURL = append(withFrontChannelURL, c)
+		}
+		if c.BackChannelLogoutURI != "" {
+			withBackChannelURL = append(withBackChannelURL, c)
+		}
+	}
+
+	return withFrontChannelURL, withBackChannelURL, nil
+}
+
+func (p *Persister) clientFlowTableNamesWithQueryHint(dialect string) (clientTable, flowTable string) {
+	switch dialect {
+	case "cockroach":
+		return "hydra_client@primary", "hydra_oauth2_flow@hydra_oauth2_flow_nid_sid_subject_idx"
+	// TODO: more
+	default:
+		return "hydra_client", "hydra_oauth2_flow"
+	}
 }
 
 func (p *Persister) CreateLogoutRequest(ctx context.Context, request *flow.LogoutRequest) (err error) {

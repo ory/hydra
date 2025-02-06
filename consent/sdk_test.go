@@ -147,13 +147,6 @@ func TestSDK(t *testing.T) {
 	_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), consentVerifier(cr4Flow))
 	require.NoError(t, err)
 
-	lur1 := test.MockLogoutRequest("testsdk-1", true, network)
-	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), lur1.Client))
-	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur1))
-
-	lur2 := test.MockLogoutRequest("testsdk-2", false, network)
-	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
-
 	cr1.ID = consentChallenge(cr1Flow)
 	crGot := execute[hydra.OAuth2ConsentRequest](t, sdk.OAuth2API.GetOAuth2ConsentRequest(ctx).ConsentChallenge(cr1.ID))
 	compareSDKConsentRequest(t, cr1, *crGot)
@@ -213,19 +206,25 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot))
 
-	luGot, _, err := sdk.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
+	lur1 := test.MockLogoutRequest("testsdk-1", true, network)
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), lur1.Client))
+	loc1, err := m.CreateLogoutChallenge(context.Background(), lur1)
+	require.NoError(t, err)
+
+	luGot, _, err := sdk.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(loc1).Execute()
 	require.NoError(t, err)
 	compareSDKLogoutRequest(t, lur1, luGot)
 
-	luaGot, _, err := sdk.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(makeID("challenge", network, "testsdk-1")).Execute()
+	luaGot, _, err := sdk.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(loc1).Execute()
 	require.NoError(t, err)
-	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier="+makeID("verifier", network, "testsdk-1"), luaGot.RedirectTo)
+	assert.Contains(t, luaGot.RedirectTo, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier=")
 
-	_, err = sdk.OAuth2API.RejectOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
+	lur2 := test.MockLogoutRequest("testsdk-2", false, network)
+	loc2, err := m.CreateLogoutChallenge(context.Background(), lur2)
 	require.NoError(t, err)
-
-	_, _, err = sdk.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(lur2.ID).Execute()
-	require.Error(t, err)
+	lur2Got, err := sdk.OAuth2API.RejectOAuth2LogoutRequest(ctx).LogoutChallenge(loc2).Execute()
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusNoContent, lur2Got.StatusCode)
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got hydra.OAuth2LoginRequest) {

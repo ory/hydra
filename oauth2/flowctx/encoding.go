@@ -27,6 +27,8 @@ const (
 	loginVerifier
 	consentChallenge
 	consentVerifier
+	logoutChallenge
+	logoutVerifier
 )
 
 func withPurpose(purpose purpose) CodecOption { return func(ad *data) { ad.Purpose = purpose } }
@@ -36,6 +38,8 @@ var (
 	AsLoginVerifier    = withPurpose(loginVerifier)
 	AsConsentChallenge = withPurpose(consentChallenge)
 	AsConsentVerifier  = withPurpose(consentVerifier)
+	AsLogoutChallenge  = withPurpose(logoutChallenge)
+	AsLogoutVerifier   = withPurpose(logoutVerifier)
 )
 
 func additionalDataFromOpts(opts ...CodecOption) []byte {

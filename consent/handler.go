@@ -911,9 +911,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 // Accept OAuth 2.0 Logout Request
 //
 // swagger:parameters acceptOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type acceptOAuth2LogoutRequest struct {
+type _ struct {
 	// OAuth 2.0 Logout Request Challenge
 	//
 	// in: query
@@ -943,23 +941,21 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		r.URL.Query().Get("challenge"),
 	)
 
-	c, err := h.r.ConsentManager().AcceptLogoutRequest(r.Context(), challenge)
+	verifier, err := h.r.ConsentManager().AcceptLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {verifier}}).String(),
 	})
 }
 
 // Reject OAuth 2.0 Logout Request
 //
 // swagger:parameters rejectOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type rejectOAuth2LogoutRequest struct {
+type _ struct {
 	// in: query
 	// required: true
 	Challenge string `json:"logout_challenge"`
@@ -999,9 +995,7 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Logout Request
 //
 // swagger:parameters getOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getOAuth2LogoutRequest struct {
+type _ struct {
 	// in: query
 	// required: true
 	Challenge string `json:"logout_challenge"`
@@ -1037,13 +1031,6 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 	// We do not want to share the secret so remove it.
 	if request.Client != nil {
 		request.Client.Secret = ""
-	}
-
-	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
-			RedirectTo: request.RequestURL,
-		})
-		return
 	}
 
 	h.r.Writer().Write(w, r, request)

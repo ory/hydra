@@ -53,7 +53,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
-	oauth2Config := func(t *testing.T, c *client.Client) *oauth2.Config {
+	oauth2Config := func(_ *testing.T, c *client.Client) *oauth2.Config {
 		return &oauth2.Config{
 			ClientID:     c.GetID(),
 			ClientSecret: c.Secret,

@@ -4,14 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Challenge** | Pointer to **string** | Challenge is the identifier (\&quot;logout challenge\&quot;) of the logout authentication request. It is used to identify the session. | [optional] 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **ExpiresAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Logout URL requested. | [optional] 
 **RequestedAt** | Pointer to **time.Time** |  | [optional] 
 **RpInitiated** | Pointer to **bool** | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client. | [optional] 
 **Sid** | Pointer to **string** | SessionID is the login session ID that was requested to log out. | [optional] 
-**Subject** | Pointer to **string** | Subject is the user for whom the logout was request. | [optional] 
+**Subject** | Pointer to **string** | Subject is the user for whom the logout was requested. | [optional] 
 
 ## Methods
 
@@ -31,31 +30,6 @@ will change when the set of required properties is changed
 NewOAuth2LogoutRequestWithDefaults instantiates a new OAuth2LogoutRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetChallenge
-
-`func (o *OAuth2LogoutRequest) GetChallenge() string`
-
-GetChallenge returns the Challenge field if non-nil, zero value otherwise.
-
-### GetChallengeOk
-
-`func (o *OAuth2LogoutRequest) GetChallengeOk() (*string, bool)`
-
-GetChallengeOk returns a tuple with the Challenge field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetChallenge
-
-`func (o *OAuth2LogoutRequest) SetChallenge(v string)`
-
-SetChallenge sets Challenge field to given value.
-
-### HasChallenge
-
-`func (o *OAuth2LogoutRequest) HasChallenge() bool`
-
-HasChallenge returns a boolean if a field has been set.
 
 ### GetClient
 

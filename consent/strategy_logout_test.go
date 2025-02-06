@@ -157,20 +157,21 @@ func TestLogoutFlows(t *testing.T) {
 		return &wg
 	}
 
-	setupCheckAndAcceptLogoutHandler := func(t *testing.T, wg *sync.WaitGroup, cb func(*testing.T, *hydra.OAuth2LogoutRequest, error)) {
+	setupCheckAndAcceptLogoutHandler := func(t *testing.T, wg *sync.WaitGroup, cb func(_ *testing.T, challenge string, _ *hydra.OAuth2LogoutRequest, _ error)) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if wg != nil {
 				defer wg.Done()
 			}
 
-			res, _, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			challenge := r.URL.Query().Get("logout_challenge")
+			res, _, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(challenge).Execute()
 			if cb != nil {
-				cb(t, res, err)
+				cb(t, challenge, res, err)
 			} else {
 				require.NoError(t, err)
 			}
 
-			v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(r.URL.Query().Get("logout_challenge")).Execute()
+			v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(challenge).Execute()
 			require.NoError(t, err)
 			require.NotEmpty(t, v.RedirectTo)
 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
@@ -244,7 +245,7 @@ func TestLogoutFlows(t *testing.T) {
 		acceptLoginAs(t, subject)
 
 		wg := newWg(2)
-		setupCheckAndAcceptLogoutHandler(t, wg, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
+		setupCheckAndAcceptLogoutHandler(t, wg, func(t *testing.T, challenge string, res *hydra.OAuth2LogoutRequest, err error) {
 			require.NoError(t, err)
 			assert.EqualValues(t, subject, *res.Subject)
 			assert.NotEmpty(t, subject, res.Sid)
@@ -277,20 +278,19 @@ func TestLogoutFlows(t *testing.T) {
 		acceptLoginAs(t, subject)
 		browser := createBrowserWithSession(t, createSampleClient(t))
 
-		var logoutReq *hydra.OAuth2LogoutRequest
-		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, req *hydra.OAuth2LogoutRequest, err error) {
+		var logoutChallenge string
+		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, challenge string, _ *hydra.OAuth2LogoutRequest, err error) {
 			require.NoError(t, err)
-			logoutReq = req
+			logoutChallenge = challenge
 		})
 
 		// run once to log out
 		logoutAndExpectPostLogoutPage(t, browser, http.MethodGet, url.Values{}, defaultRedirectedMessage)
 
-		// run again to ensure that the logout challenge is invalid
-		_, _, err := adminApi.OAuth2API.GetOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
-		assert.Error(t, err)
+		require.NotZero(t, logoutChallenge)
 
-		v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutReq.GetChallenge()).Execute()
+		// double-submit: still works
+		v, _, err := adminApi.OAuth2API.AcceptOAuth2LogoutRequest(ctx).LogoutChallenge(logoutChallenge).Execute()
 		require.NoError(t, err)
 		require.NotEmpty(t, v.RedirectTo)
 
@@ -485,7 +485,7 @@ func TestLogoutFlows(t *testing.T) {
 		c := createSampleClient(t)
 		acceptLoginAs(t, subject)
 
-		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, res *hydra.OAuth2LogoutRequest, err error) {
+		setupCheckAndAcceptLogoutHandler(t, nil, func(t *testing.T, _ string, _ *hydra.OAuth2LogoutRequest, _ error) {
 			t.Fatalf("Logout should not have been called")
 		})
 		browser := createBrowserWithSession(t, c)

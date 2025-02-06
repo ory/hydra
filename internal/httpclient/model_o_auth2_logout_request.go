@@ -21,8 +21,6 @@ var _ MappedNullable = &OAuth2LogoutRequest{}
 
 // OAuth2LogoutRequest struct for OAuth2LogoutRequest
 type OAuth2LogoutRequest struct {
-	// Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to identify the session.
-	Challenge *string       `json:"challenge,omitempty"`
 	Client    *OAuth2Client `json:"client,omitempty"`
 	ExpiresAt *time.Time    `json:"expires_at,omitempty"`
 	// RequestURL is the original Logout URL requested.
@@ -32,7 +30,7 @@ type OAuth2LogoutRequest struct {
 	RpInitiated *bool `json:"rp_initiated,omitempty"`
 	// SessionID is the login session ID that was requested to log out.
 	Sid *string `json:"sid,omitempty"`
-	// Subject is the user for whom the logout was request.
+	// Subject is the user for whom the logout was requested.
 	Subject *string `json:"subject,omitempty"`
 }
 
@@ -51,38 +49,6 @@ func NewOAuth2LogoutRequest() *OAuth2LogoutRequest {
 func NewOAuth2LogoutRequestWithDefaults() *OAuth2LogoutRequest {
 	this := OAuth2LogoutRequest{}
 	return &this
-}
-
-// GetChallenge returns the Challenge field value if set, zero value otherwise.
-func (o *OAuth2LogoutRequest) GetChallenge() string {
-	if o == nil || IsNil(o.Challenge) {
-		var ret string
-		return ret
-	}
-	return *o.Challenge
-}
-
-// GetChallengeOk returns a tuple with the Challenge field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OAuth2LogoutRequest) GetChallengeOk() (*string, bool) {
-	if o == nil || IsNil(o.Challenge) {
-		return nil, false
-	}
-	return o.Challenge, true
-}
-
-// HasChallenge returns a boolean if a field has been set.
-func (o *OAuth2LogoutRequest) HasChallenge() bool {
-	if o != nil && !IsNil(o.Challenge) {
-		return true
-	}
-
-	return false
-}
-
-// SetChallenge gets a reference to the given string and assigns it to the Challenge field.
-func (o *OAuth2LogoutRequest) SetChallenge(v string) {
-	o.Challenge = &v
 }
 
 // GetClient returns the Client field value if set, zero value otherwise.
@@ -319,9 +285,6 @@ func (o OAuth2LogoutRequest) MarshalJSON() ([]byte, error) {
 
 func (o OAuth2LogoutRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Challenge) {
-		toSerialize["challenge"] = o.Challenge
-	}
 	if !IsNil(o.Client) {
 		toSerialize["client"] = o.Client
 	}

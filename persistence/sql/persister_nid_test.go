@@ -83,29 +83,6 @@ func (s *PersisterTestSuite) TearDownTest() {
 	}
 }
 
-func (s *PersisterTestSuite) TestAcceptLogoutRequest() {
-	t := s.T()
-	lr := newLogoutRequest()
-
-	for k, r := range s.registries {
-		t.Run("dialect="+k, func(*testing.T) {
-			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
-
-			expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.Equal(t, false, expected.Accepted)
-
-			lrAccepted, err := r.ConsentManager().AcceptLogoutRequest(s.t2, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, lrAccepted)
-
-			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.Equal(t, expected, actual)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestAddKeyGetKeyDeleteKey() {
 	t := s.T()
 	key := newKey("test-ks", "test")
@@ -456,27 +433,6 @@ func (s *PersisterTestSuite) TestCreateLoginSession() {
 		})
 	}
 }
-
-func (s *PersisterTestSuite) TestCreateLogoutRequest() {
-	t := s.T()
-	for k, r := range s.registries {
-		t.Run(k, func(t *testing.T) {
-			client := &client.Client{ID: "client-id"}
-			lr := flow.LogoutRequest{
-				// TODO there is not FK for SessionID so we don't need it here; TODO make sure the missing FK is intentional
-				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: client.ID},
-			}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateLogoutRequest(s.t1, &lr))
-			actual, err := r.Persister().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.Equal(t, s.t1NID, actual.NID)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestCreateOpenIDConnectSession() {
 	t := s.T()
 	for k, r := range s.registries {
@@ -1236,30 +1192,6 @@ func (s *PersisterTestSuite) TestGetLoginRequest() {
 	}
 }
 
-func (s *PersisterTestSuite) TestGetLogoutRequest() {
-	t := s.T()
-	for k, r := range s.registries {
-		t.Run(k, func(t *testing.T) {
-			client := &client.Client{ID: "client-id"}
-			lr := flow.LogoutRequest{
-				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: client.ID},
-			}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateLogoutRequest(s.t1, &lr))
-
-			actual, err := r.Persister().GetLogoutRequest(s.t2, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, actual)
-
-			actual, err = r.Persister().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.NotEqual(t, &flow.LogoutRequest{}, actual)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestGetOpenIDConnectSession() {
 	t := s.T()
 	for k, r := range s.registries {
@@ -1723,27 +1655,6 @@ func (s *PersisterTestSuite) TestQueryWithNetwork() {
 		})
 	}
 }
-
-func (s *PersisterTestSuite) TestRejectLogoutRequest() {
-	t := s.T()
-	for k, r := range s.registries {
-		t.Run(k, func(t *testing.T) {
-			lr := newLogoutRequest()
-			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
-
-			require.Error(t, r.ConsentManager().RejectLogoutRequest(s.t2, lr.ID))
-			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.Equal(t, lr, actual)
-
-			require.NoError(t, r.ConsentManager().RejectLogoutRequest(s.t1, lr.ID))
-			actual, err = r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-			require.Error(t, err)
-			require.Equal(t, &flow.LogoutRequest{}, actual)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestRevokeAccessToken() {
 	t := s.T()
 	for k, r := range s.registries {
@@ -2136,62 +2047,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
 	}
 }
 
-func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
-	t := s.T()
-	for k, r := range s.registries {
-		t.Run(k, func(t *testing.T) {
-			run := func(t *testing.T, lr *flow.LogoutRequest) {
-				lr.Verifier = uuid.Must(uuid.NewV4()).String()
-				lr.Accepted = true
-				lr.Rejected = false
-				require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
-
-				expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-				require.NoError(t, err)
-
-				lrInvalidated, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
-				require.Error(t, err)
-				require.Nil(t, lrInvalidated)
-				actual := &flow.LogoutRequest{}
-				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
-				require.Equal(t, expected, actual)
-
-				lrInvalidated, err = r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
-				require.NoError(t, err)
-				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
-				require.Equal(t, lrInvalidated, actual)
-				require.Equal(t, true, actual.WasHandled)
-			}
-
-			t.Run("case=legacy logout request without expiry", func(t *testing.T) {
-				lr := newLogoutRequest()
-				run(t, lr)
-			})
-
-			t.Run("case=logout request with expiry", func(t *testing.T) {
-				lr := newLogoutRequest()
-				lr.ExpiresAt = sqlxx.NullTime(time.Now().Add(time.Hour))
-				run(t, lr)
-			})
-
-			t.Run("case=logout request that expired returns error", func(t *testing.T) {
-				lr := newLogoutRequest()
-				lr.ExpiresAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Hour))
-				lr.Verifier = uuid.Must(uuid.NewV4()).String()
-				lr.Accepted = true
-				lr.Rejected = false
-				require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
-
-				_, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
-				require.ErrorIs(t, err, x.ErrNotFound)
-
-				_, err = r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
-				require.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
-			})
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	t := s.T()
 	for k, r := range s.registries {
@@ -2251,12 +2106,6 @@ func newGrant(keySet string, keyID string) trust.Grant {
 			Set:   keySet,
 			KeyID: keyID,
 		},
-	}
-}
-
-func newLogoutRequest() *flow.LogoutRequest {
-	return &flow.LogoutRequest{
-		ID: uuid.Must(uuid.NewV4()).String(),
 	}
 }
 

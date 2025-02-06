@@ -21,14 +21,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
@@ -883,21 +882,18 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 			return nil, err
 		}
 
-		challenge := uuid.New()
-		if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &flow.LogoutRequest{
-			RequestURL:  r.URL.String(),
-			ID:          challenge,
-			Subject:     session.Subject,
-			SessionID:   session.ID,
-			Verifier:    uuid.New(),
-			RequestedAt: sqlxx.NullTime(time.Now().UTC().Round(time.Second)),
-			ExpiresAt:   sqlxx.NullTime(time.Now().UTC().Round(time.Second).Add(s.c.ConsentRequestMaxAge(ctx))),
-			RPInitiated: false,
-
-			// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+		now := time.Now().UTC().Round(time.Second)
+		challenge, err := s.r.ConsentManager().CreateLogoutChallenge(ctx, &flow.LogoutRequest{
+			RequestURL:            r.URL.String(),
+			Subject:               session.Subject,
+			SessionID:             session.ID,
+			RequestedAt:           now,
+			ExpiresAt:             now.Add(s.c.ConsentRequestMaxAge(ctx)),
+			RPInitiated:           false,
 			PostLogoutRedirectURI: redir,
-		}); err != nil {
-			return nil, err
+		})
+		if err != nil {
+			return nil, errors.WithStack(err)
 		}
 
 		s.r.AuditLogger().
@@ -923,13 +919,13 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		)
 	}
 
-	now := time.Now().UTC().Unix()
-	if !claims.VerifyIssuedAt(now, true) {
+	now := time.Now().UTC().Round(time.Second)
+	if !claims.VerifyIssuedAt(now.Unix(), true) {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.
 			WithHintf(
 				`Logout failed because iat claim value '%.0f' from query parameter id_token_hint is before now ('%d').`,
 				mapx.GetFloat64Default(mksi, "iat", float64(0)),
-				now,
+				now.Unix(),
 			),
 		)
 	}
@@ -967,6 +963,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.
 			WithHint("Logout failed because none of the listed audiences is a registered OAuth 2.0 Client."))
 	}
+	cl.Secret = "" // We don't want to expose the client secret.
 
 	if len(requestedRedir) > 0 {
 		var f *url.URL
@@ -1007,20 +1004,19 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		return nil, err
 	}
 
-	challenge := uuid.New()
-	if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &flow.LogoutRequest{
-		RequestURL:  r.URL.String(),
-		ID:          challenge,
-		SessionID:   hintSid,
-		Subject:     session.Subject,
-		Verifier:    uuid.New(),
-		Client:      cl,
-		RPInitiated: true,
-
-		// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+	now = time.Now().UTC().Round(time.Second)
+	challenge, err := s.r.ConsentManager().CreateLogoutChallenge(ctx, &flow.LogoutRequest{
+		RequestURL:            r.URL.String(),
+		Subject:               session.Subject,
+		SessionID:             hintSid,
+		RequestedAt:           now,
+		ExpiresAt:             now.Add(s.c.ConsentRequestMaxAge(ctx)),
+		RPInitiated:           true,
 		PostLogoutRedirectURI: redir,
-	}); err != nil {
-		return nil, err
+		Client:                cl,
+	})
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
 	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)

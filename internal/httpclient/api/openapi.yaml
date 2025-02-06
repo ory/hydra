@@ -3867,20 +3867,18 @@ components:
         sid: sid
       properties:
         challenge:
-          description: Challenge is the identifier of the logout authentication request.
+          description: Challenge is used to retrieve/accept/deny the logout request.
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'
         expires_at:
           format: date-time
-          title: NullTime implements sql.NullTime functionality.
           type: string
         request_url:
           description: RequestURL is the original Logout URL requested.
           type: string
         requested_at:
           format: date-time
-          title: NullTime implements sql.NullTime functionality.
           type: string
         rp_initiated:
           description: "RPInitiated is set to true if the request was initiated by\
@@ -3891,7 +3889,7 @@ components:
             out.
           type: string
         subject:
-          description: Subject is the user for whom the logout was request.
+          description: Subject is the user for whom the logout was requested.
           type: string
       title: Contains information about an ongoing logout request.
       type: object

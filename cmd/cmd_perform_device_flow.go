@@ -25,7 +25,7 @@ func NewPerformDeviceCodeCmd() *cobra.Command {
 		Example: "{{ .CommandPath }} --client-id ... --client-secret ...",
 		Short:   "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Device Code Flow",
 		Long: `Performs the device code flow. Useful for getting an access token and an ID token in machines without a browser.
-		The client that will be used MUST support the "client_secret_post" token-endpoint-auth-method
+The client that will be used MUST support the "client_secret_post" token-endpoint-auth-method.
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, endpoint, err := cliclient.NewClient(cmd)
@@ -68,16 +68,22 @@ func NewPerformDeviceCodeCmd() *cobra.Command {
 				Scopes: scopes,
 			}
 
-			deviceAuthResponse, err := conf.DeviceAuth(
-				ctx,
-				oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
-				oauth2.SetAuthURLParam("client_secret", clientSecret),
-			)
-			if err != nil {
-				cmdx.Fatalf("Failed to perform the device authorization request", err.Error())
+			params := []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("audience", strings.Join(audience, "+"))}
+			if clientSecret != "" {
+				params = append(params, oauth2.SetAuthURLParam("client_secret", clientSecret))
 			}
 
-			fmt.Fprintln(
+			deviceAuthResponse, err := conf.DeviceAuth(
+				ctx,
+				params...,
+			)
+			if err != nil {
+				_, _ = fmt.Fprintf(
+					cmd.ErrOrStderr(), "Failed to perform the device authorization request: %s", err)
+				return cmdx.FailSilently(cmd)
+			}
+
+			_, _ = fmt.Fprintln(
 				cmd.OutOrStdout(),
 				"To login please go to:\n\t",
 				deviceAuthResponse.VerificationURIComplete,
@@ -85,7 +91,9 @@ func NewPerformDeviceCodeCmd() *cobra.Command {
 
 			token, err := conf.DeviceAccessToken(ctx, deviceAuthResponse)
 			if err != nil {
-				cmdx.Fatalf("Failed to perform the device token request: %e", err.Error())
+				_, _ = fmt.Fprintf(
+					cmd.ErrOrStderr(), "Failed to perform the device token request: %s", err)
+				return cmdx.FailSilently(cmd)
 			}
 
 			fmt.Println("Successfully signed in!")

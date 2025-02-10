@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
   device_code_signature VARCHAR(255)  NOT NULL,
   user_code_signature   VARCHAR(255)  NOT NULL,
   request_id            VARCHAR(40)   NOT NULL,
-  requested_at          TIMESTAMP     NOT NULL DEFAULT NOW(),
+  requested_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   client_id             VARCHAR(255)  NOT NULL,
   scope                 VARCHAR(1024) NOT NULL,
   granted_scope         VARCHAR(1024) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
   granted_audience      VARCHAR(1024) NOT NULL,
   challenge_id          VARCHAR(40)   NULL,
   expires_at            TIMESTAMP     NULL,
-  nid                   CHAR(36)      NOT NULL,
+  nid                   UUID          NOT NULL,
 
   FOREIGN KEY (client_id, nid) REFERENCES hydra_client (id, nid) ON DELETE CASCADE,
   FOREIGN KEY (nid) REFERENCES networks (id) ON UPDATE RESTRICT ON DELETE CASCADE,
@@ -40,7 +40,7 @@ ALTER TABLE hydra_oauth2_flow
 ALTER TABLE hydra_oauth2_flow
   ADD COLUMN device_user_code_accepted_at TIMESTAMP NULL;
 ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_was_used BOOL NULL;
+  ADD COLUMN device_was_used BOOLEAN NULL;
 ALTER TABLE hydra_oauth2_flow
   ADD COLUMN device_handled_at TIMESTAMP NULL;
 ALTER TABLE hydra_oauth2_flow

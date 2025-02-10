@@ -816,22 +816,29 @@
             "/ui/logout"
           ]
         },
-        "device_verification": {
-          "type": "string",
-          "description": "Sets the device verification URL. Defaults to an internal fallback URL showing an error.",
-          "format": "uri-reference",
-          "examples": [
-            "https://my-app/device",
-            "/ui/device"
-          ]
-        },
-        "device_verification_success": {
-          "type": "string",
-          "description": "When a user completes an authentication flow initiated by a device, they will be redirected to this url afterwards.",
-          "format": "uri-reference",
-          "examples": [
-            "https://my-app/device/post"
-          ]
+        "device": {
+          "type": "object",
+          "description": "Configure URLs for the OAuth 2.0 Device Code Flow.",
+          "properties": {
+            "verification": {
+              "type": "string",
+              "description": "Sets the device user code verification endpoint. Defaults to an internal fallback URL showing an error.",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-logout.app/device_verification",
+                "/ui/device_verification"
+              ]
+            },
+            "success": {
+              "type": "string",
+              "description": "Sets the post device authentication endpoint. Defaults to an internal fallback URL showing an error.",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-logout.app/device_done",
+                "/ui/device_done"
+              ]
+            }
+          }
         },
         "error": {
           "type": "string",

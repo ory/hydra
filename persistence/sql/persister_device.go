@@ -153,27 +153,25 @@ func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSi
 	}, nil
 }
 
-func (p *Persister) createDeviceAuthSession(ctx context.Context, deviceCodeSignature, userCodeSignature string, requester fosite.DeviceRequester, expiresAt time.Time) error {
-	req, err := p.sqlDeviceSchemaFromRequest(ctx, deviceCodeSignature, userCodeSignature, requester, expiresAt)
+// CreateDeviceCodeSession creates a new device code session and stores it in the database
+func (p *Persister) CreateDeviceAuthSession(ctx context.Context, deviceCodeSignature, userCodeSignature string, requester fosite.DeviceRequester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
+	defer otelx.End(span, &err)
+
+	req, err := p.sqlDeviceSchemaFromRequest(ctx, deviceCodeSignature, userCodeSignature, requester, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
 	if err != nil {
 		return err
 	}
 
-	if err = sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 	} else if errors.Is(err, sqlcon.ErrUniqueViolation) {
 		return errors.Wrap(fosite.ErrExistingUserCodeSignature, err.Error())
 	} else if err != nil {
 		return err
 	}
-	return nil
-}
 
-// CreateDeviceCodeSession creates a new device code session and stores it in the database
-func (p *Persister) CreateDeviceAuthSession(ctx context.Context, deviceCodeSignature, userCodeSignature string, requester fosite.DeviceRequester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
-	defer otelx.End(span, &err)
-	return p.createDeviceAuthSession(ctx, deviceCodeSignature, userCodeSignature, requester, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
+	return nil
 }
 
 // UpdateDeviceCodeSessionBySignature updates a device code session by the device_code signature
@@ -192,12 +190,14 @@ func (p *Persister) UpdateDeviceCodeSessionBySignature(ctx context.Context, sign
 	)
 
 	/* #nosec G201 table is static */
-	err = p.Connection(ctx).RawQuery(stmt, req.GrantedScope, req.GrantedAudience, req.Session, req.UserCodeState, req.Subject, req.ConsentChallenge, signature, p.NetworkID(ctx)).Exec()
-	if err != nil {
-		return sqlcon.HandleError(err)
-	}
-
-	return nil
+	return sqlcon.HandleError(
+		p.Connection(ctx).RawQuery(stmt,
+			req.GrantedScope, req.GrantedAudience,
+			req.Session, req.UserCodeState,
+			req.Subject, req.ConsentChallenge,
+			signature, p.NetworkID(ctx),
+		).Exec(),
+	)
 }
 
 // GetDeviceCodeSession returns a device code session from the database
@@ -206,13 +206,12 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 	defer otelx.End(span, &err)
 
 	r := DeviceRequestSQL{}
-	err = p.QueryWithNetwork(ctx).Where("device_code_signature = ?", signature).First(&r)
-	if errors.Is(err, sql.ErrNoRows) {
+	if err = p.QueryWithNetwork(ctx).Where("device_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrNotFound)
-	}
-	if err != nil {
+	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
+
 	if !r.DeviceCodeActive {
 		fr, err := r.toRequest(ctx, session, p)
 		if err != nil {
@@ -230,13 +229,12 @@ func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, request
 	defer otelx.End(span, &err)
 
 	r := DeviceRequestSQL{}
-	err = p.QueryWithNetwork(ctx).Where("request_id = ?", requestID).First(&r)
-	if errors.Is(err, sql.ErrNoRows) {
+	if err = p.QueryWithNetwork(ctx).Where("request_id = ?", requestID).First(&r); errors.Is(err, sql.ErrNoRows) {
 		return nil, "", errorsx.WithStack(fosite.ErrNotFound)
-	}
-	if err != nil {
+	} else if err != nil {
 		return nil, "", sqlcon.HandleError(err)
 	}
+
 	if !r.DeviceCodeActive {
 		fr, err := r.toRequest(ctx, session, p)
 		if err != nil {
@@ -278,11 +276,10 @@ func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, se
 	if session == nil {
 		session = oauth2.NewSession("")
 	}
-	err = p.QueryWithNetwork(ctx).Where("user_code_signature = ?", signature).First(&r)
-	if errors.Is(err, sql.ErrNoRows) {
+
+	if err = p.QueryWithNetwork(ctx).Where("user_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
 		return nil, errorsx.WithStack(fosite.ErrNotFound)
-	}
-	if err != nil {
+	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -290,6 +287,7 @@ func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, se
 	if err != nil {
 		return nil, err
 	}
+
 	if r.UserCodeState != fosite.UserCodeUnused {
 		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
 	}

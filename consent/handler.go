@@ -1157,7 +1157,6 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	}
 
 	f.RequestURL = reqURL.String()
-
 	hr, err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

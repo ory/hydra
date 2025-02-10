@@ -1365,7 +1365,7 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 			ks := newKeySet(issuer, "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
-				ExpiresAt: time.Now().Add(time.Hour),
+				ExpiresAt: time.Now().UTC().Add(time.Hour),
 				Issuer:    issuer,
 				PublicKey: trust.PublicKey{Set: issuer, KeyID: ks.Keys[0].KeyID},
 			}

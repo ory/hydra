@@ -101,8 +101,9 @@ urls:
   consent: https://consent
   logout: https://logout
   error: https://error
-  device_verification: https://device
-  device_verification_success: https://device/callback
+  device:
+    verification: https://device
+    success: https://device/callback
   post_logout_redirect: https://post_logout
 
 strategies:

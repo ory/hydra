@@ -1193,20 +1193,33 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2DeviceAuthorizationRequest")
 	defer otelx.End(span, &err)
 
+	// This handler has the following validation states:
+	//
+	// 1. The flow is initiated (no verifiers) -> we request a device verifier (can only be achieved by solving the device challenge)
+	// 2. Device verifier is given -> we request login verifier (can only be achieved by solving the login challenge)
+	// 3. Login verifier is given -> we request consent verifier (can only be achieved by solving the consent challenge)
+	// 4. Consent verifier is given -> done.
+
 	deviceVerifier := strings.TrimSpace(r.URL.Query().Get("device_verifier"))
 	loginVerifier := strings.TrimSpace(r.URL.Query().Get("login_verifier"))
 	consentVerifier := strings.TrimSpace(r.URL.Query().Get("consent_verifier"))
 
+	ar := fosite.NewAuthorizeRequest()
+
 	var deviceFlow *flow.Flow
 	if deviceVerifier == "" && loginVerifier == "" && consentVerifier == "" {
-		// ok, we need to process this request and redirect to device auth endpoint
+		// No verifiers are set, let's start by requesting the device verifier first.
 		return nil, nil, s.requestDevice(ctx, w, r)
 	} else if deviceVerifier != "" && loginVerifier == "" && consentVerifier == "" {
+		// Device verifier is set, but login and consent are not. So we need to verify the device.
 		var err error
 		deviceFlow, err = s.verifyDevice(ctx, w, r, deviceVerifier)
 		if err != nil {
 			return nil, nil, err
 		}
+
+		ar.RequestedScope = fosite.Arguments(deviceFlow.RequestedScope)
+		ar.RequestedAudience = fosite.Arguments(deviceFlow.RequestedAudience)
 	}
 
 	// Validate client_id
@@ -1222,18 +1235,15 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	}
 
 	// Fake an authorization request to instantiate the flow.
-	ar := fosite.NewAuthorizeRequest()
 	ar.Client = c
 	ar.Form = r.Form
-	if deviceFlow != nil {
-		ar.RequestedScope = fosite.Arguments(deviceFlow.RequestedScope)
-		ar.RequestedAudience = fosite.Arguments(deviceFlow.RequestedAudience)
-	}
 
 	if loginVerifier == "" && consentVerifier == "" {
-		// ok, we need to process this request and redirect to the authentication endpoint
+		// Here we end up if the device has been verified, but login and verification are still missing.
+		// Let's request authentication.
 		return nil, nil, s.requestAuthentication(ctx, w, r, ar, deviceFlow)
 	} else if loginVerifier != "" {
+		// Login verification was given, let's verify!
 		f, err := s.verifyAuthentication(ctx, w, r, ar, loginVerifier)
 		if err != nil {
 			return nil, nil, err
@@ -1243,6 +1253,7 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 		return nil, f, s.requestConsent(ctx, w, r, ar, f)
 	}
 
+	// Here we end up when consent verifier is set, so we verify the consent.
 	var consentSession *flow.AcceptOAuth2ConsentRequest
 	var f *flow.Flow
 

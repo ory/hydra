@@ -26,6 +26,7 @@ type InternalRegistry interface {
 	persistence.Provider
 	Registry
 	FlowCipher() *aead.XChaCha20Poly1305
+	x.TracingProvider
 }
 
 type Registry interface {

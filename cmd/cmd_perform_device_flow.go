@@ -22,11 +22,10 @@ import (
 func NewPerformDeviceCodeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "device-code",
-		Example: "{{ .CommandPath }} --client-id ... --client-secret ...",
+		Example: "{{ .CommandPath }} --client-id ...",
 		Short:   "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Device Code Flow",
 		Long: `Performs the device code flow. Useful for getting an access token and an ID token in machines without a browser.
-The client that will be used MUST support the "client_secret_post" token-endpoint-auth-method.
-		`,
+The client that will be used MUST use the "none" or "client_secret_post" token-endpoint-auth-method.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, endpoint, err := cliclient.NewClient(cmd)
 			if err != nil {
@@ -43,8 +42,8 @@ The client that will be used MUST support the "client_secret_post" token-endpoin
 
 			clientID := flagx.MustGetString(cmd, "client-id")
 			if clientID == "" {
-				_, _ = fmt.Fprint(cmd.OutOrStdout(), cmd.UsageString())
-				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Please provide a Client ID using --client-id flag, or OAUTH2_CLIENT_ID environment variable.")
+				_, _ = fmt.Fprintln(cmd.ErrOrStderr(), cmd.UsageString())
+				_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Please provide a Client ID using --client-id flag, or OAUTH2_CLIENT_ID environment variable.")
 				return cmdx.FailSilently(cmd)
 			}
 
@@ -79,12 +78,12 @@ The client that will be used MUST support the "client_secret_post" token-endpoin
 			)
 			if err != nil {
 				_, _ = fmt.Fprintf(
-					cmd.ErrOrStderr(), "Failed to perform the device authorization request: %s", err)
+					cmd.ErrOrStderr(), "Failed to perform the device authorization request: %s\n", err)
 				return cmdx.FailSilently(cmd)
 			}
 
 			_, _ = fmt.Fprintln(
-				cmd.OutOrStdout(),
+				cmd.ErrOrStderr(),
 				"To login please go to:\n\t",
 				deviceAuthResponse.VerificationURIComplete,
 			)
@@ -92,11 +91,11 @@ The client that will be used MUST support the "client_secret_post" token-endpoin
 			token, err := conf.DeviceAccessToken(ctx, deviceAuthResponse)
 			if err != nil {
 				_, _ = fmt.Fprintf(
-					cmd.ErrOrStderr(), "Failed to perform the device token request: %s", err)
+					cmd.ErrOrStderr(), "Failed to perform the device token request: %s\n", err)
 				return cmdx.FailSilently(cmd)
 			}
 
-			fmt.Println("Successfully signed in!")
+			_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "Successfully signed in!")
 
 			cmdx.PrintRow(cmd, outputOAuth2Token(*token))
 			return nil

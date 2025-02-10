@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/otelx"
 	"html/template"
 	"net/http"
 	"net/url"
@@ -736,7 +737,13 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 //	  302: emptyResponse
 //	  default: errorOAuth2
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := r.Context()
+	var (
+		ctx = r.Context()
+		err error
+	)
+
+	ctx, span := h.r.Tracer(ctx).Tracer().Start(ctx, "oauth2.handler.performOAuth2DeviceVerificationFlow")
+	defer otelx.End(span, &err)
 
 	// When this endpoint is called with a valid consent_verifier (meaning that the login flow completed successfully)
 	// there are 3 writes happening to the database:
@@ -746,20 +753,15 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	// If there were multiple flows created for the same user_code then we may end up with multiple flow objects
 	// persisted to the database, while only one of them was actually used to validate the user_code
 	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
-	// TODO: We should wrap these queries in a transaction
 	consentSession, f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		return
-	}
-
-	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		h.r.Writer().WriteError(w, r, err)
 		return
-	}
-
-	if err != nil {
+	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -771,34 +773,39 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	req.SetUserCodeState(fosite.UserCodeAccepted)
 	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req, req.GetSession().(*Session))
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	req.SetSession(session)
-	// Update the device code session with
-	//   - the claims for which the user gave consent
-	//   - the granted scopes
-	//   - the granted audiences
-	//   - the user_code_state set to accepted
-	// This marks it as ready to be used for the token exchange endpoint.
-	err = h.r.OAuth2Storage().UpdateDeviceCodeSessionBySignature(ctx, sig, req)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	// Update the OpenID Connect session if "openid" scope is granted
-	if req.GetGrantedScopes().Has("openid") {
-		err = h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, sig, req.Sanitize(oidcParameters))
-		if err != nil {
-			x.LogError(r, err, h.r.Logger())
-			h.r.Writer().WriteError(w, r, err)
-			return
+	req.SetSession(session)
+	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+		// Update the device code session with
+		//   - the claims for which the user gave consent
+		//   - the granted scopes
+		//   - the granted audiences
+		//   - the user_code_state set to `accepted`
+		// This marks it as ready to be used for the token exchange endpoint.
+		if err = h.r.OAuth2Storage().UpdateDeviceCodeSessionBySignature(ctx, sig, req); err != nil {
+			return err
 		}
+
+		// Update the OpenID Connect session if "openid" scope is granted
+		if req.GetGrantedScopes().Has("openid") {
+			if err := h.r.OAuth2Storage().CreateOpenIDConnectSession(ctx, sig, req.Sanitize(oidcParameters)); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}); err != nil {
+		x.LogError(r, err, h.r.Logger())
+		h.r.Writer().WriteError(w, r, err)
+		return
 	}
 
 	redirectURL := urlx.SetQuery(h.c.DeviceDoneURL(ctx), url.Values{"client_id": {f.Client.GetID()}}).String()

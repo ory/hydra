@@ -251,9 +251,8 @@ func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge stri
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired, please try again."))
 	}
-	dr := f.GetDeviceUserAuthRequest()
 
-	return dr, nil
+	return f.GetDeviceUserAuthRequest(), nil
 }
 
 // HandleDeviceUserAuthRequest uses a HandledDeviceUserAuthRequest to update the flow and returns a DeviceUserAuthRequest.
@@ -299,6 +298,8 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, f *flow.Flow, req *f
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequest")
 	defer otelx.End(span, &err)
 
+	// TODO - this is quite confusing - if f is not nil we re-create the flow object with the only
+	// TODO difference being f.State?
 	if f == nil {
 		f = flow.NewFlow(req)
 	} else {
@@ -320,6 +321,7 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, f *flow.Flow, req *f
 		f.RequestedAt = req.RequestedAt
 		f.State = flow.FlowStateLoginInitialized
 	}
+
 	nid := p.NetworkID(ctx)
 	if nid == uuid.Nil {
 		return nil, errorsx.WithStack(x.ErrNotFound)

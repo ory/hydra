@@ -8,13 +8,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/otelx"
 	"html/template"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/ory/x/otelx"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/tidwall/gjson"

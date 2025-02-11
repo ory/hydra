@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Challenge** | Pointer to **string** | Challenge is the identifier (\&quot;logout challenge\&quot;) of the logout authentication request. It is used to identify the session. | [optional] 
+**Challenge** | Pointer to **string** | Challenge is the identifier of the logout authentication request. | [optional] 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **ExpiresAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Logout URL requested. | [optional] 

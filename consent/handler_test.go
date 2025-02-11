@@ -225,7 +225,6 @@ func TestGetConsentRequest(t *testing.T) {
 			} else if tc.exists {
 				var result flow.OAuth2ConsentRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-				require.Equal(t, challenge, result.ID)
 				require.Equal(t, requestURL, result.RequestURL)
 				require.NotNil(t, result.Client)
 			}

@@ -222,11 +222,11 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				http.Redirect(w, r, v.RedirectTo, http.StatusFound)
 			},
 			func(w http.ResponseWriter, r *http.Request) {
-				res, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).
-					ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				consentChallenge = r.URL.Query().Get("consent_challenge")
+				_, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).
+					ConsentChallenge(consentChallenge).
 					Execute()
 				require.NoError(t, err)
-				consentChallenge = res.Challenge
 
 				v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 					ConsentChallenge(consentChallenge).

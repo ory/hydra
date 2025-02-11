@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Acr** | Pointer to **string** | ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication. | [optional] 
 **Amr** | Pointer to **[]string** |  | [optional] 
-**Challenge** | **string** | ID is the identifier (\&quot;authorization challenge\&quot;) of the consent authorization request. It is used to identify the session. | 
+**Challenge** | **string** | ID is the identifier of the consent authorization request. | 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **Context** | Pointer to **interface{}** |  | [optional] 
 **LoginChallenge** | Pointer to **string** | LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login &amp; consent app. | [optional] 

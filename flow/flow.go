@@ -80,11 +80,13 @@ const (
 // using the original structs in the API in order to minimize the impact of the
 // database refactoring on the API.
 type Flow struct {
-	// ID is the identifier ("login challenge") of the login request. It is used to
-	// identify the session.
+	// ID is the identifier of the login request.
 	//
-	// required: true
-	ID  string    `db:"login_challenge" json:"i"`
+	// The struct field is named ID for compatibility with gobuffalo/pop.
+	//
+	// The database column should be named `login_challenge_id`, but is not for
+	// historical reasons.
+	ID  string    `db:"login_challenge" json:"i"` // PK in database
 	NID uuid.UUID `db:"nid" json:"n"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
@@ -202,10 +204,7 @@ type Flow struct {
 	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
 	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at" json:"la,omitempty"`
 
-	// ConsentChallengeID is the identifier ("authorization challenge") of the consent authorization request. It is used to
-	// identify the session.
-	//
-	// required: true
+	// ConsentChallengeID is the identifier of the consent request.
 	ConsentChallengeID sqlxx.NullString `db:"consent_challenge_id" json:"cc,omitempty"`
 
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.

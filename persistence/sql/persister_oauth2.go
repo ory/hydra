@@ -681,7 +681,7 @@ func (p *Persister) strictRefreshRotation(ctx context.Context, requestID string)
 	return nil
 }
 
-func (p *Persister) gracefulRefreshRotation(ctx context.Context, requestID string, refreshSignature string, period time.Duration) (err error) {
+func (p *Persister) gracefulRefreshRotation(ctx context.Context, requestID string, refreshSignature string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.gracefulRefreshRotation",
 		trace.WithAttributes(
 			attribute.String("request_id", requestID),
@@ -747,9 +747,8 @@ func (p *Persister) RotateRefreshToken(ctx context.Context, requestID string, re
 	defer otelx.End(span, &err)
 
 	// If we end up here, we have a valid refresh token and can proceed with the rotation.
-	gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx)
-	if gracePeriod > 0 {
-		return handleRetryError(p.gracefulRefreshRotation(ctx, requestID, refreshTokenSignature, gracePeriod))
+	if p.r.Config().RefreshTokenRotationGracePeriod(ctx) > 0 {
+		return handleRetryError(p.gracefulRefreshRotation(ctx, requestID, refreshTokenSignature))
 	}
 
 	return handleRetryError(p.strictRefreshRotation(ctx, requestID))

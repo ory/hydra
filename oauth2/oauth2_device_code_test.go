@@ -323,7 +323,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 			assert.EqualValues(t, subject, pointerx.Deref(rr.Subject))
 			assert.EqualValues(t, scopes, rr.RequestedScope)
-			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 			assert.Contains(t, *rr.RequestUrl, hydraoauth2.DeviceVerificationPath)
 			if checkRequestPayload != nil {
 				checkRequestPayload(rr)

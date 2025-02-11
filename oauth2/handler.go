@@ -47,15 +47,16 @@ import (
 )
 
 const (
-	DefaultLoginPath      = "/oauth2/fallbacks/login"
-	DefaultConsentPath    = "/oauth2/fallbacks/consent"
-	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
-	DefaultPostDevicePath = "/oauth2/fallbacks/device/done"
-	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
-	DefaultErrorPath      = "/oauth2/fallbacks/error"
-	TokenPath             = "/oauth2/token" // #nosec G101
-	AuthPath              = "/oauth2/auth"
-	LogoutPath            = "/oauth2/sessions/logout"
+	DefaultLoginPath              = "/oauth2/fallbacks/login"
+	DefaultConsentPath            = "/oauth2/fallbacks/consent"
+	DefaultPostLogoutPath         = "/oauth2/fallbacks/logout/callback"
+	DefaultDeviceVerificationPath = "/oauth2/fallbacks/device"
+	DefaultPostDevicePath         = "/oauth2/fallbacks/device/done"
+	DefaultLogoutPath             = "/oauth2/fallbacks/logout"
+	DefaultErrorPath              = "/oauth2/fallbacks/error"
+	TokenPath                     = "/oauth2/token" // #nosec G101
+	AuthPath                      = "/oauth2/auth"
+	LogoutPath                    = "/oauth2/sessions/logout"
 
 	VerifiableCredentialsPath = "/credentials"
 	UserinfoPath              = "/userinfo"
@@ -111,6 +112,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 		http.StatusOK,
 		config.KeyLogoutRedirectURL,
 	))
+	public.GET(DefaultDeviceVerificationPath, h.fallbackHandler("", "", http.StatusOK, config.KeyDeviceVerificationURL))
 	public.GET(DefaultPostDevicePath, h.fallbackHandler(
 		"You successfully authenticated on your device!",
 		"The Default Post Device URL is not set which is why you are seeing this fallback page. Your device login request however succeeded.",

@@ -233,8 +233,6 @@ type Flow struct {
 	DeviceVerifier sqlxx.NullString `db:"device_verifier" json:"dv,omitempty"`
 	// DeviceVerifier is the device request's CSRF
 	DeviceCSRF sqlxx.NullString `db:"device_csrf" json:"dc,omitempty"`
-	// DeviceUserCodeAcceptedAt is the time when device user_code was accepted
-	DeviceUserCodeAcceptedAt sqlxx.NullTime `db:"device_user_code_accepted_at" json:"da,omitempty"`
 	// DeviceWasUsed set to true means that the device request was already handled
 	DeviceWasUsed sqlxx.NullBool `db:"device_was_used" json:"du,omitempty"`
 	// DeviceHandledAt contains the timestamp the device user_code verification request was handled

@@ -301,7 +301,7 @@ func SaneMockAuthRequest(t *testing.T, m consent.Manager, ls *flow.LoginSession,
 		ID:       uuid.New().String(),
 		Verifier: uuid.New().String(),
 	}
-	_, err := m.CreateLoginRequest(context.Background(), nil, c)
+	_, err := m.CreateLoginRequest(context.Background(), c)
 	require.NoError(t, err)
 	return c
 }
@@ -346,9 +346,9 @@ func TestHelperNID(r interface {
 		require.Error(t, t2InvalidNID.CreateLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.CreateLoginSession(ctx, &testLS))
 
-		_, err := t2InvalidNID.CreateLoginRequest(ctx, nil, &testLR)
+		_, err := t2InvalidNID.CreateLoginRequest(ctx, &testLR)
 		require.Error(t, err)
-		f, err := t1ValidNID.CreateLoginRequest(ctx, nil, &testLR)
+		f, err := t1ValidNID.CreateLoginRequest(ctx, &testLR)
 		require.NoError(t, err)
 
 		testLR.ID = x.Must(f.ToLoginChallenge(ctx, r))
@@ -406,7 +406,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					RequestedAt:     time.Now(),
 				}
 
-				_, err := m.CreateLoginRequest(ctx, nil, lr[k])
+				_, err := m.CreateLoginRequest(ctx, lr[k])
 				require.NoError(t, err)
 			}
 		})
@@ -581,7 +581,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					_, err := m.GetLoginRequest(ctx, loginChallenge)
 					require.Error(t, err)
 
-					f, err = m.CreateLoginRequest(ctx, nil, c)
+					f, err = m.CreateLoginRequest(ctx, c)
 					require.NoError(t, err)
 
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
@@ -850,9 +850,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
-			f1, err := m.CreateLoginRequest(ctx, nil, lr["rv1"])
+			f1, err := m.CreateLoginRequest(ctx, lr["rv1"])
 			require.NoError(t, err)
-			f2, err := m.CreateLoginRequest(ctx, nil, lr["rv2"])
+			f2, err := m.CreateLoginRequest(ctx, lr["rv2"])
 			require.NoError(t, err)
 
 			cr1, hcr1, _ := MockConsentRequest("rv1", true, 0, false, false, false, "fk-login-challenge", network)
@@ -1172,7 +1172,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				SessionID:       sqlxx.NullString(s.ID),
 			}
 
-			f, err := m.CreateLoginRequest(ctx, nil, lr)
+			f, err := m.CreateLoginRequest(ctx, lr)
 			require.NoError(t, err)
 			expected := &flow.OAuth2ConsentRequest{
 				ConsentRequestID:     uuid.NewString(),

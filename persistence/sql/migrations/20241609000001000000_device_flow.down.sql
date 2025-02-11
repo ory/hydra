@@ -8,7 +8,6 @@ ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_challenge_id;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_code_request_id;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_verifier;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_csrf;
-ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_user_code_accepted_at;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_was_used;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_handled_at;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_error;

@@ -279,11 +279,12 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 			LoginHint:         ar.GetRequestForm().Get("login_hint"),
 		},
 	}
-	f, err := s.r.ConsentManager().CreateLoginRequest(
-		ctx,
-		f,
-		loginRequest,
-	)
+	var err error
+	if f == nil {
+		f, err = s.r.ConsentManager().CreateLoginRequest(ctx, loginRequest)
+	} else {
+		f, err = s.r.ConsentManager().CreateLoginRequestFromDeviceRequest(ctx, f, loginRequest)
+	}
 	if err != nil {
 		return errorsx.WithStack(err)
 	}
@@ -1295,7 +1296,12 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 
 	// Generate the request URL
 	iu := s.getDeviceVerificationPath(ctx)
-	iu.RawQuery = r.URL.RawQuery
+	// We don't want the user_code persisted in the database
+	q := r.URL.Query()
+	if q.Has("user_code") {
+		q.Set("user_code", "****")
+	}
+	iu.RawQuery = q.Encode()
 
 	f, err := s.r.ConsentManager().CreateDeviceUserAuthRequest(
 		r.Context(),

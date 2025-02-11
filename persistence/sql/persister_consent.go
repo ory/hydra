@@ -294,33 +294,36 @@ func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context
 	return f.GetHandledDeviceUserAuthRequest(), nil
 }
 
-func (p *Persister) CreateLoginRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (_ *flow.Flow, err error) {
+func (p *Persister) CreateLoginRequestFromDeviceRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (_ *flow.Flow, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequestFromDeviceRequest")
+	defer otelx.End(span, &err)
+
+	f.ID = req.ID
+	f.LoginSkip = req.Skip
+	f.Subject = req.Subject
+	f.SessionID = req.SessionID
+	f.LoginWasUsed = req.WasHandled
+	f.ForceSubjectIdentifier = req.ForceSubjectIdentifier
+	f.LoginVerifier = req.Verifier
+	f.LoginCSRF = req.CSRF
+	f.LoginAuthenticatedAt = req.AuthenticatedAt
+	f.RequestedAt = req.RequestedAt
+	f.State = flow.FlowStateLoginInitialized
+
+	nid := p.NetworkID(ctx)
+	if nid == uuid.Nil {
+		return nil, errorsx.WithStack(x.ErrNotFound)
+	}
+	f.NID = nid
+
+	return f, nil
+}
+
+func (p *Persister) CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequest")
 	defer otelx.End(span, &err)
 
-	// TODO - this is quite confusing - if f is not nil we re-create the flow object with the only
-	// TODO difference being f.State?
-	if f == nil {
-		f = flow.NewFlow(req)
-	} else {
-		f.ID = req.ID
-		f.RequestedScope = req.RequestedScope
-		f.RequestedAudience = req.RequestedAudience
-		f.LoginSkip = req.Skip
-		f.Subject = req.Subject
-		f.OpenIDConnectContext = req.OpenIDConnectContext
-		f.Client = req.Client
-		f.ClientID = req.ClientID
-		f.RequestURL = req.RequestURL
-		f.SessionID = req.SessionID
-		f.LoginWasUsed = req.WasHandled
-		f.ForceSubjectIdentifier = req.ForceSubjectIdentifier
-		f.LoginVerifier = req.Verifier
-		f.LoginCSRF = req.CSRF
-		f.LoginAuthenticatedAt = req.AuthenticatedAt
-		f.RequestedAt = req.RequestedAt
-		f.State = flow.FlowStateLoginInitialized
-	}
+	f := flow.NewFlow(req)
 
 	nid := p.NetworkID(ctx)
 	if nid == uuid.Nil {

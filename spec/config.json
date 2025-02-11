@@ -1181,7 +1181,7 @@
                 }
               ],
               "default": "5s",
-              "description": "configure how often a non-interactive device should poll the device token endpoint",
+              "description": "Configures how often a non-interactive device should poll the device token endpoint, this is a purely informational configuration and does not enforce rate-limiting.",
               "examples": ["5s", "15s", "1m"]
             },
             "user_code_entropy": {

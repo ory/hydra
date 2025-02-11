@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
   scope                 VARCHAR(1024) NOT NULL,
   granted_scope         VARCHAR(1024) NOT NULL,
   form_data             VARCHAR(4096) NOT NULL,
-  session_data          VARCHAR(8192) NOT NULL,
+  session_data          TEXT NOT NULL,
   subject               VARCHAR(255)  NOT NULL DEFAULT '',
   device_code_active    BOOL          NOT NULL DEFAULT true,
   user_code_state       SMALLINT      NOT NULL DEFAULT 0,
@@ -37,8 +37,6 @@ ALTER TABLE hydra_oauth2_flow
   ADD COLUMN device_verifier VARCHAR(40) NULL;
 ALTER TABLE hydra_oauth2_flow
   ADD COLUMN device_csrf VARCHAR(40) NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_user_code_accepted_at TIMESTAMP NULL;
 ALTER TABLE hydra_oauth2_flow
   ADD COLUMN device_was_used BOOLEAN NULL;
 ALTER TABLE hydra_oauth2_flow

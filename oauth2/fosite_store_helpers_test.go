@@ -126,7 +126,7 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 	}
 
 	f, err := x.ConsentManager().CreateLoginRequest(
-		ctx, nil, &flow.LoginRequest{
+		ctx, &flow.LoginRequest{
 			Client:               cl,
 			OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
 			ID:                   id,

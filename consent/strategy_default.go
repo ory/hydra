@@ -19,16 +19,16 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
-
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/mapx"
@@ -705,13 +705,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	return session, f, nil
 }
 
-func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
-	if err != nil {
-		return nil, err
-	}
-
-	var urls []string
+func generateFrontChannelLogoutURLs(clients []client.Client, iss, sid string) (urls []string, _ error) {
 	for _, c := range clients {
 		u, err := url.Parse(c.FrontChannelLogoutURI)
 		if err != nil {
@@ -719,7 +713,7 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 		}
 
 		urls = append(urls, urlx.SetQuery(u, url.Values{
-			"iss": {s.c.IssuerURL(ctx).String()},
+			"iss": {iss},
 			"sid": {sid},
 		}).String())
 	}
@@ -727,12 +721,16 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 	return urls, nil
 }
 
-func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid string) error {
-	ctx := r.Context()
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
-	if err != nil {
-		return err
+func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, clients []client.Client, sid string) (err error) {
+	if len(clients) == 0 {
+		return nil
 	}
+
+	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.executeBackChannelLogout",
+		trace.WithAttributes(
+			attribute.Int("clients", len(clients)),
+			attribute.String("sid", sid)))
+	defer otelx.End(span, &err)
 
 	openIDKeyID, err := s.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
@@ -771,15 +769,19 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.GetID(), token: t})
 	}
 
-	span := trace.SpanFromContext(ctx)
 	cl := s.r.HTTPClient(ctx)
-	execute := func(t task) {
-		log := s.r.Logger().WithRequest(r).
+	cl.HTTPClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+	execute := func(ctx context.Context, t task) {
+		log := s.r.Logger().
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
 		body := url.Values{"logout_token": {t.token}}.Encode()
-		req, err := retryablehttp.NewRequestWithContext(trace.ContextWithSpan(context.Background(), span), "POST", t.url, []byte(body))
+		ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
+		req, err := retryablehttp.NewRequestWithContext(ctx, "POST", t.url, []byte(body))
 		if err != nil {
 			log.WithError(err).Error("Unable to construct OpenID Connect Back-Channel Logout Request")
 			return
@@ -803,7 +805,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(r *http.Request, subject, sid
 	}
 
 	for _, t := range tasks {
-		go execute(t)
+		go execute(context.WithoutCancel(ctx), t)
 	}
 
 	return nil
@@ -999,9 +1001,8 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	return nil, errorsx.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Request, subject string, sid string) error {
-	ctx := r.Context()
-	if err := s.executeBackChannelLogout(r, subject, sid); err != nil {
+func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.Context, clients []client.Client, sid string) error {
+	if err := s.executeBackChannelLogout(ctx, clients, sid); err != nil {
 		return err
 	}
 
@@ -1028,7 +1029,7 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Reque
 func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*flow.LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 
-	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(r.Context(), verifier)
+	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(ctx, verifier)
 	if err != nil {
 		return nil, err
 	}
@@ -1069,12 +1070,17 @@ func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 
 	_, _ = s.revokeAuthenticationCookie(w, r, store) // Cookie removal is optional
 
-	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
+	frontChannelClients, backChannelClients, err := s.r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(ctx, lr.Subject, lr.SessionID)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(r, lr.Subject, lr.SessionID); err != nil {
+	urls, err := generateFrontChannelLogoutURLs(frontChannelClients, s.c.IssuerURL(ctx).String(), lr.SessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.performBackChannelLogoutAndDeleteSession(ctx, backChannelClients, lr.SessionID); err != nil {
 		return nil, err
 	}
 
@@ -1110,7 +1116,12 @@ func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 		return lsErr
 	}
 
-	if err := s.performBackChannelLogoutAndDeleteSession(r, loginSession.Subject, sid); err != nil {
+	_, clients, err := s.r.ConsentManager().ListClientsWithLogoutURLsForSubjectAndSID(ctx, loginSession.Subject, sid)
+	if err != nil {
+		return err
+	}
+
+	if err := s.performBackChannelLogoutAndDeleteSession(ctx, clients, sid); err != nil {
 		return err
 	}
 

@@ -179,23 +179,24 @@ app.get("/oauth2/revoke", (req, res) => {
     })
 })
 
-app.get("/oauth2/validate-jwt", (req, res) => {
+app.post("/oauth2/validate-jwt", (req, res) => {
   const client = jwksClient({
     jwksUri: new URL("/.well-known/jwks.json", config.public).toString(),
   })
 
   jwt.verify(
-    req.session.oauth2_flow.token.access_token,
+    req.body.jwt,
     (header, callback) => {
       client.getSigningKey(header.kid, function (err, key) {
         const signingKey = key.publicKey || key.rsaPublicKey
         callback(null, signingKey)
       })
     },
+    { complete: true },
     (err, decoded) => {
       if (err) {
         console.error(err)
-        res.send(400)
+        res.status(400).send(JSON.stringify({ error: err.toString() }))
         return
       }
 

@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-import { createClient, prng } from "../../helpers"
+import { createClient, prng, rotateJwks, validateJwt } from "../../helpers"
 
 const accessTokenStrategies = ["opaque", "jwt"]
 
@@ -95,6 +95,61 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
                     expect(response.status).to.eq(400)
                     expect(response.body.error).to.eq("invalid_grant")
                   })
+              },
+            )
+          })
+        })
+      })
+
+      const validateJwtAndGetKid = (token) =>
+        validateJwt(token).then(({ header }) => header.kid)
+
+      it("should refresh the Access and ID Token with newly rotated keys", function () {
+        if (
+          accessTokenStrategy === "opaque" ||
+          (Cypress.env("jwt_enabled") !== "true" &&
+            !Boolean(Cypress.env("jwt_enabled")))
+        ) {
+          this.skip()
+        }
+
+        const referrer = `${Cypress.env("client_url")}/empty`
+        cy.visit(referrer, {
+          failOnStatusCode: false,
+        })
+
+        createClient({
+          scope: "offline_access openid",
+          redirect_uris: [referrer],
+          grant_types: ["authorization_code", "refresh_token"],
+          response_types: ["code"],
+          token_endpoint_auth_method: "none",
+        }).then((client) => {
+          cy.authCodeFlowBrowser(client, {
+            consent: {
+              scope: ["offline_access", "openid"],
+            },
+            createClient: false,
+          }).then(({ body: tokensBefore }) => {
+            const kidsBefore = {
+              accessToken: validateJwtAndGetKid(tokensBefore.access_token),
+              idToken: validateJwtAndGetKid(tokensBefore.id_token),
+            }
+
+            rotateJwks("hydra.jwt.access-token")
+            rotateJwks("hydra.openid.id-token")
+
+            cy.refreshTokenBrowser(client, tokensBefore.refresh_token).then(
+              ({ body: tokensAfter }) => {
+                const kidsAfter = {
+                  accessToken: validateJwtAndGetKid(tokensAfter.access_token),
+                  idToken: validateJwtAndGetKid(tokensAfter.id_token),
+                }
+
+                expect(kidsAfter.accessToken).to.not.equal(
+                  kidsBefore.accessToken,
+                )
+                expect(kidsAfter.idToken).to.not.equal(kidsBefore.idToken)
               },
             )
           })

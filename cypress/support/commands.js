@@ -196,10 +196,9 @@ Cypress.Commands.add(
       })
     }
     if (doCreateClient) {
-      createClient(client).then(run)
-      return
+      return createClient(client).then(run)
     }
-    run(client)
+    return run(client)
   },
 )
 

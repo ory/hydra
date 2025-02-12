@@ -257,14 +257,9 @@ func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature s
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("UPDATE %s SET device_code_active=false WHERE device_code_signature=? AND nid = ?", sqlTableDeviceAuthCodes),
-				signature,
-				p.NetworkID(ctx),
-			).
-			Exec(),
-	)
+		p.QueryWithNetwork(ctx).
+			Where("device_code_signature = ?", signature).
+			Delete(DeviceRequestSQL{}))
 }
 
 // GetUserCodeSession returns a user code session from the database

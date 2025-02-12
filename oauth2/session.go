@@ -27,7 +27,6 @@ import (
 type Session struct {
 	*openid.DefaultSession `json:"id_token"`
 	Extra                  map[string]interface{} `json:"extra"`
-	KID                    string                 `json:"kid"`
 	ClientID               string                 `json:"client_id"`
 	ConsentChallenge       string                 `json:"consent_challenge"`
 	ExcludeNotBeforeClaim  bool                   `json:"exclude_not_before_claim"`
@@ -116,9 +115,7 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 }
 
 func (s *Session) GetJWTHeader() *jwt.Headers {
-	return &jwt.Headers{
-		Extra: map[string]interface{}{"kid": s.KID},
-	}
+	return jwt.NewHeaders()
 }
 
 func (s *Session) Clone() fosite.Session {

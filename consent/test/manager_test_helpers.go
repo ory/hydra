@@ -34,7 +34,7 @@ import (
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *flow.OAuth2ConsentRequest, h *flow.AcceptOAuth2ConsentRequest, f *flow.Flow) {
 	c = &flow.OAuth2ConsentRequest{
-		ID:                makeID("challenge", network, key),
+		ConsentRequestID:  makeID("challenge", network, key),
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
 		RequestedAudience: []string{"auda" + key, "audb" + key},
 		Skip:              skip,
@@ -63,7 +63,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		SessionID:            c.LoginSessionID,
 		Client:               c.Client,
 		State:                flow.FlowStateConsentInitialized,
-		ConsentChallengeID:   sqlxx.NullString(c.ID),
+		ConsentRequestID:     sqlxx.NullString(c.ConsentRequestID),
 		ConsentSkip:          c.Skip,
 		ConsentVerifier:      sqlxx.NullString(c.Verifier),
 		ConsentCSRF:          sqlxx.NullString(c.CSRF),
@@ -93,16 +93,16 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	}
 
 	h = &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:  c,
-		RememberFor:     rememberFor,
-		Remember:        remember,
-		ID:              makeID("challenge", network, key),
-		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: authenticatedAt,
-		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
-		GrantedAudience: []string{"auda" + key, "audb" + key},
-		Error:           err,
-		HandledAt:       sqlxx.NullTime(time.Now().UTC()),
+		ConsentRequest:   c,
+		RememberFor:      rememberFor,
+		Remember:         remember,
+		ConsentRequestID: makeID("challenge", network, key),
+		RequestedAt:      time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:  authenticatedAt,
+		GrantedScope:     []string{"scopea" + key, "scopeb" + key},
+		GrantedAudience:  []string{"auda" + key, "audb" + key},
+		Error:            err,
+		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
 		// WasUsed:         true,
 	}
 
@@ -196,17 +196,17 @@ func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow,
 	}
 
 	h := &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:  c,
-		RememberFor:     rememberFor,
-		Remember:        remember,
-		ID:              c.ID,
-		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: sqlxx.NullTime(authAt),
-		GrantedScope:    []string{"scopea", "scopeb"},
-		GrantedAudience: []string{"auda", "audb"},
-		Error:           rde,
-		WasHandled:      false,
-		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
+		ConsentRequest:   c,
+		RememberFor:      rememberFor,
+		Remember:         remember,
+		ConsentRequestID: c.ConsentRequestID,
+		RequestedAt:      time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:  sqlxx.NullTime(authAt),
+		GrantedScope:     []string{"scopea", "scopeb"},
+		GrantedAudience:  []string{"auda", "audb"},
+		Error:            rde,
+		WasHandled:       false,
+		HandledAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
 	_, err := m.HandleConsentRequest(context.Background(), f, h)
@@ -237,9 +237,9 @@ func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip 
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
 
-		ID:       uuid.New().String(),
-		Verifier: uuid.New().String(),
-		CSRF:     uuid.New().String(),
+		ConsentRequestID: uuid.New().String(),
+		Verifier:         uuid.New().String(),
+		CSRF:             uuid.New().String(),
 	}
 
 	require.NoError(t, m.CreateConsentRequest(context.Background(), f, c))
@@ -535,7 +535,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					require.Error(t, err)
 
 					consentChallenge = x.Must(f.ToConsentChallenge(ctx, deps))
-					// consentRequest.ID = consentChallenge
 
 					err = m.CreateConsentRequest(ctx, f, consentRequest)
 					require.NoError(t, err)
@@ -558,9 +557,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
 					require.NoError(t, err)
-					consentRequest.ID = got2.ID
 					compareConsentRequest(t, consentRequest, got2.ConsentRequest)
-					assert.Equal(t, consentRequest.ID, got2.ID)
+					assert.Equal(t, consentRequest.ConsentRequestID, got2.ConsentRequestID)
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
 
 					t.Run("sub=detect double-submit for consent verifier", func(t *testing.T) {
@@ -678,24 +676,24 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
 				"",
-				&fosite.Request{Client: cr1.Client, ID: crr1.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
 				"",
-				&fosite.Request{Client: cr2.Client, ID: crr2.ID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 
 			for i, tc := range []struct {
@@ -779,87 +777,87 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			for i, tc := range []struct {
 				subject    string
 				sid        string
-				challenges []string
+				consentIDs []string
 				clients    []string
 			}{
 				{
 					subject:    cr1.Subject,
 					sid:        makeID("fk-login-session", network, "rv1"),
-					challenges: []string{handledConsentRequest1.ID},
+					consentIDs: []string{handledConsentRequest1.ConsentRequestID},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    cr2.Subject,
 					sid:        makeID("fk-login-session", network, "rv2"),
-					challenges: []string{handledConsentRequest2.ID},
+					consentIDs: []string{handledConsentRequest2.ConsentRequestID},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{
 					subject:    "subjectrv3",
 					sid:        makeID("fk-login-session", network, "rv2"),
-					challenges: []string{},
+					consentIDs: []string{},
 					clients:    []string{},
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s/session=%s", i, tc.subject, tc.sid), func(t *testing.T) {
 					consents, err := m.FindSubjectsSessionGrantedConsentRequests(ctx, tc.subject, tc.sid, 100, 0)
-					assert.Equal(t, len(tc.challenges), len(consents))
+					assert.Equal(t, len(tc.consentIDs), len(consents))
 
-					if len(tc.challenges) == 0 {
+					if len(tc.consentIDs) == 0 {
 						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
 						for _, consent := range consents {
-							assert.Contains(t, tc.challenges, consent.ID)
+							assert.Contains(t, tc.consentIDs, consent.ConsentRequestID)
 							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.GetID())
 						}
 					}
 
 					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
 					require.NoError(t, err)
-					assert.Equal(t, n, len(tc.challenges))
+					assert.Equal(t, n, len(tc.consentIDs))
 
 				})
 			}
 
 			for i, tc := range []struct {
-				subject    string
-				challenges []string
-				clients    []string
+				subject           string
+				consentRequestIDs []string
+				clients           []string
 			}{
 				{
-					subject:    "subjectrv1",
-					challenges: []string{handledConsentRequest1.ID},
-					clients:    []string{"fk-client-rv1"},
+					subject:           "subjectrv1",
+					consentRequestIDs: []string{handledConsentRequest1.ConsentRequestID},
+					clients:           []string{"fk-client-rv1"},
 				},
 				{
-					subject:    "subjectrv2",
-					challenges: []string{handledConsentRequest2.ID},
-					clients:    []string{"fk-client-rv2"},
+					subject:           "subjectrv2",
+					consentRequestIDs: []string{handledConsentRequest2.ConsentRequestID},
+					clients:           []string{"fk-client-rv2"},
 				},
 				{
-					subject:    "subjectrv3",
-					challenges: []string{},
-					clients:    []string{},
+					subject:           "subjectrv3",
+					consentRequestIDs: []string{},
+					clients:           []string{},
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
 					consents, err := m.FindSubjectsGrantedConsentRequests(ctx, tc.subject, 100, 0)
-					assert.Equal(t, len(tc.challenges), len(consents))
+					assert.Equal(t, len(tc.consentRequestIDs), len(consents))
 
-					if len(tc.challenges) == 0 {
+					if len(tc.consentRequestIDs) == 0 {
 						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
 						for _, consent := range consents {
-							assert.Contains(t, tc.challenges, consent.ID)
+							assert.Contains(t, tc.consentRequestIDs, consent.ConsentRequestID)
 							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.GetID())
 						}
 					}
 
 					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
 					require.NoError(t, err)
-					assert.Equal(t, n, len(tc.challenges))
+					assert.Equal(t, n, len(tc.consentRequestIDs))
 
 				})
 			}
@@ -1076,7 +1074,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			f, err := m.CreateLoginRequest(ctx, lr)
 			require.NoError(t, err)
 			expected := &flow.OAuth2ConsentRequest{
-				ID:                   uuid.NewString(),
+				ConsentRequestID:     uuid.NewString(),
 				Skip:                 true,
 				Subject:              subject,
 				OpenIDConnectContext: nil,
@@ -1096,14 +1094,14 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 			result, err := m.GetConsentRequest(ctx, consentChallenge)
 			require.NoError(t, err)
-			assert.EqualValues(t, expected.ID, result.ID)
+			assert.EqualValues(t, expected.ConsentRequestID, result.ConsentRequestID)
 
 			_, err = m.DeleteLoginSession(ctx, s.ID)
 			require.NoError(t, err)
 
 			result, err = m.GetConsentRequest(ctx, consentChallenge)
 			require.NoError(t, err)
-			assert.EqualValues(t, expected.ID, result.ID)
+			assert.EqualValues(t, expected.ConsentRequestID, result.ConsentRequestID)
 		})
 	}
 }
@@ -1137,7 +1135,7 @@ func compareAuthenticationRequest(t *testing.T, a, b *flow.LoginRequest) {
 
 func compareConsentRequest(t *testing.T, a, b *flow.OAuth2ConsentRequest) {
 	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
-	assert.EqualValues(t, a.ID, b.ID)
+	assert.EqualValues(t, a.ConsentRequestID, b.ConsentRequestID)
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)

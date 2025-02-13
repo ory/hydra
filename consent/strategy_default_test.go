@@ -47,7 +47,7 @@ func checkAndAcceptConsentHandler(t *testing.T, apiClient *hydra.APIClient, cb f
 		payload := cb(t, res, err)
 
 		v, _, err := apiClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
-			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+			ConsentChallenge(res.Challenge).
 			AcceptOAuth2ConsentRequest(payload).
 			Execute()
 		require.NoError(t, err)

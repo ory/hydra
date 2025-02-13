@@ -2881,12 +2881,12 @@ func (a *OAuth2APIService) RejectOAuth2LogoutRequestExecute(r ApiRejectOAuth2Log
 }
 
 type ApiRevokeOAuth2ConsentSessionsRequest struct {
-	ctx                context.Context
-	ApiService         *OAuth2APIService
-	subject            *string
-	client             *string
-	consentChallengeId *string
-	all                *bool
+	ctx              context.Context
+	ApiService       *OAuth2APIService
+	subject          *string
+	client           *string
+	consentRequestId *string
+	all              *bool
 }
 
 // OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted.
@@ -2901,9 +2901,9 @@ func (r ApiRevokeOAuth2ConsentSessionsRequest) Client(client string) ApiRevokeOA
 	return r
 }
 
-// Consent Challenge ID  If set, revoke all token chains derived from this particular consent request ID.
-func (r ApiRevokeOAuth2ConsentSessionsRequest) ConsentChallengeId(consentChallengeId string) ApiRevokeOAuth2ConsentSessionsRequest {
-	r.consentChallengeId = &consentChallengeId
+// Consent Request ID  If set, revoke all token chains derived from this particular consent request ID.
+func (r ApiRevokeOAuth2ConsentSessionsRequest) ConsentRequestId(consentRequestId string) ApiRevokeOAuth2ConsentSessionsRequest {
+	r.consentRequestId = &consentRequestId
 	return r
 }
 
@@ -2958,8 +2958,8 @@ func (a *OAuth2APIService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 	if r.client != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "client", r.client, "")
 	}
-	if r.consentChallengeId != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "consent_challenge_id", r.consentChallengeId, "")
+	if r.consentRequestId != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "consent_request_id", r.consentRequestId, "")
 	}
 	if r.all != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "all", r.all, "")

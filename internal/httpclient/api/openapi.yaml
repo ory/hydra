@@ -1048,12 +1048,12 @@ paths:
           type: string
         style: form
       - description: |-
-          Consent Challenge ID
+          Consent Request ID
 
           If set, revoke all token chains derived from this particular consent request ID.
         explode: true
         in: query
-        name: consent_challenge_id
+        name: consent_request_id
         required: false
         schema:
           type: string
@@ -3032,6 +3032,7 @@ components:
       type: object
     oAuth2ConsentRequest:
       example:
+        consent_request_id: consent_request_id
         requested_access_token_audience:
         - requested_access_token_audience
         - requested_access_token_audience
@@ -3138,10 +3139,13 @@ components:
             \ JSON for SQL storage."
           type: array
         challenge:
-          description: ID is the identifier of the consent authorization request.
+          description: Challenge is used to retrieve/accept/deny the consent request.
           type: string
         client:
           $ref: '#/components/schemas/oAuth2Client'
+        consent_request_id:
+          description: ConsentRequestID is the ID of the consent request.
+          type: string
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
@@ -3258,8 +3262,10 @@ components:
     oAuth2ConsentSession:
       description: A completed OAuth 2.0 Consent Session.
       example:
+        consent_request_id: consent_request_id
         remember: true
         consent_request:
+          consent_request_id: consent_request_id
           requested_access_token_audience:
           - requested_access_token_audience
           - requested_access_token_audience
@@ -3374,6 +3380,10 @@ components:
       properties:
         consent_request:
           $ref: '#/components/schemas/oAuth2ConsentRequest'
+        consent_request_id:
+          description: ConsentRequestID is the identifier of the consent request that
+            initiated this consent session.
+          type: string
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."

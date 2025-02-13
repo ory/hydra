@@ -38,6 +38,8 @@ fi
 (cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
 export URLS_SELF_ISSUER=http://127.0.0.1:5004/
+export URLS_DEVICE_VERIFICATION=http://127.0.0.1:5002/device/verify
+export URLS_DEVICE_SUCCESS=http://127.0.0.1:5002/oauth2/device/success
 export URLS_CONSENT=http://127.0.0.1:5002/consent
 export URLS_LOGIN=http://127.0.0.1:5002/login
 export URLS_LOGOUT=http://127.0.0.1:5002/logout

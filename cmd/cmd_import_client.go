@@ -47,7 +47,7 @@ Alternatively:
 
 To encrypt an auto-generated OAuth2 Client Secret, use flags ` + "`--pgp-key`" + `, ` + "`--pgp-key-url`" + ` or ` + "`--keybase`" + ` flag, for example:
 
-  {{ .CommandPath }} -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
+  hydra create client --name "my app" --grant-types client_credentials --response-type token --scope core,foobar --keybase keybase_username
 `,
 		Long: `This command reads in each listed JSON file and imports their contents as a list of OAuth 2.0 Clients.
 

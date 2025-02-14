@@ -89,6 +89,18 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 		}
 	}
 
+	if c.TermsOfServiceURI != "" {
+		u, err := url.ParseRequestURI(c.TermsOfServiceURI)
+		if err != nil {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Field tos_uri must be a valid URI."))
+		}
+
+		if u.Scheme != "https" && u.Scheme != "http" {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("tos_uri %s must use https:// or http:// as HTTP scheme.", c.TermsOfServiceURI))
+		}
+
+	}
+
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHint("Field client_secret must contain a secret that is at least 6 characters long."))
 	}

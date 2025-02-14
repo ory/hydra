@@ -479,8 +479,7 @@ func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error)
 //
 // swagger:model oAuth2LogoutRequest
 type LogoutRequest struct {
-	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
-	// identify the session.
+	// Challenge is the identifier of the logout authentication request.
 	ID  string    `json:"challenge" db:"challenge"`
 	NID uuid.UUID `json:"-" db:"nid"`
 
@@ -546,8 +545,7 @@ type LogoutResult struct {
 //
 // swagger:model oAuth2LoginRequest
 type LoginRequest struct {
-	// ID is the identifier ("login challenge") of the login request. It is used to
-	// identify the session.
+	// ID is the identifier of the login request.
 	//
 	// required: true
 	ID string `json:"challenge"`
@@ -629,8 +627,7 @@ func (r *LoginRequest) MarshalJSON() ([]byte, error) {
 //
 // swagger:model oAuth2ConsentRequest
 type OAuth2ConsentRequest struct {
-	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
-	// identify the session.
+	// ID is the identifier of the consent authorization request.
 	//
 	// required: true
 	ID string `json:"challenge"`

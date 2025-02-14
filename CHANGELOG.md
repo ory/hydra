@@ -4,260 +4,257 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-01-16)](#000-2025-01-16)
-    - [Documentation](#documentation)
-- [2.3.0-pre.1 (2025-01-15)](#230-pre1-2025-01-15)
+- [0.0.0 (2025-02-11)](#000-2025-02-11)
+    - [Features](#features)
+- [2.3.0 (2025-01-17)](#230-2025-01-17)
+  - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Code Generation](#code-generation)
+    - [Documentation](#documentation)
+    - [Features](#features-1)
     - [Reverts](#reverts)
-- [2.3.0-pre.0 (2025-01-08)](#230-pre0-2025-01-08)
-  - [Breaking Changes](#breaking-changes)
-    - [Bug Fixes](#bug-fixes-1)
-    - [Code Generation](#code-generation-1)
-    - [Features](#features)
-    - [Reverts](#reverts-1)
     - [Tests](#tests)
     - [Unclassified](#unclassified)
 - [2.2.0 (2024-02-12)](#220-2024-02-12)
+    - [Bug Fixes](#bug-fixes-1)
+    - [Code Generation](#code-generation-1)
+- [2.2.0-pre.1 (2024-02-01)](#220-pre1-2024-02-01)
     - [Bug Fixes](#bug-fixes-2)
     - [Code Generation](#code-generation-2)
-- [2.2.0-pre.1 (2024-02-01)](#220-pre1-2024-02-01)
+    - [Documentation](#documentation-1)
+    - [Features](#features-2)
+- [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
     - [Bug Fixes](#bug-fixes-3)
     - [Code Generation](#code-generation-3)
-    - [Documentation](#documentation-1)
-    - [Features](#features-1)
-- [2.2.0-rc.3 (2023-08-16)](#220-rc3-2023-08-16)
-    - [Bug Fixes](#bug-fixes-4)
-    - [Code Generation](#code-generation-4)
-    - [Features](#features-2)
-- [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
-    - [Code Generation](#code-generation-5)
     - [Features](#features-3)
-- [2.2.0-rc.2 (2023-06-13)](#220-rc2-2023-06-13)
-    - [Bug Fixes](#bug-fixes-5)
-    - [Code Generation](#code-generation-6)
+- [2.2.0-pre.0 (2023-06-22)](#220-pre0-2023-06-22)
+    - [Code Generation](#code-generation-4)
     - [Features](#features-4)
+- [2.2.0-rc.2 (2023-06-13)](#220-rc2-2023-06-13)
+    - [Bug Fixes](#bug-fixes-4)
+    - [Code Generation](#code-generation-5)
+    - [Features](#features-5)
 - [2.2.0-rc.1 (2023-06-12)](#220-rc1-2023-06-12)
   - [Breaking Changes](#breaking-changes-1)
-    - [Bug Fixes](#bug-fixes-6)
-    - [Code Generation](#code-generation-7)
-    - [Features](#features-5)
+    - [Bug Fixes](#bug-fixes-5)
+    - [Code Generation](#code-generation-6)
+    - [Features](#features-6)
     - [Unclassified](#unclassified-1)
 - [2.1.2 (2023-05-24)](#212-2023-05-24)
+    - [Bug Fixes](#bug-fixes-6)
+    - [Code Generation](#code-generation-7)
+    - [Documentation](#documentation-2)
+    - [Features](#features-7)
+- [2.1.1 (2023-04-11)](#211-2023-04-11)
     - [Bug Fixes](#bug-fixes-7)
     - [Code Generation](#code-generation-8)
-    - [Documentation](#documentation-2)
-    - [Features](#features-6)
-- [2.1.1 (2023-04-11)](#211-2023-04-11)
+- [2.1.0 (2023-04-06)](#210-2023-04-06)
     - [Bug Fixes](#bug-fixes-8)
     - [Code Generation](#code-generation-9)
-- [2.1.0 (2023-04-06)](#210-2023-04-06)
-    - [Bug Fixes](#bug-fixes-9)
-    - [Code Generation](#code-generation-10)
 - [2.1.0-pre.2 (2023-04-03)](#210-pre2-2023-04-03)
-    - [Code Generation](#code-generation-11)
+    - [Code Generation](#code-generation-10)
 - [2.1.0-pre.1 (2023-04-03)](#210-pre1-2023-04-03)
-    - [Code Generation](#code-generation-12)
+    - [Code Generation](#code-generation-11)
 - [2.1.0-pre.0 (2023-03-31)](#210-pre0-2023-03-31)
+    - [Bug Fixes](#bug-fixes-9)
+    - [Code Generation](#code-generation-12)
+    - [Documentation](#documentation-3)
+    - [Features](#features-8)
+- [2.0.3 (2022-12-08)](#203-2022-12-08)
     - [Bug Fixes](#bug-fixes-10)
     - [Code Generation](#code-generation-13)
-    - [Documentation](#documentation-3)
-    - [Features](#features-7)
-- [2.0.3 (2022-12-08)](#203-2022-12-08)
+    - [Features](#features-9)
+- [2.0.2 (2022-11-10)](#202-2022-11-10)
     - [Bug Fixes](#bug-fixes-11)
     - [Code Generation](#code-generation-14)
-    - [Features](#features-8)
-- [2.0.2 (2022-11-10)](#202-2022-11-10)
-    - [Bug Fixes](#bug-fixes-12)
-    - [Code Generation](#code-generation-15)
     - [Documentation](#documentation-4)
-    - [Features](#features-9)
+    - [Features](#features-10)
     - [Tests](#tests-1)
 - [2.0.1 (2022-10-27)](#201-2022-10-27)
-    - [Bug Fixes](#bug-fixes-13)
-    - [Code Generation](#code-generation-16)
+    - [Bug Fixes](#bug-fixes-12)
+    - [Code Generation](#code-generation-15)
     - [Documentation](#documentation-5)
 - [2.0.0 (2022-10-27)](#200-2022-10-27)
   - [Breaking Changes](#breaking-changes-2)
-    - [Bug Fixes](#bug-fixes-14)
-    - [Code Generation](#code-generation-17)
+    - [Bug Fixes](#bug-fixes-13)
+    - [Code Generation](#code-generation-16)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-6)
-    - [Features](#features-10)
+    - [Features](#features-11)
     - [Tests](#tests-2)
     - [Unclassified](#unclassified-2)
 - [1.11.10 (2022-08-25)](#11110-2022-08-25)
+    - [Bug Fixes](#bug-fixes-14)
+    - [Code Generation](#code-generation-17)
+- [1.11.9 (2022-08-01)](#1119-2022-08-01)
     - [Bug Fixes](#bug-fixes-15)
     - [Code Generation](#code-generation-18)
-- [1.11.9 (2022-08-01)](#1119-2022-08-01)
+    - [Documentation](#documentation-7)
+    - [Features](#features-12)
+- [1.11.8 (2022-05-04)](#1118-2022-05-04)
     - [Bug Fixes](#bug-fixes-16)
     - [Code Generation](#code-generation-19)
-    - [Documentation](#documentation-7)
-    - [Features](#features-11)
-- [1.11.8 (2022-05-04)](#1118-2022-05-04)
-    - [Bug Fixes](#bug-fixes-17)
-    - [Code Generation](#code-generation-20)
     - [Documentation](#documentation-8)
-    - [Features](#features-12)
+    - [Features](#features-13)
     - [Tests](#tests-3)
 - [1.11.7 (2022-02-23)](#1117-2022-02-23)
-    - [Code Generation](#code-generation-21)
+    - [Code Generation](#code-generation-20)
 - [1.11.6 (2022-02-23)](#1116-2022-02-23)
+    - [Bug Fixes](#bug-fixes-17)
+    - [Code Generation](#code-generation-21)
+- [1.11.5 (2022-02-21)](#1115-2022-02-21)
     - [Bug Fixes](#bug-fixes-18)
     - [Code Generation](#code-generation-22)
-- [1.11.5 (2022-02-21)](#1115-2022-02-21)
+- [1.11.4 (2022-02-16)](#1114-2022-02-16)
     - [Bug Fixes](#bug-fixes-19)
     - [Code Generation](#code-generation-23)
-- [1.11.4 (2022-02-16)](#1114-2022-02-16)
+- [1.11.3 (2022-02-15)](#1113-2022-02-15)
     - [Bug Fixes](#bug-fixes-20)
     - [Code Generation](#code-generation-24)
-- [1.11.3 (2022-02-15)](#1113-2022-02-15)
-    - [Bug Fixes](#bug-fixes-21)
-    - [Code Generation](#code-generation-25)
 - [1.11.2 (2022-02-11)](#1112-2022-02-11)
-    - [Code Generation](#code-generation-26)
+    - [Code Generation](#code-generation-25)
 - [1.11.1 (2022-02-11)](#1111-2022-02-11)
-    - [Bug Fixes](#bug-fixes-22)
-    - [Code Generation](#code-generation-27)
+    - [Bug Fixes](#bug-fixes-21)
+    - [Code Generation](#code-generation-26)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-9)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
   - [Breaking Changes](#breaking-changes-3)
-    - [Bug Fixes](#bug-fixes-23)
-    - [Code Generation](#code-generation-28)
+    - [Bug Fixes](#bug-fixes-22)
+    - [Code Generation](#code-generation-27)
     - [Documentation](#documentation-10)
-    - [Features](#features-13)
+    - [Features](#features-14)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-4)
-    - [Bug Fixes](#bug-fixes-24)
-    - [Code Generation](#code-generation-29)
+    - [Bug Fixes](#bug-fixes-23)
+    - [Code Generation](#code-generation-28)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-11)
-    - [Features](#features-14)
+    - [Features](#features-15)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
-    - [Bug Fixes](#bug-fixes-25)
-    - [Code Generation](#code-generation-30)
+    - [Bug Fixes](#bug-fixes-24)
+    - [Code Generation](#code-generation-29)
     - [Documentation](#documentation-12)
 - [1.10.5 (2021-08-13)](#1105-2021-08-13)
+    - [Bug Fixes](#bug-fixes-25)
+    - [Code Generation](#code-generation-30)
+    - [Documentation](#documentation-13)
+    - [Features](#features-16)
+- [1.10.3 (2021-07-14)](#1103-2021-07-14)
     - [Bug Fixes](#bug-fixes-26)
     - [Code Generation](#code-generation-31)
-    - [Documentation](#documentation-13)
-    - [Features](#features-15)
-- [1.10.3 (2021-07-14)](#1103-2021-07-14)
-    - [Bug Fixes](#bug-fixes-27)
-    - [Code Generation](#code-generation-32)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-14)
-    - [Features](#features-16)
+    - [Features](#features-17)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-5)
-    - [Bug Fixes](#bug-fixes-28)
-    - [Code Generation](#code-generation-33)
+    - [Bug Fixes](#bug-fixes-27)
+    - [Code Generation](#code-generation-32)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-15)
-    - [Features](#features-17)
-- [1.10.1 (2021-03-25)](#1101-2021-03-25)
-    - [Bug Fixes](#bug-fixes-29)
-    - [Code Generation](#code-generation-34)
-    - [Documentation](#documentation-16)
     - [Features](#features-18)
+- [1.10.1 (2021-03-25)](#1101-2021-03-25)
+    - [Bug Fixes](#bug-fixes-28)
+    - [Code Generation](#code-generation-33)
+    - [Documentation](#documentation-16)
+    - [Features](#features-19)
     - [Tests](#tests-4)
     - [Unclassified](#unclassified-3)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
-    - [Code Generation](#code-generation-35)
-    - [Features](#features-19)
+    - [Code Generation](#code-generation-34)
+    - [Features](#features-20)
 - [1.9.1 (2021-01-27)](#191-2021-01-27)
-    - [Code Generation](#code-generation-36)
+    - [Code Generation](#code-generation-35)
     - [Documentation](#documentation-17)
 - [1.9.0 (2021-01-12)](#190-2021-01-12)
-    - [Code Generation](#code-generation-37)
+    - [Code Generation](#code-generation-36)
 - [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
-    - [Code Generation](#code-generation-38)
+    - [Code Generation](#code-generation-37)
 - [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
-    - [Bug Fixes](#bug-fixes-30)
-    - [Code Generation](#code-generation-39)
+    - [Bug Fixes](#bug-fixes-29)
+    - [Code Generation](#code-generation-38)
     - [Documentation](#documentation-18)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
   - [Breaking Changes](#breaking-changes-6)
-    - [Bug Fixes](#bug-fixes-31)
-    - [Code Generation](#code-generation-40)
+    - [Bug Fixes](#bug-fixes-30)
+    - [Code Generation](#code-generation-39)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-19)
-    - [Features](#features-20)
+    - [Features](#features-21)
     - [Tests](#tests-5)
     - [Unclassified](#unclassified-4)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
-    - [Bug Fixes](#bug-fixes-32)
-    - [Code Generation](#code-generation-41)
+    - [Bug Fixes](#bug-fixes-31)
+    - [Code Generation](#code-generation-40)
     - [Documentation](#documentation-20)
-    - [Features](#features-21)
+    - [Features](#features-22)
     - [Tests](#tests-6)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
-    - [Bug Fixes](#bug-fixes-33)
-    - [Code Generation](#code-generation-42)
+    - [Bug Fixes](#bug-fixes-32)
+    - [Code Generation](#code-generation-41)
     - [Code Refactoring](#code-refactoring-6)
     - [Documentation](#documentation-21)
-    - [Features](#features-22)
+    - [Features](#features-23)
     - [Tests](#tests-7)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
-    - [Code Generation](#code-generation-43)
+    - [Code Generation](#code-generation-42)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
-    - [Bug Fixes](#bug-fixes-34)
-    - [Code Generation](#code-generation-44)
-    - [Features](#features-23)
+    - [Bug Fixes](#bug-fixes-33)
+    - [Code Generation](#code-generation-43)
+    - [Features](#features-24)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-7)
+    - [Bug Fixes](#bug-fixes-34)
+    - [Code Generation](#code-generation-44)
+    - [Documentation](#documentation-22)
+    - [Features](#features-25)
+- [1.7.4 (2020-08-31)](#174-2020-08-31)
     - [Bug Fixes](#bug-fixes-35)
     - [Code Generation](#code-generation-45)
-    - [Documentation](#documentation-22)
-    - [Features](#features-24)
-- [1.7.4 (2020-08-31)](#174-2020-08-31)
-    - [Bug Fixes](#bug-fixes-36)
-    - [Code Generation](#code-generation-46)
 - [1.7.3 (2020-08-31)](#173-2020-08-31)
-    - [Code Generation](#code-generation-47)
+    - [Code Generation](#code-generation-46)
 - [1.7.1 (2020-08-31)](#171-2020-08-31)
   - [Breaking Changes](#breaking-changes-8)
-    - [Bug Fixes](#bug-fixes-37)
-    - [Code Generation](#code-generation-48)
+    - [Bug Fixes](#bug-fixes-36)
+    - [Code Generation](#code-generation-47)
     - [Code Refactoring](#code-refactoring-7)
     - [Documentation](#documentation-23)
-    - [Features](#features-25)
+    - [Features](#features-26)
     - [Unclassified](#unclassified-5)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-9)
-    - [Bug Fixes](#bug-fixes-38)
-    - [Code Generation](#code-generation-49)
+    - [Bug Fixes](#bug-fixes-37)
+    - [Code Generation](#code-generation-48)
     - [Code Refactoring](#code-refactoring-8)
     - [Documentation](#documentation-24)
-    - [Features](#features-26)
+    - [Features](#features-27)
     - [Unclassified](#unclassified-6)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
-    - [Bug Fixes](#bug-fixes-39)
-    - [Code Generation](#code-generation-50)
+    - [Bug Fixes](#bug-fixes-38)
+    - [Code Generation](#code-generation-49)
     - [Documentation](#documentation-25)
     - [Unclassified](#unclassified-7)
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
-    - [Bug Fixes](#bug-fixes-40)
-    - [Code Generation](#code-generation-51)
-    - [Features](#features-27)
+    - [Bug Fixes](#bug-fixes-39)
+    - [Code Generation](#code-generation-50)
+    - [Features](#features-28)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
-    - [Code Generation](#code-generation-52)
+    - [Code Generation](#code-generation-51)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
-    - [Bug Fixes](#bug-fixes-41)
+    - [Bug Fixes](#bug-fixes-40)
     - [Chores](#chores)
     - [Documentation](#documentation-26)
-    - [Features](#features-28)
+    - [Features](#features-29)
     - [Unclassified](#unclassified-8)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
-    - [Bug Fixes](#bug-fixes-42)
+    - [Bug Fixes](#bug-fixes-41)
     - [Chores](#chores-1)
     - [Documentation](#documentation-27)
-    - [Features](#features-29)
+    - [Features](#features-30)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
     - [Chores](#chores-2)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
-    - [Bug Fixes](#bug-fixes-43)
+    - [Bug Fixes](#bug-fixes-42)
     - [Chores](#chores-3)
     - [Code Refactoring](#code-refactoring-9)
     - [Documentation](#documentation-28)
@@ -266,38 +263,38 @@
     - [Chores](#chores-4)
     - [Code Refactoring](#code-refactoring-10)
 - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes-44)
+    - [Bug Fixes](#bug-fixes-43)
     - [Chores](#chores-5)
     - [Documentation](#documentation-29)
     - [Unclassified](#unclassified-9)
 - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-45)
+    - [Bug Fixes](#bug-fixes-44)
     - [Chores](#chores-6)
 - [1.4.8 (2020-04-24)](#148-2020-04-24)
-    - [Bug Fixes](#bug-fixes-46)
+    - [Bug Fixes](#bug-fixes-45)
     - [Chores](#chores-7)
     - [Documentation](#documentation-30)
-    - [Features](#features-30)
+    - [Features](#features-31)
 - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-47)
+    - [Bug Fixes](#bug-fixes-46)
     - [Chores](#chores-8)
     - [Documentation](#documentation-31)
 - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-48)
+    - [Bug Fixes](#bug-fixes-47)
     - [Documentation](#documentation-32)
 - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-49)
+    - [Bug Fixes](#bug-fixes-48)
     - [Documentation](#documentation-33)
 - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-50)
+    - [Bug Fixes](#bug-fixes-49)
     - [Code Refactoring](#code-refactoring-11)
     - [Documentation](#documentation-34)
-    - [Features](#features-31)
+    - [Features](#features-32)
 - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Chores](#chores-9)
     - [Documentation](#documentation-35)
 - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-51)
+    - [Bug Fixes](#bug-fixes-50)
 - [1.4.0 (2020-04-02)](#140-2020-04-02)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
     - [Impact](#impact)
@@ -314,21 +311,21 @@
     - [Workarounds](#workarounds-1)
     - [References](#references-1)
     - [Upstream](#upstream-1)
-    - [Bug Fixes](#bug-fixes-52)
+    - [Bug Fixes](#bug-fixes-51)
     - [Code Refactoring](#code-refactoring-12)
     - [Documentation](#documentation-36)
-    - [Features](#features-32)
+    - [Features](#features-33)
     - [Unclassified](#unclassified-10)
 - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-53)
+    - [Bug Fixes](#bug-fixes-52)
     - [Chores](#chores-10)
     - [Documentation](#documentation-37)
 - [1.3.1 (2020-02-16)](#131-2020-02-16)
     - [Continuous Integration](#continuous-integration)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-54)
+    - [Bug Fixes](#bug-fixes-53)
     - [Documentation](#documentation-38)
-    - [Features](#features-33)
+    - [Features](#features-34)
     - [Unclassified](#unclassified-11)
 - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-12)
@@ -721,32 +718,308 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0-pre.1...v0.0.0) (2025-01-16)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-11)
 
 
-### Documentation
+### Features
 
-* Update clarification ([#3929](https://github.com/ory/hydra/issues/3929)) ([ce7616c](https://github.com/ory/hydra/commit/ce7616cf6c600dc4f2303167fbf6b2ed81105ba5))
+* Revoke token chain by consent challenge ID ([#3932](https://github.com/ory/hydra/issues/3932)) ([4a40193](https://github.com/ory/hydra/commit/4a40193f246dd4e8e72f45e4fa31d2ee7282acec)):
+
+    This change adds the ability to revoke token chains by "consent
+    challenge ID".
+    
+    ## "Consent sessions"
+    
+    Each time the user goes through a `GET
+    /oauth2/auth?response_type=code&...` auth code flow, we persist a new
+    "consent session" to the database.
+    
+    This is independent of whether the user has previously logged in and/or
+    granted consent, or whether the user was actively asked to grant consent
+    by the consent app. A successful journey through the auth code flow
+    results in a new "consent session".
+    
+    This consent session is uniquely identified by its "consent challenge
+    ID". This ID is obtained from the [`GET
+    /admin/oauth2/auth/requests/consent?consent_challenge=...`](https://www.ory.sh/docs/reference/api#tag/oAuth2/operation/getOAuth2ConsentRequest)
+    API. Note that it is not the same as the `consent_challenge=...` query
+    parameter!
+    
+    Any access and refresh tokens obtained from a token exchange following
+    that particular user journey are bound to that consent session.
+    
+    We call the totality of all refresh+access tokens derived from a
+    particular consent session a "token chain".
+    
+    ## Token revocation
+    
+    Revoking an access token (AT) is simple: send the AT to `/oauth2/revoke`
+    and it is revoked. If this AT was derived from a refresh token (RT), the
+    parent RT is not revoked.
+    
+    Revoking a refresh token (RT) also revokes associated access tokens.
+    
+    ## Revocation by consent challenge ID
+    
+    During an authorization code flow, save the consent challenge ID into
+    the access token session data:
+    
+    ```
+    GET /admin/oauth2/auth/requests/consent?consent_challenge=abcdef
+    ```
+    Response:
+    ```
+    {
+      "acr": ...,
+      "challenge": "G_TIM3XABG14UwIgDoT1DRfipjhC1uix" # <- this is the ID we need
+      ...
+    }
+    ```
+    
+    Accept the consent request:
+    ```
+    PUT /admin/oauth2/auth/requests/consent/accept?consent_challenge=abcdef
+    {
+      "remember": true,
+      "remember_for": 3600,
+      "session": {
+        "access_token": {
+          "ccid": "G_TIM3XABG14UwIgDoT1DRfipjhC1uix"
+        }
+      },
+      ...
+    }
+    ```
+    
+    To revoke the token chain associated with this consent challenge ID, use
+    
+    ```
+    POST admin/oauth2/auth/sessions/consent?consent_challenge_id=G_TIM3XABG14UwIgDoT1DRfipjhC1uix
+    ```
 
 
-# [2.3.0-pre.1](https://github.com/ory/hydra/compare/v2.3.0-pre.0...v2.3.0-pre.1) (2025-01-15)
 
-autogen: pin v2.3.0-pre.1 release commit
+# [2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0) (2025-01-17)
+
+We’re thrilled to announce the release of **Ory Hydra 2.3.0**! This version comes packed with **graceful token refresh**, performance improvements, and fixes that enhance stability, reduce database load, and streamline the developer experience. We strongly recommend upgrading to take advantage of these enhancements and ensure the best possible OAuth2 and OpenID Connect experience with Ory Hydra. Thank you to everyone who contributed!
+
+Ory Hydra now supports graceful refresh token rotation, making OAuth2 and OpenID Connect refresh flows significantly more resilient in scenarios such as Single Page Apps and IoT. Even in highly distributed or concurrent environments, Hydra gracefully handles token refreshes reliably, ensuring tokens are not dropped or double-used.
+
+PRs: [#3860](https://github.com/ory/hydra/pull/3860), [#3895](https://github.com/ory/hydra/pull/3895)
+
+Previously, the `redirect_uri` was not required when performing flows with `scope=openid`. This release enforces the requirement to comply with the OpenID Connect standard.
+
+PR: [#3900](https://github.com/ory/hydra/pull/3900)
+
+Hydra now supports explicit SQL migration commands **`migrate sql up|down|status`** that streamline database schema management and help with zero-downtime upgrades.
+
+PR: [#3894](https://github.com/ory/hydra/pull/3894)
+
+- **Access token strategy & advanced CLI improvements**
+The CLI introduces new parameters and an option to specify a custom client ID on creation, making it easier to manage and script Hydra deployments.
+PRs: [#3718](https://github.com/ory/hydra/pull/3718), [#3725](https://github.com/ory/hydra/pull/3725), [#3874](https://github.com/ory/hydra/pull/3874)
+- **Built-in login & consent UI for `hydra perform authorization-code`**
+A minimal built-in UI for login and consent can be enabled when testing with the CLI, removing the need to spin up a separate service.
+PR: [#3845](https://github.com/ory/hydra/pull/3845)
+
+Unused indices have been removed, down migration scripts renamed for consistency, and all migrations are more efficient overall.
+
+PRs: [#3859](https://github.com/ory/hydra/pull/3859), [#3911](https://github.com/ory/hydra/pull/3911)
+
+- **Improve persistence logic** – Database transactions and concurrency have been improved across the authorization and token handlers.
+PRs: [#3756](https://github.com/ory/hydra/pull/3756), [#3763](https://github.com/ory/hydra/pull/3763), [#3886](https://github.com/ory/hydra/pull/3886)
+- **Support for more claims in password grant** – You can now include additional claims in the password grant flow, providing extra flexibility in advanced scenarios. Only available with an Ory Enterprise License.
+PR: [#3864](https://github.com/ory/hydra/pull/3864)
+
+- **Transaction Wrappers**
+Authorization and token issuance are now wrapped more consistently to prevent partial writes and race conditions.
+PRs: [#3730](https://github.com/ory/hydra/pull/3730), [#3763](https://github.com/ory/hydra/pull/3763)
+- **Improved Docker setup**
+Docker configurations have been refined, removing inconsistencies in the Compose setup and enabling a fully static binary build.
+PRs: [#3826](https://github.com/ory/hydra/pull/3826), [#3924](https://github.com/ory/hydra/pull/3924)
+- **Proper JSON round-tripping**
+Fixed an issue causing custom claims to break if they were nested or unexpectedly typed. JSON round-trips are now correct.
+PR: [#3819](https://github.com/ory/hydra/pull/3819)
+- **Speed up public key retrieval**
+Reduced overhead for the JWK public endpoint, solving CPU contention issues in large-scale deployments.
+PRs: [#3787](https://github.com/ory/hydra/pull/3787), [#3870](https://github.com/ory/hydra/pull/3870)
+- **Fix Docker Compose references**
+The CLI now properly references `docker compose` instead of `docker-compose`, ensuring compatibility with modern Docker setups.
+PR: [#3815](https://github.com/ory/hydra/pull/3815)
+
+- **Dependency upgrades**
+Bumped `fosite`, `ory/x`, `pgx/v5`, and various third-party libraries for improved stability and performance.
+- **Updated docs**
+Updated examples, improved JWK documentation, added notes on Docker Compose usage, and refined OpenID Connect discovery docs.
+- **More tracing context**
+Tracing calls have been consistently standardized with `otelx.End()`, and additional context ensures better observability.
+- **Code generation & housekeeping**
+Various housekeeping tasks: pinned GHA versions, fixed minor comment typos, updated newsletters/links, and more.
+
+To upgrade to 2.3.0, follow the usual steps:
+
+1. **Back up your database** (always recommended).
+2. **Update your Hydra version** in your Docker configuration, binary, or build to `v2.3.0`.
+3. **Run `hydra migrate sql up`** (if using the new commands) or your usual migration procedure.
+4. **Restart your services** and confirm that Hydra is up and running.
+
+Check the [migration docs](https://www.ory.sh/docs/hydra/self-hosted/upgrade) for detailed information.
+
+As always, we love hearing from our community. Here are some ways to get involved:
+
+- **Join our Slack**: [Ory Community Slack](https://www.ory.sh/chat)
+- **Ask questions on GitHub Discussions**: [Ory Hydra Discussions](https://github.com/ory/hydra/discussions)
+- **Submit bugs and feature requests**: [GitHub Issues](https://github.com/ory/hydra/issues)
+
+Thanks to all contributors for making Ory Hydra the best-in-class OAuth2 and OpenID Connect server.
+
+For Ory Hydra v2.4.0 we are looking at another highly anticipated community-contributed feature, the OAuth 2.0 Device Authorization Grant!
+
+**Full Changelog**: [v2.2.0...v2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0)
+
+*Happy building with Ory Hydra!*
 
 
+
+## Breaking Changes
+
+Going forward, OAuth2 Clients requesting an OpenID Connect flow **must** include the `redirect_uri` parameter or the request will be rejected.
+
+Deleting consents no longer returns 404 in certain edge cases but instead always 204.
 
 
 
 ### Bug Fixes
 
+* Advertise support for response_mode=form_post in OIDC discovery document ([#3861](https://github.com/ory/hydra/issues/3861)) ([9cc5f28](https://github.com/ory/hydra/commit/9cc5f28825bb80398a9830d4fcb220147f74504c))
+* Broken JSON round-tripping for custom claims ([b36b701](https://github.com/ory/hydra/commit/b36b701026d7d7324b0b04529f134d3ed1eb9eb7)):
+
+    Adding custom claims with numerical types (think JavaScript Number) previously did not
+    round-trip through Hydra correctly. For example, passing UNIX timestamps in custom claims
+    would end up as floating points in exponential notation in the final token. That, in turn,
+    confused or broke downstream consumers of the token, including Kratos.
+    
+    Ref https://github.com/go-jose/go-jose/issues/144
+
+* Change comment on revokeOAuth2LoginSessions ([#3853](https://github.com/ory/hydra/issues/3853)) ([6d829dd](https://github.com/ory/hydra/commit/6d829ddb251f9e9f1a49a91438c1bd684e827021))
+* Change index name in down migration ([#3911](https://github.com/ory/hydra/issues/3911)) ([3a09db2](https://github.com/ory/hydra/commit/3a09db2abb978df91d875333b1eca70014cdcd10))
+* Correct span names ([554238b](https://github.com/ory/hydra/commit/554238b6da4e1d8ad690b1bf359e532382571884))
+* Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
+* Cpu contention when reading JWKs and suppress generating duplicate JWKs ([#3870](https://github.com/ory/hydra/issues/3870)) ([d5f65c5](https://github.com/ory/hydra/commit/d5f65c570a02a999867f323630d2a5d099526054)):
+
+    Previously each concurrent caller would need to lock a shared mutex when reading or writing a given JWK set.
+    The read path now doesn't require locking a mutex at all and instead returns valid query results directly.
+    
+    The write path is now protected by a concurrency control mechanism (using x/sync/singleflight) to ensure only one JWK set is generated and persisted.
+    
+    Note: Duplicate JWK sets may still be improperly generated if running more than one Hydra instance in a high traffic environment.
+
+* Do not iteratively delete records ([#3766](https://github.com/ory/hydra/issues/3766)) ([5ef20a2](https://github.com/ory/hydra/commit/5ef20a2a2bc91ccde79517667ae4bf4a36c833ba)):
+
+    Resolves performance issues on some databases when deleting consent.
+
+* Do not retry sending responses ([#3764](https://github.com/ory/hydra/issues/3764)) ([1bbfdb5](https://github.com/ory/hydra/commit/1bbfdb56e55525c5bc0526726fa901cf10af59e4))
+* **docs:** Adjust note about SDK support on oauth2 flow endpoints ([#3812](https://github.com/ory/hydra/issues/3812)) ([d0e047c](https://github.com/ory/hydra/commit/d0e047ccc822972cf44ae6ec35c8f6e8507fe3ae))
+* Error log when RP responds with status code 204 ([#3731](https://github.com/ory/hydra/issues/3731)) ([153e4b5](https://github.com/ory/hydra/commit/153e4b56e6de645ee44e4e7833c32a3890e43c54))
+* Faster GetPublicKeys ([#3787](https://github.com/ory/hydra/issues/3787)) ([04c34aa](https://github.com/ory/hydra/commit/04c34aaf2e3c523f4658910d570de80de328d138)):
+
+    GetPublicKeys used to fetch all keys in a set, even if they were actually not being used. This patch fixes that.
+    
+    
+
 * Improve docker set up ([#3924](https://github.com/ory/hydra/issues/3924)) ([8ca6cbd](https://github.com/ory/hydra/commit/8ca6cbd1ab4fe659a0a9feff82766961de6c1d77)), closes [#3914](https://github.com/ory/hydra/issues/3914) [#3683](https://github.com/ory/hydra/issues/3683):
 
     Improves the docker set up and removes some unused files.
 
+* Incorrect context passthru ([fa50e3e](https://github.com/ory/hydra/commit/fa50e3e999ef962fb522dfa2f9a1f6ffa20848bf))
+* Incorrect indices ([#3778](https://github.com/ory/hydra/issues/3778)) ([cb0004b](https://github.com/ory/hydra/commit/cb0004b67b2818b3bca397e98c1bb5bcbb62296f))
+* Limit HTTP response size ([2559819](https://github.com/ory/hydra/commit/25598191ee862b764ff160755b79fab0e95e5136))
+* Omit explicit transaction in ConfirmLoginSession and add tracing ([#3886](https://github.com/ory/hydra/issues/3886)) ([a5b2d75](https://github.com/ory/hydra/commit/a5b2d75d4eeab6f26561f7a63cec24ccc7ed1127))
+* Pass context to database ping ([fa21711](https://github.com/ory/hydra/commit/fa217119494e56b043810cd5ba8e8e230a24ea94))
+* Require `redirect_uri` in openid requests ([#3900](https://github.com/ory/hydra/issues/3900)) ([5caa629](https://github.com/ory/hydra/commit/5caa6293b155a0ebe069d64d7db056ae8e5aa4b0)):
+
+    Resolves a deviation from the OpenID Connect spec, where the `redirect_uri` was not required when performing flows with `scope=openid`.
+
+* Untyped int build issues on 32bit architectures ([#3885](https://github.com/ory/hydra/issues/3885)) ([68aa167](https://github.com/ory/hydra/commit/68aa16725f529136d3f7d0282158ff8c9b11bd22))
+* Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
+* Use docker compose rather than docker-compose ([#3815](https://github.com/ory/hydra/issues/3815)) ([ffdfb73](https://github.com/ory/hydra/commit/ffdfb7362a8de6f6f0608879bf034602f01ea250))
+* Wrap authorize response in transaction ([#3763](https://github.com/ory/hydra/issues/3763)) ([5b106aa](https://github.com/ory/hydra/commit/5b106aadb0e71add56e3cc68e5a9e33cdb81dd39))
+* Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))
 
 ### Code Generation
 
-* Pin v2.3.0-pre.1 release commit ([bad64b9](https://github.com/ory/hydra/commit/bad64b9a7ced3268b16dc742463e0e8ce2772b4a))
+* Pin v2.3.0 release commit ([ee8c339](https://github.com/ory/hydra/commit/ee8c339ddada3a42529c0416897abc32bad03bbb))
+
+### Documentation
+
+* Update clarification ([#3929](https://github.com/ory/hydra/issues/3929)) ([ce7616c](https://github.com/ory/hydra/commit/ce7616cf6c600dc4f2303167fbf6b2ed81105ba5))
+
+### Features
+
+* Add access token strategy parameter to cli ([#3718](https://github.com/ory/hydra/issues/3718)) ([7862dc3](https://github.com/ory/hydra/commit/7862dc337aba2899bdb945e94eb79d3ab3509202)), closes [#3717](https://github.com/ory/hydra/issues/3717)
+* Add expiry and requested times to logout table ([#3837](https://github.com/ory/hydra/issues/3837)) ([f83193f](https://github.com/ory/hydra/commit/f83193f90814691d10d88493eb6357cf37565115))
+* Add id parameter to create oauth2-client cli ([#3725](https://github.com/ory/hydra/issues/3725)) ([b372fd2](https://github.com/ory/hydra/commit/b372fd20169156efd7c34710f823e0c5b5dbf183)):
+
+    Fixes https://github.com/ory/hydra/issues/3724
+
+* Add Inspect option to registry ([2013450](https://github.com/ory/hydra/commit/2013450a9a55af26523554c3aa01fc5243573f2c))
+* Add migrate sql up|down|status ([#3894](https://github.com/ory/hydra/issues/3894)) ([d27882f](https://github.com/ory/hydra/commit/d27882faf16cd8997c15d8facc1c190dff620a8e)):
+
+    This patch adds the ability to execute down migrations using:
+    
+    ```
+    hydra migrate sql down -e --steps {num_of_steps}
+    ```
+    
+    Please read `hydra migrate sql down --help` carefully.
+    
+    Going forward, please use the following commands
+    
+    ```
+    hydra migrate sql up ...
+    hydra migrate sql status ...
+    ```
+    
+    instead of the previous, now deprecated
+    
+    ```
+    hydra migrate sql ...
+    hydra migrate status ...
+    ```
+    
+    commands.
+    
+    See https://github.com/ory-corp/cloud/issues/7350
+
+* Built-in login/consent UI for `hydra perform authorization-code` ([#3845](https://github.com/ory/hydra/issues/3845)) ([7f8bd90](https://github.com/ory/hydra/commit/7f8bd90c2ccbf8be553d526890459f85940c8e99))
+* Graceful refresh token rotation ([#3860](https://github.com/ory/hydra/issues/3860)) ([e278b40](https://github.com/ory/hydra/commit/e278b405e53f6e00f3012a49f14938443d6e7882)), closes [#1831](https://github.com/ory/hydra/issues/1831) [#3770](https://github.com/ory/hydra/issues/3770):
+
+    This patch adds a configuration flag which enables graceful refresh token rotation. Previously, refresh tokens could only be used once. On reuse, all tokens of that chain would be revoked.
+    
+    This is particularly challenging in environments, where it's difficult to make guarantees on synchronization. This could lead to refresh tokens being sent twice due to some parallel execution.
+    
+    To resolve this, refresh tokens can now be graceful by changing `oauth2.grant.refresh_token.grace_period=10s` (example value). During this time, a refresh token can be used multiple times to generate new refresh, ID, and access tokens.
+    
+    All tokens will correctly be invalidated, when the refresh token is re-used after the grace period expires, or when the delete consent endpoint is used.
+
+* Handle concurrent refreshes and improve graceful refreshing ([#3895](https://github.com/ory/hydra/issues/3895)) ([0a6c966](https://github.com/ory/hydra/commit/0a6c96620674e880cfbff2e077f7faf12ca0e446)):
+
+    This patch improves Ory Hydra's ability to deal with refresh flows which, for example, concurrently refresh the same token. Furthermore, graceful token refresh has been improved to handle a variety of edge cases and scenarios.
+    
+    Additionally, serializability errors in CockroachDB are now correctly retried.
+    
+    See https://github.com/ory-corp/cloud/issues/7311
+    Closes https://github.com/ory/hydra/pull/3895
+
+* Improve persistence logic ([#3756](https://github.com/ory/hydra/issues/3756)) ([50301e0](https://github.com/ory/hydra/commit/50301e0022ca64c9d0823544c7b664309620c70e))
+* Reduce size of verifiers ([#3857](https://github.com/ory/hydra/issues/3857)) ([0cd00dc](https://github.com/ory/hydra/commit/0cd00dcb0e1390165ae94631fef3980f5b8df40e))
+* Remove unused indices ([#3859](https://github.com/ory/hydra/issues/3859)) ([56fc3da](https://github.com/ory/hydra/commit/56fc3da6297eab16e2aa65818dd149104557b332))
+* Support more claims in password grant ([#3864](https://github.com/ory/hydra/issues/3864)) ([41476ec](https://github.com/ory/hydra/commit/41476ec06275bc348ed4117e9e0223d04bdebfa5)):
+
+    For the resource owner password grant, the Kratos identity ID is now written to the sub claim, and the username is written to the ext.username claim. Further, token hooks are called for the initial token issuance as well as refresh flows for access tokens issued via the resource owner password grant, allowing users to customize the fields present in the access token (for the jwt strategy) as well as on introspection.
+
+* Update clients from files through the CLI ([#3874](https://github.com/ory/hydra/issues/3874)) ([f777fd1](https://github.com/ory/hydra/commit/f777fd1ac1047575624924d9243f6e532af4f538))
+* Upgrade to jackc/pgx/v5 ([#3798](https://github.com/ory/hydra/issues/3798)) ([cd7e7ef](https://github.com/ory/hydra/commit/cd7e7eff910441f40382f7b71b3fbfae26b6641a))
 
 ### Reverts
 
@@ -849,148 +1122,6 @@ autogen: pin v2.3.0-pre.1 release commit
 * Revert "chore: synchronize workspaces" ([148612b](https://github.com/ory/hydra/commit/148612bcb6cc9755bd8eaf8430fae0f74a45a821)):
 
     This reverts commit 6c359c356b53838a47ddddb7cc3168336131776e.
-
-
-
-# [2.3.0-pre.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0-pre.0) (2025-01-08)
-
-autogen: pin v2.3.0-pre.0 release commit
-
-
-
-## Breaking Changes
-
-Going forward, OAuth2 Clients requesting an OpenID Connect flow **must** include the `redirect_uri` parameter or the request will be rejected.
-
-Deleting consents no longer returns 404 in certain edge cases but instead always 204.
-
-
-
-### Bug Fixes
-
-* Advertise support for response_mode=form_post in OIDC discovery document ([#3861](https://github.com/ory/hydra/issues/3861)) ([9cc5f28](https://github.com/ory/hydra/commit/9cc5f28825bb80398a9830d4fcb220147f74504c))
-* Broken JSON round-tripping for custom claims ([b36b701](https://github.com/ory/hydra/commit/b36b701026d7d7324b0b04529f134d3ed1eb9eb7)):
-
-    Adding custom claims with numerical types (think JavaScript Number) previously did not
-    round-trip through Hydra correctly. For example, passing UNIX timestamps in custom claims
-    would end up as floating points in exponential notation in the final token. That, in turn,
-    confused or broke downstream consumers of the token, including Kratos.
-    
-    Ref https://github.com/go-jose/go-jose/issues/144
-
-* Change comment on revokeOAuth2LoginSessions ([#3853](https://github.com/ory/hydra/issues/3853)) ([6d829dd](https://github.com/ory/hydra/commit/6d829ddb251f9e9f1a49a91438c1bd684e827021))
-* Change index name in down migration ([#3911](https://github.com/ory/hydra/issues/3911)) ([3a09db2](https://github.com/ory/hydra/commit/3a09db2abb978df91d875333b1eca70014cdcd10))
-* Correct span names ([554238b](https://github.com/ory/hydra/commit/554238b6da4e1d8ad690b1bf359e532382571884))
-* Correctly pass multiple token audiences and prompt parameters when performing the authorization code flow from the CLI ([#3736](https://github.com/ory/hydra/issues/3736)) ([632faef](https://github.com/ory/hydra/commit/632faef15228c2d0a2caedfc3d7c6a3782c2e131))
-* Cpu contention when reading JWKs and suppress generating duplicate JWKs ([#3870](https://github.com/ory/hydra/issues/3870)) ([d5f65c5](https://github.com/ory/hydra/commit/d5f65c570a02a999867f323630d2a5d099526054)):
-
-    Previously each concurrent caller would need to lock a shared mutex when reading or writing a given JWK set.
-    The read path now doesn't require locking a mutex at all and instead returns valid query results directly.
-    
-    The write path is now protected by a concurrency control mechanism (using x/sync/singleflight) to ensure only one JWK set is generated and persisted.
-    
-    Note: Duplicate JWK sets may still be improperly generated if running more than one Hydra instance in a high traffic environment.
-
-* Do not iteratively delete records ([#3766](https://github.com/ory/hydra/issues/3766)) ([5ef20a2](https://github.com/ory/hydra/commit/5ef20a2a2bc91ccde79517667ae4bf4a36c833ba)):
-
-    Resolves performance issues on some databases when deleting consent.
-
-* Do not retry sending responses ([#3764](https://github.com/ory/hydra/issues/3764)) ([1bbfdb5](https://github.com/ory/hydra/commit/1bbfdb56e55525c5bc0526726fa901cf10af59e4))
-* **docs:** Adjust note about SDK support on oauth2 flow endpoints ([#3812](https://github.com/ory/hydra/issues/3812)) ([d0e047c](https://github.com/ory/hydra/commit/d0e047ccc822972cf44ae6ec35c8f6e8507fe3ae))
-* Error log when RP responds with status code 204 ([#3731](https://github.com/ory/hydra/issues/3731)) ([153e4b5](https://github.com/ory/hydra/commit/153e4b56e6de645ee44e4e7833c32a3890e43c54))
-* Faster GetPublicKeys ([#3787](https://github.com/ory/hydra/issues/3787)) ([04c34aa](https://github.com/ory/hydra/commit/04c34aaf2e3c523f4658910d570de80de328d138)):
-
-    GetPublicKeys used to fetch all keys in a set, even if they were actually not being used. This patch fixes that.
-    
-    
-
-* Incorrect context passthru ([fa50e3e](https://github.com/ory/hydra/commit/fa50e3e999ef962fb522dfa2f9a1f6ffa20848bf))
-* Incorrect indices ([#3778](https://github.com/ory/hydra/issues/3778)) ([cb0004b](https://github.com/ory/hydra/commit/cb0004b67b2818b3bca397e98c1bb5bcbb62296f))
-* Limit HTTP response size ([2559819](https://github.com/ory/hydra/commit/25598191ee862b764ff160755b79fab0e95e5136))
-* Omit explicit transaction in ConfirmLoginSession and add tracing ([#3886](https://github.com/ory/hydra/issues/3886)) ([a5b2d75](https://github.com/ory/hydra/commit/a5b2d75d4eeab6f26561f7a63cec24ccc7ed1127))
-* Pass context to database ping ([fa21711](https://github.com/ory/hydra/commit/fa217119494e56b043810cd5ba8e8e230a24ea94))
-* Require `redirect_uri` in openid requests ([#3900](https://github.com/ory/hydra/issues/3900)) ([5caa629](https://github.com/ory/hydra/commit/5caa6293b155a0ebe069d64d7db056ae8e5aa4b0)):
-
-    Resolves a deviation from the OpenID Connect spec, where the `redirect_uri` was not required when performing flows with `scope=openid`.
-
-* Untyped int build issues on 32bit architectures ([#3885](https://github.com/ory/hydra/issues/3885)) ([68aa167](https://github.com/ory/hydra/commit/68aa16725f529136d3f7d0282158ff8c9b11bd22))
-* Upgrade fosite and improve webhook integration ([#3727](https://github.com/ory/hydra/issues/3727)) ([89323e2](https://github.com/ory/hydra/commit/89323e24de470c2b0f3037e0cf8f99bc4373d4fd))
-* Use docker compose rather than docker-compose ([#3815](https://github.com/ory/hydra/issues/3815)) ([ffdfb73](https://github.com/ory/hydra/commit/ffdfb7362a8de6f6f0608879bf034602f01ea250))
-* Wrap authorize response in transaction ([#3763](https://github.com/ory/hydra/issues/3763)) ([5b106aa](https://github.com/ory/hydra/commit/5b106aadb0e71add56e3cc68e5a9e33cdb81dd39))
-* Wrap token handler in transaction ([#3730](https://github.com/ory/hydra/issues/3730)) ([67a85cc](https://github.com/ory/hydra/commit/67a85cc799b5c6ef278db93aba131e695fd761e9))
-
-### Code Generation
-
-* Pin v2.3.0-pre.0 release commit ([7d861bd](https://github.com/ory/hydra/commit/7d861bda2257b9e9e9ce59418d534fb17685397b))
-
-### Features
-
-* Add access token strategy parameter to cli ([#3718](https://github.com/ory/hydra/issues/3718)) ([7862dc3](https://github.com/ory/hydra/commit/7862dc337aba2899bdb945e94eb79d3ab3509202)), closes [#3717](https://github.com/ory/hydra/issues/3717)
-* Add expiry and requested times to logout table ([#3837](https://github.com/ory/hydra/issues/3837)) ([f83193f](https://github.com/ory/hydra/commit/f83193f90814691d10d88493eb6357cf37565115))
-* Add id parameter to create oauth2-client cli ([#3725](https://github.com/ory/hydra/issues/3725)) ([b372fd2](https://github.com/ory/hydra/commit/b372fd20169156efd7c34710f823e0c5b5dbf183)):
-
-    Fixes https://github.com/ory/hydra/issues/3724
-
-* Add Inspect option to registry ([2013450](https://github.com/ory/hydra/commit/2013450a9a55af26523554c3aa01fc5243573f2c))
-* Add migrate sql up|down|status ([#3894](https://github.com/ory/hydra/issues/3894)) ([d27882f](https://github.com/ory/hydra/commit/d27882faf16cd8997c15d8facc1c190dff620a8e)):
-
-    This patch adds the ability to execute down migrations using:
-    
-    ```
-    hydra migrate sql down -e --steps {num_of_steps}
-    ```
-    
-    Please read `hydra migrate sql down --help` carefully.
-    
-    Going forward, please use the following commands
-    
-    ```
-    hydra migrate sql up ...
-    hydra migrate sql status ...
-    ```
-    
-    instead of the previous, now deprecated
-    
-    ```
-    hydra migrate sql ...
-    hydra migrate status ...
-    ```
-    
-    commands.
-    
-    See https://github.com/ory-corp/cloud/issues/7350
-
-* Built-in login/consent UI for `hydra perform authorization-code` ([#3845](https://github.com/ory/hydra/issues/3845)) ([7f8bd90](https://github.com/ory/hydra/commit/7f8bd90c2ccbf8be553d526890459f85940c8e99))
-* Graceful refresh token rotation ([#3860](https://github.com/ory/hydra/issues/3860)) ([e278b40](https://github.com/ory/hydra/commit/e278b405e53f6e00f3012a49f14938443d6e7882)), closes [#1831](https://github.com/ory/hydra/issues/1831) [#3770](https://github.com/ory/hydra/issues/3770):
-
-    This patch adds a configuration flag which enables graceful refresh token rotation. Previously, refresh tokens could only be used once. On reuse, all tokens of that chain would be revoked.
-    
-    This is particularly challenging in environments, where it's difficult to make guarantees on synchronization. This could lead to refresh tokens being sent twice due to some parallel execution.
-    
-    To resolve this, refresh tokens can now be graceful by changing `oauth2.grant.refresh_token.grace_period=10s` (example value). During this time, a refresh token can be used multiple times to generate new refresh, ID, and access tokens.
-    
-    All tokens will correctly be invalidated, when the refresh token is re-used after the grace period expires, or when the delete consent endpoint is used.
-
-* Handle concurrent refreshes and improve graceful refreshing ([#3895](https://github.com/ory/hydra/issues/3895)) ([0a6c966](https://github.com/ory/hydra/commit/0a6c96620674e880cfbff2e077f7faf12ca0e446)):
-
-    This patch improves Ory Hydra's ability to deal with refresh flows which, for example, concurrently refresh the same token. Furthermore, graceful token refresh has been improved to handle a variety of edge cases and scenarios.
-    
-    Additionally, serializability errors in CockroachDB are now correctly retried.
-    
-    See https://github.com/ory-corp/cloud/issues/7311
-    Closes https://github.com/ory/hydra/pull/3895
-
-* Improve persistence logic ([#3756](https://github.com/ory/hydra/issues/3756)) ([50301e0](https://github.com/ory/hydra/commit/50301e0022ca64c9d0823544c7b664309620c70e))
-* Reduce size of verifiers ([#3857](https://github.com/ory/hydra/issues/3857)) ([0cd00dc](https://github.com/ory/hydra/commit/0cd00dcb0e1390165ae94631fef3980f5b8df40e))
-* Remove unused indices ([#3859](https://github.com/ory/hydra/issues/3859)) ([56fc3da](https://github.com/ory/hydra/commit/56fc3da6297eab16e2aa65818dd149104557b332))
-* Support more claims in password grant ([#3864](https://github.com/ory/hydra/issues/3864)) ([41476ec](https://github.com/ory/hydra/commit/41476ec06275bc348ed4117e9e0223d04bdebfa5)):
-
-    For the resource owner password grant, the Kratos identity ID is now written to the sub claim, and the username is written to the ext.username claim. Further, token hooks are called for the initial token issuance as well as refresh flows for access tokens issued via the resource owner password grant, allowing users to customize the fields present in the access token (for the jwt strategy) as well as on introspection.
-
-* Update clients from files through the CLI ([#3874](https://github.com/ory/hydra/issues/3874)) ([f777fd1](https://github.com/ory/hydra/commit/f777fd1ac1047575624924d9243f6e532af4f538))
-* Upgrade to jackc/pgx/v5 ([#3798](https://github.com/ory/hydra/issues/3798)) ([cd7e7ef](https://github.com/ory/hydra/commit/cd7e7eff910441f40382f7b71b3fbfae26b6641a))
-
-### Reverts
 
 * Change comment on revokeOAuth2LoginSessions ([#3853](https://github.com/ory/hydra/issues/3853)) ([#3858](https://github.com/ory/hydra/issues/3858)) ([8263ef4](https://github.com/ory/hydra/commit/8263ef4fc9130d26e0e6d165f76cf0d8b2d1474a)):
 

@@ -839,7 +839,7 @@
             "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "challenge": {
-            "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
+            "description": "ID is the identifier of the consent authorization request.",
             "type": "string"
           },
           "client": {
@@ -986,7 +986,7 @@
       "oAuth2LoginRequest": {
         "properties": {
           "challenge": {
-            "description": "ID is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
+            "description": "ID is the identifier of the login request.",
             "type": "string"
           },
           "client": {
@@ -1031,7 +1031,7 @@
       "oAuth2LogoutRequest": {
         "properties": {
           "challenge": {
-            "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
+            "description": "Challenge is the identifier of the logout authentication request.",
             "type": "string"
           },
           "client": {
@@ -2895,7 +2895,6 @@
             "description": "OAuth 2.0 Consent Subject\n\nThe subject whose consent sessions should be deleted.",
             "in": "query",
             "name": "subject",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -2904,6 +2903,14 @@
             "description": "OAuth 2.0 Client ID\n\nIf set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID.",
             "in": "query",
             "name": "client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Consent Challenge ID\n\nIf set, revoke all token chains derived from this particular consent request ID.",
+            "in": "query",
+            "name": "consent_challenge_id",
             "schema": {
               "type": "string"
             }

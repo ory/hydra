@@ -44,6 +44,14 @@ func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user,
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
 }
 
+func (p *Persister) RevokeConsentSessionByID(ctx context.Context, consentChallengeID string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeConsentSessionByID",
+		trace.WithAttributes(attribute.String("consent_challenge_id", consentChallengeID)))
+	defer otelx.End(span, &err)
+
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id = ?", consentChallengeID))
+}
+
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
 	return func(ctx context.Context, c *pop.Connection) error {
 		fs := make([]*flow.Flow, 0)
@@ -214,9 +222,6 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ 
 		return nil, err
 	}
 
-	// We need to overwrite the ID with the encoded flow (challenge) so that the client is not confused.
-	f.ConsentChallengeID = sqlxx.NullString(challenge)
-
 	return f.GetConsentRequest(), nil
 }
 
@@ -305,10 +310,6 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	if err = f.InvalidateConsentRequest(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
-
-	// We set the consent challenge ID to a new UUID that we can use as a foreign key in the database
-	// without encoding the whole flow.
-	f.ConsentChallengeID = sqlxx.NullString(uuid.Must(uuid.NewV4()).String())
 
 	if err = p.Connection(ctx).Create(f); err != nil {
 		return nil, sqlcon.HandleError(err)

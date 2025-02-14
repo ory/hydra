@@ -4,7 +4,6 @@
 package consent
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -80,7 +79,6 @@ type revokeOAuth2ConsentSessions struct {
 	// The subject whose consent sessions should be deleted.
 	//
 	// in: query
-	// required: true
 	Subject string `json:"subject"`
 
 	// OAuth 2.0 Client ID
@@ -89,6 +87,13 @@ type revokeOAuth2ConsentSessions struct {
 	//
 	// in: query
 	Client string `json:"client"`
+
+	// Consent Challenge ID
+	//
+	// If set, revoke all token chains derived from this particular consent request ID.
+	//
+	// in: query
+	ConsentChallengeID string `json:"consent_challenge_id"`
 
 	// Revoke All Consent Sessions
 	//
@@ -119,14 +124,23 @@ type revokeOAuth2ConsentSessions struct {
 func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
+	consentChallengeID := r.URL.Query().Get("consent_challenge_id")
 	allClients := r.URL.Query().Get("all") == "true"
-	if subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
+	if subject == "" && consentChallengeID == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' or 'consent_challenge_id' are required.`)))
+		return
+	}
+	if consentChallengeID != "" && subject != "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' and 'consent_challenge_id' cannot be set at the same time.`)))
+		return
+	}
+	if consentChallengeID != "" && client != "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' and 'consent_challenge_id' cannot be set at the same time.`)))
 		return
 	}
 
 	switch {
-	case len(client) > 0:
+	case client != "":
 		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -138,6 +152,12 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 			return
 		}
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
+	case consentChallengeID != "":
+		if err := h.r.ConsentManager().RevokeConsentSessionByID(r.Context(), consentChallengeID); err != nil && !errors.Is(err, x.ErrNotFound) {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+		return
 	default:
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both 'client' and 'all' is not defined but one of them should have been.`)))
 		return
@@ -479,7 +499,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 	handledLoginRequest.RequestedAt = loginRequest.RequestedAt
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsLoginChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -579,11 +599,12 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsLoginChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
 		Error:       &p,
 		ID:          challenge,
@@ -765,11 +786,12 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsConsentChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -872,7 +894,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsConsentChallenge)
+	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -1047,13 +1069,4 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request,
 	}
 
 	h.r.Writer().Write(w, r, request)
-}
-
-func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flowctx.CodecOption) (*flow.Flow, error) {
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
 }

@@ -22,7 +22,7 @@ var _ MappedNullable = &OAuth2LoginRequest{}
 
 // OAuth2LoginRequest struct for OAuth2LoginRequest
 type OAuth2LoginRequest struct {
-	// ID is the identifier (\"login challenge\") of the login request. It is used to identify the session.
+	// ID is the identifier of the login request.
 	Challenge   string                                    `json:"challenge"`
 	Client      OAuth2Client                              `json:"client"`
 	OidcContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context,omitempty"`

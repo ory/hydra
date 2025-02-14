@@ -1532,7 +1532,7 @@ No authorization required
 
 ## RevokeOAuth2ConsentSessions
 
-> RevokeOAuth2ConsentSessions(ctx).Subject(subject).Client(client).All(all).Execute()
+> RevokeOAuth2ConsentSessions(ctx).Subject(subject).Client(client).ConsentChallengeId(consentChallengeId).All(all).Execute()
 
 Revoke OAuth 2.0 Consent Sessions of a Subject
 
@@ -1551,13 +1551,14 @@ import (
 )
 
 func main() {
-	subject := "subject_example" // string | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted.
+	subject := "subject_example" // string | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted. (optional)
 	client := "client_example" // string | OAuth 2.0 Client ID  If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. (optional)
+	consentChallengeId := "consentChallengeId_example" // string | Consent Challenge ID  If set, revoke all token chains derived from this particular consent request ID. (optional)
 	all := true // bool | Revoke All Consent Sessions  If set to `true` deletes all consent sessions by the Subject that have been granted. (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2API.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).All(all).Execute()
+	r, err := apiClient.OAuth2API.RevokeOAuth2ConsentSessions(context.Background()).Subject(subject).Client(client).ConsentChallengeId(consentChallengeId).All(all).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.RevokeOAuth2ConsentSessions``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1578,6 +1579,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **subject** | **string** | OAuth 2.0 Consent Subject  The subject whose consent sessions should be deleted. | 
  **client** | **string** | OAuth 2.0 Client ID  If set, deletes only those consent sessions that have been granted to the specified OAuth 2.0 Client ID. | 
+ **consentChallengeId** | **string** | Consent Challenge ID  If set, revoke all token chains derived from this particular consent request ID. | 
  **all** | **bool** | Revoke All Consent Sessions  If set to &#x60;true&#x60; deletes all consent sessions by the Subject that have been granted. | 
 
 ### Return type

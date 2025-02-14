@@ -535,7 +535,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					require.Error(t, err)
 
 					consentChallenge = x.Must(f.ToConsentChallenge(ctx, deps))
-					consentRequest.ID = consentChallenge
+					// consentRequest.ID = consentChallenge
 
 					err = m.CreateConsentRequest(ctx, f, consentRequest)
 					require.NoError(t, err)
@@ -1076,7 +1076,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			f, err := m.CreateLoginRequest(ctx, lr)
 			require.NoError(t, err)
 			expected := &flow.OAuth2ConsentRequest{
-				ID:                   x.Must(f.ToConsentChallenge(ctx, deps)),
+				ID:                   uuid.NewString(),
 				Skip:                 true,
 				Subject:              subject,
 				OpenIDConnectContext: nil,
@@ -1091,14 +1091,17 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			err = m.CreateConsentRequest(ctx, f, expected)
 			require.NoError(t, err)
 
-			result, err := m.GetConsentRequest(ctx, expected.ID)
+			consentChallenge, err := f.ToConsentChallenge(ctx, deps)
+			require.NoError(t, err)
+
+			result, err := m.GetConsentRequest(ctx, consentChallenge)
 			require.NoError(t, err)
 			assert.EqualValues(t, expected.ID, result.ID)
 
 			_, err = m.DeleteLoginSession(ctx, s.ID)
 			require.NoError(t, err)
 
-			result, err = m.GetConsentRequest(ctx, expected.ID)
+			result, err = m.GetConsentRequest(ctx, consentChallenge)
 			require.NoError(t, err)
 			assert.EqualValues(t, expected.ID, result.ID)
 		})

@@ -37,8 +37,6 @@ func TestValidate(t *testing.T) {
 	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 	v := NewValidator(reg)
 
-	testCtx := context.TODO()
-
 	dec := json.NewDecoder(strings.NewReader(validJWKS))
 	dec.DisallowUnknownFields()
 	var goodJWKS jose.JSONWebKeySet
@@ -130,6 +128,10 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
+			in:        &Client{ID: "foo", TermsOfServiceURI: "javascript:alert('XSS')"},
+			assertErr: assert.Error,
+		},
+		{
 			in: &Client{ID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "public", c.SubjectType)
@@ -163,7 +165,7 @@ func TestValidate(t *testing.T) {
 					return v
 				}
 			}
-			err := tc.v(t).Validate(testCtx, tc.in)
+			err := tc.v(t).Validate(ctx, tc.in)
 			if tc.assertErr != nil {
 				tc.assertErr(t, err)
 			} else {
@@ -179,7 +181,7 @@ type fakeHTTP struct {
 	c *http.Client
 }
 
-func (f *fakeHTTP) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
+func (f *fakeHTTP) HTTPClient(_ context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
 	c := httpx.NewResilientClient(opts...)
 	c.HTTPClient = f.c
 	return c
@@ -190,7 +192,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	var payload string
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(payload))
+		_, _ = w.Write([]byte(payload))
 	}
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()

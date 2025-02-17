@@ -230,4 +230,20 @@ func TestClientSDK(t *testing.T) {
 		// secret hashes shouldn't change between these PUT calls
 		require.Equal(t, result1.ClientSecret, result2.ClientSecret)
 	})
+
+	t.Run("case=patch client that has JSONWebKeysURI", func(t *testing.T) {
+		op := "replace"
+		path := "/client_name"
+		value := "test"
+
+		client := createTestClient("")
+		client.SetJwksUri("https://example.org/.well-known/jwks.json")
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		require.NoError(t, err)
+		client.ClientId = created.ClientId
+
+		result, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		require.NoError(t, err)
+		require.Equal(t, value, pointerx.Deref(result.ClientName))
+	})
 }

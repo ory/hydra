@@ -10,8 +10,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/logrusx"
+
+	"github.com/ory/hydra/v2/driver/config"
 
 	"github.com/pkg/errors"
 

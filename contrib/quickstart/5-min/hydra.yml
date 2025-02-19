@@ -8,6 +8,9 @@ urls:
   consent: http://127.0.0.1:3000/consent
   login: http://127.0.0.1:3000/login
   logout: http://127.0.0.1:3000/logout
+  device:
+    verification: http://127.0.0.1:3000/device/verify
+    success: http://127.0.0.1:3000/device/success
 
 secrets:
   system:

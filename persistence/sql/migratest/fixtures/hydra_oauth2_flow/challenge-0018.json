@@ -1,0 +1,78 @@
+{
+  "i": "challenge-0018",
+  "n": "00000000-0000-0000-0000-000000000000",
+  "rs": [
+    "requested_scope-0018_1",
+    "requested_scope-0018_2"
+  ],
+  "ra": [
+    "requested_audience-0018_1",
+    "requested_audience-0018_2"
+  ],
+  "ls": false,
+  "s": "subject-0018",
+  "oc": {},
+  "r": "http://request/0018",
+  "si": "auth_session-0018",
+  "lv": "verifier-0018",
+  "lc": "csrf-0018",
+  "li": null,
+  "ia": "0001-01-01T00:00:00Z",
+  "q": 128,
+  "lr": true,
+  "lf": 15,
+  "ll": true,
+  "a": "acr-0018",
+  "am": [],
+  "fs": "force_subject_id-0018",
+  "ct": {
+    "context": "0018"
+  },
+  "lu": true,
+  "le": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "la": null,
+  "di": "challenge-0018",
+  "dr": "request-0018",
+  "dv": "verifier-0018",
+  "dc": "csrf-0018",
+  "du": true,
+  "dh": "0001-01-01T00:00:00Z",
+  "de": null,
+  "cc": "challenge-0018",
+  "cs": true,
+  "cv": "verifier-0018",
+  "cr": "csrf-0018",
+  "gs": [
+    "granted_scope-0018_1",
+    "granted_scope-0018_2"
+  ],
+  "ga": [
+    "granted_audience-0018_1",
+    "granted_audience-0018_2"
+  ],
+  "ce": true,
+  "cf": 15,
+  "ch": null,
+  "cw": true,
+  "cx": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
+  "st": {
+    "session_id_token-0018": "0018"
+  },
+  "sa": {
+    "session_access_token-0018": "0018"
+  }
+}

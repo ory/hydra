@@ -1021,6 +1021,32 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeRefreshToken)) {
+		var accessTokenKeyID string
+		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
+			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+			if err != nil {
+				h.logOrAudit(err, r)
+				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
+				return
+			}
+		}
+
+		openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+		if err != nil {
+			h.logOrAudit(err, r)
+			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
+			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
+			return
+		}
+
+		if sess, ok := accessRequest.GetSession().(*Session); ok {
+			sess.KID = accessTokenKeyID
+			sess.DefaultSession.Headers.Add("kid", openIDKeyID)
+		}
+	}
+
 	for _, hook := range h.r.AccessRequestHooks() {
 		if err = hook(ctx, accessRequest); err != nil {
 			h.logOrAudit(err, r)

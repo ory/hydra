@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-02-11)](#000-2025-02-11)
+- [0.0.0 (2025-02-19)](#000-2025-02-19)
     - [Features](#features)
 - [2.3.0 (2025-01-17)](#230-2025-01-17)
   - [Breaking Changes](#breaking-changes)
@@ -718,7 +718,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-11)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-19)
 
 
 ### Features

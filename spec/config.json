@@ -464,6 +464,11 @@
               "description": "Sets the session cookie name. Use with care!",
               "type": "object",
               "properties": {
+                "device_csrf": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_device_csrf"
+                },
                 "login_csrf": {
                   "type": "string",
                   "title": "CSRF Cookie Name",
@@ -612,6 +617,14 @@
               "format": "uri-reference",
               "examples": [
                 "https://my-service.com/oauth2/auth"
+              ]
+            },
+            "device_authorization_url": {
+              "type": "string",
+              "description": "Overwrites the OAuth2 Device Auth URL",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-service.com/oauth2/device/auth"
               ]
             },
             "client_registration_url": {
@@ -803,6 +816,30 @@
             "/ui/logout"
           ]
         },
+        "device": {
+          "type": "object",
+          "description": "Configure URLs for the OAuth 2.0 Device Code Flow.",
+          "properties": {
+            "verification": {
+              "type": "string",
+              "description": "Sets the device user code verification endpoint. Defaults to an internal fallback URL showing an error.",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-logout.app/device_verification",
+                "/ui/device_verification"
+              ]
+            },
+            "success": {
+              "type": "string",
+              "description": "Sets the post device authentication endpoint. Defaults to an internal fallback URL showing an error.",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-logout.app/device_done",
+                "/ui/device_done"
+              ]
+            }
+          }
+        },
         "error": {
           "type": "string",
           "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",
@@ -941,6 +978,15 @@
         },
         "auth_code": {
           "description": "Configures how long auth codes are valid.",
+          "default": "10m",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
+        "device_user_code": {
+          "description": "Configures how long device & user codes are valid.",
           "default": "10m",
           "allOf": [
             {
@@ -1123,6 +1169,28 @@
               "$ref": "#/definitions/webhook_config"
             }
           ]
+        },
+        "device_authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "token_polling_interval": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/duration"
+                }
+              ],
+              "default": "5s",
+              "description": "Configures how often a non-interactive device should poll the device token endpoint, this is a purely informational configuration and does not enforce rate-limiting.",
+              "examples": ["5s", "15s", "1m"]
+            },
+            "user_code_entropy": {
+              "type": "string",
+              "description": "Sets the entropy for the user codes.",
+              "default": "medium",
+              "enum": ["high", "medium", "low"]
+            }
+          }
         },
         "token_hook": {
           "description": "Sets the token hook endpoint for all grant types. If set it will be called while providing token to customize claims.",

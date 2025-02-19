@@ -6,6 +6,7 @@ on:
     tags:
       - "*"
   pull_request:
+  merge_group:
 
 # Cancel in-progress runs in current workflow.
 concurrency:

@@ -3,6 +3,7 @@ name: Format
 on:
   pull_request:
   push:
+  merge_group:
 
 jobs:
   format:

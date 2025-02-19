@@ -302,15 +302,15 @@ func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, re
 			f.LoginAuthenticatedAt = consentRequest.AuthenticatedAt
 
 			// Reject the consents
-			if consentRequest.ID == j.flushConsentRequests[0].ID {
+			if consentRequest.ConsentRequestID == j.flushConsentRequests[0].ConsentRequestID {
 				// accept this one
 				_, err = cm.HandleConsentRequest(ctx, f, consent.NewHandledConsentRequest(
-					consentRequest.ID, false, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
+					consentRequest.ConsentRequestID, false, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
 				require.NoError(t, err)
 				continue
 			}
 			_, err = cm.HandleConsentRequest(ctx, f, consent.NewHandledConsentRequest(
-				consentRequest.ID, true, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
+				consentRequest.ConsentRequestID, true, consentRequest.RequestedAt, consentRequest.AuthenticatedAt))
 			require.NoError(t, err)
 		}
 	}
@@ -320,8 +320,7 @@ func (j *JanitorConsentTestHelper) ConsentRejectionValidate(ctx context.Context,
 	return func(t *testing.T) {
 		var err error
 		for _, r := range j.flushConsentRequests {
-			t.Logf("check consent: %s", r.ID)
-			_, err = cm.GetConsentRequest(ctx, r.ID)
+			_, err = cm.GetConsentRequest(ctx, r.Challenge)
 			// Consent requests should never be persisted.
 			require.Error(t, err)
 		}
@@ -406,11 +405,11 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, reg 
 			if i == 0 {
 				// Create at least 1 consent request that has been accepted
 				_, err = cm.HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
-					ID:              consentRequest.ID,
-					WasHandled:      true,
-					HandledAt:       sqlxx.NullTime(time.Now()),
-					RequestedAt:     consentRequest.RequestedAt,
-					AuthenticatedAt: consentRequest.AuthenticatedAt,
+					ConsentRequestID: consentRequest.ConsentRequestID,
+					WasHandled:       true,
+					HandledAt:        sqlxx.NullTime(time.Now()),
+					RequestedAt:      consentRequest.RequestedAt,
+					AuthenticatedAt:  consentRequest.AuthenticatedAt,
 				})
 				require.NoError(t, err)
 			}
@@ -424,7 +423,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutValidate(ctx context.Context, c
 		var err error
 
 		for _, r := range j.flushConsentRequests {
-			_, err = cm.GetConsentRequest(ctx, r.ID)
+			_, err = cm.GetConsentRequest(ctx, r.Challenge)
 			require.Error(t, err, "Unverified consent requests are never pesisted")
 		}
 	}
@@ -809,7 +808,7 @@ func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRe
 func genConsentRequests(uniqueName string, lifespan time.Duration) []*flow.OAuth2ConsentRequest {
 	return []*flow.OAuth2ConsentRequest{
 		{
-			ID:                   fmt.Sprintf("%s_flush-consent-1", uniqueName),
+			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-1", uniqueName),
 			RequestedScope:       []string{"foo", "bar"},
 			Subject:              fmt.Sprintf("%s_flush-consent-1", uniqueName),
 			OpenIDConnectContext: nil,
@@ -821,7 +820,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*flow.OAuth
 			CSRF:                 fmt.Sprintf("%s_flush-consent-1", uniqueName),
 		},
 		{
-			ID:                   fmt.Sprintf("%s_flush-consent-2", uniqueName),
+			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-2", uniqueName),
 			RequestedScope:       []string{"foo", "bar"},
 			Subject:              fmt.Sprintf("%s_flush-consent-2", uniqueName),
 			OpenIDConnectContext: nil,
@@ -833,7 +832,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*flow.OAuth
 			CSRF:                 fmt.Sprintf("%s_flush-consent-2", uniqueName),
 		},
 		{
-			ID:                   fmt.Sprintf("%s_flush-consent-3", uniqueName),
+			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-3", uniqueName),
 			RequestedScope:       []string{"foo", "bar"},
 			Subject:              fmt.Sprintf("%s_flush-consent-3", uniqueName),
 			OpenIDConnectContext: nil,

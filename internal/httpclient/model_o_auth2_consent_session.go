@@ -21,7 +21,9 @@ var _ MappedNullable = &OAuth2ConsentSession{}
 
 // OAuth2ConsentSession A completed OAuth 2.0 Consent Session.
 type OAuth2ConsentSession struct {
-	ConsentRequest           *OAuth2ConsentRequest          `json:"consent_request,omitempty"`
+	ConsentRequest *OAuth2ConsentRequest `json:"consent_request,omitempty"`
+	// ConsentRequestID is the identifier of the consent request that initiated this consent session.
+	ConsentRequestId         *string                        `json:"consent_request_id,omitempty"`
 	Context                  interface{}                    `json:"context,omitempty"`
 	ExpiresAt                *OAuth2ConsentSessionExpiresAt `json:"expires_at,omitempty"`
 	GrantAccessTokenAudience []string                       `json:"grant_access_token_audience,omitempty"`
@@ -81,6 +83,38 @@ func (o *OAuth2ConsentSession) HasConsentRequest() bool {
 // SetConsentRequest gets a reference to the given OAuth2ConsentRequest and assigns it to the ConsentRequest field.
 func (o *OAuth2ConsentSession) SetConsentRequest(v OAuth2ConsentRequest) {
 	o.ConsentRequest = &v
+}
+
+// GetConsentRequestId returns the ConsentRequestId field value if set, zero value otherwise.
+func (o *OAuth2ConsentSession) GetConsentRequestId() string {
+	if o == nil || IsNil(o.ConsentRequestId) {
+		var ret string
+		return ret
+	}
+	return *o.ConsentRequestId
+}
+
+// GetConsentRequestIdOk returns a tuple with the ConsentRequestId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2ConsentSession) GetConsentRequestIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ConsentRequestId) {
+		return nil, false
+	}
+	return o.ConsentRequestId, true
+}
+
+// HasConsentRequestId returns a boolean if a field has been set.
+func (o *OAuth2ConsentSession) HasConsentRequestId() bool {
+	if o != nil && !IsNil(o.ConsentRequestId) {
+		return true
+	}
+
+	return false
+}
+
+// SetConsentRequestId gets a reference to the given string and assigns it to the ConsentRequestId field.
+func (o *OAuth2ConsentSession) SetConsentRequestId(v string) {
+	o.ConsentRequestId = &v
 }
 
 // GetContext returns the Context field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -352,6 +386,9 @@ func (o OAuth2ConsentSession) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.ConsentRequest) {
 		toSerialize["consent_request"] = o.ConsentRequest
+	}
+	if !IsNil(o.ConsentRequestId) {
+		toSerialize["consent_request_id"] = o.ConsentRequestId
 	}
 	if o.Context != nil {
 		toSerialize["context"] = o.Context

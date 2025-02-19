@@ -39,52 +39,52 @@ func TestSanitizeClient(t *testing.T) {
 
 func TestMatchScopes(t *testing.T) {
 	for k, tc := range []struct {
-		granted         []flow.AcceptOAuth2ConsentRequest
-		requested       []string
-		expectChallenge string
+		granted    []flow.AcceptOAuth2ConsentRequest
+		requested  []string
+		expectedID string
 	}{
 		{
-			granted:         []flow.AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
-			requested:       []string{"foo", "bar"},
-			expectChallenge: "1",
+			granted:    []flow.AcceptOAuth2ConsentRequest{{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}}},
+			requested:  []string{"foo", "bar"},
+			expectedID: "1",
 		},
 		{
-			granted:         []flow.AcceptOAuth2ConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
-			requested:       []string{"foo", "bar", "baz"},
-			expectChallenge: "",
-		},
-		{
-			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ID: "2", GrantedScope: []string{"foo", "bar"}},
-			},
-			requested:       []string{"foo", "bar"},
-			expectChallenge: "1",
+			granted:    []flow.AcceptOAuth2ConsentRequest{{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}}},
+			requested:  []string{"foo", "bar", "baz"},
+			expectedID: "",
 		},
 		{
 			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar"}},
 			},
-			requested:       []string{"foo", "bar", "baz"},
-			expectChallenge: "2",
+			requested:  []string{"foo", "bar"},
+			expectedID: "1",
 		},
 		{
 			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
-			requested:       []string{"zab"},
-			expectChallenge: "",
+			requested:  []string{"foo", "bar", "baz"},
+			expectedID: "2",
+		},
+		{
+			granted: []flow.AcceptOAuth2ConsentRequest{
+				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+			},
+			requested:  []string{"zab"},
+			expectedID: "",
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			got := matchScopes(fosite.ExactScopeStrategy, tc.granted, tc.requested)
-			if tc.expectChallenge == "" {
+			if tc.expectedID == "" {
 				assert.Nil(t, got)
 				return
 			}
-			assert.Equal(t, tc.expectChallenge, got.ID)
+			assert.Equal(t, tc.expectedID, got.ConsentRequestID)
 		})
 	}
 }

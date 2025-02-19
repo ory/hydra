@@ -109,6 +109,11 @@ func WithSubject(subject string) trace.EventOption {
 	return trace.WithAttributes(otelattr.String(attributeKeyOAuth2Subject, subject))
 }
 
+// WithSubject emits the consent request ID as part of the event.
+func WithConsentRequestID(id string) trace.EventOption {
+	return trace.WithAttributes(ConsentRequestID(id))
+}
+
 // WithRequest emits the subject and client ID from the fosite request as part of the event.
 func WithRequest(request fosite.Requester) trace.EventOption {
 	var attributes []otelattr.KeyValue

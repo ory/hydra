@@ -82,11 +82,14 @@ const (
 type Flow struct {
 	// ID is the identifier of the login request.
 	//
-	// The struct field is named ID for compatibility with gobuffalo/pop.
+	// The struct field is named ID for compatibility with gobuffalo/pop, and is
+	// the primary key in the database.
 	//
 	// The database column should be named `login_challenge_id`, but is not for
 	// historical reasons.
-	ID  string    `db:"login_challenge" json:"i"` // PK in database
+	//
+	// This is not the same as the login session ID.
+	ID  string    `db:"login_challenge" json:"i"`
 	NID uuid.UUID `db:"nid" json:"n"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
@@ -204,8 +207,9 @@ type Flow struct {
 	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
 	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at" json:"la,omitempty"`
 
-	// ConsentChallengeID is the identifier of the consent request.
-	ConsentChallengeID sqlxx.NullString `db:"consent_challenge_id" json:"cc,omitempty"`
+	// ConsentRequestID is the identifier of the consent request.
+	// The database column should be named `consent_request_id`, but is not for historical reasons.
+	ConsentRequestID sqlxx.NullString `db:"consent_challenge_id" json:"cc,omitempty"`
 
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
@@ -377,8 +381,8 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
 
-	if f.ConsentChallengeID.String() != r.ID {
-		return errors.Errorf("flow.ConsentChallengeID %s doesn't match AcceptOAuth2ConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
+	if f.ConsentRequestID.String() != r.ConsentRequestID {
+		return errors.Errorf("flow.ConsentRequestID %s doesn't match AcceptOAuth2ConsentRequest.ID %s", f.ConsentRequestID.String(), r.ConsentRequestID)
 	}
 
 	if r.Error != nil {
@@ -420,9 +424,10 @@ func (f *Flow) InvalidateConsentRequest() error {
 	return nil
 }
 
-func (f *Flow) GetConsentRequest() *OAuth2ConsentRequest {
+func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 	cs := OAuth2ConsentRequest{
-		ID:                     f.ConsentChallengeID.String(),
+		Challenge:              challenge,
+		ConsentRequestID:       f.ConsentRequestID.String(),
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
 		Skip:                   f.ConsentSkip,
@@ -455,7 +460,7 @@ func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
 		crf = *f.ConsentRememberFor
 	}
 	return &AcceptOAuth2ConsentRequest{
-		ID:                 f.ConsentChallengeID.String(),
+		ConsentRequestID:   f.ConsentRequestID.String(),
 		GrantedScope:       f.GrantedScope,
 		GrantedAudience:    f.GrantedAudience,
 		Session:            &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
@@ -464,7 +469,7 @@ func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
 		HandledAt:          f.ConsentHandledAt,
 		WasHandled:         f.ConsentWasHandled,
 		Context:            f.Context,
-		ConsentRequest:     f.GetConsentRequest(),
+		ConsentRequest:     f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
 		Error:              f.ConsentError,
 		RequestedAt:        f.RequestedAt,
 		AuthenticatedAt:    f.LoginAuthenticatedAt,
@@ -509,7 +514,7 @@ type CipherProvider interface {
 }
 
 // ToLoginChallenge converts the flow into a login challenge.
-func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvider) (challenge string, err error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
@@ -517,7 +522,7 @@ func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvide
 }
 
 // ToLoginVerifier converts the flow into a login verifier.
-func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider) (verifier string, err error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
@@ -525,7 +530,7 @@ func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider
 }
 
 // ToConsentChallenge converts the flow into a consent challenge.
-func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvider) (challenge string, err error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
@@ -533,7 +538,7 @@ func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvi
 }
 
 // ToConsentVerifier converts the flow into a consent verifier.
-func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvider) (verifier string, err error) {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}

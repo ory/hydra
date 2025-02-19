@@ -52,7 +52,7 @@ func (f *Flow) setHandledLoginRequest(r *HandledLoginRequest) {
 }
 
 func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
-	f.ConsentChallengeID = sqlxx.NullString(r.ID)
+	f.ConsentRequestID = sqlxx.NullString(r.ConsentRequestID)
 	f.RequestedScope = r.RequestedScope
 	f.RequestedAudience = r.RequestedAudience
 	f.ConsentSkip = r.Skip
@@ -75,7 +75,7 @@ func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 }
 
 func (f *Flow) setHandledConsentRequest(r AcceptOAuth2ConsentRequest) {
-	f.ConsentChallengeID = sqlxx.NullString(r.ID)
+	f.ConsentRequestID = sqlxx.NullString(r.ConsentRequestID)
 	f.GrantedScope = r.GrantedScope
 	f.GrantedAudience = r.GrantedAudience
 	f.ConsentRemember = r.Remember
@@ -191,7 +191,7 @@ func TestFlow_GetConsentRequest(t *testing.T) {
 		expected := OAuth2ConsentRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
 		f.setConsentRequest(expected)
-		actual := f.GetConsentRequest()
+		actual := f.GetConsentRequest(expected.Challenge)
 		assert.Equal(t, expected, *actual)
 	})
 }
@@ -203,7 +203,7 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 	expected := AcceptOAuth2ConsentRequest{}
 	require.NoError(t, faker.FakeData(&expected))
 
-	expected.ID = string(f.ConsentChallengeID)
+	expected.ConsentRequestID = string(f.ConsentRequestID)
 	expected.HandledAt = sqlxx.NullTime(time.Now())
 	expected.RequestedAt = f.RequestedAt
 	expected.Session = &AcceptOAuth2ConsentRequestSession{

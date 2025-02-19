@@ -1125,7 +1125,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	authorizeRequest.SetID(session.ID)
+	authorizeRequest.SetID(session.ConsentRequestID)
 	claims := &jwt.IDTokenClaims{
 		Subject:                             obfuscatedSubject,
 		Issuer:                              h.c.IssuerURL(ctx).String(),
@@ -1160,7 +1160,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 			Extra:                 session.Session.AccessToken,
 			KID:                   accessTokenKeyID,
 			ClientID:              authorizeRequest.GetClient().GetID(),
-			ConsentChallenge:      session.ID,
+			ConsentChallenge:      session.ConsentRequestID,
 			ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
 			AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
 			MirrorTopLevelClaims:  h.c.MirrorTopLevelClaims(ctx),

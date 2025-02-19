@@ -6,8 +6,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Acr** | Pointer to **string** | ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication. | [optional] 
 **Amr** | Pointer to **[]string** |  | [optional] 
-**Challenge** | **string** | ID is the identifier of the consent authorization request. | 
+**Challenge** | **string** | Challenge is used to retrieve/accept/deny the consent request. | 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
+**ConsentRequestId** | Pointer to **string** | ConsentRequestID is the ID of the consent request. | [optional] 
 **Context** | Pointer to **interface{}** |  | [optional] 
 **LoginChallenge** | Pointer to **string** | LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login &amp; consent app. | [optional] 
 **LoginSessionId** | Pointer to **string** | LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \&quot;sid\&quot; parameter in the ID Token and in OIDC Front-/Back- channel logout. It&#39;s value can generally be used to associate consecutive login requests by a certain user. | [optional] 
@@ -131,6 +132,31 @@ SetClient sets Client field to given value.
 `func (o *OAuth2ConsentRequest) HasClient() bool`
 
 HasClient returns a boolean if a field has been set.
+
+### GetConsentRequestId
+
+`func (o *OAuth2ConsentRequest) GetConsentRequestId() string`
+
+GetConsentRequestId returns the ConsentRequestId field if non-nil, zero value otherwise.
+
+### GetConsentRequestIdOk
+
+`func (o *OAuth2ConsentRequest) GetConsentRequestIdOk() (*string, bool)`
+
+GetConsentRequestIdOk returns a tuple with the ConsentRequestId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetConsentRequestId
+
+`func (o *OAuth2ConsentRequest) SetConsentRequestId(v string)`
+
+SetConsentRequestId sets ConsentRequestId field to given value.
+
+### HasConsentRequestId
+
+`func (o *OAuth2ConsentRequest) HasConsentRequestId() bool`
+
+HasConsentRequestId returns a boolean if a field has been set.
 
 ### GetContext
 

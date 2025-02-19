@@ -113,7 +113,7 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 		Client:               cl,
 		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
 		LoginChallenge:       sqlxx.NullString(id),
-		ID:                   id,
+		ConsentRequestID:     id,
 		Verifier:             id,
 		CSRF:                 id,
 		AuthenticatedAt:      sqlxx.NullTime(time.Now()),
@@ -138,16 +138,16 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 	err = x.ConsentManager().CreateConsentRequest(ctx, f, cr)
 	require.NoError(t, err)
 
-	encodedFlow, err := f.ToConsentVerifier(ctx, x)
+	_, err = f.ToConsentVerifier(ctx, x)
 	require.NoError(t, err)
 
 	_, err = x.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:  cr,
-		Session:         new(flow.AcceptOAuth2ConsentRequestSession),
-		AuthenticatedAt: sqlxx.NullTime(time.Now()),
-		ID:              encodedFlow,
-		RequestedAt:     time.Now(),
-		HandledAt:       sqlxx.NullTime(time.Now()),
+		ConsentRequest:   cr,
+		Session:          new(flow.AcceptOAuth2ConsentRequestSession),
+		AuthenticatedAt:  sqlxx.NullTime(time.Now()),
+		ConsentRequestID: cr.ConsentRequestID,
+		RequestedAt:      time.Now(),
+		HandledAt:        sqlxx.NullTime(time.Now()),
 	})
 
 	require.NoError(t, err)

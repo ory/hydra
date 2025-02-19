@@ -32,7 +32,7 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 	}
 }
 
-func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *flow.AcceptOAuth2ConsentRequest {
+func NewHandledConsentRequest(consentRequestID string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *flow.AcceptOAuth2ConsentRequest {
 	var deniedErr *flow.RequestDeniedError
 	if hasError {
 		deniedErr = &flow.RequestDeniedError{
@@ -46,11 +46,11 @@ func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.
 	}
 
 	return &flow.AcceptOAuth2ConsentRequest{
-		ID:              challenge,
-		HandledAt:       sqlxx.NullTime(time.Now().Round(time.Second)),
-		Error:           deniedErr,
-		RequestedAt:     requestedAt,
-		AuthenticatedAt: authenticatedAt,
-		WasHandled:      true,
+		ConsentRequestID: consentRequestID,
+		HandledAt:        sqlxx.NullTime(time.Now().Round(time.Second)),
+		Error:            deniedErr,
+		RequestedAt:      requestedAt,
+		AuthenticatedAt:  authenticatedAt,
+		WasHandled:       true,
 	}
 }

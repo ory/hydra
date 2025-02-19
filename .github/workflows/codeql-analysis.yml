@@ -15,7 +15,6 @@ on:
     - cron: "0 11 * * 6"
   merge_group:
 
-
 jobs:
   analyze:
     name: Analyze

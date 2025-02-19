@@ -874,7 +874,7 @@
         },
         "access_token": {
           "type": "string",
-          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens",
+          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token",
           "enum": ["opaque", "jwt"],
           "default": "opaque"
         },

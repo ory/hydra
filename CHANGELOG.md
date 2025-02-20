@@ -731,6 +731,10 @@
     which provides proper JWT guidance.
 
 * Revoke by consent request ID ([#3947](https://github.com/ory/hydra/issues/3947)) ([5d8635c](https://github.com/ory/hydra/commit/5d8635c94389ff3c87bfae66afe95105c147bec1)), closes [#3932](https://github.com/ory/hydra/issues/3932) [#3932](https://github.com/ory/hydra/issues/3932) [#3941](https://github.com/ory/hydra/issues/3941)
+* Tos_uri validation ([#3945](https://github.com/ory/hydra/issues/3945)) ([007e224](https://github.com/ory/hydra/commit/007e22412ae72403415e8b2f2283154b8d88f511)):
+
+    Contributes to https://github.com/ory-corp/cloud/issues/7395
+
 
 ### Features
 

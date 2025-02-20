@@ -1015,11 +1015,13 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(r *http.Reque
 	} else if err != nil {
 		return err
 	} else {
-		innerErr := s.r.Kratos().DisableSession(ctx, session.IdentityProviderSessionID.String())
-		if innerErr != nil {
-			s.r.Logger().WithError(innerErr).WithField("sid", sid).Error("Unable to revoke session in ORY Kratos.")
-		}
-		// We don't return the error here because we don't want to break the logout flow if Kratos is down.
+		// revoke Kratos session asynchronously
+		go func(ctx context.Context, kratosSessionID string) {
+			innerErr := s.r.Kratos().DisableSession(ctx, kratosSessionID)
+			if innerErr != nil {
+				s.r.Logger().WithError(innerErr).WithField("sid", sid).WithField("kratos-sid", kratosSessionID).Error("Unable to revoke session in Ory Kratos.")
+			}
+		}(context.WithoutCancel(ctx), session.IdentityProviderSessionID.String())
 	}
 
 	return nil

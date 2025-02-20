@@ -44,12 +44,12 @@ func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user,
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
 }
 
-func (p *Persister) RevokeConsentSessionByID(ctx context.Context, consentChallengeID string) (err error) {
+func (p *Persister) RevokeConsentSessionByID(ctx context.Context, consentRequestID string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeConsentSessionByID",
-		trace.WithAttributes(attribute.String("consent_challenge_id", consentChallengeID)))
+		trace.WithAttributes(attribute.String("consent_challenge_id", consentRequestID)))
 	defer otelx.End(span, &err)
 
-	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id = ?", consentChallengeID))
+	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id = ?", consentRequestID))
 }
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
@@ -67,7 +67,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		ids := make([]interface{}, 0, len(fs))
 		nid := p.NetworkID(ctx)
 		for _, f := range fs {
-			ids = append(ids, f.ConsentChallengeID.String())
+			ids = append(ids, f.ConsentRequestID.String())
 		}
 
 		if len(ids) == 0 {
@@ -183,7 +183,7 @@ func (p *Persister) CreateConsentRequest(ctx context.Context, f *flow.Flow, req 
 		return errorsx.WithStack(x.ErrNotFound)
 	}
 	f.State = flow.FlowStateConsentInitialized
-	f.ConsentChallengeID = sqlxx.NullString(req.ID)
+	f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
 	f.ConsentSkip = req.Skip
 	f.ConsentVerifier = sqlxx.NullString(req.Verifier)
 	f.ConsentCSRF = sqlxx.NullString(req.CSRF)
@@ -195,7 +195,6 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlowByConsentChallenge")
 	defer otelx.End(span, &err)
 
-	// challenge contains the flow.
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
 	if err != nil {
 		return nil, errorsx.WithStack(x.ErrNotFound)
@@ -222,7 +221,7 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ 
 		return nil, err
 	}
 
-	return f.GetConsentRequest(), nil
+	return f.GetConsentRequest(challenge), nil
 }
 
 func (p *Persister) CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (_ *flow.Flow, err error) {
@@ -285,14 +284,11 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	if f.NID != p.NetworkID(ctx) {
 		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
-	// Restore the short challenge ID, which was previously sent to the encoded flow,
-	// to make sure that the challenge ID in the returned flow matches the param.
-	r.ID = f.ConsentChallengeID.String()
 	if err := f.HandleConsentRequest(r); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
-	return f.GetConsentRequest(), nil
+	return f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""), nil
 }
 
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, err error) {

@@ -839,11 +839,15 @@
             "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "challenge": {
-            "description": "ID is the identifier of the consent authorization request.",
+            "description": "Challenge is used to retrieve/accept/deny the consent request.",
             "type": "string"
           },
           "client": {
             "$ref": "#/components/schemas/oAuth2Client"
+          },
+          "consent_request_id": {
+            "description": "ConsentRequestID is the ID of the consent request.",
+            "type": "string"
           },
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
@@ -922,6 +926,10 @@
         "properties": {
           "consent_request": {
             "$ref": "#/components/schemas/oAuth2ConsentRequest"
+          },
+          "consent_request_id": {
+            "description": "ConsentRequestID is the identifier of the consent request that initiated this consent session.",
+            "type": "string"
           },
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
@@ -2908,9 +2916,9 @@
             }
           },
           {
-            "description": "Consent Challenge ID\n\nIf set, revoke all token chains derived from this particular consent request ID.",
+            "description": "Consent Request ID\n\nIf set, revoke all token chains derived from this particular consent request ID.",
             "in": "query",
-            "name": "consent_challenge_id",
+            "name": "consent_request_id",
             "schema": {
               "type": "string"
             }

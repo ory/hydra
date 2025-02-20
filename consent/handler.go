@@ -88,12 +88,12 @@ type revokeOAuth2ConsentSessions struct {
 	// in: query
 	Client string `json:"client"`
 
-	// Consent Challenge ID
+	// Consent Request ID
 	//
 	// If set, revoke all token chains derived from this particular consent request ID.
 	//
 	// in: query
-	ConsentChallengeID string `json:"consent_challenge_id"`
+	ConsentRequestID string `json:"consent_request_id"`
 
 	// Revoke All Consent Sessions
 	//
@@ -122,44 +122,37 @@ type revokeOAuth2ConsentSessions struct {
 //	  204: emptyResponse
 //	  default: errorOAuth2
 func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	subject := r.URL.Query().Get("subject")
-	client := r.URL.Query().Get("client")
-	consentChallengeID := r.URL.Query().Get("consent_challenge_id")
-	allClients := r.URL.Query().Get("all") == "true"
-	if subject == "" && consentChallengeID == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' or 'consent_challenge_id' are required.`)))
-		return
-	}
-	if consentChallengeID != "" && subject != "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' and 'consent_challenge_id' cannot be set at the same time.`)))
-		return
-	}
-	if consentChallengeID != "" && client != "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' and 'consent_challenge_id' cannot be set at the same time.`)))
-		return
-	}
+	var (
+		subject          = r.URL.Query().Get("subject")
+		client           = r.URL.Query().Get("client")
+		consentRequestID = r.URL.Query().Get("consent_request_id")
+		allClients       = r.URL.Query().Get("all") == "true"
+	)
 
 	switch {
-	case client != "":
+	case consentRequestID != "" && subject == "" && client == "":
+		if err := h.r.ConsentManager().RevokeConsentSessionByID(r.Context(), consentRequestID); err != nil && !errors.Is(err, x.ErrNotFound) {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithConsentRequestID(consentRequestID))
+
+	case consentRequestID == "" && subject != "" && client != "" && !allClients:
 		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject), events.WithClientID(client))
-	case allClients:
+
+	case consentRequestID == "" && subject != "" && client == "" && allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
-	case consentChallengeID != "":
-		if err := h.r.ConsentManager().RevokeConsentSessionByID(r.Context(), consentChallengeID); err != nil && !errors.Is(err, x.ErrNotFound) {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-		return
+
 	default:
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both 'client' and 'all' is not defined but one of them should have been.`)))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Invalid combination of query parameters.")))
 		return
 	}
 
@@ -782,7 +775,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	p.ID = challenge
+	p.ConsentRequestID = cr.ConsentRequestID
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
@@ -899,12 +892,13 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	cr := f.GetConsentRequest(challenge)
 
 	request, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
-		Error:       &p,
-		ID:          challenge,
-		RequestedAt: hr.RequestedAt,
-		HandledAt:   sqlxx.NullTime(time.Now().UTC()),
+		Error:            &p,
+		ConsentRequestID: cr.ConsentRequestID,
+		RequestedAt:      hr.RequestedAt,
+		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
 	})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))

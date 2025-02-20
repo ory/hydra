@@ -145,8 +145,8 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 //
 // swagger:model acceptOAuth2ConsentRequest
 type AcceptOAuth2ConsentRequest struct {
-	// ID instead of Challenge because of pop
-	ID string `json:"-"`
+	// ConsentRequestID is for internal use only.
+	ConsentRequestID string `json:"-"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope"`
@@ -214,9 +214,7 @@ func (r *AcceptOAuth2ConsentRequest) HasError() bool {
 // List of OAuth 2.0 Consent Sessions
 //
 // swagger:model oAuth2ConsentSessions
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type oAuth2ConsentSessions []OAuth2ConsentSession
+type _ []OAuth2ConsentSession
 
 // OAuth 2.0 Consent Session
 //
@@ -224,45 +222,46 @@ type oAuth2ConsentSessions []OAuth2ConsentSession
 //
 // swagger:model oAuth2ConsentSession
 type OAuth2ConsentSession struct {
-	ID string `json:"-" db:"challenge"`
+	// ConsentRequestID is the identifier of the consent request that initiated this consent session.
+	ConsentRequestID string `json:"consent_request_id"`
 
 	// Scope Granted
 	//
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope" db:"granted_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope"`
 
 	// Audience Granted
 	//
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience"`
 
 	// Session Details
 	//
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *AcceptOAuth2ConsentRequestSession `json:"session" db:"-"`
+	Session *AcceptOAuth2ConsentRequestSession `json:"session"`
 
 	// Remember Consent
 	//
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
-	Remember bool `json:"remember" db:"remember"`
+	Remember bool `json:"remember"`
 
 	// Remember Consent For
 	//
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	RememberFor int `json:"remember_for" db:"remember_for"`
+	RememberFor int `json:"remember_for"`
 
 	// Consent Handled At
 	//
 	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
+	HandledAt sqlxx.NullTime `json:"handled_at"`
 
 	// If set to true means that the request was already handled. This
 	// can happen on form double-submit or other errors. If this is set
 	// we recommend redirecting the user to `request_url` to re-initiate
 	// the flow.
-	WasHandled bool `json:"-" db:"was_used"`
+	WasHandled bool `json:"-"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
@@ -272,14 +271,14 @@ type OAuth2ConsentSession struct {
 	// Consent Request
 	//
 	// The consent request that lead to this consent session.
-	ConsentRequest *OAuth2ConsentRequest `json:"consent_request" db:"-"`
+	ConsentRequest *OAuth2ConsentRequest `json:"consent_request"`
 
-	Error           *RequestDeniedError `json:"-" db:"error"`
-	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
+	Error           *RequestDeniedError `json:"-"`
+	RequestedAt     time.Time           `json:"-"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-"`
 
-	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
-	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
+	SessionIDToken     sqlxx.MapStringInterface `json:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `json:"-"`
 }
 
 func (r *OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
@@ -305,7 +304,6 @@ func (r *OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
 //
 // swagger:model acceptOAuth2LoginRequest
 type HandledLoginRequest struct {
-	// ID instead of challenge for pop
 	ID string `json:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
@@ -627,10 +625,13 @@ func (r *LoginRequest) MarshalJSON() ([]byte, error) {
 //
 // swagger:model oAuth2ConsentRequest
 type OAuth2ConsentRequest struct {
-	// ID is the identifier of the consent authorization request.
+	// Challenge is used to retrieve/accept/deny the consent request.
 	//
 	// required: true
-	ID string `json:"challenge"`
+	Challenge string `json:"challenge"`
+
+	// ConsentRequestID is the ID of the consent request.
+	ConsentRequestID string `json:"consent_request_id"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`

@@ -207,11 +207,12 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
+				loginChallenge = r.URL.Query().Get("login_challenge")
 				res, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(ctx).
-					LoginChallenge(r.URL.Query().Get("login_challenge")).
+					LoginChallenge(loginChallenge).
 					Execute()
 				require.NoError(t, err)
-				loginChallenge = res.Challenge
+				require.Equal(t, loginChallenge, res.Challenge)
 
 				v, _, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 					LoginChallenge(loginChallenge).
@@ -223,10 +224,11 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			},
 			func(w http.ResponseWriter, r *http.Request) {
 				consentChallenge = r.URL.Query().Get("consent_challenge")
-				_, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).
+				res, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(ctx).
 					ConsentChallenge(consentChallenge).
 					Execute()
 				require.NoError(t, err)
+				require.Equal(t, consentChallenge, res.Challenge)
 
 				v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 					ConsentChallenge(consentChallenge).

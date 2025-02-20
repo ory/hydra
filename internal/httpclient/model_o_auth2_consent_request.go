@@ -25,10 +25,12 @@ type OAuth2ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication.
 	Acr *string  `json:"acr,omitempty"`
 	Amr []string `json:"amr,omitempty"`
-	// ID is the identifier of the consent authorization request.
+	// Challenge is used to retrieve/accept/deny the consent request.
 	Challenge string        `json:"challenge"`
 	Client    *OAuth2Client `json:"client,omitempty"`
-	Context   interface{}   `json:"context,omitempty"`
+	// ConsentRequestID is the ID of the consent request.
+	ConsentRequestId *string     `json:"consent_request_id,omitempty"`
+	Context          interface{} `json:"context,omitempty"`
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login & consent app.
 	LoginChallenge *string `json:"login_challenge,omitempty"`
 	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
@@ -182,6 +184,38 @@ func (o *OAuth2ConsentRequest) HasClient() bool {
 // SetClient gets a reference to the given OAuth2Client and assigns it to the Client field.
 func (o *OAuth2ConsentRequest) SetClient(v OAuth2Client) {
 	o.Client = &v
+}
+
+// GetConsentRequestId returns the ConsentRequestId field value if set, zero value otherwise.
+func (o *OAuth2ConsentRequest) GetConsentRequestId() string {
+	if o == nil || IsNil(o.ConsentRequestId) {
+		var ret string
+		return ret
+	}
+	return *o.ConsentRequestId
+}
+
+// GetConsentRequestIdOk returns a tuple with the ConsentRequestId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OAuth2ConsentRequest) GetConsentRequestIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ConsentRequestId) {
+		return nil, false
+	}
+	return o.ConsentRequestId, true
+}
+
+// HasConsentRequestId returns a boolean if a field has been set.
+func (o *OAuth2ConsentRequest) HasConsentRequestId() bool {
+	if o != nil && !IsNil(o.ConsentRequestId) {
+		return true
+	}
+
+	return false
+}
+
+// SetConsentRequestId gets a reference to the given string and assigns it to the ConsentRequestId field.
+func (o *OAuth2ConsentRequest) SetConsentRequestId(v string) {
+	o.ConsentRequestId = &v
 }
 
 // GetContext returns the Context field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -492,6 +526,9 @@ func (o OAuth2ConsentRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize["challenge"] = o.Challenge
 	if !IsNil(o.Client) {
 		toSerialize["client"] = o.Client
+	}
+	if !IsNil(o.ConsentRequestId) {
+		toSerialize["consent_request_id"] = o.ConsentRequestId
 	}
 	if o.Context != nil {
 		toSerialize["context"] = o.Context

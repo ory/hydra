@@ -43,7 +43,7 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 		Owner:                     pointerx.Ptr(prefix + "an-owner"),
 		PolicyUri:                 pointerx.Ptr(prefix + "policy-uri"),
 		Scope:                     pointerx.Ptr(prefix + "foo bar baz"),
-		TosUri:                    pointerx.Ptr(prefix + "tos-uri"),
+		TosUri:                    pointerx.Ptr("https://example.org/" + prefix + "tos"),
 		ResponseTypes:             []string{prefix + "id_token", prefix + "code"},
 		RedirectUris:              []string{"https://" + prefix + "redirect-url", "https://" + prefix + "redirect-uri"},
 		ClientSecretExpiresAt:     pointerx.Ptr[int64](0),
@@ -95,12 +95,15 @@ func TestClientSDK(t *testing.T) {
 		// 		createClient.SecretExpiresAt = 10
 
 		// returned client is correct on Create
-		result, _, err := c.OAuth2API.CreateOAuth2Client(ctx).OAuth2Client(createClient).Execute()
-		require.NoError(t, err)
+		result, res, err := c.OAuth2API.CreateOAuth2Client(ctx).OAuth2Client(createClient).Execute()
+		if !assert.NoError(t, err) {
+			t.Fatalf("error: %s", ioutilx.MustReadAll(res.Body))
+		}
 		assert.NotEmpty(t, result.UpdatedAt)
 		assert.NotEmpty(t, result.CreatedAt)
 		assert.NotEmpty(t, result.RegistrationAccessToken)
 		assert.NotEmpty(t, result.RegistrationClientUri)
+		assert.NotEmpty(t, *result.TosUri)
 		assert.NotEmpty(t, result.ClientId)
 		createClient.ClientId = result.ClientId
 

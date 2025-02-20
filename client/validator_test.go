@@ -129,6 +129,10 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
+			in:        &Client{ID: "foo", TermsOfServiceURI: "https://example.org"},
+			assertErr: assert.NoError,
+		},
+		{
 			in:        &Client{ID: "foo", TermsOfServiceURI: "javascript:alert('XSS')"},
 			assertErr: assert.Error,
 		},

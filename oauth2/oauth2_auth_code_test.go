@@ -119,8 +119,10 @@ func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APICl
 
 func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg driver.Registry, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest) *hydra.AcceptOAuth2ConsentRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(r.URL.Query().Get("consent_challenge")).Execute()
+		challenge := r.URL.Query().Get("consent_challenge")
+		rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
 		require.NoError(t, err)
+		require.Equal(t, challenge, rr.Challenge)
 
 		assert.EqualValues(t, c.GetID(), pointerx.Deref(rr.Client.ClientId))
 		assert.Empty(t, pointerx.Deref(rr.Client.ClientSecret))
@@ -149,7 +151,7 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 		}
 
 		v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
-			ConsentChallenge(r.URL.Query().Get("consent_challenge")).
+			ConsentChallenge(challenge).
 			AcceptOAuth2ConsentRequest(acceptBody).
 			Execute()
 		require.NoError(t, err)
@@ -1212,15 +1214,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					acceptLoginHandler(t, c, adminClient, reg, subject, nil),
 					acceptConsentHandler(t, c, adminClient, reg, subject, func(ocr *hydra.OAuth2ConsentRequest) *hydra.AcceptOAuth2ConsentRequest {
 						require.NotZero(t, ocr.Challenge)
-						t.Logf("Consent Request ID: %s", ocr.Challenge)
+						require.NotNil(t, ocr.ConsentRequestId)
+						require.NotZero(t, *ocr.ConsentRequestId)
+						t.Logf("Consent challenge: %s", ocr.Challenge)
+						t.Logf("Consent request ID: %s", *ocr.ConsentRequestId)
 						return &hydra.AcceptOAuth2ConsentRequest{
 							GrantScope:               ocr.RequestedScope,
 							GrantAccessTokenAudience: ocr.RequestedAccessTokenAudience,
 							Remember:                 pointerx.Ptr(true),
 							RememberFor:              pointerx.Ptr[int64](0),
 							Session: &hydra.AcceptOAuth2ConsentRequestSession{
-								AccessToken: map[string]interface{}{"crid": ocr.Challenge},
-								IdToken:     map[string]interface{}{"crid": ocr.Challenge},
+								AccessToken: map[string]interface{}{"crid": ocr.ConsentRequestId},
+								IdToken:     map[string]interface{}{"crid": ocr.ConsentRequestId},
 							},
 						}
 					}),
@@ -1260,7 +1265,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				// revoken the first token chain by consent request id
 				_, err = adminClient.OAuth2API.
 					RevokeOAuth2ConsentSessions(context.Background()).
-					ConsentChallengeId(consentRequestID).
+					ConsentRequestId(consentRequestID).
 					Execute()
 				require.NoError(t, err)
 

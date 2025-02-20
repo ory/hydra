@@ -8,6 +8,8 @@ replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b
 
+replace github.com/ory/fosite => github.com/phooijenga/fosite v0.0.0-20250225211800-ea87e12044d7
+
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.5
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0

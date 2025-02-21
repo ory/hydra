@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AccessTokenStrategy** | Pointer to **string** | OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are &#x60;jwt&#x60; and &#x60;opaque&#x60;. &#x60;jwt&#x60; is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token Setting the stragegy here overrides the global setting in &#x60;strategies.access_token&#x60;. | [optional] 
+**AccessTokenStrategy** | Pointer to **string** | OAuth 2.0 Access Token Strategy  AccessTokenStrategy is the strategy used to generate access tokens. Valid options are &#x60;jwt&#x60; and &#x60;opaque&#x60;. &#x60;jwt&#x60; is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token Setting the strategy here overrides the global setting in &#x60;strategies.access_token&#x60;. | [optional] 
 **AllowedCorsOrigins** | Pointer to **[]string** |  | [optional] 
 **Audience** | Pointer to **[]string** |  | [optional] 
 **AuthorizationCodeGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 

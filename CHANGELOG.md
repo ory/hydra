@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-02-20)](#000-2025-02-20)
+- [0.0.0 (2025-02-21)](#000-2025-02-21)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.3.0 (2025-01-17)](#230-2025-01-17)
@@ -719,10 +719,19 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-20)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-21)
 
 
 ### Bug Fixes
+
+* Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
+
+    This commit addresses several occurrences where 'strategy' was
+    misspelled as 'stragegy' throughout the codebase.
+    
+    Additionally, a similar issue was found and corrected in the Ory
+    documentation repository (ory/docs), with a corresponding pull request
+    submitted.
 
 * JWT documentation link to point to the correct resource ([#3907](https://github.com/ory/hydra/issues/3907)) ([b746e41](https://github.com/ory/hydra/commit/b746e41eda6dc3fe376b147d146a6fcc7dafb455)):
 

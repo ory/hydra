@@ -310,8 +310,9 @@ func TestJWTBearer(t *testing.T) {
 				audience := reg.Config().OAuth2TokenURL(ctx).String()
 				grantType := "urn:ietf:params:oauth:grant-type:jwt-bearer"
 
+				jti := uuid.NewString()
 				token, _, err := signer.Generate(ctx, jwt.MapClaims{
-					"jti": uuid.NewString(),
+					"jti": jti,
 					"iss": trustGrant.Issuer,
 					"sub": trustGrant.Subject,
 					"aud": audience,
@@ -339,6 +340,7 @@ func TestJWTBearer(t *testing.T) {
 					require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
 					require.ElementsMatch(t, hookReq.Request.GrantedAudience, expectedGrantedAudience)
 					require.Equal(t, expectedPayload, hookReq.Request.Payload)
+					require.Equal(t, jti, hookReq.Request.JWTClaims["jti"])
 
 					claims := map[string]interface{}{
 						"hooked": true,
@@ -554,6 +556,194 @@ func TestJWTBearer(t *testing.T) {
 
 				_, tokenError := getToken(t, conf)
 				require.Error(t, tokenError)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+}
+
+func TestJWTClientAssertion(t *testing.T) {
+	ctx := context.Background()
+
+	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
+
+	set, kid := uuid.NewString(), uuid.NewString()
+	keys, err := jwk.GenerateJWK(ctx, jose.RS256, kid, "sig")
+	require.NoError(t, err)
+	signer := jwk.NewDefaultJWTSigner(reg.Config(), reg, set)
+	signer.GetPrivateKey = func(ctx context.Context) (interface{}, error) {
+		return keys.Keys[0], nil
+	}
+
+	client := &hc.Client{
+		GrantTypes:              []string{"client_credentials"},
+		Scope:                   "offline_access",
+		TokenEndpointAuthMethod: "private_key_jwt",
+		JSONWebKeys: &x.JoseJSONWebKeySet{
+			JSONWebKeySet: &jose.JSONWebKeySet{
+				Keys: []jose.JSONWebKey{keys.Keys[0].Public()},
+			},
+		},
+	}
+	require.NoError(t, reg.ClientManager().CreateClient(ctx, client))
+
+	var newConf = func(client *hc.Client) *clientcredentials.Config {
+		return &clientcredentials.Config{
+			AuthStyle: goauth2.AuthStyleInParams,
+			TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
+			Scopes:    strings.Split(client.Scope, " "),
+			EndpointParams: url.Values{
+				"client_assertion_type": {"urn:ietf:params:oauth:client-assertion-type:jwt-bearer"},
+			},
+		}
+	}
+	var getToken = func(t *testing.T, conf *clientcredentials.Config) (*goauth2.Token, error) {
+		return conf.Token(context.Background())
+	}
+
+	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, checkExtraClaims bool) {
+		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token.AccessToken, admin)
+
+		check := func(res gjson.Result) {
+			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
+			assert.EqualValues(t, cl.GetID(), res.Get("sub").String(), "%s", res.Raw)
+			assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
+
+			assert.EqualValues(t, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)
+			assert.True(t, res.Get("exp").Int() >= res.Get("iat").Int()+int64(reg.Config().GetAccessTokenLifespan(ctx).Seconds()), "%s", res.Raw)
+
+			if checkExtraClaims {
+				require.True(t, res.Get("ext.hooked").Bool())
+			}
+		}
+
+		check(introspection)
+		assert.True(t, introspection.Get("active").Bool())
+		assert.EqualValues(t, "access_token", introspection.Get("token_use").String())
+		assert.EqualValues(t, "Bearer", introspection.Get("token_type").String())
+		assert.EqualValues(t, "offline_access", introspection.Get("scope").String(), "%s", introspection.Raw)
+
+		if strategy != "jwt" {
+			return
+		}
+
+		body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
+		require.NoError(t, err)
+		jwtClaims := gjson.ParseBytes(body)
+		assert.NotEmpty(t, jwtClaims.Get("jti").String())
+		assert.NotEmpty(t, jwtClaims.Get("iss").String())
+		assert.NotEmpty(t, jwtClaims.Get("client_id").String())
+		assert.EqualValues(t, "offline_access", introspection.Get("scope").String(), "%s", introspection.Raw)
+
+		header, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[0])
+		require.NoError(t, err)
+		jwtHeader := gjson.ParseBytes(header)
+		assert.NotEmpty(t, jwtHeader.Get("kid").String())
+		assert.EqualValues(t, "offline_access", introspection.Get("scope").String(), "%s", introspection.Raw)
+
+		check(jwtClaims)
+	}
+
+	var generateAssertion = func() (string, jwt.MapClaims, error) {
+		claims := jwt.MapClaims{
+			"jti": uuid.NewString(),
+			"iss": client.GetID(),
+			"sub": client.GetID(),
+			"aud": reg.Config().OAuth2TokenURL(ctx).String(),
+			"exp": time.Now().Add(time.Hour).Unix(),
+			"iat": time.Now().Add(-time.Minute).Unix(),
+		}
+		headers := &jwt.Headers{Extra: map[string]interface{}{"kid": kid}}
+		token, _, err := signer.Generate(ctx, claims, headers)
+		return token, claims, err
+	}
+
+	t.Run("case=unable to exchange invalid jwt", func(t *testing.T) {
+		conf := newConf(client)
+		conf.EndpointParams.Set("client_assertion", "not-a-jwt")
+		_, err := getToken(t, conf)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "Unable to verify the integrity of the 'client_assertion' value.")
+	})
+
+	t.Run("case=should exchange for an access token", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+
+				token, _, err := generateAssertion()
+				require.NoError(t, err)
+
+				conf := newConf(client)
+				conf.EndpointParams.Set("client_assertion", token)
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				inspectToken(t, result, client, strategy, false)
+			}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
+
+	t.Run("should call token hook if configured", func(t *testing.T) {
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				token, assertionClaims, err := generateAssertion()
+				require.NoError(t, err)
+
+				hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
+					expectedGrantedScopes := []string{client.Scope}
+					expectedPayload := map[string][]string{
+						"grant_type": {"client_credentials"},
+						"scope":      {"offline_access"},
+					}
+
+					var hookReq hydraoauth2.TokenHookRequest
+					require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+					require.NotEmpty(t, hookReq.Session)
+					require.Equal(t, hookReq.Session.Extra, map[string]interface{}{})
+					require.NotEmpty(t, hookReq.Request)
+					require.ElementsMatch(t, hookReq.Request.GrantedScopes, expectedGrantedScopes)
+					require.Equal(t, expectedPayload, hookReq.Request.Payload)
+					require.Equal(t, assertionClaims["jti"], hookReq.Request.JWTClaims["jti"])
+
+					claims := map[string]interface{}{
+						"hooked": true,
+					}
+
+					hookResp := hydraoauth2.TokenHookResponse{
+						Session: flow.AcceptOAuth2ConsentRequestSession{
+							AccessToken: claims,
+							IDToken:     claims,
+						},
+					}
+
+					w.WriteHeader(http.StatusOK)
+					require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+				}))
+				defer hs.Close()
+
+				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+
+				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
+
+				conf := newConf(client)
+				conf.EndpointParams.Set("client_assertion", token)
+
+				result, err := getToken(t, conf)
+				require.NoError(t, err)
+
+				inspectToken(t, result, client, strategy, true)
 			}
 		}
 

@@ -41,6 +41,8 @@ type Request struct {
 	GrantTypes []string `json:"grant_types"`
 	// Payload is the requests payload.
 	Payload map[string][]string `json:"payload"`
+	// JWTClaims contains the decoded JWT claims (RFC 7523).
+	JWTClaims map[string]interface{} `json:"jwt_claims"`
 }
 
 // TokenHookRequest is the request body sent to the token hook.
@@ -177,6 +179,7 @@ func TokenHook(reg interface {
 			GrantedAudience: requester.GetGrantedAudience(),
 			GrantTypes:      requester.GetGrantTypes(),
 			Payload:         requester.Sanitize([]string{"assertion"}).GetRequestForm(),
+			JWTClaims:       requester.GetJWTClaims(),
 		}
 
 		reqBody := TokenHookRequest{

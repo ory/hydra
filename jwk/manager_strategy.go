@@ -12,8 +12,9 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/otelx"
+
+	"github.com/ory/hydra/v2/x"
 )
 
 const tracingComponent = "github.com/ory/hydra/v2/jwk"

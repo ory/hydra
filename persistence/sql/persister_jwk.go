@@ -6,6 +6,7 @@ package sql
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gobuffalo/pop/v6"
@@ -17,8 +18,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/sqlcon"
+
+	"github.com/ory/hydra/v2/jwk"
 )
 
 var _ jwk.Manager = &Persister{}
@@ -31,17 +33,26 @@ func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg,
 			attribute.String("alg", alg)))
 	defer otelx.End(span, &err)
 
-	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
-	if err != nil {
-		return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
-	}
+	concurrencyKey := strings.Join([]string{p.NetworkID(ctx).String(), set, kid, alg, use}, ":")
 
-	err = p.AddKeySet(ctx, set, keys)
+	// Suppress duplicate key set generation jobs where the networkID,set,kid,alg,use match.
+	keysResult, err, _ := p.jwkGenFlightGroup.Do(concurrencyKey, func() (any, error) {
+		keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
+		if err != nil {
+			return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
+		}
+
+		err = p.AddKeySet(ctx, set, keys)
+		if err != nil {
+			return nil, err
+		}
+
+		return keys, nil
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return keys, nil
+	return keysResult.(*jose.JSONWebKeySet), nil
 }
 
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) (err error) {

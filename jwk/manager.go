@@ -11,9 +11,10 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/errorsx"
 
 	jose "github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"

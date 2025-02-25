@@ -111,6 +111,12 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		{
+			in: &Client{ID: "foo", JSONWebKeys: new(x.JoseJSONWebKeySet), JSONWebKeysURI: "https://example.org/jwks.json"},
+			check: func(t *testing.T, c *Client) {
+				assert.Nil(t, c.GetJSONWebKeys())
+			},
+		},
+		{
 			in:        &Client{ID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
 			assertErr: assert.Error,
 		},

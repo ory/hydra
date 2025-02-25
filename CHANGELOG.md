@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-02-21)](#000-2025-02-21)
+- [0.0.0 (2025-02-25)](#000-2025-02-25)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.3.0 (2025-01-17)](#230-2025-01-17)
@@ -719,11 +719,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-21)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-25)
 
 
 ### Bug Fixes
 
+* Allow updating when JWKS URI is set ([#3935](https://github.com/ory/hydra/issues/3935)) ([#3946](https://github.com/ory/hydra/issues/3946)) ([fb1655b](https://github.com/ory/hydra/commit/fb1655ba86077b10141132ed332ba8d6f8c70582)):
+
+    The client validator no longer rejects PATCH and PUT updates when `JSONWebKeysURI` is non-empty and `JSONWebKeys` is not nil.
+
+* CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
 
     This commit addresses several occurrences where 'strategy' was

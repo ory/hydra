@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-02-25)](#000-2025-02-25)
+- [0.0.0 (2025-02-26)](#000-2025-02-26)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
 - [2.3.0 (2025-01-17)](#230-2025-01-17)
@@ -719,7 +719,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-25)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-02-26)
 
 
 ### Bug Fixes
@@ -751,6 +751,34 @@
 
 
 ### Features
+
+* Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
+
+    This patch introduces the OAuth 2.0 Device Authorization Grant to Ory
+    Hydra. The OAuth 2.0 device authorization grant is designed for
+    Internet-connected devices that either lack a browser to perform a
+    user-agent-based authorization or are input constrained to the extent
+    that requiring the user to input text in order to authenticate during
+    the authorization flow is impractical. It enables OAuth clients on such
+    devices (like smart TVs, media consoles, digital picture frames, and
+    printers) to obtain user authorization to access protected resources by
+    using a user agent on a separate device.
+    
+    The OAuth 2.0 Device Authorization Grant may also become relevant for AI
+    Agent authentication flows and is generally an amazing step and
+    innovation for this project.
+    
+    A very special thanks goes to @nsklikas from
+    [Canonical](https://canonical.com), @supercairos from
+    [shadow.tech](https://shadow.tech) and @BuzzBumbleBee.
+    
+    For more details, please check out the documentation
+    (https://github.com/ory/docs/pull/2026)
+    
+    To implement this feature, you will need to implement two additional
+    screens in your login and consent application. A reference
+    implementation can be found
+    [here](https://github.com/ory/hydra-login-consent-node/blob/99ca6ad544f64110706c289dda74c7c622ec3110/src/routes/device.ts).
 
 * Revoke Kratos session asynchronously ([#3936](https://github.com/ory/hydra/issues/3936)) ([a0e7ee2](https://github.com/ory/hydra/commit/a0e7ee29298d4f882a7d471e0601b01c6848c40d)):
 

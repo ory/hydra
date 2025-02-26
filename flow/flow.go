@@ -24,6 +24,10 @@ import (
 //
 // graph TD
 //
+//	DEVICE_INITIALIZED --> DEVICE_UNUSED
+//	DEVICE_UNUSED --> DEVICE_USED
+//	DEVICE_UNUSED --> DEVICE_ERROR
+//	DEVICE_USED --> LOGIN_INITIALIZED
 //	LOGIN_INITIALIZED --> LOGIN_UNUSED
 //	LOGIN_UNUSED --> LOGIN_USED
 //	LOGIN_UNUSED --> LOGIN_ERROR
@@ -53,6 +57,19 @@ const (
 
 	FlowStateConsentUnused = int16(5)
 	FlowStateConsentUsed   = int16(6)
+	// DeviceFlowStateLoginInitialized applies before the login app either
+	// accepts or rejects the login request.
+	DeviceFlowStateInitialized = int16(7)
+
+	// DeviceFlowStateUnused indicates that the login has been authenticated, but
+	// the User Agent hasn't picked up the result yet.
+	DeviceFlowStateUnused = int16(8)
+
+	// DeviceFlowStateUsed indicates that the User Agent is requesting consent and
+	// Hydra has invalidated the login request. This is a short-lived state
+	// because the transition to DeviceFlowStateConsentInitialized should happen while
+	// handling the request that triggered the transition to DeviceFlowStateUsed.
+	DeviceFlowStateUsed = int16(9)
 
 	// TODO: Refactor error handling to persist error codes instead of JSON
 	// strings. Currently we persist errors as JSON strings in the LoginError
@@ -65,6 +82,7 @@ const (
 	// If the above is implemented, merge the LoginError and ConsentError fields
 	// and use the following FlowStates when converting to/from
 	// [Handled]{Login|Consent}Request:
+	DeviceFlowStateError  = int16(127)
 	FlowStateLoginError   = int16(128)
 	FlowStateConsentError = int16(129)
 )
@@ -207,10 +225,24 @@ type Flow struct {
 	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
 	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at" json:"la,omitempty"`
 
+	// DeviceChallengeID is the device request's challenge ID
+	DeviceChallengeID sqlxx.NullString `db:"device_challenge_id" json:"di,omitempty"`
+	// DeviceCodeRequestID is the device request's ID
+	DeviceCodeRequestID sqlxx.NullString `db:"device_code_request_id" json:"dr,omitempty"`
+	// DeviceVerifier is the device request's verifier
+	DeviceVerifier sqlxx.NullString `db:"device_verifier" json:"dv,omitempty"`
+	// DeviceVerifier is the device request's CSRF
+	DeviceCSRF sqlxx.NullString `db:"device_csrf" json:"dc,omitempty"`
+	// DeviceWasUsed set to true means that the device request was already handled
+	DeviceWasUsed sqlxx.NullBool `db:"device_was_used" json:"du,omitempty"`
+	// DeviceHandledAt contains the timestamp the device user_code verification request was handled
+	DeviceHandledAt sqlxx.NullTime `db:"device_handled_at" json:"dh,omitempty"`
+	// DeviceError contains any error that happened during the handling of the device flow
+	DeviceError *RequestDeniedError `db:"device_error" json:"de,omitempty"`
+
 	// ConsentRequestID is the identifier of the consent request.
 	// The database column should be named `consent_request_id`, but is not for historical reasons.
 	ConsentRequestID sqlxx.NullString `db:"consent_challenge_id" json:"cc,omitempty"`
-
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
@@ -242,6 +274,104 @@ type Flow struct {
 	ConsentError       *RequestDeniedError      `db:"consent_error" json:"cx"`
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-" json:"st"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-" json:"sa"`
+}
+
+// NewDeviceFlow return a new Flow from a DeviceUserAuthRequest.
+func NewDeviceFlow(r *DeviceUserAuthRequest) *Flow {
+	f := &Flow{
+		DeviceChallengeID: sqlxx.NullString(r.ID),
+		Client:            r.Client,
+		RequestURL:        r.RequestURL,
+		DeviceVerifier:    sqlxx.NullString(r.Verifier),
+		DeviceCSRF:        sqlxx.NullString(r.CSRF),
+		RequestedAt:       r.RequestedAt,
+		RequestedScope:    r.RequestedScope,
+		RequestedAudience: r.RequestedAudience,
+		DeviceWasUsed:     sqlxx.NullBool{Bool: r.WasHandled, Valid: true},
+		DeviceHandledAt:   r.HandledAt,
+		State:             DeviceFlowStateInitialized,
+	}
+	if r.Client != nil {
+		f.ClientID = r.Client.GetID()
+	}
+	return f
+}
+
+// GetDeviceUserAuthRequest return the DeviceUserAuthRequest from a Flow.
+func (f *Flow) GetDeviceUserAuthRequest() *DeviceUserAuthRequest {
+	return &DeviceUserAuthRequest{
+		ID:                f.DeviceChallengeID.String(),
+		Client:            f.Client,
+		RequestURL:        f.RequestURL,
+		Verifier:          f.DeviceVerifier.String(),
+		CSRF:              f.DeviceCSRF.String(),
+		RequestedAt:       f.RequestedAt,
+		RequestedScope:    f.RequestedScope,
+		RequestedAudience: f.RequestedAudience,
+		WasHandled:        f.DeviceWasUsed.Bool,
+		HandledAt:         f.DeviceHandledAt,
+	}
+}
+
+// GetHandledDeviceUserAuthRequest return the HandledDeviceUserAuthRequest from a Flow.
+func (f *Flow) GetHandledDeviceUserAuthRequest() *HandledDeviceUserAuthRequest {
+	return &HandledDeviceUserAuthRequest{
+		ID:                  f.DeviceChallengeID.String(),
+		Client:              f.Client,
+		Request:             f.GetDeviceUserAuthRequest(),
+		DeviceCodeRequestID: f.DeviceCodeRequestID.String(),
+		RequestURL:          f.RequestURL,
+		RequestedAt:         f.RequestedAt,
+		RequestedScope:      f.RequestedScope,
+		RequestedAudience:   f.RequestedAudience,
+		WasHandled:          f.DeviceWasUsed.Bool,
+		HandledAt:           f.DeviceHandledAt,
+		Error:               f.DeviceError,
+	}
+}
+
+// HandleDeviceUserAuthRequest updates the flows fields from a handled request.
+func (f *Flow) HandleDeviceUserAuthRequest(h *HandledDeviceUserAuthRequest) error {
+	if f.DeviceWasUsed.Bool {
+		return errors.WithStack(x.ErrConflict.WithHint("The device verifier was already used and can no longer be changed."))
+	}
+
+	if f.State != DeviceFlowStateInitialized && f.State != DeviceFlowStateUnused && f.State != DeviceFlowStateError {
+		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", DeviceFlowStateInitialized, DeviceFlowStateUnused, DeviceFlowStateError, f.State)
+	}
+
+	if f.DeviceChallengeID.String() != h.ID {
+		return errors.Errorf("flow device challenge ID %s does not match HandledDeviceUserAuthRequest ID %s", f.ID, h.ID)
+	}
+
+	f.State = DeviceFlowStateUnused
+	if h.Error != nil {
+		f.State = DeviceFlowStateError
+	}
+	f.Client = h.Client
+	f.ClientID = h.Client.GetID()
+	f.DeviceCodeRequestID = sqlxx.NullString(h.DeviceCodeRequestID)
+	f.DeviceHandledAt = h.HandledAt
+	f.DeviceWasUsed = sqlxx.NullBool{Bool: h.WasHandled, Valid: true}
+	f.RequestedScope = h.RequestedScope
+	f.RequestedAudience = h.RequestedAudience
+	f.DeviceError = h.Error
+
+	return nil
+}
+
+// InvalidateDeviceRequest shifts the flow state to DeviceFlowStateUsed. This
+// transition is executed upon device completion.
+func (f *Flow) InvalidateDeviceRequest() error {
+	if f.State != DeviceFlowStateUnused && f.State != DeviceFlowStateError {
+		return errors.Errorf("invalid flow state: expected %d or %d, got %d", DeviceFlowStateUnused, DeviceFlowStateError, f.State)
+	}
+	if f.DeviceWasUsed.Bool {
+		return errors.New("device verifier has already been used")
+	}
+	f.DeviceWasUsed = sqlxx.NullBool{Bool: true, Valid: true}
+	f.State = DeviceFlowStateUsed
+	return nil
 }
 
 func NewFlow(r *LoginRequest) *Flow {
@@ -438,6 +568,7 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		RequestURL:             f.RequestURL,
 		LoginChallenge:         sqlxx.NullString(f.ID),
 		LoginSessionID:         f.SessionID,
+		DeviceChallenge:        f.DeviceChallengeID,
 		ACR:                    f.ACR,
 		AMR:                    f.AMR,
 		Context:                f.Context,
@@ -511,6 +642,16 @@ func (f *Flow) AfterSave(_ *pop.Connection) {
 
 type CipherProvider interface {
 	FlowCipher() *aead.XChaCha20Poly1305
+}
+
+// ToDeviceChallenge converts the flow into a device challenge.
+func (f *Flow) ToDeviceChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsDeviceChallenge)
+}
+
+// ToDeviceVerifier converts the flow into a device verifier.
+func (f *Flow) ToDeviceVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
+	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsDeviceVerifier)
 }
 
 // ToLoginChallenge converts the flow into a login challenge.

@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/hasherx"
+	"github.com/ory/x/randx"
 
 	"github.com/gofrs/uuid"
 
@@ -50,6 +51,7 @@ const (
 	KeyOIDCDiscoverySupportedClaims              = "webfinger.oidc_discovery.supported_claims"
 	KeyOIDCDiscoverySupportedScope               = "webfinger.oidc_discovery.supported_scope"
 	KeyOIDCDiscoveryUserinfoEndpoint             = "webfinger.oidc_discovery.userinfo_url"
+	KeyOAuth2DeviceAuthorisationURL              = "webfinger.oidc_discovery.device_authorization_url"
 	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
 	KeyDSN                                       = "dsn"
@@ -64,6 +66,7 @@ const (
 	KeyCookieDomain                              = "serve.cookies.domain"
 	KeyCookieSecure                              = "serve.cookies.secure"
 	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
+	KeyCookieDeviceCSRFName                      = "serve.cookies.names.device_csrf"
 	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
 	KeyCookieSessionName                         = "serve.cookies.names.session"
 	KeyCookieSessionPath                         = "serve.cookies.paths.session"
@@ -73,6 +76,7 @@ const (
 	KeyVerifiableCredentialsNonceLifespan        = "ttl.vc_nonce"      // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
+	KeyDeviceAndUserCodeLifespan                 = "ttl.device_user_code"
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"
@@ -82,6 +86,8 @@ const (
 	KeyLogoutURL                                 = "urls.logout"
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
+	KeyDeviceVerificationURL                     = "urls.device.verification"
+	KeyDeviceDoneURL                             = "urls.device.success"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
@@ -93,6 +99,8 @@ const (
 	KeyDBIgnoreUnknownTableColumns               = "db.ignore_unknown_table_columns"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
+	KeyDeviceAuthTokenPollingInterval            = "oauth2.device_authorization.token_polling_interval" // #nosec G101
+	KeyDeviceAuthUserCodeEntropy                 = "oauth2.device_authorization.user_code_entropy"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
@@ -112,6 +120,15 @@ const (
 )
 
 const DSNMemory = "memory"
+
+var userCodeEtropy = map[string]struct {
+	Length  int
+	Symbols []rune
+}{
+	"high":   {Length: 8, Symbols: []rune(randx.AlphaNumNoAmbiguous)},
+	"medium": {Length: 8, Symbols: []rune(randx.AlphaUpper)},
+	"low":    {Length: 9, Symbols: []rune(randx.Numeric)},
+}
 
 var (
 	_ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
@@ -397,6 +414,48 @@ func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host str
 	return &u
 }
 
+// GetDeviceAndUserCodeLifespan returns the device_code and user_code lifespan. Defaults to 15 minutes.
+func (p *DefaultProvider) GetDeviceAndUserCodeLifespan(ctx context.Context) time.Duration {
+	return p.p.DurationF(KeyDeviceAndUserCodeLifespan, time.Minute*15)
+}
+
+// GetDeviceAuthTokenPollingInterval returns device grant token endpoint polling interval. Defaults to 5 seconds.
+func (p *DefaultProvider) GetDeviceAuthTokenPollingInterval(ctx context.Context) time.Duration {
+	return p.p.DurationF(KeyDeviceAuthTokenPollingInterval, time.Second*5)
+}
+
+// GetUserCodeLength returns configured user_code length
+func (p *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
+	profile, ok := userCodeEtropy[k]
+	if !ok {
+		keys := []string{}
+		for k := range userCodeEtropy {
+			keys = append(keys, k)
+		}
+
+		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
+		return 0
+	}
+	return profile.Length
+}
+
+// GetDeviceAuthTokenPollingInterval returns configured user_code allowed symbols
+func (p *DefaultProvider) GetUserCodeSymbols(ctx context.Context) []rune {
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
+	profile, ok := userCodeEtropy[k]
+	if !ok {
+		keys := []string{}
+		for k := range userCodeEtropy {
+			keys = append(keys, k)
+		}
+
+		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
+		return nil
+	}
+	return profile.Symbols
+}
+
 func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).URIF(KeyLoginURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/login")))
 }
@@ -415,6 +474,16 @@ func (p *DefaultProvider) ConsentURL(ctx context.Context) *url.URL {
 
 func (p *DefaultProvider) ErrorURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).RequestURIF(KeyErrorURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/error")))
+}
+
+// DeviceVerificationURL returns user_code verification page URL. Defaults to "oauth2/fallbacks/device".
+func (p *DefaultProvider) DeviceVerificationURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).URIF(KeyDeviceVerificationURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device")))
+}
+
+// DeviceDoneURL returns the post device authorization URL. Defaults to "oauth2/fallbacks/device/done".
+func (p *DefaultProvider) DeviceDoneURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyDeviceDoneURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/device/done")))
 }
 
 func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
@@ -472,6 +541,11 @@ func (p *DefaultProvider) OAuth2TokenURL(ctx context.Context) *url.URL {
 
 func (p *DefaultProvider) OAuth2AuthURL(ctx context.Context) *url.URL {
 	return p.getProvider(ctx).RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/auth"))
+}
+
+// OAuth2DeviceAuthorisationURL returns device authorization endpoint. Defaults to "/oauth2/device/auth".
+func (p *DefaultProvider) OAuth2DeviceAuthorisationURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyOAuth2DeviceAuthorisationURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/device/auth"))
 }
 
 func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
@@ -660,6 +734,11 @@ func (p *DefaultProvider) SessionCookiePath(ctx context.Context) string {
 
 func (p *DefaultProvider) CookieNameLoginCSRF(ctx context.Context) string {
 	return p.cookieSuffix(ctx, KeyCookieLoginCSRFName)
+}
+
+// CookieNameDeviceCSRF returns the device CSRF cookie name.
+func (p *DefaultProvider) CookieNameDeviceCSRF(ctx context.Context) string {
+	return p.cookieSuffix(ctx, KeyCookieDeviceCSRFName)
 }
 
 func (p *DefaultProvider) CookieNameConsentCSRF(ctx context.Context) string {

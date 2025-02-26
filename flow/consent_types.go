@@ -23,6 +23,7 @@ import (
 )
 
 const (
+	DeviceRequestDeniedErrorName  = "device request denied"
 	ConsentRequestDeniedErrorName = "consent request denied"
 	LoginRequestDeniedErrorName   = "login request denied"
 )
@@ -539,6 +540,66 @@ type LogoutResult struct {
 	FrontChannelLogoutURLs []string
 }
 
+// Contains information on an ongoing device grant request.
+//
+// swagger:model DeviceUserAuthRequest
+type DeviceUserAuthRequest struct {
+	// ID is the identifier ("device challenge") of the device grant request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ID       string `json:"challenge"`
+	CSRF     string `json:"-"`
+	Verifier string `json:"-"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	Client *client.Client `json:"client"`
+	// RequestURL is the original Device Authorization URL requested.
+	RequestURL string `json:"request_url"`
+
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
+
+	RequestedAt time.Time      `json:"-"`
+	HandledAt   sqlxx.NullTime `json:"handled_at"`
+	WasHandled  bool           `json:"-"`
+}
+
+// HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.
+//
+// swagger:model verifyUserCodeRequest
+type HandledDeviceUserAuthRequest struct {
+	// ID is the identifier ("device challenge") of the device request. It is used to
+	// identify the session.
+	ID string `json:"challenge"`
+
+	Request *DeviceUserAuthRequest `json:"-" faker:"-"`
+	// RequestURL is the original Device Authorization URL requested.
+	RequestURL string `json:"request_url"`
+	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
+
+	DeviceCodeRequestID string `json:"device_code_request_id"`
+
+	// Client is the OAuth 2.0 Client that initiated the request.
+	Client *client.Client `json:"client"`
+
+	RequestedAt time.Time `json:"-"`
+
+	HandledAt  sqlxx.NullTime      `json:"handled_at"`
+	WasHandled bool                `json:"-"`
+	Error      *RequestDeniedError `json:"-"`
+}
+
+// HasError returns whether the request has errors.
+func (r *HandledDeviceUserAuthRequest) HasError() bool {
+	return r.Error.IsError()
+}
+
 // Contains information on an ongoing login request.
 //
 // swagger:model oAuth2LoginRequest
@@ -621,6 +682,13 @@ func (r *LoginRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(alias)
 }
 
+// Contains information on an device verification
+//
+// swagger:model acceptDeviceUserCodeRequest
+type AcceptDeviceUserCodeRequest struct {
+	UserCode string `json:"user_code"`
+}
+
 // Contains information on an ongoing consent request.
 //
 // swagger:model oAuth2ConsentRequest
@@ -670,6 +738,9 @@ type OAuth2ConsentRequest struct {
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	LoginSessionID sqlxx.NullString `json:"login_session_id"`
+
+	// DeviceChallenge is the device challenge this consent challenge belongs to, if this flow was initiated by a device.
+	DeviceChallenge sqlxx.NullString `json:"device_challenge_id" faker:"-"`
 
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.

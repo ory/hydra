@@ -8,6 +8,9 @@ Name | Type | Description | Notes
 **AuthorizationCodeGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **AuthorizationCodeGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **ClientCredentialsGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**DeviceAuthorizationGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**DeviceAuthorizationGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
+**DeviceAuthorizationGrantRefreshTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **ImplicitGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **ImplicitGrantIdTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
 **JwtBearerGrantAccessTokenLifespan** | Pointer to **string** | Specify a time duration in milliseconds, seconds, minutes, hours. | [optional] 
@@ -133,6 +136,81 @@ SetClientCredentialsGrantAccessTokenLifespan sets ClientCredentialsGrantAccessTo
 `func (o *OAuth2ClientTokenLifespans) HasClientCredentialsGrantAccessTokenLifespan() bool`
 
 HasClientCredentialsGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetDeviceAuthorizationGrantAccessTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantAccessTokenLifespan() string`
+
+GetDeviceAuthorizationGrantAccessTokenLifespan returns the DeviceAuthorizationGrantAccessTokenLifespan field if non-nil, zero value otherwise.
+
+### GetDeviceAuthorizationGrantAccessTokenLifespanOk
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantAccessTokenLifespanOk() (*string, bool)`
+
+GetDeviceAuthorizationGrantAccessTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantAccessTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeviceAuthorizationGrantAccessTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) SetDeviceAuthorizationGrantAccessTokenLifespan(v string)`
+
+SetDeviceAuthorizationGrantAccessTokenLifespan sets DeviceAuthorizationGrantAccessTokenLifespan field to given value.
+
+### HasDeviceAuthorizationGrantAccessTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) HasDeviceAuthorizationGrantAccessTokenLifespan() bool`
+
+HasDeviceAuthorizationGrantAccessTokenLifespan returns a boolean if a field has been set.
+
+### GetDeviceAuthorizationGrantIdTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantIdTokenLifespan() string`
+
+GetDeviceAuthorizationGrantIdTokenLifespan returns the DeviceAuthorizationGrantIdTokenLifespan field if non-nil, zero value otherwise.
+
+### GetDeviceAuthorizationGrantIdTokenLifespanOk
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantIdTokenLifespanOk() (*string, bool)`
+
+GetDeviceAuthorizationGrantIdTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantIdTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeviceAuthorizationGrantIdTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) SetDeviceAuthorizationGrantIdTokenLifespan(v string)`
+
+SetDeviceAuthorizationGrantIdTokenLifespan sets DeviceAuthorizationGrantIdTokenLifespan field to given value.
+
+### HasDeviceAuthorizationGrantIdTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) HasDeviceAuthorizationGrantIdTokenLifespan() bool`
+
+HasDeviceAuthorizationGrantIdTokenLifespan returns a boolean if a field has been set.
+
+### GetDeviceAuthorizationGrantRefreshTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantRefreshTokenLifespan() string`
+
+GetDeviceAuthorizationGrantRefreshTokenLifespan returns the DeviceAuthorizationGrantRefreshTokenLifespan field if non-nil, zero value otherwise.
+
+### GetDeviceAuthorizationGrantRefreshTokenLifespanOk
+
+`func (o *OAuth2ClientTokenLifespans) GetDeviceAuthorizationGrantRefreshTokenLifespanOk() (*string, bool)`
+
+GetDeviceAuthorizationGrantRefreshTokenLifespanOk returns a tuple with the DeviceAuthorizationGrantRefreshTokenLifespan field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetDeviceAuthorizationGrantRefreshTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) SetDeviceAuthorizationGrantRefreshTokenLifespan(v string)`
+
+SetDeviceAuthorizationGrantRefreshTokenLifespan sets DeviceAuthorizationGrantRefreshTokenLifespan field to given value.
+
+### HasDeviceAuthorizationGrantRefreshTokenLifespan
+
+`func (o *OAuth2ClientTokenLifespans) HasDeviceAuthorizationGrantRefreshTokenLifespan() bool`
+
+HasDeviceAuthorizationGrantRefreshTokenLifespan returns a boolean if a field has been set.
 
 ### GetImplicitGrantAccessTokenLifespan
 

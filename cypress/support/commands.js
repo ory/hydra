@@ -216,3 +216,90 @@ Cypress.Commands.add("refreshTokenBrowser", (client, token) =>
     failOnStatusCode: false,
   }),
 )
+
+Cypress.Commands.add(
+  "deviceAuthFlow",
+  (
+    client,
+    {
+      override: { scope, client_id, client_secret } = {},
+      consent: {
+        accept: acceptConsent = true,
+        skip: skipConsent = false,
+        remember: rememberConsent = false,
+        scope: acceptScope = [],
+      } = {},
+      login: {
+        accept: acceptLogin = true,
+        skip: skipLogin = false,
+        remember: rememberLogin = false,
+        username = "foo@bar.com",
+        password = "foobar",
+      } = {},
+      prompt = "",
+      createClient: doCreateClient = true,
+    } = {},
+    path = "oauth2",
+  ) => {
+    const run = (client) => {
+      cy.visit(
+        `${Cypress.env("client_url")}/${path}/device?client_id=${
+          client_id || client.client_id
+        }&client_secret=${client_secret || client.client_secret}&scope=${
+          scope || client.scope
+        }`,
+        { failOnStatusCode: false },
+      )
+
+      cy.get("#verify").click()
+
+      if (!skipLogin) {
+        cy.get("#email").type(username, { delay: 1 })
+        cy.get("#password").type(password, { delay: 1 })
+
+        if (rememberLogin) {
+          cy.get("#remember").click()
+        }
+
+        if (acceptLogin) {
+          cy.get("#accept").click()
+        } else {
+          cy.get("#reject").click()
+        }
+      }
+
+      if (!skipConsent) {
+        acceptScope.forEach((s) => {
+          cy.get(`#${s}`).click()
+        })
+
+        if (rememberConsent) {
+          cy.get("#remember").click()
+        }
+
+        if (acceptConsent) {
+          cy.get("#accept").click()
+        } else {
+          cy.get("#reject").click()
+        }
+
+        cy.location().should((loc) => {
+          expect(loc.origin).to.eq(Cypress.env("consent_url"))
+          expect(loc.pathname).to.eq("/oauth2/device/success")
+        })
+      }
+    }
+
+    if (doCreateClient) {
+      createClient(client).should((client) => {
+        run(client)
+      })
+      return
+    }
+    run(client)
+  },
+)
+
+Cypress.Commands.add("postDeviceAuthFlow", (path = "oauth2") =>
+  cy.request(`${Cypress.env("client_url")}/${path}/device/success`),
+)

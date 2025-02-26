@@ -152,6 +152,87 @@ app.get("/oauth2/callback", async (req, res) => {
     })
 })
 
+app.get("/oauth2/device", async (req, res) => {
+  const client = {
+    id: req.query.client_id,
+    secret: req.query.client_secret,
+  }
+
+  const state = uuid.v4()
+  const scope = req.query.scope || ""
+
+  req.session.client = client
+  req.session.scope = scope.split(" ")
+
+  const params = new URLSearchParams()
+  params.append("client_id", req.query.client_id)
+  params.append("scope", scope)
+
+  let headers = new Headers()
+  headers.set(
+    "Authorization",
+    "Basic " +
+      Buffer.from(req.query.client_id + ":" + req.query.client_secret).toString(
+        "base64",
+      ),
+  )
+
+  fetch(new URL("/oauth2/device/auth", config.public).toString(), {
+    method: "POST",
+    body: params,
+    headers: headers,
+  })
+    .then(isStatusOk)
+    .then((res) => res.json())
+    .then((body) => {
+      // Store the device_code to use after authentication to get the tokens
+      req.session.device_code = body?.device_code
+      res.redirect(body?.verification_uri_complete)
+    })
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
+})
+
+app.get("/oauth2/device/success", async (req, res) => {
+  const clientId = req.session?.client?.id
+  const clientSecret = req.session?.client?.secret
+
+  if (clientId === undefined || clientSecret === undefined) {
+    res.send(
+      JSON.stringify({
+        result: "error",
+        error: "no client credentials in session",
+      }),
+    )
+    return
+  }
+
+  const params = new URLSearchParams()
+  params.append("client_id", clientId)
+  params.append("device_code", req.session?.device_code)
+  params.append("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
+  let headers = new Headers()
+  headers.set(
+    "Authorization",
+    "Basic " + Buffer.from(clientId + ":" + clientSecret).toString("base64"),
+  )
+
+  fetch(new URL("/oauth2/token", config.public).toString(), {
+    method: "POST",
+    body: params,
+    headers: headers,
+  })
+    .then(isStatusOk)
+    .then((resp) => resp.json())
+    .then((data) => {
+      res.send({ result: "success", token: data })
+    })
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
+})
+
 app.get("/oauth2/refresh", function (req, res) {
   oauth2
     .create(req.session.credentials)

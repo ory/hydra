@@ -35,6 +35,7 @@
       ]
     }
   ],
+  "device_authorization_endpoint": "http://hydra.localhost/oauth2/device/auth",
   "end_session_endpoint": "http://hydra.localhost/oauth2/sessions/logout",
   "frontchannel_logout_session_supported": true,
   "frontchannel_logout_supported": true,
@@ -42,7 +43,8 @@
     "authorization_code",
     "implicit",
     "client_credentials",
-    "refresh_token"
+    "refresh_token",
+    "urn:ietf:params:oauth:grant-type:device_code"
   ],
   "id_token_signed_response_alg": [
     "RS256"

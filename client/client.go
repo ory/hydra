@@ -79,6 +79,7 @@ type Client struct {
 	// - OpenID Connect Implicit Grant (deprecated!): `implicit`
 	// - Refresh Token Grant: `refresh_token`
 	// - OAuth 2.0 Token Exchange: `urn:ietf:params:oauth:grant-type:jwt-bearer`
+	// - OAuth 2.0 Device Code Grant: `urn:ietf:params:oauth:grant-type:device_code`
 	GrantTypes sqlxx.StringSliceJSONFormat `json:"grant_types" db:"grant_types"`
 
 	// OAuth 2.0 Client Response Types
@@ -379,6 +380,21 @@ type Lifespans struct {
 	//
 	// The lifespan of a refresh token issued by the OAuth2 2.0 Refresh Token Grant for this OAuth 2.0 Client.
 	RefreshTokenGrantRefreshTokenLifespan x.NullDuration `json:"refresh_token_grant_refresh_token_lifespan,omitempty" db:"refresh_token_grant_refresh_token_lifespan"`
+
+	// OAuth2 2.0 Device Authorization Grant ID Token Lifespan
+	//
+	// The lifespan of an ID token issued by the OAuth2 2.0 Device Authorization Grant for this OAuth 2.0 Client.
+	DeviceAuthorizationGrantIDTokenLifespan x.NullDuration `json:"device_authorization_grant_id_token_lifespan,omitempty" db:"device_authorization_grant_id_token_lifespan"`
+
+	// OAuth2 2.0 Device Authorization Grant Access Token Lifespan
+	//
+	// The lifespan of an access token issued by the OAuth2 2.0 Device Authorization Grant for this OAuth 2.0 Client.
+	DeviceAuthorizationGrantAccessTokenLifespan x.NullDuration `json:"device_authorization_grant_access_token_lifespan,omitempty" db:"device_authorization_grant_access_token_lifespan"`
+
+	// OAuth2 2.0 Device Authorization Grant Device Authorization Lifespan
+	//
+	// The lifespan of a Device Authorization issued by the OAuth2 2.0 Device Authorization Grant for this OAuth 2.0 Client.
+	DeviceAuthorizationGrantRefreshTokenLifespan x.NullDuration `json:"device_authorization_grant_refresh_token_lifespan,omitempty" db:"device_authorization_grant_refresh_token_lifespan"`
 }
 
 func (Client) TableName() string {
@@ -548,6 +564,14 @@ func (c *Client) GetEffectiveLifespan(gt fosite.GrantType, tt fosite.TokenType, 
 			cl = &c.RefreshTokenGrantIDTokenLifespan.Duration
 		} else if tt == fosite.RefreshToken && c.RefreshTokenGrantRefreshTokenLifespan.Valid {
 			cl = &c.RefreshTokenGrantRefreshTokenLifespan.Duration
+		}
+	} else if gt == fosite.GrantTypeDeviceCode {
+		if tt == fosite.AccessToken && c.DeviceAuthorizationGrantAccessTokenLifespan.Valid {
+			cl = &c.DeviceAuthorizationGrantAccessTokenLifespan.Duration
+		} else if tt == fosite.IDToken && c.DeviceAuthorizationGrantIDTokenLifespan.Valid {
+			cl = &c.DeviceAuthorizationGrantIDTokenLifespan.Duration
+		} else if tt == fosite.RefreshToken && c.DeviceAuthorizationGrantRefreshTokenLifespan.Valid {
+			cl = &c.DeviceAuthorizationGrantRefreshTokenLifespan.Duration
 		}
 	}
 

@@ -787,6 +787,40 @@ paths:
       summary: Reject OAuth 2.0 Consent Request
       tags:
       - oAuth2
+  /admin/oauth2/auth/requests/device/accept:
+    put:
+      description: Accepts a device grant user_code request
+      operationId: acceptUserCodeRequest
+      parameters:
+      - explode: true
+        in: query
+        name: device_challenge
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/acceptDeviceUserCodeRequest'
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oAuth2RedirectTo'
+          description: oAuth2RedirectTo
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorOAuth2'
+          description: errorOAuth2
+      summary: Accepts a device grant user_code request
+      tags:
+      - oAuth2
   /admin/oauth2/auth/requests/login:
     get:
       description: |-
@@ -1512,6 +1546,49 @@ paths:
       summary: OAuth 2.0 Authorize Endpoint
       tags:
       - oAuth2
+  /oauth2/device/auth:
+    post:
+      description: |-
+        This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+        OAuth2 is a very popular protocol and a library for your programming language will exists.
+
+        To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
+      operationId: oAuth2DeviceFlow
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deviceAuthorization'
+          description: deviceAuthorization
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorOAuth2'
+          description: errorOAuth2
+      summary: The OAuth 2.0 Device Authorize Endpoint
+      tags:
+      - oAuth2
+  /oauth2/device/verify:
+    get:
+      description: This is the device user verification endpoint. The user is redirected
+        here when trying to login using the device flow.
+      operationId: performOAuth2DeviceVerificationFlow
+      responses:
+        "302":
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 204.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorOAuth2'
+          description: errorOAuth2
+      summary: OAuth 2.0 Device Verification Endpoint
+      tags:
+      - oAuth2
   /oauth2/register:
     post:
       description: |-
@@ -1879,6 +1956,38 @@ components:
         a verifiable credential.
       type: object
     DefaultError: {}
+    DeviceUserAuthRequest:
+      properties:
+        challenge:
+          description: |-
+            ID is the identifier ("device challenge") of the device grant request. It is used to
+            identify the session.
+          type: string
+        client:
+          $ref: '#/components/schemas/oAuth2Client'
+        handled_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
+        request_url:
+          description: RequestURL is the original Device Authorization URL requested.
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
+            \ JSON for SQL storage."
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
+            \ JSON for SQL storage."
+          type: array
+      required:
+      - challenge
+      title: Contains information on an ongoing device grant request.
+      type: object
     JSONRawMessage:
       title: "JSONRawMessage represents a json.RawMessage that works well with JSON,\
         \ SQL, and Swagger."
@@ -1941,6 +2050,12 @@ components:
         proof_type:
           type: string
       title: VerifiableCredentialProof contains the proof of a verifiable credential.
+      type: object
+    acceptDeviceUserCodeRequest:
+      description: Contains information on an device verification
+      properties:
+        user_code:
+          type: string
       type: object
     acceptOAuth2ConsentRequest:
       properties:
@@ -2137,6 +2252,53 @@ components:
             type: string
           type: array
       title: Verifiable Credentials Metadata (Draft 00)
+      type: object
+    deviceAuthorization:
+      description: '# Ory''s OAuth 2.0 Device Authorization API'
+      example:
+        user_code: AAAAAA
+        device_code: ory_dc_smldfksmdfkl.mslkmlkmlk
+        interval: 5
+        verification_uri_complete: https://auth.ory.sh/tv?user_code=AAAAAA
+        verification_uri: https://auth.ory.sh/tv
+        expires_in: 16830
+      properties:
+        device_code:
+          description: The device verification code.
+          example: ory_dc_smldfksmdfkl.mslkmlkmlk
+          type: string
+        expires_in:
+          description: The lifetime in seconds of the "device_code" and "user_code".
+          example: 16830
+          format: int64
+          type: integer
+        interval:
+          description: |-
+            The minimum amount of time in seconds that the client
+            SHOULD wait between polling requests to the token endpoint.  If no
+            value is provided, clients MUST use 5 as the default.
+          example: 5
+          format: int64
+          type: integer
+        user_code:
+          description: The end-user verification code.
+          example: AAAAAA
+          type: string
+        verification_uri:
+          description: |-
+            The end-user verification URI on the authorization
+            server.  The URI should be short and easy to remember as end users
+            will be asked to manually type it into their user agent.
+          example: https://auth.ory.sh/tv
+          type: string
+        verification_uri_complete:
+          description: |-
+            A verification URI that includes the "user_code" (or
+            other information with the same function as the "user_code"),
+            which is designed for non-textual transmission.
+          example: https://auth.ory.sh/tv?user_code=AAAAAA
+          type: string
+      title: OAuth2 Device Flow
       type: object
     errorOAuth2:
       description: Error
@@ -2568,47 +2730,28 @@ components:
         generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
       example:
         metadata: ""
-        token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
-        client_uri: client_uri
-        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-        jwks: ""
         logo_uri: logo_uri
-        created_at: 2000-01-23T04:56:07.000+00:00
-        registration_client_uri: registration_client_uri
         allowed_cors_origins:
         - allowed_cors_origins
         - allowed_cors_origins
         refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
-        registration_access_token: registration_access_token
         client_id: client_id
-        token_endpoint_auth_method: client_secret_basic
-        userinfo_signed_response_alg: userinfo_signed_response_alg
-        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
         authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
         client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
-        updated_at: 2000-01-23T04:56:07.000+00:00
-        scope: scope1 scope-2 scope.3 scope:4
         request_uris:
         - request_uris
         - request_uris
         client_secret: client_secret
         backchannel_logout_session_required: true
         backchannel_logout_uri: backchannel_logout_uri
-        client_name: client_name
-        policy_uri: policy_uri
-        owner: owner
-        skip_consent: true
         audience:
         - audience
         - audience
-        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
         post_logout_redirect_uris:
         - post_logout_redirect_uris
         - post_logout_redirect_uris
-        grant_types:
-        - grant_types
-        - grant_types
-        subject_type: subject_type
+        device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
+        device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
         refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
         redirect_uris:
         - redirect_uris
@@ -2616,21 +2759,43 @@ components:
         sector_identifier_uri: sector_identifier_uri
         frontchannel_logout_session_required: true
         frontchannel_logout_uri: frontchannel_logout_uri
-        skip_logout_consent: true
         refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
-        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
-        client_secret_expires_at: 0
-        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
         access_token_strategy: access_token_strategy
-        jwks_uri: jwks_uri
         request_object_signing_alg: request_object_signing_alg
         tos_uri: tos_uri
-        contacts:
-        - contacts
-        - contacts
         response_types:
         - response_types
         - response_types
+        token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
+        client_uri: client_uri
+        jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+        jwks: ""
+        created_at: 2000-01-23T04:56:07.000+00:00
+        registration_client_uri: registration_client_uri
+        registration_access_token: registration_access_token
+        token_endpoint_auth_method: client_secret_basic
+        userinfo_signed_response_alg: userinfo_signed_response_alg
+        authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        scope: scope1 scope-2 scope.3 scope:4
+        device_authorization_grant_refresh_token_lifespan: device_authorization_grant_refresh_token_lifespan
+        client_name: client_name
+        policy_uri: policy_uri
+        owner: owner
+        skip_consent: true
+        authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+        grant_types:
+        - grant_types
+        - grant_types
+        subject_type: subject_type
+        skip_logout_consent: true
+        implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+        client_secret_expires_at: 0
+        implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+        jwks_uri: jwks_uri
+        contacts:
+        - contacts
+        - contacts
       properties:
         access_token_strategy:
           description: |-
@@ -2737,6 +2902,24 @@ components:
 
             CreatedAt returns the timestamp of the client's creation.
           format: date-time
+          type: string
+        device_authorization_grant_access_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
+          type: string
+        device_authorization_grant_id_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
+          type: string
+        device_authorization_grant_refresh_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
           type: string
         frontchannel_logout_session_required:
           description: |-
@@ -2992,6 +3175,24 @@ components:
           pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
           title: Time duration
           type: string
+        device_authorization_grant_access_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
+          type: string
+        device_authorization_grant_id_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
+          type: string
+        device_authorization_grant_refresh_token_lifespan:
+          description: "Specify a time duration in milliseconds, seconds, minutes,\
+            \ hours."
+          pattern: "^([0-9]+(ns|us|ms|s|m|h))*$"
+          title: Time duration
+          type: string
         implicit_grant_access_token_lifespan:
           description: "Specify a time duration in milliseconds, seconds, minutes,\
             \ hours."
@@ -3052,6 +3253,7 @@ components:
           - acr_values
           - acr_values
           display: display
+        device_challenge_id: device_challenge_id
         skip: true
         request_url: request_url
         acr: acr
@@ -3059,47 +3261,28 @@ components:
         challenge: challenge
         client:
           metadata: ""
-          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
-          client_uri: client_uri
-          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: ""
           logo_uri: logo_uri
-          created_at: 2000-01-23T04:56:07.000+00:00
-          registration_client_uri: registration_client_uri
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
-          registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: client_secret_basic
-          userinfo_signed_response_alg: userinfo_signed_response_alg
-          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
           - request_uris
           - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          client_name: client_name
-          policy_uri: policy_uri
-          owner: owner
-          skip_consent: true
           audience:
           - audience
           - audience
-          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
-          grant_types:
-          - grant_types
-          - grant_types
-          subject_type: subject_type
+          device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
+          device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
@@ -3107,21 +3290,43 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
-          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
-          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
-          client_secret_expires_at: 0
-          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           access_token_strategy: access_token_strategy
-          jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
-          contacts:
-          - contacts
-          - contacts
           response_types:
           - response_types
           - response_types
+          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
+          client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: ""
+          created_at: 2000-01-23T04:56:07.000+00:00
+          registration_client_uri: registration_client_uri
+          registration_access_token: registration_access_token
+          token_endpoint_auth_method: client_secret_basic
+          userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          scope: scope1 scope-2 scope.3 scope:4
+          device_authorization_grant_refresh_token_lifespan: device_authorization_grant_refresh_token_lifespan
+          client_name: client_name
+          policy_uri: policy_uri
+          owner: owner
+          skip_consent: true
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+          grant_types:
+          - grant_types
+          - grant_types
+          subject_type: subject_type
+          skip_logout_consent: true
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          jwks_uri: jwks_uri
+          contacts:
+          - contacts
+          - contacts
         login_session_id: login_session_id
         requested_scope:
         - requested_scope
@@ -3149,6 +3354,10 @@ components:
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
+        device_challenge_id:
+          description: "DeviceChallenge is the device challenge this consent challenge\
+            \ belongs to, if this flow was initiated by a device."
+          type: string
         login_challenge:
           description: |-
             LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
@@ -3285,6 +3494,7 @@ components:
             - acr_values
             - acr_values
             display: display
+          device_challenge_id: device_challenge_id
           skip: true
           request_url: request_url
           acr: acr
@@ -3292,47 +3502,28 @@ components:
           challenge: challenge
           client:
             metadata: ""
-            token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
-            client_uri: client_uri
-            jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-            jwks: ""
             logo_uri: logo_uri
-            created_at: 2000-01-23T04:56:07.000+00:00
-            registration_client_uri: registration_client_uri
             allowed_cors_origins:
             - allowed_cors_origins
             - allowed_cors_origins
             refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
-            registration_access_token: registration_access_token
             client_id: client_id
-            token_endpoint_auth_method: client_secret_basic
-            userinfo_signed_response_alg: userinfo_signed_response_alg
-            authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
             authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
             client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
-            updated_at: 2000-01-23T04:56:07.000+00:00
-            scope: scope1 scope-2 scope.3 scope:4
             request_uris:
             - request_uris
             - request_uris
             client_secret: client_secret
             backchannel_logout_session_required: true
             backchannel_logout_uri: backchannel_logout_uri
-            client_name: client_name
-            policy_uri: policy_uri
-            owner: owner
-            skip_consent: true
             audience:
             - audience
             - audience
-            authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
             post_logout_redirect_uris:
             - post_logout_redirect_uris
             - post_logout_redirect_uris
-            grant_types:
-            - grant_types
-            - grant_types
-            subject_type: subject_type
+            device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
+            device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
             refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
             redirect_uris:
             - redirect_uris
@@ -3340,21 +3531,43 @@ components:
             sector_identifier_uri: sector_identifier_uri
             frontchannel_logout_session_required: true
             frontchannel_logout_uri: frontchannel_logout_uri
-            skip_logout_consent: true
             refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
-            implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
-            client_secret_expires_at: 0
-            implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
             access_token_strategy: access_token_strategy
-            jwks_uri: jwks_uri
             request_object_signing_alg: request_object_signing_alg
             tos_uri: tos_uri
-            contacts:
-            - contacts
-            - contacts
             response_types:
             - response_types
             - response_types
+            token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
+            client_uri: client_uri
+            jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+            jwks: ""
+            created_at: 2000-01-23T04:56:07.000+00:00
+            registration_client_uri: registration_client_uri
+            registration_access_token: registration_access_token
+            token_endpoint_auth_method: client_secret_basic
+            userinfo_signed_response_alg: userinfo_signed_response_alg
+            authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+            updated_at: 2000-01-23T04:56:07.000+00:00
+            scope: scope1 scope-2 scope.3 scope:4
+            device_authorization_grant_refresh_token_lifespan: device_authorization_grant_refresh_token_lifespan
+            client_name: client_name
+            policy_uri: policy_uri
+            owner: owner
+            skip_consent: true
+            authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+            grant_types:
+            - grant_types
+            - grant_types
+            subject_type: subject_type
+            skip_logout_consent: true
+            implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+            client_secret_expires_at: 0
+            implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+            jwks_uri: jwks_uri
+            contacts:
+            - contacts
+            - contacts
           login_session_id: login_session_id
           requested_scope:
           - requested_scope
@@ -3449,47 +3662,28 @@ components:
         challenge: challenge
         client:
           metadata: ""
-          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
-          client_uri: client_uri
-          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: ""
           logo_uri: logo_uri
-          created_at: 2000-01-23T04:56:07.000+00:00
-          registration_client_uri: registration_client_uri
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
-          registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: client_secret_basic
-          userinfo_signed_response_alg: userinfo_signed_response_alg
-          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
           - request_uris
           - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          client_name: client_name
-          policy_uri: policy_uri
-          owner: owner
-          skip_consent: true
           audience:
           - audience
           - audience
-          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
-          grant_types:
-          - grant_types
-          - grant_types
-          subject_type: subject_type
+          device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
+          device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
@@ -3497,21 +3691,43 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
-          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
-          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
-          client_secret_expires_at: 0
-          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           access_token_strategy: access_token_strategy
-          jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
-          contacts:
-          - contacts
-          - contacts
           response_types:
           - response_types
           - response_types
+          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
+          client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: ""
+          created_at: 2000-01-23T04:56:07.000+00:00
+          registration_client_uri: registration_client_uri
+          registration_access_token: registration_access_token
+          token_endpoint_auth_method: client_secret_basic
+          userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          scope: scope1 scope-2 scope.3 scope:4
+          device_authorization_grant_refresh_token_lifespan: device_authorization_grant_refresh_token_lifespan
+          client_name: client_name
+          policy_uri: policy_uri
+          owner: owner
+          skip_consent: true
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+          grant_types:
+          - grant_types
+          - grant_types
+          subject_type: subject_type
+          skip_logout_consent: true
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          jwks_uri: jwks_uri
+          contacts:
+          - contacts
+          - contacts
         session_id: session_id
         skip: true
         request_url: request_url
@@ -3579,47 +3795,28 @@ components:
         challenge: challenge
         client:
           metadata: ""
-          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
-          client_uri: client_uri
-          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
-          jwks: ""
           logo_uri: logo_uri
-          created_at: 2000-01-23T04:56:07.000+00:00
-          registration_client_uri: registration_client_uri
           allowed_cors_origins:
           - allowed_cors_origins
           - allowed_cors_origins
           refresh_token_grant_access_token_lifespan: refresh_token_grant_access_token_lifespan
-          registration_access_token: registration_access_token
           client_id: client_id
-          token_endpoint_auth_method: client_secret_basic
-          userinfo_signed_response_alg: userinfo_signed_response_alg
-          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
-          updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
           - request_uris
           - request_uris
           client_secret: client_secret
           backchannel_logout_session_required: true
           backchannel_logout_uri: backchannel_logout_uri
-          client_name: client_name
-          policy_uri: policy_uri
-          owner: owner
-          skip_consent: true
           audience:
           - audience
           - audience
-          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
           post_logout_redirect_uris:
           - post_logout_redirect_uris
           - post_logout_redirect_uris
-          grant_types:
-          - grant_types
-          - grant_types
-          subject_type: subject_type
+          device_authorization_grant_id_token_lifespan: device_authorization_grant_id_token_lifespan
+          device_authorization_grant_access_token_lifespan: device_authorization_grant_access_token_lifespan
           refresh_token_grant_refresh_token_lifespan: refresh_token_grant_refresh_token_lifespan
           redirect_uris:
           - redirect_uris
@@ -3627,21 +3824,43 @@ components:
           sector_identifier_uri: sector_identifier_uri
           frontchannel_logout_session_required: true
           frontchannel_logout_uri: frontchannel_logout_uri
-          skip_logout_consent: true
           refresh_token_grant_id_token_lifespan: refresh_token_grant_id_token_lifespan
-          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
-          client_secret_expires_at: 0
-          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
           access_token_strategy: access_token_strategy
-          jwks_uri: jwks_uri
           request_object_signing_alg: request_object_signing_alg
           tos_uri: tos_uri
-          contacts:
-          - contacts
-          - contacts
           response_types:
           - response_types
           - response_types
+          token_endpoint_auth_signing_alg: token_endpoint_auth_signing_alg
+          client_uri: client_uri
+          jwt_bearer_grant_access_token_lifespan: jwt_bearer_grant_access_token_lifespan
+          jwks: ""
+          created_at: 2000-01-23T04:56:07.000+00:00
+          registration_client_uri: registration_client_uri
+          registration_access_token: registration_access_token
+          token_endpoint_auth_method: client_secret_basic
+          userinfo_signed_response_alg: userinfo_signed_response_alg
+          authorization_code_grant_id_token_lifespan: authorization_code_grant_id_token_lifespan
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          scope: scope1 scope-2 scope.3 scope:4
+          device_authorization_grant_refresh_token_lifespan: device_authorization_grant_refresh_token_lifespan
+          client_name: client_name
+          policy_uri: policy_uri
+          owner: owner
+          skip_consent: true
+          authorization_code_grant_access_token_lifespan: authorization_code_grant_access_token_lifespan
+          grant_types:
+          - grant_types
+          - grant_types
+          subject_type: subject_type
+          skip_logout_consent: true
+          implicit_grant_id_token_lifespan: implicit_grant_id_token_lifespan
+          client_secret_expires_at: 0
+          implicit_grant_access_token_lifespan: implicit_grant_access_token_lifespan
+          jwks_uri: jwks_uri
+          contacts:
+          - contacts
+          - contacts
         rp_initiated: true
         request_url: request_url
         requested_at: 2000-01-23T04:56:07.000+00:00
@@ -3741,6 +3960,7 @@ components:
         - userinfo_signed_response_alg
         - userinfo_signed_response_alg
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
+        device_authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/device/oauth
         claims_supported:
         - claims_supported
         - claims_supported
@@ -3863,6 +4083,10 @@ components:
           items:
             $ref: '#/components/schemas/credentialSupportedDraft00'
           type: array
+        device_authorization_endpoint:
+          description: OAuth 2.0 Device Authorization Endpoint URL
+          example: https://playground.ory.sh/ory-hydra/public/oauth2/device/oauth
+          type: string
         end_session_endpoint:
           description: |-
             OpenID Connect End-Session Endpoint
@@ -4042,6 +4266,7 @@ components:
           type: array
       required:
       - authorization_endpoint
+      - device_authorization_endpoint
       - id_token_signed_response_alg
       - id_token_signing_alg_values_supported
       - issuer
@@ -4508,6 +4733,39 @@ components:
         format:
           type: string
       title: VerifiableCredentialResponse contains the verifiable credential.
+      type: object
+    verifyUserCodeRequest:
+      properties:
+        challenge:
+          description: |-
+            ID is the identifier ("device challenge") of the device request. It is used to
+            identify the session.
+          type: string
+        client:
+          $ref: '#/components/schemas/oAuth2Client'
+        device_code_request_id:
+          type: string
+        handled_at:
+          format: date-time
+          title: NullTime implements sql.NullTime functionality.
+          type: string
+        request_url:
+          description: RequestURL is the original Device Authorization URL requested.
+          type: string
+        requested_access_token_audience:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
+            \ JSON for SQL storage."
+          type: array
+        requested_scope:
+          items:
+            type: string
+          title: "StringSliceJSONFormat represents []string{} which is encoded to/from\
+            \ JSON for SQL storage."
+          type: array
+      title: HandledDeviceUserAuthRequest is the request payload used to accept a
+        device user_code.
       type: object
     version:
       properties:

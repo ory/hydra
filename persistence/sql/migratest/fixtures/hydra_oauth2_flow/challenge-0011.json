@@ -36,6 +36,8 @@
     "valid": false
   },
   "la": null,
+  "du": null,
+  "dh": null,
   "cc": "challenge-0011",
   "cs": true,
   "cv": "verifier-0011",

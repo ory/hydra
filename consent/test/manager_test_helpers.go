@@ -118,15 +118,13 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 	}
 	return &flow.LogoutRequest{
 		Subject:               "subject" + key,
-		ID:                    makeID("challenge", network, key),
-		Verifier:              makeID("verifier", network, key),
 		SessionID:             makeID("session", network, key),
 		RPInitiated:           true,
 		RequestURL:            "http://request-me/",
 		PostLogoutRedirectURI: "http://redirect-me/",
-		WasHandled:            false,
-		Accepted:              false,
 		Client:                cl,
+		RequestedAt:           time.Now().UTC().Add(-time.Minute),
+		ExpiresAt:             time.Now().UTC().Add(time.Hour),
 	}
 }
 
@@ -1086,66 +1084,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					})
 				}
 			})
-
-			t.Run("case=LogoutRequest", func(t *testing.T) {
-				for k, tc := range []struct {
-					key        string
-					authAt     bool
-					withClient bool
-				}{
-					{"LogoutRequest-1", true, true},
-					{"LogoutRequest-2", true, true},
-					{"LogoutRequest-3", true, true},
-					{"LogoutRequest-4", true, true},
-					{"LogoutRequest-5", true, false},
-					{"LogoutRequest-6", false, false},
-				} {
-					t.Run("key="+tc.key, func(t *testing.T) {
-						challenge := makeID("challenge", network, tc.key)
-						verifier := makeID("verifier", network, tc.key)
-						c := MockLogoutRequest(tc.key, tc.withClient, network)
-						if tc.withClient {
-							require.NoError(t, clientManager.CreateClient(ctx, c.Client)) // Ignore errors that are caused by duplication
-						}
-
-						_, err := m.GetLogoutRequest(ctx, challenge)
-						require.Error(t, err)
-
-						require.NoError(t, m.CreateLogoutRequest(ctx, c))
-
-						got2, err := m.GetLogoutRequest(ctx, challenge)
-						require.NoError(t, err)
-						assert.False(t, got2.WasHandled)
-						assert.False(t, got2.Accepted)
-						compareLogoutRequest(t, c, got2)
-
-						if k%2 == 0 {
-							got2, err = m.AcceptLogoutRequest(ctx, challenge)
-							require.NoError(t, err)
-							assert.True(t, got2.Accepted)
-							compareLogoutRequest(t, c, got2)
-
-							got3, err := m.VerifyAndInvalidateLogoutRequest(ctx, verifier)
-							require.NoError(t, err)
-							assert.True(t, got3.Accepted)
-							assert.True(t, got3.WasHandled)
-							compareLogoutRequest(t, c, got3)
-
-							_, err = m.VerifyAndInvalidateLogoutRequest(ctx, verifier)
-							require.NoError(t, err)
-
-							got2, err = m.GetLogoutRequest(ctx, challenge)
-							require.NoError(t, err)
-							compareLogoutRequest(t, got3, got2)
-							assert.True(t, got2.WasHandled)
-						} else {
-							require.NoError(t, m.RejectLogoutRequest(ctx, challenge))
-							_, err = m.GetLogoutRequest(ctx, challenge)
-							require.Error(t, err)
-						}
-					})
-				}
-			})
 		})
 
 		t.Run("case=foreign key regression", func(t *testing.T) {
@@ -1213,9 +1151,7 @@ func compareLogoutRequest(t *testing.T, a, b *flow.LogoutRequest) {
 		assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
 	}
 
-	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, a.Subject, b.Subject)
-	assert.EqualValues(t, a.Verifier, b.Verifier)
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
 	assert.EqualValues(t, a.PostLogoutRedirectURI, b.PostLogoutRedirectURI)
 	assert.EqualValues(t, a.RPInitiated, b.RPInitiated)

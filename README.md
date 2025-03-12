@@ -609,7 +609,7 @@ that your company deserves a spot here, reach out to
                 </picture>
             </td>
             <td><a href="https://pinniped.dev/">pinniped.dev</a></td>
-        </tr>
+        </tr>         
         <tr>
             <td>Adopter *</td>
             <td>Pvotal</td>

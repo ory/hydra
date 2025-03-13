@@ -960,7 +960,6 @@
         "refresh_token": {
           "description": "Configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.",
           "default": "720h",
-          "type": "string",
           "oneOf": [
             {
               "$ref": "#/definitions/duration"

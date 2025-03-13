@@ -5,7 +5,7 @@ export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
 export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
-GOLANGCI_LINT_VERSION = 1.61.0
+GOLANGCI_LINT_VERSION = 1.64.7
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \

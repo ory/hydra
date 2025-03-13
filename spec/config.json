@@ -266,6 +266,7 @@
           "required": ["type", "config"],
           "properties": {
             "type": {
+              "type": "string",
               "const": "api_key"
             },
             "config": {
@@ -274,6 +275,7 @@
               "required": ["name", "value"],
               "properties": {
                 "in": {
+                  "type": "string",
                   "enum": ["header", "cookie"]
                 },
                 "name": {
@@ -700,6 +702,7 @@
                 "properties": {
                   "supported_types": {
                     "contains": {
+                      "type": "string",
                       "const": "pairwise"
                     }
                   }
@@ -937,6 +940,7 @@
         "login_consent_request": {
           "description": "Configures how long a user login and consent flow may take.",
           "default": "30m",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -946,6 +950,7 @@
         "access_token": {
           "description": "Configures how long access tokens are valid.",
           "default": "1h",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -970,6 +975,7 @@
         "id_token": {
           "description": "Configures how long id tokens are valid.",
           "default": "1h",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -979,6 +985,7 @@
         "auth_code": {
           "description": "Configures how long auth codes are valid.",
           "default": "10m",
+          "type": "string",
           "allOf": [
             {
               "$ref": "#/definitions/duration"
@@ -1121,6 +1128,7 @@
                   "title": "Refresh Token Rotation Grace Period",
                   "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is 5 minutes.",
                   "default": "0s",
+                  "type": "string",
                   "allOf": [
                     {
                       "$ref": "#/definitions/duration"
@@ -1147,6 +1155,7 @@
                 "max_ttl": {
                   "description": "Configures what the maximum age of a JWT assertion used in the JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants (RFC7523) can be. This feature uses the `exp` claim and `iat` claim to calculate assertion age. Assertions exceeding the max age will be denied. Useful as a safety measure and recommended to keep below 720h. This governs the `grant.jwt.max_ttl` setting.",
                   "default": "720h",
+                  "type": "string",
                   "allOf": [
                     {
                       "$ref": "#/definitions/duration"

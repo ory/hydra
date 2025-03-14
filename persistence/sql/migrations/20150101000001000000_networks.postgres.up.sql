@@ -7,6 +7,7 @@ CREATE TABLE "networks" (
   "updated_at" timestamp NOT NULL
 );
 
+
 INSERT INTO networks (id, created_at, updated_at) VALUES (uuid_in(
   overlay(
     overlay(

@@ -756,79 +756,73 @@ WHERE
 	return cs, nil
 }
 
-func (p *Persister) CreateLogoutRequest(ctx context.Context, request *flow.LogoutRequest) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLogoutRequest")
+func (p *Persister) CreateLogoutChallenge(ctx context.Context, request *flow.LogoutRequest) (challenge string, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLogoutChallenge")
 	defer otelx.End(span, &err)
 
-	return errorsx.WithStack(p.CreateWithNetwork(ctx, request))
+	request.Challenge = ""
+	challenge, err = flowctx.Encode(ctx, p.r.FlowCipher(), request, flowctx.AsLogoutChallenge)
+	if err != nil {
+		return "", errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHintf("Failed to encrypt the logout challenge."))
+	}
+	return challenge, nil
 }
 
-func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (_ *flow.LogoutRequest, err error) {
+func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (verifier string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AcceptLogoutRequest")
 	defer otelx.End(span, &err)
 
-	if err := p.Connection(ctx).RawQuery("UPDATE hydra_oauth2_logout_request SET accepted=true, rejected=false WHERE challenge=? AND nid = ?", challenge, p.NetworkID(ctx)).Exec(); err != nil {
-		return nil, sqlcon.HandleError(err)
+	req, err := flowctx.Decode[flow.LogoutRequest](ctx, p.r.FlowCipher(), challenge, flowctx.AsLogoutChallenge)
+	if err != nil {
+		return "", errorsx.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
+	}
+	req.Challenge = ""
+
+	verifier, err = flowctx.Encode(ctx, p.r.FlowCipher(), req, flowctx.AsLogoutVerifier)
+	if err != nil {
+		return "", errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithHintf("Failed to encrypty the logout verifier."))
 	}
 
-	return p.GetLogoutRequest(ctx, challenge)
+	return verifier, nil
 }
 
 func (p *Persister) RejectLogoutRequest(ctx context.Context, challenge string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RejectLogoutRequest")
 	defer otelx.End(span, &err)
 
-	count, err := p.Connection(ctx).
-		RawQuery("UPDATE hydra_oauth2_logout_request SET rejected=true, accepted=false WHERE challenge=? AND nid = ?", challenge, p.NetworkID(ctx)).
-		ExecWithCount()
-	if count == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
-	} else {
-		return errorsx.WithStack(err)
+	_, err = flowctx.Decode[flow.LogoutRequest](ctx, p.r.FlowCipher(), challenge, flowctx.AsLogoutChallenge)
+	if err != nil {
+		return errorsx.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
 	}
+	return nil
 }
 
 func (p *Persister) GetLogoutRequest(ctx context.Context, challenge string) (_ *flow.LogoutRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLogoutRequest")
 	defer otelx.End(span, &err)
 
-	var lr flow.LogoutRequest
-	return &lr, sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("challenge = ? AND rejected = FALSE", challenge).First(&lr))
+	request, err := flowctx.Decode[flow.LogoutRequest](ctx, p.r.FlowCipher(), challenge, flowctx.AsLogoutChallenge)
+	if err != nil {
+		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout challenge."))
+	}
+	request.Challenge = challenge
+	return request, nil
 }
 
 func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (_ *flow.LogoutRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLogoutRequest")
 	defer otelx.End(span, &err)
 
-	var lr flow.LogoutRequest
-	if count, err := p.Connection(ctx).RawQuery(`
-UPDATE hydra_oauth2_logout_request
-  SET was_used = TRUE
-WHERE nid = ?
-  AND verifier = ?
-  AND accepted = TRUE
-  AND rejected = FALSE`,
-		p.NetworkID(ctx),
-		verifier,
-	).ExecWithCount(); count == 0 && err == nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	} else if err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
-
-	err = sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier = ?", verifier).First(&lr))
+	lr, err := flowctx.Decode[flow.LogoutRequest](ctx, p.r.FlowCipher(), verifier, flowctx.AsLogoutVerifier)
 	if err != nil {
-		return nil, err
+		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err).WithHintf("Failed to decrypt the logout verifier."))
 	}
 
-	if expiry := time.Time(lr.ExpiresAt);
-	// If the expiry is unset, we are in a legacy use case (allow logout).
-	// TODO: Remove this in the future.
-	!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
+	if lr.ExpiresAt.Before(time.Now()) {
 		return nil, errorsx.WithStack(flow.ErrorLogoutFlowExpired)
 	}
 
-	return &lr, nil
+	return lr, nil
 }
 
 func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) (err error) {

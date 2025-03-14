@@ -31,61 +31,6 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-func TestGetLogoutRequest(t *testing.T) {
-	for k, tc := range []struct {
-		exists  bool
-		handled bool
-		status  int
-	}{
-		{false, false, http.StatusNotFound},
-		{true, false, http.StatusOK},
-		{true, true, http.StatusGone},
-	} {
-		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			ctx := context.Background()
-			key := fmt.Sprint(k)
-			challenge := "challenge" + key
-			requestURL := "http://192.0.2.1"
-
-			conf := testhelpers.NewConfigurationWithDefaults()
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
-
-			if tc.exists {
-				cl := &client.Client{ID: "client" + key}
-				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &flow.LogoutRequest{
-					Client:     cl,
-					ID:         challenge,
-					WasHandled: tc.handled,
-					RequestURL: requestURL,
-				}))
-			}
-
-			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin(conf.AdminURL)
-			h.SetRoutes(r)
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-
-			c := &http.Client{}
-			resp, err := c.Get(ts.URL + "/admin" + LogoutPath + "?challenge=" + challenge)
-			require.NoError(t, err)
-			require.EqualValues(t, tc.status, resp.StatusCode)
-
-			if tc.handled {
-				var result flow.OAuth2RedirectTo
-				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-				require.Equal(t, requestURL, result.RedirectTo)
-			} else if tc.exists {
-				var result flow.LogoutRequest
-				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-				require.Equal(t, challenge, result.ID)
-				require.Equal(t, requestURL, result.RequestURL)
-			}
-		})
-	}
-}
-
 func TestGetLoginRequest(t *testing.T) {
 	for k, tc := range []struct {
 		exists  bool

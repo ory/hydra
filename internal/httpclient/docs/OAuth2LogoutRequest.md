@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Challenge** | Pointer to **string** | Challenge is the identifier of the logout authentication request. | [optional] 
+**Challenge** | Pointer to **string** | Challenge is used to retrieve/accept/deny the logout request. | [optional] 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **ExpiresAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Logout URL requested. | [optional] 
 **RequestedAt** | Pointer to **time.Time** |  | [optional] 
 **RpInitiated** | Pointer to **bool** | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client. | [optional] 
 **Sid** | Pointer to **string** | SessionID is the login session ID that was requested to log out. | [optional] 
-**Subject** | Pointer to **string** | Subject is the user for whom the logout was request. | [optional] 
+**Subject** | Pointer to **string** | Subject is the user for whom the logout was requested. | [optional] 
 
 ## Methods
 

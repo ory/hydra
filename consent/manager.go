@@ -57,9 +57,9 @@ type (
 		ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
 		ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
 
-		CreateLogoutRequest(ctx context.Context, request *flow.LogoutRequest) error
+		CreateLogoutChallenge(ctx context.Context, request *flow.LogoutRequest) (challenge string, err error)
 		GetLogoutRequest(ctx context.Context, challenge string) (*flow.LogoutRequest, error)
-		AcceptLogoutRequest(ctx context.Context, challenge string) (*flow.LogoutRequest, error)
+		AcceptLogoutRequest(ctx context.Context, challenge string) (verifier string, err error)
 		RejectLogoutRequest(ctx context.Context, challenge string) error
 		VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*flow.LogoutRequest, error)
 

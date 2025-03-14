@@ -1138,21 +1138,23 @@
       "oAuth2LogoutRequest": {
         "properties": {
           "challenge": {
-            "description": "Challenge is the identifier of the logout authentication request.",
+            "description": "Challenge is used to retrieve/accept/deny the logout request.",
             "type": "string"
           },
           "client": {
             "$ref": "#/components/schemas/oAuth2Client"
           },
           "expires_at": {
-            "$ref": "#/components/schemas/nullTime"
+            "format": "date-time",
+            "type": "string"
           },
           "request_url": {
             "description": "RequestURL is the original Logout URL requested.",
             "type": "string"
           },
           "requested_at": {
-            "$ref": "#/components/schemas/nullTime"
+            "format": "date-time",
+            "type": "string"
           },
           "rp_initiated": {
             "description": "RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.",
@@ -1163,7 +1165,7 @@
             "type": "string"
           },
           "subject": {
-            "description": "Subject is the user for whom the logout was request.",
+            "description": "Subject is the user for whom the logout was requested.",
             "type": "string"
           }
         },

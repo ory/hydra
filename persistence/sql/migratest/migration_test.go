@@ -85,7 +85,7 @@ func TestMigrations(t *testing.T) {
 		})
 	}
 
-	var test = func(db string, c *pop.Connection) func(t *testing.T) {
+	var test = func(_ string, c *pop.Connection) func(t *testing.T) {
 		return func(t *testing.T) {
 			ctx := context.Background()
 			x.CleanSQLPop(t, c)
@@ -165,19 +165,6 @@ func TestMigrations(t *testing.T) {
 						testhelpersuuid.AssertUUID(t, s.NID)
 						s.NID = uuid.Nil
 						CompareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
-					}
-				})
-
-				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
-					lrs := []flow.LogoutRequest{}
-					require.NoError(t, c.All(&lrs))
-					require.Equal(t, 7, len(lrs))
-
-					for _, s := range lrs {
-						testhelpersuuid.AssertUUID(t, s.NID)
-						s.NID = uuid.Nil
-						s.Client = nil
-						CompareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
 					}
 				})
 

@@ -213,10 +213,9 @@ authentication.
 The Ory community stands on the shoulders of individuals, companies, and
 maintainers. The Ory team thanks everyone involved - from submitting bug reports
 and feature requests, to contributing patches and documentation. The Ory
-community counts more than 33.000 members and is growing rapidly. The Ory stack
-protects 60.000.000.000+ API requests every month with over 400.000+ active
-service nodes. None of this would have been possible without each and everyone
-of you!
+community counts more than 50.000 members and is growing. The Ory stack protects
+7.000.000.000+ API requests every day across thousands of companies. None of
+this would have been possible without each and everyone of you!
 
 The following list represents companies that have accompanied us along the way
 and that have made outstanding contributions to our ecosystem. _If you think
@@ -226,15 +225,202 @@ that your company deserves a spot here, reach out to
 <table>
     <thead>
         <tr>
-            <th>Type</th>
             <th>Name</th>
             <th>Logo</th>
             <th>Website</th>
+            <th>Case Study</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Adopter *</td>
+            <td>OpenAI</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/openai.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/openai.svg" alt="OpenAI">
+                </picture>
+            </td>
+            <td><a href="https://openai.com/">openai.com</a></td>
+            <td><a href="https://www.ory.sh/case-studies/openai">OpenAI Case Study</a></td>
+        </tr>
+        <tr>
+            <td>Fandom</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/fandom.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/fandom.svg" alt="Fandom">
+                </picture>
+            </td>
+            <td><a href="https://www.fandom.com/">fandom.com</a></td>
+            <td><a href="https://www.ory.sh/case-studies/fandom">Fandom Case Study</a></td>
+        </tr>
+        <tr>
+            <td>Lumin</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/lumin.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/lumin.svg" alt="Lumin">
+                </picture>
+            </td>
+            <td><a href="https://www.luminpdf.com/">luminpdf.com</a></td>
+            <td><a href="https://www.ory.sh/case-studies/lumin">Lumin Case Study</a></td>
+        </tr>
+        <tr>
+            <td>Sencrop</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/sencrop.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/sencrop.svg" alt="Sencrop">
+                </picture>
+            </td>
+            <td><a href="https://sencrop.com/">sencrop.com</a></td>
+            <td><a href="https://www.ory.sh/case-studies/sencrop">Sencrop Case Study</a></td>
+        </tr>
+        <tr>
+            <td>OSINT Industries</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/osint.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/osint.svg" alt="OSINT Industries">
+                </picture>
+            </td>
+            <td><a href="https://www.osint.industries/">osint.industries</a></td>
+            <td><a href="https://www.ory.sh/case-studies/osint">OSINT Industries Case Study</a></td>
+        </tr>
+        <tr>
+            <td>HGV</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/hgv.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/hgv.svg" alt="HGV">
+                </picture>
+            </td>
+            <td><a href="https://www.hgv.it/">hgv.it</a></td>
+            <td><a href="https://www.ory.sh/case-studies/hgv">HGV Case Study</a></td>
+        </tr>
+        <tr>
+            <td>Maxroll</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/maxroll.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/maxroll.svg" alt="Maxroll">
+                </picture>
+            </td>
+            <td><a href="https://maxroll.gg/">maxroll.gg</a></td>
+            <td><a href="https://www.ory.sh/case-studies/maxroll">Maxroll Case Study</a></td>
+        </tr>
+        <tr>
+            <td>Zezam</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/zezam.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/zezam.svg" alt="Zezam">
+                </picture>
+            </td>
+            <td><a href="https://www.zezam.io/">zezam.io</a></td>
+            <td><a href="https://www.ory.sh/case-studies/zezam">Zezam Case Study</a></td>
+        </tr>
+        <tr>
+            <td>T.RowePrice</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/troweprice.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/troweprice.svg" alt="T.RowePrice">
+                </picture>
+            </td>
+            <td><a href="https://www.troweprice.com/">troweprice.com</a></td>
+        </tr>
+        <tr>
+            <td>Mistral</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/mistral.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/mistral.svg" alt="Mistral">
+                </picture>
+            </td>
+            <td><a href="https://www.mistral.ai/">mistral.ai</a></td>
+        </tr>
+        <tr>
+            <td>Axel Springer</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/axelspringer.svg" />
+                    <img height="22px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/axelspringer.svg" alt="Axel Springer">
+                </picture>
+            </td>
+            <td><a href="https://www.axelspringer.com/">axelspringer.com</a></td>
+        </tr>
+        <tr>
+            <td>Hemnet</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/hemnet.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/hemnet.svg" alt="Hemnet">
+                </picture>
+            </td>
+            <td><a href="https://www.hemnet.se/">hemnet.se</a></td>
+        </tr>
+        <tr>
+            <td>Cisco</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/cisco.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/cisco.svg" alt="Cisco">
+                </picture>
+            </td>
+            <td><a href="https://www.cisco.com/">cisco.com</a></td>
+        </tr>
+        <tr>
+            <td>Presidencia de la República Dominicana</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/republica-dominicana.svg" />
+                    <img height="42px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/republica-dominicana.svg" alt="Presidencia de la República Dominicana">
+                </picture>
+            </td>
+            <td><a href="https://www.presidencia.gob.do/">presidencia.gob.do</a></td>
+        </tr>
+        <tr>
+            <td>Moonpig</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/moonpig.svg" />
+                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/moonpig.svg" alt="Moonpig">
+                </picture>
+            </td>
+            <td><a href="https://www.moonpig.com/">moonpig.com</a></td>
+        </tr>
+        <tr>
+            <td>Booster</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/booster.svg" />
+                    <img height="18px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/booster.svg" alt="Booster">
+                </picture>
+            </td>
+            <td><a href="https://www.choosebooster.com/">choosebooster.com</a></td>
+        </tr>
+        <tr>
+            <td>Zaptec</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/zaptec.svg" />
+                    <img height="24px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/zaptec.svg" alt="Zaptec">
+                </picture>
+            </td>
+            <td><a href="https://www.zaptec.com/">zaptec.com</a></td>
+        </tr>
+        <tr>
+            <td>Klarna</td>
+            <td align="center">
+                <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset="../../../static/adopters/light/klarna.svg" />
+                    <img height="24px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/klarna.svg" alt="Klarna">
+                </picture>
+            </td>
+            <td><a href="https://www.klarna.com/">klarna.com</a></td>
+        </tr>
+        <tr>
             <td>Raspberry PI Foundation</td>
             <td align="center">
                 <picture>
@@ -245,18 +431,6 @@ that your company deserves a spot here, reach out to
             <td><a href="https://www.raspberrypi.org/">raspberrypi.org</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
-            <td>Kyma Project</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/kyma.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/kyma.svg" alt="Kyma Project">
-                </picture>
-            </td>
-            <td><a href="https://kyma-project.io">kyma-project.io</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
             <td>Tulip</td>
             <td align="center">
                 <picture>
@@ -267,18 +441,6 @@ that your company deserves a spot here, reach out to
             <td><a href="https://tulip.com/">tulip.com</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
-            <td>Cashdeck / All My Funds</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/allmyfunds.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/allmyfunds.svg" alt="All My Funds">
-                </picture>
-            </td>
-            <td><a href="https://cashdeck.com.au/">cashdeck.com.au</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
             <td>Hootsuite</td>
             <td align="center">
                 <picture>
@@ -289,7 +451,6 @@ that your company deserves a spot here, reach out to
             <td><a href="https://hootsuite.com/">hootsuite.com</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
             <td>Segment</td>
             <td align="center">
                 <picture>
@@ -300,7 +461,6 @@ that your company deserves a spot here, reach out to
             <td><a href="https://segment.com/">segment.com</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
             <td>Arduino</td>
             <td align="center">
                 <picture>
@@ -311,29 +471,16 @@ that your company deserves a spot here, reach out to
             <td><a href="https://www.arduino.cc/">arduino.cc</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
-            <td>DataDetect</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/datadetect.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/datadetect.svg" alt="Datadetect">
-                </picture>
-            </td>
-            <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
             <td>Sainsbury's</td>
             <td align="center">
                 <picture>
                     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/sainsburys.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/sainsburys.svg" alt="Sainsbury's">
+                    <img height="24px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/sainsburys.svg" alt="Sainsbury's">
                 </picture>
             </td>
             <td><a href="https://www.sainsburys.co.uk/">sainsburys.co.uk</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
             <td>Contraste</td>
             <td align="center">
                 <picture>
@@ -344,150 +491,16 @@ that your company deserves a spot here, reach out to
             <td><a href="https://www.contraste.com/en">contraste.com</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
-            <td>Reyah</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/reyah.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/reyah.svg" alt="Reyah">
-                </picture>
-            </td>
-            <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Zero</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/commitzero.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/commitzero.svg" alt="Project Zero by Commit">
-                </picture>
-            </td>
-            <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Padis</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/padis.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/padis.svg" alt="Padis">
-                </picture>
-            </td>
-            <td><a href="https://padis.io/">padis.io</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Cloudbear</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/cloudbear.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/cloudbear.svg" alt="Cloudbear">
-                </picture>
-            </td>
-            <td><a href="https://cloudbear.eu/">cloudbear.eu</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Security Onion Solutions</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/securityonion.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/securityonion.svg" alt="Security Onion Solutions">
-                </picture>
-            </td>
-            <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Factly</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/factly.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/factly.svg" alt="Factly">
-                </picture>
-            </td>
-            <td><a href="https://factlylabs.com/">factlylabs.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Nortal</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/nortal.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/nortal.svg" alt="Nortal">
-                </picture>
-            </td>
-            <td><a href="https://nortal.com/">nortal.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>OrderMyGear</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/ordermygear.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/ordermygear.svg" alt="OrderMyGear">
-                </picture>
-            </td>
-            <td><a href="https://www.ordermygear.com/">ordermygear.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Spiri.bo</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/spiribo.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/spiribo.svg" alt="Spiri.bo">
-                </picture>
-            </td>
-            <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Strivacity</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/strivacity.svg" />
-                    <img height="16px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/strivacity.svg" alt="Spiri.bo">
-                </picture>
-            </td>
-            <td><a href="https://strivacity.com/">strivacity.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Hanko</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/hanko.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/hanko.svg" alt="Hanko">
-                </picture>
-            </td>
-            <td><a href="https://hanko.io/">hanko.io</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Rabbit</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/rabbit.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/rabbit.svg" alt="Rabbit">
-                </picture>
-            </td>
-            <td><a href="https://rabbit.co.th/">rabbit.co.th</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
             <td>inMusic</td>
             <td align="center">
                 <picture>
                     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/inmusic.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/inmusic.svg" alt="InMusic">
+                    <img height="24px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/inmusic.svg" alt="InMusic">
                 </picture>
             </td>
             <td><a href="https://inmusicbrands.com/">inmusicbrands.com</a></td>
         </tr>
         <tr>
-            <td>Adopter *</td>
             <td>Buhta</td>
             <td align="center">
                 <picture>
@@ -497,99 +510,8 @@ that your company deserves a spot here, reach out to
             </td>
             <td><a href="https://buhta.com/">buhta.com</a></td>
         </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Connctd</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/connctd.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/connctd.svg" alt="Connctd">
-                </picture>
-            </td>
-            <td><a href="https://connctd.com/">connctd.com</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>Paralus</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/paralus.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/paralus.svg" alt="Paralus">
-                </picture>
-            </td>
-            <td><a href="https://www.paralus.io/">paralus.io</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>TIER IV</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/tieriv.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/tieriv.svg" alt="TIER IV">
-                </picture>
-            </td>
-            <td><a href="https://tier4.jp/en/">tier4.jp</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>R2Devops</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/r2devops.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/r2devops.svg" alt="R2Devops">
-                </picture>
-            </td>
-            <td><a href="https://r2devops.io/">r2devops.io</a></td>
-        </tr>
-        <tr>
-            <td>Adopter *</td>
-            <td>LunaSec</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/lunasec.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/lunasec.svg" alt="LunaSec">
-                </picture>
-            </td>
-            <td><a href="https://www.lunasec.io/">lunasec.io</a></td>
         </tr>
             <tr>
-            <td>Adopter *</td>
-            <td>Serlo</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/serlo.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/serlo.svg" alt="Serlo">
-                </picture>
-            </td>
-            <td><a href="https://serlo.org/">serlo.org</a></td>
-        </tr>
-        </tr>
-            <tr>
-            <td>Adopter *</td>
-            <td>dyrector.io</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/dyrector_io.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/dyrector_io.svg" alt="dyrector.io">
-                </picture>
-            </td>
-            <td><a href="https://dyrector.io/">dyrector.io</a></td>
-        </tr>
-        </tr>
-            <tr>
-            <td>Adopter *</td>
-            <td>Stackspin</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/stackspin.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/stackspin.svg" alt="stackspin.net">
-                </picture>
-            </td>
-            <td><a href="https://www.stackspin.net/">stackspin.net</a></td>
-        </tr>
-        </tr>
-            <tr>
-            <td>Adopter *</td>
             <td>Amplitude</td>
             <td align="center">
                 <picture>
@@ -599,36 +521,36 @@ that your company deserves a spot here, reach out to
             </td>
             <td><a href="https://amplitude.com/">amplitude.com</a></td>
         </tr>
-         <tr>
-            <td>Adopter *</td>
-            <td>Pinniped</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/pinniped.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/pinniped.svg" alt="pinniped.dev">
-                </picture>
-            </td>
-            <td><a href="https://pinniped.dev/">pinniped.dev</a></td>
-        </tr>         
-        <tr>
-            <td>Adopter *</td>
-            <td>Pvotal</td>
-            <td align="center">
-                <picture>
-                    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/pvotal.svg" />
-                    <img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/pvotal.svg" alt="pvotal.tech">
-                </picture>
-            </td>
-            <td><a href="https://pvotal.tech/">pvotal.tech</a></td>
-        </tr>
+    <tr>
+      <td align="center"><a href="https://tier4.jp/en/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/tieriv.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/tieriv.svg" alt="TIER IV"></picture></a></td>
+      <td align="center"><a href="https://kyma-project.io"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/kyma.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/kyma.svg" alt="Kyma Project"></picture></a></td>
+      <td align="center"><a href="https://serlo.org/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/serlo.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/serlo.svg" alt="Serlo"></picture></a></td>
+      <td align="center"><a href="https://padis.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/padis.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/padis.svg" alt="Padis"></picture></a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://cloudbear.eu/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/cloudbear.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/cloudbear.svg" alt="Cloudbear"></picture></a></td>
+      <td align="center"><a href="https://securityonionsolutions.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/securityonion.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/securityonion.svg" alt="Security Onion Solutions"></picture></a></td>
+      <td align="center"><a href="https://factlylabs.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/factly.svg" /><img height="24px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/factly.svg" alt="Factly"></picture></a></td>
+      <td align="center"><a href="https://cashdeck.com.au/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/allmyfunds.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/allmyfunds.svg" alt="All My Funds"></picture></a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://nortal.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/nortal.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/nortal.svg" alt="Nortal"></picture></a></td>
+      <td align="center"><a href="https://www.ordermygear.com/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/ordermygear.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/ordermygear.svg" alt="OrderMyGear"></picture></a></td>
+      <td align="center"><a href="https://r2devops.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/r2devops.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/r2devops.svg" alt="R2Devops"></picture></a></td>
+      <td align="center"><a href="https://www.paralus.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/paralus.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/paralus.svg" alt="Paralus"></picture></a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://dyrector.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/dyrector_io.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/dyrector_io.svg" alt="dyrector.io"></picture></a></td>
+      <td align="center"><a href="https://pinniped.dev/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/pinniped.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/pinniped.svg" alt="pinniped.dev"></picture></a></td>
+      <td align="center"><a href="https://pvotal.tech/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ory/meta/master/static/adopters/light/pvotal.svg" /><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/dark/pvotal.svg" alt="pvotal.tech"></picture></a></td>
+      <td></td>
+    </tr>
     </tbody>
 </table>
 
 Many thanks to all individual contributors
 
 <a href="https://opencollective.com/ory" target="_blank"><img src="https://opencollective.com/ory/contributors.svg?width=890&limit=714&button=false" /></a>
-
-<em>\* Uses one of Ory's major projects in production.</em>
 
 <!--END ADOPTERS-->
 

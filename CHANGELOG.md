@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-03-13)](#000-2025-03-13)
+- [0.0.0 (2025-03-17)](#000-2025-03-17)
   - [Breaking Changes](#breaking-changes)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes)
@@ -649,7 +649,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-03-13)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-03-17)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing

@@ -29,7 +29,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/graceful"
 	"github.com/ory/x/healthx"
@@ -190,14 +189,6 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 
 func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(config.Version))
-
-	if d.Config().CGroupsV1AutoMaxProcsEnabled() {
-		_, err := maxprocs.Set(maxprocs.Logger(d.Logger().Infof))
-
-		if err != nil {
-			d.Logger().WithError(err).Fatal("Couldn't set GOMAXPROCS")
-		}
-	}
 
 	adminmw = negroni.New()
 	publicmw = negroni.New()

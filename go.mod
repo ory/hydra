@@ -1,15 +1,15 @@
 module github.com/ory/hydra/v2
 
-go 1.22
+go 1.23.6
 
-toolchain go1.22.5
+toolchain go1.24.1
 
 replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 
 replace github.com/gobuffalo/pop/v6 => github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b
 
 require (
-	github.com/ThalesIgnite/crypto11 v1.2.5
+	github.com/ThalesGroup/crypto11 v1.4.1
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
 	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/fatih/structs v1.1.0

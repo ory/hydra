@@ -26,7 +26,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 
-	"github.com/ThalesIgnite/crypto11"
+	"github.com/ThalesGroup/crypto11"
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
 	"github.com/golang/mock/gomock"

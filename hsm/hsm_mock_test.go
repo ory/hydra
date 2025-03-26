@@ -14,7 +14,7 @@ import (
 	elliptic "crypto/elliptic"
 	reflect "reflect"
 
-	crypto11 "github.com/ThalesIgnite/crypto11"
+	crypto11 "github.com/ThalesGroup/crypto11"
 	gomock "github.com/golang/mock/gomock"
 )
 

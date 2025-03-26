@@ -9,7 +9,7 @@ package hsm
 import (
 	"crypto/elliptic"
 
-	"github.com/ThalesIgnite/crypto11"
+	"github.com/ThalesGroup/crypto11"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/x/logrusx"

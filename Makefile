@@ -5,7 +5,7 @@ export PATH 					:= .bin:${PATH}
 export PWD 						:= $(shell pwd)
 export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
-GOLANGCI_LINT_VERSION = 1.64.7
+GOLANGCI_LINT_VERSION = 1.64.8
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
@@ -151,6 +151,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		--git-host github.com \
 		--api-name-suffix "API" \
 		--global-property apiTests=false
+	(cd internal/httpclient; go mod tidy)
 
 	make format
 

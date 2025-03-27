@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-go@v3
         with:
-          go-version: "1.22"
+          go-version: "1.24"
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
@@ -83,7 +83,7 @@ jobs:
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v4
         with:
-          go-version: "1.22"
+          go-version: "1.24"
       - run: go list -json > go.list
       - name: Run nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
@@ -95,7 +95,7 @@ jobs:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: v1.61.0
+          version: v1.64.8
           skip-pkg-cache: true
       - name: Run go-acc (tests)
         run: |
@@ -126,7 +126,7 @@ jobs:
           key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v3
         with:
-          go-version: "1.22"
+          go-version: "1.24"
       - name: Setup HSM libs and packages
         run: |
           sudo apt install -y softhsm2 opensc
@@ -177,7 +177,7 @@ jobs:
       - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v3
         with:
-          go-version: "1.22"
+          go-version: "1.24"
       - uses: actions/cache@v4
         with:
           path: ./test/e2e/hydra

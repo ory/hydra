@@ -9,27 +9,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/x/assertx"
-
-	"github.com/ory/x/ioutilx"
-
-	"github.com/ory/x/uuidx"
-
 	"github.com/mohae/deepcopy"
-
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/pointerx"
-
-	"github.com/ory/hydra/v2/driver/config"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/assertx"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/uuidx"
 )
 
 func createTestClient(prefix string) hydra.OAuth2Client {
@@ -54,7 +47,7 @@ func createTestClient(prefix string) hydra.OAuth2Client {
 		// because these values are not nullable in the SQL schema, we have to set them not nil
 		AllowedCorsOrigins: []string{},
 		Audience:           []string{},
-		Jwks:               map[string]interface{}{},
+		Jwks:               &hydra.JsonWebKeySet{},
 		SkipConsent:        pointerx.Ptr(false),
 	}
 }

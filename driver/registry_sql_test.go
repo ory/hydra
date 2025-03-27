@@ -190,7 +190,7 @@ func sussessfulPing() func(r *RegistrySQL) error {
 
 func failedPing(err error) func(r *RegistrySQL) error {
 	return func(r *RegistrySQL) error {
-		r.Logger().Fatalf(err.Error())
+		r.Logger().Fatal(err.Error())
 		return errorsx.WithStack(err)
 	}
 }

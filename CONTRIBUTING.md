@@ -10,7 +10,7 @@
 - [FAQ](#faq)
 - [How can I contribute?](#how-can-i-contribute)
 - [Communication](#communication)
-- [Contribute examples](#contribute-examples)
+- [Contribute examples or community projects](#contribute-examples-or-community-projects)
 - [Contribute code](#contribute-code)
 - [Contribute documentation](#contribute-documentation)
 - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
@@ -123,34 +123,16 @@ the projects that you are interested in.
 
 Also, [follow us on Twitter](https://twitter.com/orycorp).
 
-## Contribute examples
+## Contribute examples or community projects
 
-One of the most impactful ways to contribute is by adding examples. You can find
-an overview of examples using Ory services on the
-[documentation examples page](https://www.ory.sh/docs/examples). Source code for
-examples can be found in most cases in the
-[ory/examples](https://github.com/ory/examples) repository.
+One of the most impactful ways to contribute is by adding code examples or other
+Ory-related code. You can find an overview of community code in the
+[awesome-ory](https://github.com/ory/awesome-ory) repository.
 
 _If you would like to contribute a new example, we would love to hear from you!_
 
-Please [open an issue](https://github.com/ory/examples/issues/new/choose) to
-describe your example before you start working on it. We would love to provide
-guidance to make for a pleasant contribution experience. Go through this
-checklist to contribute an example:
-
-1. Create a GitHub issue proposing a new example and make sure it's different
-   from an existing one.
-1. Fork the repo and create a feature branch off of `master` so that changes do
-   not get mixed up.
-1. Add a descriptive prefix to commits. This ensures a uniform commit history
-   and helps structure the changelog. Please refer to this
-   [Convential Commits configuration](https://github.com/ory/hydra/blob/master/.github/workflows/conventional_commits.yml)
-   for the list of accepted prefixes. You can read more about the Conventional
-   Commit specification
-   [at their site](https://www.conventionalcommits.org/en/v1.0.0/).
-1. Create a `README.md` that explains how to use the example. (Use
-   [the README template](https://github.com/ory/examples/blob/master/_common/README.md)).
-1. Open a pull request and maintainers will review and merge your example.
+Please [open a pull request at awesome-ory](https://github.com/ory/awesome-ory/)
+to add your example or Ory-related project to the awesome-ory README.
 
 ## Contribute code
 

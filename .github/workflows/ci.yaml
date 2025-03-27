@@ -95,7 +95,7 @@ jobs:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: v1.61.0
+          version: v1.64.8
           skip-pkg-cache: true
       - name: Run go-acc (tests)
         run: |

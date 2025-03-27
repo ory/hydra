@@ -1,36 +1,19 @@
 SHELL=/bin/bash -o pipefail
 
-export GO111MODULE 		:= on
-export PATH 					:= .bin:${PATH}
-export PWD 						:= $(shell pwd)
-export IMAGE_TAG 			:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
+export PATH 		:= .bin:${PATH}
+export PWD 			:= $(shell pwd)
+export IMAGE_TAG 	:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
 GOLANGCI_LINT_VERSION = 1.64.8
 
-GO_DEPENDENCIES = github.com/ory/go-acc \
-				  github.com/golang/mock/mockgen \
-				  golang.org/x/tools/cmd/goimports \
-				  github.com/go-swagger/go-swagger/cmd/swagger
-
-define make-go-dependency
-  # go install is responsible for not re-building when the code hasn't changed
-  .bin/$(notdir $1): go.sum go.mod
-		GOBIN=$(PWD)/.bin/ go install $1
-endef
-
-.bin/golangci-lint-$(GOLANGCI_LINT_VERSION):
+.bin/golangci-lint: Makefile
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v$(GOLANGCI_LINT_VERSION)
-	mv .bin/golangci-lint .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
 node_modules: package-lock.json
 	npm ci
 	touch node_modules
-
-.PHONY: .bin/yq
-.bin/yq:
-	go build -o .bin/yq github.com/mikefarah/yq/v4
 
 .bin/clidoc: go.mod
 	go build -o .bin/clidoc ./cmd/clidoc/.
@@ -46,14 +29,14 @@ docs/cli: .bin/clidoc
 	touch .bin/ory
 
 .PHONY: lint
-lint: .bin/golangci-lint-$(GOLANGCI_LINT_VERSION)
-	.bin/golangci-lint-$(GOLANGCI_LINT_VERSION) run -v ./...
+lint: .bin/golangci-lint
+	golangci-lint run -v ./...
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
-test: .bin/go-acc
+test:
 	make test-resetdb
-	source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension
+	source scripts/test-env.sh && go test -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...
 	docker rm -f hydra_test_database_mysql
 	docker rm -f hydra_test_database_postgres
 	docker rm -f hydra_test_database_cockroach
@@ -101,22 +84,22 @@ authors:  # updates the AUTHORS file
 
 # Formats the code
 .PHONY: format
-format: .bin/goimports .bin/ory node_modules
-	.bin/ory dev headers copyright --type=open-source --exclude=internal/httpclient
-	.bin/goimports -w --local github.com/ory .
+format: .bin/ory node_modules
+	ory dev headers copyright --type=open-source --exclude=internal/httpclient
+	go tool goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 
 # Generates mocks
 .PHONY: mocks
-mocks: .bin/mockgen
-	mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-	mockgen -package jwk_test -destination jwk/registry_mock_test.go -source=jwk/registry.go
+mocks:
+	go tool mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
+	go tool mockgen -package jwk_test -destination jwk/registry_mock_test.go -source=jwk/registry.go
 	go generate ./...
 
 # Generates the SDKs
 .PHONY: sdk
-sdk: .bin/swagger .bin/ory node_modules
-	swagger generate spec -m -o spec/swagger.json \
+sdk: .bin/ory node_modules
+	go tool swagger generate spec -m -o spec/swagger.json \
 		-c github.com/ory/hydra/v2/client \
 		-c github.com/ory/hydra/v2/consent \
 		-c github.com/ory/hydra/v2/flow \
@@ -129,7 +112,7 @@ sdk: .bin/swagger .bin/ory node_modules
 		-c github.com/ory/x/pagination \
 		-c github.com/ory/herodot
 	ory dev swagger sanitize ./spec/swagger.json
-	swagger validate ./spec/swagger.json
+	go tool swagger validate ./spec/swagger.json
 	CIRCLE_PROJECT_USERNAME=ory CIRCLE_PROJECT_REPONAME=hydra \
 			ory dev openapi migrate \
 				--health-path-tags metadata \
@@ -191,13 +174,10 @@ install:
 	go install -tags sqlite,sqlite_omit_load_extension .
 
 .PHONY: post-release
-post-release: .bin/yq
-	yq e '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
-	yq e '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
-	yq e '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' -i quickstart.yml
-
-generate: .bin/mockgen
-	go generate ./...
+post-release:
+	go tool yq e '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	go tool yq e '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
+	go tool yq e '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' -i quickstart.yml
 
 licenses: .bin/licenses node_modules  # checks open-source licenses
 	.bin/licenses

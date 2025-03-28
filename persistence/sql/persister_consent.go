@@ -77,7 +77,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where("nid = ?", nid).
 			Where("request_id IN (?)", ids...).
-			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}); errors.Is(err, fosite.ErrNotFound) {
+			Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
 			return err
@@ -86,7 +86,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		if err := p.QueryWithNetwork(ctx).
 			Where("nid = ?", nid).
 			Where("request_id IN (?)", ids...).
-			Delete(&OAuth2RequestSQL{Table: sqlTableRefresh}); errors.Is(err, fosite.ErrNotFound) {
+			Delete(OAuth2RefreshTable{}.TableName()); errors.Is(err, fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
 			return err

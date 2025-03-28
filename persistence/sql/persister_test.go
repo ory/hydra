@@ -118,13 +118,14 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 }
 
 func TestManagersNextGen(t *testing.T) {
-	regs := map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{}),
+	t.Parallel()
+
+	regs := make(map[string]driver.Registry)
+	if !testing.Short() {
+		regs = testhelpers.ConnectDatabases(t, true)
 	}
 
-	if !testing.Short() {
-		regs["postgres"], regs["mysql"], regs["cockroach"], _ = testhelpers.ConnectDatabases(t, true, &contextx.Default{})
-	}
+	regs["memory"] = testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{})
 
 	ctx := context.Background()
 	networks := make([]uuid.UUID, 5)
@@ -141,7 +142,6 @@ func TestManagersNextGen(t *testing.T) {
 	}
 
 	for k := range regs {
-		k := k
 		t.Run("database="+k, func(t *testing.T) {
 			t.Parallel()
 			client.TestHelperCreateGetUpdateDeleteClientNext(t, regs[k].Persister(), networks)
@@ -150,43 +150,47 @@ func TestManagersNextGen(t *testing.T) {
 }
 
 func TestManagers(t *testing.T) {
-	ctx := context.TODO()
-	t1registries := map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{}),
-	}
+	t.Parallel()
 
-	t2registries := map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), false, &contextx.Default{}),
-	}
+	ctx := context.Background()
+	regs1, regs2 := make(map[string]driver.Registry), make(map[string]driver.Registry)
+
+	sqlite := dbal.NewSQLiteTestDatabase(t)
+	regs1["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, true, &contextx.Default{})
+	regs2["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, false, &contextx.Default{})
 
 	if !testing.Short() {
-		t2registries["postgres"], t2registries["mysql"], t2registries["cockroach"], _ = testhelpers.ConnectDatabases(t, false, &contextx.Default{})
-		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = testhelpers.ConnectDatabases(t, true, &contextx.Default{})
+		pg, mysql, crdb := testhelpers.ConnectDatabasesURLs(t)
+		regs1["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, true, &contextx.Default{})
+		regs2["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, false, &contextx.Default{})
+		regs1["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, true, &contextx.Default{})
+		regs2["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, false, &contextx.Default{})
+		regs1["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, true, &contextx.Default{})
+		regs2["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, false, &contextx.Default{})
 	}
 
-	network1NID, _ := uuid.NewV4()
-	network2NID, _ := uuid.NewV4()
+	network1NID, network2NID := uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
 
-	for k, t1 := range t1registries {
-		t2 := t2registries[k]
-		require.NoError(t, t1.Persister().Connection(ctx).Create(&networkx.Network{ID: network1NID}))
-		require.NoError(t, t2.Persister().Connection(ctx).Create(&networkx.Network{ID: network2NID}))
-		t1.WithContextualizer(&contextx.Static{NID: network1NID, C: t1.Config().Source(context.Background())})
-		t2.WithContextualizer(&contextx.Static{NID: network2NID, C: t2.Config().Source(context.Background())})
-		t.Run("parallel-boundary", func(t *testing.T) { testRegistry(t, ctx, k, t1, t2) })
+	for k, r1 := range regs1 {
+		r2 := regs2[k]
+		require.NoError(t, r1.Persister().Connection(ctx).Create(&networkx.Network{ID: network1NID}))
+		require.NoError(t, r1.Persister().Connection(ctx).Create(&networkx.Network{ID: network2NID}))
+		r1.WithContextualizer(&contextx.Static{NID: network1NID, C: r1.Config().Source(context.Background())})
+		r2.WithContextualizer(&contextx.Static{NID: network2NID, C: r2.Config().Source(context.Background())})
+		t.Run("parallel-boundary", func(t *testing.T) { testRegistry(t, ctx, k, r1, r2) })
 	}
 
-	for k, t1 := range t1registries {
-		t2 := t2registries[k]
-		t2.WithContextualizer(&contextx.Static{NID: uuid.Nil, C: t2.Config().Source(context.Background())})
+	for k, r1 := range regs1 {
+		r2 := regs2[k]
+		r2.WithContextualizer(&contextx.Static{NID: uuid.Nil, C: r2.Config().Source(context.Background())})
 
-		if !t1.Config().HSMEnabled() { // We don't support NID isolation with HSM at the moment
+		if !r1.Config().HSMEnabled() { // We don't support NID isolation with HSM at the moment
 			t.Run("package=jwk/manager="+k+"/case=nid",
-				jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),
+				jwk.TestHelperNID(r1.KeyManager(), r2.KeyManager()),
 			)
 		}
 		t.Run("package=consent/manager="+k+"/case=nid",
-			test.TestHelperNID(t1, t1.ConsentManager(), t2.ConsentManager()),
+			test.TestHelperNID(r1, r1.ConsentManager(), r2.ConsentManager()),
 		)
 	}
 }

@@ -97,10 +97,9 @@ jobs:
           args: --timeout 10m0s
           version: v1.64.8
           skip-pkg-cache: true
-      - name: Run go-acc (tests)
+      - name: Run go tests
         run: |
-          make .bin/go-acc
-          .bin/go-acc -o coverage.out ./... -- -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension
+          go test -coverprofile coverage.out -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...
       - name: Submit to Codecov
         run: |
           bash <(curl -s https://codecov.io/bash)

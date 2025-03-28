@@ -19,6 +19,8 @@ import (
 )
 
 func TestPersister_Nonce(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	p := testhelpers.NewMockedRegistry(t, new(contextx.Default)).Persister()
 

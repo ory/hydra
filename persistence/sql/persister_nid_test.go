@@ -62,7 +62,7 @@ func (s *PersisterTestSuite) SetupSuite() {
 	}
 
 	if !testing.Short() {
-		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], _ = testhelpers.ConnectDatabases(s.T(), true, &contextx.Default{})
+		s.registries = testhelpers.ConnectDatabases(s.T(), true)
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -532,7 +532,7 @@ func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 			request.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+			actual := persistencesql.OAuth2RefreshTable{}
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, authorizeCode, "", request))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
@@ -730,7 +730,7 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 			signature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request))
 
-			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+			actual := persistencesql.OAuth2RefreshTable{}
 
 			require.NoError(t, r.Persister().DeleteRefreshTokenSession(s.t2, signature))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
@@ -936,7 +936,7 @@ func (s *PersisterTestSuite) TestFlushInactiveRefreshTokens() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, "", request))
 
-			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+			actual := persistencesql.OAuth2RefreshTable{}
 
 			require.NoError(t, r.Persister().FlushInactiveRefreshTokens(s.t2, time.Now(), 100, 100))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
@@ -1829,14 +1829,14 @@ func (s *PersisterTestSuite) TestRotateRefreshToken() {
 				// Rotate token T1
 				require.NoError(t, r.Persister().RotateRefreshToken(s.t1, request.ID, signatureT1))
 				{
-					refreshT1 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					refreshT1 := persistencesql.OAuth2RefreshTable{}
 					require.NoError(t, r.Persister().Connection(s.t1).Where("signature = ?", signatureT1).First(&refreshT1))
 					require.Equal(t, false, refreshT1.Active)
 
 					accessT1 := persistencesql.OAuth2RequestSQL{Table: "access"}
 					require.ErrorIs(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignatureT1)).First(&accessT1), sql.ErrNoRows)
 
-					refreshT2 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					refreshT2 := persistencesql.OAuth2RefreshTable{}
 					require.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", signatureT2).First(&refreshT2))
 					require.Equal(t, true, refreshT2.Active)
 
@@ -1847,7 +1847,7 @@ func (s *PersisterTestSuite) TestRotateRefreshToken() {
 
 				require.NoError(t, r.Persister().RotateRefreshToken(s.t2, request.ID, signatureT2))
 				{
-					refreshT2 := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					refreshT2 := persistencesql.OAuth2RefreshTable{}
 					require.NoError(t, r.Persister().Connection(s.t2).Where("signature = ?", signatureT2).First(&refreshT2))
 					require.Equal(t, false, refreshT2.Active)
 
@@ -1879,7 +1879,7 @@ func (s *PersisterTestSuite) TestRotateRefreshToken() {
 					accessT1 := persistencesql.OAuth2RequestSQL{Table: "access"}
 					require.ErrorIs(t, r.Persister().Connection(s.t1).Where("signature = ?", x.SignatureHash(accessSignature1)).First(&accessT1), sql.ErrNoRows)
 
-					refresh := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+					refresh := persistencesql.OAuth2RefreshTable{}
 					require.NoError(t, r.Persister().Connection(s.t1).Where("signature = ?", signature).First(&refresh))
 					require.Equal(t, false, refresh.Active)
 
@@ -2215,6 +2215,8 @@ func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 }
 
 func TestPersisterTestSuite(t *testing.T) {
+	t.Parallel()
+
 	suite.Run(t, new(PersisterTestSuite))
 }
 

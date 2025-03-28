@@ -5,8 +5,15 @@ package testhelpers
 
 import (
 	"context"
+	"regexp"
+	"strings"
 	"sync"
 	"testing"
+	"time"
+
+	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/x/dbal"
 
@@ -16,7 +23,6 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
@@ -73,14 +79,6 @@ func RegistryFactory(t testing.TB, url string, c *config.DefaultProvider, networ
 	return r
 }
 
-func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
-	return func(t *testing.T) {
-		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
-		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-		t.Log("clean and migrate done")
-	}
-}
-
 func ConnectToMySQL(t testing.TB) string {
 	return dockertest.RunTestMySQLWithVersion(t, "8.0")
 }
@@ -93,49 +91,69 @@ func ConnectToCRDB(t testing.TB) string {
 	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v24.1")
 }
 
-func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
-	var pgURL, mysqlURL, crdbURL string
+func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 	wg := sync.WaitGroup{}
 
 	wg.Add(3)
 	go func() {
 		pgURL = ConnectToPG(t)
 		t.Log("Pg done")
+
+		require.EventuallyWithT(t, func(t *assert.CollectT) {
+			c, err := pop.NewConnection(&pop.ConnectionDetails{URL: pgURL})
+			require.NoError(t, err)
+			require.NoError(t, c.Open())
+			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
+			pgURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(pgURL, "/"+dbName+"?")
+		}, 20*time.Second, 100*time.Millisecond)
+
 		wg.Done()
 	}()
 	go func() {
 		mysqlURL = ConnectToMySQL(t)
 		t.Log("myssql done")
+
+		require.EventuallyWithT(t, func(t *assert.CollectT) {
+			c, err := pop.NewConnection(&pop.ConnectionDetails{URL: mysqlURL})
+			require.NoError(t, err)
+			require.NoError(t, c.Open())
+			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
+			mysqlURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(mysqlURL, "/"+dbName+"?")
+		}, 20*time.Second, 100*time.Millisecond)
+
 		wg.Done()
 	}()
 	go func() {
 		crdbURL = ConnectToCRDB(t)
 		t.Log("crdb done")
+
+		require.EventuallyWithT(t, func(t *assert.CollectT) {
+			c, err := pop.NewConnection(&pop.ConnectionDetails{URL: crdbURL})
+			require.NoError(t, err)
+			require.NoError(t, c.Open())
+			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
+			crdbURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(crdbURL, "/"+dbName+"?")
+		}, 20*time.Second, 100*time.Millisecond)
+
 		wg.Done()
 	}()
 	t.Log("beginning to wait")
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistrySQLFromURL(t, pgURL, migrate, ctxer)
-	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate, ctxer)
-	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate, ctxer)
-	dbs := []driver.Registry{pg, mysql, crdb}
-
-	clean = func(t *testing.T) {
-		wg := sync.WaitGroup{}
-
-		wg.Add(len(dbs))
-		for _, db := range dbs {
-			go func(db driver.Registry) {
-				defer wg.Done()
-				CleanAndMigrate(db)(t)
-			}(db)
-		}
-		wg.Wait()
-	}
-	clean(t)
 	return
+}
+
+func ConnectDatabases(t *testing.T, migrate bool) map[string]driver.Registry {
+	pg, mysql, crdb := ConnectDatabasesURLs(t)
+	regs := make(map[string]driver.Registry)
+	regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, &contextx.Default{})
+	regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, &contextx.Default{})
+	regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, &contextx.Default{})
+	return regs
 }
 
 func MustEnsureRegistryKeys(ctx context.Context, r driver.Registry, key string) {

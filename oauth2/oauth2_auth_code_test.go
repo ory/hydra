@@ -174,11 +174,10 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	setupRegistries(t)
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	ctx := context.Background()
 
-	for dbName, reg := range registries {
+	for dbName, reg := range testhelpers.ConnectDatabases(t, false) {
 		t.Run("registry="+dbName, func(t *testing.T) {
 			reg := testhelpers.NewRegistrySQLFromURL(t, reg.Config().DSN(), true, &contextx.Default{})
 

@@ -62,7 +62,7 @@ func (s *PersisterTestSuite) SetupSuite() {
 	}
 
 	if !testing.Short() {
-		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], _ = testhelpers.ConnectDatabases(s.T(), true, &contextx.Default{})
+		s.registries = testhelpers.ConnectDatabases(s.T(), true)
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -2215,6 +2215,8 @@ func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 }
 
 func TestPersisterTestSuite(t *testing.T) {
+	t.Parallel()
+
 	suite.Run(t, new(PersisterTestSuite))
 }
 

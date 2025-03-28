@@ -10,12 +10,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/dbal"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"
@@ -42,7 +43,6 @@ import (
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
 )
 
 func snapshotFor(paths ...string) *cupaloy.Config {
@@ -62,33 +62,54 @@ func CompareWithFixture(t *testing.T, actual interface{}, prefix string, id stri
 }
 
 func TestMigrations(t *testing.T) {
-	connections := make(map[string]*pop.Connection, 1)
+	connections := make(map[string]*pop.Connection, 4)
 
-	if testing.Short() {
-		reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-		c := reg.Persister().Connection(context.Background())
+	{
+		c, err := pop.NewConnection(&pop.ConnectionDetails{URL: dbal.NewSQLiteTestDatabase(t)})
+		require.NoError(t, err)
+		require.NoError(t, c.Open())
 		connections["sqlite"] = c
 	}
 
 	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			func() {
-				connections["postgres"] = dockertest.ConnectToTestPostgreSQLPop(t)
-			},
-			func() {
-				connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
-			},
-			func() {
-				connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
-			},
-		})
+		wg := sync.WaitGroup{}
+		for db, dsn := range map[string]string{
+			"postgres":  dockertest.RunTestPostgreSQL(t),
+			"mysql":     dockertest.RunTestMySQL(t),
+			"cockroach": dockertest.RunTestCockroachDB(t),
+		} {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+
+				dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
+				t.Logf("using %s database %q", db, dbName)
+
+				require.EventuallyWithT(t, func(t *assert.CollectT) {
+					c, err := pop.NewConnection(&pop.ConnectionDetails{URL: dsn})
+					require.NoError(t, err)
+					require.NoError(t, c.Open())
+					require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
+					dsn = regexp.MustCompile("/[a-z0-9]+\\?").ReplaceAllString(dsn, "/"+dbName+"?")
+					require.NoError(t, c.Close())
+
+					c, err = pop.NewConnection(&pop.ConnectionDetails{URL: dsn})
+					require.NoError(t, err)
+					require.NoError(t, c.Open())
+					connections[db] = c
+				}, 20*time.Second, 100*time.Millisecond)
+				t.Cleanup(func() {
+					connections[db].Close()
+				})
+			}()
+		}
+		wg.Wait()
 	}
 
-	var test = func(db string, c *pop.Connection) func(t *testing.T) {
-		return func(t *testing.T) {
+	for db, c := range connections {
+		t.Run("database="+db, func(t *testing.T) {
+			t.Parallel()
 			ctx := context.Background()
-			x.CleanSQLPop(t, c)
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
@@ -103,7 +124,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
 					cs := []client.Client{}
 					require.NoError(t, c.All(&cs))
-					require.Equal(t, 19, len(cs))
+					require.Len(t, cs, 19)
 					for _, c := range cs {
 						require.False(t, c.CreatedAt.IsZero())
 						require.False(t, c.UpdatedAt.IsZero())
@@ -120,7 +141,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_jwk", func(t *testing.T) {
 					js := []jwk.SQLData{}
 					require.NoError(t, c.All(&js))
-					require.Equal(t, 7, len(js))
+					require.Len(t, js, 7)
 					for _, j := range js {
 						testhelpersuuid.AssertUUID(t, j.ID)
 						testhelpersuuid.AssertUUID(t, j.NID)
@@ -134,7 +155,7 @@ func TestMigrations(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				require.Equal(t, 17, len(flows))
+				require.Len(t, flows, 17)
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
@@ -146,7 +167,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_authentication_session", func(t *testing.T) {
 					ss := []flow.LoginSession{}
 					require.NoError(t, c.All(&ss))
-					require.Equal(t, 17, len(ss))
+					require.Len(t, ss, 17)
 
 					for _, s := range ss {
 						testhelpersuuid.AssertUUID(t, s.NID)
@@ -159,7 +180,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_obfuscated_authentication_session", func(t *testing.T) {
 					ss := []consent.ForcedObfuscatedLoginSession{}
 					require.NoError(t, c.All(&ss))
-					require.Equal(t, 13, len(ss))
+					require.Len(t, ss, 13)
 
 					for _, s := range ss {
 						testhelpersuuid.AssertUUID(t, s.NID)
@@ -171,7 +192,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_logout_request", func(t *testing.T) {
 					lrs := []flow.LogoutRequest{}
 					require.NoError(t, c.All(&lrs))
-					require.Equal(t, 7, len(lrs))
+					require.Len(t, lrs, 7)
 
 					for _, s := range lrs {
 						testhelpersuuid.AssertUUID(t, s.NID)
@@ -184,7 +205,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_jti_blacklist", func(t *testing.T) {
 					bjtis := []oauth2.BlacklistedJTI{}
 					require.NoError(t, c.All(&bjtis))
-					require.Equal(t, 1, len(bjtis))
+					require.Len(t, bjtis, 1)
 					for _, bjti := range bjtis {
 						testhelpersuuid.AssertUUID(t, bjti.NID)
 						bjti.NID = uuid.Nil
@@ -196,7 +217,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_access", func(t *testing.T) {
 					as := []sql.OAuth2RequestSQL{}
 					require.NoError(t, c.RawQuery("SELECT * FROM hydra_oauth2_access").All(&as))
-					require.Equal(t, 13, len(as))
+					require.Len(t, as, 13)
 
 					for _, a := range as {
 						testhelpersuuid.AssertUUID(t, a.NID)
@@ -212,7 +233,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_refresh", func(t *testing.T) {
 					rs := []sql.OAuth2RequestSQL{}
 					require.NoError(t, c.RawQuery(`SELECT signature, nid, request_id, challenge_id, requested_at, client_id, scope, granted_scope, requested_audience, granted_audience, form_data, subject, active, session_data, expires_at	FROM hydra_oauth2_refresh`).All(&rs))
-					require.Equal(t, 13, len(rs))
+					require.Len(t, rs, 13)
 
 					for _, r := range rs {
 						testhelpersuuid.AssertUUID(t, r.NID)
@@ -228,7 +249,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_code", func(t *testing.T) {
 					cs := []sql.OAuth2RequestSQL{}
 					require.NoError(t, c.RawQuery("SELECT * FROM hydra_oauth2_code").All(&cs))
-					require.Equal(t, 13, len(cs))
+					require.Len(t, cs, 13)
 
 					for _, c := range cs {
 						testhelpersuuid.AssertUUID(t, c.NID)
@@ -244,7 +265,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_oidc", func(t *testing.T) {
 					os := []sql.OAuth2RequestSQL{}
 					require.NoError(t, c.RawQuery("SELECT * FROM hydra_oauth2_oidc").All(&os))
-					require.Equal(t, 13, len(os))
+					require.Len(t, os, 13)
 
 					for _, o := range os {
 						testhelpersuuid.AssertUUID(t, o.NID)
@@ -260,7 +281,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_pkce", func(t *testing.T) {
 					ps := []sql.OAuth2RequestSQL{}
 					require.NoError(t, c.RawQuery("SELECT * FROM hydra_oauth2_pkce").All(&ps))
-					require.Equal(t, 11, len(ps))
+					require.Len(t, ps, 11)
 
 					for _, p := range ps {
 						testhelpersuuid.AssertUUID(t, p.NID)
@@ -276,7 +297,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=networks", func(t *testing.T) {
 					ns := []networkx.Network{}
 					require.NoError(t, c.RawQuery("SELECT * FROM networks").All(&ns))
-					require.Equal(t, 1, len(ns))
+					require.Len(t, ns, 1)
 					for _, n := range ns {
 						testhelpersuuid.AssertUUID(t, n.ID)
 						require.NotZero(t, n.CreatedAt)
@@ -284,12 +305,6 @@ func TestMigrations(t *testing.T) {
 					}
 				})
 			})
-		}
-	}
-
-	for db, c := range connections {
-		t.Run(fmt.Sprintf("database=%s", db), test(db, c))
-		x.CleanSQLPop(t, c)
-		require.NoError(t, c.Close())
+		})
 	}
 }

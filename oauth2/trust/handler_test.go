@@ -50,7 +50,7 @@ type HandlerTestSuite struct {
 }
 
 // Setup will run before the tests in the suite are run.
-func (s *HandlerTestSuite) SetupSuite() {
+func (s *HandlerTestSuite) SetupTest() {
 	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(context.Background(), config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(context.Background(), config.KeyDefaultClientScope, []string{"foo", "bar"})
@@ -72,17 +72,13 @@ func (s *HandlerTestSuite) SetupSuite() {
 }
 
 // Setup before each test.
-func (s *HandlerTestSuite) SetupTest() {
-}
+func (s *HandlerTestSuite) SetupSuite() {}
 
 // Will run after all the tests in the suite have been run.
-func (s *HandlerTestSuite) TearDownSuite() {
-}
+func (s *HandlerTestSuite) TearDownSuite() {}
 
 // Will run after each test in the suite.
-func (s *HandlerTestSuite) TearDownTest() {
-	testhelpers.CleanAndMigrate(s.registry)(s.T())
-}
+func (s *HandlerTestSuite) TearDownTest() {}
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run.
@@ -268,12 +264,13 @@ func (s *HandlerTestSuite) TestGrantListCanBeFetched() {
 
 	getResult, _, err := s.hydraClient.OAuth2API.ListTrustedOAuth2JwtGrantIssuers(context.Background()).Execute()
 	s.Require().NoError(err, "no errors expected on grant list fetching")
-	s.Len(getResult, 2, "expected to get list of 2 grants")
+	s.Require().Len(getResult, 2, "expected to get list of 2 grants")
+	s.ElementsMatch([]string{createRequestParams.Issuer, createRequestParams2.Issuer}, []string{*getResult[0].Issuer, *getResult[1].Issuer})
 
 	getResult, _, err = s.hydraClient.OAuth2API.ListTrustedOAuth2JwtGrantIssuers(context.Background()).Issuer(createRequestParams2.Issuer).Execute()
 
 	s.Require().NoError(err, "no errors expected on grant list fetching")
-	s.Len(getResult, 1, "expected to get list of 1 grant, when filtering by issuer")
+	s.Require().Len(getResult, 1, "expected to get list of 1 grant, when filtering by issuer")
 	s.Equal(createRequestParams2.Issuer, *getResult[0].Issuer, "issuer must match")
 }
 

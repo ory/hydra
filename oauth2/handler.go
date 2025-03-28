@@ -1178,7 +1178,8 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 
 	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
 		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) ||
-		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeAuthorizationCode)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)

@@ -105,7 +105,7 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 			require.NoError(t, c.Open())
 			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
-			pgURL = regexp.MustCompile("/[a-z0-9]+\\?").ReplaceAllString(pgURL, "/"+dbName+"?")
+			pgURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(pgURL, "/"+dbName+"?")
 		}, 20*time.Second, 100*time.Millisecond)
 
 		wg.Done()
@@ -120,7 +120,7 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 			require.NoError(t, c.Open())
 			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
-			mysqlURL = regexp.MustCompile("/[a-z0-9]+\\?").ReplaceAllString(mysqlURL, "/"+dbName+"?")
+			mysqlURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(mysqlURL, "/"+dbName+"?")
 		}, 20*time.Second, 100*time.Millisecond)
 
 		wg.Done()
@@ -135,7 +135,7 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 			require.NoError(t, c.Open())
 			dbName := "testdb" + strings.ReplaceAll(uuid.Must(uuid.NewV4()).String(), "-", "")
 			require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
-			crdbURL = regexp.MustCompile("/[a-z0-9]+\\?").ReplaceAllString(crdbURL, "/"+dbName+"?")
+			crdbURL = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(crdbURL, "/"+dbName+"?")
 		}, 20*time.Second, 100*time.Millisecond)
 
 		wg.Done()

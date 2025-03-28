@@ -8,6 +8,7 @@ import (
 	"io/fs"
 
 	"github.com/pkg/errors"
+	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
@@ -138,6 +139,14 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 	if o.validate {
 		if err := config.Validate(ctx, l, c); err != nil {
 			return nil, err
+		}
+	}
+
+	if c.CGroupsV1AutoMaxProcsEnabled() {
+		_, err := maxprocs.Set(maxprocs.Logger(l.Infof))
+
+		if err != nil {
+			l.WithError(err).Fatal("Couldn't set GOMAXPROCS")
 		}
 	}
 

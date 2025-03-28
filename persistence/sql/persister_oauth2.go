@@ -288,7 +288,7 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 	err := sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
 			Where("signature = ?", signature).
-			Delete(&OAuth2RequestSQL{Table: table}))
+			Delete(OAuth2RequestSQL{Table: table}.TableName()))
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
 	}
@@ -304,7 +304,7 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 
 	err = p.QueryWithNetwork(ctx).
 		Where("request_id=?", id).
-		Delete(&OAuth2RequestSQL{Table: table})
+		Delete(OAuth2RequestSQL{Table: table}.TableName())
 	if errors.Is(err, sql.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
 	}
@@ -418,7 +418,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 	err = sqlcon.HandleError(
 		p.QueryWithNetwork(ctx).
 			Where("signature = ?", x.SignatureHash(signature)).
-			Delete(&OAuth2RequestSQL{Table: sqlTableAccess}))
+			Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()))
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		// Backwards compatibility: we previously did not always hash the
 		// signature before inserting. In case there are still very old (but
@@ -426,7 +426,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 		err = sqlcon.HandleError(
 			p.QueryWithNetwork(ctx).
 				Where("signature = ?", signature).
-				Delete(&OAuth2RequestSQL{Table: sqlTableAccess}))
+				Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()))
 		if errors.Is(err, sqlcon.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		}

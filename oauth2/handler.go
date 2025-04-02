@@ -1172,7 +1172,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-		events.Trace(ctx, events.TokenExchangeError)
+		events.Trace(ctx, events.TokenExchangeError, events.WithError(err))
 		return
 	}
 
@@ -1185,7 +1185,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.logOrAudit(err, r)
 				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
+				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 				return
 			}
 		}
@@ -1234,23 +1234,22 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, hook := range h.r.AccessRequestHooks() {
-		if err = hook(ctx, accessRequest); err != nil {
+		if err := hook(ctx, accessRequest); err != nil {
 			h.logOrAudit(err, r)
 			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
+			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 			return
 		}
 	}
 
 	var accessResponse fosite.AccessResponder
-	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
-		var err error
+	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) (err error) {
 		accessResponse, err = h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 		return err
 	}); err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest))
+		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 		return
 	}
 

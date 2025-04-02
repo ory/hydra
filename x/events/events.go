@@ -5,11 +5,13 @@ package events
 
 import (
 	"context"
+	"errors"
 
 	otelattr "go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
+	"github.com/ory/herodot"
 	"github.com/ory/x/otelx/semconv"
 )
 
@@ -68,6 +70,7 @@ const (
 	attributeKeyOAuth2TokenFormat           = "OAuth2TokenFormat"           //nolint:gosec
 	attributeKeyOAuth2RefreshTokenSignature = "OAuth2RefreshTokenSignature" //nolint:gosec
 	attributeKeyOAuth2AccessTokenSignature  = "OAuth2AccessTokenSignature"  //nolint:gosec
+	attributeKeyErrorReason                 = "ErrorReason"
 )
 
 // WithTokenFormat emits the token format as part of the event.
@@ -127,6 +130,17 @@ func WithRequest(request fosite.Requester) trace.EventOption {
 	}
 
 	return trace.WithAttributes(attributes...)
+}
+
+// WithError sets the Reason attribute according to the error given.
+func WithError(err error) trace.EventOption {
+	if err == nil {
+		return trace.WithAttributes()
+	}
+	if rc := herodot.ReasonCarrier(nil); errors.As(err, &rc) && rc.Reason() != "" { // also works for fosite.RFC6749Error
+		return trace.WithAttributes(otelattr.String(attributeKeyErrorReason, rc.Reason()))
+	}
+	return trace.WithAttributes(otelattr.String(attributeKeyErrorReason, err.Error()))
 }
 
 // Trace emits an event with the given attributes.

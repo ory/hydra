@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-03-17)](#000-2025-03-17)
+- [0.0.0 (2025-04-10)](#000-2025-04-10)
   - [Breaking Changes](#breaking-changes)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes)
@@ -649,7 +649,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-03-17)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-04-10)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -696,6 +696,7 @@ If this pull request
 
 ### Features
 
+* Add error reason to OAuth2TokenExchangeError event ([#3971](https://github.com/ory/hydra/issues/3971)) ([241dd45](https://github.com/ory/hydra/commit/241dd45fa17ed10d1101d890199df47dab4dbce5))
 * Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
 
     This patch introduces the OAuth 2.0 Device Authorization Grant to Ory

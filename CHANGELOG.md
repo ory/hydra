@@ -693,6 +693,13 @@ If this pull request
 
     Contributes to https://github.com/ory-corp/cloud/issues/7395
 
+* Using uuid_generate_v4 function ([#3958](https://github.com/ory/hydra/issues/3958)) ([c206066](https://github.com/ory/hydra/commit/c20606606654af975e5d82998956bb998acee576)):
+
+    Removing the md5 function for the uuid generation with native pgsql
+    function https://www.postgresql.org/docs/current/uuid-ossp.html
+    
+    Closes https://github.com/ory/hydra/issues/3844
+
 
 ### Features
 

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-04-10)](#000-2025-04-10)
+- [0.0.0 (2025-04-14)](#000-2025-04-14)
   - [Breaking Changes](#breaking-changes)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes)
@@ -649,7 +649,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-04-10)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-04-14)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -725,6 +725,7 @@ If this pull request
     implementation can be found
     [here](https://github.com/ory/hydra-login-consent-node/blob/99ca6ad544f64110706c289dda74c7c622ec3110/src/routes/device.ts).
 
+* Improve oauth2 event data ([#3975](https://github.com/ory/hydra/issues/3975)) ([6da0fd3](https://github.com/ory/hydra/commit/6da0fd327e16d0bf40a5f637766a11b087e7ff1e))
 * Improve openapi spec ([#3908](https://github.com/ory/hydra/issues/3908)) ([4053c9e](https://github.com/ory/hydra/commit/4053c9ecc19f50a3793c595eeb3e242a47bbedf0)), closes [#1234](https://github.com/ory/hydra/issues/1234) [#1234](https://github.com/ory/hydra/issues/1234):
 
     <!--

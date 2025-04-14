@@ -1172,7 +1172,13 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-		events.Trace(ctx, events.TokenExchangeError, events.WithError(err))
+		// NewAccessRequest sometimes returns the accessRequest even if an error occurs
+		// If that is the case, we want to log it to get information about the client
+		if accessRequest != nil {
+			events.Trace(ctx, events.TokenExchangeError, events.WithError(err), events.WithRequest(accessRequest))
+		} else {
+			events.Trace(ctx, events.TokenExchangeError, events.WithError(err))
+		}
 		return
 	}
 

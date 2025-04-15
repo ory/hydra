@@ -1298,9 +1298,7 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	iu := s.getDeviceVerificationPath(ctx)
 	// We don't want the user_code persisted in the database
 	q := r.URL.Query()
-	if q.Has("user_code") {
-		q.Set("user_code", "****")
-	}
+	q = caseInsensitiveFilterParam(q, "user_code")
 	iu.RawQuery = q.Encode()
 
 	f, err := s.r.ConsentManager().CreateDeviceUserAuthRequest(

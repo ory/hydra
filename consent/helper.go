@@ -4,6 +4,9 @@
 package consent
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/flow"
@@ -37,4 +40,19 @@ func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []flow.Acce
 	}
 
 	return nil
+}
+
+func caseInsensitiveFilterParam(q url.Values, key string) url.Values {
+	query := url.Values{}
+	key = strings.ToLower(key)
+	for k, vs := range q {
+		if key == strings.ToLower(k) {
+			query.Set(k, "****")
+		} else {
+			for _, v := range vs {
+				query.Add(k, v)
+			}
+		}
+	}
+	return query
 }

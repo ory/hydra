@@ -65,7 +65,6 @@ func TestUnmarshalSession(t *testing.T) {
 			Subject:  "foo@bar.com",
 		},
 		Extra:                 map[string]interface{}{},
-		KID:                   "public:hydra.jwt.access-token",
 		ClientID:              "auth-code-client",
 		ConsentChallenge:      "2261efbd447044a1b2f76b05c6aca164",
 		ExcludeNotBeforeClaim: false,

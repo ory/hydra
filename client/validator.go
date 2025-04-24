@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -18,7 +19,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/ipx"
-	"github.com/ory/x/stringslice"
 )
 
 var (
@@ -162,11 +162,11 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.r.Config().SubjectTypesSupported(ctx, c), c.SubjectType) {
+		if !slices.Contains(v.r.Config().SubjectTypesSupported(ctx, c), c.SubjectType) {
 			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config().SubjectTypesSupported(ctx, c)))
 		}
 	} else {
-		if stringslice.Has(v.r.Config().SubjectTypesSupported(ctx, c), "public") {
+		if slices.Contains(v.r.Config().SubjectTypesSupported(ctx, c), "public") {
 			c.SubjectType = "public"
 		} else {
 			c.SubjectType = v.r.Config().SubjectTypesSupported(ctx, c)[0]
@@ -258,7 +258,7 @@ func (v *Validator) ValidateSectorIdentifierURL(ctx context.Context, location st
 	}
 
 	for _, r := range redirectURIs {
-		if !stringslice.Has(urls, r) {
+		if !slices.Contains(urls, r) {
 			return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug(fmt.Sprintf("Redirect URL \"%s\" does not match values from sector_identifier_uri.", r)))
 		}
 	}

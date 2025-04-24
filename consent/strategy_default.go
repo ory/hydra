@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -35,7 +36,6 @@ import (
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
-	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
 )
@@ -133,7 +133,7 @@ func (s *DefaultStrategy) requestAuthentication(
 	defer otelx.End(span, &err)
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "login") {
+	if slices.Contains(prompt, "login") {
 		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil, f)
 	}
 
@@ -154,7 +154,7 @@ func (s *DefaultStrategy) requestAuthentication(
 	}
 
 	if maxAge > -1 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
-		if stringslice.Has(prompt, "none") {
+		if slices.Contains(prompt, "none") {
 			return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because prompt is set to 'none' and authentication time reached 'max_age'."))
 		}
 		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil, f)
@@ -222,7 +222,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 
 	// Let's validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "none") && !skip {
+	if slices.Contains(prompt, "none") && !skip {
 		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint(`Prompt 'none' was requested, but no existing login session was found.`))
 	}
 
@@ -305,7 +305,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 	}
 
 	var baseURL *url.URL
-	if stringslice.Has(prompt, "registration") {
+	if slices.Contains(prompt, "registration") {
 		baseURL = s.c.RegistrationURL(ctx)
 	} else {
 		baseURL = s.c.LoginURL(ctx)
@@ -538,7 +538,7 @@ func (s *DefaultStrategy) requestConsent(
 	defer otelx.End(span, &err)
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "consent") {
+	if slices.Contains(prompt, "consent") {
 		return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
 	}
 
@@ -607,7 +607,7 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	}
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "none") && !skip {
+	if slices.Contains(prompt, "none") && !skip {
 		return errorsx.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 

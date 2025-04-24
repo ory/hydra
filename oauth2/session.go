@@ -6,6 +6,7 @@ package oauth2
 import (
 	"bytes"
 	"context"
+	"slices"
 	"time"
 
 	jjson "github.com/go-jose/go-jose/v3/json"
@@ -64,7 +65,7 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 
 	// remove any reserved claims from the custom claims
 	allowedClaimsFromConfigWithoutReserved := stringslice.Filter(s.AllowedTopLevelClaims, func(s string) bool {
-		return stringslice.Has(reservedClaims, s)
+		return slices.Contains(reservedClaims, s)
 	})
 
 	// our new extra map which will be added to the jwt

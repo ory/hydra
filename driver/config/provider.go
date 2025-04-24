@@ -9,6 +9,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 
@@ -275,7 +276,7 @@ func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalS
 		types = []string{"public"}
 	}
 
-	if stringslice.Has(types, "pairwise") {
+	if slices.Contains(types, "pairwise") {
 		if p.AccessTokenStrategy(ctx, additionalSources...) == AccessTokenJWTStrategy {
 			p.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.supported_types" (e.g. oidc.subject_identifiers.supported_types=public) or set strategies.access_token to "opaque".`)
 			types = stringslice.Filter(

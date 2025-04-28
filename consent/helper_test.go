@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -418,6 +419,45 @@ func TestCreateCsrfSession(t *testing.T) {
 				}
 			}
 			assert.Equal(t, tc.expectedCookies, cookies)
+		})
+	}
+}
+
+func TestCaseInsensitiveFilterParam(t *testing.T) {
+	for k, tc := range []struct {
+		requestedQuery string
+		key            string
+
+		expectedQuery url.Values
+	}{
+		{
+			requestedQuery: "key=value",
+			key:            "key2",
+			expectedQuery:  url.Values{"key": []string{"value"}},
+		},
+		{
+			requestedQuery: "KeY=value",
+			key:            "key",
+			expectedQuery:  url.Values{"KeY": []string{"****"}},
+		},
+		{
+			requestedQuery: "KeY=value",
+			key:            "kEy",
+			expectedQuery:  url.Values{"KeY": []string{"****"}},
+		},
+		{
+			requestedQuery: "key=value&KEY2=value2",
+			key:            "key2",
+			expectedQuery:  url.Values{"key": []string{"value"}, "KEY2": []string{"****"}},
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			query, err := url.ParseQuery(tc.requestedQuery)
+			assert.NoError(t, err)
+
+			q := caseInsensitiveFilterParam(query, tc.key)
+
+			assert.Equal(t, tc.expectedQuery, q)
 		})
 	}
 }

@@ -369,3 +369,35 @@ func TestHandlerWellKnown(t *testing.T) {
 		snapshotx.SnapshotT(t, wellKnownResp)
 	})
 }
+
+func TestHandlerOauthAuthorizationServer(t *testing.T) {
+	ctx := context.Background()
+	conf := testhelpers.NewConfigurationWithDefaults()
+	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {
+		conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+		conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+		conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+		conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
+		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+
+		h := oauth2.NewHandler(reg, conf)
+
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
+			return h
+		})
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")
+		require.NoError(t, err)
+		defer res.Body.Close()
+
+		var wellKnownResp hydra.OidcConfiguration
+		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
+		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
+		snapshotx.SnapshotT(t, wellKnownResp)
+	})
+}

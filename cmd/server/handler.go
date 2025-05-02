@@ -9,33 +9,29 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
-	"github.com/ory/x/otelx/semconv"
-
-	"github.com/ory/x/servicelocatorx"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/analytics-go/v5"
-	"github.com/ory/x/configx"
-
-	"github.com/ory/x/reqlog"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/automaxprocs/maxprocs"
+	"golang.org/x/sync/errgroup"
 
+	"github.com/ory/analytics-go/v5"
 	"github.com/ory/graceful"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/otelx/semconv"
+	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/reqlog"
+	"github.com/ory/x/servicelocatorx"
+	"github.com/ory/x/tlsx"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
@@ -44,14 +40,17 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	prometheus "github.com/ory/x/prometheusx"
 )
 
 var _ = &consent.Handler{}
 
-func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, iface config.ServeInterface) http.Handler {
-	if !networkx.AddressIsUnixSocket(address) {
-		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(ctx, iface)))
+func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, iface config.ServeInterface) (http.Handler, error) {
+	if !networkx.AddressIsUnixSocket(address) && d.Config().TLS(ctx, iface).Enabled() {
+		mw, err := tlsx.EnforceTLSRequests(d, d.Config().TLS(ctx, iface).AllowTerminationFrom())
+		if err != nil {
+			return nil, err
+		}
+		n.Use(mw)
 	}
 
 	for _, mw := range sl.HTTPMiddlewares() {
@@ -68,7 +67,7 @@ func EnhanceMiddleware(ctx context.Context, sl *servicelocatorx.Options, d drive
 
 	n.UseHandler(router)
 
-	return n
+	return n, nil
 }
 
 func ensureNoMemoryDSN(r driver.Registry) {
@@ -91,22 +90,18 @@ func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifi
 		admin, _, adminmw, _ := setup(ctx, d, cmd)
 		d.PrometheusManager().RegisterRouter(admin.Router)
 
-		var wg sync.WaitGroup
-		wg.Add(1)
-
-		go serve(
+		h, err := EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface)
+		if err != nil {
+			return err
+		}
+		return serve(
 			ctx,
 			d,
-			cmd,
-			&wg,
 			config.AdminInterface,
-			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface),
+			h,
 			d.Config().ListenOn(config.AdminInterface),
 			d.Config().SocketPermission(config.AdminInterface),
 		)
-
-		wg.Wait()
-		return nil
 	}
 }
 
@@ -124,22 +119,18 @@ func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModif
 		_, public, _, publicmw := setup(ctx, d, cmd)
 		d.PrometheusManager().RegisterRouter(public.Router)
 
-		var wg sync.WaitGroup
-		wg.Add(1)
-
-		go serve(
+		h, err := EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface)
+		if err != nil {
+			return err
+		}
+		return serve(
 			ctx,
 			d,
-			cmd,
-			&wg,
 			config.PublicInterface,
-			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface),
+			h,
 			d.Config().ListenOn(config.PublicInterface),
 			d.Config().SocketPermission(config.PublicInterface),
 		)
-
-		wg.Wait()
-		return nil
 	}
 }
 
@@ -158,33 +149,40 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 		d.PrometheusManager().RegisterRouter(admin.Router)
 		d.PrometheusManager().RegisterRouter(public.Router)
 
-		var wg sync.WaitGroup
-		wg.Add(2)
+		ph, err := EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface)
+		if err != nil {
+			return err
+		}
+		ah, err := EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface)
+		if err != nil {
+			return err
+		}
 
-		go serve(
-			ctx,
-			d,
-			cmd,
-			&wg,
-			config.PublicInterface,
-			EnhanceMiddleware(ctx, sl, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, config.PublicInterface),
-			d.Config().ListenOn(config.PublicInterface),
-			d.Config().SocketPermission(config.PublicInterface),
-		)
+		eg, ctx := errgroup.WithContext(ctx)
 
-		go serve(
-			ctx,
-			d,
-			cmd,
-			&wg,
-			config.AdminInterface,
-			EnhanceMiddleware(ctx, sl, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, config.AdminInterface),
-			d.Config().ListenOn(config.AdminInterface),
-			d.Config().SocketPermission(config.AdminInterface),
-		)
+		eg.Go(func() error {
+			return serve(
+				ctx,
+				d,
+				config.PublicInterface,
+				ph,
+				d.Config().ListenOn(config.PublicInterface),
+				d.Config().SocketPermission(config.PublicInterface),
+			)
+		})
 
-		wg.Wait()
-		return nil
+		eg.Go(func() error {
+			return serve(
+				ctx,
+				d,
+				config.AdminInterface,
+				ah,
+				d.Config().ListenOn(config.AdminInterface),
+				d.Config().SocketPermission(config.AdminInterface),
+			)
+		})
+
+		return eg.Wait()
 	}
 }
 
@@ -209,7 +207,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 		NewMiddlewareFromLogger(d.Logger(),
 			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL(ctx).String()))
 	if d.Config().DisableHealthAccessLog(config.AdminInterface) {
-		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheus.MetricsPrometheusPath)
+		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheusx.MetricsPrometheusPath)
 	}
 
 	adminmw.UseFunc(semconv.Middleware)
@@ -279,8 +277,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 				"/admin" + healthx.ReadyCheckPath,
 				healthx.VersionPath,
 				"/admin" + healthx.VersionPath,
-				prometheus.MetricsPrometheusPath,
-				"/admin" + prometheus.MetricsPrometheusPath,
+				prometheusx.MetricsPrometheusPath,
+				"/admin" + prometheusx.MetricsPrometheusPath,
 				"/",
 			},
 			BuildVersion: config.Version,
@@ -307,16 +305,12 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *h
 func serve(
 	ctx context.Context,
 	d driver.Registry,
-	cmd *cobra.Command,
-	wg *sync.WaitGroup,
 	iface config.ServeInterface,
 	handler http.Handler,
 	address string,
 	permission *configx.UnixPermission,
-) {
-	defer wg.Done()
-
-	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
+) error {
+	if tracer := d.Tracer(ctx); tracer.IsLoaded() {
 		handler = otelx.TraceHandler(
 			handler,
 			otelhttp.WithTracerProvider(tracer.Provider()),
@@ -333,7 +327,7 @@ func serve(
 		tlsConfig = &tls.Config{GetCertificate: GetOrCreateTLSCertificate(ctx, d, iface, stopReload)}
 	}
 
-	var srv = graceful.WithDefaults(&http.Server{
+	srv := graceful.WithDefaults(&http.Server{
 		Handler:           handler,
 		TLSConfig:         tlsConfig,
 		ReadHeaderTimeout: time.Second * 5,
@@ -363,6 +357,8 @@ func serve(
 		close(stopReload)
 		return srv.Shutdown(ctx)
 	}); err != nil {
-		d.Logger().WithError(err).Fatal("Could not gracefully run server")
+		d.Logger().WithError(err).Error("Could not gracefully run server")
+		return err
 	}
+	return nil
 }

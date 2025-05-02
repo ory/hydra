@@ -411,6 +411,8 @@ github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b h1:BIzoOe2/wynZBQak1p
 github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b/go.mod h1:okVAYKGtgunD/wbW3NGhZTndJCS+6FqO+cA89rQ4doc=
 github.com/ory/x v0.0.707 h1:dcOlbIlzAS2vhsBcKwCFG685gZy9aO2h2SGJej87hpo=
 github.com/ory/x v0.0.707/go.mod h1:by9HRTEZgIS48FIoF/RjYHb2s1eSiycCZy0m/BMhsf8=
+github.com/ory/x v0.0.712 h1:3HRRXBlKXwkIh5ag55fs25tIMipb058muNtEWTFOqfI=
+github.com/ory/x v0.0.712/go.mod h1:FxgJl980fq/41JTPPloNawYPCY25KRYuMO98SRk1czc=
 github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
 github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.9.5 h1:4yBQzkHv+7BHq2PQUZF3Mx0IYxG7LsP222s7Agd3ve8=

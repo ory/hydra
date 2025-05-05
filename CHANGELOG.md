@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-04-14)](#000-2025-04-14)
+- [0.0.0 (2025-05-05)](#000-2025-05-05)
   - [Breaking Changes](#breaking-changes)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes)
@@ -649,7 +649,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-04-14)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-05)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -672,6 +672,7 @@ If this pull request
 
     The client validator no longer rejects PATCH and PUT updates when `JSONWebKeysURI` is non-empty and `JSONWebKeys` is not nil.
 
+* Case-insensitive user_code scrubbing ([#3979](https://github.com/ory/hydra/issues/3979)) ([d389fd0](https://github.com/ory/hydra/commit/d389fd0269f93c8b7c787f1b3683ae4c6e9e1909))
 * CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
 
@@ -704,6 +705,15 @@ If this pull request
 ### Features
 
 * Add error reason to OAuth2TokenExchangeError event ([#3971](https://github.com/ory/hydra/issues/3971)) ([241dd45](https://github.com/ory/hydra/commit/241dd45fa17ed10d1101d890199df47dab4dbce5))
+* Add handler for /.well-known/oauth-authorization-server. ([#3980](https://github.com/ory/hydra/issues/3980)) ([5baca28](https://github.com/ory/hydra/commit/5baca2843a98c222006b27b20e7e6392421ecad8)):
+
+    In order to support OAuth2.1 and some specific integrations that
+    leverage the `/.well-known/oauth-authorization-server` endpoint, this PR
+    adds a handler for the specific endpoint. The
+    `/.well-known/openid-configuration` endpoint already supports all
+    configuration items that conform to this endpoint as seen here:
+    https://datatracker.ietf.org/doc/html/rfc8414
+
 * Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
 
     This patch introduces the OAuth 2.0 Device Authorization Grant to Ory

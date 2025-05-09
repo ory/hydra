@@ -12,6 +12,6 @@ ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_was_used;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_handled_at;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN IF EXISTS device_error;
 
-ALTER TABLE hydra_client DROP COLUMN device_authorization_grant_id_token_lifespan;
-ALTER TABLE hydra_client DROP COLUMN device_authorization_grant_access_token_lifespan;
-ALTER TABLE hydra_client DROP COLUMN device_authorization_grant_refresh_token_lifespan;
+ALTER TABLE hydra_client DROP COLUMN IF EXISTS device_authorization_grant_id_token_lifespan;
+ALTER TABLE hydra_client DROP COLUMN IF EXISTS device_authorization_grant_access_token_lifespan;
+ALTER TABLE hydra_client DROP COLUMN IF EXISTS device_authorization_grant_refresh_token_lifespan;

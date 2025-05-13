@@ -15,27 +15,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/go-jose/go-jose/v3"
+	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/x/pointerx"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/hydra/v2/oauth2/trust"
-	"github.com/ory/x/contextx"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/suite"
-
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/jwk"
-
 	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/pointerx"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -134,8 +128,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSameIssuerSubjectKey() {
 	_, _, err = s.hydraClient.OAuth2API.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.Require().Error(err, "expected error, because grant with same issuer+subject+kid exists")
 
-	kid := uuid.New().String()
-	createRequestParams.Jwk.Kid = kid
+	createRequestParams.Jwk.Kid = uuid.Must(uuid.NewV4()).String()
 	_, _, err = s.hydraClient.OAuth2API.TrustOAuth2JwtGrantIssuer(ctx).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
 	s.NoError(err, "no errors expected on grant creation, because kid is now different")
 }
@@ -165,6 +158,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithUnknownJWK() {
 	}
 
 	_, res, err := s.hydraClient.OAuth2API.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
+	s.Require().NoError(err)
 	s.Assert().Equal(http.StatusBadRequest, res.StatusCode)
 	body, _ := io.ReadAll(res.Body)
 	s.Contains(gjson.GetBytes(body, "error_description").String(), "unknown json web key type")
@@ -297,7 +291,7 @@ func (s *HandlerTestSuite) generateJWK(publicKey *rsa.PublicKey) hydra.JsonWebKe
 	var b bytes.Buffer
 	s.Require().NoError(json.NewEncoder(&b).Encode(&jose.JSONWebKey{
 		Key:       publicKey,
-		KeyID:     uuid.New().String(),
+		KeyID:     uuid.Must(uuid.NewV4()).String(),
 		Algorithm: string(jose.RS256),
 		Use:       "sig",
 	}))
@@ -315,8 +309,8 @@ func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 		Issuer:          issuer,
 		Jwk:             s.generateJWK(s.publicKey),
 		Scope:           scope,
-		Subject:         pointerx.String(subject),
-		AllowAnySubject: pointerx.Bool(allowAnySubject),
+		Subject:         pointerx.Ptr(subject),
+		AllowAnySubject: pointerx.Ptr(allowAnySubject),
 	}
 }
 

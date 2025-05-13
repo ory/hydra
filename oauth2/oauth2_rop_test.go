@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -31,6 +31,8 @@ import (
 )
 
 func TestResourceOwnerPasswordGrant(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
 	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
@@ -38,7 +40,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 	reg.WithExtraFositeFactories([]fositex.Factory{compose.OAuth2ResourceOwnerPasswordCredentialsFactory})
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
-	secret := uuid.New().String()
+	secret := uuid.Must(uuid.NewV4()).String()
 	audience := sqlxx.StringSliceJSONFormat{"https://aud.example.com"}
 	client := &hydra.Client{
 		Secret:     secret,

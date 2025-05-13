@@ -34,6 +34,8 @@ import (
 )
 
 func TestDeviceAuthRequest(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	testhelpers.NewOAuth2Server(ctx, t, reg)
@@ -98,6 +100,8 @@ func TestDeviceAuthRequest(t *testing.T) {
 }
 
 func TestDeviceTokenRequest(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	testhelpers.NewOAuth2Server(ctx, t, reg)
@@ -227,6 +231,8 @@ func TestDeviceTokenRequest(t *testing.T) {
 }
 
 func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")

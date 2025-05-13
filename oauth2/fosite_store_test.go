@@ -8,9 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
@@ -21,6 +20,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestManagers(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	tests := []struct {
 		name                   string
@@ -39,6 +40,8 @@ func TestManagers(t *testing.T) {
 		t.Run("suite="+tc.name, func(t *testing.T) {
 			for k, r := range testhelpers.ConnectDatabases(t, false) {
 				t.Run("database="+k, func(t *testing.T) {
+					t.Parallel()
+
 					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true, &contextx.Default{})
 					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
 

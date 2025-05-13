@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -52,15 +52,14 @@ func BenchmarkClientCredentials(b *testing.B) {
 	}
 
 	var newClient = func(b *testing.B) (*hc.Client, clientcredentials.Config) {
-		cc, config := newCustomClient(b, &hc.Client{
-			Secret:        uuid.New().String(),
+		return newCustomClient(b, &hc.Client{
+			Secret:        uuid.Must(uuid.NewV4()).String(),
 			RedirectURIs:  []string{public.URL + "/callback"},
 			ResponseTypes: []string{"token"},
 			GrantTypes:    []string{"client_credentials"},
 			Scope:         "foobar",
 			Audience:      []string{"https://api.ory.sh/"},
 		})
-		return cc, config
 	}
 
 	var getToken = func(t *testing.B, conf clientcredentials.Config) (*goauth2.Token, error) {

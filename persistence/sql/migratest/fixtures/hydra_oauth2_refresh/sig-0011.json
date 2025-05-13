@@ -16,5 +16,17 @@
   "Subject": "subject-0011",
   "Active": false,
   "Session": "c2Vzc2lvbi0wMDEx",
-  "Table": ""
+  "Table": "",
+  "FirstUsedAt": {
+    "Time": "0001-01-01T00:00:00Z",
+    "Valid": false
+  },
+  "AccessTokenSignature": {
+    "String": "",
+    "Valid": false
+  },
+  "UsedTimes": {
+    "Int32": 0,
+    "Valid": false
+  }
 }

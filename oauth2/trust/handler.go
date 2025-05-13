@@ -8,18 +8,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/x/pagination/tokenpagination"
-
-	"github.com/ory/hydra/v2/x"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/google/uuid"
-
+	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
+	"github.com/pkg/errors"
 
-	"github.com/ory/x/errorsx"
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/pagination/tokenpagination"
 )
 
 const (
@@ -112,7 +108,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {
 		h.registry.Writer().WriteError(w, r,
-			errorsx.WithStack(&fosite.RFC6749Error{
+			errors.WithStack(&fosite.RFC6749Error{
 				ErrorField:       "error",
 				DescriptionField: err.Error(),
 				CodeField:        http.StatusBadRequest,
@@ -126,7 +122,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 	}
 
 	grant := Grant{
-		ID:              uuid.New().String(),
+		ID:              uuid.Must(uuid.NewV4()).String(),
 		Issuer:          grantRequest.Issuer,
 		Subject:         grantRequest.Subject,
 		AllowAnySubject: grantRequest.AllowAnySubject,

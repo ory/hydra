@@ -24,9 +24,5 @@
   "AccessTokenSignature": {
     "String": "",
     "Valid": false
-  },
-  "UsedTimes": {
-    "Int32": 0,
-    "Valid": false
   }
 }

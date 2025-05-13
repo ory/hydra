@@ -1,0 +1,32 @@
+{
+  "ID": "sig-20250513132142",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Request": "req-20250513132142",
+  "ConsentChallenge": {
+    "String": "challenge-0014",
+    "Valid": true
+  },
+  "RequestedAt": "0001-01-01T00:00:00Z",
+  "Client": "",
+  "Scopes": "scope",
+  "GrantedScope": "granted_scope",
+  "RequestedAudience": "requested_audience",
+  "GrantedAudience": "granted_audience",
+  "Form": "form_data",
+  "Subject": "subject-0014",
+  "Active": false,
+  "Session": "c2Vzc2lvbl9pZC0wMDE0",
+  "Table": "",
+  "FirstUsedAt": {
+    "Time": "0001-01-01T00:00:00Z",
+    "Valid": false
+  },
+  "AccessTokenSignature": {
+    "String": "",
+    "Valid": false
+  },
+  "UsedTimes": {
+    "Int32": 1,
+    "Valid": true
+  }
+}

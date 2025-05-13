@@ -158,11 +158,10 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithUnknownJWK() {
 	}
 
 	_, res, err := s.hydraClient.OAuth2API.TrustOAuth2JwtGrantIssuer(context.Background()).TrustOAuth2JwtGrantIssuer(createRequestParams).Execute()
-	s.Require().NoError(err)
+	s.Require().Error(err, "expected error, because the key type was unknown")
 	s.Assert().Equal(http.StatusBadRequest, res.StatusCode)
 	body, _ := io.ReadAll(res.Body)
 	s.Contains(gjson.GetBytes(body, "error_description").String(), "unknown json web key type")
-	s.Require().Error(err, "expected error, because the key type was unknown")
 }
 
 func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {

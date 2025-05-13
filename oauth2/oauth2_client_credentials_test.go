@@ -207,9 +207,8 @@ func TestClientCredentials(t *testing.T) {
 			return func(t *testing.T) {
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 
-				secret := uuid.New().String()
 				cl, conf := newCustomClient(t, &hc.Client{
-					Secret:        secret,
+					Secret:        uuid.Must(uuid.NewV4()).String(),
 					RedirectURIs:  []string{public.URL + "/callback"},
 					ResponseTypes: []string{"token"},
 					GrantTypes:    []string{"client_credentials"},
@@ -303,9 +302,8 @@ func TestClientCredentials(t *testing.T) {
 
 				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
-				secret := uuid.New().String()
 				cl, conf := newCustomClient(t, &hc.Client{
-					Secret:        secret,
+					Secret:        uuid.Must(uuid.NewV4()).String(),
 					RedirectURIs:  []string{public.URL + "/callback"},
 					ResponseTypes: []string{"token"},
 					GrantTypes:    []string{"client_credentials"},

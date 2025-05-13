@@ -110,7 +110,8 @@ const (
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
-	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period" // #nosec G101
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period"      // #nosec G101
+	KeyRefreshTokenRotationGraceReuseCount       = "oauth2.grant.refresh_token.rotation_grace_reuse_count" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -759,9 +760,15 @@ func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
 }
 
 func (p *DefaultProvider) RefreshTokenRotationGracePeriod(ctx context.Context) time.Duration {
-	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
-	if gracePeriod > time.Minute*5 {
-		return time.Minute * 5
+	return p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+}
+
+func (p *DefaultProvider) RefreshTokenRotationGraceReuseCount(ctx context.Context) int32 {
+	reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0)
+	if reuseCount > math.MaxInt32 {
+		return math.MaxInt32
+	} else if reuseCount < 0 {
+		return 0
 	}
-	return gracePeriod
+	return int32(reuseCount)
 }

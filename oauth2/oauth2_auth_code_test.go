@@ -430,7 +430,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						t.Parallel()
 
 						for _, alg := range supportedCryptoSuites {
-							alg := alg
 							t.Run(fmt.Sprintf("alg=%s", alg), func(t *testing.T) {
 								t.Parallel()
 								assertCreateVerifiableCredential(t, reg, vcNonce, token, jose.SignatureAlgorithm(alg))
@@ -505,7 +504,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								},
 							},
 						} {
-							tc := tc
 							t.Run(tc.name, func(t *testing.T) {
 								t.Parallel()
 								_, err := createVerifiableCredential(t, reg, token, &hydraoauth2.CreateVerifiableCredentialRequestBody{
@@ -516,8 +514,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 										JWT:       tc.proof(),
 									},
 								})
-								require.Error(t, err)
-								assert.Equal(t, "invalid_request", err.Error())
+								require.EqualError(t, err, "invalid_request")
 							})
 						}
 
@@ -1693,7 +1690,7 @@ func createVerifiableCredential(
 	reg driver.Registry,
 	token *oauth2.Token,
 	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
-) (vcRes *hydraoauth2.VerifiableCredentialResponse, vcErr error) {
+) (vcRes *hydraoauth2.VerifiableCredentialResponse, _ error) {
 	var (
 		ctx  = context.Background()
 		body bytes.Buffer
@@ -1714,7 +1711,7 @@ func createVerifiableCredential(
 	var vc hydraoauth2.VerifiableCredentialResponse
 	require.NoError(t, json.NewDecoder(res.Body).Decode(&vc))
 
-	return &vc, vcErr
+	return &vc, nil
 }
 
 func doPrimingRequest(

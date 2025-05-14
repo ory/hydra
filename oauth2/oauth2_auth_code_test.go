@@ -178,11 +178,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	ctx := context.Background()
 
-	for dbName, reg := range testhelpers.ConnectDatabases(t, false) {
+	for dbName, reg := range testhelpers.ConnectDatabases(t, true) {
 		t.Run("registry="+dbName, func(t *testing.T) {
 			t.Parallel()
-
-			reg := testhelpers.NewRegistrySQLFromURL(t, reg.Config().DSN(), true, &contextx.Default{})
 
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OpenIDConnectKeyName))
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OAuth2JWTKeyName))
@@ -360,7 +358,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				})
 			})
 
-			t.Run("case=perform authorize code flow with verifable credentials", func(t *testing.T) {
+			t.Run("case=perform authorize code flow with verifiable credentials", func(t *testing.T) {
 				// Make sure we test against all crypto suites that we advertise.
 				cfg, _, err := publicClient.OidcAPI.DiscoverOidcConfiguration(ctx).Execute()
 				require.NoError(t, err)
@@ -1759,6 +1757,8 @@ func createVCProofJWT(t *testing.T, pubKey *jose.JSONWebKey, privKey any, nonce 
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {

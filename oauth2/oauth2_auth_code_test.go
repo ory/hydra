@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ory/x/requirex"
 	"io"
 	"math/rand"
 	"net/http"
@@ -199,7 +200,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				actualExp, err := strconv.ParseInt(introspect.Get("exp").String(), 10, 64)
 				require.NoError(t, err, "%s", introspect)
 				if !expectedExp.IsZero() {
-					require.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
+					requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
 				}
 			}
 
@@ -217,7 +218,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				assert.Truef(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
 				if !expectedExp.IsZero() {
 					// 1.5s due to rounding
-					require.WithinDuration(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 1*time.Second+500*time.Millisecond)
+					requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 1*time.Second+500*time.Millisecond)
 				}
 				assert.NotEmptyf(t, claims.Get("jti").String(), "%s", claims)
 				assert.EqualValuesf(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
@@ -267,7 +268,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 				assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 				assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-				require.WithinDuration(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
+				requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 				assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 				assert.EqualValues(t, scopes, i.Get("scp").Raw, "%s", i)
 				return i
@@ -718,7 +719,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					require.NoError(t, err)
 
 					body := introspectAccessToken(t, conf, token, subject)
-					require.WithinDuration(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+					requirex.EqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 					assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), `["hydra","offline","openid"]`)
 					assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.AuthorizationCodeGrantIDTokenLifespan.Duration))
@@ -739,7 +740,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
 
 						body := introspectAccessToken(t, conf, refreshedToken, subject)
-						require.WithinDuration(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+						requirex.EqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 						t.Run("followup=original access token is no longer valid", func(t *testing.T) {
 							i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)

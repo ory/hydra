@@ -58,10 +58,11 @@ const (
 	AuthPath                      = "/oauth2/auth"
 	LogoutPath                    = "/oauth2/sessions/logout"
 
-	VerifiableCredentialsPath = "/credentials"
-	UserinfoPath              = "/userinfo"
-	WellKnownPath             = "/.well-known/openid-configuration"
-	JWKPath                   = "/.well-known/jwks.json"
+	VerifiableCredentialsPath    = "/credentials"
+	UserinfoPath                 = "/userinfo"
+	WellKnownPath                = "/.well-known/openid-configuration"
+	OauthAuthorizationServerPath = "/.well-known/oauth-authorization-server"
+	JWKPath                      = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath   = "/oauth2/introspect"
@@ -125,6 +126,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)))
 	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
+	public.Handler("OPTIONS", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handler("GET", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
 	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))

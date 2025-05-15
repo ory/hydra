@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
@@ -82,7 +82,7 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 	}
 
 	values.Add("response_type", "code")
-	values.Add("state", uuid.New().String())
+	values.Add("state", uuid.Must(uuid.NewV4()).String())
 	values.Add("client_id", oc.GetID())
 	values.Add("redirect_uri", oc.GetRedirectURIs()[0])
 	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), values).String())
@@ -133,10 +133,10 @@ func makeOAuth2DeviceVerificationRequest(t *testing.T, reg driver.Registry, hc *
 }
 
 func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
-	secret := uuid.New().String()
+	secret := uuid.Must(uuid.NewV4()).String()
 	c.Secret = secret
 	c.Scope = "openid offline"
-	c.ID = uuid.New().String()
+	c.ID = uuid.Must(uuid.NewV4()).String()
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	c.Secret = secret
 	return c

@@ -5,6 +5,7 @@ package oauth2_test
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -21,8 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/jwk"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/julienschmidt/httprouter"
@@ -32,6 +31,7 @@ import (
 	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
@@ -40,6 +40,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
@@ -49,19 +50,13 @@ import (
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/josex"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/requirex"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/stringsx"
 )
 
 func noopHandler(*testing.T) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.WriteHeader(http.StatusNotImplemented)
 	}
-}
-
-type clientCreator interface {
-	CreateClient(context.Context, *client.Client) error
 }
 
 func getAuthorizeCode(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
@@ -174,12 +169,14 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
+	t.Parallel()
+
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	ctx := context.Background()
 
-	for dbName, reg := range testhelpers.ConnectDatabases(t, false) {
+	for dbName, reg := range testhelpers.ConnectDatabases(t, true) {
 		t.Run("registry="+dbName, func(t *testing.T) {
-			reg := testhelpers.NewRegistrySQLFromURL(t, reg.Config().DSN(), true, &contextx.Default{})
+			t.Parallel()
 
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OpenIDConnectKeyName))
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OAuth2JWTKeyName))
@@ -197,7 +194,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				introspect := testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS)
 				actualExp, err := strconv.ParseInt(introspect.Get("exp").String(), 10, 64)
 				require.NoError(t, err, "%s", introspect)
-				requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
+				if !expectedExp.IsZero() {
+					require.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
+				}
 			}
 
 			assertIDToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
@@ -209,27 +208,27 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.NoError(t, err)
 
 				claims := gjson.ParseBytes(body)
-				assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
-				assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
-				assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
+				assert.Truef(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
+				assert.Truef(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
+				assert.Truef(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
 				if !expectedExp.IsZero() {
 					// 1.5s due to rounding
-					requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 1*time.Second+500*time.Millisecond)
+					require.WithinDuration(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 1*time.Second+500*time.Millisecond)
 				}
-				assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
-				assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
-				assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
-				assert.Equal(t, "1", claims.Get("acr").String(), "%s", claims)
-				require.Len(t, claims.Get("amr").Array(), 1, "%s", claims)
-				assert.EqualValues(t, "pwd", claims.Get("amr").Array()[0].String(), "%s", claims)
+				assert.NotEmptyf(t, claims.Get("jti").String(), "%s", claims)
+				assert.EqualValuesf(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
+				assert.NotEmptyf(t, claims.Get("sid").String(), "%s", claims)
+				assert.Equalf(t, "1", claims.Get("acr").String(), "%s", claims)
+				require.Lenf(t, claims.Get("amr").Array(), 1, "%s", claims)
+				assert.EqualValuesf(t, "pwd", claims.Get("amr.0").String(), "%s", claims)
 
-				require.Len(t, claims.Get("aud").Array(), 1, "%s", claims)
-				assert.EqualValues(t, c.ClientID, claims.Get("aud").Array()[0].String(), "%s", claims)
-				assert.EqualValues(t, expectedSubject, claims.Get("sub").String(), "%s", claims)
-				assert.EqualValues(t, expectedNonce, claims.Get("nonce").String(), "%s", claims)
-				assert.EqualValues(t, `baz`, claims.Get("bar").String(), "%s", claims)
-				assert.EqualValues(t, `foo@bar.com`, claims.Get("email").String(), "%s", claims)
-				assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
+				require.Lenf(t, claims.Get("aud").Array(), 1, "%s", claims)
+				assert.EqualValuesf(t, c.ClientID, claims.Get("aud.0").String(), "%s", claims)
+				assert.EqualValuesf(t, expectedSubject, claims.Get("sub").String(), "%s", claims)
+				assert.EqualValuesf(t, expectedNonce, claims.Get("nonce").String(), "%s", claims)
+				assert.EqualValuesf(t, `baz`, claims.Get("bar").String(), "%s", claims)
+				assert.EqualValuesf(t, `foo@bar.com`, claims.Get("email").String(), "%s", claims)
+				assert.NotEmptyf(t, claims.Get("sid").String(), "%s", claims)
 
 				return claims
 			}
@@ -264,14 +263,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 				assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 				assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-				requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
+				require.WithinDuration(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 				assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 				assert.EqualValues(t, scopes, i.Get("scp").Raw, "%s", i)
 				return i
-			}
-
-			waitForRefreshTokenExpiry := func() {
-				time.Sleep(reg.Config().GetRefreshTokenLifespan(ctx) + time.Second)
 			}
 
 			subject := "aeneas-rekkas"
@@ -334,8 +329,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						})
 
 						t.Run("followup=but fail subsequent refresh because expiry was reached", func(t *testing.T) {
-							waitForRefreshTokenExpiry()
-
 							// Force golang to refresh token
 							refreshedToken.Expiry = refreshedToken.Expiry.Add(-time.Hour * 24)
 							_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
@@ -355,7 +348,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				})
 			})
 
-			t.Run("case=perform authorize code flow with verifable credentials", func(t *testing.T) {
+			t.Run("case=perform authorize code flow with verifiable credentials", func(t *testing.T) {
 				// Make sure we test against all crypto suites that we advertise.
 				cfg, _, err := publicClient.OidcAPI.DiscoverOidcConfiguration(ctx).Execute()
 				require.NoError(t, err)
@@ -425,7 +418,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						t.Parallel()
 
 						for _, alg := range supportedCryptoSuites {
-							alg := alg
 							t.Run(fmt.Sprintf("alg=%s", alg), func(t *testing.T) {
 								t.Parallel()
 								assertCreateVerifiableCredential(t, reg, vcNonce, token, jose.SignatureAlgorithm(alg))
@@ -500,19 +492,17 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								},
 							},
 						} {
-							tc := tc
 							t.Run(tc.name, func(t *testing.T) {
 								t.Parallel()
 								_, err := createVerifiableCredential(t, reg, token, &hydraoauth2.CreateVerifiableCredentialRequestBody{
-									Format: stringsx.Coalesce(tc.format, "jwt_vc_json"),
+									Format: cmp.Or(tc.format, "jwt_vc_json"),
 									Types:  []string{"VerifiableCredential", "UserInfoCredential"},
 									Proof: &hydraoauth2.VerifiableCredentialProof{
-										ProofType: stringsx.Coalesce(tc.proofType, "jwt"),
+										ProofType: cmp.Or(tc.proofType, "jwt"),
 										JWT:       tc.proof(),
 									},
 								})
-								require.Error(t, err)
-								assert.Equal(t, "invalid_request", err.Error())
+								require.EqualError(t, err, "invalid_request")
 							})
 						}
 
@@ -718,7 +708,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					require.NoError(t, err)
 
 					body := introspectAccessToken(t, conf, token, subject)
-					requirex.EqualTime(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+					require.WithinDuration(t, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 					assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.AuthorizationCodeGrantAccessTokenLifespan.Duration), `["hydra","offline","openid"]`)
 					assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.AuthorizationCodeGrantIDTokenLifespan.Duration))
@@ -739,7 +729,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
 
 						body := introspectAccessToken(t, conf, refreshedToken, subject)
-						requirex.EqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+						require.WithinDuration(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 						t.Run("followup=original access token is no longer valid", func(t *testing.T) {
 							i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
@@ -1397,7 +1387,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					//
 					// - Token re-use detection clears all tokens if a refresh token is re-used after the grace period.
 					// - Revoking consent clears all tokens.
-					// - Token revokation clears all tokens.
+					// - Token revocation clears all tokens.
 					//
 					// The test creates 4 token generations, where each generations has twice as many tokens as the previous generation.
 					// The generations are created like this:
@@ -1415,35 +1405,33 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						reg.Config().Delete(ctx, config.KeyTokenHook)
 						reg.Config().Delete(ctx, config.KeyRefreshTokenHook)
 
-						createTokenGenerations := func(t *testing.T, count int, withSleep time.Duration) [][]*oauth2.Token {
+						createTokenGenerations := func(t *testing.T, count int, sleep time.Duration) [][]*oauth2.Token {
 							generations := make([][]*oauth2.Token, count)
 							generations[0] = []*oauth2.Token{issueTokens(t)}
 							// Start from the first generation. For every next generation, we refresh all the tokens of the previous generation twice.
-							for i := 1; i < len(generations); i++ {
-								generations[i] = make([]*oauth2.Token, 0, len(generations[i-1])*2)
+							for i := range len(generations) - 1 {
+								generations[i+1] = make([]*oauth2.Token, 0, len(generations[i])*2)
 
 								var wg sync.WaitGroup
-								gen := func(i int, token *oauth2.Token) {
+								gen := func(token *oauth2.Token) {
 									defer wg.Done()
-									generations[i] = append(generations[i], refreshTokens(t, token))
+									generations[i+1] = append(generations[i+1], refreshTokens(t, token))
 								}
 
-								for _, token := range generations[i-1] {
+								for _, token := range generations[i] {
 									wg.Add(2)
 									if dbName != "cockroach" {
 										// We currently only support TX retries on cockroach
-										gen(i, token)
-										gen(i, token)
+										gen(token)
+										gen(token)
 									} else {
-										go gen(i, token)
-										go gen(i, token)
+										go gen(token)
+										go gen(token)
 									}
 								}
 
 								wg.Wait()
-								if withSleep > 0 {
-									time.Sleep(withSleep)
-								}
+								time.Sleep(sleep)
 							}
 							return generations
 						}
@@ -1578,43 +1566,44 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							t.Skip("Skipping test because SQLite can not handle concurrency")
 						}
 
+						const nRefreshes = 5
+
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "5s")
 
 						token := issueTokens(t)
+						token.Expiry = time.Now().Add(-time.Hour * 24)
 
-						var wg sync.WaitGroup
-						refresh := func(t *testing.T, token *oauth2.Token) *oauth2.Token {
-							require.NotEmpty(t, token.RefreshToken)
-							token.Expiry = time.Now().Add(-time.Hour * 24)
-							tt, err := conf.TokenSource(context.Background(), token).Token()
-							require.NoError(t, err)
-							return tt
-						}
-
-						refreshes := make([]*oauth2.Token, 5)
+						eg, ctx := errgroup.WithContext(t.Context())
+						refreshes := make([]*oauth2.Token, nRefreshes)
 						for k := range refreshes {
-							wg.Add(1)
-							go func(k int) {
-								defer wg.Done()
-								refreshes[k] = refresh(t, token)
-							}(k)
+							eg.Go(func() (err error) {
+								refreshes[k], err = conf.TokenSource(ctx, token).Token()
+								return
+							})
 						}
-						wg.Wait()
+						require.NoError(t, eg.Wait())
+						require.NotContains(t, refreshes, nil)
 
 						// All tokens are valid.
-						for k, actual := range refreshes {
-							refresh := actual
-							require.NotEmpty(t, refresh.RefreshToken, "token %d:\ntoken:%+v", k, refresh)
-							require.NotEmpty(t, refresh.AccessToken, "token %d:\ntoken:%+v", k, refresh)
-							require.NotEmpty(t, refresh.Extra("id_token"), "token %d:\ntoken:%+v", k, refresh)
-
-							i := testhelpers.IntrospectToken(t, conf, refresh.AccessToken, adminTS)
-							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, refresh, i)
-
-							i = testhelpers.IntrospectToken(t, conf, refresh.RefreshToken, adminTS)
-							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, refresh, i)
+						allTokens := map[string]struct{}{
+							token.AccessToken:  {},
+							token.RefreshToken: {},
 						}
+						for k, actual := range refreshes {
+							require.NotEmptyf(t, actual.RefreshToken, "token %d:\ntoken:%+v", k, actual)
+							require.NotEmptyf(t, actual.AccessToken, "token %d:\ntoken:%+v", k, actual)
+							require.NotEmptyf(t, actual.Extra("id_token"), "token %d:\ntoken:%+v", k, actual)
+
+							allTokens[actual.AccessToken], allTokens[actual.RefreshToken] = struct{}{}, struct{}{}
+
+							i := testhelpers.IntrospectToken(t, conf, actual.AccessToken, adminTS)
+							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
+
+							i = testhelpers.IntrospectToken(t, conf, actual.RefreshToken, adminTS)
+							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
+						}
+						assert.Len(t, allTokens, (1+nRefreshes)*2)
 					})
 				}
 
@@ -1689,7 +1678,7 @@ func createVerifiableCredential(
 	reg driver.Registry,
 	token *oauth2.Token,
 	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
-) (vcRes *hydraoauth2.VerifiableCredentialResponse, vcErr error) {
+) (vcRes *hydraoauth2.VerifiableCredentialResponse, _ error) {
 	var (
 		ctx  = context.Background()
 		body bytes.Buffer
@@ -1710,7 +1699,7 @@ func createVerifiableCredential(
 	var vc hydraoauth2.VerifiableCredentialResponse
 	require.NoError(t, json.NewDecoder(res.Body).Decode(&vc))
 
-	return &vc, vcErr
+	return &vc, nil
 }
 
 func doPrimingRequest(
@@ -1739,7 +1728,7 @@ func doPrimingRequest(
 }
 
 func createVCProofJWT(t *testing.T, pubKey *jose.JSONWebKey, privKey any, nonce string) string {
-	proofToken := jwt.NewWithClaims(jwt.GetSigningMethod(string(pubKey.Algorithm)), jwt.MapClaims{"nonce": nonce})
+	proofToken := jwt.NewWithClaims(jwt.GetSigningMethod(pubKey.Algorithm), jwt.MapClaims{"nonce": nonce})
 	proofToken.Header["jwk"] = pubKey
 	proofJWT, err := proofToken.SignedString(privKey)
 	require.NoError(t, err)
@@ -1758,6 +1747,8 @@ func createVCProofJWT(t *testing.T, pubKey *jose.JSONWebKey, privKey any, nonce 
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
@@ -1780,11 +1771,10 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				return h
 			})
 
-			var callbackHandler *httprouter.Handle
+			var callbackHandler httprouter.Handle
 			router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-				(*callbackHandler)(w, r, ps)
+				callbackHandler(w, r, ps)
 			})
-			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(ctx, &client.Client{
 				ID:            "app-client",
@@ -1943,8 +1933,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-					mutex.Lock()
-					defer mutex.Unlock()
 					if tc.cb == nil {
 						tc.cb = noopHandler
 					}
@@ -1953,8 +1941,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					consentStrategy.authTime = tc.authTime
 					consentStrategy.requestTime = tc.requestTime
 
-					cb := tc.cb(t)
-					callbackHandler = &cb
+					callbackHandler = tc.cb(t)
 
 					req, err := http.NewRequest("GET", tc.authURL, nil)
 					require.NoError(t, err)
@@ -1974,7 +1961,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					require.NotEmpty(t, code)
 
-					token, err := oauthConfig.Exchange(context.TODO(), code)
+					token, err := oauthConfig.Exchange(ctx, code)
 					if tc.expectOAuthTokenError {
 						require.Error(t, err)
 						return

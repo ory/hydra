@@ -7,16 +7,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func createSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, extra map[string]interface{}) oauth2.Session {
@@ -39,6 +37,8 @@ func createSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvide
 }
 
 func TestCustomClaimsInSession(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	c := testhelpers.NewConfigurationWithDefaults()
 

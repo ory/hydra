@@ -19,8 +19,7 @@ import (
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
 
-	gofrsuuid "github.com/gofrs/uuid"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -131,10 +130,10 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 }
 
 func MockDeviceRequest(key string, network string) (c *flow.DeviceUserAuthRequest, h *flow.HandledDeviceUserAuthRequest, f *flow.Flow) {
-	client := &client.Client{ID: "fk-client-" + key}
+	cl := &client.Client{ID: "fk-client-" + key}
 	c = &flow.DeviceUserAuthRequest{
 		RequestedAt: time.Now().UTC().Add(-time.Minute),
-		Client:      client,
+		Client:      cl,
 		RequestURL:  "https://request-url/path" + key,
 		ID:          makeID("challenge", network, key),
 		Verifier:    makeID("verifier", network, key),
@@ -155,7 +154,7 @@ func MockDeviceRequest(key string, network string) (c *flow.DeviceUserAuthReques
 	h = &flow.HandledDeviceUserAuthRequest{
 		ID:          makeID("challenge", network, key),
 		RequestedAt: time.Now().UTC().Add(-time.Minute),
-		Client:      client,
+		Client:      cl,
 		Error:       err,
 		Request:     c,
 		WasHandled:  false,
@@ -271,9 +270,9 @@ func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip 
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
 
-		ConsentRequestID: uuid.New().String(),
-		Verifier:         uuid.New().String(),
-		CSRF:             uuid.New().String(),
+		ConsentRequestID: uuid.Must(uuid.NewV4()).String(),
+		Verifier:         uuid.Must(uuid.NewV4()).String(),
+		CSRF:             uuid.Must(uuid.NewV4()).String(),
 	}
 
 	require.NoError(t, m.CreateConsentRequest(context.Background(), f, c))
@@ -297,9 +296,9 @@ func SaneMockAuthRequest(t *testing.T, m consent.Manager, ls *flow.LoginSession,
 		RequestedScope: []string{"scopea", "scopeb"},
 		SessionID:      sqlxx.NullString(ls.ID),
 
-		CSRF:     uuid.New().String(),
-		ID:       uuid.New().String(),
-		Verifier: uuid.New().String(),
+		CSRF:     uuid.Must(uuid.NewV4()).String(),
+		ID:       uuid.Must(uuid.NewV4()).String(),
+		Verifier: uuid.Must(uuid.NewV4()).String(),
 	}
 	_, err := m.CreateLoginRequest(context.Background(), c)
 	require.NoError(t, err)
@@ -628,7 +627,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				t.Run("key="+tc.key, func(t *testing.T) {
 					consentRequest, h, f := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt, "challenge", network)
 					_ = clientManager.CreateClient(ctx, consentRequest.Client) // Ignore errors that are caused by duplication
-					f.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
+					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 
 					consentChallenge := makeID("challenge", network, tc.key)
 
@@ -753,8 +752,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 			cr1, hcr1, f1 := MockConsentRequest("rv1", false, 0, false, false, false, "fk-login-challenge", network)
 			cr2, hcr2, f2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
-			f1.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
-			f2.NID = deps.Contextualizer().Network(context.Background(), gofrsuuid.Nil)
+			f1.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
+			f2.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 
 			// Ignore duplication errors
 			_ = clientManager.CreateClient(ctx, cr1.Client)
@@ -908,9 +907,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
-						for _, consent := range consents {
-							assert.Contains(t, tc.consentIDs, consent.ConsentRequestID)
-							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.GetID())
+						for _, cs := range consents {
+							assert.Contains(t, tc.consentIDs, cs.ConsentRequestID)
+							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())
 						}
 					}
 
@@ -950,9 +949,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
-						for _, consent := range consents {
-							assert.Contains(t, tc.consentRequestIDs, consent.ConsentRequestID)
-							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.GetID())
+						for _, cs := range consents {
+							assert.Contains(t, tc.consentRequestIDs, cs.ConsentRequestID)
+							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())
 						}
 					}
 
@@ -976,8 +975,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 				got, err := m.GetForcedObfuscatedLoginSession(ctx, "fk-client-1", "obfuscated-1")
 				require.NoError(t, err)
-				require.NotEqual(t, got.NID, gofrsuuid.Nil)
-				got.NID = gofrsuuid.Nil
+				require.NotEqual(t, got.NID, uuid.Nil)
+				got.NID = uuid.Nil
 				assert.EqualValues(t, expect, got)
 
 				expect = &consent.ForcedObfuscatedLoginSession{
@@ -988,8 +987,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				require.NoError(t, m.CreateForcedObfuscatedLoginSession(ctx, expect))
 
 				got, err = m.GetForcedObfuscatedLoginSession(ctx, "fk-client-1", "obfuscated-2")
-				require.NotEqual(t, got.NID, gofrsuuid.Nil)
-				got.NID = gofrsuuid.Nil
+				require.NotEqual(t, got.NID, uuid.Nil)
+				got.NID = uuid.Nil
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
 
@@ -1010,7 +1009,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				frontChannels := map[string][]client.Client{}
 				backChannels := map[string][]client.Client{}
 				for k := range sessions {
-					id := uuid.New().String()
+					id := uuid.Must(uuid.NewV4()).String()
 					subject := subjects[k%len(subjects)]
 					t.Run(fmt.Sprintf("create/session=%s/subject=%s", id, subject), func(t *testing.T) {
 						ls := &flow.LoginSession{
@@ -1022,7 +1021,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						ls.Remember = true
 						require.NoError(t, m.ConfirmLoginSession(ctx, ls))
 
-						cl := &client.Client{ID: uuid.New().String()}
+						cl := &client.Client{ID: uuid.Must(uuid.NewV4()).String()}
 						switch k % 4 {
 						case 0:
 							cl.FrontChannelLogoutURI = "http://some-url.com/"
@@ -1040,7 +1039,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 						ar := SaneMockAuthRequest(t, m, ls, cl)
 						f := flow.NewFlow(ar)
-						f.NID = deps.Contextualizer().Network(ctx, gofrsuuid.Nil)
+						f.NID = deps.Contextualizer().Network(ctx, uuid.Nil)
 						cr := SaneMockConsentRequest(t, m, f, false)
 						_ = SaneMockHandleConsentRequest(t, m, f, cr, time.Time{}, 0, false, false)
 						_, err = m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f.ToConsentVerifier(ctx, deps)))
@@ -1149,12 +1148,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=foreign key regression", func(t *testing.T) {
-			cl := &client.Client{ID: uuid.New().String()}
+			cl := &client.Client{ID: uuid.Must(uuid.NewV4()).String()}
 			require.NoError(t, clientManager.CreateClient(ctx, cl))
 
-			subject := uuid.New().String()
+			subject := uuid.Must(uuid.NewV4()).String()
 			s := flow.LoginSession{
-				ID:              uuid.New().String(),
+				ID:              uuid.Must(uuid.NewV4()).String(),
 				AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
 				Subject:         subject,
 			}
@@ -1163,9 +1162,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, m.ConfirmLoginSession(ctx, &s))
 
 			lr := &flow.LoginRequest{
-				ID:              uuid.New().String(),
-				Subject:         uuid.New().String(),
-				Verifier:        uuid.New().String(),
+				ID:              uuid.Must(uuid.NewV4()).String(),
+				Subject:         uuid.Must(uuid.NewV4()).String(),
+				Verifier:        uuid.Must(uuid.NewV4()).String(),
 				Client:          cl,
 				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				RequestedAt:     time.Now(),
@@ -1175,7 +1174,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			f, err := m.CreateLoginRequest(ctx, lr)
 			require.NoError(t, err)
 			expected := &flow.OAuth2ConsentRequest{
-				ConsentRequestID:     uuid.NewString(),
+				ConsentRequestID:     uuid.Must(uuid.NewV4()).String(),
 				Skip:                 true,
 				Subject:              subject,
 				OpenIDConnectContext: nil,
@@ -1184,8 +1183,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				RequestURL:           "",
 				LoginChallenge:       sqlxx.NullString(lr.ID),
 				LoginSessionID:       sqlxx.NullString(s.ID),
-				Verifier:             uuid.New().String(),
-				CSRF:                 uuid.New().String(),
+				Verifier:             uuid.Must(uuid.NewV4()).String(),
+				CSRF:                 uuid.Must(uuid.NewV4()).String(),
 			}
 			err = m.CreateConsentRequest(ctx, f, expected)
 			require.NoError(t, err)

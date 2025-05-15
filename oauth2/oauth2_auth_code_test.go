@@ -5,6 +5,7 @@ package oauth2_test
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -50,17 +51,12 @@ import (
 	"github.com/ory/x/josex"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/stringsx"
 )
 
 func noopHandler(*testing.T) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		w.WriteHeader(http.StatusNotImplemented)
 	}
-}
-
-type clientCreator interface {
-	CreateClient(context.Context, *client.Client) error
 }
 
 func getAuthorizeCode(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
@@ -273,10 +269,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				return i
 			}
 
-			waitForRefreshTokenExpiry := func() {
-				time.Sleep(reg.Config().GetRefreshTokenLifespan(ctx) + time.Second)
-			}
-
 			subject := "aeneas-rekkas"
 			nonce := uuid.New()
 
@@ -337,8 +329,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						})
 
 						t.Run("followup=but fail subsequent refresh because expiry was reached", func(t *testing.T) {
-							waitForRefreshTokenExpiry()
-
 							// Force golang to refresh token
 							refreshedToken.Expiry = refreshedToken.Expiry.Add(-time.Hour * 24)
 							_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
@@ -505,10 +495,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							t.Run(tc.name, func(t *testing.T) {
 								t.Parallel()
 								_, err := createVerifiableCredential(t, reg, token, &hydraoauth2.CreateVerifiableCredentialRequestBody{
-									Format: stringsx.Coalesce(tc.format, "jwt_vc_json"),
+									Format: cmp.Or(tc.format, "jwt_vc_json"),
 									Types:  []string{"VerifiableCredential", "UserInfoCredential"},
 									Proof: &hydraoauth2.VerifiableCredentialProof{
-										ProofType: stringsx.Coalesce(tc.proofType, "jwt"),
+										ProofType: cmp.Or(tc.proofType, "jwt"),
 										JWT:       tc.proof(),
 									},
 								})

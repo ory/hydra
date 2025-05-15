@@ -231,8 +231,8 @@ func TestMigrations(t *testing.T) {
 				})
 
 				t.Run("case=hydra_oauth2_refresh", func(t *testing.T) {
-					rs := []sql.OAuth2RequestSQL{}
-					require.NoError(t, c.RawQuery(`SELECT signature, nid, request_id, challenge_id, requested_at, client_id, scope, granted_scope, requested_audience, granted_audience, form_data, subject, active, session_data, expires_at	FROM hydra_oauth2_refresh`).All(&rs))
+					rs := []sql.OAuth2RefreshTable{}
+					require.NoError(t, c.All(&rs))
 					require.Len(t, rs, 13)
 
 					for _, r := range rs {

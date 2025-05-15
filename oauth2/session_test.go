@@ -4,6 +4,7 @@
 package oauth2
 
 import (
+	_ "embed"
 	"encoding/json"
 	"testing"
 	"time"
@@ -15,8 +16,6 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/snapshotx"
-
-	_ "embed"
 )
 
 //go:embed fixtures/v1.11.8-session.json
@@ -32,6 +31,8 @@ func parseTime(t *testing.T, ts string) time.Time {
 }
 
 func TestUnmarshalSession(t *testing.T) {
+	t.Parallel()
+
 	expect := &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims: &jwt.IDTokenClaims{
@@ -83,13 +84,13 @@ func TestUnmarshalSession(t *testing.T) {
 		var actual Session
 		require.NoError(t, json.Unmarshal(v1118Session, &actual))
 		assertx.EqualAsJSON(t, expect, &actual)
-		snapshotx.SnapshotTExcept(t, &actual, nil)
+		snapshotx.SnapshotT(t, &actual)
 	})
 
 	t.Run("v1.11.9" /* and later versions */, func(t *testing.T) {
 		var actual Session
 		require.NoError(t, json.Unmarshal(v1119Session, &actual))
 		assertx.EqualAsJSON(t, expect, &actual)
-		snapshotx.SnapshotTExcept(t, &actual, nil)
+		snapshotx.SnapshotT(t, &actual)
 	})
 }

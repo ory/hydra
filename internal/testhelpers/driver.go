@@ -29,26 +29,28 @@ import (
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-func resetConfig(p *config.DefaultProvider) {
-	p.MustSet(context.Background(), config.KeyBCryptCost, "4")
-	p.MustSet(context.Background(), config.KeySubjectIdentifierAlgorithmSalt, "00000000")
-	p.MustSet(context.Background(), config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(context.Background(), config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(context.Background(), config.KeyLogLevel, "trace")
+var defaultConfig = map[string]any{
+	config.KeyBCryptCost:                     4,
+	config.KeySubjectIdentifierAlgorithmSalt: "00000000",
+	config.KeyGetSystemSecret:                []string{"000000000000000000000000000000000000000000000000"},
+	config.KeyGetCookieSecrets:               []string{"000000000000000000000000000000000000000000000000"},
+	config.KeyLogLevel:                       "trace",
 }
 
 func NewConfigurationWithDefaults() *config.DefaultProvider {
-	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
-	resetConfig(p)
-	p.MustSet(context.Background(), config.KeyTLSEnabled, false)
-	return p
+	return config.MustNew(context.Background(), logrusx.New("", ""),
+		configx.SkipValidation(),
+		configx.WithValues(defaultConfig),
+		configx.WithValue(config.KeyTLSEnabled, false),
+	)
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
-	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
-	resetConfig(p)
-	p.MustSet(context.Background(), config.KeyTLSEnabled, true)
-	return p
+	return config.MustNew(context.Background(), logrusx.New("", ""),
+		configx.SkipValidation(),
+		configx.WithValues(defaultConfig),
+		configx.WithValue(config.KeyTLSEnabled, true),
+	)
 }
 
 func NewRegistryMemory(t testing.TB, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {

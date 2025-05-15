@@ -15,19 +15,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	hydra "github.com/ory/hydra-client-go/v2"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/x/snapshotx"
-
-	"github.com/ory/x/contextx"
-
-	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -36,14 +23,23 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/snapshotx"
 )
 
 var lifespan = time.Hour
 
 func TestHandlerDeleteHandler(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
@@ -87,6 +83,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 }
 
 func TestUserinfo(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(ctx, config.KeyScopeStrategy, "")
@@ -339,6 +337,8 @@ func TestUserinfo(t *testing.T) {
 }
 
 func TestHandlerWellKnown(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	conf := testhelpers.NewConfigurationWithDefaults()
 	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {
@@ -371,6 +371,8 @@ func TestHandlerWellKnown(t *testing.T) {
 }
 
 func TestHandlerOauthAuthorizationServer(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	conf := testhelpers.NewConfigurationWithDefaults()
 	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {

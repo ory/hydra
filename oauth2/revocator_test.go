@@ -62,6 +62,8 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 }
 
 func TestRevoke(t *testing.T) {
+	t.Parallel()
+
 	conf := testhelpers.NewConfigurationWithDefaults()
 	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 

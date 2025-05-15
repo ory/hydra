@@ -10,20 +10,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
 )
 
 func TestHandlerConsent(t *testing.T) {
+	t.Parallel()
+
 	conf := testhelpers.NewConfigurationWithDefaults()
 	conf.MustSet(context.Background(), config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})

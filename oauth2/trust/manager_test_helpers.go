@@ -9,14 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/josex"
-
 	"github.com/go-jose/go-jose/v3"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/x/josex"
 )
 
 func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {
@@ -28,9 +27,9 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		if parallel {
 			t.Parallel()
 		}
-		kid1, kid2 := uuid.NewString(), uuid.NewString()
-		kid3 := uuid.NewString()
-		set := uuid.NewString()
+		kid1, kid2 := uuid.Must(uuid.NewV4()).String(), uuid.Must(uuid.NewV4()).String()
+		kid3 := uuid.Must(uuid.NewV4()).String()
+		set := uuid.Must(uuid.NewV4()).String()
 
 		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
 		require.NoError(t, err)
@@ -55,7 +54,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		createdAt := time.Now().UTC().Round(time.Second)
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
-			ID:      uuid.New().String(),
+			ID:      uuid.Must(uuid.NewV4()).String(),
 			Issuer:  set,
 			Subject: "bob@example.com",
 			Scope:   []string{"openid", "offline"},
@@ -81,7 +80,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Equal(t, grant.ExpiresAt.Format(time.RFC3339), storedGrant.ExpiresAt.Format(time.RFC3339))
 
 		grant2 := Grant{
-			ID:      uuid.New().String(),
+			ID:      uuid.Must(uuid.NewV4()).String(),
 			Issuer:  set,
 			Subject: "maria@example.com",
 			Scope:   []string{"openid"},
@@ -96,7 +95,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, err)
 
 		grant3 := Grant{
-			ID:      uuid.New().String(),
+			ID:      uuid.Must(uuid.NewV4()).String(),
 			Issuer:  "https://mike.example.com",
 			Subject: "mike@example.com",
 			Scope:   []string{"permissions", "openid", "offline"},
@@ -161,8 +160,8 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 	pubKey2 := jose.JSONWebKey{}
 
 	return func(t *testing.T) {
-		set := uuid.NewString()
-		kid1, kid2 := uuid.NewString(), uuid.NewString()
+		set := uuid.Must(uuid.NewV4()).String()
+		kid1, kid2 := uuid.Must(uuid.NewV4()).String(), uuid.Must(uuid.NewV4()).String()
 
 		t.Parallel()
 		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
@@ -176,7 +175,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		createdAt := time.Now()
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
-			ID:      uuid.New().String(),
+			ID:      uuid.Must(uuid.NewV4()).String(),
 			Issuer:  "issuer",
 			Subject: "subject",
 			Scope:   []string{"openid", "offline"},
@@ -191,7 +190,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
 		require.NoError(t, err)
 
-		grant.ID = uuid.New().String()
+		grant.ID = uuid.Must(uuid.NewV4()).String()
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
 		require.Error(t, err, "error expected, because combination of issuer + subject + key_id must be unique")
 
@@ -203,7 +202,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		err = m.CreateGrant(context.TODO(), grant2, pubKey2)
 		require.NoError(t, err)
 
-		nonExistingGrantID := uuid.New().String()
+		nonExistingGrantID := uuid.Must(uuid.NewV4()).String()
 		err = m.DeleteGrant(context.TODO(), nonExistingGrantID)
 		require.Error(t, err, "expect error, when deleting non-existing grant")
 

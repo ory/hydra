@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/require"
 
@@ -138,7 +138,7 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 }
 
 func TestCreateSelfSignedCertificate(t *testing.T) {
-	keys, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New().String(), "sig")
+	keys, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 	require.NoError(t, err)
 
 	private := keys.Keys[0]

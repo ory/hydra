@@ -13,26 +13,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/tidwall/gjson"
+	"github.com/gofrs/uuid"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
 	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
+	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/x/contextx"
-
-	hc "github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/requirex"
 )
 
 func TestClientCredentials(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
@@ -51,15 +52,14 @@ func TestClientCredentials(t *testing.T) {
 	}
 
 	var newClient = func(t *testing.T) (*hc.Client, clientcredentials.Config) {
-		cc, config := newCustomClient(t, &hc.Client{
-			Secret:        uuid.New().String(),
+		return newCustomClient(t, &hc.Client{
+			Secret:        uuid.Must(uuid.NewV4()).String(),
 			RedirectURIs:  []string{public.URL + "/callback"},
 			ResponseTypes: []string{"token"},
 			GrantTypes:    []string{"client_credentials"},
 			Scope:         "foobar",
 			Audience:      []string{"https://api.ory.sh/"},
 		})
-		return cc, config
 	}
 
 	var getToken = func(t *testing.T, conf clientcredentials.Config) (*goauth2.Token, error) {
@@ -207,9 +207,8 @@ func TestClientCredentials(t *testing.T) {
 			return func(t *testing.T) {
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
 
-				secret := uuid.New().String()
 				cl, conf := newCustomClient(t, &hc.Client{
-					Secret:        secret,
+					Secret:        uuid.Must(uuid.NewV4()).String(),
 					RedirectURIs:  []string{public.URL + "/callback"},
 					ResponseTypes: []string{"token"},
 					GrantTypes:    []string{"client_credentials"},
@@ -303,9 +302,8 @@ func TestClientCredentials(t *testing.T) {
 
 				defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 
-				secret := uuid.New().String()
 				cl, conf := newCustomClient(t, &hc.Client{
-					Secret:        secret,
+					Secret:        uuid.Must(uuid.NewV4()).String(),
 					RedirectURIs:  []string{public.URL + "/callback"},
 					ResponseTypes: []string{"token"},
 					GrantTypes:    []string{"client_credentials"},

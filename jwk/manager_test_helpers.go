@@ -10,15 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-
-	"github.com/ory/x/assertx"
-
-	"github.com/ory/x/errorsx"
-
-	jose "github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v3"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/assertx"
+	"github.com/ory/x/errorsx"
 )
 
 func RandomBytes(n int) ([]byte, error) {
@@ -54,24 +52,26 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 	}
 
 	return func(t *testing.T) {
-		set := algo + uuid.NewString()
+		ctx := t.Context()
 
-		_, err := m.GetKey(context.TODO(), set, suffix)
+		set := algo + uuid.Must(uuid.NewV4()).String()
+
+		_, err := m.GetKey(ctx, set, suffix)
 		assert.NotNil(t, err)
 
-		err = m.AddKey(context.TODO(), set, First(priv))
+		err = m.AddKey(ctx, set, First(priv))
 		require.NoError(t, err)
 
-		got, err := m.GetKey(context.TODO(), set, suffix)
+		got, err := m.GetKey(ctx, set, suffix)
 		require.NoError(t, err)
 		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
 
 		addKey := First(pub)
-		addKey.KeyID = uuid.NewString()
-		err = m.AddKey(context.TODO(), set, addKey)
+		addKey.KeyID = uuid.Must(uuid.NewV4()).String()
+		err = m.AddKey(ctx, set, addKey)
 		require.NoError(t, err)
 
-		got, err = m.GetKey(context.TODO(), set, suffix)
+		got, err = m.GetKey(ctx, set, suffix)
 		require.NoError(t, err)
 		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
 
@@ -81,23 +81,23 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 		newKID := "new-key-id:" + suffix
 		pub[0].KeyID = newKID
 		pub[0].Use = "sig"
-		err = m.AddKey(context.TODO(), set, First(pub))
+		err = m.AddKey(ctx, set, First(pub))
 		require.NoError(t, err)
 
-		got, err = m.GetKey(context.TODO(), set, newKID)
+		got, err = m.GetKey(ctx, set, newKID)
 		require.NoError(t, err)
 		newKey := First(got.Keys)
 		assert.EqualValues(t, "sig", newKey.Use)
 
 		newKey.Use = "enc"
-		err = m.UpdateKey(context.TODO(), set, newKey)
+		err = m.UpdateKey(ctx, set, newKey)
 		require.NoError(t, err)
-		updated, err := m.GetKey(context.TODO(), set, newKID)
+		updated, err := m.GetKey(ctx, set, newKID)
 		require.NoError(t, err)
 		updatedKey := First(updated.Keys)
 		assert.EqualValues(t, "enc", updatedKey.Use)
 
-		keys, err = m.GetKeySet(context.TODO(), set)
+		keys, err = m.GetKeySet(ctx, set)
 		require.NoError(t, err)
 		var found bool
 		for _, k := range keys.Keys {
@@ -109,13 +109,13 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 		assert.True(t, found, "Key not found in key set: %s / %s\n%+v", keys, newKID)
 
 		beforeDeleteKeysCount := len(keys.Keys)
-		err = m.DeleteKey(context.TODO(), set, suffix)
+		err = m.DeleteKey(ctx, set, suffix)
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), set, suffix)
+		_, err = m.GetKey(ctx, set, suffix)
 		require.Error(t, err)
 
-		keys, err = m.GetKeySet(context.TODO(), set)
+		keys, err = m.GetKeySet(ctx, set)
 		require.NoError(t, err)
 		assert.EqualValues(t, beforeDeleteKeysCount-1, len(keys.Keys))
 	}
@@ -123,17 +123,19 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 
 func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		ctx := t.Context()
+
 		if parallel {
 			t.Parallel()
 		}
-		set := uuid.NewString()
-		_, err := m.GetKeySet(context.TODO(), algo+set)
+		set := uuid.Must(uuid.NewV4()).String()
+		_, err := m.GetKeySet(ctx, algo+set)
 		require.Error(t, err)
 
-		err = m.AddKeySet(context.TODO(), algo+set, keys)
+		err = m.AddKeySet(ctx, algo+set, keys)
 		require.NoError(t, err)
 
-		got, err := m.GetKeySet(context.TODO(), algo+set)
+		got, err := m.GetKeySet(ctx, algo+set)
 		require.NoError(t, err)
 		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
 		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
@@ -141,31 +143,33 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 		for i := range got.Keys {
 			got.Keys[i].Use = "enc"
 		}
-		err = m.UpdateKeySet(context.TODO(), algo+set, got)
+		err = m.UpdateKeySet(ctx, algo+set, got)
 		require.NoError(t, err)
 
-		updated, err := m.GetKeySet(context.TODO(), algo+set)
+		updated, err := m.GetKeySet(ctx, algo+set)
 		require.NoError(t, err)
 		assert.EqualValues(t, "enc", updated.Key(suffix)[0].Public().Use)
 		assert.EqualValues(t, "enc", updated.Key(suffix)[0].Use)
 
-		err = m.DeleteKeySet(context.TODO(), algo+set)
+		err = m.DeleteKeySet(ctx, algo+set)
 		require.NoError(t, err)
 
-		_, err = m.GetKeySet(context.TODO(), algo+set)
+		_, err = m.GetKeySet(ctx, algo+set)
 		require.Error(t, err)
 	}
 }
 
 func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		ctx := t.Context()
+
 		if parallel {
 			t.Parallel()
 		}
-		_, err := m.GetKeySet(context.TODO(), "foo")
+		_, err := m.GetKeySet(ctx, "foo")
 		require.Error(t, err)
 
-		keys, err := m.GenerateAndPersistKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		keys, err := m.GenerateAndPersistKeySet(ctx, "foo", "bar", alg, "sig")
 		require.NoError(t, err)
 		genPub, err := FindPublicKey(keys)
 		require.NoError(t, err)
@@ -173,7 +177,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 		genPriv, err := FindPrivateKey(keys)
 		require.NoError(t, err)
 
-		got, err := m.GetKeySet(context.TODO(), "foo")
+		got, err := m.GetKeySet(ctx, "foo")
 		require.NoError(t, err)
 		gotPub, err := FindPublicKey(got)
 		require.NoError(t, err)
@@ -185,57 +189,59 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 
 		assert.EqualValues(t, genPriv.KeyID, gotPriv.KeyID)
 
-		err = m.DeleteKeySet(context.TODO(), "foo")
+		err = m.DeleteKeySet(ctx, "foo")
 		require.NoError(t, err)
 
-		_, err = m.GetKeySet(context.TODO(), "foo")
+		_, err = m.GetKeySet(ctx, "foo")
 		require.Error(t, err)
 	}
 }
 
 func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) func(t *testing.T) {
 	return func(t *testing.T) {
-		_, err := t1.GetKeySet(context.TODO(), "foo")
+		ctx := t.Context()
+
+		_, err := t1.GetKeySet(ctx, "foo")
 		require.Error(t, err)
-		_, err = t2.GetKeySet(context.TODO(), "foo")
+		_, err = t2.GetKeySet(ctx, "foo")
 		require.Error(t, err)
 
-		_, err = t1.GenerateAndPersistKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		_, err = t1.GenerateAndPersistKeySet(ctx, "foo", "bar", alg, "sig")
 		require.NoError(t, err)
-		keys, err := t1.GetKeySet(context.TODO(), "foo")
+		keys, err := t1.GetKeySet(ctx, "foo")
 		require.NoError(t, err)
-		_, err = t2.GetKeySet(context.TODO(), "foo")
+		_, err = t2.GetKeySet(ctx, "foo")
 		require.Error(t, err)
 
-		err = t2.DeleteKeySet(context.TODO(), "foo")
+		err = t2.DeleteKeySet(ctx, "foo")
 		require.Error(t, err)
-		err = t1.DeleteKeySet(context.TODO(), "foo")
+		err = t1.DeleteKeySet(ctx, "foo")
 		require.NoError(t, err)
-		_, err = t1.GetKeySet(context.TODO(), "foo")
+		_, err = t1.GetKeySet(ctx, "foo")
 		require.Error(t, err)
 
-		err = t1.AddKeySet(context.TODO(), "foo", keys)
+		err = t1.AddKeySet(ctx, "foo", keys)
 		require.NoError(t, err)
-		err = t2.DeleteKeySet(context.TODO(), "foo")
+		err = t2.DeleteKeySet(ctx, "foo")
 		require.Error(t, err)
 
 		for i := range keys.Keys {
 			keys.Keys[i].Use = "enc"
 		}
-		err = t1.UpdateKeySet(context.TODO(), "foo", keys)
+		err = t1.UpdateKeySet(ctx, "foo", keys)
 		require.Error(t, err)
 		for i := range keys.Keys {
 			keys.Keys[i].Use = "err"
 		}
-		err = t2.UpdateKeySet(context.TODO(), "foo", keys)
+		err = t2.UpdateKeySet(ctx, "foo", keys)
 		require.Error(t, err)
-		updated, err := t1.GetKeySet(context.TODO(), "foo")
+		updated, err := t1.GetKeySet(ctx, "foo")
 		require.NoError(t, err)
 		for i := range updated.Keys {
 			assert.EqualValues(t, "enc", updated.Keys[i].Use)
 		}
 
-		err = t1.DeleteKeySet(context.TODO(), "foo")
+		err = t1.DeleteKeySet(ctx, "foo")
 		require.Error(t, err)
 	}
 }

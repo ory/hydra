@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-05-12)](#000-2025-05-12)
+- [0.0.0 (2025-05-15)](#000-2025-05-15)
   - [Breaking Changes](#breaking-changes)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes)
@@ -649,7 +649,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-12)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-15)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -835,6 +835,10 @@ If this pull request
     POST admin/oauth2/auth/sessions/consent?consent_challenge_id=G_TIM3XABG14UwIgDoT1DRfipjhC1uix
     ```
 
+
+### Tests
+
+* Parallelize and improve ([#3989](https://github.com/ory/hydra/issues/3989)) ([a47e395](https://github.com/ory/hydra/commit/a47e39513f1f08076849f77517977abffa195364))
 
 
 # [2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0) (2025-01-17)

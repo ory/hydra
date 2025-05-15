@@ -56,10 +56,9 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 }
 
 func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
-	// Lifespan is two seconds to avoid time synchronization issues with SQL.
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
-	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, 10*time.Second)
+	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
 	reg.Config().MustSet(ctx, config.PublicInterface.Key(config.KeySuffixTLSEnabled), false)
 	reg.Config().MustSet(ctx, config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")

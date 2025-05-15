@@ -1508,11 +1508,9 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
 	accessToken := fosite.AccessTokenFromRequest(r)
-	fmt.Printf("introspecting token %q\n", accessToken)
 	tokenType, _, err := h.r.OAuth2Provider().IntrospectToken(ctx, accessToken, fosite.AccessToken, session)
 
 	if err != nil {
-		fmt.Printf("failed to introspect token %+v\n", err)
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

@@ -21,13 +21,13 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_device_auth_codes
   FOREIGN KEY (client_id, nid) REFERENCES hydra_client (id, nid) ON DELETE CASCADE,
   FOREIGN KEY (nid) REFERENCES networks (id) ON UPDATE RESTRICT ON DELETE CASCADE,
   FOREIGN KEY (challenge_id) REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE,
-  PRIMARY KEY (device_code_signature, nid),
-
-  INDEX hydra_oauth2_device_auth_codes_request_id_idx (request_id, nid),
-  INDEX hydra_oauth2_device_auth_codes_client_id_idx (client_id, nid),
-  INDEX hydra_oauth2_device_auth_codes_challenge_id_idx (challenge_id),
-  UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx (nid, user_code_signature)
+  PRIMARY KEY (device_code_signature, nid)
 );
+
+CREATE INDEX hydra_oauth2_device_auth_codes_request_id_idx ON hydra_oauth2_device_auth_codes (request_id, nid);
+CREATE INDEX hydra_oauth2_device_auth_codes_client_id_idx ON hydra_oauth2_device_auth_codes (client_id, nid);
+CREATE INDEX hydra_oauth2_device_auth_codes_challenge_id_idx ON hydra_oauth2_device_auth_codes (challenge_id);
+CREATE UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx ON hydra_oauth2_device_auth_codes (nid, user_code_signature);
 
 ALTER TABLE hydra_oauth2_flow
   ADD COLUMN IF NOT EXISTS device_challenge_id VARCHAR(255) NULL,

@@ -9,11 +9,12 @@
     "requested_audience-0018_1",
     "requested_audience-0018_2"
   ],
-  "ls": false,
+  "ls": true,
   "s": "subject-0018",
-  "oc": {},
+  "oc": {
+    "display": "display-0018"
+  },
   "r": "http://request/0018",
-  "si": "auth_session-0018",
   "lv": "verifier-0018",
   "lc": "csrf-0018",
   "li": null,
@@ -23,7 +24,10 @@
   "lf": 15,
   "ll": true,
   "a": "acr-0018",
-  "am": [],
+  "am": [
+    "amr-0018-1",
+    "amr-0018-2"
+  ],
   "fs": "force_subject_id-0018",
   "ct": {
     "context": "0018"
@@ -38,13 +42,20 @@
     "valid": false
   },
   "la": null,
-  "di": "challenge-0018",
-  "dr": "request-0018",
-  "dv": "verifier-0018",
-  "dc": "csrf-0018",
+  "di": "device-challenge-0018",
+  "dr": "device-request-id-0018",
+  "dv": "device-verifier-0018",
+  "dc": "device-csrf-0018",
   "du": true,
-  "dh": "0001-01-01T00:00:00Z",
-  "de": null,
+  "dh": "2025-05-16T12:24:00Z",
+  "de": {
+    "error": "",
+    "error_description": "",
+    "error_hint": "",
+    "status_code": 0,
+    "error_debug": "",
+    "valid": false
+  },
   "cc": "challenge-0018",
   "cs": true,
   "cv": "verifier-0018",

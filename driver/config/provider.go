@@ -759,16 +759,24 @@ func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
 	return p.getProvider(ctx).String(key) + suffix
 }
 
-func (p *DefaultProvider) RefreshTokenRotationGracePeriod(ctx context.Context) time.Duration {
-	return p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+type GracefulRefreshTokenRotation struct {
+	Period time.Duration
+	Count  int32
 }
 
-func (p *DefaultProvider) RefreshTokenRotationGraceReuseCount(ctx context.Context) int32 {
+func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) GracefulRefreshTokenRotation {
 	reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0)
 	if reuseCount > math.MaxInt32 {
-		return math.MaxInt32
+		reuseCount = math.MaxInt32
 	} else if reuseCount < 0 {
-		return 0
+		reuseCount = 0
 	}
-	return int32(reuseCount)
+	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if reuseCount == 0 && gracePeriod > 5*time.Minute {
+		gracePeriod = 5 * time.Minute
+	}
+	return GracefulRefreshTokenRotation{
+		Period: gracePeriod,
+		Count:  int32(reuseCount),
+	}
 }

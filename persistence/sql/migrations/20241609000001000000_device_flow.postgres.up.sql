@@ -30,25 +30,17 @@ CREATE INDEX hydra_oauth2_device_auth_codes_challenge_id_idx ON hydra_oauth2_dev
 CREATE UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx ON hydra_oauth2_device_auth_codes (nid, user_code_signature);
 
 ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_challenge_id VARCHAR(255) NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_code_request_id VARCHAR(255) NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_verifier VARCHAR(40) NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_csrf VARCHAR(40) NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_was_used BOOLEAN NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_handled_at TIMESTAMP NULL;
-ALTER TABLE hydra_oauth2_flow
-  ADD COLUMN device_error VARCHAR(2048) NULL;
+  ADD COLUMN IF NOT EXISTS device_challenge_id VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS device_code_request_id VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS device_verifier VARCHAR(40) NULL,
+  ADD COLUMN IF NOT EXISTS device_csrf VARCHAR(40) NULL,
+  ADD COLUMN IF NOT EXISTS device_was_used BOOLEAN NULL,
+  ADD COLUMN IF NOT EXISTS device_handled_at TIMESTAMP NULL,
+  ADD COLUMN IF NOT EXISTS device_error VARCHAR(2048) NULL;
 
-CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
+CREATE UNIQUE INDEX IF NOT EXISTS hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
 
 ALTER TABLE hydra_client
-  ADD COLUMN device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL;
-ALTER TABLE hydra_client
-  ADD COLUMN device_authorization_grant_access_token_lifespan BIGINT NULL DEFAULT NULL;
-ALTER TABLE hydra_client
-  ADD COLUMN device_authorization_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL;
+  ADD COLUMN IF NOT EXISTS device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS device_authorization_grant_access_token_lifespan BIGINT NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS device_authorization_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL;

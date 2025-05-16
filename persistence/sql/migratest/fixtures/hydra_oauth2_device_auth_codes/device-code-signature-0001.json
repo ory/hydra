@@ -1,0 +1,21 @@
+{
+  "ID": "device-code-signature-0001",
+  "UserCodeID": "user-code-signature-0001",
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Request": "request-id-0001",
+  "ConsentChallenge": {
+    "String": "challenge-0018",
+    "Valid": true
+  },
+  "RequestedAt": "2025-05-16T12:24:00Z",
+  "Client": "client-21",
+  "Scopes": "[\"scope-0001_1\",\"scope-0001_2\"]",
+  "GrantedScope": "[\"granted_scope-0001_1\",\"granted_scope-0001_2\"]",
+  "RequestedAudience": "[\"requested_audience-0001_1\",\"requested_audience-0001_2\"]",
+  "GrantedAudience": "[\"granted_audience-0001_1\",\"granted_audience-0001_2\"]",
+  "Form": "{\"form_data\": \"0001\"}",
+  "Subject": "subject-0001",
+  "DeviceCodeActive": true,
+  "UserCodeState": 0,
+  "Session": "eyJzZXNzaW9uX2RhdGEiOiAiMDAwMSJ9"
+}

@@ -124,7 +124,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
 					cs := []client.Client{}
 					require.NoError(t, c.All(&cs))
-					require.Len(t, cs, 19)
+					require.Len(t, cs, 20)
 					for _, c := range cs {
 						require.False(t, c.CreatedAt.IsZero())
 						require.False(t, c.UpdatedAt.IsZero())
@@ -155,7 +155,7 @@ func TestMigrations(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				require.Len(t, flows, 17)
+				require.Len(t, flows, 18)
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
@@ -291,6 +291,18 @@ func TestMigrations(t *testing.T) {
 						require.NotZero(t, p.Client)
 						p.Client = ""
 						CompareWithFixture(t, p, "hydra_oauth2_pkce", p.ID)
+					}
+				})
+
+				t.Run("case=hydra_oauth2_device_auth_codes", func(t *testing.T) {
+					rs := []sql.DeviceRequestSQL{}
+					require.NoError(t, c.All(&rs))
+					require.Len(t, rs, 1)
+
+					for _, r := range rs {
+						testhelpersuuid.AssertUUID(t, r.NID)
+						r.NID = uuid.Nil
+						CompareWithFixture(t, r, "hydra_oauth2_device_auth_codes", r.ID)
 					}
 				})
 

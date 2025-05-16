@@ -497,7 +497,7 @@ func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string
 		return nil, sqlcon.HandleError(err)
 	}
 
-	gracePeriod := p.r.Config().RefreshTokenRotationGracePeriod(ctx)
+	gracePeriod := p.r.Config().GracefulRefreshTokenRotation(ctx).Period
 	if row.Active {
 		// Token is active
 		return row.toRequest(ctx, session, p)
@@ -700,7 +700,7 @@ SET active=false, first_used_at = COALESCE(first_used_at, ?), used_times = COALE
 WHERE signature = ? AND nid = ?`
 	args := make([]any, 3, 4)
 	args[0], args[1], args[2] = now, refreshSignature, p.NetworkID(ctx)
-	if l := p.r.Config().RefreshTokenRotationGraceReuseCount(ctx); l > 0 {
+	if l := p.r.Config().GracefulRefreshTokenRotation(ctx).Count; l > 0 {
 		query += " AND (used_times IS NULL OR used_times < ?)"
 		args = append(args, l)
 	}
@@ -748,7 +748,7 @@ func (p *Persister) RotateRefreshToken(ctx context.Context, requestID, refreshTo
 	defer otelx.End(span, &err)
 
 	// If we end up here, we have a valid refresh token and can proceed with the rotation.
-	if p.r.Config().RefreshTokenRotationGracePeriod(ctx) > 0 {
+	if p.r.Config().GracefulRefreshTokenRotation(ctx).Period > 0 {
 		return handleRetryError(p.gracefulRefreshRotation(ctx, requestID, refreshTokenSignature))
 	}
 

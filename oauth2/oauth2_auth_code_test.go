@@ -1389,7 +1389,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					// - Revoking consent clears all tokens.
 					// - Token revocation clears all tokens.
 					//
-					// The test creates 4 token generations, where each generations has twice as many tokens as the previous generation.
+					// The test creates 4 token generations, where each generation has twice as many tokens as the previous generation.
 					// The generations are created like this:
 					//
 					// - In the first scenario, all token generations are created at the same time.
@@ -1604,6 +1604,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
 						}
 						assert.Len(t, allTokens, (1+nRefreshes)*2)
+					})
+
+					t.Run("graceful refresh count limit is respected when set", func(t *testing.T) {
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 3)
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+
+						token := issueTokens(t)
+						token.Expiry = time.Now().Add(-time.Hour * 24)
+
+						for range 3 {
+							_, err := conf.TokenSource(ctx, token).Token()
+							require.NoError(t, err)
+						}
+						_, err := conf.TokenSource(ctx, token).Token()
+						assert.Error(t, err, "Rotating a used refresh token is not possible after the limit is exceeded")
 					})
 				}
 

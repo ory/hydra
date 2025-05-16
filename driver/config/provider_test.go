@@ -294,11 +294,13 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, []string{"whatever"}, c.DefaultClientScope(ctx))
 
 	// refresh
-	assert.Equal(t, time.Duration(0), c.RefreshTokenRotationGracePeriod(ctx))
+	assert.Equal(t, GracefulRefreshTokenRotation{}, c.GracefulRefreshTokenRotation(ctx))
 	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, "1s"))
-	assert.Equal(t, time.Second, c.RefreshTokenRotationGracePeriod(ctx))
+	assert.Equal(t, time.Second, c.GracefulRefreshTokenRotation(ctx).Period)
 	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, "2h"))
-	assert.Equal(t, time.Minute*5, c.RefreshTokenRotationGracePeriod(ctx))
+	assert.Equal(t, 5*time.Minute, c.GracefulRefreshTokenRotation(ctx).Period)
+	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGraceReuseCount, "2"))
+	assert.Equal(t, GracefulRefreshTokenRotation{Count: 2, Period: 2 * time.Hour}, c.GracefulRefreshTokenRotation(ctx))
 
 	// urls
 	assert.Equal(t, urlx.ParseOrPanic("https://issuer"), c.IssuerURL(ctx))

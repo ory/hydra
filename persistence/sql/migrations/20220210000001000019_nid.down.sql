@@ -1,2 +1,2 @@
--- This blank migration was generated to meet ory/x/popx validation criteria, see https://github.com/ory/x/pull/509; DO NOT EDIT.
--- hydra:generate hydra migrate gen
+-- This is a blank migration. It is generated to ensure that all dialects are represented in the migration files.
+-- ./hydra migrate gen ./persistence/sql/src/20220210000001_nid/ ./persistence/sql/migrations/

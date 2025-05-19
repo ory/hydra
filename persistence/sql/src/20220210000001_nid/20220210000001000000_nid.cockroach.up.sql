@@ -103,8 +103,9 @@ DROP INDEX hydra_oauth2_jti_blacklist_expires_at_idx;
 --split
 CREATE INDEX hydra_oauth2_jti_blacklist_expires_at_idx ON hydra_oauth2_jti_blacklist (expires_at ASC, nid ASC);
 --split
-ALTER TABLE hydra_oauth2_jti_blacklist DROP CONSTRAINT "primary";
-ALTER TABLE hydra_oauth2_jti_blacklist ADD CONSTRAINT hydra_oauth2_jti_blacklist_pkey PRIMARY KEY (signature ASC, nid ASC);
+ALTER TABLE hydra_oauth2_jti_blacklist
+    DROP CONSTRAINT "primary",
+    ADD CONSTRAINT hydra_oauth2_jti_blacklist_pkey PRIMARY KEY (signature ASC, nid ASC);
 --split
 
 -- hydra_oauth2_logout_request
@@ -132,8 +133,9 @@ ALTER TABLE hydra_oauth2_obfuscated_authentication_session ALTER nid SET NOT NUL
 --split
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT hydra_oauth2_obfuscated_authentication_session_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
 --split
-ALTER TABLE hydra_oauth2_obfuscated_authentication_session DROP CONSTRAINT "primary";
-ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT "hydra_oauth2_obfuscated_authentication_session_pkey" PRIMARY KEY (subject ASC, client_id ASC, nid ASC);
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session
+    DROP CONSTRAINT "primary",
+    ADD CONSTRAINT "hydra_oauth2_obfuscated_authentication_session_pkey" PRIMARY KEY (subject ASC, client_id ASC, nid ASC);
 --split
 DROP INDEX hydra_oauth2_obfuscated_authentication_session_client_id_subject_obfuscated_idx;
 --split

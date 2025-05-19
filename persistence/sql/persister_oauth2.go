@@ -492,18 +492,21 @@ func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string
 
 	var row OAuth2RefreshTable
 	if err := p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&row); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrNotFound)
+		return nil, errors.WithStack(fosite.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	gracePeriod := p.r.Config().GracefulRefreshTokenRotation(ctx).Period
 	if row.Active {
 		// Token is active
 		return row.toRequest(ctx, session, p)
-	} else if gracePeriod > 0 &&
+	}
+
+	if graceful := p.r.Config().GracefulRefreshTokenRotation(ctx); graceful.Period > 0 &&
 		row.FirstUsedAt.Valid &&
-		row.FirstUsedAt.Time.Add(gracePeriod).After(time.Now()) {
+		row.FirstUsedAt.Time.Add(graceful.Period).After(time.Now()) &&
+		(graceful.Count == 0 || // no limit
+			(row.UsedTimes.Valid && row.UsedTimes.Int32 < graceful.Count)) {
 		// We return the request as is, which indicates that the token is active (because we are in the grace period still).
 		return row.toRequest(ctx, session, p)
 	}

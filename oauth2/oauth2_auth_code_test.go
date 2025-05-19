@@ -844,7 +844,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					original := introspectAccessToken(t, conf, token, subject)
 
 					t.Run("followup=run the flow three more times", func(t *testing.T) {
-						for i := 0; i < 3; i++ {
+						for i := range 3 {
 							t.Run(fmt.Sprintf("run=%d", i), func(t *testing.T) {
 								code, _ := getAuthorizeCode(t, conf, oc,
 									oauth2.SetAuthURLParam("nonce", nonce),
@@ -1569,7 +1569,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						const nRefreshes = 5
 
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
-						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "5s")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "10s")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
 
 						token := issueTokens(t)
 						token.Expiry = time.Now().Add(-time.Hour * 24)

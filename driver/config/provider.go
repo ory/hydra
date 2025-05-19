@@ -764,19 +764,18 @@ type GracefulRefreshTokenRotation struct {
 	Count  int32
 }
 
-func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) GracefulRefreshTokenRotation {
-	reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0)
-	if reuseCount > math.MaxInt32 {
-		reuseCount = math.MaxInt32
-	} else if reuseCount < 0 {
-		reuseCount = 0
+func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) (cfg GracefulRefreshTokenRotation) {
+	switch reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0); {
+	case reuseCount > math.MaxInt32:
+		cfg.Count = math.MaxInt32
+	case reuseCount < 0:
+		cfg.Count = 0
+	default:
+		cfg.Count = int32(reuseCount)
 	}
-	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
-	if reuseCount == 0 && gracePeriod > 5*time.Minute {
-		gracePeriod = 5 * time.Minute
+	cfg.Period = p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if cfg.Count == 0 && cfg.Period > 5*time.Minute {
+		cfg.Period = 5 * time.Minute
 	}
-	return GracefulRefreshTokenRotation{
-		Period: gracePeriod,
-		Count:  int32(reuseCount),
-	}
+	return
 }

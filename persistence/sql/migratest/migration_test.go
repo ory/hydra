@@ -233,7 +233,7 @@ func TestMigrations(t *testing.T) {
 				t.Run("case=hydra_oauth2_refresh", func(t *testing.T) {
 					rs := []sql.OAuth2RefreshTable{}
 					require.NoError(t, c.All(&rs))
-					require.Len(t, rs, 13)
+					require.Len(t, rs, 14)
 
 					for _, r := range rs {
 						testhelpersuuid.AssertUUID(t, r.NID)

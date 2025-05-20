@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-05-16)](#000-2025-05-16)
+- [0.0.0 (2025-05-20)](#000-2025-05-20)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-16)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-20)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -74,6 +74,27 @@ If this pull request
     The previous link in the documentation led to a page unrelated to JWT.
     Updated the URL to https://www.ory.sh/docs/oauth2-oidc/jwt-access-token,
     which provides proper JWT guidance.
+
+* Migrations on CockroachDB v25+ ([#3994](https://github.com/ory/hydra/issues/3994)) ([38efece](https://github.com/ory/hydra/commit/38efece55be02d722eafef9d0cec06ec12a29d65)), closes [#3964](https://github.com/ory/hydra/issues/3964) [#3993](https://github.com/ory/hydra/issues/3993):
+
+    I've added some output to the generated migrations files to make them
+    easier to recreate, hence the big diff.
+    
+    These are important:
+    
+    ```
+    persistence/sql/migrations/20211004110001000000_change_client_primary_key.cockroach.down.sql
+    persistence/sql/migrations/20211004110001000000_change_client_primary_key.cockroach.up.sql
+    persistence/sql/migrations/20211004110003000000_change_client_primary_key.cockroach.down.sql
+    persistence/sql/migrations/20211004110003000000_change_client_primary_key.cockroach.up.sql
+    
+    persistence/sql/migrations/20211011000001000000_change_jwk_primary_key.cockroach.down.sql
+    persistence/sql/migrations/20211011000001000000_change_jwk_primary_key.cockroach.up.sql
+    persistence/sql/migrations/20211011000003000000_change_jwk_primary_key.cockroach.down.sql
+    persistence/sql/migrations/20211011000003000000_change_jwk_primary_key.cockroach.up.sql
+    
+    persistence/sql/src/20220210000001_nid/20220210000001000000_nid.cockroach.up.sql
+    ```
 
 * Revoke by consent request ID ([#3947](https://github.com/ory/hydra/issues/3947)) ([5d8635c](https://github.com/ory/hydra/commit/5d8635c94389ff3c87bfae66afe95105c147bec1)), closes [#3932](https://github.com/ory/hydra/issues/3932) [#3932](https://github.com/ory/hydra/issues/3932) [#3941](https://github.com/ory/hydra/issues/3941)
 * Tos_uri validation ([#3945](https://github.com/ory/hydra/issues/3945)) ([007e224](https://github.com/ory/hydra/commit/007e22412ae72403415e8b2f2283154b8d88f511)):

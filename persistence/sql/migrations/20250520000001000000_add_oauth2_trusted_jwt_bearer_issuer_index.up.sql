@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX hydra_oauth2_trusted_jwt_bearer_issuer_issuer_subject_key_id_key_2 ON ory_hydra.public.hydra_oauth2_trusted_jwt_bearer_issuer USING btree (key_id ASC, issuer ASC, subject ASC, nid ASC);

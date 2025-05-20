@@ -76,7 +76,7 @@ func TestMigrations(t *testing.T) {
 		for db, dsn := range map[string]string{
 			"postgres":  dockertest.RunTestPostgreSQL(t),
 			"mysql":     dockertest.RunTestMySQL(t),
-			"cockroach": dockertest.RunTestCockroachDB(t),
+			"cockroach": dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.1"),
 		} {
 			wg.Add(1)
 			go func() {
@@ -90,7 +90,7 @@ func TestMigrations(t *testing.T) {
 					require.NoError(t, err)
 					require.NoError(t, c.Open())
 					require.NoError(t, c.RawQuery("CREATE DATABASE "+dbName).Exec())
-					dsn = regexp.MustCompile("/[a-z0-9]+\\?").ReplaceAllString(dsn, "/"+dbName+"?")
+					dsn = regexp.MustCompile(`/[a-z0-9]+\?`).ReplaceAllString(dsn, "/"+dbName+"?")
 					require.NoError(t, c.Close())
 
 					c, err = pop.NewConnection(&pop.ConnectionDetails{URL: dsn})

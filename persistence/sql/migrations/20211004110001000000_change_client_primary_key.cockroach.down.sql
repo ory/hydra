@@ -1,1 +1,3 @@
-ALTER TABLE hydra_client DROP CONSTRAINT "hydra_client_pkey", ADD CONSTRAINT "primary" PRIMARY KEY (pk_deprecated);
+ALTER TABLE hydra_client "hydra_client_pkey"
+    DROP COLUMN pk,
+    RENAME COLUMN pk_deprecated TO pk;

@@ -1,1 +1,3 @@
-ALTER TABLE hydra_jwk DROP CONSTRAINT "hydra_jwk", ADD CONSTRAINT "primary" PRIMARY KEY (pk_deprecated);
+ALTER TABLE hydra_jwk
+    DROP COLUMN pk,
+    RENAME pk_deprecated TO pk;

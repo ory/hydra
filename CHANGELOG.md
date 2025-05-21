@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-05-21)](#000-2025-05-21)
+- [0.0.0 (2025-05-20)](#000-2025-05-20)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-21)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-20)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -162,10 +162,6 @@ If this pull request
     documenting the breaking change:
     
     ```
-
-* Monorepo ([a77b206](https://github.com/ory/hydra/commit/a77b20608238b292192498bc35a20ebd0e47c9f0)):
-
-    GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
 
 * Revoke Kratos session asynchronously ([#3936](https://github.com/ory/hydra/issues/3936)) ([a0e7ee2](https://github.com/ory/hydra/commit/a0e7ee29298d4f882a7d471e0601b01c6848c40d)):
 

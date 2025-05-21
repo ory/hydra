@@ -1,1 +1,1 @@
-DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_key_id;
+DROP INDEX IF EXISTS hydra_oauth2_trusted_jwt_bearer_issuer_key_id;

@@ -1397,11 +1397,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					//
 					// Tokens for each generation are created in parallel to ensure we have no state leak anywhere.0
 					t.Run("token generations", func(t *testing.T) {
-
 						gracePeriod := time.Second
-						aboveGracePeriod := time.Second * 2
+						aboveGracePeriod := 2 * time.Second
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
-						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, gracePeriod.String())
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, gracePeriod)
 						reg.Config().Delete(ctx, config.KeyTokenHook)
 						reg.Config().Delete(ctx, config.KeyRefreshTokenHook)
 
@@ -1446,6 +1445,35 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							tokenIndex := rng.Intn(len(generations[generationIndex]))
 
 							token := generations[generationIndex][tokenIndex]
+							token.Expiry = time.Now().Add(-time.Hour * 24)
+							_, err := conf.TokenSource(ctx, token).Token()
+							require.Error(t, err)
+
+							// Now all tokens are inactive
+							for i, generation := range generations {
+								t.Run(fmt.Sprintf("generation=%d", i), func(t *testing.T) {
+									for j, token := range generation {
+										t.Run(fmt.Sprintf("token=%d", j), func(t *testing.T) {
+											assertInactive(t, token.AccessToken, conf)
+											assertInactive(t, token.RefreshToken, conf)
+										})
+									}
+								})
+							}
+						})
+
+						t.Run("re-using a graceful refresh token above the count limit invalidates all tokens", func(t *testing.T) {
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 2)
+							t.Cleanup(func() {
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1s")
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
+							})
+							generations := createTokenGenerations(t, 4, time.Second*2)
+
+							token := generations[0][0]
 							token.Expiry = time.Now().Add(-time.Hour * 24)
 							_, err := conf.TokenSource(ctx, token).Token()
 							require.Error(t, err)

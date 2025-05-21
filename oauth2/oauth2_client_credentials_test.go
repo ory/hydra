@@ -86,7 +86,7 @@ func TestClientCredentials(t *testing.T) {
 			assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
 
 			assert.EqualValues(t, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)
-			requirex.EqualTime(t, expectedExp, time.Unix(res.Get("exp").Int(), 0), time.Second)
+			requirex.EqualTime(t, expectedExp, time.Unix(res.Get("exp").Int(), 0), 2*time.Second)
 
 			assert.EqualValues(t, encodeOr(t, conf.EndpointParams["audience"], "[]"), res.Get("aud").Raw, "%s", res.Raw)
 

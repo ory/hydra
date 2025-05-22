@@ -349,6 +349,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			})
 
 			t.Run("case=perform authorize code flow with verifiable credentials", func(t *testing.T) {
+				reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, "24h")
+				t.Cleanup(func() {
+					reg.Config().Delete(ctx, config.KeyAccessTokenLifespan)
+				})
+
 				// Make sure we test against all crypto suites that we advertise.
 				cfg, _, err := publicClient.OidcAPI.DiscoverOidcConfiguration(ctx).Execute()
 				require.NoError(t, err)
@@ -1682,7 +1687,7 @@ func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce s
 			JWT:       proofJWT,
 		},
 	})
-	require.NoError(t, err)
+	require.NoError(t, err, "Error: %+v", err)
 	require.NotNil(t, verifiableCredential)
 
 	_, claims := claimsFromVCResponse(t, reg, verifiableCredential)

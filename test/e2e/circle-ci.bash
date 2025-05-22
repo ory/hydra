@@ -12,7 +12,6 @@ function catch {
 trap catch ERR
 
 killall hydra || true
-killall node || true
 
 # Check if any ports that we need are open already
 ! nc -zv 127.0.0.1 5004

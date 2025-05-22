@@ -152,7 +152,7 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
 	require.NoError(t, err)
 
-	statement := "ALTER TABLE \"hydra_client\" ADD COLUMN \"temp_column\" VARCHAR(128) NOT NULL DEFAULT '';"
+	statement := `ALTER TABLE "hydra_client" ADD COLUMN IF NOT EXISTS "temp_column" VARCHAR(128) NOT NULL DEFAULT '';`
 	require.NoError(t, reg.Persister().Connection(ctx).RawQuery(statement).Exec())
 
 	cl := &client.Client{
@@ -161,7 +161,7 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	require.NoError(t, reg.Persister().CreateClient(ctx, cl))
 	getClients := func(reg Registry) ([]client.Client, error) {
 		readClients := make([]client.Client, 0)
-		return readClients, reg.Persister().Connection(ctx).RawQuery("SELECT * FROM \"hydra_client\"").All(&readClients)
+		return readClients, reg.Persister().Connection(ctx).RawQuery(`SELECT * FROM "hydra_client"`).All(&readClients)
 	}
 
 	t.Run("with ignore disabled (default behavior)", func(t *testing.T) {

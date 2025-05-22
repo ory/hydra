@@ -1126,7 +1126,7 @@
               "properties": {
                 "rotation_grace_period": {
                   "title": "Refresh Token Rotation Grace Period",
-                  "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is 5 minutes.",
+                  "description": "Configures how long a Refresh Token remains valid after it has been used. The maximum value is 5 minutes, unless also a reuse count is configured.",
                   "default": "0s",
                   "type": "string",
                   "allOf": [
@@ -1134,6 +1134,13 @@
                       "$ref": "#/definitions/duration"
                     }
                   ]
+                },
+                "rotation_grace_reuse_count": {
+                  "title": "Refresh Token Rotation Grace Period Reuse Count",
+                  "description": "Configures how many times a Refresh Token can be reused during the grace period. This is only effective if combined with a rotation grace period.",
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0
                 }
               }
             },

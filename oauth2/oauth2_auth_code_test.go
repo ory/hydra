@@ -844,7 +844,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					original := introspectAccessToken(t, conf, token, subject)
 
 					t.Run("followup=run the flow three more times", func(t *testing.T) {
-						for i := 0; i < 3; i++ {
+						for i := range 3 {
 							t.Run(fmt.Sprintf("run=%d", i), func(t *testing.T) {
 								code, _ := getAuthorizeCode(t, conf, oc,
 									oauth2.SetAuthURLParam("nonce", nonce),
@@ -1389,7 +1389,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					// - Revoking consent clears all tokens.
 					// - Token revocation clears all tokens.
 					//
-					// The test creates 4 token generations, where each generations has twice as many tokens as the previous generation.
+					// The test creates 4 token generations, where each generation has twice as many tokens as the previous generation.
 					// The generations are created like this:
 					//
 					// - In the first scenario, all token generations are created at the same time.
@@ -1397,11 +1397,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					//
 					// Tokens for each generation are created in parallel to ensure we have no state leak anywhere.0
 					t.Run("token generations", func(t *testing.T) {
-
 						gracePeriod := time.Second
-						aboveGracePeriod := time.Second * 2
+						aboveGracePeriod := 2 * time.Second
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
-						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, gracePeriod.String())
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, gracePeriod)
 						reg.Config().Delete(ctx, config.KeyTokenHook)
 						reg.Config().Delete(ctx, config.KeyRefreshTokenHook)
 
@@ -1446,6 +1445,35 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							tokenIndex := rng.Intn(len(generations[generationIndex]))
 
 							token := generations[generationIndex][tokenIndex]
+							token.Expiry = time.Now().Add(-time.Hour * 24)
+							_, err := conf.TokenSource(ctx, token).Token()
+							require.Error(t, err)
+
+							// Now all tokens are inactive
+							for i, generation := range generations {
+								t.Run(fmt.Sprintf("generation=%d", i), func(t *testing.T) {
+									for j, token := range generation {
+										t.Run(fmt.Sprintf("token=%d", j), func(t *testing.T) {
+											assertInactive(t, token.AccessToken, conf)
+											assertInactive(t, token.RefreshToken, conf)
+										})
+									}
+								})
+							}
+						})
+
+						t.Run("re-using a graceful refresh token above the count limit invalidates all tokens", func(t *testing.T) {
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+							reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 2)
+							t.Cleanup(func() {
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1s")
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+								reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
+							})
+							generations := createTokenGenerations(t, 4, time.Second*2)
+
+							token := generations[0][0]
 							token.Expiry = time.Now().Add(-time.Hour * 24)
 							_, err := conf.TokenSource(ctx, token).Token()
 							require.Error(t, err)
@@ -1569,7 +1597,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						const nRefreshes = 5
 
 						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
-						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "5s")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "10s")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
 
 						token := issueTokens(t)
 						token.Expiry = time.Now().Add(-time.Hour * 24)
@@ -1604,6 +1633,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
 						}
 						assert.Len(t, allTokens, (1+nRefreshes)*2)
+					})
+
+					t.Run("graceful refresh count limit is respected when set", func(t *testing.T) {
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 3)
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1m")
+						reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, "1m")
+
+						token := issueTokens(t)
+						token.Expiry = time.Now().Add(-time.Hour * 24)
+
+						for range 3 {
+							_, err := conf.TokenSource(ctx, token).Token()
+							require.NoError(t, err)
+						}
+						_, err := conf.TokenSource(ctx, token).Token()
+						assert.Error(t, err, "Rotating a used refresh token is not possible after the limit is exceeded")
 					})
 				}
 

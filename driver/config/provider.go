@@ -110,7 +110,8 @@ const (
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
-	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period" // #nosec G101
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period"      // #nosec G101
+	KeyRefreshTokenRotationGraceReuseCount       = "oauth2.grant.refresh_token.rotation_grace_reuse_count" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -758,10 +759,23 @@ func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
 	return p.getProvider(ctx).String(key) + suffix
 }
 
-func (p *DefaultProvider) RefreshTokenRotationGracePeriod(ctx context.Context) time.Duration {
-	gracePeriod := p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
-	if gracePeriod > time.Minute*5 {
-		return time.Minute * 5
+type GracefulRefreshTokenRotation struct {
+	Period time.Duration
+	Count  int32
+}
+
+func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) (cfg GracefulRefreshTokenRotation) {
+	switch reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0); {
+	case reuseCount > math.MaxInt32:
+		cfg.Count = math.MaxInt32
+	case reuseCount < 0:
+		cfg.Count = 0
+	default:
+		cfg.Count = int32(reuseCount)
 	}
-	return gracePeriod
+	cfg.Period = p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if cfg.Count == 0 && cfg.Period > 5*time.Minute {
+		cfg.Period = 5 * time.Minute
+	}
+	return
 }

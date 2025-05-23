@@ -47,10 +47,10 @@
     "urn:ietf:params:oauth:grant-type:device_code"
   ],
   "id_token_signed_response_alg": [
-    "RS256"
+    "ES256"
   ],
   "id_token_signing_alg_values_supported": [
-    "RS256"
+    "ES256"
   ],
   "issuer": "http://hydra.localhost",
   "jwks_uri": "http://hydra.localhost/.well-known/jwks.json",
@@ -95,10 +95,10 @@
   ],
   "userinfo_endpoint": "/userinfo",
   "userinfo_signed_response_alg": [
-    "RS256"
+    "ES256"
   ],
   "userinfo_signing_alg_values_supported": [
     "none",
-    "RS256"
+    "ES256"
   ]
 }

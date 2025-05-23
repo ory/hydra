@@ -349,6 +349,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
 		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg, conf)
 
@@ -383,6 +384,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
 		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg, conf)
 

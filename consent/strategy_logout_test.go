@@ -185,7 +185,7 @@ func TestLogoutFlows(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndAcceptLoginHandler(t, adminApi, subject, func(t *testing.T, res *hydra.OAuth2LoginRequest, err error) hydra.AcceptOAuth2LoginRequest {
 				require.NoError(t, err)
-				//res.Payload.SessionID
+				// res.Payload.SessionID
 				return hydra.AcceptOAuth2LoginRequest{
 					Remember:                  pointerx.Ptr(true),
 					IdentityProviderSessionId: pointerx.Ptr(kratos.FakeSessionID),
@@ -536,7 +536,8 @@ func TestLogoutFlows(t *testing.T) {
 		sid := make(chan string)
 		acceptLoginAsAndWatchSid(t, subject, sid)
 
-		wg := newWg(2)
+		wg := newWg(3)
+		fakeKratos.DisableSessionCB = wg.Done
 		setupCheckAndAcceptLogoutHandler(t, wg, nil)
 		browser := createBrowserWithSession(t, c)
 
@@ -585,7 +586,9 @@ func TestLogoutFlows(t *testing.T) {
 		sid := make(chan string, numSidConsumers)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, numSidConsumers)
 
-		backChannelWG := newWg(1)
+		backChannelWG := newWg(2)
+		fakeKratos.DisableSessionCB = backChannelWG.Done
+
 		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
 			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
 			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
@@ -610,9 +613,13 @@ func TestLogoutFlows(t *testing.T) {
 		sid := make(chan string)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, false, 1)
 
+		wg := newWg(1)
+		fakeKratos.DisableSessionCB = wg.Done
+
 		c := createSampleClient(t)
 
 		logoutViaHeadlessAndExpectNoContent(t, createBrowserWithSession(t, c), url.Values{"sid": {<-sid}})
+		wg.Wait()
 		assert.True(t, fakeKratos.DisableSessionWasCalled)
 		assert.Equal(t, fakeKratos.LastDisabledSession, kratos.FakeSessionID)
 	})

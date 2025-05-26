@@ -13,6 +13,7 @@ import (
 type (
 	FakeKratos struct {
 		DisableSessionWasCalled bool
+		DisableSessionCB        func()
 		LastDisabledSession     string
 	}
 )
@@ -33,6 +34,9 @@ func NewFake() *FakeKratos {
 func (f *FakeKratos) DisableSession(_ context.Context, identityProviderSessionID string) error {
 	f.DisableSessionWasCalled = true
 	f.LastDisabledSession = identityProviderSessionID
+	if f.DisableSessionCB != nil {
+		f.DisableSessionCB()
+	}
 
 	return nil
 }
@@ -45,6 +49,5 @@ func (f *FakeKratos) Authenticate(_ context.Context, username, password string) 
 }
 
 func (f *FakeKratos) Reset() {
-	f.DisableSessionWasCalled = false
-	f.LastDisabledSession = ""
+	(*f) = *NewFake()
 }

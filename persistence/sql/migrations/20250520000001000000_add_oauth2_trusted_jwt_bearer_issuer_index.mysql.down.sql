@@ -1,0 +1,2 @@
+DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx;
+

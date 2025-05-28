@@ -5,6 +5,7 @@ package sql
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -114,15 +115,21 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	defer otelx.End(span, &err)
 
 	var data trust.SQLData
-	query := p.QueryWithNetwork(ctx).
-		Where("issuer = ?", issuer).
-		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
-		Where("key_id = ?", keyId).
-		Where("nid = ?", p.NetworkID(ctx))
+	tableName := data.TableName()
+	// Index hint.
+	if p.Connection(ctx).Dialect.Name() == "cockroach" {
+		tableName += "@hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx"
+	}
+
+	sql := fmt.Sprintf(`SELECT key_set FROM %s WHERE key_id = ? AND nid = ? AND issuer = ? AND (subject = ? OR allow_any_subject IS TRUE) LIMIT 1`, tableName)
+	query := p.Connection(ctx).RawQuery(sql,
+		keyId, p.NetworkID(ctx), issuer, subject,
+	)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
+	// TODO: Consider merging this query with the one above using a `JOIN`.
 	keySet, err := p.GetKey(ctx, data.KeySet, keyId)
 	if err != nil {
 		return nil, err
@@ -196,17 +203,21 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	defer otelx.End(span, &err)
 
 	var data trust.SQLData
-	query := p.QueryWithNetwork(ctx).
-		Where("issuer = ?", issuer).
-		Where("(subject = ? OR allow_any_subject IS TRUE)", subject).
-		Where("key_id = ?", keyId).
-		Where("nid = ?", p.NetworkID(ctx))
+	tableName := data.TableName()
+	// Index hint.
+	if p.Connection(ctx).Dialect.Name() == "cockroach" {
+		tableName += "@hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx"
+	}
 
+	sql := fmt.Sprintf(`SELECT scope FROM %s WHERE key_id = ? AND nid = ? AND issuer = ? AND (subject = ? OR allow_any_subject IS TRUE) LIMIT 1`, tableName)
+	query := p.Connection(ctx).RawQuery(sql,
+		keyId, p.NetworkID(ctx), issuer, subject,
+	)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return p.jwtGrantFromSQlData(data).Scope, nil
+	return stringsx.Splitx(data.Scope, "|"), nil
 }
 
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (ok bool, err error) {

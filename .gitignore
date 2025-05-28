@@ -32,3 +32,4 @@ cypress/videos
 cypress/screenshots
 BENCHMARKS.md
 *.sqlite
+hydra

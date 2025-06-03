@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-05-20)](#000-2025-05-20)
+- [0.0.0 (2025-06-03)](#000-2025-06-03)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-20)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-06-03)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -45,6 +45,10 @@ If this pull request
 
     The client validator no longer rejects PATCH and PUT updates when `JSONWebKeysURI` is non-empty and `JSONWebKeys` is not nil.
 
+* Always use EC private keys in tests ([7481827](https://github.com/ory/hydra/commit/748182721768a6bf331e51a6989420f20383ae05)):
+
+    GitOrigin-RevId: a82b6e636e84d543db3b035194c3a5dc85286afc
+
 * Case-insensitive user_code scrubbing ([#3979](https://github.com/ory/hydra/issues/3979)) ([d389fd0](https://github.com/ory/hydra/commit/d389fd0269f93c8b7c787f1b3683ae4c6e9e1909))
 * CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
@@ -68,6 +72,10 @@ If this pull request
     documenting the breaking change:
     
     ```
+
+* Ignore flaky keys in Hydra HSM tests ([469b2ad](https://github.com/ory/hydra/commit/469b2ad538865a38738a10f46d270f53d12101ad)):
+
+    GitOrigin-RevId: 83312e6544bc33ccc30e1e1e414cc04910429192
 
 * JWT documentation link to point to the correct resource ([#3907](https://github.com/ory/hydra/issues/3907)) ([b746e41](https://github.com/ory/hydra/commit/b746e41eda6dc3fe376b147d146a6fcc7dafb455)):
 
@@ -121,6 +129,10 @@ If this pull request
     configuration items that conform to this endpoint as seen here:
     https://datatracker.ietf.org/doc/html/rfc8414
 
+* **changelog:** Graceful refresh count limit ([470713d](https://github.com/ory/hydra/commit/470713da36862745ca0222c284e0692fa40559ae)):
+
+    GitOrigin-RevId: 7f8bf5fee8b06490f888590054d2dcd2f1cf2cba
+
 * Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
 
     This patch introduces the OAuth 2.0 Device Authorization Grant to Ory
@@ -162,6 +174,14 @@ If this pull request
     documenting the breaking change:
     
     ```
+
+* Monorepo ([3ff992e](https://github.com/ory/hydra/commit/3ff992e38abe10156bc3b7bed37d35784bf3021b)):
+
+    GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
+
+* Monorepo ([a77b206](https://github.com/ory/hydra/commit/a77b20608238b292192498bc35a20ebd0e47c9f0)):
+
+    GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
 
 * Revoke Kratos session asynchronously ([#3936](https://github.com/ory/hydra/issues/3936)) ([a0e7ee2](https://github.com/ory/hydra/commit/a0e7ee29298d4f882a7d471e0601b01c6848c40d)):
 
@@ -241,6 +261,13 @@ If this pull request
     ```
     POST admin/oauth2/auth/sessions/consent?consent_challenge_id=G_TIM3XABG14UwIgDoT1DRfipjhC1uix
     ```
+
+
+### Performance Improvements
+
+* Add index to optimize jwt query ([72fa16d](https://github.com/ory/hydra/commit/72fa16d5f677bdf505847fa781d1ca84bc2ceb39)):
+
+    GitOrigin-RevId: 93e0aca39592dbd249c4df90506fa416bfdcaab4
 
 
 ### Tests

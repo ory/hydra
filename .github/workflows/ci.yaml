@@ -32,22 +32,10 @@ jobs:
       - name: Run tests
         run: ./test/conformance/test.sh -v -short -parallel 16
 
-  sdk-generate:
-    name: Generate SDKs
-    runs-on: ubuntu-latest
-    outputs:
-      sdk-cache-key: ${{ steps.sdk-generate.outputs.sdk-cache-key }}
-    steps:
-      - uses: ory/ci/sdk/generate@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-        id: sdk-generate
 
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
-    needs:
-      - sdk-generate
     services:
       postgres:
         image: postgres:16
@@ -108,8 +96,6 @@ jobs:
 
   test-hsm:
     name: Run HSM tests
-    needs:
-      - sdk-generate
     runs-on: ubuntu-latest
     env:
       HSM_ENABLED: true
@@ -142,12 +128,10 @@ jobs:
   test-e2e:
     name: Run end-to-end tests
     runs-on: ubuntu-latest
-    needs:
-      - sdk-generate
     strategy:
       matrix:
-        database: ["memory", "postgres", "mysql", "cockroach"]
-        args: ["", "--jwt"]
+        database: [ "memory", "postgres", "mysql", "cockroach" ]
+        args: [ "", "--jwt" ]
     services:
       postgres:
         image: postgres:16
@@ -210,21 +194,6 @@ jobs:
     steps:
       - uses: ory/ci/changelog@master
         with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-
-  sdk-release:
-    name: Release SDKs
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - test
-      - test-hsm
-      - sdk-generate
-      - release
-    steps:
-      - uses: ory/ci/sdk/release@master
-        with:
-          swag-spec-location: spec/api.json
           token: ${{ secrets.ORY_BOT_PAT }}
 
   release:

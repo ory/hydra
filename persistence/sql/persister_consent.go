@@ -197,10 +197,10 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
 	if err != nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))

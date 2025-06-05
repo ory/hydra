@@ -98,3 +98,16 @@ const deleteGrant = (id) =>
     "DELETE",
     Cypress.env("admin_url") + "/trust/grants/jwt-bearer/issuers/" + id,
   )
+
+export const validateJwt = (jwt) =>
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("client_url")}/oauth2/validate-jwt`,
+    form: true,
+    body: { jwt },
+  })
+
+export const rotateJwks = (set) =>
+  cy.request("POST", `${Cypress.env("admin_url")}/keys/${set}`, {
+    alg: "RS256",
+  })

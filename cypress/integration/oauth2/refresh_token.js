@@ -1,7 +1,9 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-import { createClient, prng } from "../../helpers"
+import { validate as uuidValidate } from "uuid"
+
+import { createClient, prng, rotateJwks, validateJwt } from "../../helpers"
 
 const accessTokenStrategies = ["opaque", "jwt"]
 
@@ -94,6 +96,77 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
                   .then((response) => {
                     expect(response.status).to.eq(400)
                     expect(response.body.error).to.eq("invalid_grant")
+                  })
+              },
+            )
+          })
+        })
+      })
+
+      it("should refresh the Access and ID Token with newly rotated keys", function () {
+        if (
+          accessTokenStrategy === "opaque" ||
+          (Cypress.env("jwt_enabled") !== "true" &&
+            !Boolean(Cypress.env("jwt_enabled")))
+        ) {
+          this.skip()
+        }
+
+        const referrer = `${Cypress.env("client_url")}/empty`
+        cy.visit(referrer, {
+          failOnStatusCode: false,
+        })
+
+        createClient({
+          scope: "offline_access openid",
+          redirect_uris: [referrer],
+          grant_types: ["authorization_code", "refresh_token"],
+          response_types: ["code"],
+          token_endpoint_auth_method: "none",
+        }).then((client) => {
+          cy.authCodeFlowBrowser(client, {
+            consent: {
+              scope: ["offline_access", "openid"],
+            },
+            createClient: false,
+          }).then((originalResponse) => {
+            expect(originalResponse.status).to.eq(200)
+            expect(originalResponse.body.refresh_token).to.not.be.empty
+
+            const originalToken = originalResponse.body.refresh_token
+
+            rotateJwks("hydra.jwt.access-token")
+            rotateJwks("hydra.openid.id-token")
+
+            cy.refreshTokenBrowser(client, originalToken).then(
+              (refreshedResponse) => {
+                expect(refreshedResponse.status).to.eq(200)
+                expect(refreshedResponse.body.refresh_token).to.not.be.empty
+
+                validateJwt(originalResponse.body.access_token)
+                  .its("body.header.kid")
+                  .then((originalKid) => {
+                    expect(originalKid).to.satisfy(uuidValidate)
+
+                    validateJwt(refreshedResponse.body.access_token)
+                      .its("body.header.kid")
+                      .then((refreshedKid) => {
+                        expect(refreshedKid).to.satisfy(uuidValidate)
+                        expect(refreshedKid).to.not.eq(originalKid)
+                      })
+                  })
+
+                validateJwt(originalResponse.body.id_token)
+                  .its("body.header.kid")
+                  .then((originalKid) => {
+                    expect(originalKid).to.satisfy(uuidValidate)
+
+                    validateJwt(refreshedResponse.body.id_token)
+                      .its("body.header.kid")
+                      .then((refreshedKid) => {
+                        expect(refreshedKid).to.satisfy(uuidValidate)
+                        expect(refreshedKid).to.not.eq(originalKid)
+                      })
                   })
               },
             )

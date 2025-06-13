@@ -139,6 +139,9 @@ func (s *DefaultStrategy) requestAuthentication(
 
 	session, err := s.authenticationSession(ctx, w, r)
 	if errors.Is(err, ErrNoAuthenticationSessionFound) {
+		if stringslice.Has(prompt, "none") {
+			return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because prompt is set to 'none' and no existing login session was found."))
+		}
 		return s.forwardAuthenticationRequest(ctx, w, r, ar, "", time.Time{}, nil, f)
 	} else if err != nil {
 		return err
@@ -220,12 +223,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 		skip = true
 	}
 
-	// Let's validate that prompt is actually not "none" if we can't skip authentication
-	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "none") && !skip {
-		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint(`Prompt 'none' was requested, but no existing login session was found.`))
-	}
-
 	// Set up csrf/challenge/verifier values
 	verifier := strings.Replace(uuid.New(), "-", "", -1)
 	challenge := strings.Replace(uuid.New(), "-", "", -1)
@@ -305,6 +302,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 	}
 
 	var baseURL *url.URL
+	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "registration") {
 		baseURL = s.c.RegistrationURL(ctx)
 	} else {

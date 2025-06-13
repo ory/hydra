@@ -811,7 +811,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			acceptConsentHandler(t, &hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(true)}))
 
 		makeRequestAndExpectError(t, nil, c, url.Values{"prompt": {"none"}},
-			"Prompt 'none' was requested, but no existing login session was found")
+			"prompt is set to 'none' and no existing login session was found")
 	})
 
 	t.Run("case=should fail because prompt is none and consent is missing a permission which requires re-authorization of the app", func(t *testing.T) {

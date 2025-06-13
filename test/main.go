@@ -1,0 +1,14 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/gobuffalo/pop/v6"
+	"github.com/ory/hydra/v2/flow"
+)
+
+func main() {
+	var session flow.LoginSession
+
+	fmt.Printf("%+v", pop.NewModel(&session, context.Background()).Columns().Readable().SelectString())
+}

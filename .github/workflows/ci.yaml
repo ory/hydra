@@ -32,7 +32,6 @@ jobs:
       - name: Run tests
         run: ./test/conformance/test.sh -v -short -parallel 16
 
-
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
@@ -130,8 +129,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        database: [ "memory", "postgres", "mysql", "cockroach" ]
-        args: [ "", "--jwt" ]
+        database: ["memory", "postgres", "mysql", "cockroach"]
+        args: ["", "--jwt"]
     services:
       postgres:
         image: postgres:16

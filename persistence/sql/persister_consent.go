@@ -518,54 +518,46 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginS
 	return nil
 }
 
-func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (deletedSession *flow.LoginSession, err error) {
+func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteLoginSession")
 	defer otelx.End(span, &err)
 
-	if p.Connection(ctx).Dialect.Name() == "mysql" {
+	c := p.Connection(ctx)
+	if c.Dialect.Name() == "mysql" {
 		// MySQL does not support RETURNING.
 		return p.mySQLDeleteLoginSession(ctx, id)
 	}
 
 	var session flow.LoginSession
-
-	err = p.Connection(ctx).RawQuery(
-		`DELETE FROM hydra_oauth2_authentication_session
-       WHERE id = ? AND nid = ?
-       RETURNING *`,
+	columns := pop.NewModel(&session, ctx).Columns().Readable()
+	if err := p.Connection(ctx).RawQuery(
+		fmt.Sprintf(
+			`DELETE FROM hydra_oauth2_authentication_session WHERE id = ? AND nid = ? RETURNING %s`,
+			columns.QuotedString(c.Dialect)),
 		id,
 		p.NetworkID(ctx),
-	).First(&session)
-	if err != nil {
+	).First(&session); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
 	return &session, nil
 }
 
-func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (*flow.LoginSession, error) {
-	var session flow.LoginSession
+func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.mySQLDeleteLoginSession")
+	defer otelx.End(span, &err)
 
-	err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
-		err := tx.RawQuery(`
-SELECT * FROM hydra_oauth2_authentication_session
-WHERE id = ? AND nid = ?`,
-			id,
-			p.NetworkID(ctx),
-		).First(&session)
-		if err != nil {
+	var session flow.LoginSession
+	if err := p.Connection(ctx).Transaction(func(tx *pop.Connection) error {
+		if err := tx.Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).First(&session); err != nil {
 			return err
 		}
 
-		return p.Connection(ctx).RawQuery(`
-DELETE FROM hydra_oauth2_authentication_session
-WHERE id = ? AND nid = ?`,
-			id,
-			p.NetworkID(ctx),
+		return tx.RawQuery(
+			`DELETE FROM hydra_oauth2_authentication_session WHERE id = ? AND nid = ?`,
+			id, p.NetworkID(ctx),
 		).Exec()
-	})
-
-	if err != nil {
+	}); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 

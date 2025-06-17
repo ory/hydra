@@ -784,6 +784,9 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, f, req))
 			_, err := r.Persister().HandleConsentRequest(s.t1, f, hcr)
 			require.NoError(t, err)
+
+			f.ConsentWasHandled = true
+			f.State = flow.FlowStateConsentUsed
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
 			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t2, client.ID, f.Subject)
@@ -1432,6 +1435,7 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			sessionID := uuid.Must(uuid.NewV4()).String()
 			c1 := &client.Client{ID: uuidx.NewV4().String()}
 			f := newFlow(s.t1NID, c1.ID, "sub", sqlxx.NullString(sessionID))
+
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
@@ -1461,6 +1465,9 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			actualCR, err = r.Persister().HandleConsentRequest(s.t1, f, hcr)
 			require.NoError(t, err)
 			require.NotNil(t, actualCR)
+
+			f.ConsentWasHandled = true
+			f.State = flow.FlowStateConsentUsed
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, c1.ID, f.Subject)
 			require.NoError(t, err)

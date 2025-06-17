@@ -571,17 +571,19 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 
 	var f flow.Flow
 	if err = p.Connection(ctx).
-		Where(
-			strings.TrimSpace(fmt.Sprintf(`
-(state = %d OR state = %d) AND
+		Where(`
+state = ? AND
 subject = ? AND
 client_id = ? AND
 consent_skip=FALSE AND
 consent_error='{}' AND
 consent_remember=TRUE AND
-nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
-			)),
-			subject, client, p.NetworkID(ctx)).
+nid = ?`,
+			flow.FlowStateConsentUsed,
+			subject,
+			client,
+			p.NetworkID(ctx),
+		).
 		Order("requested_at DESC").
 		Limit(1).
 		First(&f); err != nil {

@@ -666,7 +666,9 @@ func (p *Persister) strictRefreshRotation(ctx context.Context, requestID string)
 
 	// In strict rotation we only have one token chain for every request. Therefore, we remove all
 	// access tokens associated with the request ID.
-	if err := p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess); err != nil {
+	if err := p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess); errors.Is(err, fosite.ErrNotFound) {
+		return nil // Tokens may have been pruned earlier, so we do not return an error here.
+	} else if err != nil {
 		return err
 	}
 
@@ -739,11 +741,23 @@ WHERE signature = ? AND nid = ?`
 
 	if !accessTokenSignature.Valid {
 		// If the access token is not found, we fall back to deleting all access tokens associated with the request ID.
-		return p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess)
+		if err := p.deleteSessionByRequestID(ctx, requestID, sqlTableAccess); errors.Is(err, fosite.ErrNotFound) {
+			// Tokens may have been pruned earlier, so we do not return an error here.
+			return nil
+		} else if err != nil {
+			return err
+		}
 	}
 
 	// We have the signature and we will only remove that specific access token as part of the rotation.
-	return p.deleteSessionBySignature(ctx, accessTokenSignature.String, sqlTableAccess)
+	if err := p.deleteSessionBySignature(ctx, accessTokenSignature.String, sqlTableAccess); errors.Is(err, fosite.ErrNotFound) {
+		// Tokens may have been pruned earlier, so we do not return an error here.
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Persister) RotateRefreshToken(ctx context.Context, requestID, refreshTokenSignature string) (err error) {

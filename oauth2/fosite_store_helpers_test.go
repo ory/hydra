@@ -529,6 +529,84 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			assert.ErrorIs(t, err, fosite.ErrInactiveToken, "Token is no longer active because it was refreshed")
 		})
 
+		t.Run("Rotation works when access token is already pruned", func(t *testing.T) {
+			// Test both with and without grace period
+			testCases := []struct {
+				name              string
+				configureGrace    bool
+				expectTokenActive bool
+			}{
+				{
+					name:              "with grace period",
+					configureGrace:    true,
+					expectTokenActive: true,
+				},
+				{
+					name:              "without grace period",
+					configureGrace:    false,
+					expectTokenActive: false,
+				},
+			}
+
+			for _, tc := range testCases {
+				t.Run(tc.name, func(t *testing.T) {
+					if tc.configureGrace {
+						x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1s")
+					} else {
+						x.Config().Delete(ctx, config.KeyRefreshTokenRotationGracePeriod)
+					}
+					t.Cleanup(func() {
+						x.Config().Delete(ctx, config.KeyRefreshTokenRotationGracePeriod)
+					})
+
+					m := x.OAuth2Storage()
+					r := newDefaultRequest(uuid.New())
+
+					// Create tokens
+					refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.New())
+					accessTokenSession := fmt.Sprintf("access_token_%s", uuid.New())
+
+					// Create access token
+					err := m.CreateAccessTokenSession(ctx, accessTokenSession, &r)
+					require.NoError(t, err)
+
+					// Create refresh token linked to the access token
+					err = m.CreateRefreshTokenSession(ctx, refreshTokenSession, accessTokenSession, &r)
+					require.NoError(t, err)
+
+					// Verify tokens were created successfully
+					req, err := m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+					require.NoError(t, err)
+					require.Equal(t, r.GetID(), req.GetID())
+
+					req, err = m.GetAccessTokenSession(ctx, accessTokenSession, nil)
+					require.NoError(t, err)
+					require.Equal(t, r.GetID(), req.GetID())
+
+					// Delete the access token (simulating it being pruned)
+					err = m.DeleteAccessTokenSession(ctx, accessTokenSession)
+					require.NoError(t, err)
+
+					// Verify access token is gone
+					_, err = m.GetAccessTokenSession(ctx, accessTokenSession, nil)
+					assert.Error(t, err)
+
+					// Rotation should still work even though the access token is gone
+					err = m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession)
+					require.NoError(t, err)
+
+					// Check refresh token state based on grace period configuration
+					req, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+					if tc.expectTokenActive {
+						assert.NoError(t, err)
+						assert.Equal(t, r.GetID(), req.GetID())
+					} else {
+						assert.ErrorIs(t, err, fosite.ErrInactiveToken, "Token should be inactive when no grace period is configured")
+					}
+				})
+			}
+		})
+
 		t.Run("refresh token is valid until the grace period has ended", func(t *testing.T) {
 			x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, "1s")
 

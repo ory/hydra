@@ -5,6 +5,7 @@ package watcherx
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -74,7 +75,7 @@ func streamFileEvents(ctx context.Context, watcher *fsnotify.Watcher, c EventCha
 				c <- &RemoveEvent{eventSource}
 			} else {
 				// The file does exist. Announce the current content by sending a ChangeEvent.
-				//#nosec G304 -- false positive
+				// #nosec G304 -- false positive
 				data, err := os.ReadFile(watchedFile)
 				if err != nil {
 					select {
@@ -107,6 +108,8 @@ func streamFileEvents(ctx context.Context, watcher *fsnotify.Watcher, c EventCha
 			if !ok {
 				return
 			}
+			list := watcher.WatchList()
+			fmt.Println(list)
 			// filter events to only watch watchedFile
 			// e.Name contains the name of the watchedFile (regardless whether it is a symlink), not the resolved file name
 			if filepath.Clean(e.Name) == watchedFile {
@@ -146,7 +149,7 @@ func streamFileEvents(ctx context.Context, watcher *fsnotify.Watcher, c EventCha
 					// we fallthrough because we also want to read the file in this case
 					fallthrough
 				case e.Has(fsnotify.Write | fsnotify.Create):
-					//#nosec G304 -- false positive
+					// #nosec G304 -- false positive
 					data, err := os.ReadFile(watchedFile)
 					if err != nil {
 						select {

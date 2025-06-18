@@ -8,6 +8,7 @@ RUN apt-get update && \
 WORKDIR /go/src/github.com/ory/hydra
 RUN mkdir -p ./internal/httpclient
 
+
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 

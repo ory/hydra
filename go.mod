@@ -2,7 +2,11 @@ module github.com/ory/hydra/v2
 
 go 1.24.4
 
-replace github.com/ory/hydra-client-go/v2 => ./internal/httpclient
+replace (
+	github.com/ory/hydra-client-go/v2 => ./internal/httpclient
+	github.com/ory/x => ./oryx
+
+)
 
 require (
 	github.com/ThalesGroup/crypto11 v1.4.1

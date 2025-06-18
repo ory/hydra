@@ -776,6 +776,8 @@ func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) (cfg
 	cfg.Period = p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
 	if cfg.Count == 0 && cfg.Period > 5*time.Minute {
 		cfg.Period = 5 * time.Minute
+	} else if cfg.Count > 0 && cfg.Period > 30*24*time.Hour {
+		cfg.Period = 30 * 24 * time.Hour
 	}
 	return
 }

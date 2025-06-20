@@ -10,8 +10,8 @@ import (
 
 	"github.com/ory/hydra/v2/x/events"
 
-	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"

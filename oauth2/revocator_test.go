@@ -13,7 +13,7 @@ import (
 
 	"github.com/ory/hydra/v2/internal/testhelpers"
 
-	"github.com/gobuffalo/pop/v6"
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/httprouterx"
 

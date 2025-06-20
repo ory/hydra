@@ -6,7 +6,7 @@ package x
 import (
 	"testing"
 
-	"github.com/gobuffalo/pop/v6"
+	"github.com/ory/pop/v6"
 )
 
 func DeleteHydraRows(t *testing.T, c *pop.Connection) {

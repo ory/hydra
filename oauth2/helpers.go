@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gobuffalo/pop/v6"
 	gofrsuuid "github.com/gofrs/uuid"
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/hydra/v2/x"
 )

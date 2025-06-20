@@ -10,7 +10,7 @@ import (
 
 	"github.com/ory/x/networkx"
 
-	"github.com/gobuffalo/pop/v6"
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"

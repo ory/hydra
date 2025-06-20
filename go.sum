@@ -407,10 +407,10 @@ github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e h1:4tUrC7x4YWR
 github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e/go.mod h1:XWLxVK4un/iuIcrw+6lCeanbF3NZwO5k6RdLeu/loQk=
 github.com/ory/kratos-client-go v1.3.8 h1:S4D5dAURq5C6LbOUU+DgE4ZXxp37IlJG2GngemdF9h0=
 github.com/ory/kratos-client-go v1.3.8/go.mod h1:Dc+ANapsPxu+CfdC0yk8TxmvceCmrvNozW+ZGS/xq5o=
-github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b h1:BIzoOe2/wynZBQak1po0tzgvARseIKsR2bF6b+SZoKE=
-github.com/ory/pop/v6 v6.2.1-0.20241121111754-e5dfc0f3344b/go.mod h1:okVAYKGtgunD/wbW3NGhZTndJCS+6FqO+cA89rQ4doc=
-github.com/ory/x v0.0.718 h1:/zsayNY4XWfzjIk5o8ytkEgLsVO8onz0qIotW5ue3TU=
-github.com/ory/x v0.0.718/go.mod h1:FxgJl980fq/41JTPPloNawYPCY25KRYuMO98SRk1czc=
+github.com/ory/pop/v6 v6.3.0 h1:joFHw2Z3X0MVmbW+HXDcIafkaSjmqAUwNonwcTf63Gw=
+github.com/ory/pop/v6 v6.3.0/go.mod h1:geBTmKYA8PM9GAYzUNbAqeEToPwyTafEW2JVSmntJdQ=
+github.com/ory/x v0.0.721 h1:MN25GGP2GN+fiinoCIe4v4iybn8r70Ssj/ifWMydiUE=
+github.com/ory/x v0.0.721/go.mod h1:9uJPOoL3R1K2NJBM+JOpmyYgcVWfeqQeT/udkft+rcE=
 github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
 github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.9.5 h1:4yBQzkHv+7BHq2PQUZF3Mx0IYxG7LsP222s7Agd3ve8=

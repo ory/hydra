@@ -1500,3 +1500,188 @@ func createTestRequest(id string) *fosite.Request {
 		Session:           &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	}
 }
+
+func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+
+		// Create client
+		cl := &client.Client{ID: "refresh-expiry-client"}
+		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
+
+		// Create a request with a long expiry
+		initialRequest := fosite.Request{
+			ID:          uuid.New(),
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Client:      cl,
+			Session:     oauth2.NewSession("sub"),
+		}
+
+		// Set a long expiry time (24 hours)
+		initialExpiry := time.Now().Add(24 * time.Hour)
+		initialRequest.Session.SetExpiresAt(fosite.RefreshToken, initialExpiry)
+
+		t.Run("regular rotation", func(t *testing.T) {
+			// Create original refresh token
+			regularSignature := uuid.New()
+			require.NoError(t, x.OAuth2Storage().CreateRefreshTokenSession(ctx, regularSignature, "", &initialRequest))
+
+			// Verify initial expiry is set correctly
+			originalToken, err := x.OAuth2Storage().GetRefreshTokenSession(ctx, regularSignature, oauth2.NewSession("sub"))
+			require.NoError(t, err)
+			require.Equal(t, initialExpiry.Unix(), originalToken.GetSession().GetExpiresAt(fosite.RefreshToken).Unix())
+
+			// Set up a connection to directly query the database
+			var actualExpiresAt time.Time
+			require.NoError(t, x.Persister().Connection(ctx).RawQuery("SELECT expires_at FROM hydra_oauth2_refresh WHERE signature=?", regularSignature).First(&actualExpiresAt))
+			require.Equal(t, initialExpiry.UTC().Round(time.Second), actualExpiresAt.UTC().Round(time.Second))
+
+			// Rotate the token
+			err = x.OAuth2Storage().RotateRefreshToken(ctx, initialRequest.ID, regularSignature)
+			require.NoError(t, err)
+
+			// Check that the original token's expiry was updated to be closer to now
+			var revokedData struct {
+				ExpiresAt time.Time `db:"expires_at"`
+				Active    bool      `db:"active"`
+			}
+			require.NoError(t, x.Persister().Connection(ctx).RawQuery("SELECT expires_at, active FROM hydra_oauth2_refresh WHERE signature=?", regularSignature).First(&revokedData))
+
+			// Verify the token is now inactive
+			require.False(t, revokedData.Active)
+
+			// Verify the expiry is updated to be closer to now than the original expiry
+			require.True(t, revokedData.ExpiresAt.Before(initialExpiry), "Expiry should be updated to be sooner than original")
+			require.True(t, revokedData.ExpiresAt.After(time.Now()), "Expiry should still be in the future")
+			require.True(t, time.Until(revokedData.ExpiresAt) < time.Until(initialExpiry), "New expiry should be closer to now than original expiry")
+
+			t.Logf("Original expiry: %v, Updated expiry: %v, Now: %v", initialExpiry, revokedData.ExpiresAt, time.Now())
+		})
+
+		t.Run("graceful rotation", func(t *testing.T) {
+			// Create refresh token for graceful rotation
+			gracefulSignature := uuid.New()
+			require.NoError(t, x.OAuth2Storage().CreateRefreshTokenSession(ctx, gracefulSignature, "", &initialRequest))
+
+			// Set config to graceful rotation
+			oldPeriod := x.Config().GracefulRefreshTokenRotation(ctx).Period
+			t.Cleanup(func() {
+				x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, oldPeriod)
+				x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 0)
+			})
+			x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGracePeriod, time.Minute*30)
+			x.Config().MustSet(ctx, config.KeyRefreshTokenRotationGraceReuseCount, 3)
+
+			// Record time before rotation
+			beforeRotation := time.Now().UTC().Add(-time.Second) // Ensure we have a different timestamp for first_used_at
+
+			// Rotate the token
+			err := x.OAuth2Storage().RotateRefreshToken(ctx, initialRequest.ID, gracefulSignature)
+			require.NoError(t, err)
+
+			// Check the token's expiry and status
+			var rotatedData struct {
+				ExpiresAt   time.Time       `db:"expires_at"`
+				Active      bool            `db:"active"`
+				FirstUsedAt sqlxx.NullTime  `db:"first_used_at"`
+				UsedTimes   sqlxx.NullInt64 `db:"used_times"`
+			}
+			require.NoError(t, x.Persister().Connection(ctx).RawQuery("SELECT expires_at, active, first_used_at, used_times FROM hydra_oauth2_refresh WHERE signature=?", gracefulSignature).First(&rotatedData))
+
+			// Token is used
+			require.False(t, rotatedData.Active)
+
+			// Verify first_used_at is set and reasonable
+			assert.True(t, time.Time(rotatedData.FirstUsedAt).After(beforeRotation) || time.Time(rotatedData.FirstUsedAt).Equal(beforeRotation), "%s should be after or equal to %s", time.Time(rotatedData.FirstUsedAt), beforeRotation)
+
+			now := time.Now().UTC().Add(time.Second)
+			assert.True(t, time.Time(rotatedData.FirstUsedAt).Before(now) || time.Time(rotatedData.FirstUsedAt).Equal(now), "%s should be before or equal to %s", time.Time(rotatedData.FirstUsedAt), now)
+
+			// Verify used_times was incremented
+			assert.True(t, rotatedData.UsedTimes.Valid)
+			assert.Equal(t, int64(1), rotatedData.UsedTimes.Int)
+
+			// Verify the expiry is updated and is in the future
+			assert.True(t, rotatedData.ExpiresAt.Before(initialExpiry), "Expiry should be updated to be sooner than original")
+			assert.True(t, rotatedData.ExpiresAt.After(time.Now().UTC()), "Expiry should still be in the future")
+			assert.True(t, time.Until(rotatedData.ExpiresAt) < time.Until(initialExpiry), "New expiry should be closer to now than original expiry")
+
+			t.Logf("Original expiry: %v, Updated expiry: %v, Now: %v", initialExpiry, rotatedData.ExpiresAt, time.Now())
+		})
+	}
+}
+
+func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+
+		// Create client
+		cl := &client.Client{ID: "auth-code-client"}
+		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
+
+		// Create a request with a long expiry
+		initialRequest := fosite.Request{
+			ID:          uuid.New(),
+			RequestedAt: time.Now().UTC().Round(time.Second),
+			Client:      cl,
+			Session:     oauth2.NewSession("sub"),
+		}
+
+		// Set a long expiry time (1 hour)
+		initialExpiry := time.Now().Add(1 * time.Hour)
+		initialRequest.Session.SetExpiresAt(fosite.AuthorizeCode, initialExpiry)
+
+		// Create authorize code session
+		authCodeSignature := uuid.New()
+		require.NoError(t, x.OAuth2Storage().CreateAuthorizeCodeSession(ctx, authCodeSignature, &initialRequest))
+
+		// Verify initial state
+		originalCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewSession("sub"))
+		require.NoError(t, err)
+		require.Equal(t, initialExpiry.Unix(), originalCode.GetSession().GetExpiresAt(fosite.AuthorizeCode).Unix())
+
+		// Check database directly
+		var codeData struct {
+			ExpiresAt time.Time `db:"expires_at"`
+			Active    bool      `db:"active"`
+		}
+		require.NoError(t, x.Persister().Connection(ctx).RawQuery(
+			"SELECT expires_at, active FROM hydra_oauth2_code WHERE signature=?",
+			authCodeSignature).First(&codeData))
+		require.Equal(t, initialExpiry.UTC().Round(time.Second), codeData.ExpiresAt.UTC().Round(time.Second))
+		require.True(t, codeData.Active)
+
+		// Invalidate the code
+		err = x.OAuth2Storage().InvalidateAuthorizeCodeSession(ctx, authCodeSignature)
+		require.NoError(t, err)
+
+		// Check that the code was invalidated but is still retrievable
+		invalidatedCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewSession("sub"))
+		require.Error(t, err)
+		require.ErrorIs(t, err, fosite.ErrInvalidatedAuthorizeCode)
+		require.NotNil(t, invalidatedCode) // Should still be retrievable
+
+		// Verify database state after invalidation
+		var invalidatedData struct {
+			ExpiresAt time.Time `db:"expires_at"`
+			Active    bool      `db:"active"`
+		}
+		require.NoError(t, x.Persister().Connection(ctx).RawQuery(
+			"SELECT expires_at, active FROM hydra_oauth2_code WHERE signature=?",
+			authCodeSignature).First(&invalidatedData))
+
+		// Verify the code is now inactive
+		require.False(t, invalidatedData.Active)
+
+		// Verify the expiry is updated to be closer to now than the original expiry
+		require.True(t, invalidatedData.ExpiresAt.Before(initialExpiry),
+			"Expiry should be updated to be sooner than original")
+		require.True(t, invalidatedData.ExpiresAt.After(time.Now()),
+			"Expiry should still be in the future")
+		require.True(t, time.Until(invalidatedData.ExpiresAt) < time.Until(initialExpiry),
+			"New expiry should be closer to now than original expiry")
+
+		t.Logf("Original expiry: %v, Updated expiry: %v, Now: %v",
+			initialExpiry, invalidatedData.ExpiresAt, time.Now())
+	}
+}

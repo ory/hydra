@@ -40,8 +40,6 @@ func TestManagers(t *testing.T) {
 		t.Run("suite="+tc.name, func(t *testing.T) {
 			for k, r := range testhelpers.ConnectDatabases(t, false) {
 				t.Run("database="+k, func(t *testing.T) {
-					t.Parallel()
-
 					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true, &contextx.Default{})
 					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
 
@@ -75,6 +73,8 @@ func TestManagers(t *testing.T) {
 					t.Run("testHelperRevokeAccessToken", testHelperRevokeAccessToken(store))
 					t.Run("testFositeJWTBearerGrantStorage", testFositeJWTBearerGrantStorage(store))
 					t.Run("testHelperRotateRefreshToken", testHelperRotateRefreshToken(store))
+					t.Run("testHelperRefreshTokenExpiryUpdate", testHelperRefreshTokenExpiryUpdate(store))
+					t.Run("testHelperAuthorizeCodeInvalidation", testHelperAuthorizeCodeInvalidation(store))
 				})
 			}
 		})

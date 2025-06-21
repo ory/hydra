@@ -321,22 +321,6 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 	return nil
 }
 
-func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string, table tableName) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deactivateSessionByRequestID")
-	defer otelx.End(span, &err)
-
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false WHERE request_id=? AND nid = ? AND active=true", OAuth2RequestSQL{Table: table}.TableName()),
-				id,
-				p.NetworkID(ctx),
-			).
-			Exec(),
-	)
-}
-
 func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) error {
 	return otelx.WithSpan(ctx, "persistence.sql.CreateAuthorizeCodeSession", func(ctx context.Context) error {
 		return p.createSession(ctx, signature, requester, sqlTableCode, requester.GetSession().GetExpiresAt(fosite.AuthorizeCode).UTC())
@@ -358,7 +342,13 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active = false WHERE signature = ? AND nid = ?", OAuth2RequestSQL{Table: sqlTableCode}.TableName()),
+				fmt.Sprintf(
+					"UPDATE %s SET active = false, expires_at = ? WHERE signature = ? AND nid = ?",
+					OAuth2RequestSQL{Table: sqlTableCode}.TableName(),
+				),
+				// We don't expire immediately, but in 30 minutes to avoid prematurely removing
+				// rows while they may still be needed (e.g. for reuse detection).
+				newUsedExpiry(),
 				signature,
 				p.NetworkID(ctx),
 			).
@@ -674,7 +664,10 @@ func (p *Persister) strictRefreshRotation(ctx context.Context, requestID string)
 
 	// The same applies to refresh tokens in strict mode. We disable all old refresh tokens when rotating.
 	count, err := c.RawQuery(
-		"UPDATE hydra_oauth2_refresh SET active=false WHERE request_id=? AND nid = ? AND active",
+		"UPDATE hydra_oauth2_refresh SET active=false, expires_at = ? WHERE request_id=? AND nid = ? AND active",
+		// We don't expire immediately, but in 30 minutes to avoid prematurely removing
+		// rows while they may still be needed (e.g. for reuse detection).
+		newUsedExpiry(),
 		requestID,
 		p.NetworkID(ctx),
 	).ExecWithCount()
@@ -696,15 +689,29 @@ func (p *Persister) gracefulRefreshRotation(ctx context.Context, requestID, refr
 
 	c := p.Connection(ctx)
 	now := time.Now().UTC().Round(time.Millisecond)
+	// The new expiry of the token starts now and ends at the end of the graceful token period.
+	// After that, we can prune tokens from the store.
+	expiresAt := newUsedExpiry().Add(p.r.Config().GracefulRefreshTokenRotation(ctx).Period)
 
 	// Signature is the primary key so no limit needed. We only update first_used_at if it is not set yet (otherwise
 	// we would "refresh" the grace period again and again, and the refresh token would never "expire").
 	query := `
 UPDATE hydra_oauth2_refresh
-SET active=false, first_used_at = COALESCE(first_used_at, ?), used_times = COALESCE(used_times, 0) + 1
+SET
+	active=false,
+    first_used_at = COALESCE(first_used_at, ?),
+    used_times = COALESCE(used_times, 0) + 1,
+	expires_at = ?
 WHERE signature = ? AND nid = ?`
-	args := make([]any, 3, 4)
-	args[0], args[1], args[2] = now, refreshSignature, p.NetworkID(ctx)
+
+	args := make([]any, 0, 5)
+	args = append(args,
+		now,
+		expiresAt,
+		refreshSignature,
+		p.NetworkID(ctx),
+	)
+
 	if l := p.r.Config().GracefulRefreshTokenRotation(ctx).Count; l > 0 {
 		query += " AND (used_times IS NULL OR used_times < ?)"
 		args = append(args, l)
@@ -770,4 +777,10 @@ func (p *Persister) RotateRefreshToken(ctx context.Context, requestID, refreshTo
 	}
 
 	return handleRetryError(p.strictRefreshRotation(ctx, requestID))
+}
+
+func newUsedExpiry() time.Time {
+	// Reuse detection is racy and would generally happen within seconds. Using 30 minutes here is a paranoid
+	// setting but ensures that we do not prematurely remove rows while they may still be needed (e.g. for reuse detection).
+	return time.Now().UTC().Round(time.Millisecond).Add(time.Minute * 30)
 }

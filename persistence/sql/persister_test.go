@@ -13,10 +13,11 @@ import (
 	"github.com/go-jose/go-jose/v3"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/pop/v6"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/internal/testhelpers"

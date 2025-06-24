@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/ory/pop/v6"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"

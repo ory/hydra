@@ -330,6 +330,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, 2*time.Hour, c.GetIDTokenLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetAuthorizeCodeLifespan(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetDeviceAndUserCodeLifespan(ctx))
+	assert.Equal(t, 24*time.Hour, c.GetAuthenticationSessionLifespan(ctx))
 
 	// oauth2
 	assert.Equal(t, true, c.GetSendDebugMessagesToClients(ctx))
@@ -430,6 +431,17 @@ func TestInfinitRefreshTokenTTL(t *testing.T) {
 	c := MustNew(context.Background(), l, configx.WithValue("ttl.refresh_token", -1))
 
 	assert.Equal(t, -1*time.Nanosecond, c.GetRefreshTokenLifespan(ctx))
+}
+
+func TestLimitAuthSessionLifespan(t *testing.T) {
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(io.Discard)
+	c := MustNew(context.Background(), l)
+	assert.Equal(t, 30*24*time.Hour, c.GetAuthenticationSessionLifespan(ctx))
+
+	require.NoError(t, c.Set(ctx, KeyAuthenticationSessionLifespan, (time.Hour*24*300).String()))
+	assert.Equal(t, 180*24*time.Hour, c.GetAuthenticationSessionLifespan(ctx))
 }
 
 func TestCookieSecure(t *testing.T) {

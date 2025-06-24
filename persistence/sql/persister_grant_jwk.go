@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/go-jose/go-jose/v3"
+
 	"github.com/ory/pop/v6"
 
 	"github.com/ory/hydra/v2/oauth2/trust"

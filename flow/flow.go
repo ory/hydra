@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/pop/v6"
 	"github.com/pkg/errors"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"

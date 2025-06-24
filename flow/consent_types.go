@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+
 	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/errorsx"
@@ -49,6 +50,7 @@ type LoginSession struct {
 	Subject                   string           `db:"subject"`
 	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id"`
 	Remember                  bool             `db:"remember"`
+	ExpiresAt                 sqlxx.NullTime   `db:"expires_at"`
 }
 
 func (LoginSession) TableName() string {

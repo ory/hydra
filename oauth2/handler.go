@@ -17,8 +17,9 @@ import (
 
 	"github.com/ory/x/otelx"
 
-	"github.com/ory/pop/v6"
 	"github.com/tidwall/gjson"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/pborman/uuid"
 

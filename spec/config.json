@@ -947,8 +947,18 @@
             }
           ]
         },
+        "authentication_session": {
+          "description": "Configures how long the authentication session cookie will be valid after login has been remembered. The larger this value is, the more database storage is needed. Defaults to 30 days.",
+          "default": "720h",
+          "type": "string",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
         "access_token": {
-          "description": "Configures how long access tokens are valid.",
+          "description": "Configures how long access tokens are valid. The larger this value is, the more database storage is needed.",
           "default": "1h",
           "type": "string",
           "allOf": [
@@ -958,7 +968,7 @@
           ]
         },
         "refresh_token": {
-          "description": "Configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.",
+          "description": "Configures how long refresh tokens are valid. The larger this value is, the more database storage is needed. Set to -1 for refresh tokens to never expire, which is not recommended as the database can not be cleaned from stale tokens.",
           "default": "720h",
           "oneOf": [
             {
@@ -983,7 +993,7 @@
           ]
         },
         "auth_code": {
-          "description": "Configures how long auth codes are valid.",
+          "description": "Configures how long auth codes are valid. The larger this value is, the more database storage is needed.",
           "default": "10m",
           "type": "string",
           "allOf": [
@@ -993,7 +1003,7 @@
           ]
         },
         "device_user_code": {
-          "description": "Configures how long device & user codes are valid.",
+          "description": "Configures how long device & user codes are valid. The larger this value is, the more database storage is needed.",
           "default": "10m",
           "allOf": [
             {

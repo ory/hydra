@@ -190,13 +190,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 			adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
-			assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
+			assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) gjson.Result {
 				introspect := testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS)
 				actualExp, err := strconv.ParseInt(introspect.Get("exp").String(), 10, 64)
 				require.NoError(t, err, "%s", introspect)
 				if !expectedExp.IsZero() {
 					require.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
 				}
+				return introspect
 			}
 
 			assertIDToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
@@ -334,6 +335,63 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
 							require.Error(t, err)
 						})
+					})
+				}
+
+				t.Run("strategy=jwt", func(t *testing.T) {
+					reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
+					run(t, "jwt")
+				})
+
+				t.Run("strategy=opaque", func(t *testing.T) {
+					reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+					run(t, "opaque")
+				})
+			})
+
+			t.Run("case=removing the authentication session does not cause an issue when refreshing tokens", func(t *testing.T) {
+				run := func(t *testing.T, strategy string) {
+					c, conf := newOAuth2Client(t, reg, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+					testhelpers.NewLoginConsentUI(t, reg.Config(),
+						acceptLoginHandler(t, c, adminClient, reg, subject, nil),
+						acceptConsentHandler(t, c, adminClient, reg, subject, nil),
+					)
+
+					code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+					require.NotEmpty(t, code)
+					token, err := conf.Exchange(context.Background(), code)
+					iat := time.Now()
+					require.NoError(t, err)
+
+					assert.Empty(t, token.Extra("c_nonce_draft_00"), "should not be set if not requested")
+					assert.Empty(t, token.Extra("c_nonce_expires_in_draft_00"), "should not be set if not requested")
+					introspectAccessToken(t, conf, token, subject)
+					assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(reg.Config().GetAccessTokenLifespan(ctx)), `["hydra","offline","openid"]`)
+					firstIdToken := assertIDToken(t, token, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+					firstAccessToken := assertRefreshToken(t, token, conf, iat.Add(reg.Config().GetRefreshTokenLifespan(ctx)))
+
+					assert.EqualValues(t, subject, firstIdToken.Get("sub").String(), "%s", firstIdToken)
+					assert.NotEmpty(t, firstIdToken.Get("sid").String(), "%s", firstIdToken)
+
+					assert.EqualValues(t, subject, firstAccessToken.Get("sub").String(), "%s", firstAccessToken)
+					rows, err := reg.Persister().Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id = ?", firstIdToken.Get("sid").String()).ExecWithCount()
+					require.NoError(t, err)
+					require.EqualValues(t, 1, rows, "Expected to delete one row, but deleted %d", rows)
+
+					t.Run("followup=successfully perform refresh token flow", func(t *testing.T) {
+						require.NotEmpty(t, token.RefreshToken)
+						token.Expiry = token.Expiry.Add(-time.Hour * 24)
+						iat = time.Now()
+						refreshedToken, err := conf.TokenSource(context.Background(), token).Token()
+						require.NoError(t, err)
+
+						secondIdToken := assertIDToken(t, refreshedToken, conf, subject, nonce, iat.Add(reg.Config().GetIDTokenLifespan(ctx)))
+						secondAccessToken := introspectAccessToken(t, conf, refreshedToken, subject)
+
+						assert.EqualValues(t, subject, secondIdToken.Get("sub").String(), "%s", secondIdToken)
+						assert.EqualValues(t, firstIdToken.Get("sid").String(), secondIdToken.Get("sid").String(), "%s", secondIdToken)
+
+						assert.EqualValues(t, subject, secondAccessToken.Get("sub").String(), "%s", secondAccessToken)
 					})
 				}
 

@@ -117,6 +117,7 @@ ttl:
   id_token: 2h
   auth_code: 2h
   device_user_code: 2h
+  authentication_session: 24h
 
 oauth2:
   expose_internal_errors: true

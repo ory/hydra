@@ -12,8 +12,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/pop/v6"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/dbal"
 

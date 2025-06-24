@@ -4,5 +4,6 @@
   "AuthenticatedAt": null,
   "Subject": "subject-0004",
   "IdentityProviderSessionID": "",
-  "Remember": true
+  "Remember": true,
+  "ExpiresAt": null
 }

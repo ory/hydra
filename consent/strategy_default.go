@@ -333,7 +333,6 @@ func (s *DefaultStrategy) revokeAuthenticationSession(ctx context.Context, w htt
 	}
 
 	_, err = s.r.ConsentManager().DeleteLoginSession(r.Context(), sid)
-
 	return err
 }
 
@@ -418,7 +417,6 @@ func (s *DefaultStrategy) verifyAuthentication(
 	}
 
 	sessionID := session.LoginRequest.SessionID.String()
-
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -466,6 +464,11 @@ func (s *DefaultStrategy) verifyAuthentication(
 		}
 	}
 
+	rememberFor := s.r.Config().GetAuthenticationSessionLifespan(ctx)
+	if session.RememberFor > 0 {
+		rememberFor = min(time.Second*time.Duration(session.RememberFor), rememberFor)
+	}
+
 	if !session.LoginRequest.Skip {
 		if time.Time(session.AuthenticatedAt).IsZero() {
 			return nil, errorsx.WithStack(fosite.ErrServerError.WithHint(
@@ -479,6 +482,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 			Subject:                   session.Subject,
 			IdentityProviderSessionID: sqlxx.NullString(session.IdentityProviderSessionID),
 			Remember:                  session.Remember,
+			ExpiresAt:                 sqlxx.NullTime(time.Now().Add(rememberFor).UTC()),
 		}); err != nil {
 			if errors.Is(err, sqlcon.ErrUniqueViolation) {
 				return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used."))
@@ -505,7 +509,8 @@ func (s *DefaultStrategy) verifyAuthentication(
 	// Not a skipped login and the user asked to remember its session, store a cookie
 	cookie, _ := store.Get(r, s.c.SessionCookieName(ctx))
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
-	if session.RememberFor >= 0 {
+	cookie.Options.MaxAge = int(s.c.GetAuthenticationSessionLifespan(ctx).Seconds())
+	if session.RememberFor > 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true

@@ -77,6 +77,7 @@ const (
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
 	KeyDeviceAndUserCodeLifespan                 = "ttl.device_user_code"
+	KeyAuthenticationSessionLifespan             = "ttl.authentication_session"
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"
@@ -418,6 +419,15 @@ func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host str
 // GetDeviceAndUserCodeLifespan returns the device_code and user_code lifespan. Defaults to 15 minutes.
 func (p *DefaultProvider) GetDeviceAndUserCodeLifespan(ctx context.Context) time.Duration {
 	return p.p.DurationF(KeyDeviceAndUserCodeLifespan, time.Minute*15)
+}
+
+// GetAuthenticationSessionLifespan returns the authentication_session lifespan.
+func (p *DefaultProvider) GetAuthenticationSessionLifespan(ctx context.Context) time.Duration {
+	lifespan := p.p.Duration(KeyAuthenticationSessionLifespan)
+	if lifespan > time.Hour*24*180 {
+		return time.Hour * 24 * 180
+	}
+	return lifespan
 }
 
 // GetDeviceAuthTokenPollingInterval returns device grant token endpoint polling interval. Defaults to 5 seconds.

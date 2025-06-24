@@ -11,10 +11,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/pop/v6"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
@@ -475,6 +476,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.
 
 	loginSession.NID = p.NetworkID(ctx)
 	loginSession.AuthenticatedAt = sqlxx.NullTime(time.Time(loginSession.AuthenticatedAt).Truncate(time.Second))
+	loginSession.ExpiresAt = sqlxx.NullTime(time.Now().Truncate(time.Second).Add(p.config.GetAuthenticationSessionLifespan(ctx)))
 
 	if p.Connection(ctx).Dialect.Name() == "mysql" {
 		// MySQL does not support UPSERT.
@@ -482,14 +484,15 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.
 	}
 
 	res, err := p.Connection(ctx).Store.NamedExecContext(ctx, `
-INSERT INTO hydra_oauth2_authentication_session (id, nid, authenticated_at, subject, remember, identity_provider_session_id)
-VALUES (:id, :nid, :authenticated_at, :subject, :remember, :identity_provider_session_id)
+INSERT INTO hydra_oauth2_authentication_session (id, nid, authenticated_at, subject, remember, identity_provider_session_id, expires_at)
+VALUES (:id, :nid, :authenticated_at, :subject, :remember, :identity_provider_session_id, :expires_at)
 ON CONFLICT(id) DO
 UPDATE SET
 	authenticated_at = :authenticated_at,
 	subject = :subject,
 	remember = :remember,
-	identity_provider_session_id = :identity_provider_session_id
+	identity_provider_session_id = :identity_provider_session_id,
+	expires_at = :expires_at
 WHERE hydra_oauth2_authentication_session.id = :id AND hydra_oauth2_authentication_session.nid = :nid
 `, loginSession)
 	if err != nil {
@@ -500,7 +503,7 @@ WHERE hydra_oauth2_authentication_session.id = :id AND hydra_oauth2_authenticati
 		return sqlcon.HandleError(err)
 	}
 	if n == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	return nil
 }
@@ -899,7 +902,7 @@ func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.
 
 	n, err := p.Connection(ctx).
 		Where("id = ? and nid = ?", session.ID, session.NID).
-		UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember")
+		UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember", "expires_at")
 	if err != nil {
 		return errors.WithStack(sqlcon.HandleError(err))
 	}

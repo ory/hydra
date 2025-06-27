@@ -81,7 +81,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cloudflare/circl v1.3.7 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.4.0 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect
 	github.com/cristalhq/jwt/v4 v4.0.2 // indirect

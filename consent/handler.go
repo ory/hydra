@@ -10,21 +10,20 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-	"github.com/ory/hydra/v2/x/events"
-	"github.com/ory/x/pagination/tokenpagination"
-
-	"github.com/ory/x/httprouterx"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/httprouterx"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
+	"github.com/ory/x/pagination/tokenpagination"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
@@ -207,19 +206,23 @@ type listOAuth2ConsentSessions struct {
 func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
 		return
 	}
-	loginSessionId := r.URL.Query().Get("login_session_id")
 
-	page, itemsPerPage := x.ParsePagination(r)
+	pageKeys := h.r.Config().GetPaginationEncryptionKeys(r.Context())
+	pageOpts, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to parse pagination parameters: %s", err)))
+		return
+	}
 
-	var s []flow.AcceptOAuth2ConsentRequest
-	var err error
-	if len(loginSessionId) == 0 {
-		s, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, itemsPerPage, itemsPerPage*page)
+	var requests []flow.AcceptOAuth2ConsentRequest
+	var nextPage *keysetpagination.Paginator
+	if loginSessionID := r.URL.Query().Get("login_session_id"); len(loginSessionID) == 0 {
+		requests, nextPage, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, pageOpts...)
 	} else {
-		s, err = h.r.ConsentManager().FindSubjectsSessionGrantedConsentRequests(r.Context(), subject, loginSessionId, itemsPerPage, itemsPerPage*page)
+		requests, nextPage, err = h.r.ConsentManager().FindSubjectsSessionGrantedConsentRequests(r.Context(), subject, loginSessionID, pageOpts...)
 	}
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		h.r.Writer().Write(w, r, []flow.OAuth2ConsentSession{})
@@ -229,24 +232,14 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var a []flow.OAuth2ConsentSession
-	for _, session := range s {
-		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
-		a = append(a, flow.OAuth2ConsentSession(session))
+	sessions := make([]flow.OAuth2ConsentSession, len(requests))
+	for i := range requests {
+		sessions[i] = flow.OAuth2ConsentSession(requests[i])
+		sessions[i].ConsentRequest.Client = sanitizeClient(sessions[i].ConsentRequest.Client)
 	}
 
-	if len(a) == 0 {
-		a = []flow.OAuth2ConsentSession{}
-	}
-
-	n, err := h.r.ConsentManager().CountSubjectsGrantedConsentRequests(r.Context(), subject)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	x.PaginationHeader(w, r.URL, int64(n), itemsPerPage, itemsPerPage*page)
-	h.r.Writer().Write(w, r, a)
+	keysetpagination.SetLinkHeader(w, pageKeys, r.URL, nextPage)
+	h.r.Writer().Write(w, r, sessions)
 }
 
 // Revoke OAuth 2.0 Consent Login Sessions Parameters

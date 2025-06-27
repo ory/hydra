@@ -6,19 +6,15 @@ package sql
 import (
 	"context"
 
-	"go.opentelemetry.io/otel/trace"
-
-	"github.com/ory/hydra/v2/x/events"
-
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/errorsx"
-	"github.com/ory/x/otelx"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/x/events"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/otelx"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -56,7 +52,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		} else {
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
-				return errorsx.WithStack(err)
+				return err
 			}
 			cl.Secret = string(h)
 		}
@@ -91,11 +87,11 @@ func (p *Persister) AuthenticateClient(ctx context.Context, id string, secret []
 
 	c, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, err
 	}
 
 	if err := p.r.ClientHasher().Compare(ctx, c.GetHashedSecret(), secret); err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, err
 	}
 
 	return c, nil
@@ -147,15 +143,16 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) (err error) {
 	return nil
 }
 
-func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []client.Client, err error) {
+func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (cs []client.Client, _ *keysetpagination.Paginator, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetClients")
 	defer otelx.End(span, &err)
 
-	cs := make([]client.Client, 0)
+	paginator := keysetpagination.NewPaginator(append(filters.PageOpts,
+		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "id", Value: ""})),
+	)...)
 
-	query := p.QueryWithNetwork(ctx).
-		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
-		Order("id")
+	query := p.QueryWithNetwork(ctx).Scope(
+		keysetpagination.Paginate[client.Client](paginator))
 
 	if filters.Name != "" {
 		query.Where("client_name = ?", filters.Name)
@@ -165,9 +162,10 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (_ []
 	}
 
 	if err := query.All(&cs); err != nil {
-		return nil, sqlcon.HandleError(err)
+		return nil, nil, sqlcon.HandleError(err)
 	}
-	return cs, nil
+	cs, nextPage := keysetpagination.Result(cs, paginator)
+	return cs, nextPage, nil
 }
 
 func (p *Persister) CountClients(ctx context.Context) (n int, err error) {

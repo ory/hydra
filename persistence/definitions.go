@@ -8,15 +8,13 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/ory/x/networkx"
-
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/networkx"
 	"github.com/ory/x/popx"
 )
 

@@ -16,33 +16,27 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/dbal"
-
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/networkx"
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/hydra/v2/flow"
-	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
-	"github.com/ory/hydra/v2/persistence/sql"
-	"github.com/ory/x/popx"
-
-	"github.com/ory/x/sqlcon/dockertest"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/flow"
+	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/persistence/sql"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/networkx"
+	"github.com/ory/x/popx"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/sqlxx"
 )
 
 func snapshotFor(paths ...string) *cupaloy.Config {

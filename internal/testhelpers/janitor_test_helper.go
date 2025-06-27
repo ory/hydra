@@ -850,7 +850,7 @@ func getGrantRequests(uniqueName string, lifespan time.Duration) []*createGrantR
 	return []*createGrantRequest{
 		{
 			grant: trust.Grant{
-				ID:      uuid.Must(uuid.NewV4()).String(),
+				ID:      uuid.Must(uuid.NewV4()),
 				Issuer:  fmt.Sprintf("%s_flush-grant-iss-1", uniqueName),
 				Subject: fmt.Sprintf("%s_flush-grant-sub-1", uniqueName),
 				Scope:   []string{"foo", "bar"},
@@ -868,7 +868,7 @@ func getGrantRequests(uniqueName string, lifespan time.Duration) []*createGrantR
 		},
 		{
 			grant: trust.Grant{
-				ID:      uuid.Must(uuid.NewV4()).String(),
+				ID:      uuid.Must(uuid.NewV4()),
 				Issuer:  fmt.Sprintf("%s_flush-grant-iss-2", uniqueName),
 				Subject: fmt.Sprintf("%s_flush-grant-sub-2", uniqueName),
 				Scope:   []string{"foo", "bar"},
@@ -886,7 +886,7 @@ func getGrantRequests(uniqueName string, lifespan time.Duration) []*createGrantR
 		},
 		{
 			grant: trust.Grant{
-				ID:      uuid.Must(uuid.NewV4()).String(),
+				ID:      uuid.Must(uuid.NewV4()),
 				Issuer:  fmt.Sprintf("%s_flush-grant-iss-3", uniqueName),
 				Subject: fmt.Sprintf("%s_flush-grant-sub-3", uniqueName),
 				Scope:   []string{"foo", "bar"},

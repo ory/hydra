@@ -17,15 +17,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/x/contextx"
-
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/persistence/sql"
-	"github.com/ory/x/configx"
-	"github.com/ory/x/logrusx"
-
 	"github.com/ThalesGroup/crypto11"
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
@@ -36,8 +27,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/logrusx"
 )
 
 func TestDefaultKeyManager_HSMEnabled(t *testing.T) {

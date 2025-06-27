@@ -11,11 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/persistence/sql"
-
 	"github.com/go-jose/go-jose/v3"
-	gofrsuuid "github.com/gofrs/uuid"
-	"github.com/pborman/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,6 +27,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/sqlcon"
@@ -159,7 +157,7 @@ func TestHelperRunner(t *testing.T) {
 func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		requestID := uuid.New()
+		requestID := uuid.Must(uuid.NewV4()).String()
 		mockRequestForeignKey(t, requestID, m)
 		cl := &client.Client{ID: "foobar"}
 
@@ -170,9 +168,9 @@ func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *t
 			Session:     oauth2.NewSession("bar"),
 		}
 
-		for i := 0; i < 4; i++ {
-			signature := uuid.New()
-			accessSignature := uuid.New()
+		for range 4 {
+			signature := uuid.Must(uuid.NewV4()).String()
+			accessSignature := uuid.Must(uuid.NewV4()).String()
 			err := m.OAuth2Storage().CreateRefreshTokenSession(ctx, signature, accessSignature, fositeRequest)
 			assert.NoError(t, err)
 			err = m.OAuth2Storage().CreateAccessTokenSession(ctx, signature, fositeRequest)
@@ -191,7 +189,7 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x oauth2.InternalRegistry) fu
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		ctx := context.Background()
 		_, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewSession("bar")})
 		assert.NotNil(t, err)
@@ -215,7 +213,7 @@ func testHelperCreateGetDeleteRefreshTokenSession(x oauth2.InternalRegistry) fun
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		ctx := context.Background()
 		_, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewSession("bar"))
 		assert.NotNil(t, err)
@@ -243,8 +241,8 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 		_, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewSession("bar"))
 		assert.Error(t, err)
 
-		reqIdOne := uuid.New()
-		reqIdTwo := uuid.New()
+		reqIdOne := uuid.Must(uuid.NewV4()).String()
+		reqIdTwo := uuid.Must(uuid.NewV4()).String()
 
 		mockRequestForeignKey(t, reqIdOne, x)
 		mockRequestForeignKey(t, reqIdTwo, x)
@@ -290,7 +288,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x oauth2.InternalRegistry) func(t *
 
 		mockRequestForeignKey(t, "blank", x)
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 
 		ctx := context.Background()
 		res, err := m.GetAuthorizeCodeSession(ctx, code, oauth2.NewSession("bar"))
@@ -337,7 +335,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		s.SetExpiresAt(fosite.RefreshToken, time.Now().Add(time.Hour*2).Round(time.Minute))
 		s.SetExpiresAt(fosite.AuthorizeCode, time.Now().Add(time.Hour*3).Round(time.Minute))
 		request := fosite.Request{
-			ID:          uuid.New(),
+			ID:          uuid.Must(uuid.NewV4()).String(),
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Client: &client.Client{
 				ID:       "foobar",
@@ -352,7 +350,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		}
 
 		t.Run("case=CreateAccessTokenSession", func(t *testing.T) {
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV4()).String()
 			err := m.CreateAccessTokenSession(ctx, id, &request)
 			require.NoError(t, err)
 
@@ -363,7 +361,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=CreateRefreshTokenSession", func(t *testing.T) {
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV4()).String()
 			err := m.CreateRefreshTokenSession(ctx, id, "", &request)
 			require.NoError(t, err)
 
@@ -373,7 +371,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=CreateAuthorizeCodeSession", func(t *testing.T) {
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV4()).String()
 			err := m.CreateAuthorizeCodeSession(ctx, id, &request)
 			require.NoError(t, err)
 
@@ -383,7 +381,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=CreatePKCERequestSession", func(t *testing.T) {
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV4()).String()
 			err := m.CreatePKCERequestSession(ctx, id, &request)
 			require.NoError(t, err)
 
@@ -393,7 +391,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=CreateOpenIDConnectSession", func(t *testing.T) {
-			id := uuid.New()
+			id := uuid.Must(uuid.NewV4()).String()
 			err := m.CreateOpenIDConnectSession(ctx, id, &request)
 			require.NoError(t, err)
 
@@ -407,9 +405,9 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 func testHelperNilAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		c := &client.Client{ID: uuid.New()}
+		c := &client.Client{ID: uuid.Must(uuid.NewV4()).String()}
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
-		err := m.CreateAccessTokenSession(context.Background(), uuid.New(), &fosite.Request{
+		err := m.CreateAccessTokenSession(context.Background(), uuid.Must(uuid.NewV4()).String(), &fosite.Request{
 			ID:                "",
 			RequestedAt:       time.Now().UTC().Round(time.Second),
 			Client:            c,
@@ -428,7 +426,7 @@ func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		ctx := context.Background()
 		_, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
 		assert.Error(t, err)
@@ -453,7 +451,7 @@ func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) 
 		m := x.OAuth2Storage()
 		ctx := context.Background()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
 		require.NoError(t, err)
 
@@ -474,7 +472,7 @@ func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 		m := x.OAuth2Storage()
 		ctx := context.Background()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
 		require.NoError(t, err)
 
@@ -495,8 +493,8 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 		ctx := context.Background()
 
 		createTokens := func(t *testing.T, r *fosite.Request) (refreshTokenSession string, accessTokenSession string) {
-			refreshTokenSession = fmt.Sprintf("refresh_token_%s", uuid.New())
-			accessTokenSession = fmt.Sprintf("access_token_%s", uuid.New())
+			refreshTokenSession = fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
+			accessTokenSession = fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 			err := x.OAuth2Storage().CreateAccessTokenSession(ctx, accessTokenSession, r)
 			require.NoError(t, err)
 
@@ -516,7 +514,7 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 
 		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.New())
+			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
 			refreshTokenSession, accessTokenSession := createTokens(t, &r)
 
 			err := m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession)
@@ -560,11 +558,11 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 					})
 
 					m := x.OAuth2Storage()
-					r := newDefaultRequest(uuid.New())
+					r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
 
 					// Create tokens
-					refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.New())
-					accessTokenSession := fmt.Sprintf("access_token_%s", uuid.New())
+					refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
+					accessTokenSession := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 
 					// Create access token
 					err := m.CreateAccessTokenSession(ctx, accessTokenSession, &r)
@@ -617,9 +615,9 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.New())
+			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
 			refreshTokenSession, accessTokenSession1 := createTokens(t, &r)
-			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.New())
+			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, &r))
 
 			// Create a second access token
@@ -654,7 +652,7 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.New())
+			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
 
 			refreshTokenSession, _ := createTokens(t, &r)
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
@@ -680,11 +678,11 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.New())
+			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
 
-			refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.New())
-			accessTokenSession1 := fmt.Sprintf("access_token_%s", uuid.New())
-			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.New())
+			refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
+			accessTokenSession1 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
+			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession1, &r))
 			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, &r))
 
@@ -718,7 +716,7 @@ func testHelperCreateGetDeletePKCERequestSession(x oauth2.InternalRegistry) func
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		code := uuid.New()
+		code := uuid.Must(uuid.NewV4()).String()
 		ctx := context.Background()
 		_, err := m.GetPKCERequestSession(ctx, code, oauth2.NewSession("bar"))
 		assert.NotNil(t, err)
@@ -787,7 +785,7 @@ func testHelperFlushTokensWithLimitAndBatchSize(x oauth2.InternalRegistry, limit
 		var requests []*fosite.Request
 
 		// create five expired requests
-		id := uuid.New()
+		id := uuid.Must(uuid.NewV4()).String()
 		totalCount := 5
 		for i := 0; i < totalCount; i++ {
 			r := createTestRequest(fmt.Sprintf("%s-%d", id, i+1))
@@ -881,7 +879,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m oauth2.InternalRe
 		ctx := context.Background()
 		ctx, err := txnStore.BeginTX(ctx)
 		require.NoError(t, err)
-		signature := uuid.New()
+		signature := uuid.Must(uuid.NewV4()).String()
 		testRequest := createTestRequest(signature)
 		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
 		require.NoError(t, err)
@@ -917,7 +915,7 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m oauth2.Internal
 		ctx, err := txnStore.BeginTX(ctx)
 		require.NoError(t, err)
 
-		signature := uuid.New()
+		signature := uuid.Must(uuid.NewV4()).String()
 		testRequest := createTestRequest(signature)
 		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
 		require.NoError(t, err)
@@ -931,7 +929,7 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m oauth2.Internal
 		require.Error(t, err)
 
 		// create a new session, delete it, then rollback the delete. We should be able to then get it.
-		signature2 := uuid.New()
+		signature2 := uuid.Must(uuid.NewV4()).String()
 		testRequest2 := createTestRequest(signature2)
 		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature2, testRequest2)
 		require.NoError(t, err)
@@ -955,13 +953,13 @@ func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testi
 		t.Run("case=basic setting works", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			jti := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(time.Minute))
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 
 			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
-			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
-			cmp.NID = gofrsuuid.Nil
+			require.NotEqual(t, cmp.NID, uuid.Nil)
+			cmp.NID = uuid.Nil
 			require.NoError(t, err)
 			assert.Equal(t, jti, cmp)
 		})
@@ -969,7 +967,7 @@ func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testi
 		t.Run("case=errors when the JTI is blacklisted", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			jti := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(time.Minute))
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			assert.ErrorIs(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
@@ -978,9 +976,9 @@ func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testi
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			expiredJTI := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(-time.Minute))
+			expiredJTI := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(-time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), expiredJTI))
-			newJTI := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(time.Minute))
+			newJTI := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), newJTI.JTI, newJTI.Expiry))
 
@@ -988,15 +986,15 @@ func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testi
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 			cmp, err := store.GetClientAssertionJWT(context.Background(), newJTI.JTI)
 			require.NoError(t, err)
-			require.NotEqual(t, cmp.NID, gofrsuuid.Nil)
-			cmp.NID = gofrsuuid.Nil
+			require.NotEqual(t, cmp.NID, uuid.Nil)
+			cmp.NID = uuid.Nil
 			assert.Equal(t, newJTI, cmp)
 		})
 
 		t.Run("case=inserts same JTI if expired", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			jti := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(-time.Minute))
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(-time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			jti.Expiry = jti.Expiry.Add(2 * time.Minute)
@@ -1014,13 +1012,13 @@ func testFositeStoreClientAssertionJWTValid(m oauth2.InternalRegistry) func(*tes
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
 
-			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), uuid.New()))
+			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), uuid.Must(uuid.NewV4()).String()))
 		})
 
 		t.Run("case=returns invalid on known JTI", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			jti := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(time.Minute))
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
@@ -1030,7 +1028,7 @@ func testFositeStoreClientAssertionJWTValid(m oauth2.InternalRegistry) func(*tes
 		t.Run("case=returns valid on expired JTI", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
-			jti := oauth2.NewBlacklistedJTI(uuid.New(), time.Now().Add(-time.Minute))
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(-time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
@@ -1047,14 +1045,14 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
 
 		t.Run("case=associated key added with grant", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
-			subject := "bob+" + uuid.New() + "@example.com"
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := "bob+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1093,17 +1091,17 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=only associated key returns", func(t *testing.T) {
-			keySetToNotReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.New(), "sig")
+			keySetToNotReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
-			require.NoError(t, keyManager.AddKeySet(context.Background(), uuid.New(), keySetToNotReturn), "adding a random key should not fail")
+			require.NoError(t, keyManager.AddKeySet(context.Background(), uuid.Must(uuid.NewV4()).String(), keySetToNotReturn), "adding a random key should not fail")
 
-			issuer := uuid.New()
-			subject := "maria+" + uuid.New() + "@example.com"
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := "maria+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 
-			keySet1ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.New(), "sig")
+			keySet1ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, grantManager.CreateGrant(context.Background(), trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1113,10 +1111,10 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}, keySet1ToReturn.Keys[0].Public()))
 
-			keySet2ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.New(), "sig")
+			keySet2ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, grantManager.CreateGrant(ctx, trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1156,14 +1154,14 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
-			subject := "aeneas+" + uuid.New() + "@example.com"
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := "aeneas+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1193,14 +1191,14 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
-			subject := "vladimir+" + uuid.New() + "@example.com"
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := "vladimir+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1230,14 +1228,14 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=only returns the key when subject matches", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
-			subject := "jagoba+" + uuid.New() + "@example.com"
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := "jagoba+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
 				AllowAnySubject: false,
@@ -1272,13 +1270,13 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=returns the key when any subject is allowed", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
+			issuer := uuid.Must(uuid.NewV4()).String()
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         "",
 				AllowAnySubject: true,
@@ -1305,13 +1303,13 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=does not return expired values", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.New(), "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
-			issuer := uuid.New()
+			issuer := uuid.Must(uuid.NewV4()).String()
 			grant := trust.Grant{
-				ID:              uuid.New(),
+				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         "",
 				AllowAnySubject: true,
@@ -1341,7 +1339,7 @@ func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
 	ctx := context.Background()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
-	signature := uuid.New()
+	signature := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature, createTestRequest(signature))
 	require.NoError(t, err)
 	err = txnStore.Commit(ctx)
@@ -1378,7 +1376,7 @@ func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
 	ctx := context.Background()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
-	signature := uuid.New()
+	signature := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature, "", createTestRequest(signature))
 	require.NoError(t, err)
 	err = txnStore.Commit(ctx)
@@ -1416,7 +1414,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	ctx := context.Background()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
-	signature := uuid.New()
+	signature := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature, createTestRequest(signature))
 	require.NoError(t, err)
 	err = txnStore.Rollback(ctx)
@@ -1429,7 +1427,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	require.Error(t, err)
 
 	// create a new token, revoke it, then rollback the revoke. We should be able to then get it successfully.
-	signature2 := uuid.New()
+	signature2 := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature2, createTestRequest(signature2))
 	require.NoError(t, err)
 	_, err = getFn(ctx, signature2, oauth2.NewSession("bar"))
@@ -1457,7 +1455,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 	ctx := context.Background()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
-	signature := uuid.New()
+	signature := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature, "", createTestRequest(signature))
 	require.NoError(t, err)
 	err = txnStore.Rollback(ctx)
@@ -1470,7 +1468,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 	require.Error(t, err)
 
 	// create a new token, revoke it, then rollback the revoke. We should be able to then get it successfully.
-	signature2 := uuid.New()
+	signature2 := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature2, "", createTestRequest(signature2))
 	require.NoError(t, err)
 	_, err = getFn(ctx, signature2, oauth2.NewSession("bar"))
@@ -1511,7 +1509,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 
 		// Create a request with a long expiry
 		initialRequest := fosite.Request{
-			ID:          uuid.New(),
+			ID:          uuid.Must(uuid.NewV4()).String(),
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Client:      cl,
 			Session:     oauth2.NewSession("sub"),
@@ -1523,7 +1521,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 
 		t.Run("regular rotation", func(t *testing.T) {
 			// Create original refresh token
-			regularSignature := uuid.New()
+			regularSignature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, x.OAuth2Storage().CreateRefreshTokenSession(ctx, regularSignature, "", &initialRequest))
 
 			// Verify initial expiry is set correctly
@@ -1560,7 +1558,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 
 		t.Run("graceful rotation", func(t *testing.T) {
 			// Create refresh token for graceful rotation
-			gracefulSignature := uuid.New()
+			gracefulSignature := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, x.OAuth2Storage().CreateRefreshTokenSession(ctx, gracefulSignature, "", &initialRequest))
 
 			// Set config to graceful rotation
@@ -1621,7 +1619,7 @@ func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *test
 
 		// Create a request with a long expiry
 		initialRequest := fosite.Request{
-			ID:          uuid.New(),
+			ID:          uuid.Must(uuid.NewV4()).String(),
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Client:      cl,
 			Session:     oauth2.NewSession("sub"),
@@ -1632,7 +1630,7 @@ func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *test
 		initialRequest.Session.SetExpiresAt(fosite.AuthorizeCode, initialExpiry)
 
 		// Create authorize code session
-		authCodeSignature := uuid.New()
+		authCodeSignature := uuid.Must(uuid.NewV4()).String()
 		require.NoError(t, x.OAuth2Storage().CreateAuthorizeCodeSession(ctx, authCodeSignature, &initialRequest))
 
 		// Verify initial state

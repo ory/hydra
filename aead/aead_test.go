@@ -10,14 +10,13 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 )
 
 func secret(t *testing.T) string {

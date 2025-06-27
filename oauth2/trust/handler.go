@@ -13,9 +13,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/pagination/tokenpagination"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 )
 
 const (
@@ -122,7 +123,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 	}
 
 	grant := Grant{
-		ID:              uuid.Must(uuid.NewV4()).String(),
+		ID:              uuid.Must(uuid.NewV4()),
 		Issuer:          grantRequest.Issuer,
 		Subject:         grantRequest.Subject,
 		AllowAnySubject: grantRequest.AllowAnySubject,
@@ -140,7 +141,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
+	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID.String(), &grant)
 }
 
 // Get Trusted OAuth2 JWT Bearer Grant Type Issuer Request
@@ -175,7 +176,13 @@ type getTrustedOAuth2JwtGrantIssuer struct {
 //	  200: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
 func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
+	rawID := ps.ByName("id")
+	id, err := uuid.FromString(rawID)
+	if err != nil {
+		h.registry.Writer().WriteError(w, r,
+			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse parameter id: %v", err)))
+		return
+	}
 
 	grant, err := h.registry.GrantManager().GetConcreteGrant(r.Context(), id)
 	if err != nil {
@@ -220,7 +227,13 @@ type deleteTrustedOAuth2JwtGrantIssuer struct {
 //	  204: emptyResponse
 //	  default: genericError
 func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
+	rawID := ps.ByName("id")
+	id, err := uuid.FromString(rawID)
+	if err != nil {
+		h.registry.Writer().WriteError(w, r,
+			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse parameter id: %v", err)))
+		return
+	}
 
 	if err := h.registry.GrantManager().DeleteGrant(r.Context(), id); err != nil {
 		h.registry.Writer().WriteError(w, r, err)
@@ -242,7 +255,7 @@ type listTrustedOAuth2JwtGrantIssuers struct {
 	// required: false
 	Issuer string `json:"issuer"`
 
-	tokenpagination.TokenPaginator
+	keysetpagination.RequestParameters
 }
 
 // swagger:route GET /admin/trust/grants/jwt-bearer/issuers oAuth2 listTrustedOAuth2JwtGrantIssuers
@@ -262,26 +275,26 @@ type listTrustedOAuth2JwtGrantIssuers struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuers
 //	  default: genericError
-func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	page, itemsPerPage := x.ParsePagination(r)
+func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	optionalIssuer := r.URL.Query().Get("issuer")
 
-	grants, err := h.registry.GrantManager().GetGrants(r.Context(), itemsPerPage, page*itemsPerPage, optionalIssuer)
+	pageKeys := h.registry.Config().GetPaginationEncryptionKeys(r.Context())
+	pageOpts, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
+	if err != nil {
+		h.registry.Writer().WriteError(w, r,
+			errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse pagination parameters: %v", err)))
+		return
+	}
+
+	grants, nextPage, err := h.registry.GrantManager().GetGrants(r.Context(), optionalIssuer, pageOpts...)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r, err)
 		return
 	}
-
-	n, err := h.registry.GrantManager().CountGrants(r.Context())
-	if err != nil {
-		h.registry.Writer().WriteError(w, r, err)
-		return
-	}
-
-	x.PaginationHeader(w, r.URL, int64(n), page, itemsPerPage)
 	if grants == nil {
 		grants = []Grant{}
 	}
 
+	keysetpagination.SetLinkHeader(w, pageKeys, r.URL, nextPage)
 	h.registry.Writer().Write(w, r, grants)
 }

@@ -583,14 +583,14 @@ func (s *DefaultStrategy) requestConsent(
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
-	consentSessions, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequests(ctx, ar.GetClient().GetID(), f.Subject)
+	consentSession, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequest(ctx, ar.GetClient().GetID(), f.Subject)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
 	} else if err != nil {
 		return err
 	}
 
-	if found := matchScopes(s.r.Config().GetScopeStrategy(ctx), consentSessions, ar.GetRequestedScopes()); found != nil {
+	if found := matchScopes(s.r.Config().GetScopeStrategy(ctx), consentSession, ar.GetRequestedScopes()); found != nil {
 		return s.forwardConsentRequest(ctx, w, r, ar, f, found)
 	}
 

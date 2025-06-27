@@ -10,6 +10,7 @@ import (
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/flow"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 )
 
 type ForcedObfuscatedLoginSession struct {
@@ -33,9 +34,9 @@ type (
 		RevokeConsentSessionByID(ctx context.Context, consentRequestID string) error
 
 		VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.AcceptOAuth2ConsentRequest, error)
-		FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]flow.AcceptOAuth2ConsentRequest, error)
-		FindSubjectsGrantedConsentRequests(ctx context.Context, user string, limit, offset int) ([]flow.AcceptOAuth2ConsentRequest, error)
-		FindSubjectsSessionGrantedConsentRequests(ctx context.Context, user, sid string, limit, offset int) ([]flow.AcceptOAuth2ConsentRequest, error)
+		FindGrantedAndRememberedConsentRequest(ctx context.Context, client, user string) (*flow.AcceptOAuth2ConsentRequest, error)
+		FindSubjectsGrantedConsentRequests(ctx context.Context, user string, pageOpts ...keysetpagination.Option) ([]flow.AcceptOAuth2ConsentRequest, *keysetpagination.Paginator, error)
+		FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) ([]flow.AcceptOAuth2ConsentRequest, *keysetpagination.Paginator, error)
 		CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 		// Cookie management

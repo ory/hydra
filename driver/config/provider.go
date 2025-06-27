@@ -5,6 +5,7 @@ package config
 
 import (
 	"context"
+	"crypto/sha512"
 	"fmt"
 	"math"
 	"net/http"
@@ -81,6 +82,7 @@ const (
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"
+	KeyPaginationSecrets                         = "secrets.pagination"
 	KeyLogoutRedirectURL                         = "urls.post_logout_redirect"
 	KeyLoginURL                                  = "urls.login"
 	KeyRegistrationURL                           = "urls.registration"
@@ -790,4 +792,17 @@ func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) (cfg
 		cfg.Period = 30 * 24 * time.Hour
 	}
 	return
+}
+
+func (p *DefaultProvider) GetPaginationEncryptionKeys(ctx context.Context) [][32]byte {
+	secrets := p.getProvider(ctx).Strings(KeyPaginationSecrets)
+	if len(secrets) == 0 {
+		secrets = p.getProvider(ctx).Strings(KeyGetSystemSecret)
+	}
+
+	hashed := make([][32]byte, len(secrets))
+	for i := range secrets {
+		hashed[i] = sha512.Sum512_256([]byte(secrets[i]))
+	}
+	return hashed
 }

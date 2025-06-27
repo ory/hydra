@@ -140,7 +140,7 @@ func TestJWTBearer(t *testing.T) {
 	keys, err := jwk.GenerateJWK(ctx, jose.RS256, kid, "sig")
 	require.NoError(t, err)
 	trustGrant := trust.Grant{
-		ID:              uuid.Must(uuid.NewV4()).String(),
+		ID:              uuid.Must(uuid.NewV4()),
 		Issuer:          set,
 		Subject:         uuid.Must(uuid.NewV4()).String(),
 		AllowAnySubject: false,

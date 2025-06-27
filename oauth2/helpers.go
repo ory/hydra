@@ -9,11 +9,10 @@ import (
 	"fmt"
 	"time"
 
-	gofrsuuid "github.com/gofrs/uuid"
-
-	"github.com/ory/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
 )
 
 func signatureFromJTI(jti string) string {
@@ -21,10 +20,10 @@ func signatureFromJTI(jti string) string {
 }
 
 type BlacklistedJTI struct {
-	JTI    string         `db:"-"`
-	ID     string         `db:"signature"`
-	Expiry time.Time      `db:"expires_at"`
-	NID    gofrsuuid.UUID `db:"nid"`
+	JTI    string    `db:"-"`
+	ID     string    `db:"signature"`
+	Expiry time.Time `db:"expires_at"`
+	NID    uuid.UUID `db:"nid"`
 }
 
 func (j *BlacklistedJTI) AfterFind(_ *pop.Connection) error {

@@ -15,36 +15,28 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/x/otelx"
-
-	"github.com/tidwall/gjson"
-
-	"github.com/ory/pop/v6"
-
-	"github.com/pborman/uuid"
-
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/x/events"
-	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/josex"
-	"github.com/ory/x/stringsx"
-
 	jwtV5 "github.com/golang-jwt/jwt/v5"
-
-	"github.com/ory/x/errorsx"
-
 	"github.com/julienschmidt/httprouter"
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/x/urlx"
-
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/hydra/v2/x/events"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/josex"
+	"github.com/ory/x/otelx"
+	"github.com/ory/x/stringsx"
+	"github.com/ory/x/urlx"
 )
 
 const (

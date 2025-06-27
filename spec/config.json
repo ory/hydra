@@ -1255,7 +1255,22 @@
         },
         "cookie": {
           "type": "array",
-          "description": "A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+          "description": "Secrets that are used for cookie session encryption. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+          "items": {
+            "type": "string",
+            "minLength": 16
+          },
+          "examples": [
+            [
+              "this-is-the-primary-secret",
+              "this-is-an-old-secret",
+              "this-is-another-old-secret"
+            ]
+          ]
+        },
+        "pagination": {
+          "type": "array",
+          "description": "Secrets that are used for pagination token encryption. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
           "items": {
             "type": "string",
             "minLength": 16

@@ -13,12 +13,10 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )

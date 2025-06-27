@@ -8,27 +8,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/consent/test"
-
 	"github.com/go-jose/go-jose/v3"
-
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent/test"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
+	"github.com/ory/pop/v6"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
-
-	"github.com/ory/hydra/v2/jwk"
-
-	"github.com/ory/hydra/v2/driver"
 )
 
 func init() {

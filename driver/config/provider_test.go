@@ -348,7 +348,11 @@ func TestViperProviderValidates(t *testing.T) {
 
 	cookieSecret, err := c.GetCookieSecrets(ctx)
 	require.NoError(t, err)
-	assert.Equal(t, [][]uint8{[]byte("some-random-cookie-secret")}, cookieSecret)
+	assert.Equal(t, [][]byte{[]byte("some-random-cookie-secret")}, cookieSecret)
+
+	paginationKeys := c.GetPaginationEncryptionKeys(ctx)
+	require.Len(t, paginationKeys, 1)
+	assert.Equal(t, [32]byte{0x1a, 0x4c, 0x1, 0xbc, 0x1b, 0xd1, 0x4c, 0xdf, 0x23, 0x3, 0xd9, 0x1a, 0x2a, 0x1b, 0x68, 0xdc, 0x69, 0x17, 0xf4, 0x31, 0xd, 0x27, 0x6d, 0x86, 0x70, 0xb0, 0xae, 0x2d, 0x45, 0xe2, 0xf, 0xab}, paginationKeys[0])
 
 	// profiling
 	assert.Equal(t, "cpu", c.Source(ctx).String("profiling"))

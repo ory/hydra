@@ -15,16 +15,16 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
@@ -376,13 +376,13 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	defer otelx.End(span, &err)
 
 	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	if err := f.HandleConsentRequest(r); err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, err
 	}
 
 	return f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""), nil
@@ -568,106 +568,105 @@ func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *
 
 }
 
-func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) (rs []flow.AcceptOAuth2ConsentRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequests")
+func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.AcceptOAuth2ConsentRequest, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequest")
 	defer otelx.End(span, &err)
 
 	var f flow.Flow
-	if err = p.Connection(ctx).
-		Where(`
-state = ? AND
-subject = ? AND
-client_id = ? AND
-consent_skip=FALSE AND
-consent_error='{}' AND
-consent_remember=TRUE AND
-nid = ?`,
-			flow.FlowStateConsentUsed,
-			subject,
-			client,
-			p.NetworkID(ctx),
-		).
+	err = p.QueryWithNetwork(ctx).
+		Where("state = ?", flow.FlowStateConsentUsed).
+		Where("subject = ?", subject).
+		Where("client_id = ?", client).
+		Where("consent_skip = FALSE").
+		Where("consent_error = '{}'").
+		Where("consent_remember = TRUE").
 		Order("requested_at DESC").
-		Limit(1).
-		First(&f); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-		}
+		First(&f)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return p.filterExpiredConsentRequests(ctx, []flow.AcceptOAuth2ConsentRequest{*f.GetHandledConsentRequest()})
+	fs := filterExpiredConsentRequests([]flow.Flow{f})
+	if len(fs) == 0 {
+		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	}
+	return fs[0].GetHandledConsentRequest(), nil
 }
 
-func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) (_ []flow.AcceptOAuth2ConsentRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests",
-		trace.WithAttributes(attribute.Int("limit", limit), attribute.Int("offset", offset)))
+func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.AcceptOAuth2ConsentRequest, _ *keysetpagination.Paginator, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer otelx.End(span, &err)
 
+	paginator := keysetpagination.NewPaginator(append(pageOpts,
+		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
+	)...)
+
 	var fs []flow.Flow
-	c := p.Connection(ctx)
-
-	if err := c.
-		Where(
-			strings.TrimSpace(fmt.Sprintf(`
-(state = %d OR state = %d) AND
-subject = ? AND
-consent_skip=FALSE AND
-consent_error='{}' AND
-nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
-			)),
-			subject, p.NetworkID(ctx)).
-		Order("requested_at DESC").
-		Paginate(offset/limit+1, limit).
-		All(&fs); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-		}
-		return nil, sqlcon.HandleError(err)
+	err = p.QueryWithNetwork(ctx).
+		Where("state IN (?, ?)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
+		Where("subject = ?", subject).
+		Where("consent_skip = FALSE").
+		Where("consent_error = '{}'").
+		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
+		All(&fs)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	} else if err != nil {
+		return nil, nil, sqlcon.HandleError(err)
 	}
 
-	var rs []flow.AcceptOAuth2ConsentRequest
-	for _, f := range fs {
-		rs = append(rs, *f.GetHandledConsentRequest())
+	fs = filterExpiredConsentRequests(fs)
+	if len(fs) == 0 {
+		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	}
+	fs, nextPage := keysetpagination.Result(fs, paginator)
+
+	rs := make([]flow.AcceptOAuth2ConsentRequest, len(fs))
+	for i := range fs {
+		rs[i] = *(fs[i].GetHandledConsentRequest())
 	}
 
-	return p.filterExpiredConsentRequests(ctx, rs)
+	return rs, nextPage, nil
 }
 
-func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, limit, offset int) (_ []flow.AcceptOAuth2ConsentRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests",
-		trace.WithAttributes(attribute.String("sid", sid), attribute.Int("limit", limit), attribute.Int("offset", offset)))
+func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) (_ []flow.AcceptOAuth2ConsentRequest, _ *keysetpagination.Paginator, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
+	paginator := keysetpagination.NewPaginator(append(pageOpts,
+		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
+	)...)
+
 	var fs []flow.Flow
-	c := p.Connection(ctx)
-
-	if err := c.
-		Where(
-			strings.TrimSpace(fmt.Sprintf(`
-(state = %d OR state = %d) AND
-subject = ? AND
-login_session_id = ? AND
-consent_skip=FALSE AND
-consent_error='{}' AND
-nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
-			)),
-			subject, sid, p.NetworkID(ctx)).
-		Order("requested_at DESC").
-		Paginate(offset/limit+1, limit).
-		All(&fs); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-		}
-		return nil, sqlcon.HandleError(err)
+	err = p.QueryWithNetwork(ctx).
+		Where("state IN (?, ?)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
+		Where("subject = ?", subject).
+		Where("login_session_id = ?", sid).
+		Where("consent_skip = FALSE").
+		Where("consent_error = '{}'").
+		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
+		All(&fs)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	} else if err != nil {
+		return nil, nil, sqlcon.HandleError(err)
 	}
 
-	var rs []flow.AcceptOAuth2ConsentRequest
-	for _, f := range fs {
-		rs = append(rs, *f.GetHandledConsentRequest())
+	fs = filterExpiredConsentRequests(fs)
+	if len(fs) == 0 {
+		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
 
-	return p.filterExpiredConsentRequests(ctx, rs)
+	fs, nextPage := keysetpagination.Result(fs, paginator)
+
+	rs := make([]flow.AcceptOAuth2ConsentRequest, len(fs))
+	for i := range fs {
+		rs[i] = *(fs[i].GetHandledConsentRequest())
+	}
+
+	return rs, nextPage, nil
 }
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (n int, err error) {
@@ -691,21 +690,19 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 	return n, sqlcon.HandleError(err)
 }
 
-func (p *Persister) filterExpiredConsentRequests(ctx context.Context, requests []flow.AcceptOAuth2ConsentRequest) (_ []flow.AcceptOAuth2ConsentRequest, err error) {
-	_, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.filterExpiredConsentRequests")
-	defer otelx.End(span, &err)
-
-	var result []flow.AcceptOAuth2ConsentRequest
+func filterExpiredConsentRequests(requests []flow.Flow) []flow.Flow {
+	result := make([]flow.Flow, 0, len(requests))
 	for _, v := range requests {
-		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
+		rememberFor := 0
+		if v.ConsentRememberFor != nil {
+			rememberFor = *v.ConsentRememberFor
+		}
+		if rememberFor > 0 && v.RequestedAt.Add(time.Duration(rememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 		result = append(result, v)
 	}
-	if len(result) == 0 {
-		return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
-	}
-	return result, nil
+	return result
 }
 
 func (p *Persister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {

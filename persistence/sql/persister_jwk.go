@@ -8,17 +8,14 @@ import (
 	"encoding/json"
 
 	"github.com/go-jose/go-jose/v3"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/pop/v6"
-
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-
-	"github.com/pkg/errors"
-
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/sqlcon"
 )
 

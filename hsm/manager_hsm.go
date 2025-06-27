@@ -16,26 +16,21 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/x/otelx"
-
-	"github.com/pkg/errors"
-
-	"github.com/pborman/uuid"
-
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/v2/jwk"
-
-	"github.com/miekg/pkcs11"
-
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/ThalesGroup/crypto11"
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
+	"github.com/miekg/pkcs11"
+	"github.com/pborman/uuid"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/otelx"
 )
 
 const tracingComponent = "github.com/ory/hydra/hsm"

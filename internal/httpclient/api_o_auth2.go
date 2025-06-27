@@ -1845,9 +1845,6 @@ func (a *OAuth2APIService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 	}
 	if r.pageToken != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page_token", r.pageToken, "")
-	} else {
-		var defaultValue string = "1"
-		r.pageToken = &defaultValue
 	}
 	if r.clientName != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "client_name", r.clientName, "")
@@ -2075,20 +2072,22 @@ func (a *OAuth2APIService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 }
 
 type ApiListTrustedOAuth2JwtGrantIssuersRequest struct {
-	ctx          context.Context
-	ApiService   *OAuth2APIService
-	maxItems     *int64
-	defaultItems *int64
-	issuer       *string
+	ctx        context.Context
+	ApiService *OAuth2APIService
+	pageSize   *int64
+	pageToken  *string
+	issuer     *string
 }
 
-func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) MaxItems(maxItems int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
-	r.maxItems = &maxItems
+// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) PageSize(pageSize int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	r.pageSize = &pageSize
 	return r
 }
 
-func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) DefaultItems(defaultItems int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
-	r.defaultItems = &defaultItems
+// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) PageToken(pageToken string) ApiListTrustedOAuth2JwtGrantIssuersRequest {
+	r.pageToken = &pageToken
 	return r
 }
 
@@ -2139,11 +2138,14 @@ func (a *OAuth2APIService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if r.maxItems != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "MaxItems", r.maxItems, "")
+	if r.pageSize != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_size", r.pageSize, "")
+	} else {
+		var defaultValue int64 = 250
+		r.pageSize = &defaultValue
 	}
-	if r.defaultItems != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "DefaultItems", r.defaultItems, "")
+	if r.pageToken != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "page_token", r.pageToken, "")
 	}
 	if r.issuer != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "issuer", r.issuer, "")

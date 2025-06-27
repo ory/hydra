@@ -11,25 +11,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/hydra/v2/persistence/sql"
-	"github.com/ory/x/contextx"
-
-	hydra "github.com/ory/hydra-client-go/v2"
-
-	"github.com/ory/hydra/v2/internal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/internal"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
 )
 
 func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {

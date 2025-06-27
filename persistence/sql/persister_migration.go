@@ -12,11 +12,8 @@ import (
 	"time"
 
 	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/popx"
-
 	"github.com/ory/x/errorsx"
-
+	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 )
 

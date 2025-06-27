@@ -15,44 +15,40 @@ import (
 	"encoding/json"
 )
 
-// checks if the Pagination type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &Pagination{}
+// checks if the KeysetPaginationRequestParameters type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &KeysetPaginationRequestParameters{}
 
-// Pagination struct for Pagination
-type Pagination struct {
-	// Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// KeysetPaginationRequestParameters The `Link` HTTP header contains multiple links (`first`, `next`) formatted as: `<https://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250&page_token=>; rel=\"first\"`  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+type KeysetPaginationRequestParameters struct {
+	// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageSize *int64 `json:"page_size,omitempty"`
 	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageToken *string `json:"page_token,omitempty"`
 }
 
-// NewPagination instantiates a new Pagination object
+// NewKeysetPaginationRequestParameters instantiates a new KeysetPaginationRequestParameters object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPagination() *Pagination {
-	this := Pagination{}
+func NewKeysetPaginationRequestParameters() *KeysetPaginationRequestParameters {
+	this := KeysetPaginationRequestParameters{}
 	var pageSize int64 = 250
 	this.PageSize = &pageSize
-	var pageToken string = "1"
-	this.PageToken = &pageToken
 	return &this
 }
 
-// NewPaginationWithDefaults instantiates a new Pagination object
+// NewKeysetPaginationRequestParametersWithDefaults instantiates a new KeysetPaginationRequestParameters object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewPaginationWithDefaults() *Pagination {
-	this := Pagination{}
+func NewKeysetPaginationRequestParametersWithDefaults() *KeysetPaginationRequestParameters {
+	this := KeysetPaginationRequestParameters{}
 	var pageSize int64 = 250
 	this.PageSize = &pageSize
-	var pageToken string = "1"
-	this.PageToken = &pageToken
 	return &this
 }
 
 // GetPageSize returns the PageSize field value if set, zero value otherwise.
-func (o *Pagination) GetPageSize() int64 {
+func (o *KeysetPaginationRequestParameters) GetPageSize() int64 {
 	if o == nil || IsNil(o.PageSize) {
 		var ret int64
 		return ret
@@ -62,7 +58,7 @@ func (o *Pagination) GetPageSize() int64 {
 
 // GetPageSizeOk returns a tuple with the PageSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Pagination) GetPageSizeOk() (*int64, bool) {
+func (o *KeysetPaginationRequestParameters) GetPageSizeOk() (*int64, bool) {
 	if o == nil || IsNil(o.PageSize) {
 		return nil, false
 	}
@@ -70,7 +66,7 @@ func (o *Pagination) GetPageSizeOk() (*int64, bool) {
 }
 
 // HasPageSize returns a boolean if a field has been set.
-func (o *Pagination) HasPageSize() bool {
+func (o *KeysetPaginationRequestParameters) HasPageSize() bool {
 	if o != nil && !IsNil(o.PageSize) {
 		return true
 	}
@@ -79,12 +75,12 @@ func (o *Pagination) HasPageSize() bool {
 }
 
 // SetPageSize gets a reference to the given int64 and assigns it to the PageSize field.
-func (o *Pagination) SetPageSize(v int64) {
+func (o *KeysetPaginationRequestParameters) SetPageSize(v int64) {
 	o.PageSize = &v
 }
 
 // GetPageToken returns the PageToken field value if set, zero value otherwise.
-func (o *Pagination) GetPageToken() string {
+func (o *KeysetPaginationRequestParameters) GetPageToken() string {
 	if o == nil || IsNil(o.PageToken) {
 		var ret string
 		return ret
@@ -94,7 +90,7 @@ func (o *Pagination) GetPageToken() string {
 
 // GetPageTokenOk returns a tuple with the PageToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Pagination) GetPageTokenOk() (*string, bool) {
+func (o *KeysetPaginationRequestParameters) GetPageTokenOk() (*string, bool) {
 	if o == nil || IsNil(o.PageToken) {
 		return nil, false
 	}
@@ -102,7 +98,7 @@ func (o *Pagination) GetPageTokenOk() (*string, bool) {
 }
 
 // HasPageToken returns a boolean if a field has been set.
-func (o *Pagination) HasPageToken() bool {
+func (o *KeysetPaginationRequestParameters) HasPageToken() bool {
 	if o != nil && !IsNil(o.PageToken) {
 		return true
 	}
@@ -111,11 +107,11 @@ func (o *Pagination) HasPageToken() bool {
 }
 
 // SetPageToken gets a reference to the given string and assigns it to the PageToken field.
-func (o *Pagination) SetPageToken(v string) {
+func (o *KeysetPaginationRequestParameters) SetPageToken(v string) {
 	o.PageToken = &v
 }
 
-func (o Pagination) MarshalJSON() ([]byte, error) {
+func (o KeysetPaginationRequestParameters) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -123,7 +119,7 @@ func (o Pagination) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o Pagination) ToMap() (map[string]interface{}, error) {
+func (o KeysetPaginationRequestParameters) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.PageSize) {
 		toSerialize["page_size"] = o.PageSize
@@ -134,38 +130,38 @@ func (o Pagination) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullablePagination struct {
-	value *Pagination
+type NullableKeysetPaginationRequestParameters struct {
+	value *KeysetPaginationRequestParameters
 	isSet bool
 }
 
-func (v NullablePagination) Get() *Pagination {
+func (v NullableKeysetPaginationRequestParameters) Get() *KeysetPaginationRequestParameters {
 	return v.value
 }
 
-func (v *NullablePagination) Set(val *Pagination) {
+func (v *NullableKeysetPaginationRequestParameters) Set(val *KeysetPaginationRequestParameters) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullablePagination) IsSet() bool {
+func (v NullableKeysetPaginationRequestParameters) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullablePagination) Unset() {
+func (v *NullableKeysetPaginationRequestParameters) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullablePagination(val *Pagination) *NullablePagination {
-	return &NullablePagination{value: val, isSet: true}
+func NewNullableKeysetPaginationRequestParameters(val *KeysetPaginationRequestParameters) *NullableKeysetPaginationRequestParameters {
+	return &NullableKeysetPaginationRequestParameters{value: val, isSet: true}
 }
 
-func (v NullablePagination) MarshalJSON() ([]byte, error) {
+func (v NullableKeysetPaginationRequestParameters) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullablePagination) UnmarshalJSON(src []byte) error {
+func (v *NullableKeysetPaginationRequestParameters) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

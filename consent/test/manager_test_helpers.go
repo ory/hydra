@@ -675,27 +675,27 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			}
 
 			for _, tc := range []struct {
-				keyC           string
-				keyS           string
-				expectedLength int
+				keyC          string
+				keyS          string
+				expectedFound bool
 			}{
-				{"1", "1", 1},
-				{"2", "2", 0},
-				// {"3", "3", 0},  // Some consent is given in some other test case. Yay global fixtues :)
-				{"4", "4", 0},
-				{"1", "2", 0},
-				{"2", "1", 0},
-				{"5", "5", 1},
-				{"6", "6", 0},
+				{"1", "1", true},
+				{"2", "2", false},
+				// {"3", "3", false},  // Some consent is given in some other test case. Yay global fixtues :)
+				{"4", "4", false},
+				{"1", "2", false},
+				{"2", "1", false},
+				{"5", "5", true},
+				{"6", "6", false},
 			} {
 				t.Run("key="+tc.keyC+"-"+tc.keyS, func(t *testing.T) {
-					rs, err := m.FindGrantedAndRememberedConsentRequests(ctx, "fk-client-"+tc.keyC, "subject"+tc.keyS)
-					if tc.expectedLength == 0 {
+					rs, err := m.FindGrantedAndRememberedConsentRequest(ctx, "fk-client-"+tc.keyC, "subject"+tc.keyS)
+					if !tc.expectedFound {
 						assert.Nil(t, rs)
-						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
+						assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
 					} else {
 						require.NoError(t, err)
-						assert.Len(t, rs, tc.expectedLength)
+						assert.NotNil(t, rs)
 					}
 				})
 			}
@@ -900,13 +900,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s/session=%s", i, tc.subject, tc.sid), func(t *testing.T) {
-					consents, err := m.FindSubjectsSessionGrantedConsentRequests(ctx, tc.subject, tc.sid, 100, 0)
-					assert.Equal(t, len(tc.consentIDs), len(consents))
-
+					consents, nextPage, err := m.FindSubjectsSessionGrantedConsentRequests(ctx, tc.subject, tc.sid)
 					if len(tc.consentIDs) == 0 {
-						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
+						assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
 					} else {
 						require.NoError(t, err)
+						require.Len(t, consents, len(tc.consentIDs))
+						assert.True(t, nextPage.IsLast())
 						for _, cs := range consents {
 							assert.Contains(t, tc.consentIDs, cs.ConsentRequestID)
 							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())
@@ -942,13 +942,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-					consents, err := m.FindSubjectsGrantedConsentRequests(ctx, tc.subject, 100, 0)
-					assert.Equal(t, len(tc.consentRequestIDs), len(consents))
-
+					consents, nextPage, err := m.FindSubjectsGrantedConsentRequests(ctx, tc.subject)
 					if len(tc.consentRequestIDs) == 0 {
 						assert.EqualError(t, err, consent.ErrNoPreviousConsentFound.Error())
 					} else {
 						require.NoError(t, err)
+						require.Len(t, consents, len(tc.consentRequestIDs))
+						assert.True(t, nextPage.IsLast())
 						for _, cs := range consents {
 							assert.Contains(t, tc.consentRequestIDs, cs.ConsentRequestID)
 							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())

@@ -22,7 +22,7 @@ import (
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/jsonx"
 	"github.com/ory/x/openapix"
-	"github.com/ory/x/pagination/tokenpagination"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/uuidx"
 )
@@ -461,7 +461,7 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request, ps h
 //
 //lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type listOAuth2ClientsResponse struct {
-	tokenpagination.ResponseHeaders
+	keysetpagination.ResponseHeaders
 
 	// List of OAuth 2.0 Clients
 	//
@@ -475,7 +475,7 @@ type listOAuth2ClientsResponse struct {
 //
 //lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
 type listOAuth2ClientsParameters struct {
-	tokenpagination.RequestParameters
+	keysetpagination.RequestParameters
 
 	// The name of the clients to filter by.
 	//
@@ -506,16 +506,20 @@ type listOAuth2ClientsParameters struct {
 //	Responses:
 //	  200: listOAuth2Clients
 //	  default: errorOAuth2Default
-func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	page, itemsPerPage := x.ParsePagination(r)
+func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	pageKeys := h.r.Config().GetPaginationEncryptionKeys(r.Context())
+	pagination, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to parse pagination parameters: %s", err)))
+		return
+	}
 	filters := Filter{
-		Limit:  itemsPerPage,
-		Offset: page * itemsPerPage,
-		Name:   r.URL.Query().Get("client_name"),
-		Owner:  r.URL.Query().Get("owner"),
+		PageOpts: pagination,
+		Name:     r.URL.Query().Get("client_name"),
+		Owner:    r.URL.Query().Get("owner"),
 	}
 
-	c, err := h.r.ClientManager().GetClients(r.Context(), filters)
+	c, nextPage, err := h.r.ClientManager().GetClients(r.Context(), filters)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -529,13 +533,7 @@ func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request, ps h
 		c[k].Secret = ""
 	}
 
-	total, err := h.r.ClientManager().CountClients(r.Context())
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	x.PaginationHeader(w, r.URL, int64(total), page, itemsPerPage)
+	keysetpagination.SetLinkHeader(w, pageKeys, r.URL, nextPage)
 	h.r.Writer().Write(w, r, c)
 }
 

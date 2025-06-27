@@ -5,10 +5,12 @@ package trust
 
 import (
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 type Grant struct {
-	ID string `json:"id"`
+	ID uuid.UUID `json:"id"`
 
 	// Issuer identifies the principal that issued the JWT assertion (same as iss claim in jwt).
 	Issuer string `json:"issuer"`

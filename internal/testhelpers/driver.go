@@ -11,21 +11,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/pop/v6"
-
-	"github.com/ory/x/dbal"
-
-	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/pop/v6"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/sqlcon/dockertest"
 )

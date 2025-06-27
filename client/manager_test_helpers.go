@@ -16,13 +16,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/fosite"
 	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
+	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -276,7 +276,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 
 		compare(t, t1c1, d, k)
 
-		ds, err := t1.GetClients(ctx, Filter{Limit: 100, Offset: 0})
+		ds, nextPage, err := t1.GetClients(ctx, Filter{})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds[0].GetID(), ds[1].GetID())
@@ -284,31 +284,39 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
+		assert.True(t, nextPage.IsLast())
 
-		ds, err = t1.GetClients(ctx, Filter{Limit: 1, Offset: 0})
+		ds, nextPage, err = t1.GetClients(ctx, Filter{PageOpts: []keysetpagination.Option{keysetpagination.WithSize(1)}})
 		assert.NoError(t, err)
-		assert.Len(t, ds, 1)
+		require.Len(t, ds, 1)
+		assert.Equal(t, ds[0].GetID(), t1c1.GetID())
+		assert.False(t, nextPage.IsLast())
 
-		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 100})
+		ds, nextPage, err = t1.GetClients(ctx, Filter{PageOpts: nextPage.ToOptions()})
 		assert.NoError(t, err)
-		assert.Empty(t, ds)
+		require.Len(t, ds, 1)
+		assert.Equal(t, ds[0].GetID(), c2Template.GetID())
+		assert.True(t, nextPage.IsLast())
 
 		// get by name
-		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "name"})
+		ds, nextPage, err = t1.GetClients(ctx, Filter{Name: "name"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Name, "name")
+		assert.True(t, nextPage.IsLast())
 
 		// get by name not exist
-		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Name: "bad name"})
+		ds, nextPage, err = t1.GetClients(ctx, Filter{Name: "bad name"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 0)
+		assert.True(t, nextPage.IsLast())
 
 		// get by owner
-		ds, err = t1.GetClients(ctx, Filter{Limit: 100, Offset: 0, Owner: "aeneas"})
+		ds, nextPage, err = t1.GetClients(ctx, Filter{Owner: "aeneas"})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 		assert.Equal(t, ds[0].Owner, "aeneas")
+		assert.True(t, nextPage.IsLast())
 
 		testHelperUpdateClient(t, ctx, t1, k)
 		testHelperUpdateClient(t, ctx, t2, k)

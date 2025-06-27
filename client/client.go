@@ -9,17 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/twmb/murmur3"
-
+	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
+	"github.com/twmb/murmur3"
 
 	"github.com/ory/pop/v6"
 
-	"github.com/ory/hydra/v2/driver/config"
-
-	"github.com/go-jose/go-jose/v3"
-
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/sqlxx"
 )

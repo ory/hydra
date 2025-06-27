@@ -136,6 +136,8 @@ secrets:
     - some-random-system-secret
   cookie:
     - some-random-cookie-secret
+  pagination:
+    - some-random-pagination-secret
 
 profiling: cpu
 

@@ -4,6 +4,7 @@
 package trust
 
 import (
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 )
 
@@ -11,6 +12,7 @@ type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryLogger
 	Registry
+	config.Provider
 }
 
 type Registry interface {

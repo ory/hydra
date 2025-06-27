@@ -103,7 +103,7 @@
         "operationId": "listOAuth2Clients",
         "parameters": [
           {
-            "maximum": 500,
+            "maximum": 1000,
             "minimum": 1,
             "type": "integer",
             "format": "int64",
@@ -113,9 +113,7 @@
             "in": "query"
           },
           {
-            "minimum": 1,
             "type": "string",
-            "default": "1",
             "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
             "name": "page_token",
             "in": "query"
@@ -1483,15 +1481,19 @@
         "operationId": "listTrustedOAuth2JwtGrantIssuers",
         "parameters": [
           {
+            "maximum": 1000,
+            "minimum": 1,
             "type": "integer",
             "format": "int64",
-            "name": "MaxItems",
+            "default": 250,
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "name": "page_size",
             "in": "query"
           },
           {
-            "type": "integer",
-            "format": "int64",
-            "name": "DefaultItems",
+            "type": "string",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "name": "page_token",
             "in": "query"
           },
           {
@@ -2811,6 +2813,36 @@
         }
       }
     },
+    "keysetPaginationRequestParameters": {
+      "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "type": "object",
+      "title": "Pagination Request Parameters",
+      "properties": {
+        "page_size": {
+          "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "integer",
+          "format": "int64",
+          "default": 250,
+          "maximum": 1000,
+          "minimum": 1
+        },
+        "page_token": {
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "string"
+        }
+      }
+    },
+    "keysetPaginationResponseHeaders": {
+      "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "type": "object",
+      "title": "Pagination Response Header",
+      "properties": {
+        "link": {
+          "description": "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited list of links to the following pages:\n\nfirst: The first page of results.\nnext: The next page of results.\n\nPages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:\n\n\u003c/admin/sessions?page_size=250\u0026page_token={last_item_uuid}; rel=\"first\",/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"next\"",
+          "type": "string"
+        }
+      }
+    },
     "nullTime": {
       "type": "string",
       "format": "date-time",
@@ -3599,38 +3631,6 @@
         }
       }
     },
-    "pagination": {
-      "type": "object",
-      "properties": {
-        "page_size": {
-          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
-          "type": "integer",
-          "format": "int64",
-          "default": 250,
-          "maximum": 1000,
-          "minimum": 1
-        },
-        "page_token": {
-          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
-          "type": "string",
-          "default": "1",
-          "minimum": 1
-        }
-      }
-    },
-    "paginationHeaders": {
-      "type": "object",
-      "properties": {
-        "link": {
-          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
-          "type": "string"
-        },
-        "x-total-count": {
-          "description": "The total number of clients.\n\nin: header",
-          "type": "string"
-        }
-      }
-    },
     "rejectOAuth2Request": {
       "type": "object",
       "title": "The request payload used to accept a login or consent request.",
@@ -3962,12 +3962,7 @@
       "headers": {
         "link": {
           "type": "string",
-          "description": "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited list of links to the following pages:\n\nfirst: The first page of results.\nnext: The next page of results.\nprev: The previous page of results.\nlast: The last page of results.\n\nPages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:\n\n\u003c/clients?page_size=5\u0026page_token=0\u003e; rel=\"first\",\u003c/clients?page_size=5\u0026page_token=15\u003e; rel=\"next\",\u003c/clients?page_size=5\u0026page_token=5\u003e; rel=\"prev\",\u003c/clients?page_size=5\u0026page_token=20\u003e; rel=\"last\""
-        },
-        "x-total-count": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The X-Total-Count HTTP Header\n\nThe `X-Total-Count` header contains the total number of items in the collection."
+          "description": "The Link HTTP Header\n\nThe `Link` header contains a comma-delimited list of links to the following pages:\n\nfirst: The first page of results.\nnext: The next page of results.\n\nPages are omitted if they do not exist. For example, if there is no next page, the `next` link is omitted. Examples:\n\n\u003c/admin/sessions?page_size=250\u0026page_token={last_item_uuid}; rel=\"first\",/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"next\""
         }
       }
     }

@@ -12,8 +12,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/aead"
@@ -21,6 +19,7 @@ import (
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/pop/v6"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/fsx"

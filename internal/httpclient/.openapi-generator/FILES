@@ -31,6 +31,8 @@ docs/JsonPatch.md
 docs/JsonWebKey.md
 docs/JsonWebKeySet.md
 docs/JwkAPI.md
+docs/KeysetPaginationRequestParameters.md
+docs/KeysetPaginationResponseHeaders.md
 docs/MetadataAPI.md
 docs/OAuth2API.md
 docs/OAuth2Client.md
@@ -46,8 +48,6 @@ docs/OAuth2TokenExchange.md
 docs/OidcAPI.md
 docs/OidcConfiguration.md
 docs/OidcUserInfo.md
-docs/Pagination.md
-docs/PaginationHeaders.md
 docs/RFC6749ErrorJson.md
 docs/RejectOAuth2Request.md
 docs/TokenPagination.md
@@ -86,6 +86,8 @@ model_is_ready_503_response.go
 model_json_patch.go
 model_json_web_key.go
 model_json_web_key_set.go
+model_keyset_pagination_request_parameters.go
+model_keyset_pagination_response_headers.go
 model_o_auth2_client.go
 model_o_auth2_client_token_lifespans.go
 model_o_auth2_consent_request.go
@@ -98,8 +100,6 @@ model_o_auth2_redirect_to.go
 model_o_auth2_token_exchange.go
 model_oidc_configuration.go
 model_oidc_user_info.go
-model_pagination.go
-model_pagination_headers.go
 model_reject_o_auth2_request.go
 model_rfc6749_error_json.go
 model_token_pagination.go

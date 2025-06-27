@@ -24,22 +24,13 @@ func sanitizeClient(c *client.Client) *client.Client {
 	return cc
 }
 
-func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []flow.AcceptOAuth2ConsentRequest, requestedScope []string) *flow.AcceptOAuth2ConsentRequest {
-	for _, cs := range previousConsent {
-		var found = true
-		for _, scope := range requestedScope {
-			if !scopeStrategy(cs.GrantedScope, scope) {
-				found = false
-				break
-			}
-		}
-
-		if found {
-			return &cs
+func matchScopes(scopeStrategy fosite.ScopeStrategy, cs *flow.AcceptOAuth2ConsentRequest, requestedScope []string) *flow.AcceptOAuth2ConsentRequest {
+	for _, scope := range requestedScope {
+		if !scopeStrategy(cs.GrantedScope, scope) {
+			return nil
 		}
 	}
-
-	return nil
+	return cs
 }
 
 func caseInsensitiveFilterParam(q url.Values, key string) url.Values {

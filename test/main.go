@@ -7,9 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ory/pop/v6"
-
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/pop/v6"
 )
 
 func main() {

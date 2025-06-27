@@ -40,52 +40,38 @@ func TestSanitizeClient(t *testing.T) {
 
 func TestMatchScopes(t *testing.T) {
 	for k, tc := range []struct {
-		granted    []flow.AcceptOAuth2ConsentRequest
+		granted    *flow.AcceptOAuth2ConsentRequest
 		requested  []string
 		expectedID string
 	}{
 		{
-			granted:    []flow.AcceptOAuth2ConsentRequest{{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
 			requested:  []string{"foo", "bar"},
 			expectedID: "1",
 		},
 		{
-			granted:    []flow.AcceptOAuth2ConsentRequest{{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
 			requested:  []string{"foo", "bar", "baz"},
 			expectedID: "",
 		},
 		{
-			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar"}},
-			},
-			requested:  []string{"foo", "bar"},
+			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
+			requested:  []string{"foo"},
 			expectedID: "1",
 		},
 		{
-			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
-			},
-			requested:  []string{"foo", "bar", "baz"},
-			expectedID: "2",
-		},
-		{
-			granted: []flow.AcceptOAuth2ConsentRequest{
-				{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-				{ConsentRequestID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
-			},
-			requested:  []string{"zab"},
+			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
+			requested:  []string{"zab", "baz"},
 			expectedID: "",
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			got := matchScopes(fosite.ExactScopeStrategy, tc.granted, tc.requested)
+			actual := matchScopes(fosite.ExactScopeStrategy, tc.granted, tc.requested)
 			if tc.expectedID == "" {
-				assert.Nil(t, got)
+				assert.Nil(t, actual)
 				return
 			}
-			assert.Equal(t, tc.expectedID, got.ConsentRequestID)
+			assert.Equal(t, tc.expectedID, actual.ConsentRequestID)
 		})
 	}
 }

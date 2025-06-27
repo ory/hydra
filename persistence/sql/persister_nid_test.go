@@ -416,13 +416,13 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
 			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
-			actual := trust.SQLData{}
+			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
@@ -433,10 +433,10 @@ func (s *PersisterTestSuite) TestCreateLoginRequest() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			client := &client.Client{ID: "client-id"}
-			lr := flow.LoginRequest{ID: "lr-id", ClientID: client.ID, RequestedAt: time.Now()}
+			cl := &client.Client{ID: "client-id"}
+			lr := flow.LoginRequest{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now()}
 
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
 			require.NoError(t, err)
 			require.Equal(t, s.t1NID, f.NID)
@@ -626,14 +626,14 @@ func (s *PersisterTestSuite) TestDeleteGrant() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
 			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
 
-			actual := trust.SQLData{}
+			actual := persistencesql.SQLGrant{}
 			require.Error(t, r.Persister().DeleteGrant(s.t2, grant.ID))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
 			require.NoError(t, r.Persister().DeleteGrant(s.t1, grant.ID))
@@ -763,10 +763,10 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{ID: "client-id"}
-			f := newFlow(s.t1NID, client.ID, "sub", sqlxx.NullString(sessionID))
+			cl := &client.Client{ID: "client-id"}
+			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 
 			req := &flow.OAuth2ConsentRequest{
 				ConsentRequestID: "consent-request-id",
@@ -789,13 +789,13 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			f.State = flow.FlowStateConsentUsed
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t2, client.ID, f.Subject)
-			require.Error(t, err)
-			require.Equal(t, 0, len(actual))
+			actual, err := r.Persister().FindGrantedAndRememberedConsentRequest(s.t2, cl.ID, f.Subject)
+			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
+			assert.Nil(t, actual)
 
-			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, client.ID, f.Subject)
+			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, cl.ID, f.Subject)
 			require.NoError(t, err)
-			require.Equal(t, 1, len(actual))
+			assert.Equal(t, hcr.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }
@@ -805,14 +805,14 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{ID: "client-id"}
-			f := newFlow(s.t1NID, client.ID, "sub", sqlxx.NullString(sessionID))
+			cl := &client.Client{ID: "client-id"}
+			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
 			req := &flow.OAuth2ConsentRequest{
-				ConsentRequestID: "consent-request-id",
+				ConsentRequestID: f.ConsentRequestID.String(),
 				LoginChallenge:   sqlxx.NullString(f.ID),
 				Skip:             false,
 				Verifier:         "verifier",
@@ -828,13 +828,14 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 			_, err := r.Persister().HandleConsentRequest(s.t1, f, hcr)
 			require.NoError(t, err)
 
-			actual, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t2, f.Subject, 100, 0)
-			require.Error(t, err)
-			require.Equal(t, 0, len(actual))
+			_, _, err = r.Persister().FindSubjectsGrantedConsentRequests(s.t2, f.Subject)
+			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
 
-			actual, err = r.Persister().FindSubjectsGrantedConsentRequests(s.t1, f.Subject, 100, 0)
+			actual, nextPage, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t1, f.Subject)
 			require.NoError(t, err)
-			require.Equal(t, 1, len(actual))
+			require.Len(t, actual, 1)
+			assert.Equal(t, hcr.ConsentRequestID, actual[0].ConsentRequestID)
+			assert.True(t, nextPage.IsLast())
 		})
 	}
 }
@@ -843,12 +844,12 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(t *testing.T) {
-			client := &client.Client{ID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			cl := &client.Client{ID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.RequestedAt = time.Now().UTC().Add(-24 * time.Hour)
-			fr.Client = &fosite.DefaultClient{ID: client.ID}
+			fr.Client = &fosite.DefaultClient{ID: cl.ID}
 			fr.Session = &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "sub"}}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 
@@ -887,14 +888,14 @@ func (s *PersisterTestSuite) TestFlushInactiveGrants() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(-24 * time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
 			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
 
-			actual := trust.SQLData{}
+			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().FlushInactiveGrants(s.t2, time.Now(), 100, 100))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
 			require.NoError(t, r.Persister().FlushInactiveGrants(s.t1, time.Now(), 100, 100))
@@ -1036,12 +1037,15 @@ func (s *PersisterTestSuite) TestGetClients() {
 			c := &client.Client{ID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c))
 
-			actual, err := r.Persister().GetClients(s.t2, client.Filter{Offset: 0, Limit: 100})
+			actual, nextPage, err := r.Persister().GetClients(s.t2, client.Filter{})
 			require.NoError(t, err)
-			require.Equal(t, 0, len(actual))
-			actual, err = r.Persister().GetClients(s.t1, client.Filter{Offset: 0, Limit: 100})
+			assert.Len(t, actual, 0)
+			assert.True(t, nextPage.IsLast())
+
+			actual, nextPage, err = r.Persister().GetClients(s.t1, client.Filter{})
 			require.NoError(t, err)
-			require.Equal(t, 1, len(actual))
+			assert.Len(t, actual, 1)
+			assert.True(t, nextPage.IsLast())
 		})
 	}
 }
@@ -1069,7 +1073,7 @@ func (s *PersisterTestSuite) TestGetConcreteGrant() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
@@ -1196,20 +1200,22 @@ func (s *PersisterTestSuite) TestGetGrants() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
 			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
 
-			actual, err := r.Persister().GetGrants(s.t2, 100, 0, "")
+			actual, nextPage, err := r.Persister().GetGrants(s.t2, "")
 			require.NoError(t, err)
-			require.Equal(t, 0, len(actual))
+			assert.Len(t, actual, 0)
+			assert.True(t, nextPage.IsLast())
 
-			actual, err = r.Persister().GetGrants(s.t1, 100, 0, "")
+			actual, nextPage, err = r.Persister().GetGrants(s.t1, "")
 			require.NoError(t, err)
-			require.Equal(t, 1, len(actual))
+			assert.Len(t, actual, 1)
+			assert.True(t, nextPage.IsLast())
 		})
 	}
 }
@@ -1317,7 +1323,7 @@ func (s *PersisterTestSuite) TestGetPublicKey() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
@@ -1341,7 +1347,7 @@ func (s *PersisterTestSuite) TestGetPublicKeyScopes() {
 		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				Scope:     []string{"a", "b", "c"},
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
@@ -1367,7 +1373,7 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 			const issuer = "ks-id"
 			ks := newKeySet(issuer, "use")
 			grant := trust.Grant{
-				ID:        uuid.Must(uuid.NewV4()).String(),
+				ID:        uuid.Must(uuid.NewV4()),
 				ExpiresAt: time.Now().UTC().Add(time.Hour),
 				Issuer:    issuer,
 				PublicKey: trust.PublicKey{Set: issuer, KeyID: ks.Keys[0].KeyID},
@@ -1458,9 +1464,9 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			actualCR, err := r.Persister().HandleConsentRequest(s.t2, f, hcr)
 			require.Error(t, err)
 			require.Nil(t, actualCR)
-			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, c1.ID, f.Subject)
-			require.Error(t, err)
-			require.Equal(t, 0, len(actual))
+			actual, err := r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
+			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
+			assert.Nil(t, actual)
 
 			actualCR, err = r.Persister().HandleConsentRequest(s.t1, f, hcr)
 			require.NoError(t, err)
@@ -1469,9 +1475,9 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			f.ConsentWasHandled = true
 			f.State = flow.FlowStateConsentUsed
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
-			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, c1.ID, f.Subject)
+			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
 			require.NoError(t, err)
-			require.Equal(t, 1, len(actual))
+			assert.Equal(t, hcr.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }
@@ -2244,9 +2250,9 @@ func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.Nul
 		LoginError:       &flow.RequestDeniedError{},
 		Context:          sqlxx.JSONRawMessage{},
 		AMR:              sqlxx.StringSliceJSONFormat{},
-		ConsentRequestID: sqlxx.NullString("not-null"),
-		ConsentVerifier:  sqlxx.NullString("not-null"),
-		ConsentCSRF:      sqlxx.NullString("not-null"),
+		ConsentRequestID: "not-null",
+		ConsentVerifier:  "not-null",
+		ConsentCSRF:      "not-null",
 		SessionID:        sessionID,
 		RequestedAt:      time.Now(),
 	}
@@ -2254,7 +2260,7 @@ func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.Nul
 
 func newGrant(keySet string, keyID string) trust.Grant {
 	return trust.Grant{
-		ID:        uuid.Must(uuid.NewV4()).String(),
+		ID:        uuid.Must(uuid.NewV4()),
 		ExpiresAt: time.Now().Add(time.Hour),
 		PublicKey: trust.PublicKey{
 			Set:   keySet,

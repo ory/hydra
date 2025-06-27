@@ -43,9 +43,10 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, err)
 		mikePubKey = josex.ToPublicKey(&keySet.Keys[0])
 
-		storedGrants, err := t1.GetGrants(context.TODO(), 100, 0, "")
+		storedGrants, nextPage, err := t1.GetGrants(context.TODO(), "")
 		require.NoError(t, err)
 		assert.Len(t, storedGrants, 0)
+		assert.True(t, nextPage.IsLast())
 
 		count, err := t1.CountGrants(context.TODO())
 		require.NoError(t, err)
@@ -54,7 +55,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		createdAt := time.Now().UTC().Round(time.Second)
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
-			ID:      uuid.Must(uuid.NewV4()).String(),
+			ID:      uuid.Must(uuid.NewV4()),
 			Issuer:  set,
 			Subject: "bob@example.com",
 			Scope:   []string{"openid", "offline"},
@@ -80,7 +81,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Equal(t, grant.ExpiresAt.Format(time.RFC3339), storedGrant.ExpiresAt.Format(time.RFC3339))
 
 		grant2 := Grant{
-			ID:      uuid.Must(uuid.NewV4()).String(),
+			ID:      uuid.Must(uuid.NewV4()),
 			Issuer:  set,
 			Subject: "maria@example.com",
 			Scope:   []string{"openid"},
@@ -95,7 +96,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, err)
 
 		grant3 := Grant{
-			ID:      uuid.Must(uuid.NewV4()).String(),
+			ID:      uuid.Must(uuid.NewV4()),
 			Issuer:  "https://mike.example.com",
 			Subject: "mike@example.com",
 			Scope:   []string{"permissions", "openid", "offline"},
@@ -114,7 +115,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, err)
 		assert.Equal(t, 3, count)
 
-		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, "")
+		storedGrants, nextPage, err = t1.GetGrants(context.TODO(), "")
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -123,8 +124,9 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Equal(t, grant.ID, storedGrants[0].ID)
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 		assert.Equal(t, grant3.ID, storedGrants[2].ID)
+		assert.True(t, nextPage.IsLast())
 
-		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, set)
+		storedGrants, nextPage, err = t1.GetGrants(context.TODO(), set)
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -132,6 +134,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.Len(t, storedGrants, 2)
 		assert.Equal(t, grant.ID, storedGrants[0].ID)
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
+		assert.True(t, nextPage.IsLast())
 
 		err = t1.DeleteGrant(context.TODO(), grant.ID)
 		require.NoError(t, err)
@@ -175,7 +178,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		createdAt := time.Now()
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
-			ID:      uuid.Must(uuid.NewV4()).String(),
+			ID:      uuid.Must(uuid.NewV4()),
 			Issuer:  "issuer",
 			Subject: "subject",
 			Scope:   []string{"openid", "offline"},
@@ -190,7 +193,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
 		require.NoError(t, err)
 
-		grant.ID = uuid.Must(uuid.NewV4()).String()
+		grant.ID = uuid.Must(uuid.NewV4())
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
 		require.Error(t, err, "error expected, because combination of issuer + subject + key_id must be unique")
 
@@ -202,7 +205,7 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		err = m.CreateGrant(context.TODO(), grant2, pubKey2)
 		require.NoError(t, err)
 
-		nonExistingGrantID := uuid.Must(uuid.NewV4()).String()
+		nonExistingGrantID := uuid.Must(uuid.NewV4())
 		err = m.DeleteGrant(context.TODO(), nonExistingGrantID)
 		require.Error(t, err, "expect error, when deleting non-existing grant")
 

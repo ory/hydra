@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-05-20)](#000-2025-05-20)
+- [0.0.0 (2025-07-02)](#000-2025-07-02)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-05-20)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-07-02)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -45,7 +45,31 @@ If this pull request
 
     The client validator no longer rejects PATCH and PUT updates when `JSONWebKeysURI` is non-empty and `JSONWebKeys` is not nil.
 
+* Always use EC private keys in tests ([7481827](https://github.com/ory/hydra/commit/748182721768a6bf331e51a6989420f20383ae05)):
+
+    GitOrigin-RevId: a82b6e636e84d543db3b035194c3a5dc85286afc
+
 * Case-insensitive user_code scrubbing ([#3979](https://github.com/ory/hydra/issues/3979)) ([d389fd0](https://github.com/ory/hydra/commit/d389fd0269f93c8b7c787f1b3683ae4c6e9e1909))
+* **changelog-oel:** Cap grace period for refresh token rotation at 30d ([35d5d58](https://github.com/ory/hydra/commit/35d5d586aa19780116b6ef20321433af7ba45325)):
+
+    GitOrigin-RevId: a8785b2760897612d8b72d62b95622f35ee8ac36
+
+* **changelog-oel:** Reduce rows read when checking past consents ([ace80c2](https://github.com/ory/hydra/commit/ace80c2c145ddb541dd06110ace4039439ab3139)):
+
+    GitOrigin-RevId: 2df16d3053a1b4fb0bb0eb9e4f829f6861a55f1b
+
+* **changelog-oel:** Replace `returning *` with defined column names ([0b26e27](https://github.com/ory/hydra/commit/0b26e279d8b9c5b27961ba3b943e8a94d338d50b)):
+
+    GitOrigin-RevId: 8fa1912556293bba8f9c841ec316da18a52ea61e
+
+* **changelog-oel:** Update expires_at on token use ([0588744](https://github.com/ory/hydra/commit/0588744a246e924012f46200b31b993796b5f3a6)):
+
+    GitOrigin-RevId: c4ea129061ba34aaae5ed63403ee32221aee5556
+
+* **changelog-oel:** Use keyset pagination instead of offset ([cbf14c0](https://github.com/ory/hydra/commit/cbf14c0b9c763e60424949358126258cbf3c316a)):
+
+    GitOrigin-RevId: 61645585277edd95914705499afd7211a85983eb
+
 * CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
 
@@ -68,6 +92,14 @@ If this pull request
     documenting the breaking change:
     
     ```
+
+* Ignore flaky keys in Hydra HSM tests ([469b2ad](https://github.com/ory/hydra/commit/469b2ad538865a38738a10f46d270f53d12101ad)):
+
+    GitOrigin-RevId: 83312e6544bc33ccc30e1e1e414cc04910429192
+
+* **infrastructure:** Hydra oss CI ([e846541](https://github.com/ory/hydra/commit/e84654185cdfffbf160d5309f744795d15d723f9)):
+
+    GitOrigin-RevId: 3df0724e5ea4c81a0f4c481c1a3a34529356d073
 
 * JWT documentation link to point to the correct resource ([#3907](https://github.com/ory/hydra/issues/3907)) ([b746e41](https://github.com/ory/hydra/commit/b746e41eda6dc3fe376b147d146a6fcc7dafb455)):
 
@@ -97,9 +129,21 @@ If this pull request
     ```
 
 * Revoke by consent request ID ([#3947](https://github.com/ory/hydra/issues/3947)) ([5d8635c](https://github.com/ory/hydra/commit/5d8635c94389ff3c87bfae66afe95105c147bec1)), closes [#3932](https://github.com/ory/hydra/issues/3932) [#3932](https://github.com/ory/hydra/issues/3932) [#3941](https://github.com/ory/hydra/issues/3941)
+* Simplify and fix Copybara sync job ([f998d09](https://github.com/ory/hydra/commit/f998d090ca6408b05524aea5e5f3a79c5d44b1a4)):
+
+    GitOrigin-RevId: 115f1ba1aa8f92d9c546046b37d4fb27dacedec8
+
 * Tos_uri validation ([#3945](https://github.com/ory/hydra/issues/3945)) ([007e224](https://github.com/ory/hydra/commit/007e22412ae72403415e8b2f2283154b8d88f511)):
 
     Contributes to https://github.com/ory-corp/cloud/issues/7395
+
+* Update debian version in httpd test image ([f6720c4](https://github.com/ory/hydra/commit/f6720c4e62f66c245ce8370da40acbc91eca3ffb)):
+
+    GitOrigin-RevId: 4251fd1bab4a548b0796790381f4c79930592bc8
+
+* Upgrade to go 1.24.4 to fix CVE-2025-4673 ([c14e538](https://github.com/ory/hydra/commit/c14e538d8d993252a246eb17832c09234825a98c)):
+
+    GitOrigin-RevId: 64950988a466bbdb4f25b8d9f5c416ff591c00bf
 
 * Using uuid_generate_v4 function ([#3958](https://github.com/ory/hydra/issues/3958)) ([c206066](https://github.com/ory/hydra/commit/c20606606654af975e5d82998956bb998acee576)):
 
@@ -120,6 +164,18 @@ If this pull request
     `/.well-known/openid-configuration` endpoint already supports all
     configuration items that conform to this endpoint as seen here:
     https://datatracker.ietf.org/doc/html/rfc8414
+
+* **changelog-oel:** Add `hydra debug challenge` command ([a94662f](https://github.com/ory/hydra/commit/a94662f1edc49e662a5e1818dbfd4cac15bd9ead)):
+
+    GitOrigin-RevId: 793cf3327696465ea89fdfcf078f26594832a666
+
+* **changelog-oel:** Add expiry and TTL to `authentication_session` table ([d9ea549](https://github.com/ory/hydra/commit/d9ea5496d81c6218abfc407d7b0849ff03a41915)):
+
+    GitOrigin-RevId: 1a115d9e2055bbf9a0bb4ecf7c6a266b2b70a8cd
+
+* **changelog:** Graceful refresh count limit ([470713d](https://github.com/ory/hydra/commit/470713da36862745ca0222c284e0692fa40559ae)):
+
+    GitOrigin-RevId: 7f8bf5fee8b06490f888590054d2dcd2f1cf2cba
 
 * Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
 
@@ -162,6 +218,14 @@ If this pull request
     documenting the breaking change:
     
     ```
+
+* Monorepo ([3ff992e](https://github.com/ory/hydra/commit/3ff992e38abe10156bc3b7bed37d35784bf3021b)):
+
+    GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
+
+* Monorepo ([a77b206](https://github.com/ory/hydra/commit/a77b20608238b292192498bc35a20ebd0e47c9f0)):
+
+    GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
 
 * Revoke Kratos session asynchronously ([#3936](https://github.com/ory/hydra/issues/3936)) ([a0e7ee2](https://github.com/ory/hydra/commit/a0e7ee29298d4f882a7d471e0601b01c6848c40d)):
 
@@ -241,6 +305,17 @@ If this pull request
     ```
     POST admin/oauth2/auth/sessions/consent?consent_challenge_id=G_TIM3XABG14UwIgDoT1DRfipjhC1uix
     ```
+
+* Use vendored jackson ([a0a9062](https://github.com/ory/hydra/commit/a0a906211bce4ced3e1f4324eb9d287ef10892a6)):
+
+    GitOrigin-RevId: 591238768218ba2b5af93f91ac7e16f4c170da5b
+
+
+### Performance Improvements
+
+* Add index to optimize jwt query ([72fa16d](https://github.com/ory/hydra/commit/72fa16d5f677bdf505847fa781d1ca84bc2ceb39)):
+
+    GitOrigin-RevId: 93e0aca39592dbd249c4df90506fa416bfdcaab4
 
 
 ### Tests

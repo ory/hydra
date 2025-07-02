@@ -63,11 +63,6 @@ jobs:
       - uses: ory/ci/checkout@master
         with:
           fetch-depth: 2
-      - uses: actions/cache@v4
-        with:
-          path: |
-            internal/httpclient
-          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v4
         with:
           go-version: "1.24"
@@ -103,11 +98,6 @@ jobs:
       HSM_PIN: 1234
     steps:
       - uses: ory/ci/checkout@master
-      - uses: actions/cache@v4
-        with:
-          path: |
-            internal/httpclient
-          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v3
         with:
           go-version: "1.24"
@@ -164,11 +154,6 @@ jobs:
         with:
           path: ./test/e2e/hydra
           key: ${{ runner.os }}-hydra
-      - uses: actions/cache@v4
-        with:
-          path: |
-            internal/httpclient
-          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - run: ./test/e2e/circle-ci.bash ${{ matrix.database }} ${{ matrix.args }}
 
   docs-cli:

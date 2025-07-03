@@ -1,7 +1,7 @@
 // Copyright © 2022 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-import { createClient, prng } from "../../helpers"
+import { createClient, prng, validateJwt } from "../../helpers"
 
 const accessTokenStrategies = ["opaque", "jwt"]
 
@@ -44,15 +44,12 @@ describe("OAuth 2.0 JSON Web Token Access Tokens", () => {
               expect(token.refresh_token).to.not.be.empty
               expect(token.access_token.split(".").length).to.equal(3)
               expect(token.refresh_token.split(".").length).to.equal(2)
-            })
 
-          cy.request(`${Cypress.env("client_url")}/oauth2/validate-jwt`)
-            .its("body")
-            .then((body) => {
-              console.log(body)
-              expect(body.sub).to.eq("foo@bar.com")
-              expect(body.client_id).to.eq(client.client_id)
-              expect(body.jti).to.not.be.empty
+              validateJwt(token.access_token).then(({ payload }) => {
+                expect(payload.sub).to.eq("foo@bar.com")
+                expect(payload.client_id).to.eq(client.client_id)
+                expect(payload.jti).to.not.be.empty
+              })
             })
         })
       })

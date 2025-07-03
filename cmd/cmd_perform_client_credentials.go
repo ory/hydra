@@ -35,7 +35,7 @@ using the CLI.`,
 				return err
 			}
 
-			ctx := context.WithValue(cmd.Context(), oauth2.HTTPClient, hc)
+			ctx := context.WithValue(cmd.Context(), oauth2.HTTPClient, hc.GetConfig().HTTPClient)
 
 			scopes := flagx.MustGetStringSlice(cmd, "scope")
 			audience := flagx.MustGetStringSlice(cmd, "audience")

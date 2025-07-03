@@ -598,7 +598,7 @@ func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.
 	}
 
 	code := r.URL.Query().Get("code")
-	ctx := context.WithValue(rt.cmd.Context(), oauth2.HTTPClient, rt.cl)
+	ctx := context.WithValue(rt.cmd.Context(), oauth2.HTTPClient, rt.cl.GetConfig().HTTPClient)
 	token, err := rt.conf.Exchange(ctx, code)
 	if err != nil {
 		_, _ = fmt.Fprintf(rt.cmd.ErrOrStderr(), "Unable to exchange code for token: %s\n", err)

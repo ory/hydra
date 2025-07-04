@@ -41,10 +41,6 @@ If this pull request
 
 ### Bug Fixes
 
-* Add repo syncing for polis ([46d17f8](https://github.com/ory/hydra/commit/46d17f8bfdc59e2185e9ce65823eb2652e01f1b8)):
-
-    GitOrigin-RevId: e277a25d594b512b800d39dd18f36ea3d99fcf84
-
 * Allow updating when JWKS URI is set ([#3935](https://github.com/ory/hydra/issues/3935)) ([#3946](https://github.com/ory/hydra/issues/3946)) ([fb1655b](https://github.com/ory/hydra/commit/fb1655ba86077b10141132ed332ba8d6f8c70582)):
 
     The client validator no longer rejects PATCH and PUT updates when `JSONWebKeysURI` is non-empty and `JSONWebKeys` is not nil.
@@ -325,13 +321,6 @@ If this pull request
 ### Tests
 
 * Parallelize and improve ([#3989](https://github.com/ory/hydra/issues/3989)) ([a47e395](https://github.com/ory/hydra/commit/a47e39513f1f08076849f77517977abffa195364))
-
-### Unclassified
-
-* Merge 3834fab8c161a7dc98d43f32acf8efd9e6e95352 into 4dae0f4a8785eb36d8dbb27137f6b924c1e0f0b5 ([dc84053](https://github.com/ory/hydra/commit/dc840535c19d58caf130966e00d3d2fe9f3eb577)):
-
-    GitOrigin-RevId: 0c2dcaa065b64d2aafbcfd49c79363a214c5b2aa
-
 
 
 # [2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0) (2025-01-17)

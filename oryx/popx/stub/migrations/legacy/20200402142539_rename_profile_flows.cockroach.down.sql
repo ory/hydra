@@ -1,0 +1,3 @@
+ALTER TABLE "selfservice_settings_request_methods" RENAME COLUMN "selfservice_settings_request_id" TO "selfservice_profile_management_request_id";COMMIT TRANSACTION;BEGIN TRANSACTION;
+ALTER TABLE "selfservice_settings_request_methods" RENAME TO "selfservice_profile_management_request_methods";COMMIT TRANSACTION;BEGIN TRANSACTION;
+ALTER TABLE "selfservice_settings_requests" RENAME TO "selfservice_profile_management_requests";COMMIT TRANSACTION;BEGIN TRANSACTION;

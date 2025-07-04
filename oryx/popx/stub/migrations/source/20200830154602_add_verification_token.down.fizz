@@ -1,0 +1,1 @@
+drop_table("identity_verification_tokens")

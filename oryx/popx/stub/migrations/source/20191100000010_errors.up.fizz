@@ -1,0 +1,1 @@
+change_column("selfservice_errors", "seen_at", "timestamp", { "null": true })

@@ -1,0 +1,4 @@
+DROP TABLE "identity_recovery_tokens";COMMIT TRANSACTION;BEGIN TRANSACTION;
+DROP TABLE "selfservice_recovery_request_methods";COMMIT TRANSACTION;BEGIN TRANSACTION;
+DROP TABLE "selfservice_recovery_requests";COMMIT TRANSACTION;BEGIN TRANSACTION;
+DROP TABLE "identity_recovery_addresses";COMMIT TRANSACTION;BEGIN TRANSACTION;

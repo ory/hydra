@@ -1,0 +1,135 @@
+{
+  "courier": {
+    "smtp": {
+      "connection_uri": "smtps://test:test@mailslurper:1025/?skip_ssl_verify=true",
+      "from_address": "no-reply@ory.kratos.sh"
+    }
+  },
+  "dsn": "sqlite:///var/lib/sqlite/db.sqlite?_fk=true",
+  "hashers": {
+    "argon2": {
+      "iterations": 2,
+      "key_length": 16,
+      "memory": 131072,
+      "parallelism": 1,
+      "salt_length": 16
+    }
+  },
+  "identity": {
+    "default_schema_url": "file:///etc/config/kratos/identity.schema.json"
+  },
+  "log": {
+    "format": "text",
+    "leak_sensitive_values": true,
+    "level": "debug"
+  },
+  "secrets": {
+    "cookie": ["PLEASE-CHANGE-ME-I-AM-VERY-INSECURE"]
+  },
+  "selfservice": {
+    "default_browser_return_url": "http://127.0.0.1:4455/",
+    "flows": {
+      "error": {
+        "ui_url": "http://127.0.0.1:4455/error"
+      },
+      "login": {
+        "lifespan": "10m",
+        "ui_url": "http://127.0.0.1:4455/auth/login"
+      },
+      "logout": {
+        "after": {
+          "default_browser_return_url": "http://127.0.0.1:4455/auth/login"
+        }
+      },
+      "recovery": {
+        "enabled": true,
+        "lifespan": "1h",
+        "ui_url": "http://127.0.0.1:4455/recovery"
+      },
+      "registration": {
+        "after": {
+          "password": {
+            "hooks": [
+              {
+                "hook": "session"
+              }
+            ]
+          }
+        },
+        "lifespan": "10m",
+        "ui_url": "http://127.0.0.1:4455/auth/registration"
+      },
+      "settings": {
+        "lifespan": "1h",
+        "privileged_session_max_age": "15m",
+        "ui_url": "http://127.0.0.1:4455/settings"
+      },
+      "verification": {
+        "after": {
+          "default_browser_return_url": "http://127.0.0.1:4455/"
+        },
+        "enabled": true,
+        "lifespan": "1h",
+        "ui_url": "http://127.0.0.1:4455/verify"
+      }
+    },
+    "methods": {
+      "link": {
+        "enabled": true
+      },
+      "oidc": {
+        "enabled": true,
+        "config": {
+          "providers": [
+            {
+              "id": "google",
+              "provider": "google",
+              "mapper_url": "file:///etc/config/kratos/oidc.google.jsonnet",
+              "client_id": "client@example.com",
+              "client_secret": "secret"
+            }
+          ]
+        }
+      },
+      "password": {
+        "enabled": true
+      },
+      "profile": {
+        "enabled": true
+      }
+    },
+    "whitelisted_return_urls": ["http://127.0.0.1:4455"]
+  },
+  "serve": {
+    "admin": {
+      "base_url": "http://kratos:4434/",
+      "host": "0.0.0.0",
+      "port": 4434
+    },
+    "public": {
+      "base_url": "http://127.0.0.1:4433/",
+      "cors": {
+        "allow_credentials": true,
+        "allowed_headers": ["Authorization", "Content-Type", "X-Session-Token"],
+        "allowed_methods": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+        "allowed_origins": ["*"],
+        "debug": false,
+        "enabled": true,
+        "exposed_headers": ["Content-Type"],
+        "max_age": 0,
+        "options_passthrough": false
+      },
+      "host": "0.0.0.0",
+      "port": 4433
+    }
+  },
+  "session": {
+    "cookie": {
+      "path": "/",
+      "persistent": true,
+      "same_site": "Lax"
+    },
+    "lifespan": "24h"
+  },
+  "version": "v0.5.3-alpha.1"
+}

@@ -1,0 +1,1 @@
+add_column("selfservice_verification_flows", "state", "string", {"default": "show_form"})

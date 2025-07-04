@@ -1,0 +1,3 @@
+ALTER TABLE "selfservice_verification_flows" DROP COLUMN "form";COMMIT TRANSACTION;BEGIN TRANSACTION;
+ALTER TABLE "selfservice_verification_flows" DROP COLUMN "via";COMMIT TRANSACTION;BEGIN TRANSACTION;
+ALTER TABLE "selfservice_verification_flows" DROP COLUMN "success";COMMIT TRANSACTION;BEGIN TRANSACTION;

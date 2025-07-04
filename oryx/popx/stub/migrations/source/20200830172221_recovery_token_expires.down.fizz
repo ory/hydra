@@ -1,0 +1,4 @@
+sql("DELETE FROM identity_recovery_tokens WHERE selfservice_recovery_flow_id IS NULL")
+change_column("identity_recovery_tokens", "selfservice_recovery_flow_id", "uuid")
+drop_column("identity_recovery_tokens", "expires_at")
+drop_column("identity_recovery_tokens", "issued_at")

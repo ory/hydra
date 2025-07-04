@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "providers": {
+      "title": "OpenID Connect and OAuth2 Providers",
+      "description": "A list and configuration of OAuth2 and OpenID Connect providers ORY Kratos should integrate with.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": ["google"]
+          },
+          "provider": {
+            "title": "Provider",
+            "description": "Can be one of github, gitlab, generic, google, microsoft, discord.",
+            "type": "string",
+            "enum": [
+              "github",
+              "gitlab",
+              "generic",
+              "google",
+              "microsoft",
+              "discord"
+            ],
+            "examples": ["google"]
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "issuer_url": {
+            "type": "string",
+            "format": "uri",
+            "examples": ["https://accounts.google.com"]
+          },
+          "auth_url": {
+            "type": "string",
+            "format": "uri",
+            "examples": ["https://accounts.google.com/o/oauth2/v2/auth"]
+          },
+          "token_url": {
+            "type": "string",
+            "format": "uri",
+            "examples": ["https://www.googleapis.com/oauth2/v4/token"]
+          },
+          "mapper_url": {
+            "title": "Jsonnet Mapper URL",
+            "description": "The URL where the jsonnet source is located for mapping the provider's data to ORY Kratos data.",
+            "type": "string",
+            "format": "uri",
+            "examples": [
+              "file://path/to/oidc.jsonnet",
+              "https://foo.bar.com/path/to/oidc.jsonnet",
+              "base64://bG9jYWwgc3ViamVjdCA9I..."
+            ]
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": ["offline_access", "profile"]
+            }
+          },
+          "tenant": {
+            "title": "Azure AD Tenant",
+            "description": "The Azure AD Tenant to use for authentication.",
+            "type": "string",
+            "examples": [
+              "common",
+              "organizations",
+              "consumers",
+              "8eaef023-2b34-4da1-9baa-8bc8c9d6a490",
+              "contoso.onmicrosoft.com"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [],
+        "if": {
+          "properties": {
+            "provider": {
+              "const": "microsoft"
+            }
+          },
+          "required": ["provider"]
+        },
+        "then": {
+          "required": ["tenant"]
+        },
+        "else": {
+          "not": {
+            "properties": {
+              "tenant": {}
+            },
+            "required": ["tenant"]
+          }
+        }
+      }
+    }
+  }
+}

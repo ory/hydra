@@ -1,0 +1,15 @@
+{
+  "nested": {
+    "object": {
+      "source": "https://gist.githubusercontent.com/aeneasr/eb4612d295f613ee44bada6e30e2a856/raw/29edbda41bcb27492a1ac56926e03dee9480708f/hello-world.txt"
+    },
+    "array": [
+      {
+        "nested": {
+          "source": "https://gist.githubusercontent.com/aeneasr/eb4612d295f613ee44bada6e30e2a856/raw/29edbda41bcb27492a1ac56926e03dee9480708f/hello-world.txt"
+        }
+      },
+      "https://gist.githubusercontent.com/aeneasr/eb4612d295f613ee44bada6e30e2a856/raw/29edbda41bcb27492a1ac56926e03dee9480708f/hello-world.txt"
+    ]
+  }
+}

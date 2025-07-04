@@ -1,0 +1,47 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/workflows/stale.yml
+
+name: "Close Stale Issues"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  stale:
+    if: github.repository_owner == 'ory'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: |
+            Hello contributors!
+
+            I am marking this issue as stale as it has not received any engagement from the community or maintainers for a year. That does not imply that the issue has no merit! If you feel strongly about this issue
+
+            - open a PR referencing and resolving the issue;
+            - leave a comment on it and discuss ideas on how you could contribute towards resolving it;
+            - leave a comment and describe in detail why this issue is critical for your use case;
+            - open a new issue with updated details and a plan for resolving the issue.
+
+            Throughout its lifetime, Ory has received over 10.000 issues and PRs. To sustain that growth, we need to prioritize and focus on issues that are important to the community. A good indication of importance, and thus priority, is activity on a topic.
+
+            Unfortunately, [burnout](https://www.jeffgeerling.com/blog/2016/why-i-close-prs-oss-project-maintainer-notes) has become a [topic](https://opensource.guide/best-practices/#its-okay-to-hit-pause) of [concern](https://docs.brew.sh/Maintainers-Avoiding-Burnout) amongst open-source projects.
+
+            It can lead to severe personal and health issues as well as [opening](https://haacked.com/archive/2019/05/28/maintainer-burnout/) catastrophic [attack vectors](https://www.gradiant.org/en/blog/open-source-maintainer-burnout-as-an-attack-surface/).
+
+            The motivation for this automation is to help prioritize issues in the backlog and not ignore, reject, or belittle anyone.
+
+            If this issue was marked as stale erroneously you can exempt it by adding the `backlog` label, assigning someone, or setting a milestone for it.
+
+            Thank you for your understanding and to anyone who participated in the conversation! And as written above, please do participate in the conversation if this topic is important to you!
+
+            Thank you 🙏✌️
+          stale-issue-label: "stale"
+          exempt-issue-labels: "bug,blocking,docs,backlog"
+          days-before-stale: 365
+          days-before-close: 30
+          exempt-milestones: true
+          exempt-assignees: true
+          only-pr-labels: "stale"

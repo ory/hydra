@@ -1,0 +1,1 @@
+ALTER TABLE "identity_verifiable_addresses" RENAME COLUMN "expires_at" TO "_expires_at_tmp"

@@ -1,0 +1,1 @@
+INSERT INTO "_courier_messages_tmp" (id, type, status, body, subject, recipient, created_at, updated_at) SELECT id, type, status, body, subject, recipient, created_at, updated_at FROM "courier_messages"

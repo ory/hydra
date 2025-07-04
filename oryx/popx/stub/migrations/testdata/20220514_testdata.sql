@@ -1,0 +1,1 @@
+-- empty migrations should not error

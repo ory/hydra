@@ -1,0 +1,1 @@
+CREATE INDEX "sessions_token_idx" ON "_sessions_tmp" (token)

@@ -1,0 +1,7 @@
+drop_table("selfservice_login_request_methods")
+drop_table("selfservice_login_requests")
+
+drop_table("selfservice_registration_request_methods")
+drop_table("selfservice_registration_requests")
+
+drop_table("selfservice_profile_management_requests")

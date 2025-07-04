@@ -1,0 +1,1 @@
+ALTER TABLE `selfservice_verification_flows` MODIFY `form` JSON

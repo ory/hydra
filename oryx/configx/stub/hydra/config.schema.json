@@ -1,0 +1,792 @@
+{
+  "$id": "https://github.com/ory/hydra/docs/config.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ORY Hydra Configuration",
+  "type": "object",
+  "definitions": {
+    "http_method": {
+      "type": "string",
+      "enum": [
+        "POST",
+        "GET",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "CONNECT",
+        "HEAD",
+        "OPTIONS",
+        "TRACE"
+      ]
+    },
+    "port_number": {
+      "type": "integer",
+      "description": "The port to listen on.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "socket": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sets the permissions of the unix socket",
+      "properties": {
+        "owner": {
+          "type": "string",
+          "description": "Owner of unix socket. If empty, the owner will be the user running hydra.",
+          "default": ""
+        },
+        "group": {
+          "type": "string",
+          "description": "Group of unix socket. If empty, the group will be the primary group of the user running hydra.",
+          "default": ""
+        },
+        "mode": {
+          "type": "integer",
+          "description": "Mode of unix socket in numeric form",
+          "default": 493,
+          "minimum": 0,
+          "maximum": 511
+        }
+      }
+    },
+    "cors": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures Cross Origin Resource Sharing for public endpoints.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Sets whether CORS is enabled.",
+          "default": false
+        },
+        "allowed_origins": {
+          "type": "array",
+          "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "not": {
+              "type": "string",
+              "description": "does match all strings that contain two or more (*)",
+              "pattern": ".*\\*.*\\*.*"
+            },
+            "anyOf": [
+              {
+                "format": "uri"
+              },
+              {
+                "const": "*"
+              }
+            ]
+          },
+          "uniqueItems": true,
+          "default": ["*"],
+          "examples": [
+            [
+              "https://example.com",
+              "https://*.example.com",
+              "https://*.foo.example.com"
+            ]
+          ]
+        },
+        "allowed_methods": {
+          "type": "array",
+          "description": "A list of HTTP methods the user agent is allowed to use with cross-domain requests.",
+          "default": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+          "items": {
+            "type": "string",
+            "enum": [
+              "POST",
+              "GET",
+              "PUT",
+              "PATCH",
+              "DELETE",
+              "CONNECT",
+              "HEAD",
+              "OPTIONS",
+              "TRACE"
+            ]
+          }
+        },
+        "allowed_headers": {
+          "type": "array",
+          "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
+          "default": ["Authorization", "Content-Type"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "exposed_headers": {
+          "type": "array",
+          "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
+          "default": ["Content-Type"],
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_credentials": {
+          "type": "boolean",
+          "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
+          "default": true
+        },
+        "options_passthrough": {
+          "type": "boolean",
+          "description": "TODO",
+          "default": false
+        },
+        "max_age": {
+          "type": "integer",
+          "description": "Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.",
+          "default": 0,
+          "minimum": 0
+        },
+        "debug": {
+          "type": "boolean",
+          "description": "Adds additional log output to debug server side CORS issues.",
+          "default": false
+        }
+      }
+    },
+    "pem_file": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The path to the pem file.",
+              "examples": ["/path/to/file.pem"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["path"]
+        },
+        {
+          "properties": {
+            "base64": {
+              "type": "string",
+              "description": "The base64 encoded string (without padding).",
+              "contentEncoding": "base64",
+              "contentMediaType": "application/x-pem-file",
+              "examples": ["b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["base64"]
+        }
+      ]
+    },
+    "duration": {
+      "type": "string",
+      "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+      "examples": ["1h"]
+    }
+  },
+  "properties": {
+    "log": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures the logger",
+      "properties": {
+        "level": {
+          "type": "string",
+          "description": "Sets the log level.",
+          "enum": ["panic", "fatal", "error", "warn", "info", "debug", "trace"],
+          "default": "info"
+        },
+        "leak_sensitive_values": {
+          "type": "boolean",
+          "description": "Logs sensitive values such as cookie and URL parameter.",
+          "default": false
+        },
+        "redaction_text": {
+          "type": "string",
+          "title": "Sensitive log value redaction text",
+          "description": "Text to use, when redacting sensitive log value."
+        },
+        "format": {
+          "type": "string",
+          "description": "Sets the log format.",
+          "enum": ["json", "json_pretty", "text"],
+          "default": "text"
+        }
+      }
+    },
+    "serve": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Controls the configuration for the http(s) daemon(s).",
+      "properties": {
+        "public": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json",
+          "properties": {
+            "port": {
+              "default": 4444,
+              "allOf": [
+                {
+                  "$ref": "#/definitions/port_number"
+                }
+              ]
+            },
+            "host": {
+              "type": "string",
+              "description": "The interface or unix socket ORY Hydra should listen and handle public API requests on. Use the prefix \"unix:\" to specify a path to a unix socket. Leave empty to listen on all interfaces.",
+              "default": "",
+              "examples": ["localhost"]
+            },
+            "cors": {
+              "$ref": "#/definitions/cors"
+            },
+            "socket": {
+              "$ref": "#/definitions/socket"
+            },
+            "access_log": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Access Log configuration for public server.",
+              "properties": {
+                "disable_for_health": {
+                  "type": "boolean",
+                  "description": "Disable access log for health endpoints.",
+                  "default": false
+                }
+              }
+            }
+          }
+        },
+        "admin": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "port": {
+              "default": 4445,
+              "allOf": [
+                {
+                  "$ref": "#/definitions/port_number"
+                }
+              ]
+            },
+            "host": {
+              "type": "string",
+              "description": "The interface or unix socket ORY Hydra should listen and handle administrative API requests on. Use the prefix \"unix:\" to specify a path to a unix socket. Leave empty to listen on all interfaces.",
+              "default": "",
+              "examples": ["localhost"]
+            },
+            "cors": {
+              "$ref": "#/definitions/cors"
+            },
+            "socket": {
+              "$ref": "#/definitions/socket"
+            },
+            "access_log": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Access Log configuration for admin server.",
+              "properties": {
+                "disable_for_health": {
+                  "type": "boolean",
+                  "description": "Disable access log for health endpoints.",
+                  "default": false
+                }
+              }
+            }
+          }
+        },
+        "tls": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
+          "properties": {
+            "key": {
+              "description": "Configures the private key (pem encoded).",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/pem_file"
+                }
+              ]
+            },
+            "cert": {
+              "description": "Configures the private key (pem encoded).",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/pem_file"
+                }
+              ]
+            },
+            "allow_termination_from": {
+              "type": "array",
+              "description": "Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. Hydra serves http instead of https when this option is set.",
+              "items": {
+                "type": "string",
+                "oneOf": [
+                  {
+                    "pattern": "^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$"
+                  },
+                  {
+                    "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$"
+                  }
+                ],
+                "examples": ["127.0.0.1/32"]
+              }
+            }
+          }
+        },
+        "cookies": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "same_site_mode": {
+              "type": "string",
+              "description": "Specify the SameSite mode that cookies should be sent with.",
+              "enum": ["Strict", "Lax", "None"],
+              "default": "None"
+            },
+            "same_site_legacy_workaround": {
+              "type": "boolean",
+              "description": "Some older browser versions don’t work with SameSite=None. This option enables the workaround defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie without SameSite as a fallback.",
+              "default": false,
+              "examples": [true]
+            }
+          }
+        }
+      }
+    },
+    "dsn": {
+      "type": "string",
+      "description": "Sets the data source name. This configures the backend where ORY Hydra persists data. If dsn is \"memory\", data will be written to memory and is lost when you restart this instance. ORY Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
+    },
+    "webfinger": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures ./well-known/ settings.",
+      "properties": {
+        "jwks": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures the /.well-known/jwks.json endpoint.",
+          "properties": {
+            "broadcast_keys": {
+              "type": "array",
+              "description": "A list of JSON Web Keys that should be exposed at that endpoint. This is usually the public key for verifying OpenID Connect ID Tokens. However, you might want to add additional keys here as well.",
+              "items": {
+                "type": "string"
+              },
+              "default": ["hydra.openid.id-token"],
+              "examples": ["hydra.jwt.access-token"]
+            }
+          }
+        },
+        "oidc_discovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures OpenID Connect Discovery (/.well-known/openid-configuration).",
+          "properties": {
+            "jwks_url": {
+              "type": "string",
+              "description": "Overwrites the JWKS URL",
+              "format": "uri",
+              "examples": ["https://my-service.com/.well-known/jwks.json"]
+            },
+            "token_url": {
+              "type": "string",
+              "description": "Overwrites the OAuth2 Token URL",
+              "format": "uri",
+              "examples": ["https://my-service.com/oauth2/token"]
+            },
+            "auth_url": {
+              "type": "string",
+              "description": "Overwrites the OAuth2 Auth URL",
+              "format": "uri",
+              "examples": ["https://my-service.com/oauth2/auth"]
+            },
+            "client_registration_url": {
+              "description": "Sets the OpenID Connect Dynamic Client Registration Endpoint",
+              "type": "string",
+              "format": "uri",
+              "examples": ["https://my-service.com/clients"]
+            },
+            "supported_claims": {
+              "type": "array",
+              "description": "A list of supported claims to be broadcasted. Claim \"sub\" is always included.",
+              "items": {
+                "type": "string"
+              },
+              "examples": [["email", "username"]]
+            },
+            "supported_scope": {
+              "type": "array",
+              "description": "The scope OAuth 2.0 Clients may request. Scope `offline`, `offline_access`, and `openid` are always included.",
+              "items": {
+                "type": "string"
+              },
+              "examples": [["email", "whatever", "read.photos"]]
+            },
+            "userinfo_url": {
+              "type": "string",
+              "description": "A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.",
+              "format": "uri",
+              "examples": ["https://example.org/my-custom-userinfo-endpoint"]
+            }
+          }
+        }
+      }
+    },
+    "oidc": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures OpenID Connect features.",
+      "properties": {
+        "subject_identifiers": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms",
+          "properties": {
+            "enabled": {
+              "type": "array",
+              "description": "A list of algorithms to enable.",
+              "items": {
+                "type": "string",
+                "enum": ["public", "pairwise"]
+              }
+            },
+            "pairwise": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures the pairwise algorithm.",
+              "properties": {
+                "salt": {
+                  "type": "string"
+                }
+              },
+              "required": ["salt"]
+            }
+          },
+          "if": {
+            "properties": {
+              "enabled": {
+                "contains": {
+                  "const": "pairwise"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": ["pairwise"]
+          },
+          "else": {
+            "properties": {
+              "pairwise": {
+                "$comment": "This enforces pairwise to not be set if 'enabled' does not contain 'pairwise'",
+                "not": {}
+              }
+            }
+          },
+          "examples": [
+            {
+              "enabled": ["public", "pairwise"],
+              "pairwise": {
+                "salt": "some-random-salt"
+              }
+            }
+          ]
+        },
+        "dynamic_client_registration": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).",
+          "properties": {
+            "default_scope": {
+              "type": "array",
+              "description": "The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the \"scope\" key in the registration payload, effectively disabling the concept of whitelisted scopes.",
+              "items": {
+                "type": "string"
+              },
+              "examples": [["openid", "offline", "offline_access"]]
+            }
+          }
+        }
+      }
+    },
+    "urls": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "self": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "issuer": {
+              "type": "string",
+              "description": "This value will be used as the \"issuer\" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.",
+              "format": "uri",
+              "examples": ["https://localhost:4444/"]
+            },
+            "public": {
+              "type": "string",
+              "description": "This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.",
+              "format": "uri",
+              "examples": ["https://localhost:4444/"]
+            }
+          }
+        },
+        "login": {
+          "type": "string",
+          "description": "Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": ["https://my-login.app/login"]
+        },
+        "consent": {
+          "type": "string",
+          "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": ["https://my-consent.app/consent"]
+        },
+        "logout": {
+          "type": "string",
+          "description": "Sets the logout endpoint. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": ["https://my-logout.app/logout"]
+        },
+        "error": {
+          "type": "string",
+          "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",
+          "format": "uri",
+          "examples": ["https://my-error.app/error"]
+        },
+        "post_logout_redirect": {
+          "type": "string",
+          "description": "When a user agent requests to logout, it will be redirected to this url afterwards per default.",
+          "format": "uri",
+          "examples": ["https://my-example.app/logout-successful"]
+        }
+      }
+    },
+    "strategies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "type": "string",
+          "description": "Defines how scopes are matched. For more details have a look at https://github.com/ory/fosite#scopes",
+          "enum": [
+            "exact",
+            "wildcard",
+            "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY"
+          ],
+          "default": "wildcard"
+        },
+        "access_token": {
+          "type": "string",
+          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens",
+          "enum": ["opaque", "jwt"]
+        }
+      }
+    },
+    "ttl": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures time to live.",
+      "properties": {
+        "login_consent_request": {
+          "description": "Configures how long a user login and consent flow may take.",
+          "default": "1h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
+        "access_token": {
+          "description": "Configures how long access tokens are valid.",
+          "default": "1h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
+        "refresh_token": {
+          "description": "Configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.",
+          "default": "720h",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/duration"
+            },
+            {
+              "enum": ["-1", -1]
+            }
+          ]
+        },
+        "id_token": {
+          "description": "Configures how long id tokens are valid.",
+          "default": "1h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        },
+        "auth_code": {
+          "description": "Configures how long auth codes are valid.",
+          "default": "10m",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        }
+      }
+    },
+    "oauth2": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expose_internal_errors": {
+          "type": "boolean",
+          "description": "Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.",
+          "default": false,
+          "examples": [true]
+        },
+        "session": {
+          "type": "object",
+          "properties": {
+            "encrypt_at_rest": {
+              "type": "boolean",
+              "default": true,
+              "title": "Encrypt OAuth2 Session",
+              "description": "If set to true (default) ORY Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database."
+            }
+          }
+        },
+        "include_legacy_error_fields": {
+          "type": "boolean",
+          "description": "Set this to true if you want to include the `error_hint` and `error_debug` legacy fields in error responses. We recommend to set this to `false` unless you have clients using these fields.",
+          "default": false,
+          "examples": [true]
+        },
+        "hashers": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures hashing algorithms. Supports only BCrypt at the moment.",
+          "properties": {
+            "bcrypt": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures the BCrypt hashing algorithm used for hashing Client Secrets.",
+              "properties": {
+                "cost": {
+                  "type": "integer",
+                  "description": "Sets the BCrypt cost. The higher the value, the more CPU time is being used to generate hashes.",
+                  "default": 10,
+                  "minimum": 4,
+                  "maximum": 31
+                }
+              }
+            }
+          }
+        },
+        "pkce": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enforced": {
+              "type": "boolean",
+              "description": "Sets whether PKCE should be enforced for all clients.",
+              "examples": [true]
+            },
+            "enforced_for_public_clients": {
+              "type": "boolean",
+              "description": "Sets whether PKCE should be enforced for public clients.",
+              "examples": [true]
+            }
+          }
+        },
+        "client_credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "default_grant_allowed_scope": {
+              "type": "boolean",
+              "description": "Defines how scopes are added if the request doesn't contains any scope",
+              "examples": [false]
+            }
+          }
+        }
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys",
+      "properties": {
+        "system": {
+          "description": "The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 16
+          },
+          "examples": [
+            [
+              "this-is-the-primary-secret",
+              "this-is-an-old-secret",
+              "this-is-another-old-secret"
+            ]
+          ]
+        },
+        "cookie": {
+          "type": "array",
+          "description": "A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+          "items": {
+            "type": "string",
+            "minLength": 16
+          },
+          "examples": [
+            [
+              "this-is-the-primary-secret",
+              "this-is-an-old-secret",
+              "this-is-another-old-secret"
+            ]
+          ]
+        }
+      }
+    },
+    "profiling": {
+      "type": "string",
+      "description": "Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs",
+      "enum": ["cpu", "mem"],
+      "examples": ["cpu"]
+    },
+    "tracing": {
+      "$ref": "ory://tracing-config"
+    },
+    "version": {
+      "type": "string",
+      "title": "The Hydra version this config is written for.",
+      "description": "SemVer according to https://semver.org/ prefixed with `v` as in our releases.",
+      "pattern": "^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "cgroups": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "ORY Hydra can respect Linux container CPU quota",
+      "properties": {
+        "v1": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures parameters using cgroups v1 hierarchy",
+          "properties": {
+            "auto_max_procs_enabled": {
+              "type": "boolean",
+              "description": "Set GOMAXPROCS automatically according to cgroups limits",
+              "default": false,
+              "examples": [true]
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["dsn"]
+}

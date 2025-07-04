@@ -1,0 +1,12 @@
+{
+  "$id": "https://example.com/config.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "config",
+  "type": "object",
+  "properties": {
+    "dsn": {
+      "type": "string"
+    }
+  },
+  "required": ["dsn"]
+}

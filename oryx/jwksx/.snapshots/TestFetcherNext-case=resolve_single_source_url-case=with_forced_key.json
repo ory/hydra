@@ -1,0 +1,7 @@
+{
+  "alg": "HS256",
+  "k": "Y2hhbmdlbWVjaGFuZ2VtZWNoYW5nZW1lY2hhbmdlbWU",
+  "kid": "7d5f5ad0674ec2f2960b1a34f33370a0f71471fa0e3ef0c0a692977d276dafe8",
+  "kty": "oct",
+  "use": "sig"
+}

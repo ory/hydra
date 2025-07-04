@@ -1,0 +1,122 @@
+{
+  "cgroups": {
+    "v1": {
+      "auto_max_procs_enabled": false
+    }
+  },
+  "dsn": "sqlite:///var/lib/sqlite/db.sqlite?_fk=true",
+  "log": {
+    "format": "text",
+    "leak_sensitive_values": false,
+    "level": "info"
+  },
+  "oauth2": {
+    "expose_internal_errors": false,
+    "hashers": {
+      "bcrypt": {
+        "cost": 10
+      }
+    },
+    "include_legacy_error_fields": false,
+    "session": {
+      "encrypt_at_rest": true
+    }
+  },
+  "oidc": {
+    "subject_identifiers": {
+      "enabled": ["pairwise", "public"],
+      "pairwise": {
+        "salt": "youReallyNeedToChangeThis"
+      }
+    }
+  },
+  "secrets": {
+    "system": ["youReallyNeedToChangeThis"]
+  },
+  "serve": {
+    "admin": {
+      "access_log": {
+        "disable_for_health": false
+      },
+      "cors": {
+        "allow_credentials": true,
+        "allowed_headers": ["Authorization", "Content-Type"],
+        "allowed_methods": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+        "allowed_origins": ["*"],
+        "debug": false,
+        "enabled": false,
+        "exposed_headers": ["Content-Type"],
+        "max_age": 0,
+        "options_passthrough": false
+      },
+      "host": "",
+      "port": 4445,
+      "socket": {
+        "group": "",
+        "mode": 493,
+        "owner": ""
+      }
+    },
+    "cookies": {
+      "same_site_legacy_workaround": false,
+      "same_site_mode": "Lax"
+    },
+    "public": {
+      "access_log": {
+        "disable_for_health": false
+      },
+      "cors": {
+        "allow_credentials": true,
+        "allowed_headers": ["Authorization", "Content-Type"],
+        "allowed_methods": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+        "allowed_origins": ["*"],
+        "debug": false,
+        "enabled": false,
+        "exposed_headers": ["Content-Type"],
+        "max_age": 0,
+        "options_passthrough": false
+      },
+      "host": "",
+      "port": 4444,
+      "socket": {
+        "group": "",
+        "mode": 493,
+        "owner": ""
+      }
+    }
+  },
+  "strategies": {
+    "scope": "wildcard"
+  },
+  "tracing": {
+    "provider": "jaeger",
+    "providers": {
+      "jaeger": {
+        "local_agent_address": "jaeger:6831",
+        "sampling": {
+          "server_url": "http://jaeger:5778/sampling"
+        }
+      }
+    }
+  },
+  "ttl": {
+    "access_token": "1h",
+    "auth_code": "10m",
+    "id_token": "1h",
+    "login_consent_request": "1h",
+    "refresh_token": "720h"
+  },
+  "urls": {
+    "consent": "http://127.0.0.1:3000/consent",
+    "login": "http://127.0.0.1:3000/login",
+    "logout": "http://127.0.0.1:3000/logout",
+    "self": {
+      "issuer": "http://127.0.0.1:4444"
+    }
+  },
+  "webfinger": {
+    "jwks": {
+      "broadcast_keys": ["hydra.openid.id-token"]
+    }
+  }
+}

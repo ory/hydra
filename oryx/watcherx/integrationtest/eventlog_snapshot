@@ -1,0 +1,21 @@
+watching file /etc/config/mock-config
+got change event:
+Data: othervalue,
+Src: /etc/config/mock-config
+watching file /etc/config/mock-config
+got change event:
+Data: othervalue,
+Src: /etc/config/mock-config
+got change event:
+Data: somevalue,
+Src: /etc/config/mock-config
+watching file /etc/config/mock-config
+got change event:
+Data: othervalue,
+Src: /etc/config/mock-config
+got change event:
+Data: somevalue,
+Src: /etc/config/mock-config
+got change event:
+Data: othervalue,
+Src: /etc/config/mock-config

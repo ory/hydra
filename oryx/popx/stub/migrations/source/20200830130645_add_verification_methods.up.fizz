@@ -1,0 +1,1 @@
+sql("INSERT INTO selfservice_verification_flow_methods (id, method, selfservice_verification_flow_id, config, created_at, updated_at) SELECT id, 'link', id, form, created_at, updated_at FROM selfservice_verification_flows;")

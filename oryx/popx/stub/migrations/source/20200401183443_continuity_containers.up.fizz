@@ -1,0 +1,11 @@
+create_table("continuity_containers") {
+	t.Column("id", "uuid", {primary: true})
+
+	t.Column("identity_id", "uuid", {null: true})
+
+  t.Column("name", "string")
+  t.Column("payload", "json", {null: true})
+  t.Column("expires_at", "timestamp")
+
+  t.ForeignKey("identity_id", {"identities": ["id"]}, {"on_delete": "cascade"})
+}

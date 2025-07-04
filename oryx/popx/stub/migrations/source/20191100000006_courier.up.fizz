@@ -1,0 +1,10 @@
+create_table("courier_messages") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("type", "int")
+  t.Column("status", "int")
+
+  t.Column("body", "string")
+  t.Column("subject", "string")
+  t.Column("recipient", "string")
+}

@@ -1,0 +1,1 @@
+ALTER TABLE "identities" RENAME COLUMN "traits_schema_id" TO "schema_id";COMMIT TRANSACTION;BEGIN TRANSACTION;

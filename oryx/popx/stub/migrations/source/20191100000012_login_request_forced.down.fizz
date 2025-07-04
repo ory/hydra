@@ -1,0 +1,1 @@
+drop_column("selfservice_login_requests", "forced")

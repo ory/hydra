@@ -1,0 +1,5 @@
+drop_index("identity_verifiable_addresses", "identity_verifiable_addresses_code_uq_idx")
+drop_index("identity_verifiable_addresses", "identity_verifiable_addresses_code_idx")
+
+drop_column("identity_verifiable_addresses", "code")
+drop_column("identity_verifiable_addresses", "expires_at")

@@ -1,0 +1,5 @@
+.github/pull_request_template.md
+clidoc/testdata/
+healthx/openapi/patch.yaml
+.snapshots
+fixtures

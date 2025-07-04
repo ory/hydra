@@ -1,0 +1,312 @@
+# Please find the documentation for this file at
+# https://www.ory.sh/oathkeeper/docs/configuration
+
+log:
+  level: debug
+  format: json
+
+profiling: cpu
+
+serve:
+  proxy:
+    port: 1234
+    host: 127.0.0.1
+
+    timeout:
+      read: 1s
+      write: 2s
+      idle: 3s
+
+    cors:
+      enabled: true
+      allowed_origins:
+        - https://example.com
+        - https://*.example.com
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - Content-Type
+      allow_credentials: true
+      max_age: 10
+      debug: true
+    tls:
+      key:
+        path: /path/to/key.pem
+        base64: LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLVxuTUlJRkRqQkFCZ2txaGtpRzl3MEJCUTB3...
+      cert:
+        path: /path/to/cert.pem
+        base64: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
+
+  api:
+    port: 1235
+    host: 127.0.0.2
+
+    timeout:
+      read: 1s
+      write: 2s
+      idle: 3s
+
+    cors:
+      enabled: true
+      allowed_origins:
+        - https://example.org
+        - https://*.example.org
+      allowed_methods:
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - Content-Type
+      allow_credentials: true
+      max_age: 10
+      debug: true
+    tls:
+      key:
+        path: /path/to/key.pem
+        base64: LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLVxuTUlJRkRqQkFCZ2txaGtpRzl3MEJCUTB3...
+      cert:
+        path: /path/to/cert.pem
+        base64: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
+
+  prometheus:
+    port: 9000
+    host: localhost
+    metrics_path: /metrics
+    collapse_request_paths: true
+
+# Configures Access Rules
+access_rules:
+  # Locations (list of URLs) where access rules should be fetched from on boot.
+  # It is expected that the documents at those locations return a JSON or YAML Array containing ORY Oathkeeper Access Rules.
+  repositories:
+    # If the URL Scheme is `file://`, the access rules (an array of access rules is expected) will be
+    # fetched from the local file system.
+    - file://path/to/rules.json
+    # If the URL Scheme is `inline://`, the access rules (an array of access rules is expected)
+    # are expected to be a base64 encoded (with padding!) JSON/YAML string (base64_encode(`[{"id":"foo-rule","authenticators":[....]}]`)):
+    - inline://W3siaWQiOiJmb28tcnVsZSIsImF1dGhlbnRpY2F0b3JzIjpbXX1d
+    # If the URL Scheme is `http://` or `https://`, the access rules (an array of access rules is expected) will be
+    # fetched from the provided HTTP(s) location.
+    - https://path-to-my-rules/rules.json
+  # Optional fields describing matching strategy, defaults to "regexp".
+  matching_strategy: glob
+
+errors:
+  fallback:
+    - json
+  handlers:
+    redirect:
+      enabled: true
+      config:
+        to: http://path-to/redirect
+    json:
+      enabled: true
+      config:
+        verbose: true
+        when:
+          - error:
+              - unauthorized
+              - forbidden
+              - internal_server_error
+            request:
+              header:
+                content_type:
+                  - application/json
+                accept:
+                  - application/json
+              cidr:
+                - 127.0.0.0/24
+
+# All authenticators can be configured under this configuration key
+authenticators:
+  # Configures the anonymous authenticator
+  anonymous:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+    config:
+      # Sets the anonymous username. Defaults to "anonymous". Common names include "guest", "anon", "anonymous", "unknown".
+      subject: guest
+
+  # Configures the cookie session authenticator
+  cookie_session:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+    config:
+      # Sets the origin to proxy requests to. If the response is a 200 with body `{ "subject": "...", "extra": {} }`
+      # The request will pass the subject through successfully, otherwise it will be marked as unauthorized
+      check_session_url: https://session-store-host
+
+      # Sets a list of possible cookies to look for on incoming requests, and will fallthrough to the next authenticator if
+      # none of the passed cookies are set on the request
+      only:
+        - sessionid
+
+  # Configures the jwt authenticator
+  jwt:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+    config:
+      # REQUIRED IF ENABLED - The URL where ORY Oathkeeper can retrieve JSON Web Keys from for validating the JSON Web
+      # Token. Usually something like "https://my-keys.com/.well-known/jwks.json". The response of that endpoint must
+      # return a JSON Web Key Set (JWKS).
+      jwks_urls:
+        - https://my-website.com/.well-known/jwks.json
+        - https://my-other-website.com/.well-known/jwks.json
+        - file://path/to/local/jwks.json
+
+      # Sets the strategy to be used to validate/match the scope. Supports "hierarchic", "exact", "wildcard", "none". Defaults
+      # to "none".
+      scope_strategy: wildcard
+
+  # Configures the noop authenticator
+  noop:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+  # Configures the oauth2_client_credentials authenticator
+  oauth2_client_credentials:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+    config:
+      # REQUIRED IF ENABLED - The OAuth 2.0 Token Endpoint that will be used to validate the client credentials.
+      token_url: https://my-website.com/oauth2/token
+
+  # Configures the oauth2_introspection authenticator
+  oauth2_introspection:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+    config:
+      # REQUIRED IF ENABLED - The OAuth 2.0 Token Introspection endpoint.
+      introspection_url: https://my-website.com/oauth2/introspection
+
+      # Sets the strategy to be used to validate/match the token scope. Supports "hierarchic", "exact", "wildcard", "none". Defaults
+      # to "none".
+      scope_strategy: exact
+
+      # Enable pre-authorization in cases where the OAuth 2.0 Token Introspection endpoint is protected by OAuth 2.0 Bearer
+      # Tokens that can be retrieved using the OAuth 2.0 Client Credentials grant.
+      pre_authorization:
+        # Enable pre-authorization. Defaults to false.
+        enabled: true
+
+        # REQUIRED IF ENABLED - The OAuth 2.0 Client ID to be used for the OAuth 2.0 Client Credentials Grant.
+        client_id: some_id
+
+        # REQUIRED IF ENABLED - The OAuth 2.0 Client Secret to be used for the OAuth 2.0 Client Credentials Grant.
+        client_secret: some_secret
+
+        # The OAuth 2.0 Scope to be requested during the OAuth 2.0 Client Credentials Grant.
+        scope:
+          - foo
+          - bar
+
+        # REQUIRED IF ENABLED - The OAuth 2.0 Token Endpoint where the OAuth 2.0 Client Credentials Grant will be performed.
+        token_url: https://my-website.com/oauth2/token
+
+  # Configures the unauthorized authenticator
+  unauthorized:
+    # Set enabled to true if the authenticator should be enabled and false to disable the authenticator. Defaults to false.
+    enabled: true
+
+# All authorizers can be configured under this configuration key
+authorizers:
+  # Configures the allow authorizer
+  allow:
+    # Set enabled to true if the authorizer should be enabled and false to disable the authorizer. Defaults to false.
+    enabled: true
+
+  # Configures the deny authorizer
+  deny:
+    # Set enabled to true if the authorizer should be enabled and false to disable the authorizer. Defaults to false.
+    enabled: true
+
+  # Configures the keto_engine_acp_ory authorizer
+  keto_engine_acp_ory:
+    # Set enabled to true if the authorizer should be enabled and false to disable the authorizer. Defaults to false.
+    enabled: true
+
+    config:
+      # REQUIRED IF ENABLED - The base URL of ORY Keto, typically something like http(s)://<host>[:<port>]/
+      base_url: http://my-keto/
+      required_action: unknown
+      required_resource: unknown
+
+  # Configures the remote authorizer
+  remote:
+    # Set enabled to true if the authorizer should be enabled and false to disable the authorizer. Defaults to false.
+    enabled: true
+
+    config:
+      remote: https://host/path
+      headers: {}
+
+  # Configures the remote_json authorizer
+  remote_json:
+    # Set enabled to true if the authorizer should be enabled and false to disable the authorizer. Defaults to false.
+    enabled: true
+
+    config:
+      remote: https://host/path
+      payload: "{}"
+
+# All mutators can be configured under this configuration key
+mutators:
+  header:
+    enabled: true
+    config:
+      headers:
+        foo: bar
+
+  # Configures the cookie mutator
+  cookie:
+    # Set enabled to true if the mutator should be enabled and false to disable the mutator. Defaults to false.
+    enabled: true
+    config:
+      cookies:
+        foo: bar
+
+  # Configures the hydrator mutator
+  hydrator:
+    # Set enabled to true if the mutator should be enabled and false to disable the mutator. Defaults to false.
+    enabled: true
+
+    config:
+      api:
+        url: https://some-url/
+
+  # Configures the id_token mutator
+  id_token:
+    # Set enabled to true if the mutator should be enabled and false to disable the mutator. Defaults to false.
+    enabled: true
+    config:
+      # REQUIRED IF ENABLED - Sets the "iss" value of the ID Token.
+      issuer_url: https://my-oathkeeper/
+      # REQUIRED IF ENABLED - Sets the URL where keys should be fetched from. Supports remote locations (http, https) as
+      # well as local filesystem paths.
+      jwks_url: https://fetch-keys/from/this/location.json
+      # jwks_url: file:///from/this/absolute/location.json
+      # jwks_url: file://../from/this/relative/location.json
+
+      # Sets the time-to-live of the ID token. Defaults to one minute. Valid time units are: s (second), m (minute), h (hour).
+      ttl: 1h
+
+  # Configures the noop mutator
+  noop:
+    # Set enabled to true if the mutator should be enabled and false to disable the mutator. Defaults to false.
+    enabled: true

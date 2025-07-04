@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_errors" RENAME COLUMN "seen_at" TO "_seen_at_tmp"

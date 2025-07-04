@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_settings_requests" ADD COLUMN "state" TEXT NOT NULL DEFAULT 'show_form'

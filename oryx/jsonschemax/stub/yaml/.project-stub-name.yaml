@@ -1,0 +1,4 @@
+# serve controls the configuration for the http(s) daemon
+serve:
+  admin:
+    port: 3

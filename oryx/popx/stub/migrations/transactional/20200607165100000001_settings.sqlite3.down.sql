@@ -1,0 +1,1 @@
+ALTER TABLE "_selfservice_settings_requests_tmp" RENAME TO "selfservice_settings_requests"

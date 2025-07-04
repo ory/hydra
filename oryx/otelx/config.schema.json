@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ory://tracing-config",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Configure distributed tracing using OpenTelemetry",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin, and OTEL.",
+      "enum": ["jaeger", "otel", "zipkin"],
+      "examples": ["jaeger"]
+    },
+    "service_name": {
+      "type": "string",
+      "description": "Specifies the service name to use on the tracer.",
+      "examples": ["Ory Hydra", "Ory Kratos", "Ory Keto", "Ory Oathkeeper"]
+    },
+    "deployment_environment": {
+      "type": "string",
+      "description": "Specifies the deployment environment to use on the tracer.",
+      "examples": ["development", "staging", "production"]
+    },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "jaeger": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures the jaeger tracing backend.",
+          "properties": {
+            "local_agent_address": {
+              "type": "string",
+              "description": "The address of the jaeger-agent where spans should be sent to.",
+              "anyOf": [
+                {
+                  "title": "IPv6 Address and Port",
+                  "pattern": "^\\[(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))]:([0-9]*)$"
+                },
+                {
+                  "title": "IPv4 Address and Port",
+                  "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]*)$"
+                },
+                {
+                  "title": "Hostname and Port",
+                  "pattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):([0-9]*)$"
+                }
+              ],
+              "examples": ["127.0.0.1:6831"]
+            },
+            "sampling": {
+              "type": "object",
+              "propertyNames": {
+                "enum": ["server_url", "trace_id_ratio"]
+              },
+              "additionalProperties": false,
+              "properties": {
+                "server_url": {
+                  "type": "string",
+                  "description": "The address of jaeger-agent's HTTP sampling server",
+                  "format": "uri",
+                  "examples": ["http://localhost:5778/sampling"]
+                },
+                "trace_id_ratio": {
+                  "type": "number",
+                  "description": "Trace Id ratio sample",
+                  "examples": [0.5]
+                }
+              }
+            }
+          }
+        },
+        "zipkin": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures the zipkin tracing backend.",
+          "properties": {
+            "server_url": {
+              "type": "string",
+              "description": "The address of the Zipkin server where spans should be sent to.",
+              "format": "uri",
+              "examples": ["http://localhost:9411/api/v2/spans"]
+            },
+            "sampling": {
+              "type": "object",
+              "propertyNames": {
+                "enum": ["sampling_ratio"]
+              },
+              "additionalProperties": false,
+              "properties": {
+                "sampling_ratio": {
+                  "type": "number",
+                  "description": "Sampling ratio for spans.",
+                  "examples": [0.4]
+                }
+              }
+            }
+          }
+        },
+        "otlp": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures the OTLP tracing backend.",
+          "properties": {
+            "server_url": {
+              "type": "string",
+              "description": "The endpoint of the OTLP exporter (HTTP) where spans should be sent to.",
+              "anyOf": [
+                {
+                  "title": "IPv6 Address and Port",
+                  "pattern": "^\\[(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))]:([0-9]*)$"
+                },
+                {
+                  "title": "IPv4 Address and Port",
+                  "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]*)$"
+                },
+                {
+                  "title": "Hostname and Port",
+                  "pattern": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9]):([0-9]*)$"
+                }
+              ],
+              "examples": ["localhost:4318"]
+            },
+            "insecure": {
+              "type": "boolean",
+              "description": "Will use HTTP if set to true; defaults to HTTPS."
+            },
+            "sampling": {
+              "type": "object",
+              "propertyNames": {
+                "enum": ["sampling_ratio"]
+              },
+              "additionalProperties": false,
+              "properties": {
+                "sampling_ratio": {
+                  "type": "number",
+                  "description": "Sampling ratio for spans.",
+                  "examples": [0.4]
+                }
+              }
+            },
+            "authorization_header": {
+              "type": "string",
+              "examples": ["Bearer 2389s8fs9d8fus9f"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$id": "https://example.com/config.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "object",
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        }
+      }
+    },
+    "dynamic_object": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

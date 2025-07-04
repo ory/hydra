@@ -1,0 +1,6 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: changing-config
+data:
+  mock-config: somevalue

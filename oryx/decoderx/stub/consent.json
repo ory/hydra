@@ -1,0 +1,53 @@
+{
+  "$id": "https://example.com/ory.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "traits": {
+      "additionalProperties": false,
+      "properties": {
+        "consent": {
+          "additionalProperties": false,
+          "properties": {
+            "tos": {
+              "description": "yyyymmdd of when this was accepted",
+              "title": "I accept the Terms of Service https://www.ory.sh/ptos",
+              "const": true,
+              "maxLength": 30
+            },
+            "inner": {
+              "type": "object",
+              "properties": {
+                "foo": {
+                  "type": "string"
+                }
+              },
+              "required": ["foo"]
+            }
+          },
+          "required": ["tos"],
+          "title": "Consent",
+          "type": "object"
+        },
+        "notrequired": {
+          "additionalProperties": false,
+          "properties": {
+            "tos": {
+              "description": "yyyymmdd of when this was accepted",
+              "title": "I accept the Terms of Service https://www.ory.sh/ptos",
+              "const": true,
+              "maxLength": 30
+            }
+          },
+          "required": ["tos"],
+          "title": "Consent",
+          "type": "object"
+        }
+      },
+      "required": ["consent"],
+      "type": "object"
+    }
+  },
+  "title": "Person",
+  "type": "object"
+}

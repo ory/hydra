@@ -1,0 +1,109 @@
+name: "Run Tests and Lint Code"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test-windows:
+    name: Run Tests on Windows
+    runs-on: windows-latest
+    steps:
+      - run: |
+          git config --system core.autocrlf false
+          git config --system core.eol lf
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.24"
+      - run: |
+          go test -tags sqlite -failfast -short -timeout=20m $(go list ./... | grep -v sqlcon | grep -v watcherx | grep -v pkgerx | grep -v configx)
+        shell: bash
+
+  test:
+    name: Run Tests and Lint Code
+    runs-on: ubuntu-latest
+    env:
+      TEST_DATABASE_POSTGRESQL: postgres://test:test@localhost:5432/sqlcon?sslmode=disable
+      TEST_DATABASE_MYSQL: mysql://root:test@tcp(localhost:3306)/mysql?parseTime=true&multiStatements=true
+      TEST_DATABASE_COCKROACHDB: cockroach://root@localhost:26257/defaultdb?sslmode=disable
+    services:
+      postgres:
+        image: postgres:11.8
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: sqlcon
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: test
+    steps:
+      - name: Start cockroach
+        run:
+          docker run --name cockroach -p 26257:26257 -d
+          cockroachdb/cockroach:v22.2.5 start-single-node --insecure
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.24"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.5
+          args: --timeout 5m
+      - name: Install cockroach DB
+        run: |
+          curl https://binaries.cockroachdb.com/cockroach-v22.2.5.linux-amd64.tgz | tar -xz
+          sudo cp -iv cockroach-v22.2.5.linux-amd64/cockroach /usr/local/bin/
+          rm -rf cockroach-v22.2.5.linux-amd64
+          cockroach version
+      - name: Prepare nancy dependency list
+        run: go list -json -deps > go.list
+      - name: Run nancy
+        uses: sonatype-nexus-community/nancy-github-action@main
+        with:
+          nancyVersion: v1.0.42
+      - run:
+          go test -coverprofile=coverage.out -failfast -timeout=5m -tags sqlite
+          ./...
+        env:
+          COCKROACH_BINARY: /usr/local/bin/cockroach
+      - name: Convert coverage report to lcov
+        run: go tool gcov2lcov -infile=coverage.out -outfile=coverage.lcov
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.lcov
+
+  release:
+    name: Release a new version
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - name: Define next tag
+        run:
+          npx semver -- $(git describe --tags `git rev-list --tags
+          --max-count=1`)
+      - name: Create git tag
+        run: |
+          git tag "v$(npx semver -- $(git describe --tags `git rev-list --tags --max-count=1`) --increment=patch)"
+      - name: Push git tag
+        run: git push --tags

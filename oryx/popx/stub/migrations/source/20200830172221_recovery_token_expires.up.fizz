@@ -1,0 +1,3 @@
+add_column("identity_recovery_tokens", "expires_at", "timestamp", { "default": "2000-01-01 00:00:00" })
+add_column("identity_recovery_tokens", "issued_at", "timestamp", { "default": "2000-01-01 00:00:00" })
+change_column("identity_recovery_tokens", "selfservice_recovery_flow_id", "uuid", {"null": true})

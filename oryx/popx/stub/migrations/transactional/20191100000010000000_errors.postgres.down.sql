@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_errors" ALTER COLUMN "seen_at" TYPE timestamp, ALTER COLUMN "seen_at" DROP NOT NULL;

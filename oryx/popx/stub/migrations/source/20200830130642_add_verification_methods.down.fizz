@@ -1,0 +1,16 @@
+{{ if or .IsPostgreSQL .IsMySQL .IsMariaDB }}
+  add_column("selfservice_verification_flows", "form", "json", { "null": true })
+  sql("UPDATE selfservice_verification_flows SET form=(SELECT * FROM (SELECT m.config FROM selfservice_verification_flows AS r INNER JOIN selfservice_verification_flow_methods AS m ON r.id=m.selfservice_verification_flow_id) as t);")
+  change_column("selfservice_verification_flows", "form", "json", { "null": false })
+{{ end }}
+
+{{ if .IsCockroach }}
+  add_column("selfservice_verification_flows", "form", "json", { "default": "{}" })
+{{ end }}
+
+drop_table("selfservice_verification_flow_methods")
+drop_column("selfservice_verification_flows", "active_method")
+drop_column("selfservice_verification_flows", "state")
+
+add_column("selfservice_verification_flows", "via", "string", {"size": 16, "default": "email"})
+add_column("selfservice_verification_flows", "success", "bool", {"default_raw": "FALSE"})

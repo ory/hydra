@@ -1,0 +1,5 @@
+[
+  "\u003chttp://example.com?page=1\u0026page_size=50\u0026page_token=eyJvZmZzZXQiOiI1MCIsInYiOjJ9\u0026per_page=50\u003e",
+  "rel=\"next\",\u003chttp://example.com?page=2\u0026page_size=50\u0026page_token=eyJvZmZzZXQiOiIxMDAiLCJ2IjoyfQ\u0026per_page=50\u003e",
+  "rel=\"last\""
+]

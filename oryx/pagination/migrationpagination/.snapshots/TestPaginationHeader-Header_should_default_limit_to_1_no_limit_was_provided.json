@@ -1,0 +1,7 @@
+[
+  "\u003chttp://example.com?page=0\u0026page_size=1\u0026page_token=eyJvZmZzZXQiOiIwIiwidiI6Mn0\u0026per_page=1\u003e",
+  "rel=\"first\",\u003chttp://example.com?page=21\u0026page_size=1\u0026page_token=eyJvZmZzZXQiOiIyMSIsInYiOjJ9\u0026per_page=1\u003e",
+  "rel=\"next\",\u003chttp://example.com?page=19\u0026page_size=1\u0026page_token=eyJvZmZzZXQiOiIxOSIsInYiOjJ9\u0026per_page=1\u003e",
+  "rel=\"prev\",\u003chttp://example.com?page=99\u0026page_size=1\u0026page_token=eyJvZmZzZXQiOiI5OSIsInYiOjJ9\u0026per_page=1\u003e",
+  "rel=\"last\""
+]

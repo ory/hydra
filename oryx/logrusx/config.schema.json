@@ -1,0 +1,43 @@
+{
+  "$id": "ory://logging-config",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Log",
+  "description": "Configure logging using the following options. Logs will always be sent to stdout and stderr.",
+  "type": "object",
+  "properties": {
+    "level": {
+      "title": "Level",
+      "description": "The level of log entries to show. Debug enables stack traces on errors.",
+      "type": "string",
+      "default": "info",
+      "enum": ["panic", "fatal", "error", "warn", "info", "debug", "trace"]
+    },
+    "format": {
+      "title": "Log Format",
+      "description": "The output format of log messages.",
+      "type": "string",
+      "default": "text",
+      "enum": ["json", "json_pretty", "gelf", "text"]
+    },
+    "leak_sensitive_values": {
+      "type": "boolean",
+      "title": "Leak Sensitive Log Values",
+      "description": "If set will leak sensitive values (e.g. emails) in the logs.",
+      "default": false
+    },
+    "redaction_text": {
+      "type": "string",
+      "title": "Sensitive log value redaction text",
+      "description": "Text to use, when redacting sensitive log value."
+    },
+    "additional_redacted_headers": {
+      "type": "array",
+      "title": "Additional redacted headers",
+      "description": "List of HTTP headers which will be redacted.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

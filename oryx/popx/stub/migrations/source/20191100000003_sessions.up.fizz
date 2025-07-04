@@ -1,0 +1,9 @@
+create_table("sessions") {
+	t.Column("id", "uuid", {primary: true})
+  t.Column("issued_at", "timestamp", { "default_raw": "CURRENT_TIMESTAMP" })
+  t.Column("expires_at", "timestamp")
+  t.Column("authenticated_at", "timestamp")
+  t.Column("identity_id", "uuid")
+
+  t.ForeignKey("identity_id", {"identities": ["id"]}, {"on_delete": "cascade"})
+}

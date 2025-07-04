@@ -1,0 +1,1 @@
+INSERT INTO "_selfservice_errors_tmp" (id, errors, seen_at, was_seen, created_at, updated_at, csrf_token) SELECT id, errors, seen_at, was_seen, created_at, updated_at, csrf_token FROM "selfservice_errors"

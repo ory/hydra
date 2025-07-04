@@ -1,0 +1,14 @@
+{
+  "TableName": "\"test_models\"",
+  "ColumnsDecl": "\"created_at\", \"id\", \"int\", \"nid\", \"null_time_ptr\", \"string\", \"updated_at\"",
+  "Columns": [
+    "created_at",
+    "id",
+    "int",
+    "nid",
+    "null_time_ptr",
+    "string",
+    "updated_at"
+  ],
+  "Placeholders": "(?, ?, ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, ?, ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, ?, ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, gen_random_uuid(), ?, ?, ?, ?, ?),\n(?, ?, ?, ?, ?, ?, ?)"
+}

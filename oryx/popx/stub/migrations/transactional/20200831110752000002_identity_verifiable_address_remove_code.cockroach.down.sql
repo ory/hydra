@@ -1,0 +1,1 @@
+ALTER TABLE "identity_verifiable_addresses" DROP COLUMN "_expires_at_tmp"

@@ -1,0 +1,57 @@
+{
+  "$id": "https://example.com/person.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "object",
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        }
+      },
+      "required": ["first"]
+    },
+    "name2": {
+      "type": "object",
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        }
+      },
+      "required": ["first"]
+    },
+    "age": {
+      "type": "integer"
+    },
+    "age2": {
+      "type": "integer"
+    },
+    "ratio": {
+      "type": "number"
+    },
+    "ratio2": {
+      "type": "number"
+    },
+    "consent": {
+      "type": "boolean"
+    },
+    "consent2": {
+      "type": "boolean"
+    },
+    "newsletter": {
+      "type": "boolean"
+    },
+    "newsletter2": {
+      "type": "boolean"
+    }
+  },
+  "required": ["age2", "ratio2", "consent2", "newsletter2", "name2"]
+}

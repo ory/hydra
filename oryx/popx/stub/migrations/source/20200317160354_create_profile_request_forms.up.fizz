@@ -1,0 +1,12 @@
+create_table("selfservice_profile_management_request_methods") {
+	t.Column("id", "uuid", {primary: true})
+  t.Column("method", "string", {"size": 32})
+  t.Column("selfservice_profile_management_request_id", "uuid")
+  t.Column("config", "json")
+}
+
+add_column("selfservice_profile_management_requests", "active_method", "string", {"size": 32, null: true})
+
+sql("INSERT INTO selfservice_profile_management_request_methods (id, method, selfservice_profile_management_request_id, config) SELECT id, 'traits', id, form FROM selfservice_profile_management_requests;")
+
+drop_column("selfservice_profile_management_requests", "form")

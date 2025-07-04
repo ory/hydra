@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_settings_requests" ADD COLUMN "messages" json;COMMIT TRANSACTION;BEGIN TRANSACTION;

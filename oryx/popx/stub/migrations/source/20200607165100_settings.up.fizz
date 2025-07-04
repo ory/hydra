@@ -1,0 +1,2 @@
+add_column("selfservice_settings_requests", "state", "string", {"default": "show_form"})
+drop_column("selfservice_settings_requests", "update_successful")

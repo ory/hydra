@@ -1,0 +1,21 @@
+create_table("identity_verification_tokens") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("token", "string", {"size": 64})
+  t.Column("used", "bool", {"default": false})
+  t.Column("used_at", "timestamp", {"null": true})
+  t.Column("expires_at", "timestamp")
+  t.Column("issued_at", "timestamp")
+
+  t.Column("identity_verifiable_address_id", "uuid")
+  t.ForeignKey("identity_verifiable_address_id", {"identity_verifiable_addresses": ["id"]}, {"on_delete": "cascade"})
+
+  t.Column("selfservice_verification_flow_id", "uuid", {"null": true})
+  t.ForeignKey("selfservice_verification_flow_id", {"selfservice_verification_flows": ["id"]}, {"on_delete": "cascade"})
+}
+
+add_index("identity_verification_tokens", ["token"], { "unique": true, "name": "identity_verification_tokens_token_uq_idx" })
+add_index("identity_verification_tokens", ["token"], { "name": "identity_verification_tokens_token_idx" })
+
+add_index("identity_verification_tokens", ["identity_verifiable_address_id"], { "name": "identity_verification_tokens_verifiable_address_id_idx" })
+add_index("identity_verification_tokens", ["selfservice_verification_flow_id"], { "name": "identity_verification_tokens_verification_flow_id_idx" })

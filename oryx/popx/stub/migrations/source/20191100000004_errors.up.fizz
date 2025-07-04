@@ -1,0 +1,6 @@
+create_table("selfservice_errors") {
+	t.Column("id", "uuid", {primary: true})
+  t.Column("errors", "json")
+  t.Column("seen_at", "timestamp")
+  t.Column("was_seen", "bool")
+}

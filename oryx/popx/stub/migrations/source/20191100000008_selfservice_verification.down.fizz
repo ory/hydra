@@ -1,0 +1,2 @@
+drop_table("selfservice_verification_requests")
+drop_table("identity_verifiable_addresses")

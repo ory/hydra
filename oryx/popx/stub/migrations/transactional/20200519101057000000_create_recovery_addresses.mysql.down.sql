@@ -1,0 +1,1 @@
+DROP TABLE `identity_recovery_addresses`;

@@ -1,0 +1,1 @@
+INSERT INTO testdata (Data) VALUES ('testdata');

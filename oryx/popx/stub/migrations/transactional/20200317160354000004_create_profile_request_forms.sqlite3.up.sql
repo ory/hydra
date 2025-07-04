@@ -1,0 +1,1 @@
+INSERT INTO "_selfservice_profile_management_requests_tmp" (id, request_url, issued_at, expires_at, update_successful, identity_id, created_at, updated_at, active_method) SELECT id, request_url, issued_at, expires_at, update_successful, identity_id, created_at, updated_at, active_method FROM "selfservice_profile_management_requests"

@@ -1,0 +1,1 @@
+ALTER TABLE "courier_messages" ALTER COLUMN "body" TYPE text, ALTER COLUMN "body" SET NOT NULL;

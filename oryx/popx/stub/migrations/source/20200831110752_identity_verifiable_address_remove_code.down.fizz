@@ -1,0 +1,28 @@
+add_column("identity_verifiable_addresses", "code", "string", {"size": 32, "null": true})
+add_column("identity_verifiable_addresses", "expires_at", "timestamp", { "null": true })
+
+{{ if .IsSQLite }}
+  sql("UPDATE identity_verifiable_addresses SET code = substr(hex(randomblob(32)), 0, 32) WHERE code IS NULL")
+  sql("UPDATE identity_verifiable_addresses SET expires_at = CURRENT_TIMESTAMP WHERE expires_at IS NULL")
+{{ end }}
+
+{{ if or .IsMySQL .IsMariaDB }}
+  sql("UPDATE identity_verifiable_addresses SET code = LEFT(MD5(RAND()), 32) WHERE code IS NULL")
+  sql("UPDATE identity_verifiable_addresses SET expires_at = CURRENT_TIMESTAMP WHERE expires_at IS NULL")
+{{ end }}
+
+{{ if .IsPostgreSQL }}
+  sql("UPDATE identity_verifiable_addresses SET code = substr(md5(random()::text), 0, 32) WHERE code IS NULL")
+  sql("UPDATE identity_verifiable_addresses SET expires_at = CURRENT_TIMESTAMP WHERE expires_at IS NULL")
+{{ end }}
+
+{{ if .IsCockroach }}
+  sql("UPDATE identity_verifiable_addresses SET code = substr(md5(uuid_v4()), 0, 32) WHERE code IS NULL")
+  sql("UPDATE identity_verifiable_addresses SET expires_at = CURRENT_TIMESTAMP WHERE expires_at IS NULL")
+{{ end }}
+
+change_column("identity_verifiable_addresses", "code", "string", {"size": 32})
+change_column("identity_verifiable_addresses", "expires_at", "timestamp", { "null": false })
+
+add_index("identity_verifiable_addresses", ["code"], { "unique": true, "name": "identity_verifiable_addresses_code_uq_idx" })
+add_index("identity_verifiable_addresses", ["code"], { "name": "identity_verifiable_addresses_code_idx" })

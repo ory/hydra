@@ -1,0 +1,92 @@
+{
+  "$id": "https://raw.githubusercontent.com/ory/x/master/.schemas/corsx/viper.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cross Origin Resource Sharing (CORS)",
+  "description": "Configure [Cross Origin Resource Sharing (CORS)](http://www.w3.org/TR/cors/) using the following options.",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "title": "Enable CORS",
+      "description": "If set to true, CORS will be enabled and preflight-requests (OPTION) will be answered."
+    },
+    "allowed_origins": {
+      "title": "Allowed Origins",
+      "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Usage of wildcards implies a small performance penality. Only one wildcard can be used per origin.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": ["*"],
+      "uniqueItems": true,
+      "examples": [
+        "https://example.com",
+        "https://*.example.com",
+        "https://*.foo.example.com"
+      ]
+    },
+    "allowed_methods": {
+      "type": "array",
+      "title": "Allowed HTTP Methods",
+      "description": "A list of methods the client is allowed to use with cross-domain requests.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "GET",
+          "HEAD",
+          "POST",
+          "PUT",
+          "DELETE",
+          "CONNECT",
+          "TRACE",
+          "PATCH"
+        ]
+      },
+      "uniqueItems": true,
+      "default": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    },
+    "allowed_headers": {
+      "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
+      "title": "Allowed Request HTTP Headers",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minLength": 1,
+      "uniqueItems": true,
+      "default": ["Authorization", "Content-Type"]
+    },
+    "exposed_headers": {
+      "description": "Indicates which headers are safe to expose to the API of a CORS API specification",
+      "title": "Allowed Response HTTP Headers",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minLength": 1,
+      "uniqueItems": true,
+      "default": ["Content-Type"]
+    },
+    "allow_credentials": {
+      "type": "boolean",
+      "title": "Allow HTTP Credentials",
+      "default": false,
+      "description": "Indicates whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates."
+    },
+    "max_age": {
+      "type": "number",
+      "default": 0,
+      "title": "Maximum Age",
+      "description": "Indicates how long (in seconds) the results of a preflight request can be cached. The default is 0 which stands for no max age."
+    },
+    "debug": {
+      "type": "boolean",
+      "default": false,
+      "title": "Enable Debugging",
+      "description": "Set to true to debug server side CORS issues."
+    }
+  },
+  "additionalProperties": false
+}

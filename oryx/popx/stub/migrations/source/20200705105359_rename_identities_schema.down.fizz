@@ -1,0 +1,1 @@
+rename_column("identities", "schema_id", "traits_schema_id")

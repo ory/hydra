@@ -1,0 +1,9 @@
+{
+  "ui": {
+    "action": "https://auth.example.com"
+  },
+  "callbacks": [
+    "https://auth.example.com/path/to/resource",
+    "https://auth.example.com/path?q=https://localhost:8000"
+  ]
+}

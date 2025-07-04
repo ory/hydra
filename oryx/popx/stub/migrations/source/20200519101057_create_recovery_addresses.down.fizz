@@ -1,0 +1,4 @@
+drop_table("identity_recovery_tokens")
+drop_table("selfservice_recovery_request_methods")
+drop_table("selfservice_recovery_requests")
+drop_table("identity_recovery_addresses")

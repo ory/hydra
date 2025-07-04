@@ -1,0 +1,15 @@
+{
+  "nested": {
+    "object": {
+      "source": "base64://aGVsbG8gd29ybGQ="
+    },
+    "array": [
+      {
+        "nested": {
+          "source": "base64://aGVsbG8gd29ybGQ="
+        }
+      },
+      "base64://aGVsbG8gd29ybGQ="
+    ]
+  }
+}

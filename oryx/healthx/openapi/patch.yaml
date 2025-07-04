@@ -1,0 +1,112 @@
+- op: replace
+  path: /paths/~1health~1alive
+  value:
+    get:
+      description: |-
+        This endpoint returns a HTTP 200 status code when {{.ProjectHumanName}} is accepting incoming
+        HTTP requests. This status does currently not include checks whether the database connection is working.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of this service, the health status will never
+        refer to the cluster state, only to a single instance.
+      operationId: isAlive
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                required:
+                  - status
+                type: object
+                properties:
+                  status:
+                    description: Always "ok".
+                    type: string
+          description: '{{.ProjectHumanName}} is ready to accept connections.'
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Unexpected error
+      summary: Check HTTP Server Status
+      tags: {{ .HealthPathTags | toJson }}
+- op: replace
+  path: /paths/~1health~1ready
+  value:
+    get:
+      operationId: isReady
+      description: |-
+        This endpoint returns a HTTP 200 status code when {{.ProjectHumanName}} is up running and the environment dependencies (e.g.
+        the database) are responsive as well.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of {{.ProjectHumanName}}, the health status will never
+        refer to the cluster state, only to a single instance.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                required:
+                  - status
+                type: object
+                properties:
+                  status:
+                    description: Always "ok".
+                    type: string
+          description: '{{.ProjectHumanName}} is ready to accept requests.'
+        '503':
+          content:
+            application/json:
+              schema:
+                required:
+                  - errors
+                properties:
+                  errors:
+                    additionalProperties:
+                      type: string
+                    description: Errors contains a list of errors that caused the not ready status.
+                    type: object
+                type: object
+          description: Ory Kratos is not yet ready to accept requests.
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Unexpected error
+      summary: Check HTTP Server and Database Status
+      tags: {{ .HealthPathTags | toJson }}
+- op: replace
+  path: /paths/~1version
+  value:
+    get:
+      description: |-
+        This endpoint returns the version of {{.ProjectHumanName}}.
+
+        If the service supports TLS Edge Termination, this endpoint does not require the
+        `X-Forwarded-Proto` header to be set.
+
+        Be aware that if you are running multiple nodes of this service, the version will never
+        refer to the cluster state, only to a single instance.
+      operationId: getVersion
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - version
+                properties:
+                  version:
+                    description: The version of {{.ProjectHumanName}}.
+                    type: string
+          description: Returns the {{.ProjectHumanName}} version.
+      summary: Return Running Software Version.
+      tags: {{ .HealthPathTags | toJson }}

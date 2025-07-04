@@ -1,0 +1,7 @@
+<%#
+
+Do nothing because the change will not be able to preserve data and the change is insignificant as it's compatible
+with both code bases (prior and after this change).
+
+WARNING: https://github.com/gobuffalo/fizz/issues/45#issuecomment-586833728
+%>

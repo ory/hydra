@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_verification_flows" ADD COLUMN "state" TEXT NOT NULL DEFAULT 'show_form';

@@ -1,0 +1,1 @@
+UPDATE identity_verifiable_addresses SET code = LEFT(MD5(RAND()), 32) WHERE code IS NULL

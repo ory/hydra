@@ -1,0 +1,1085 @@
+{
+  "$id": "https://github.com/ory/kratos/.schema/config.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ORY Kratos Configuration",
+  "type": "object",
+  "definitions": {
+    "defaultReturnTo": {
+      "title": "Redirect browsers to set URL per default",
+      "description": "ORY Kratos redirects to this URL per default on completion of self-service flows and other browser interaction. Read this [article for more information on browser redirects](https://www.ory.sh/kratos/docs/concepts/browser-redirect-flow-completion).",
+      "type": "string",
+      "format": "uri-reference",
+      "minLength": 1,
+      "examples": ["https://my-app.com/dashboard", "/dashboard"]
+    },
+    "selfServiceSessionRevokerHook": {
+      "type": "object",
+      "properties": {
+        "hook": {
+          "const": "revoke_active_sessions"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["hook"]
+    },
+    "selfServiceVerifyHook": {
+      "type": "object",
+      "properties": {
+        "hook": {
+          "const": "verify"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["hook"]
+    },
+    "selfServiceSessionIssuerHook": {
+      "type": "object",
+      "properties": {
+        "hook": {
+          "const": "session"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["hook"]
+    },
+    "OIDCClaims": {
+      "title": "OpenID Connect claims",
+      "description": "The OpenID Connect claims and optionally their properties which should be included in the id_token or returned from the UserInfo Endpoint.",
+      "type": "object",
+      "examples": [
+        {
+          "id_token": {
+            "email": null,
+            "email_verified": null
+          }
+        },
+        {
+          "userinfo": {
+            "given_name": {
+              "essential": true
+            },
+            "nickname": null,
+            "email": {
+              "essential": true
+            },
+            "email_verified": {
+              "essential": true
+            },
+            "picture": null,
+            "http://example.info/claims/groups": null
+          },
+          "id_token": {
+            "auth_time": {
+              "essential": true
+            },
+            "acr": {
+              "values": ["urn:mace:incommon:iap:silver"]
+            }
+          }
+        }
+      ],
+      "patternProperties": {
+        "^userinfo$|^id_token$": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            ".*": {
+              "oneOf": [
+                {
+                  "const": null,
+                  "description": "Indicates that this Claim is being requested in the default manner."
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "essential": {
+                      "description": "Indicates whether the Claim being requested is an Essential Claim.",
+                      "type": "boolean"
+                    },
+                    "value": {
+                      "description": "Requests that the Claim be returned with a particular value.",
+                      "$comment": "There seem to be no constrains on value"
+                    },
+                    "values": {
+                      "description": "Requests that the Claim be returned with one of a set of values, with the values appearing in order of preference.",
+                      "type": "array",
+                      "items": {
+                        "$comment": "There seem to be no constrains on individual items"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "selfServiceOIDCProvider": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "examples": ["google"]
+        },
+        "provider": {
+          "title": "Provider",
+          "description": "Can be one of github, gitlab, generic, google, microsoft, discord.",
+          "type": "string",
+          "enum": [
+            "github",
+            "gitlab",
+            "generic",
+            "google",
+            "microsoft",
+            "discord"
+          ],
+          "examples": ["google"]
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        },
+        "issuer_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": ["https://accounts.google.com"]
+        },
+        "auth_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": ["https://accounts.google.com/o/oauth2/v2/auth"]
+        },
+        "token_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": ["https://www.googleapis.com/oauth2/v4/token"]
+        },
+        "mapper_url": {
+          "title": "Jsonnet Mapper URL",
+          "description": "The URL where the jsonnet source is located for mapping the provider's data to ORY Kratos data.",
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "file://path/to/oidc.jsonnet",
+            "https://foo.bar.com/path/to/oidc.jsonnet",
+            "base64://bG9jYWwgc3ViamVjdCA9I..."
+          ]
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "examples": ["offline_access", "profile"]
+          }
+        },
+        "tenant": {
+          "title": "Azure AD Tenant",
+          "description": "The Azure AD Tenant to use for authentication.",
+          "type": "string",
+          "examples": [
+            "common",
+            "organizations",
+            "consumers",
+            "8eaef023-2b34-4da1-9baa-8bc8c9d6a490",
+            "contoso.onmicrosoft.com"
+          ]
+        },
+        "requested_claims": {
+          "$ref": "#/definitions/OIDCClaims"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "provider",
+        "client_id",
+        "client_secret",
+        "mapper_url"
+      ],
+      "if": {
+        "properties": {
+          "provider": {
+            "const": "microsoft"
+          }
+        },
+        "required": ["provider"]
+      },
+      "then": {
+        "required": ["tenant"]
+      },
+      "else": {
+        "not": {
+          "properties": {
+            "tenant": {}
+          },
+          "required": ["tenant"]
+        }
+      }
+    },
+    "selfServiceAfterSettingsMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "hooks": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/selfServiceVerifyHook"
+              }
+            ]
+          },
+          "uniqueItems": true,
+          "additionalItems": false
+        }
+      }
+    },
+    "selfServiceAfterLoginMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "hooks": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/selfServiceSessionRevokerHook"
+              }
+            ]
+          },
+          "uniqueItems": true,
+          "additionalItems": false
+        }
+      }
+    },
+    "selfServiceAfterRegistrationMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "hooks": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/selfServiceSessionIssuerHook"
+              }
+            ]
+          },
+          "uniqueItems": true,
+          "additionalItems": false
+        }
+      }
+    },
+    "selfServiceAfterSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "password": {
+          "$ref": "#/definitions/selfServiceAfterSettingsMethod"
+        },
+        "profile": {
+          "$ref": "#/definitions/selfServiceAfterSettingsMethod"
+        }
+      }
+    },
+    "selfServiceAfterLogin": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "password": {
+          "$ref": "#/definitions/selfServiceAfterLoginMethod"
+        },
+        "oidc": {
+          "$ref": "#/definitions/selfServiceAfterLoginMethod"
+        }
+      }
+    },
+    "selfServiceAfterRegistration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "password": {
+          "$ref": "#/definitions/selfServiceAfterRegistrationMethod"
+        },
+        "oidc": {
+          "$ref": "#/definitions/selfServiceAfterRegistrationMethod"
+        }
+      }
+    }
+  },
+  "properties": {
+    "selfservice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_browser_return_url"],
+      "properties": {
+        "default_browser_return_url": {
+          "$ref": "#/definitions/defaultReturnTo"
+        },
+        "whitelisted_return_urls": {
+          "title": "Whitelisted Return To URLs",
+          "description": "List of URLs that are allowed to be redirected to. A redirection request is made by appending `?return_to=...` to Login, Registration, and other self-service flows.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "examples": [
+            [
+              "https://app.my-app.com/dashboard",
+              "/dashboard",
+              "https://www.my-app.com/"
+            ]
+          ],
+          "uniqueItems": true
+        },
+        "flows": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "settings": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ui_url": {
+                  "title": "URL of the Settings page.",
+                  "description": "URL where the Settings UI is hosted. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/user/settings"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/settings"
+                },
+                "lifespan": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                },
+                "privileged_session_max_age": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                },
+                "after": {
+                  "$ref": "#/definitions/selfServiceAfterSettings"
+                }
+              }
+            },
+            "logout": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "after": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "default_browser_return_url": {
+                      "$ref": "#/definitions/defaultReturnTo"
+                    }
+                  }
+                }
+              }
+            },
+            "registration": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ui_url": {
+                  "title": "Registration UI URL",
+                  "description": "URL where the Registration UI is hosted. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/signup"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/registration"
+                },
+                "lifespan": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                },
+                "after": {
+                  "$ref": "#/definitions/selfServiceAfterRegistration"
+                }
+              }
+            },
+            "login": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ui_url": {
+                  "title": "Login UI URL",
+                  "description": "URL where the Login UI is hosted. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/login"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/login"
+                },
+                "lifespan": {
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                },
+                "after": {
+                  "$ref": "#/definitions/selfServiceAfterLogin"
+                }
+              }
+            },
+            "verification": {
+              "title": "Email and Phone Verification and Account Activation Configuration",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enable Email/Phone Verification",
+                  "description": "If set to true will enable [Email and Phone Verification and Account Activation](https://www.ory.sh/kratos/docs/self-service/flows/verify-email-account-activation/).",
+                  "default": false
+                },
+                "ui_url": {
+                  "title": "Verify UI URL",
+                  "description": "URL where the ORY Verify UI is hosted. This is the page where users activate and / or verify their email or telephone number. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/verify"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/verification"
+                },
+                "after": {
+                  "type": "object",
+                  "properties": {
+                    "default_browser_return_url": {
+                      "$ref": "#/definitions/defaultReturnTo"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "lifespan": {
+                  "title": "Self-Service Verification Request Lifespan",
+                  "description": "Sets how long the verification request (for the UI interaction) is valid.",
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                }
+              }
+            },
+            "recovery": {
+              "title": "Account Recovery Configuration",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enable Account Recovery",
+                  "description": "If set to true will enable [Account Recovery](https://www.ory.sh/kratos/docs/self-service/flows/password-reset-account-recovery/).",
+                  "default": false
+                },
+                "ui_url": {
+                  "title": "Recovery UI URL",
+                  "description": "URL where the ORY Recovery UI is hosted. This is the page where users request and complete account recovery. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/verify"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/recovery"
+                },
+                "after": {
+                  "type": "object",
+                  "properties": {
+                    "default_browser_return_url": {
+                      "$ref": "#/definitions/defaultReturnTo"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "lifespan": {
+                  "title": "Self-Service Recovery Request Lifespan",
+                  "description": "Sets how long the recovery request is valid. If expired, the user has to redo the flow.",
+                  "type": "string",
+                  "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+                  "default": "1h",
+                  "examples": ["1h", "1m", "1s"]
+                }
+              }
+            },
+            "error": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "ui_url": {
+                  "title": "ORY Kratos Error UI URL",
+                  "description": "URL where the ORY Kratos Error UI is hosted. Check the [reference implementation](https://github.com/ory/kratos-selfservice-ui-node).",
+                  "type": "string",
+                  "format": "uri-reference",
+                  "examples": ["https://my-app.com/kratos-error"],
+                  "default": "https://www.ory.sh/kratos/docs/fallback/error"
+                }
+              }
+            }
+          }
+        },
+        "methods": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "profile": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enables Profile Management Method",
+                  "default": true
+                }
+              }
+            },
+            "link": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enables Link Method",
+                  "default": true
+                }
+              }
+            },
+            "password": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enables Username/Email and Password Method",
+                  "default": true
+                }
+              }
+            },
+            "oidc": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enables OpenID Connect Method",
+                  "default": false
+                },
+                "config": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "providers": {
+                      "title": "OpenID Connect and OAuth2 Providers",
+                      "description": "A list and configuration of OAuth2 and OpenID Connect providers ORY Kratos should integrate with.",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/selfServiceOIDCProvider"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dsn": {
+      "type": "string",
+      "title": "Data Source Name",
+      "description": "DSN is used to specify the database credentials as a connection URI.",
+      "examples": [
+        "postgres://user: password@postgresd:5432/database?sslmode=disable&max_conns=20&max_idle_conns=4",
+        "mysql://user:secret@tcp(mysqld:3306)/database?max_conns=20&max_idle_conns=4",
+        "cockroach://user@cockroachdb:26257/database?sslmode=disable&max_conns=20&max_idle_conns=4",
+        "sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc"
+      ]
+    },
+    "courier": {
+      "type": "object",
+      "title": "Courier configuration",
+      "description": "The courier is responsible for sending and delivering messages over email, sms, and other means.",
+      "properties": {
+        "template_override_path": {
+          "type": "string",
+          "title": "Override message templates",
+          "description": "You can override certain or all message templates by pointing this key to the path where the templates are located.",
+          "examples": ["/conf/courier-templates"]
+        },
+        "smtp": {
+          "title": "SMTP Configuration",
+          "description": "Configures outgoing emails using the SMTP protocol.",
+          "type": "object",
+          "properties": {
+            "connection_uri": {
+              "title": "SMTP connection string",
+              "description": "This URI will be used to connect to the SMTP server. Use the query parameter to allow (`?skip_ssl_verify=true`) or disallow (`?skip_ssl_verify=false`) self-signed TLS certificates. Please keep in mind that any host other than localhost / 127.0.0.1 must use smtp over TLS (smtps) or the connection will not be possible.",
+              "examples": [
+                "smtps://foo:bar@my-mailserver:1234/?skip_ssl_verify=false"
+              ],
+              "type": "string",
+              "format": "uri"
+            },
+            "from_address": {
+              "title": "SMTP Sender Address",
+              "description": "The recipient of an email will see this as the sender address.",
+              "type": "string",
+              "format": "email",
+              "default": "no-reply@ory.kratos.sh"
+            }
+          },
+          "required": ["connection_uri"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["smtp"],
+      "additionalProperties": false
+    },
+    "serve": {
+      "type": "object",
+      "properties": {
+        "admin": {
+          "type": "object",
+          "properties": {
+            "base_url": {
+              "title": "Admin Base URL",
+              "description": "The URL where the admin endpoint is exposed at.",
+              "type": "string",
+              "format": "uri",
+              "examples": ["https://kratos.private-network:4434/"]
+            },
+            "host": {
+              "title": "Admin Host",
+              "description": "The host (interface) kratos' admin endpoint listens on.",
+              "type": "string",
+              "default": "0.0.0.0"
+            },
+            "port": {
+              "title": "Admin Port",
+              "description": "The port kratos' admin endpoint listens on.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "examples": [4434],
+              "default": 4434
+            }
+          },
+          "additionalProperties": false
+        },
+        "public": {
+          "type": "object",
+          "properties": {
+            "cors": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures Cross Origin Resource Sharing for public endpoints.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Sets whether CORS is enabled.",
+                  "default": false
+                },
+                "allowed_origins": {
+                  "type": "array",
+                  "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "not": {
+                      "type": "string",
+                      "description": "does match all strings that contain two or more (*)",
+                      "pattern": ".*\\*.*\\*.*"
+                    },
+                    "anyOf": [
+                      {
+                        "format": "uri"
+                      },
+                      {
+                        "const": "*"
+                      }
+                    ]
+                  },
+                  "uniqueItems": true,
+                  "default": ["*"],
+                  "examples": [
+                    [
+                      "https://example.com",
+                      "https://*.example.com",
+                      "https://*.foo.example.com"
+                    ]
+                  ]
+                },
+                "allowed_methods": {
+                  "type": "array",
+                  "description": "A list of HTTP methods the user agent is allowed to use with cross-domain requests.",
+                  "default": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "POST",
+                      "GET",
+                      "PUT",
+                      "PATCH",
+                      "DELETE",
+                      "CONNECT",
+                      "HEAD",
+                      "OPTIONS",
+                      "TRACE"
+                    ]
+                  }
+                },
+                "allowed_headers": {
+                  "type": "array",
+                  "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
+                  "default": [
+                    "Authorization",
+                    "Content-Type",
+                    "X-Session-Token"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "exposed_headers": {
+                  "type": "array",
+                  "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
+                  "default": ["Content-Type"],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "allow_credentials": {
+                  "type": "boolean",
+                  "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
+                  "default": true
+                },
+                "options_passthrough": {
+                  "type": "boolean",
+                  "description": "TODO",
+                  "default": false
+                },
+                "max_age": {
+                  "type": "integer",
+                  "description": "Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.",
+                  "default": 0,
+                  "minimum": 0
+                },
+                "debug": {
+                  "type": "boolean",
+                  "description": "Adds additional log output to debug server side CORS issues.",
+                  "default": false
+                }
+              }
+            },
+            "base_url": {
+              "title": "Public Base URL",
+              "description": "The URL where the public endpoint is exposed at.",
+              "type": "string",
+              "format": "uri-reference",
+              "examples": [
+                "https://my-app.com/.ory/kratos/public",
+                "/.ory/kratos/public/"
+              ]
+            },
+            "host": {
+              "title": "Public Host",
+              "description": "The host (interface) kratos' public endpoint listens on.",
+              "type": "string",
+              "default": "0.0.0.0"
+            },
+            "port": {
+              "title": "Public Port",
+              "description": "The port kratos' public endpoint listens on.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535,
+              "examples": [4433],
+              "default": 4433
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "log": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "trace",
+            "debug",
+            "info",
+            "warning",
+            "error",
+            "fatal",
+            "panic"
+          ]
+        },
+        "leak_sensitive_values": {
+          "type": "boolean",
+          "title": "Leak Sensitive Log Values",
+          "description": "If set will leak sensitive values (e.g. emails) in the logs."
+        },
+        "redaction_text": {
+          "type": "string",
+          "title": "Sensitive log value redaction text",
+          "description": "Text to use, when redacting sensitive log value."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["json", "text"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "properties": {
+        "default_schema_url": {
+          "title": "JSON Schema URL for default identity traits",
+          "description": "Path to the JSON Schema which describes a default identity's traits.",
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "file://path/to/identity.traits.schema.json",
+            "https://foo.bar.com/path/to/identity.traits.schema.json"
+          ]
+        },
+        "schemas": {
+          "type": "array",
+          "title": "Additional JSON Schemas for Identity Traits",
+          "examples": [
+            [
+              {
+                "id": "customer",
+                "url": "https://foo.bar.com/path/to/customer.traits.schema.json"
+              },
+              {
+                "id": "employee",
+                "url": "https://foo.bar.com/path/to/employee.traits.schema.json"
+              },
+              {
+                "id": "employee-v2",
+                "url": "https://foo.bar.com/path/to/employee.v2.traits.schema.json"
+              }
+            ]
+          ],
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "title": "The schema's ID.",
+                "type": "string",
+                "examples": ["employee"]
+              },
+              "url": {
+                "type": "string",
+                "title": "Path to the JSON Schema",
+                "format": "uri",
+                "examples": [
+                  "file://path/to/identity.traits.schema.json",
+                  "https://foo.bar.com/path/to/identity.traits.schema.json"
+                ]
+              }
+            },
+            "required": ["id", "url"],
+            "not": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "const": "default"
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        }
+      },
+      "required": ["default_schema_url"],
+      "additionalProperties": false
+    },
+    "secrets": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "array",
+          "title": "Default Encryption Signing Secrets",
+          "description": "The first secret in the array is used for singing and encrypting things while all other keys are used to verify and decrypt older things that were signed with that old secret.",
+          "items": {
+            "type": "string",
+            "minLength": 16
+          },
+          "uniqueItems": true
+        },
+        "cookie": {
+          "type": "array",
+          "title": "Singing Keys for Cookies",
+          "description": "The first secret in the array is used for encrypting cookies while all other keys are used to decrypt older cookies that were signed with that old secret.",
+          "items": {
+            "type": "string",
+            "minLength": 16
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "hashers": {
+      "title": "Hashing Algorithm Configuration",
+      "type": "object",
+      "properties": {
+        "argon2": {
+          "title": "Configuration for the Argon2id hasher.",
+          "type": "object",
+          "properties": {
+            "memory": {
+              "type": "integer",
+              "minimum": 16384
+            },
+            "iterations": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "parallelism": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "salt_length": {
+              "type": "integer",
+              "minimum": 16
+            },
+            "key_length": {
+              "type": "integer",
+              "minimum": 16
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lifespan": {
+          "title": "Session Lifespan",
+          "description": "Defines how long a session is active. Once that lifespan has been reached, the user needs to sign in again.",
+          "type": "string",
+          "pattern": "^[0-9]+(ns|us|ms|s|m|h)$",
+          "default": "24h",
+          "examples": ["1h", "1m", "1s"]
+        },
+        "cookie": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "title": "Session Cookie Domain",
+              "description": "Sets the session cookie domain. Useful when dealing with subdomains. Use with care!",
+              "type": "string"
+            },
+            "persistent": {
+              "title": "Make Session Cookie Persistent",
+              "description": "If set to true will persist the cookie in the end-user's browser using the `max-age` parameter which is set to the `session.lifespan` value. Persistent cookies are not deleted when the browser is closed (e.g. on reboot or alt+f4).",
+              "type": "boolean",
+              "default": true
+            },
+            "path": {
+              "title": "Session Cookie Path",
+              "description": "Sets the session cookie path. Use with care!",
+              "type": "string",
+              "default": "/"
+            },
+            "same_site": {
+              "title": "Cookie Same Site Configuration",
+              "type": "string",
+              "enum": ["Strict", "Lax", "None"],
+              "default": "Lax"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "version": {
+      "title": "The kratos version this config is written for.",
+      "description": "SemVer according to https://semver.org/ prefixed with `v` as in our releases.",
+      "type": "string",
+      "pattern": "^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "examples": ["v0.5.0-alpha.1"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "selfservice": {
+            "properties": {
+              "flows": {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "verification": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        },
+                        "required": ["enabled"]
+                      }
+                    },
+                    "required": ["verification"]
+                  },
+                  {
+                    "properties": {
+                      "recovery": {
+                        "properties": {
+                          "enabled": {
+                            "const": true
+                          }
+                        },
+                        "required": ["enabled"]
+                      }
+                    },
+                    "required": ["recovery"]
+                  }
+                ]
+              }
+            },
+            "required": ["flows"]
+          }
+        },
+        "required": ["selfservice"]
+      },
+      "then": {
+        "required": ["courier"]
+      }
+    }
+  ],
+  "required": ["identity", "dsn", "selfservice"]
+}

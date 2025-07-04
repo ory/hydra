@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_errors" ADD COLUMN "seen_at" timestamp

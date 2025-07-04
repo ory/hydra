@@ -1,0 +1,7 @@
+sql("DELETE FROM sessions")
+
+add_column("sessions", "token", "string", {"size": 32, "null": true})
+change_column("sessions", "token", "string", {"size": 32, "null": false})
+
+add_index("sessions", "token", {"unique": true, "name": "sessions_token_uq_idx"})
+add_index("sessions", "token", {"name": "sessions_token_idx" })

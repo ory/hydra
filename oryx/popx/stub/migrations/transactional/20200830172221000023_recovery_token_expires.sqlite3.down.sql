@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS "identity_recovery_addresses_code_uq_idx"

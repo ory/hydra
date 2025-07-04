@@ -1,0 +1,8 @@
+create_table("selfservice_verification_flow_methods") {
+	t.Column("id", "uuid", {primary: true})
+  t.Column("method", "string", {"size": 32})
+  t.Column("selfservice_verification_flow_id", "uuid")
+  t.Column("config", "json")
+}
+
+add_column("selfservice_verification_flows", "active_method", "string", {"size": 32, null: true})

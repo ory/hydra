@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_recovery_flow_methods" RENAME COLUMN "selfservice_recovery_flow_id" TO "selfservice_recovery_request_id";

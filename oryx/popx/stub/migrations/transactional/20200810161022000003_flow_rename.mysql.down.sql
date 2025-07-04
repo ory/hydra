@@ -1,0 +1,1 @@
+ALTER TABLE `selfservice_settings_flows` RENAME TO `selfservice_settings_requests`

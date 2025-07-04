@@ -1,0 +1,1 @@
+ALTER TABLE "selfservice_verification_flows" ADD COLUMN "via" VARCHAR (16) NOT NULL DEFAULT 'email'

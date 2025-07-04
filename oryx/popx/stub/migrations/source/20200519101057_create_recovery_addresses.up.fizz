@@ -1,0 +1,52 @@
+create_table("identity_recovery_addresses") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("via", "string", {"size": 16})
+  t.Column("value", "string", {"size": 400})
+
+  t.Column("identity_id", "uuid")
+  t.ForeignKey("identity_id", {"identities": ["id"]}, {"on_delete": "cascade"})
+}
+
+add_index("identity_recovery_addresses", ["via", "value"], { "unique": true, "name": "identity_recovery_addresses_status_via_uq_idx" })
+add_index("identity_recovery_addresses", ["via", "value"], { "name": "identity_recovery_addresses_status_via_idx" })
+
+create_table("selfservice_recovery_requests") {
+  t.Column("id", "uuid", {primary: true})
+  t.Column("request_url", "string", {"size": 2048})
+  t.Column("issued_at", "timestamp", { "default_raw": "CURRENT_TIMESTAMP" })
+  t.Column("expires_at", "timestamp")
+  t.Column("messages", "json", {"null": true})
+  t.Column("active_method", "string", {"size": 32, "null": true})
+  t.Column("csrf_token", "string")
+  t.Column("state", "string", {"size": 32})
+
+  t.Column("recovered_identity_id", "uuid", { "null": true })
+  t.ForeignKey("recovered_identity_id", {"identities": ["id"]}, {"on_delete": "cascade"})
+}
+
+create_table("selfservice_recovery_request_methods") {
+  t.Column("id", "uuid", {primary: true})
+  t.Column("method", "string", {"size": 32})
+  t.Column("config", "json")
+
+  t.Column("selfservice_recovery_request_id", "uuid")
+  t.ForeignKey("selfservice_recovery_request_id", {"selfservice_recovery_requests": ["id"]}, {"on_delete": "cascade"})
+}
+
+create_table("identity_recovery_tokens") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("token", "string", {"size": 64})
+  t.Column("used", "bool", {"default": false})
+  t.Column("used_at", "timestamp", {"null": true})
+
+  t.Column("identity_recovery_address_id", "uuid")
+  t.ForeignKey("identity_recovery_address_id", {"identity_recovery_addresses": ["id"]}, {"on_delete": "cascade"})
+
+  t.Column("selfservice_recovery_request_id", "uuid")
+  t.ForeignKey("selfservice_recovery_request_id", {"selfservice_recovery_requests": ["id"]}, {"on_delete": "cascade"})
+}
+
+add_index("identity_recovery_tokens", ["token"], { "unique": true, "name": "identity_recovery_addresses_code_uq_idx" })
+add_index("identity_recovery_tokens", ["token"], { "name": "identity_recovery_addresses_code_idx" })

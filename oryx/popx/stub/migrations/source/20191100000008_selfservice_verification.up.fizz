@@ -1,0 +1,35 @@
+create_table("identity_verifiable_addresses") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("code", "string", {"size": 32})
+  t.Column("status", "string", {"size": 16})
+  t.Column("via", "string", {"size": 16})
+  t.Column("verified", "bool")
+
+  t.Column("value", "string", {"size": 400})
+
+  t.Column("verified_at", "timestamp", {"null": true})
+  t.Column("expires_at", "timestamp", { "default_raw": "CURRENT_TIMESTAMP" })
+
+  t.Column("identity_id", "uuid")
+  t.ForeignKey("identity_id", {"identities": ["id"]}, {"on_delete": "cascade"})
+}
+
+add_index("identity_verifiable_addresses", ["code"], { "unique": true, "name": "identity_verifiable_addresses_code_uq_idx" })
+add_index("identity_verifiable_addresses", ["code"], { "name": "identity_verifiable_addresses_code_idx" })
+
+add_index("identity_verifiable_addresses", ["via", "value"], { "unique": true, "name": "identity_verifiable_addresses_status_via_uq_idx" })
+add_index("identity_verifiable_addresses", ["via", "value"], { "name": "identity_verifiable_addresses_status_via_idx" })
+
+create_table("selfservice_verification_requests") {
+	t.Column("id", "uuid", {primary: true})
+
+  t.Column("request_url", "string", {"size": 2048})
+  t.Column("issued_at", "timestamp", { "default_raw": "CURRENT_TIMESTAMP" })
+  t.Column("expires_at", "timestamp")
+
+  t.Column("form", "json")
+  t.Column("via", "string", {"size": 16})
+  t.Column("csrf_token", "string")
+  t.Column("success", "bool")
+}

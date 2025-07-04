@@ -1,0 +1,59 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/workflows/conventional_commits.yml
+
+name: Conventional commits
+
+# This GitHub CI Action enforces that pull request titles follow conventional commits.
+# More info at https://www.conventionalcommits.org.
+#
+# The Ory-wide defaults for commit titles and scopes are below.
+# Your repository can add/replace elements via a configuration file at the path below.
+# More info at https://github.com/ory/ci/blob/master/conventional_commit_config/README.md
+
+on:
+  pull_request_target:
+    types:
+      - edited
+      - opened
+      - ready_for_review
+      - reopened
+  # pull_request: # for debugging, uses config in local branch but supports only Pull Requests from this repo
+
+jobs:
+  main:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: config
+        uses: ory/ci/conventional_commit_config@master
+        with:
+          config_path: .github/conventional_commits.json
+          default_types: |
+            feat
+            fix
+            revert
+            docs
+            style
+            refactor
+            test
+            build
+            autogen
+            security
+            ci
+            chore
+          default_scopes: |
+            deps
+            docs
+          default_require_scope: false
+      - uses: amannn/action-semantic-pull-request@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: ${{ steps.config.outputs.types }}
+          scopes: ${{ steps.config.outputs.scopes }}
+          requireScope: ${{ steps.config.outputs.requireScope }}
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject should start with a lowercase letter, yours is uppercase:
+            "{subject}"

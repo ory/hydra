@@ -1,0 +1,36 @@
+{
+  "$id": "https://example.com/person.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "type": "object",
+  "required": ["node"],
+  "properties": {
+    "node": {
+      "type": "object",
+      "required": ["node"],
+      "properties": {
+        "node": {
+          "type": "object",
+          "properties": {
+            "node": {
+              "type": "object",
+              "properties": {
+                "leaf": {
+                  "type": "string"
+                }
+              },
+              "required": ["leaf"]
+            },
+            "leaf": {
+              "type": "string"
+            }
+          },
+          "required": ["leaf"]
+        },
+        "leaf": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

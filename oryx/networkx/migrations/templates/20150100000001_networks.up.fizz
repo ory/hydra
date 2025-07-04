@@ -1,0 +1,3 @@
+create_table("networks") {
+  t.Column("id", "uuid", {primary: true})
+}

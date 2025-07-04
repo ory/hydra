@@ -1,0 +1,9 @@
+linters:
+  enable:
+    - gosec
+    - govet
+  disable-all: true
+
+issues:
+  exclude-files:
+    - ".+_test.go"

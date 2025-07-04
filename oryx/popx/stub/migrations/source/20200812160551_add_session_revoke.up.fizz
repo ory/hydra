@@ -1,0 +1,1 @@
+add_column("sessions", "active", "boolean", {"null": false, "default": false})

@@ -1,0 +1,1 @@
+UPDATE identity_verifiable_addresses SET code = substr(md5(uuid_v4()), 0, 32) WHERE code IS NULL

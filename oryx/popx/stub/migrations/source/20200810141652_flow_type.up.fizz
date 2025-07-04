@@ -1,0 +1,5 @@
+add_column("selfservice_login_requests", "type", "string", {"default": "browser", "size": 16})
+add_column("selfservice_registration_requests", "type", "string", {"default": "browser", "size": 16})
+add_column("selfservice_settings_requests", "type", "string", {"default": "browser", "size": 16})
+add_column("selfservice_recovery_requests", "type", "string", {"default": "browser", "size": 16})
+add_column("selfservice_verification_requests", "type", "string", {"default": "browser", "size": 16})

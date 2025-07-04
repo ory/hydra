@@ -1,0 +1,19 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: eventlogger
+  annotations:
+    variant: somevalue
+spec:
+  containers:
+    - name: eventlogger
+      image: eventlogger:latest
+      imagePullPolicy: Never
+      volumeMounts:
+        - name: changing-config
+          mountPath: /etc/config
+  restartPolicy: Never
+  volumes:
+    - name: changing-config
+      configMap:
+        name: changing-config

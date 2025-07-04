@@ -1,0 +1,1 @@
+INSERT INTO "_identity_verifiable_addresses_tmp" (id, status, via, verified, value, verified_at, expires_at, identity_id, created_at, updated_at) SELECT id, status, via, verified, value, verified_at, expires_at, identity_id, created_at, updated_at FROM "identity_verifiable_addresses"

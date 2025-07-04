@@ -1,0 +1,3 @@
+drop_column("selfservice_verification_flows", "form")
+drop_column("selfservice_verification_flows", "via")
+drop_column("selfservice_verification_flows", "success")

@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": 404,
+    "message": "Not Found",
+    "reason": "The requested route does not exist. Make sure you are using the right path, domain, and port."
+  }
+}

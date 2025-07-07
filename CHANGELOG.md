@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-07-03)](#000-2025-07-03)
+- [0.0.0 (2025-07-07)](#000-2025-07-07)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-07-03)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-07-07)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -40,6 +40,10 @@ If this pull request
 
 
 ### Bug Fixes
+
+* Add repo syncing for polis ([46d17f8](https://github.com/ory/hydra/commit/46d17f8bfdc59e2185e9ce65823eb2652e01f1b8)):
+
+    GitOrigin-RevId: e277a25d594b512b800d39dd18f36ea3d99fcf84
 
 * Allow updating when JWKS URI is set ([#3935](https://github.com/ory/hydra/issues/3935)) ([#3946](https://github.com/ory/hydra/issues/3946)) ([fb1655b](https://github.com/ory/hydra/commit/fb1655ba86077b10141132ed332ba8d6f8c70582)):
 
@@ -71,6 +75,10 @@ If this pull request
     GitOrigin-RevId: 61645585277edd95914705499afd7211a85983eb
 
 * CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
+* Copybara script ([7b33358](https://github.com/ory/hydra/commit/7b333585bb44a069bf47267c853aa2e91db0efa3)):
+
+    GitOrigin-RevId: 14665e01451ac5fcdda148b473b8fc35d4fe21ef
+
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
 
     This commit addresses several occurrences where 'strategy' was
@@ -96,6 +104,10 @@ If this pull request
 * Ignore flaky keys in Hydra HSM tests ([469b2ad](https://github.com/ory/hydra/commit/469b2ad538865a38738a10f46d270f53d12101ad)):
 
     GitOrigin-RevId: 83312e6544bc33ccc30e1e1e414cc04910429192
+
+* Include go.mod in vendored oryx ([08a3ab4](https://github.com/ory/hydra/commit/08a3ab43ddb1e2a0df430224f969fe3f0ba161bf)):
+
+    GitOrigin-RevId: 20365bbe6b2cf95ac7973bcca9056455d2cb3803
 
 * **infrastructure:** Hydra oss CI ([e846541](https://github.com/ory/hydra/commit/e84654185cdfffbf160d5309f744795d15d723f9)):
 
@@ -144,6 +156,14 @@ If this pull request
 * Upgrade to go 1.24.4 to fix CVE-2025-4673 ([c14e538](https://github.com/ory/hydra/commit/c14e538d8d993252a246eb17832c09234825a98c)):
 
     GitOrigin-RevId: 64950988a466bbdb4f25b8d9f5c416ff591c00bf
+
+* Use hard-coded fallback key instead of panic ([e1f6450](https://github.com/ory/hydra/commit/e1f645012f43f62928fdc79710b45d935878367f)):
+
+    GitOrigin-RevId: d7a2270bbf5360288199e9632b2eac6cbc29737c
+
+* Use main branch for polis ([6c24e68](https://github.com/ory/hydra/commit/6c24e68995b8eae9ba0b8872867270ef1d35113b)):
+
+    GitOrigin-RevId: 04533493184c6abdc3a211daffd98f6b68e1c9cc
 
 * Using uuid_generate_v4 function ([#3958](https://github.com/ory/hydra/issues/3958)) ([c206066](https://github.com/ory/hydra/commit/c20606606654af975e5d82998956bb998acee576)):
 
@@ -310,6 +330,10 @@ If this pull request
 
     GitOrigin-RevId: 591238768218ba2b5af93f91ac7e16f4c170da5b
 
+* Use vendored ory/x ([6581e01](https://github.com/ory/hydra/commit/6581e01679b2e146433061cbaaebb80a0e3905b5)):
+
+    GitOrigin-RevId: 994f3b754946ca5b2bd1bab0fe20532f5d5ab62f
+
 
 ### Performance Improvements
 
@@ -321,6 +345,13 @@ If this pull request
 ### Tests
 
 * Parallelize and improve ([#3989](https://github.com/ory/hydra/issues/3989)) ([a47e395](https://github.com/ory/hydra/commit/a47e39513f1f08076849f77517977abffa195364))
+
+### Unclassified
+
+* Merge 3834fab8c161a7dc98d43f32acf8efd9e6e95352 into 4dae0f4a8785eb36d8dbb27137f6b924c1e0f0b5 ([dc84053](https://github.com/ory/hydra/commit/dc840535c19d58caf130966e00d3d2fe9f3eb577)):
+
+    GitOrigin-RevId: 0c2dcaa065b64d2aafbcfd49c79363a214c5b2aa
+
 
 
 # [2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0) (2025-01-17)

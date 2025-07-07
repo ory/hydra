@@ -22,7 +22,6 @@ import (
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/errorsx"
-	"github.com/ory/x/fsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
@@ -42,14 +41,16 @@ const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
-		conn        *pop.Connection
-		mb          *popx.MigrationBox
-		mbs         popx.MigrationStatuses
-		r           Dependencies
-		config      *config.DefaultProvider
-		l           *logrusx.Logger
-		fallbackNID uuid.UUID
-		p           *networkx.Manager
+		conn            *pop.Connection
+		extraMigrations []fs.FS
+		goMigrations    []popx.Migration
+		mb              *popx.MigrationBox
+		mbs             popx.MigrationStatuses
+		r               Dependencies
+		config          *config.DefaultProvider
+		l               *logrusx.Logger
+		fallbackNID     uuid.UUID
+		p               *networkx.Manager
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -120,21 +121,14 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 }
 
 func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
-	mb, err := popx.NewMigrationBox(
-		fsx.Merge(append([]fs.FS{Migrations}, extraMigrations...)...),
-		popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0),
-		popx.WithGoMigrations(goMigrations))
-	if err != nil {
-		return nil, errorsx.WithStack(err)
-	}
-
 	return &Persister{
-		conn:   c,
-		mb:     mb,
-		r:      r,
-		config: config,
-		l:      r.Logger(),
-		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		conn:            c,
+		extraMigrations: extraMigrations,
+		goMigrations:    goMigrations,
+		r:               r,
+		config:          config,
+		l:               r.Logger(),
+		p:               networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
 	}, nil
 }
 
@@ -148,21 +142,21 @@ func (p Persister) WithFallbackNetworkID(nid uuid.UUID) persistence.Persister {
 }
 
 func (p *Persister) CreateWithNetwork(ctx context.Context, v interface{}) error {
-	n := p.NetworkID(ctx)
-	return p.Connection(ctx).Create(p.mustSetNetwork(n, v))
+	p.mustSetNetwork(ctx, v)
+	return p.Connection(ctx).Create(v)
 }
 
 func (p *Persister) UpdateWithNetwork(ctx context.Context, v interface{}) (int64, error) {
-	n := p.NetworkID(ctx)
-	v = p.mustSetNetwork(n, v)
+	p.mustSetNetwork(ctx, v)
 
 	m := pop.NewModel(v, ctx)
-	var cs []string
+	cols := m.Columns()
+	cs := make([]string, 0, len(cols.Cols))
 	for _, t := range m.Columns().Cols {
 		cs = append(cs, t.Name)
 	}
 
-	return p.Connection(ctx).Where(m.IDField()+" = ? AND nid = ?", m.ID(), n).UpdateQuery(v, cs...)
+	return p.Connection(ctx).Where(m.IDField()+" = ? AND nid = ?", m.ID(), p.NetworkID(ctx)).UpdateQuery(v, cs...)
 }
 
 func (p *Persister) NetworkID(ctx context.Context) uuid.UUID {
@@ -177,15 +171,10 @@ func (p *Persister) Connection(ctx context.Context) *pop.Connection {
 	return popx.GetConnection(ctx, p.conn)
 }
 
-func (p *Persister) Ping(ctx context.Context) error {
-	return p.conn.Store.SQLDB().PingContext(ctx)
-}
-func (p *Persister) PingContext(ctx context.Context) error {
-	type pinger interface{ PingContext(context.Context) error }
-	return p.conn.Store.(pinger).PingContext(ctx)
-}
+func (p *Persister) Ping(ctx context.Context) error        { return p.conn.Store.SQLDB().PingContext(ctx) }
+func (p *Persister) PingContext(ctx context.Context) error { return p.conn.Store.PingContext(ctx) }
 
-func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
+func (p *Persister) mustSetNetwork(ctx context.Context, v interface{}) {
 	rv := reflect.ValueOf(v)
 
 	if rv.Kind() != reflect.Ptr || (rv.Kind() == reflect.Ptr && rv.Elem().Kind() != reflect.Struct) {
@@ -195,8 +184,7 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 	if !nf.IsValid() || !nf.CanSet() {
 		panic("v must have settable a field 'NID uuid.UUID'")
 	}
-	nf.Set(reflect.ValueOf(nid))
-	return v
+	nf.Set(reflect.ValueOf(p.NetworkID(ctx)))
 }
 
 func (p *Persister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {

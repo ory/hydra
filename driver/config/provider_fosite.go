@@ -43,9 +43,9 @@ func (p *DefaultProvider) GetRotatedGlobalSecrets(ctx context.Context) ([][]byte
 		return nil, nil
 	}
 
-	var rotated [][]byte
-	for _, secret := range secrets[1:] {
-		rotated = append(rotated, x.HashStringSecret(secret))
+	rotated := make([][]byte, len(secrets)-1)
+	for i, secret := range secrets[1:] {
+		rotated[i] = x.HashStringSecret(secret)
 	}
 
 	return rotated, nil

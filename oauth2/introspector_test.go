@@ -53,10 +53,10 @@ func TestIntrospectorSDK(t *testing.T) {
 	defer server.Close()
 
 	now := time.Now().UTC().Round(time.Minute)
-	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(-time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("my-client", "my-client", tokens[2][0], now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"hydra.introspect"})
-	createAccessTokenSessionPairwise("alice", "my-client", tokens[3][0], now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"}, "alice-obfuscated")
+	createAccessTokenSession("alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("siri", "my-client", tokens[1].sig, now.Add(-time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession("my-client", "my-client", tokens[2].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"hydra.introspect"})
+	createAccessTokenSessionPairwise("alice", "my-client", tokens[3].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"}, "alice-obfuscated")
 
 	t.Run("TestIntrospect", func(t *testing.T) {
 		for k, c := range []struct {
@@ -74,7 +74,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 			{
 				description:    "should fail because token is expired",
-				token:          tokens[1][1],
+				token:          tokens[1].tok,
 				expectInactive: true,
 			},
 			// {
@@ -91,18 +91,18 @@ func TestIntrospectorSDK(t *testing.T) {
 			// },
 			{
 				description:    "should fail because scope `bar` was requested but only `foo` is granted",
-				token:          tokens[0][1],
+				token:          tokens[0].tok,
 				expectInactive: true,
 				scopes:         []string{"bar"},
 			},
 			{
 				description:    "should pass",
-				token:          tokens[0][1],
+				token:          tokens[0].tok,
 				expectInactive: false,
 			},
 			{
 				description:    "should pass using bearer authorization",
-				token:          tokens[0][1],
+				token:          tokens[0].tok,
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.IntrospectedOAuth2Token) {
@@ -115,7 +115,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 			{
 				description:    "should pass using regular authorization",
-				token:          tokens[0][1],
+				token:          tokens[0].tok,
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.IntrospectedOAuth2Token) {
@@ -129,7 +129,7 @@ func TestIntrospectorSDK(t *testing.T) {
 			},
 			{
 				description:    "should pass and check for obfuscated subject",
-				token:          tokens[3][1],
+				token:          tokens[3].tok,
 				expectInactive: false,
 				scopes:         []string{"foo.bar"},
 				assert: func(t *testing.T, c *hydra.IntrospectedOAuth2Token) {
@@ -151,11 +151,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					Token(c.token).Scope(strings.Join(c.scopes, " ")).Execute()
 				require.NoError(t, err)
 
-				if c.expectInactive {
-					assert.False(t, ctx.Active)
-				} else {
-					assert.True(t, ctx.Active)
-				}
+				assert.Equal(t, c.expectInactive, !ctx.Active)
 
 				if !c.expectInactive && c.assert != nil {
 					c.assert(t, ctx)

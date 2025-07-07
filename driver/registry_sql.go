@@ -399,7 +399,7 @@ func (m *RegistrySQL) AuditLogger() *logrusx.Logger {
 
 func (m *RegistrySQL) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		m.fh = x.NewHasher(m.Config())
+		m.fh = x.NewHasher(m, m.Config())
 	}
 	return m.fh
 }

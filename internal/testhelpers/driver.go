@@ -19,6 +19,7 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
@@ -40,6 +41,7 @@ func NewConfigurationWithDefaults() *config.DefaultProvider {
 		configx.SkipValidation(),
 		configx.WithValues(defaultConfig),
 		configx.WithValue(config.KeyTLSEnabled, false),
+		configx.WithValue("log.leak_sensitive_values", true),
 	)
 }
 
@@ -68,25 +70,21 @@ func registryFactory(t testing.TB, url string, c *config.DefaultProvider, migrat
 }
 
 func RegistryFactory(t testing.TB, url string, c *config.DefaultProvider, networkInit, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
-	ctx := context.Background()
+	ctx := t.Context()
+	sql.SilenceMigrations = true
 	c.MustSet(ctx, config.KeyLogLevel, "trace")
 	c.MustSet(ctx, config.KeyDSN, url)
 	c.MustSet(ctx, "dev", true)
+	l := logrusx.New("test_hydra", "master", logrusx.WithConfigurator(c.Source(ctx)))
 
-	r, err := driver.NewRegistryFromDSN(ctx, c, logrusx.New("test_hydra", "master"), networkInit, migrate, ctxer)
+	r, err := driver.NewRegistryFromDSN(ctx, c, l, networkInit, migrate, ctxer)
 	require.NoError(t, err)
 
 	return r
 }
 
-func ConnectToMySQL(t testing.TB) string {
-	return dockertest.RunTestMySQLWithVersion(t, "8.0")
-}
-
-func ConnectToPG(t testing.TB) string {
-	return dockertest.RunTestPostgreSQLWithVersion(t, "16")
-}
-
+func ConnectToMySQL(t testing.TB) string { return dockertest.RunTestMySQLWithVersion(t, "8.0") }
+func ConnectToPG(t testing.TB) string    { return dockertest.RunTestPostgreSQLWithVersion(t, "16") }
 func ConnectToCRDB(t testing.TB) string {
 	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v24.1")
 }
@@ -148,11 +146,14 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 }
 
 func ConnectDatabases(t *testing.T, migrate bool) map[string]driver.Registry {
-	pg, mysql, crdb := ConnectDatabasesURLs(t)
 	regs := make(map[string]driver.Registry)
-	regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, &contextx.Default{})
-	regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, &contextx.Default{})
-	regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, &contextx.Default{})
+	regs["memory"] = NewRegistryMemory(t, NewConfigurationWithDefaults(), &contextx.Default{})
+	if !testing.Short() {
+		pg, mysql, crdb := ConnectDatabasesURLs(t)
+		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, &contextx.Default{})
+		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, &contextx.Default{})
+		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, &contextx.Default{})
+	}
 	return regs
 }
 

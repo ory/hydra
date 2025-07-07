@@ -6,6 +6,7 @@ package oauth2
 import (
 	"bytes"
 	"context"
+	"slices"
 	"time"
 
 	jjson "github.com/go-jose/go-jose/v3/json"
@@ -20,7 +21,6 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/x/logrusx"
-	"github.com/ory/x/stringslice"
 )
 
 // swagger:ignore
@@ -59,16 +59,19 @@ func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, 
 }
 
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
-	// a slice of claims that are reserved and should not be overridden
-	reservedClaims := []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
-
 	// remove any reserved claims from the custom claims
-	allowedClaimsFromConfigWithoutReserved := stringslice.Filter(s.AllowedTopLevelClaims, func(s string) bool {
-		return stringslice.Has(reservedClaims, s)
+	allowedClaimsFromConfigWithoutReserved := slices.DeleteFunc(s.AllowedTopLevelClaims, func(s string) bool {
+		switch s {
+		// these claims are reserved and should not be overridden
+		case "iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext":
+			return true
+		}
+		return false
 	})
 
 	// our new extra map which will be added to the jwt
-	topLevelExtraWithMirrorExt := map[string]interface{}{}
+	topLevelExtraWithMirrorExt := make(map[string]interface{}, len(allowedClaimsFromConfigWithoutReserved)+2)
+	topLevelExtraWithMirrorExt["client_id"] = s.ClientID
 
 	// setting every allowed claim top level in jwt with respective value
 	for _, allowedClaim := range allowedClaimsFromConfigWithoutReserved {
@@ -107,11 +110,6 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 		claims.NotBefore = claims.IssuedAt
 	}
 
-	if claims.Extra == nil {
-		claims.Extra = map[string]interface{}{}
-	}
-
-	claims.Extra["client_id"] = s.ClientID
 	return claims
 }
 

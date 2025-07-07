@@ -7,12 +7,18 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"io/fs"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus/hooks/test"
+
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/fsx"
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 )
@@ -20,12 +26,30 @@ import (
 //go:embed migrations/*.sql
 var Migrations embed.FS
 
+var SilenceMigrations = false
+
+func (p *Persister) migrationBox(ctx context.Context) (*popx.MigrationBox, error) {
+	logger := p.r.Logger()
+	if SilenceMigrations {
+		inner, _ := test.NewNullLogger()
+		logger = logrusx.New("hydra", "", logrusx.UseLogger(inner))
+	}
+	return popx.NewMigrationBox(
+		fsx.Merge(append([]fs.FS{Migrations}, p.extraMigrations...)...),
+		popx.NewMigrator(p.conn.WithContext(ctx), logger, p.r.Tracer(ctx), 0),
+		popx.WithGoMigrations(p.goMigrations))
+}
+
 func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
 	if p.mbs != nil {
 		return p.mbs, nil
 	}
 
-	status, err := p.mb.Status(ctx)
+	mb, err := p.migrationBox(ctx)
+	if err != nil {
+		return nil, err
+	}
+	status, err := mb.Status(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -38,22 +62,22 @@ func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses
 }
 
 func (p *Persister) MigrateDown(ctx context.Context, steps int) error {
-	return errorsx.WithStack(p.mb.Down(ctx, steps))
+	mb, err := p.migrationBox(ctx)
+	if err != nil {
+		return err
+	}
+	return mb.Down(ctx, steps)
 }
 
 func (p *Persister) MigrateUp(ctx context.Context) error {
 	if err := p.migrateOldMigrationTables(); err != nil {
 		return err
 	}
-	return errorsx.WithStack(p.mb.Up(ctx))
-}
-
-func (p *Persister) MigrateUpTo(ctx context.Context, steps int) (int, error) {
-	if err := p.migrateOldMigrationTables(); err != nil {
-		return 0, err
+	mb, err := p.migrationBox(ctx)
+	if err != nil {
+		return err
 	}
-	n, err := p.mb.UpTo(ctx, steps)
-	return n, errorsx.WithStack(err)
+	return mb.Up(ctx)
 }
 
 func (p *Persister) PrepareMigration(_ context.Context) error {
@@ -83,7 +107,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 	}
 
 	if err := pop.CreateSchemaMigrations(p.conn); err != nil {
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	// in this order the migrations only depend on already done ones

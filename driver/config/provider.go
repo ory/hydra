@@ -13,24 +13,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/x/hasherx"
-	"github.com/ory/x/randx"
-
-	"github.com/gofrs/uuid"
-
-	"github.com/ory/x/otelx"
-
 	"github.com/ory/hydra/v2/spec"
-	"github.com/ory/x/dbal"
-
-	"github.com/ory/x/configx"
-
-	"github.com/ory/x/logrusx"
-
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/hasherx"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
+	"github.com/ory/x/randx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
 )
@@ -129,9 +123,9 @@ var userCodeEtropy = map[string]struct {
 	Length  int
 	Symbols []rune
 }{
-	"high":   {Length: 8, Symbols: []rune(randx.AlphaNumNoAmbiguous)},
-	"medium": {Length: 8, Symbols: []rune(randx.AlphaUpper)},
-	"low":    {Length: 9, Symbols: []rune(randx.Numeric)},
+	"high":   {Length: 8, Symbols: randx.AlphaNumNoAmbiguous},
+	"medium": {Length: 8, Symbols: randx.AlphaUpper},
+	"low":    {Length: 9, Symbols: randx.Numeric},
 }
 
 var (
@@ -145,15 +139,8 @@ type DefaultProvider struct {
 	c contextx.Contextualizer
 }
 
-func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) x.HashAlgorithm {
-	switch strings.ToLower(p.getProvider(ctx).String(KeyHasherAlgorithm)) {
-	case x.HashAlgorithmBCrypt.String():
-		return x.HashAlgorithmBCrypt
-	case x.HashAlgorithmPBKDF2.String():
-		fallthrough
-	default:
-		return x.HashAlgorithmPBKDF2
-	}
+func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) string {
+	return strings.ToLower(p.getProvider(ctx).String(KeyHasherAlgorithm))
 }
 
 func (p *DefaultProvider) HasherBcryptConfig(ctx context.Context) *hasherx.BCryptConfig {

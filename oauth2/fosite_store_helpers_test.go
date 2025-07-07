@@ -118,7 +118,7 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 		RequestedAt:          time.Now(),
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	if _, err := x.ClientManager().GetClient(ctx, cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
 		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
 	}
@@ -151,12 +151,9 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 	require.NoError(t, err)
 }
 
-func TestHelperRunner(t *testing.T) {
-}
-
 func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		requestID := uuid.Must(uuid.NewV4()).String()
 		mockRequestForeignKey(t, requestID, m)
 		cl := &client.Client{ID: "foobar"}
@@ -190,7 +187,7 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x oauth2.InternalRegistry) fu
 		m := x.OAuth2Storage()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		ctx := context.Background()
+		ctx := t.Context()
 		_, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewSession("bar")})
 		assert.NotNil(t, err)
 
@@ -214,7 +211,7 @@ func testHelperCreateGetDeleteRefreshTokenSession(x oauth2.InternalRegistry) fun
 		m := x.OAuth2Storage()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		ctx := context.Background()
+		ctx := t.Context()
 		_, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewSession("bar"))
 		assert.NotNil(t, err)
 
@@ -237,7 +234,7 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
-		ctx := context.Background()
+		ctx := t.Context()
 		_, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewSession("bar"))
 		assert.Error(t, err)
 
@@ -290,7 +287,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x oauth2.InternalRegistry) func(t *
 
 		code := uuid.Must(uuid.NewV4()).String()
 
-		ctx := context.Background()
+		ctx := t.Context()
 		res, err := m.GetAuthorizeCodeSession(ctx, code, oauth2.NewSession("bar"))
 		assert.Error(t, err)
 		assert.Nil(t, res)
@@ -328,7 +325,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 
 		mockRequestForeignKey(t, "blank", reg)
 
-		ctx := context.Background()
+		ctx := t.Context()
 
 		s := oauth2.NewSession("bar")
 		s.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Minute))
@@ -427,7 +424,7 @@ func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func
 		m := x.OAuth2Storage()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		ctx := context.Background()
+		ctx := t.Context()
 		_, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
 		assert.Error(t, err)
 
@@ -449,7 +446,7 @@ func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func
 func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		ctx := context.Background()
+		ctx := t.Context()
 
 		code := uuid.Must(uuid.NewV4()).String()
 		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
@@ -470,7 +467,7 @@ func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) 
 func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		ctx := context.Background()
+		ctx := t.Context()
 
 		code := uuid.Must(uuid.NewV4()).String()
 		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
@@ -490,7 +487,7 @@ func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 
 func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 
 		createTokens := func(t *testing.T, r *fosite.Request) (refreshTokenSession string, accessTokenSession string) {
 			refreshTokenSession = fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
@@ -717,7 +714,7 @@ func testHelperCreateGetDeletePKCERequestSession(x oauth2.InternalRegistry) func
 		m := x.OAuth2Storage()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		ctx := context.Background()
+		ctx := t.Context()
 		_, err := m.GetPKCERequestSession(ctx, code, oauth2.NewSession("bar"))
 		assert.NotNil(t, err)
 
@@ -741,7 +738,7 @@ func testHelperFlushTokens(x oauth2.InternalRegistry, lifespan time.Duration) fu
 	ds := &oauth2.Session{}
 
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		for _, r := range flushRequests {
 			mockRequestForeignKey(t, r.ID, x)
 			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
@@ -781,7 +778,7 @@ func testHelperFlushTokensWithLimitAndBatchSize(x oauth2.InternalRegistry, limit
 	ds := &oauth2.Session{}
 
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		var requests []*fosite.Request
 
 		// create five expired requests
@@ -876,7 +873,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m oauth2.InternalRe
 	return func(t *testing.T) {
 		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
-		ctx := context.Background()
+		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
 		require.NoError(t, err)
 		signature := uuid.Must(uuid.NewV4()).String()
@@ -911,7 +908,7 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m oauth2.Internal
 	return func(t *testing.T) {
 		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
-		ctx := context.Background()
+		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
 		require.NoError(t, err)
 
@@ -1039,7 +1036,7 @@ func testFositeStoreClientAssertionJWTValid(m oauth2.InternalRegistry) func(*tes
 
 func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 		grantManager := x.GrantManager()
 		keyManager := x.KeyManager()
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
@@ -1336,7 +1333,7 @@ func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
 ) {
 	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
-	ctx := context.Background()
+	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
@@ -1373,7 +1370,7 @@ func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
 ) {
 	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
-	ctx := context.Background()
+	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
@@ -1411,7 +1408,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
@@ -1452,7 +1449,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 	require.True(t, ok)
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
 	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
@@ -1501,7 +1498,7 @@ func createTestRequest(id string) *fosite.Request {
 
 func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 
 		// Create client
 		cl := &client.Client{ID: "refresh-expiry-client"}
@@ -1611,7 +1608,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 
 func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 
 		// Create client
 		cl := &client.Client{ID: "auth-code-client"}

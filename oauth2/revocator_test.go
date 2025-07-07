@@ -75,10 +75,10 @@ func TestRevoke(t *testing.T) {
 	server := httptest.NewServer(router)
 	defer server.Close()
 
-	createAccessTokenSession("alice", "my-client", tokens[0][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "my-client", tokens[1][0], now.Add(time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "encoded:client", tokens[3][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "my-client", tokens[1].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "my-client", tokens[2].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession("siri", "encoded:client", tokens[3].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 	require.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 
 	client := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -94,29 +94,29 @@ func TestRevoke(t *testing.T) {
 			},
 		},
 		{
-			token: tokens[3][1],
+			token: tokens[3].tok,
 			assert: func(t *testing.T) {
 				assert.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
-			token: tokens[0][1],
+			token: tokens[0].tok,
 			assert: func(t *testing.T) {
-				t.Logf("Tried to delete: %s %s", tokens[0][0], tokens[0][1])
+				t.Logf("Tried to delete: %s %s", tokens[0].sig, tokens[0].tok)
 				assert.Equal(t, 3, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
-			token: tokens[0][1],
+			token: tokens[0].tok,
 		},
 		{
-			token: tokens[2][1],
+			token: tokens[2].tok,
 			assert: func(t *testing.T) {
 				assert.Equal(t, 2, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
-			token: tokens[1][1],
+			token: tokens[1].tok,
 			assert: func(t *testing.T) {
 				assert.Equal(t, 1, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},

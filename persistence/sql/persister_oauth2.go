@@ -89,19 +89,6 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		subject = r.GetSession().GetSubject()
 	}
 
-	session, err := json.Marshal(r.GetSession())
-	if err != nil {
-		return nil, errorsx.WithStack(err)
-	}
-
-	if p.config.EncryptSessionData(ctx) {
-		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
-		if err != nil {
-			return nil, errorsx.WithStack(err)
-		}
-		session = []byte(ciphertext)
-	}
-
 	var challenge sql.NullString
 	rr, ok := r.GetSession().(*oauth2.Session)
 	if !ok && r.GetSession() != nil {
@@ -110,6 +97,19 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		if len(rr.ConsentChallenge) > 0 {
 			challenge = sql.NullString{Valid: true, String: rr.ConsentChallenge}
 		}
+	}
+
+	session, err := json.Marshal(rr)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	if p.config.EncryptSessionData(ctx) {
+		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
+		if err != nil {
+			return nil, err
+		}
+		session = []byte(ciphertext)
 	}
 
 	return &OAuth2RequestSQL{
@@ -158,13 +158,13 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 		var err error
 		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess), nil)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, err
 		}
 	}
 
 	if session != nil {
 		if err := json.Unmarshal(sess, session); err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 	} else {
 		p.l.Debugf("Got an empty session in toRequest")
@@ -177,7 +177,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 
 	val, err := url.ParseQuery(r.Form)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return &fosite.Request{
@@ -207,7 +207,7 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) (er
 	}
 	if j.Expiry.After(time.Now()) {
 		// the jti is not expired yet => invalid
-		return errorsx.WithStack(fosite.ErrJTIKnown)
+		return errors.WithStack(fosite.ErrJTIKnown)
 	}
 	// the jti is expired => valid
 	return nil
@@ -224,7 +224,7 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 
 	if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
 		// found a jti
-		return errorsx.WithStack(fosite.ErrJTIKnown)
+		return errors.WithStack(fosite.ErrJTIKnown)
 	} else if err != nil {
 		return err
 	}
@@ -266,7 +266,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, signature string
 	r := OAuth2RequestSQL{Table: table}
 	err := p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrNotFound)
+		return nil, errors.WithStack(fosite.ErrNotFound)
 	}
 	if err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -277,9 +277,9 @@ func (p *Persister) findSessionBySignature(ctx context.Context, signature string
 			return nil, err
 		}
 		if table == sqlTableCode {
-			return fr, errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			return fr, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 		}
-		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+		return fr, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
 	return r.toRequest(ctx, session, p)
@@ -291,7 +291,7 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 			Where("signature = ?", signature).
 			Delete(OAuth2RequestSQL{Table: table}.TableName()))
 	if errors.Is(err, sqlcon.ErrNoRows) {
-		return errorsx.WithStack(fosite.ErrNotFound)
+		return errors.WithStack(fosite.ErrNotFound)
 	}
 	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return fosite.ErrSerializationFailure.WithWrap(err)
@@ -307,7 +307,7 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 		Where("request_id=?", id).
 		Delete(OAuth2RequestSQL{Table: table}.TableName())
 	if errors.Is(err, sql.ErrNoRows) {
-		return errorsx.WithStack(fosite.ErrNotFound)
+		return errors.WithStack(fosite.ErrNotFound)
 	}
 	if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {

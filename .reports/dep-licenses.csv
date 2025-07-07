@@ -1,2 +1,6 @@
 "module name","licenses"
 
+"github.com/ory/x","Apache-2.0"
+"github.com/stretchr/testify","MIT"
+"go.opentelemetry.io/otel/sdk","Apache-2.0"
+

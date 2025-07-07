@@ -112,14 +112,13 @@ func ParseQueryParams(keys [][32]byte, q url.Values) ([]Option, error) {
 // ParsePageToken parses a page token from the given raw string using the provided keys.
 // It panics if no keys are provided.
 func ParsePageToken(keys [][32]byte, raw string) (t PageToken, err error) {
-	if len(keys) == 0 {
-		panic("keysetpagination: cannot parse page token with no keys")
-	}
 	for i := range keys {
 		err = errors.WithStack(hyrumtoken.Unmarshal(&keys[i], raw, &t))
 		if err == nil {
 			return
 		}
 	}
-	return
+	// as a last resort, try the fallback key
+	err = hyrumtoken.Unmarshal(fallbackEncryptionKey, raw, &t)
+	return t, errors.WithStack(err)
 }

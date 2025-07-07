@@ -93,6 +93,15 @@ func TestParsePageToken(t *testing.T) {
 		require.ErrorContains(t, err, "decrypt token")
 		assert.Zero(t, token)
 	})
+
+	t.Run("uses fallback key", func(t *testing.T) {
+		fallbackEncryptedToken := expectedToken.Encrypt(nil)
+		for _, noKeys := range [][][32]byte{nil, {}} {
+			token, err := ParsePageToken(noKeys, fallbackEncryptedToken)
+			require.NoError(t, err)
+			assert.Equal(t, expectedToken, token)
+		}
+	})
 }
 
 func TestParse(t *testing.T) {

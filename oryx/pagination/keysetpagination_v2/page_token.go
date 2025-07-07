@@ -13,6 +13,8 @@ import (
 	"github.com/ory/herodot"
 )
 
+var fallbackEncryptionKey = &[32]byte{}
+
 type (
 	PageToken struct {
 		testNow func() time.Time
@@ -34,10 +36,11 @@ func (t PageToken) Columns() []Column { return t.cols }
 // Encrypt encrypts the page token using the first key in the provided keyset.
 // It panics if no keys are provided.
 func (t PageToken) Encrypt(keys [][32]byte) string {
-	if len(keys) == 0 {
-		panic("keyset pagination: cannot encrypt page token with no keys")
+	key := fallbackEncryptionKey
+	if len(keys) > 0 {
+		key = &keys[0]
 	}
-	return hyrumtoken.Marshal(&keys[0], t)
+	return hyrumtoken.Marshal(key, t)
 }
 
 func (t PageToken) MarshalJSON() ([]byte, error) {

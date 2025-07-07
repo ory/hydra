@@ -57,8 +57,11 @@ func TestPageToken_Encrypt(t *testing.T) {
 		assert.ErrorContains(t, err, "decrypt token")
 	})
 
-	t.Run("panics with no keys", func(t *testing.T) {
-		assert.PanicsWithValue(t, "keyset pagination: cannot encrypt page token with no keys", func() { token.Encrypt(nil) })
-		assert.PanicsWithValue(t, "keyset pagination: cannot encrypt page token with no keys", func() { token.Encrypt([][32]byte{}) })
+	t.Run("uses fallback key", func(t *testing.T) {
+		for _, encrypted := range []string{token.Encrypt(nil), token.Encrypt([][32]byte{})} {
+			decrypted, err := ParsePageToken([][32]byte{*fallbackEncryptionKey}, encrypted)
+			require.NoError(t, err)
+			assert.Equal(t, token, decrypted)
+		}
 	})
 }

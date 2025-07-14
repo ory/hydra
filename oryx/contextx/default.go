@@ -15,13 +15,13 @@ type Default struct{}
 
 var _ Contextualizer = (*Default)(nil)
 
-func (d *Default) Network(ctx context.Context, network uuid.UUID) uuid.UUID {
+func (d *Default) Network(_ context.Context, network uuid.UUID) uuid.UUID {
 	if network == uuid.Nil {
 		panic("nid must be not nil")
 	}
 	return network
 }
 
-func (d *Default) Config(ctx context.Context, config *configx.Provider) *configx.Provider {
+func (d *Default) Config(_ context.Context, config *configx.Provider) *configx.Provider {
 	return config
 }

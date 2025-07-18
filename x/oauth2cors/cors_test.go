@@ -220,7 +220,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			prep: func(t *testing.T, r driver.Registry) {
 				r.Config().MustSet(ctx, "serve.public.cors.enabled", true)
 				r.Config().MustSet(ctx, "serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
-				sess := oauth2.NewSession("foo-9")
+				sess := oauth2.NewTestSession(t, "foo-9")
 				sess.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour))
 				ar := fosite.NewAccessRequest(sess)
 				cl := &client.Client{ID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}

@@ -269,11 +269,11 @@ func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, se
 
 	r := DeviceRequestSQL{}
 	if session == nil {
-		session = oauth2.NewSession("")
+		session = oauth2.NewSessionWithCustomClaims(ctx, p.r.Config(), "")
 	}
 
 	if err = p.QueryWithNetwork(ctx).Where("user_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrNotFound)
+		return nil, errors.WithStack(fosite.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -284,7 +284,7 @@ func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, se
 	}
 
 	if r.UserCodeState != fosite.UserCodeUnused {
-		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+		return fr, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
 	return fr, err

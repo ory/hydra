@@ -26,12 +26,12 @@ import (
 	"github.com/ory/x/httprouterx"
 )
 
-func createAccessTokenSession(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {
-	createAccessTokenSessionPairwise(subject, client, token, expiresAt, fs, scopes, "")
+func createAccessTokenSession(t testing.TB, subject, client, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {
+	createAccessTokenSessionPairwise(t, subject, client, token, expiresAt, fs, scopes, "")
 }
 
-func createAccessTokenSessionPairwise(subject, client string, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments, obfuscated string) {
-	ar := fosite.NewAccessRequest(oauth2.NewSession(subject))
+func createAccessTokenSessionPairwise(t testing.TB, subject, client, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments, obfuscated string) {
+	ar := fosite.NewAccessRequest(oauth2.NewTestSession(t, subject))
 	ar.GrantedScope = fosite.Arguments{"core"}
 	if scopes != nil {
 		ar.GrantedScope = scopes
@@ -75,10 +75,10 @@ func TestRevoke(t *testing.T) {
 	server := httptest.NewServer(router)
 	defer server.Close()
 
-	createAccessTokenSession("alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "my-client", tokens[1].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "my-client", tokens[2].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
-	createAccessTokenSession("siri", "encoded:client", tokens[3].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession(t, "alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession(t, "siri", "my-client", tokens[1].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession(t, "siri", "my-client", tokens[2].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
+	createAccessTokenSession(t, "siri", "encoded:client", tokens[3].sig, now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 	require.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 
 	client := hydra.NewAPIClient(hydra.NewConfiguration())

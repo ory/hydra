@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"slices"
+	"testing"
 	"time"
 
 	jjson "github.com/go-jose/go-jose/v3/json"
@@ -37,8 +38,8 @@ type Session struct {
 	Flow *flow.Flow `json:"-"`
 }
 
-func NewSession(subject string) *Session {
-	ctx := context.Background()
+func NewTestSession(t testing.TB, subject string) *Session {
+	ctx := t.Context()
 	provider := config.MustNew(ctx, logrusx.New("", ""))
 	return NewSessionWithCustomClaims(ctx, provider, subject)
 }
@@ -48,9 +49,10 @@ func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, 
 	mirrorTopLevelClaims := p.MirrorTopLevelClaims(ctx)
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
-			Claims:  new(jwt.IDTokenClaims),
-			Headers: new(jwt.Headers),
-			Subject: subject,
+			Claims:    new(jwt.IDTokenClaims),
+			Headers:   new(jwt.Headers),
+			Subject:   subject,
+			ExpiresAt: make(map[fosite.TokenType]time.Time),
 		},
 		Extra:                 map[string]interface{}{},
 		AllowedTopLevelClaims: allowedTopLevelClaims,

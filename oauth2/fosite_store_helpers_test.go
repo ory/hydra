@@ -48,8 +48,8 @@ var defaultIgnoreKeys = []string{
 	"client.client_secret",
 }
 
-func newDefaultRequest(id string) fosite.Request {
-	return fosite.Request{
+func newDefaultRequest(t testing.TB, id string) *fosite.Request {
+	return &fosite.Request{
 		ID:          id,
 		RequestedAt: time.Now().UTC().Round(time.Second),
 		Client: &client.Client{
@@ -68,11 +68,9 @@ func newDefaultRequest(id string) fosite.Request {
 		RequestedAudience: fosite.Arguments{"ad1", "ad2"},
 		GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
 		Form:              url.Values{"foo": []string{"bar", "baz"}},
-		Session:           oauth2.NewSession("bar"),
+		Session:           oauth2.NewTestSession(t, "bar"),
 	}
 }
-
-var defaultRequest = newDefaultRequest("blank")
 
 // var lifespan = time.Hour
 var flushRequests = []*fosite.Request{
@@ -162,7 +160,7 @@ func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *t
 			ID:          requestID,
 			Client:      cl,
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     oauth2.NewSession("bar"),
+			Session:     oauth2.NewTestSession(t, "bar"),
 		}
 
 		for range 4 {
@@ -188,20 +186,20 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x oauth2.InternalRegistry) fu
 
 		code := uuid.Must(uuid.NewV4()).String()
 		ctx := t.Context()
-		_, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewSession("bar")})
+		_, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewTestSession(t, "bar")})
 		assert.NotNil(t, err)
 
-		err = m.CreateOpenIDConnectSession(ctx, code, &defaultRequest)
+		err = m.CreateOpenIDConnectSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewSession("bar")})
+		res, err := m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewTestSession(t, "bar")})
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteOpenIDConnectSession(ctx, code)
 		require.NoError(t, err)
 
-		_, err = m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewSession("bar")})
+		_, err = m.GetOpenIDConnectSession(ctx, code, &fosite.Request{Session: oauth2.NewTestSession(t, "bar")})
 		assert.NotNil(t, err)
 	}
 }
@@ -212,20 +210,20 @@ func testHelperCreateGetDeleteRefreshTokenSession(x oauth2.InternalRegistry) fun
 
 		code := uuid.Must(uuid.NewV4()).String()
 		ctx := t.Context()
-		_, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, code, "", &defaultRequest)
+		err = m.CreateRefreshTokenSession(ctx, code, "", newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewSession("bar"))
+		res, err := m.GetRefreshTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteRefreshTokenSession(ctx, code)
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err = m.GetRefreshTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 	}
 }
@@ -235,7 +233,7 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 		m := x.OAuth2Storage()
 
 		ctx := t.Context()
-		_, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewSession("bar"))
+		_, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewTestSession(t, "bar"))
 		assert.Error(t, err)
 
 		reqIdOne := uuid.Must(uuid.NewV4()).String()
@@ -248,7 +246,7 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			ID:          reqIdOne,
 			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     oauth2.NewSession("user"),
+			Session:     oauth2.NewTestSession(t, "user"),
 		})
 		require.NoError(t, err)
 
@@ -256,11 +254,11 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			ID:          reqIdTwo,
 			Client:      &client.Client{ID: "foobar"},
 			RequestedAt: time.Now().UTC().Round(time.Second),
-			Session:     oauth2.NewSession("user"),
+			Session:     oauth2.NewTestSession(t, "user"),
 		})
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", oauth2.NewSession("bar"))
+		_, err = m.GetRefreshTokenSession(ctx, "1111", oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
 
 		err = m.RevokeRefreshToken(ctx, reqIdOne)
@@ -269,11 +267,11 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
-		req, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewSession("bar"))
+		req, err := m.GetRefreshTokenSession(ctx, "1111", oauth2.NewTestSession(t, "bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 
-		req, err = m.GetRefreshTokenSession(ctx, "1122", oauth2.NewSession("bar"))
+		req, err = m.GetRefreshTokenSession(ctx, "1122", oauth2.NewTestSession(t, "bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
@@ -288,21 +286,21 @@ func testHelperCreateGetDeleteAuthorizeCodes(x oauth2.InternalRegistry) func(t *
 		code := uuid.Must(uuid.NewV4()).String()
 
 		ctx := t.Context()
-		res, err := m.GetAuthorizeCodeSession(ctx, code, oauth2.NewSession("bar"))
+		res, err := m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.Error(t, err)
 		assert.Nil(t, res)
 
-		err = m.CreateAuthorizeCodeSession(ctx, code, &defaultRequest)
+		err = m.CreateAuthorizeCodeSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewSession("bar"))
+		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.InvalidateAuthorizeCodeSession(ctx, code)
 		require.NoError(t, err)
 
-		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewSession("bar"))
+		res, err = m.GetAuthorizeCodeSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.Error(t, err)
 		assert.EqualError(t, err, fosite.ErrInvalidatedAuthorizeCode.Error())
 		assert.NotNil(t, res)
@@ -327,7 +325,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 
 		ctx := t.Context()
 
-		s := oauth2.NewSession("bar")
+		s := oauth2.NewTestSession(t, "bar")
 		s.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour).Round(time.Minute))
 		s.SetExpiresAt(fosite.RefreshToken, time.Now().Add(time.Hour*2).Round(time.Minute))
 		s.SetExpiresAt(fosite.AuthorizeCode, time.Now().Add(time.Hour*3).Round(time.Minute))
@@ -413,7 +411,7 @@ func testHelperNilAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 			RequestedAudience: fosite.Arguments{"ad1", "ad2"},
 			GrantedAudience:   fosite.Arguments{"ad1", "ad2"},
 			Form:              url.Values{"foo": []string{"bar", "baz"}},
-			Session:           oauth2.NewSession("bar"),
+			Session:           oauth2.NewTestSession(t, "bar"),
 		})
 		require.NoError(t, err)
 	}
@@ -425,20 +423,20 @@ func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func
 
 		code := uuid.Must(uuid.NewV4()).String()
 		ctx := t.Context()
-		_, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err := m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.Error(t, err)
 
-		err = m.CreateAccessTokenSession(ctx, code, &defaultRequest)
+		err = m.CreateAccessTokenSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		res, err := m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteAccessTokenSession(ctx, code)
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.Error(t, err)
 	}
 }
@@ -449,16 +447,16 @@ func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) 
 		ctx := t.Context()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
+		err := m.CreateAccessTokenSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
 
-		err = m.DeleteAccessTokens(ctx, defaultRequest.Client.GetID())
+		err = m.DeleteAccessTokens(ctx, newDefaultRequest(t, "blank").Client.GetID())
 		require.NoError(t, err)
 
-		req, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		req, err := m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
@@ -470,16 +468,16 @@ func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 		ctx := t.Context()
 
 		code := uuid.Must(uuid.NewV4()).String()
-		err := m.CreateAccessTokenSession(ctx, code, &defaultRequest)
+		err := m.CreateAccessTokenSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		_, err = m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
 
-		err = m.RevokeAccessToken(ctx, defaultRequest.GetID())
+		err = m.RevokeAccessToken(ctx, newDefaultRequest(t, "blank").GetID())
 		require.NoError(t, err)
 
-		req, err := m.GetAccessTokenSession(ctx, code, oauth2.NewSession("bar"))
+		req, err := m.GetAccessTokenSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.Nil(t, req)
 		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
@@ -511,8 +509,8 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 
 		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
-			refreshTokenSession, accessTokenSession := createTokens(t, &r)
+			r := newDefaultRequest(t, uuid.Must(uuid.NewV4()).String())
+			refreshTokenSession, accessTokenSession := createTokens(t, r)
 
 			err := m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession)
 			require.NoError(t, err)
@@ -555,18 +553,18 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 					})
 
 					m := x.OAuth2Storage()
-					r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
+					r := newDefaultRequest(t, uuid.Must(uuid.NewV4()).String())
 
 					// Create tokens
 					refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
 					accessTokenSession := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 
 					// Create access token
-					err := m.CreateAccessTokenSession(ctx, accessTokenSession, &r)
+					err := m.CreateAccessTokenSession(ctx, accessTokenSession, r)
 					require.NoError(t, err)
 
 					// Create refresh token linked to the access token
-					err = m.CreateRefreshTokenSession(ctx, refreshTokenSession, accessTokenSession, &r)
+					err = m.CreateRefreshTokenSession(ctx, refreshTokenSession, accessTokenSession, r)
 					require.NoError(t, err)
 
 					// Verify tokens were created successfully
@@ -612,10 +610,10 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
-			refreshTokenSession, accessTokenSession1 := createTokens(t, &r)
+			r := newDefaultRequest(t, uuid.Must(uuid.NewV4()).String())
+			refreshTokenSession, accessTokenSession1 := createTokens(t, r)
 			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
-			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, &r))
+			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, r))
 
 			// Create a second access token
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
@@ -649,9 +647,9 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
+			r := newDefaultRequest(t, uuid.Must(uuid.NewV4()).String())
 
-			refreshTokenSession, _ := createTokens(t, &r)
+			refreshTokenSession, _ := createTokens(t, r)
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
 
 			var expected sql.OAuth2RefreshTable
@@ -675,15 +673,15 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			})
 
 			m := x.OAuth2Storage()
-			r := newDefaultRequest(uuid.Must(uuid.NewV4()).String())
+			r := newDefaultRequest(t, uuid.Must(uuid.NewV4()).String())
 
 			refreshTokenSession := fmt.Sprintf("refresh_token_%s", uuid.Must(uuid.NewV4()).String())
 			accessTokenSession1 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
 			accessTokenSession2 := fmt.Sprintf("access_token_%s", uuid.Must(uuid.NewV4()).String())
-			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession1, &r))
-			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, &r))
+			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession1, r))
+			require.NoError(t, m.CreateAccessTokenSession(ctx, accessTokenSession2, r))
 
-			require.NoError(t, m.CreateRefreshTokenSession(ctx, refreshTokenSession, "", &r),
+			require.NoError(t, m.CreateRefreshTokenSession(ctx, refreshTokenSession, "", r),
 				"precondition failed: could not create refresh token session")
 
 			// ACT
@@ -715,20 +713,20 @@ func testHelperCreateGetDeletePKCERequestSession(x oauth2.InternalRegistry) func
 
 		code := uuid.Must(uuid.NewV4()).String()
 		ctx := t.Context()
-		_, err := m.GetPKCERequestSession(ctx, code, oauth2.NewSession("bar"))
+		_, err := m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 
-		err = m.CreatePKCERequestSession(ctx, code, &defaultRequest)
+		err = m.CreatePKCERequestSession(ctx, code, newDefaultRequest(t, "blank"))
 		require.NoError(t, err)
 
-		res, err := m.GetPKCERequestSession(ctx, code, oauth2.NewSession("bar"))
+		res, err := m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		require.NoError(t, err)
-		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
+		AssertObjectKeysEqual(t, newDefaultRequest(t, "blank"), res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeletePKCERequestSession(ctx, code)
 		require.NoError(t, err)
 
-		_, err = m.GetPKCERequestSession(ctx, code, oauth2.NewSession("bar"))
+		_, err = m.GetPKCERequestSession(ctx, code, oauth2.NewTestSession(t, "bar"))
 		assert.NotNil(t, err)
 	}
 }
@@ -887,7 +885,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m oauth2.InternalRe
 		res, err := m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
 		// session should have been created successfully because Commit did not return an error
 		require.NoError(t, err)
-		assertx.EqualAsJSONExcept(t, &defaultRequest, res, defaultIgnoreKeys)
+		assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
 
 		// test delete within a transaction
 		ctx, err = txnStore.BeginTX(context.Background())
@@ -1343,10 +1341,10 @@ func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	res, err := getFn(context.Background(), signature, oauth2.NewSession("bar"))
+	res, err := getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
 	// token should have been created successfully because Commit did not return an error
 	require.NoError(t, err)
-	assertx.EqualAsJSONExcept(t, &defaultRequest, res, defaultIgnoreKeys)
+	assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
 	// AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 	// testrevoke within a transaction
@@ -1358,7 +1356,7 @@ func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	_, err = getFn(context.Background(), signature, oauth2.NewSession("bar"))
+	_, err = getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since commit worked for revoke, we should get an error here.
 	require.Error(t, err)
 }
@@ -1380,10 +1378,10 @@ func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	res, err := getFn(context.Background(), signature, oauth2.NewSession("bar"))
+	res, err := getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
 	// token should have been created successfully because Commit did not return an error
 	require.NoError(t, err)
-	assertx.EqualAsJSONExcept(t, &defaultRequest, res, defaultIgnoreKeys)
+	assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
 	// AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 	// testrevoke within a transaction
@@ -1395,7 +1393,7 @@ func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	// Require a new context, since the old one contains the transaction.
-	_, err = getFn(context.Background(), signature, oauth2.NewSession("bar"))
+	_, err = getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since commit worked for revoke, we should get an error here.
 	require.Error(t, err)
 }
@@ -1419,7 +1417,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 
 	// Require a new context, since the old one contains the transaction.
 	ctx = context.Background()
-	_, err = getFn(ctx, signature, oauth2.NewSession("bar"))
+	_, err = getFn(ctx, signature, oauth2.NewTestSession(t, "bar"))
 	// Since we rolled back above, the token should not exist and getting it should result in an error
 	require.Error(t, err)
 
@@ -1427,7 +1425,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	signature2 := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature2, createTestRequest(signature2))
 	require.NoError(t, err)
-	_, err = getFn(ctx, signature2, oauth2.NewSession("bar"))
+	_, err = getFn(ctx, signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 
 	ctx, err = txnStore.BeginTX(context.Background())
@@ -1437,7 +1435,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	err = txnStore.Rollback(ctx)
 	require.NoError(t, err)
 
-	_, err = getFn(context.Background(), signature2, oauth2.NewSession("bar"))
+	_, err = getFn(context.Background(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 }
 
@@ -1460,7 +1458,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 
 	// Require a new context, since the old one contains the transaction.
 	ctx = context.Background()
-	_, err = getFn(ctx, signature, oauth2.NewSession("bar"))
+	_, err = getFn(ctx, signature, oauth2.NewTestSession(t, "bar"))
 	// Since we rolled back above, the token should not exist and getting it should result in an error
 	require.Error(t, err)
 
@@ -1468,7 +1466,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 	signature2 := uuid.Must(uuid.NewV4()).String()
 	err = createFn(ctx, signature2, "", createTestRequest(signature2))
 	require.NoError(t, err)
-	_, err = getFn(ctx, signature2, oauth2.NewSession("bar"))
+	_, err = getFn(ctx, signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 
 	ctx, err = txnStore.BeginTX(context.Background())
@@ -1478,7 +1476,7 @@ func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
 	err = txnStore.Rollback(ctx)
 	require.NoError(t, err)
 
-	_, err = getFn(context.Background(), signature2, oauth2.NewSession("bar"))
+	_, err = getFn(context.Background(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 }
 
@@ -1509,7 +1507,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 			ID:          uuid.Must(uuid.NewV4()).String(),
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Client:      cl,
-			Session:     oauth2.NewSession("sub"),
+			Session:     oauth2.NewTestSession(t, "sub"),
 		}
 
 		// Set a long expiry time (24 hours)
@@ -1522,7 +1520,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 			require.NoError(t, x.OAuth2Storage().CreateRefreshTokenSession(ctx, regularSignature, "", &initialRequest))
 
 			// Verify initial expiry is set correctly
-			originalToken, err := x.OAuth2Storage().GetRefreshTokenSession(ctx, regularSignature, oauth2.NewSession("sub"))
+			originalToken, err := x.OAuth2Storage().GetRefreshTokenSession(ctx, regularSignature, oauth2.NewTestSession(t, "sub"))
 			require.NoError(t, err)
 			require.Equal(t, initialExpiry.Unix(), originalToken.GetSession().GetExpiresAt(fosite.RefreshToken).Unix())
 
@@ -1619,7 +1617,7 @@ func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *test
 			ID:          uuid.Must(uuid.NewV4()).String(),
 			RequestedAt: time.Now().UTC().Round(time.Second),
 			Client:      cl,
-			Session:     oauth2.NewSession("sub"),
+			Session:     oauth2.NewTestSession(t, "sub"),
 		}
 
 		// Set a long expiry time (1 hour)
@@ -1631,7 +1629,7 @@ func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *test
 		require.NoError(t, x.OAuth2Storage().CreateAuthorizeCodeSession(ctx, authCodeSignature, &initialRequest))
 
 		// Verify initial state
-		originalCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewSession("sub"))
+		originalCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewTestSession(t, "sub"))
 		require.NoError(t, err)
 		require.Equal(t, initialExpiry.Unix(), originalCode.GetSession().GetExpiresAt(fosite.AuthorizeCode).Unix())
 
@@ -1651,7 +1649,7 @@ func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *test
 		require.NoError(t, err)
 
 		// Check that the code was invalidated but is still retrievable
-		invalidatedCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewSession("sub"))
+		invalidatedCode, err := x.OAuth2Storage().GetAuthorizeCodeSession(ctx, authCodeSignature, oauth2.NewTestSession(t, "sub"))
 		require.Error(t, err)
 		require.ErrorIs(t, err, fosite.ErrInvalidatedAuthorizeCode)
 		require.NotNil(t, invalidatedCode) // Should still be retrievable

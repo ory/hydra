@@ -53,10 +53,10 @@ func TestIntrospectorSDK(t *testing.T) {
 	defer server.Close()
 
 	now := time.Now().UTC().Round(time.Minute)
-	createAccessTokenSession("alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("siri", "my-client", tokens[1].sig, now.Add(-time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
-	createAccessTokenSession("my-client", "my-client", tokens[2].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"hydra.introspect"})
-	createAccessTokenSessionPairwise("alice", "my-client", tokens[3].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"}, "alice-obfuscated")
+	createAccessTokenSession(t, "alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession(t, "siri", "my-client", tokens[1].sig, now.Add(-time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"})
+	createAccessTokenSession(t, "my-client", "my-client", tokens[2].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"hydra.introspect"})
+	createAccessTokenSessionPairwise(t, "alice", "my-client", tokens[3].sig, now.Add(time.Hour), reg.OAuth2Storage(), fosite.Arguments{"core", "foo.*"}, "alice-obfuscated")
 
 	t.Run("TestIntrospect", func(t *testing.T) {
 		for k, c := range []struct {

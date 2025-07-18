@@ -4,6 +4,7 @@
 package tlsx
 
 import (
+	"bytes"
 	"context"
 	"crypto"
 	"crypto/ecdsa"
@@ -16,12 +17,16 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math/big"
 	"os"
+	"path/filepath"
 	"sync/atomic"
+	"testing"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/watcherx"
 )
@@ -117,6 +122,8 @@ func Certificate(
 	return nil, errors.WithStack(ErrInvalidCertificateConfiguration)
 }
 
+type CertFunc = func(*tls.ClientHelloInfo) (*tls.Certificate, error)
+
 // GetCertificate returns a function for use with
 // "net/tls".Config.GetCertificate.
 //
@@ -132,7 +139,7 @@ func GetCertificate(
 	ctx context.Context,
 	certPath, keyPath string,
 	errs chan<- error,
-) (func(*tls.ClientHelloInfo) (*tls.Certificate, error), error) {
+) (CertFunc, error) {
 	if certPath == "" || keyPath == "" {
 		return nil, errors.WithStack(ErrNoCertificatesConfigured)
 	}
@@ -192,7 +199,7 @@ func GetCertificate(
 		}
 	}()
 
-	return func(_ *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 		if cert, ok := store.Load().(*tls.Certificate); ok {
 			return cert, nil
 		}
@@ -283,4 +290,54 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 		return nil, errors.WithStack(err)
 	}
 	return &pem.Block{Type: "PRIVATE KEY", Bytes: b}, nil
+}
+
+// CreateSelfSignedCertificateForTest writes a new, self-signed TLS
+// certificate+key (in PEM format) to a temporary location on disk and returns
+// the paths to both, and the respective contents in base64 encoding. The
+// files are automatically cleaned up when the given *testing.T concludes its
+// tests.
+func CreateSelfSignedCertificateForTest(t testing.TB) (certPath, keyPath, certBase64, keyBase64 string) {
+	tmpDir := t.TempDir()
+
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.NoError(t, err)
+
+	cert, err := CreateSelfSignedCertificate(privateKey)
+	require.NoError(t, err)
+
+	// write cert
+	certFile, err := os.Create(filepath.Join(tmpDir, "cert.pem"))
+	require.NoError(t, err)
+	certPath = certFile.Name()
+
+	var buf bytes.Buffer
+	enc := base64.NewEncoder(base64.StdEncoding, &buf)
+	require.NoErrorf(t, pem.Encode(
+		io.MultiWriter(enc, certFile),
+		&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw},
+	), "Failed to write data to %q", certPath)
+	require.NoError(t, enc.Close())
+	require.NoErrorf(t, certFile.Close(), "Error closing %q", certPath)
+	certBase64 = buf.String()
+
+	// write key
+	keyFile, err := os.Create(filepath.Join(tmpDir, "key.pem"))
+	require.NoError(t, err)
+	keyPath = keyFile.Name()
+	buf.Reset()
+	enc = base64.NewEncoder(base64.StdEncoding, &buf)
+
+	privBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	require.NoError(t, err)
+
+	require.NoErrorf(t, pem.Encode(
+		io.MultiWriter(enc, keyFile),
+		&pem.Block{Type: "PRIVATE KEY", Bytes: privBytes},
+	), "Failed to write data to %q", keyPath)
+	require.NoError(t, enc.Close())
+	require.NoErrorf(t, keyFile.Close(), "Error closing %q", keyPath)
+	keyBase64 = buf.String()
+
+	return
 }

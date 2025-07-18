@@ -90,7 +90,7 @@ func TestCORSOptions(t *testing.T) {
 	p := newProvider()
 	p.MustSet(ctx, "serve.public.cors.enabled", true)
 
-	conf, enabled := p.CORS(ctx, PublicInterface)
+	conf, enabled := p.CORSPublic(ctx)
 	assert.True(t, enabled)
 
 	assert.EqualValues(t, cors.Options{
@@ -109,13 +109,13 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(context.Background(), l)
 
-	value := p.DisableHealthAccessLog(AdminInterface)
-	assert.Equal(t, false, value)
+	serve := p.ServeAdmin(ctx)
+	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p.MustSet(ctx, AdminInterface.Key(KeySuffixDisableHealthAccessLog), "true")
+	p.MustSet(ctx, "serve.admin.requestlog.disable_health", "true")
 
-	value = p.DisableHealthAccessLog(AdminInterface)
-	assert.Equal(t, true, value)
+	serve = p.ServeAdmin(ctx)
+	assert.True(t, serve.RequestLog.DisableHealth)
 }
 
 func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
@@ -125,13 +125,13 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(context.Background(), l)
 
-	value := p.DisableHealthAccessLog(PublicInterface)
-	assert.Equal(t, false, value)
+	serve := p.ServePublic(ctx)
+	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p.MustSet(ctx, PublicInterface.Key(KeySuffixDisableHealthAccessLog), "true")
+	p.MustSet(ctx, "serve.public.requestlog.disable_health", "true")
 
-	value = p.DisableHealthAccessLog(PublicInterface)
-	assert.Equal(t, true, value)
+	serve = p.ServePublic(ctx)
+	assert.True(t, serve.RequestLog.DisableHealth)
 }
 
 func TestPublicAllowDynamicRegistration(t *testing.T) {
@@ -200,7 +200,7 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	l.Logrus().SetOutput(io.Discard)
 
 	p := MustNew(context.Background(), l, configx.SkipValidation())
-	p.MustSet(ctx, KeyTLSEnabled, true)
+	p.MustSet(ctx, "serve.tls.enabled", true)
 
 	p.MustSet(ctx, KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode(ctx))
@@ -234,8 +234,11 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "json", c.Source(ctx).String("log.format"))
 
 	// serve
-	assert.Equal(t, "localhost:1", c.ListenOn(PublicInterface))
-	assert.Equal(t, "localhost:2", c.ListenOn(AdminInterface))
+	servePublic, serveAdmin := c.ServePublic(ctx), c.ServeAdmin(ctx)
+	assert.Equal(t, "localhost", servePublic.Host)
+	assert.Equal(t, 1, servePublic.Port)
+	assert.Equal(t, "localhost", serveAdmin.Host)
+	assert.Equal(t, 2, serveAdmin.Port)
 
 	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
@@ -247,8 +250,8 @@ func TestViperProviderValidates(t *testing.T) {
 		Group: "hydra-admin-api",
 		Mode:  0770,
 	}
-	assert.Equal(t, expectedPublicPermission, c.SocketPermission(PublicInterface))
-	assert.Equal(t, expectedAdminPermission, c.SocketPermission(AdminInterface))
+	assert.Equal(t, expectedPublicPermission, &servePublic.Socket)
+	assert.Equal(t, expectedAdminPermission, &serveAdmin.Socket)
 
 	expectedCors := cors.Options{
 		AllowedOrigins:   []string{"https://example.com"},
@@ -260,17 +263,23 @@ func TestViperProviderValidates(t *testing.T) {
 		Debug:            false,
 	}
 
-	gc, enabled := c.CORS(ctx, AdminInterface)
+	gc, enabled := c.CORSAdmin(ctx)
 	assert.False(t, enabled)
 	assert.Equal(t, expectedCors, gc)
 
-	gc, enabled = c.CORS(ctx, PublicInterface)
+	gc, enabled = c.CORSPublic(ctx)
 	assert.False(t, enabled)
 	assert.Equal(t, expectedCors, gc)
 
-	assert.Equal(t, []string{"127.0.0.1/32"}, c.TLS(ctx, PublicInterface).AllowTerminationFrom())
+	assert.Equal(t, []string{"127.0.0.1/32"}, c.Source(ctx).Strings("serve.tls.allow_termination_from"))
+	assert.Equal(t, []string{"127.0.0.1/32"}, servePublic.TLS.AllowTerminationFrom)
+	assert.Equal(t, []string{"127.0.0.1/32"}, serveAdmin.TLS.AllowTerminationFrom)
 	assert.Equal(t, "/path/to/file.pem", c.Source(ctx).String("serve.tls.key.path"))
+	assert.Equal(t, "/path/to/file.pem", servePublic.TLS.KeyPath)
+	assert.Equal(t, "/path/to/file.pem", serveAdmin.TLS.KeyPath)
 	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", c.Source(ctx).String("serve.tls.cert.base64"))
+	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", servePublic.TLS.CertBase64)
+	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", serveAdmin.TLS.CertBase64)
 	assert.Equal(t, http.SameSiteLaxMode, c.CookieSameSiteMode(ctx))
 	assert.Equal(t, true, c.CookieSameSiteLegacyWorkaround(ctx))
 

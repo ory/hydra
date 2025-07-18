@@ -24,7 +24,7 @@ func newCompiler(schema []byte) (string, *jsonschema.Compiler, error) {
 	}
 
 	compiler := jsonschema.NewCompiler()
-	if err := compiler.AddResource(id, bytes.NewBuffer(schema)); err != nil {
+	if err := compiler.AddResource(id, bytes.NewReader(schema)); err != nil {
 		return "", nil, errors.WithStack(err)
 	}
 
@@ -35,6 +35,9 @@ func newCompiler(schema []byte) (string, *jsonschema.Compiler, error) {
 		return "", nil, err
 	}
 	if err := logrusx.AddConfigSchema(compiler); err != nil {
+		return "", nil, err
+	}
+	if err := AddSchemaResources(compiler); err != nil {
 		return "", nil, err
 	}
 

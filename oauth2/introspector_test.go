@@ -6,7 +6,6 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -22,7 +21,6 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/httprouterx"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
@@ -46,9 +44,7 @@ func TestIntrospectorSDK(t *testing.T) {
 
 	router := x.NewRouterAdmin(conf.AdminURL)
 	handler := reg.OAuth2Handler()
-	handler.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
-		return h
-	})
+	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)
 	defer server.Close()
 

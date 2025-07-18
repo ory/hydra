@@ -81,7 +81,7 @@ func SnapshotTJSONString(t *testing.T, str string, except ...ExceptOpt) {
 func SnapshotT(t *testing.T, actual interface{}, except ...ExceptOpt) {
 	t.Helper()
 	compare, err := json.MarshalIndent(actual, "", "  ")
-	require.NoError(t, err, "%+v", actual)
+	require.NoErrorf(t, err, "%+v", actual)
 	for _, e := range except {
 		compare = e.apply(t, compare)
 	}

@@ -42,19 +42,21 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
-	admin.GET(ClientsHandlerPath, h.listOAuth2Clients)
-	admin.POST(ClientsHandlerPath, h.createOAuth2Client)
-	admin.GET(ClientsHandlerPath+"/:id", h.Get)
-	admin.PUT(ClientsHandlerPath+"/:id", h.setOAuth2Client)
-	admin.PATCH(ClientsHandlerPath+"/:id", h.patchOAuth2Client)
-	admin.DELETE(ClientsHandlerPath+"/:id", h.deleteOAuth2Client)
-	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.setOAuth2ClientLifespans)
+func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
+	r.GET(ClientsHandlerPath, h.listOAuth2Clients)
+	r.POST(ClientsHandlerPath, h.createOAuth2Client)
+	r.GET(ClientsHandlerPath+"/:id", h.Get)
+	r.PUT(ClientsHandlerPath+"/:id", h.setOAuth2Client)
+	r.PATCH(ClientsHandlerPath+"/:id", h.patchOAuth2Client)
+	r.DELETE(ClientsHandlerPath+"/:id", h.deleteOAuth2Client)
+	r.PUT(ClientsHandlerPath+"/:id/lifespans", h.setOAuth2ClientLifespans)
+}
 
-	public.POST(DynClientsHandlerPath, h.createOidcDynamicClient)
-	public.GET(DynClientsHandlerPath+"/:id", h.getOidcDynamicClient)
-	public.PUT(DynClientsHandlerPath+"/:id", h.setOidcDynamicClient)
-	public.DELETE(DynClientsHandlerPath+"/:id", h.deleteOidcDynamicClient)
+func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic) {
+	r.POST(DynClientsHandlerPath, h.createOidcDynamicClient)
+	r.GET(DynClientsHandlerPath+"/:id", h.getOidcDynamicClient)
+	r.PUT(DynClientsHandlerPath+"/:id", h.setOidcDynamicClient)
+	r.DELETE(DynClientsHandlerPath+"/:id", h.deleteOidcDynamicClient)
 }
 
 // OAuth 2.0 Client Creation Parameters
@@ -140,7 +142,7 @@ type createOidcDynamicClient struct {
 //	  201: oAuth2Client
 //	  400: errorOAuth2BadRequest
 //	  default: errorOAuth2Default
-func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

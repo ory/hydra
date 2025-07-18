@@ -63,9 +63,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, store.CreateAccessTokenSession(context.Background(), deleteRequest.ID, deleteRequest))
 
 	r := x.NewRouterAdmin(conf.AdminURL)
-	h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
-		return h
-	})
+	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -101,9 +100,8 @@ func TestUserinfo(t *testing.T) {
 	h := reg.OAuth2Handler()
 
 	router := x.NewRouterAdmin(conf.AdminURL)
-	h.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
-		return h
-	})
+	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler { return h })
+	h.SetAdminRoutes(router)
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
@@ -354,9 +352,8 @@ func TestHandlerWellKnown(t *testing.T) {
 		h := oauth2.NewHandler(reg, conf)
 
 		r := x.NewRouterAdmin(conf.AdminURL)
-		h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
-			return h
-		})
+		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 
@@ -401,9 +398,8 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 		h := oauth2.NewHandler(reg, conf)
 
 		r := x.NewRouterAdmin(conf.AdminURL)
-		h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
-			return h
-		})
+		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)
 		defer ts.Close()
 

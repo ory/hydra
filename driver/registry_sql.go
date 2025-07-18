@@ -20,6 +20,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
@@ -156,6 +157,13 @@ func (m *RegistrySQL) Init(
 				instrumentedsql.WithTracer(otelsql.NewTracer()),
 				instrumentedsql.WithOmitArgs(), // don't risk leaking PII or secrets
 				instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
+			}
+		}
+
+		if m.Config().CGroupsV1AutoMaxProcsEnabled() {
+			_, err := maxprocs.Set(maxprocs.Logger(m.Logger().Infof))
+			if err != nil {
+				return fmt.Errorf("could not set GOMAXPROCS: %w", err)
 			}
 		}
 
@@ -307,7 +315,7 @@ func (m *RegistrySQL) OAuth2AwareMiddleware() func(h http.Handler) http.Handler 
 }
 
 func (m *RegistrySQL) addPublicCORSOnHandler(ctx context.Context) func(http.Handler) http.Handler {
-	corsConfig, corsEnabled := m.Config().CORS(ctx, config.PublicInterface)
+	corsConfig, corsEnabled := m.Config().CORSPublic(ctx)
 	if !corsEnabled {
 		return func(h http.Handler) http.Handler {
 			return h
@@ -321,18 +329,28 @@ func (m *RegistrySQL) addPublicCORSOnHandler(ctx context.Context) func(http.Hand
 	}
 }
 
-func (m *RegistrySQL) RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic) {
-	m.HealthHandler().SetHealthRoutes(admin.Router, true)
-	m.HealthHandler().SetVersionRoutes(admin.Router)
+func (m *RegistrySQL) RegisterPublicRoutes(ctx context.Context, public *httprouterx.RouterPublic) {
+	m.PrometheusManager().RegisterRouter(public.Router)
 
 	m.HealthHandler().SetHealthRoutes(public.Router, false, healthx.WithMiddleware(m.addPublicCORSOnHandler(ctx)))
+
+	m.KeyHandler().SetPublicRoutes(public, m.OAuth2AwareMiddleware())
+	m.ClientHandler().SetPublicRoutes(public)
+	m.OAuth2Handler().SetPublicRoutes(public, m.OAuth2AwareMiddleware())
+}
+
+func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
+	m.PrometheusManager().RegisterRouter(admin.Router)
+
+	m.HealthHandler().SetHealthRoutes(admin.Router, true)
+	m.HealthHandler().SetVersionRoutes(admin.Router)
 
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.KeyHandler().SetAdminRoutes(admin)
+	m.ClientHandler().SetAdminRoutes(admin)
+	m.OAuth2Handler().SetAdminRoutes(admin)
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 

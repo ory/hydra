@@ -1875,11 +1875,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 			reg.WithConsentStrategy(consentStrategy)
 			handler := reg.OAuth2Handler()
-			handler.SetRoutes(
-				httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL),
-				router,
-				func(h http.Handler) http.Handler { return h },
-			)
+			handler.SetAdminRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL))
+			handler.SetPublicRoutes(router, func(h http.Handler) http.Handler { return h })
 
 			var callbackHandler httprouter.Handle
 			router.GET("/callback", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -2261,7 +2258,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
 								accessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
-								require.Equal(t, accessTokenClaims.Get("ext.hooked").String(), hookType)
+								require.Equalf(t, hookType, accessTokenClaims.Get("ext.hooked").String(), "%+v", accessTokenClaims)
 
 								idTokenBody, err := x.DecodeSegment(
 									strings.Split(

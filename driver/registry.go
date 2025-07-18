@@ -64,7 +64,8 @@ type Registry interface {
 
 	kratos.Provider
 
-	RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic)
+	RegisterPublicRoutes(context.Context, *httprouterx.RouterPublic)
+	RegisterAdminRoutes(*httprouterx.RouterAdmin)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler

@@ -1,0 +1,70 @@
+{
+  "$id": "https://github.com/ory/x/configx/serve.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "request_log": {
+      "type": "object",
+      "properties": {
+        "disable_for_health": {
+          "title": "Disable health endpoints request logging",
+          "description": "Disable request logging for /health/alive and /health/ready endpoints",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "base_url": {
+      "title": "Base URL",
+      "description": "The URL where the endpoint is exposed at. This domain is used to generate redirects, form URLs, and more.",
+      "type": "string",
+      "format": "uri-reference",
+      "examples": [
+        "https://my-app.com/",
+        "https://my-app.com/.ory/kratos/public",
+        "https://auth.my-app.com/hydra"
+      ]
+    },
+    "host": {
+      "title": "Host",
+      "description": "The host (interface) that the endpoint listens on.",
+      "type": "string",
+      "default": "0.0.0.0"
+    },
+    "port": {
+      "title": "Port",
+      "description": "The port that the endpoint listens on.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "socket": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Sets the permissions of the unix socket",
+      "properties": {
+        "owner": {
+          "type": "string",
+          "description": "Owner of unix socket. If empty, the owner will be the user running the service.",
+          "default": ""
+        },
+        "group": {
+          "type": "string",
+          "description": "Group of unix socket. If empty, the group will be the primary group of the user running the service.",
+          "default": ""
+        },
+        "mode": {
+          "type": "integer",
+          "description": "Mode of unix socket in numeric form",
+          "default": 493,
+          "minimum": 0,
+          "maximum": 511
+        }
+      }
+    },
+    "tls": {
+      "$ref": "ory://tls-config"
+    }
+  }
+}

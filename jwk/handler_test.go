@@ -10,19 +10,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/x/contextx"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
@@ -33,7 +29,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
-	h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL), router, func(h http.Handler) http.Handler {
+	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 		return h
 	})
 	testServer := httptest.NewServer(router)

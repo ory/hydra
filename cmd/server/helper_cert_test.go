@@ -30,12 +30,12 @@ import (
 )
 
 func TestGetOrCreateTLSCertificate(t *testing.T) {
+	ctx := t.Context()
 	certPath, keyPath, cert, priv := testhelpers.GenerateTLSCertificateFilesForTests(t)
 	logger := logrusx.New("", "")
 	logger.Logger.ExitFunc = func(code int) { t.Fatalf("Logger called os.Exit(%v)", code) }
-	hook := test.NewLocal(logger.Logger)
 	cfg := config.MustNew(
-		context.Background(),
+		ctx,
 		logger,
 		configx.WithValues(map[string]interface{}{
 			"dsn":                 config.DSNMemory,
@@ -46,7 +46,7 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 	)
 	d, err := driver.NewRegistryWithoutInit(cfg, logger)
 	require.NoError(t, err)
-	getCert := server.GetOrCreateTLSCertificate(context.Background(), d, config.AdminInterface, nil)
+	getCert := server.GetOrCreateTLSCertificate(ctx, d, d.Config().ServeAdmin(ctx).TLS, "admin")
 	require.NotNil(t, getCert)
 	tlsCert, err := getCert(nil)
 	require.NoError(t, err)
@@ -64,6 +64,8 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 	require.False(t, priv.Equal(newPriv))
 	require.NotEqual(t, certPath, newCertPath)
 	require.NotEqual(t, keyPath, newKeyPath)
+
+	hook := test.NewLocal(logger.Logger)
 
 	// move them into place
 	require.NoError(t, os.Rename(newKeyPath, keyPath))
@@ -96,10 +98,11 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 		default:
 		}
 	}
-	require.Contains(t, hook.LastEntry().Message, "Failed to reload TLS certificates. Using the previously loaded certificates.")
+	require.Contains(t, hook.LastEntry().Message, "Failed to reload TLS certificates, using previous certificates")
 }
 
 func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
+	ctx := t.Context()
 	certPath, keyPath, cert, priv := testhelpers.GenerateTLSCertificateFilesForTests(t)
 	certPEM, err := os.ReadFile(certPath)
 	require.NoError(t, err)
@@ -113,7 +116,7 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 	hook := test.NewLocal(logger.Logger)
 	_ = hook
 	cfg := config.MustNew(
-		context.Background(),
+		ctx,
 		logger,
 		configx.WithValues(map[string]interface{}{
 			"dsn":                   config.DSNMemory,
@@ -124,7 +127,7 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 	)
 	d, err := driver.NewRegistryWithoutInit(cfg, logger)
 	require.NoError(t, err)
-	getCert := server.GetOrCreateTLSCertificate(context.Background(), d, config.AdminInterface, nil)
+	getCert := server.GetOrCreateTLSCertificate(ctx, d, d.Config().ServeAdmin(ctx).TLS, "admin")
 	require.NotNil(t, getCert)
 	tlsCert, err := getCert(nil)
 	require.NoError(t, err)

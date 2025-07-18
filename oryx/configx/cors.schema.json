@@ -1,0 +1,106 @@
+{
+  "$id": "https://github.com/ory/x/configx/cors.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CORS",
+  "description": "Configures Cross Origin Resource Sharing for this endpoint.",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "allowed_origins": {
+      "type": "array",
+      "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: https://*.example.com). Only one wildcard can be used per origin.",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "not": {
+          "type": "string",
+          "description": "matches all strings that contain two or more (*)",
+          "pattern": ".*\\*.*\\*.*"
+        },
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "uri"
+          },
+          {
+            "const": "*"
+          }
+        ]
+      },
+      "uniqueItems": true,
+      "examples": [
+        [
+          "https://example.com",
+          "https://*.example.com",
+          "https://*.foo.example.com"
+        ]
+      ]
+    },
+    "allowed_methods": {
+      "type": "array",
+      "description": "A list of HTTP methods the user agent is allowed to use with cross-domain requests.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "POST",
+          "GET",
+          "PUT",
+          "PATCH",
+          "DELETE",
+          "CONNECT",
+          "HEAD",
+          "OPTIONS",
+          "TRACE"
+        ]
+      }
+    },
+    "allowed_headers": {
+      "type": "array",
+      "description": "A list of non-simple headers the client is allowed to use with cross-domain requests.",
+      "examples": [
+        [
+          "Authorization",
+          "Content-Type",
+          "Max-Age",
+          "X-Session-Token",
+          "X-XSRF-TOKEN",
+          "X-CSRF-TOKEN"
+        ]
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "exposed_headers": {
+      "type": "array",
+      "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allow_credentials": {
+      "type": "boolean",
+      "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
+      "default": true
+    },
+    "options_passthrough": {
+      "type": "boolean",
+      "description": "TODO",
+      "default": false
+    },
+    "max_age": {
+      "type": "integer",
+      "description": "Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.",
+      "default": 0,
+      "minimum": 0
+    },
+    "debug": {
+      "type": "boolean",
+      "description": "Adds additional log output to debug CORS issues.",
+      "default": false
+    }
+  }
+}

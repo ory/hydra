@@ -1,0 +1,68 @@
+{
+  "$id": "https://github.com/ory/x/tlsx/config.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HTTPS",
+  "description": "Configure HTTP over TLS (HTTPS).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "key": {
+      "title": "Private Key (PEM)",
+      "$ref": "#/definitions/source"
+    },
+    "cert": {
+      "title": "TLS Certificate (PEM)",
+      "$ref": "#/definitions/source"
+    },
+    "allow_termination_from": {
+      "type": "array",
+      "description": "Allow-list one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. The service serves http instead of https when this option is set.",
+      "items": {
+        "description": "CIDR address range.",
+        "type": "string",
+        "oneOf": [
+          {
+            "pattern": "^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$"
+          },
+          {
+            "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$"
+          }
+        ],
+        "examples": ["127.0.0.1/32"]
+      }
+    }
+  },
+  "definitions": {
+    "source": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "path": {
+              "title": "Path to PEM-encoded File",
+              "type": "string",
+              "examples": ["path/to/file.pem"]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "base64": {
+              "title": "Base64 Encoded Inline",
+              "description": "The base64 string of the PEM-encoded file content. Can be generated using for example `base64 -i path/to/file.pem`.",
+              "type": "string",
+              "examples": [
+                "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr..."
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

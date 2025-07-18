@@ -34,13 +34,13 @@ var defaultConfig = map[string]any{
 	config.KeyGetSystemSecret:                []string{"000000000000000000000000000000000000000000000000"},
 	config.KeyGetCookieSecrets:               []string{"000000000000000000000000000000000000000000000000"},
 	config.KeyLogLevel:                       "trace",
+	"serve.public.host":                      "localhost",
 }
 
 func NewConfigurationWithDefaults() *config.DefaultProvider {
 	return config.MustNew(context.Background(), logrusx.New("", ""),
 		configx.SkipValidation(),
 		configx.WithValues(defaultConfig),
-		configx.WithValue(config.KeyTLSEnabled, false),
 		configx.WithValue("log.leak_sensitive_values", true),
 	)
 }
@@ -49,7 +49,6 @@ func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
 	return config.MustNew(context.Background(), logrusx.New("", ""),
 		configx.SkipValidation(),
 		configx.WithValues(defaultConfig),
-		configx.WithValue(config.KeyTLSEnabled, true),
 	)
 }
 

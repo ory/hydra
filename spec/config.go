@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
+	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 )
@@ -36,6 +37,9 @@ func AddConfigSchema(compiler interface {
 		return err
 	}
 	if err := logrusx.AddConfigSchema(compiler); err != nil {
+		return err
+	}
+	if err := configx.AddSchemaResources(compiler); err != nil {
 		return err
 	}
 

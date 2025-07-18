@@ -9,16 +9,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/x/contextx"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/healthx"
 )
 
@@ -56,17 +52,17 @@ func TestPublicHealthHandler(t *testing.T) {
 		{
 			name: "with CORS enabled",
 			config: map[string]interface{}{
-				"cors.allowed_origins":   []string{"https://example.com"},
-				"cors.enabled":           true,
-				"cors.allowed_methods":   []string{"GET"},
-				"cors.allow_credentials": true,
+				"serve.public.cors.allowed_origins":   []string{"https://example.com"},
+				"serve.public.cors.enabled":           true,
+				"serve.public.cors.allowed_methods":   []string{"GET"},
+				"serve.public.cors.allow_credentials": true,
 			},
 			verifyResponse: expectCORSHeaders,
 		},
 		{
 			name: "with CORS disabled",
 			config: map[string]interface{}{
-				"cors.enabled": false,
+				"serve.public.cors.enabled": false,
 			},
 			verifyResponse: expectNoCORSHeaders,
 		},
@@ -74,13 +70,13 @@ func TestPublicHealthHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			conf := testhelpers.NewConfigurationWithDefaults()
 			for k, v := range tc.config {
-				conf.MustSet(ctx, config.PublicInterface.Key(k), v)
+				conf.MustSet(ctx, k, v)
 			}
 
 			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			public := x.NewRouterPublic()
-			reg.RegisterRoutes(ctx, x.NewRouterAdmin(conf.AdminURL), public)
+			reg.RegisterPublicRoutes(ctx, public)
 
 			ts := httptest.NewServer(public)
 

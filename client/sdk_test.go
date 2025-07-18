@@ -65,7 +65,8 @@ func TestClientSDK(t *testing.T) {
 	routerAdmin := x.NewRouterAdmin(conf.AdminURL)
 	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
-	handler.SetRoutes(routerAdmin, routerPublic)
+	handler.SetPublicRoutes(routerPublic)
+	handler.SetAdminRoutes(routerAdmin)
 	server := httptest.NewServer(routerAdmin)
 	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
 

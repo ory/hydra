@@ -95,7 +95,7 @@ func TestHandler(t *testing.T) {
 					except = append(except, "client_id", "client_secret", "registration_client_uri")
 				}
 
-				snapshotx.SnapshotTExcept(t, c, except)
+				snapshotx.SnapshotT(t, c, snapshotx.ExceptPaths(except...))
 			})
 		}
 	})
@@ -134,7 +134,8 @@ func TestHandler(t *testing.T) {
 	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
 		require.NoError(t, reg.Config().Set(ctx, config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
 		router := httprouter.New()
-		h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router, "/admin", reg.Config().AdminURL), &httprouterx.RouterPublic{Router: router})
+		h.SetAdminRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router, "/admin", reg.Config().AdminURL))
+		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: router})
 		ts := httptest.NewServer(router)
 		t.Cleanup(ts.Close)
 		reg.Config().MustSet(ctx, config.KeyAdminURL, ts.URL)
@@ -239,19 +240,19 @@ func TestHandler(t *testing.T) {
 						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)
 
-						snapshotx.SnapshotTExcept(t, newResponseSnapshot(string(body), res), nil)
+						snapshotx.SnapshotT(t, newResponseSnapshot(string(body), res))
 					})
 
 					t.Run("without incorrect auth", func(t *testing.T) {
 						body, res := fetchWithBearerAuth(t, method, ts.URL+client.DynClientsHandlerPath+"/"+expectedFirstID, "incorrect", nil)
 						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-						snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+						snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 					})
 
 					t.Run("with a different client auth", func(t *testing.T) {
 						body, res := fetchWithBearerAuth(t, method, ts.URL+client.DynClientsHandlerPath+"/"+expectedFirstID, expectedSecondID, nil)
 						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
-						snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+						snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 					})
 				})
 			}
@@ -424,7 +425,7 @@ func TestHandler(t *testing.T) {
 			} {
 				t.Run("path="+path, func(t *testing.T) {
 					body, res := fetchWithBearerAuth(t, "GET", ts.URL+path, gjson.Get(expected, "registration_access_token").String(), nil)
-					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+					snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 				})
 			}
 		})
@@ -436,7 +437,7 @@ func TestHandler(t *testing.T) {
 			} {
 				t.Run("path="+path, func(t *testing.T) {
 					body, res := fetchWithBearerAuth(t, "PUT", ts.URL+path, "invalid", bytes.NewBufferString("{}"))
-					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+					snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 				})
 			}
 		})
@@ -448,14 +449,14 @@ func TestHandler(t *testing.T) {
 			} {
 				t.Run("path="+path, func(t *testing.T) {
 					body, res := fetchWithBearerAuth(t, "DELETE", ts.URL+path, "invalid", nil)
-					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+					snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 				})
 			}
 		})
 
 		t.Run("case=patching non-existing client", func(t *testing.T) {
 			body, res := fetchWithBearerAuth(t, "PATCH", ts.URL+client.ClientsHandlerPath+"/foo", "", nil)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+			snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 		})
 
 		t.Run("case=fetching existing client", func(t *testing.T) {
@@ -470,7 +471,7 @@ func TestHandler(t *testing.T) {
 				body, res := fetch(t, ts.URL+client.ClientsHandlerPath+"/"+id)
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Equal(t, id, gjson.Get(body, "client_id").String())
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at"))
 			})
 
 			t.Run("endpoint=selfservice", func(t *testing.T) {
@@ -478,7 +479,7 @@ func TestHandler(t *testing.T) {
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Equal(t, id, gjson.Get(body, "client_id").String())
 				assert.False(t, gjson.Get(body, "metadata").Bool())
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at"))
 			})
 		})
 
@@ -499,7 +500,7 @@ func TestHandler(t *testing.T) {
 
 			body, res := fetchWithBearerAuth(t, "PUT", ts.URL+client.DynClientsHandlerPath+"/"+id, gjson.Get(expected, "registration_access_token").String(), bytes.NewBufferString(payload))
 			assert.Equal(t, http.StatusBadRequest, res.StatusCode, "%s\n%s", body, payload)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+			snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 		})
 
 		t.Run("case=updating existing client", func(t *testing.T) {
@@ -514,7 +515,7 @@ func TestHandler(t *testing.T) {
 				payload, _ := sjson.Set(expected, "redirect_uris", []string{"http://localhost:3000/cb", "https://foobar.com"})
 				body, res := makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+expectedID, json.RawMessage(payload))
 				assert.Equal(t, http.StatusOK, res.StatusCode)
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token"})
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token"))
 			})
 
 			t.Run("endpoint=dynamic client registration", func(t *testing.T) {
@@ -536,7 +537,7 @@ func TestHandler(t *testing.T) {
 				newToken := gjson.Get(body, "registration_access_token").String()
 				assert.NotEmpty(t, newToken)
 				require.NotEqual(t, originalRAT, newToken, "the new token should be different from the old token")
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at", "body.registration_access_token", "body.client_id", "body.registration_client_uri"})
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.created_at", "body.updated_at", "body.registration_access_token", "body.client_id", "body.registration_client_uri"))
 
 				_, res = fetchWithBearerAuth(t, "GET", ts.URL+client.DynClientsHandlerPath+"/"+expectedID, originalRAT, bytes.NewBufferString(payload))
 				assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
@@ -559,7 +560,7 @@ func TestHandler(t *testing.T) {
 				originalRAT := gjson.Get(expected, "registration_access_token").String()
 				body, res := fetchWithBearerAuth(t, "PUT", ts.URL+client.DynClientsHandlerPath+"/"+expectedID, originalRAT, bytes.NewBufferString(payload))
 				assert.Equal(t, http.StatusForbidden, res.StatusCode)
-				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 			})
 		})
 
@@ -569,7 +570,7 @@ func TestHandler(t *testing.T) {
 				Secret:                  "foobarbaz",
 			})
 			require.Equal(t, http.StatusBadRequest, res.StatusCode, body)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+			snapshotx.SnapshotT(t, newResponseSnapshot(body, res))
 		})
 
 		t.Run("case=update the lifespans of an OAuth2 client", func(t *testing.T) {
@@ -584,7 +585,7 @@ func TestHandler(t *testing.T) {
 
 			body, res = makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+gjson.Get(body, "client_id").String()+"/lifespans", testhelpers.TestLifespans)
 			require.Equal(t, http.StatusOK, res.StatusCode, body)
-			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.client_id", "body.created_at", "body.updated_at"})
+			snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.client_id", "body.created_at", "body.updated_at"))
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

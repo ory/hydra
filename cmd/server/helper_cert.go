@@ -12,18 +12,14 @@ import (
 	"encoding/pem"
 	"sync"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/go-jose/go-jose/v3"
-
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/driver/config"
-
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/x/tlsx"
-
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/tlsx"
 )
 
 const (
@@ -44,12 +40,12 @@ var lock sync.Mutex
 // GetOrCreateTLSCertificate returns a function for use with
 // "net/tls".Config.GetCertificate. If the certificate and key are read from
 // disk, they will be automatically reloaded until stopReload is close()'d.
-func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, iface config.ServeInterface, stopReload <-chan struct{}) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, tlsConfig configx.TLS, ifaceName string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
 	// check if certificates are configured
-	certFunc, err := d.Config().TLS(ctx, iface).GetCertificateFunc(stopReload, d.Logger())
+	certFunc, err := tlsConfig.GetCertFunc(ctx, d.Logger(), ifaceName)
 	if err == nil {
 		return certFunc
 	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {

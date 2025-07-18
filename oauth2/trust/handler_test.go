@@ -54,9 +54,7 @@ func (s *HandlerTestSuite) SetupTest() {
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)
-	jwkHandler.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
-		return h
-	})
+	jwkHandler.SetAdminRoutes(router)
 	s.server = httptest.NewServer(router)
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())

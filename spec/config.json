@@ -18,196 +18,6 @@
         "TRACE"
       ]
     },
-    "portNumber": {
-      "description": "The port to listen on.",
-      "minimum": 1,
-      "maximum": 65535
-    },
-    "socket": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Sets the permissions of the unix socket",
-      "properties": {
-        "owner": {
-          "type": "string",
-          "description": "Owner of unix socket. If empty, the owner will be the user running hydra.",
-          "default": ""
-        },
-        "group": {
-          "type": "string",
-          "description": "Group of unix socket. If empty, the group will be the primary group of the user running hydra.",
-          "default": ""
-        },
-        "mode": {
-          "type": "integer",
-          "description": "Mode of unix socket in numeric form, base 10.",
-          "default": 493,
-          "minimum": 0,
-          "maximum": 511
-        }
-      }
-    },
-    "cors": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Configures Cross Origin Resource Sharing for public endpoints.",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Sets whether CORS is enabled.",
-          "default": false
-        },
-        "allowed_origins": {
-          "type": "array",
-          "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.",
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "not": {
-              "type": "string",
-              "description": "does match all strings that contain two or more (*)",
-              "pattern": ".*\\*.*\\*.*"
-            },
-            "anyOf": [
-              {
-                "format": "uri"
-              },
-              {
-                "const": "*"
-              }
-            ]
-          },
-          "uniqueItems": true,
-          "default": [],
-          "examples": [
-            [
-              "*",
-              "https://example.com",
-              "https://*.example.com",
-              "https://*.foo.example.com"
-            ]
-          ]
-        },
-        "allowed_methods": {
-          "type": "array",
-          "description": "A list of HTTP methods the user agent is allowed to use with cross-domain requests.",
-          "default": [
-            "POST",
-            "GET",
-            "PUT",
-            "PATCH",
-            "DELETE",
-            "CONNECT",
-            "HEAD",
-            "OPTIONS",
-            "TRACE"
-          ],
-          "items": {
-            "type": "string",
-            "enum": [
-              "POST",
-              "GET",
-              "PUT",
-              "PATCH",
-              "DELETE",
-              "CONNECT",
-              "HEAD",
-              "OPTIONS",
-              "TRACE"
-            ]
-          }
-        },
-        "allowed_headers": {
-          "type": "array",
-          "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
-          "default": [
-            "Accept",
-            "Content-Type",
-            "Content-Length",
-            "Accept-Language",
-            "Content-Language",
-            "Authorization"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "exposed_headers": {
-          "type": "array",
-          "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
-          "default": [
-            "Cache-Control",
-            "Expires",
-            "Last-Modified",
-            "Pragma",
-            "Content-Length",
-            "Content-Language",
-            "Content-Type"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "allow_credentials": {
-          "type": "boolean",
-          "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
-          "default": true
-        },
-        "max_age": {
-          "type": "integer",
-          "description": "Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.",
-          "default": 0,
-          "minimum": 0
-        },
-        "debug": {
-          "type": "boolean",
-          "description": "Adds additional log output to debug server side CORS issues.",
-          "default": false
-        }
-      }
-    },
-    "cidr": {
-      "description": "CIDR address range.",
-      "type": "string",
-      "oneOf": [
-        {
-          "pattern": "^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$"
-        },
-        {
-          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$"
-        }
-      ],
-      "examples": ["127.0.0.1/32"]
-    },
-    "pem_file": {
-      "type": "object",
-      "oneOf": [
-        {
-          "properties": {
-            "path": {
-              "type": "string",
-              "description": "The path to the pem file.",
-              "examples": ["/path/to/file.pem"]
-            }
-          },
-          "additionalProperties": false,
-          "required": ["path"]
-        },
-        {
-          "properties": {
-            "base64": {
-              "type": "string",
-              "description": "The base64 encoded string (without padding).",
-              "contentEncoding": "base64",
-              "contentMediaType": "application/x-pem-file",
-              "examples": ["b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK"]
-            }
-          },
-          "additionalProperties": false,
-          "required": ["base64"]
-        }
-      ]
-    },
     "duration": {
       "type": "string",
       "pattern": "^(\\d+(ns|us|ms|s|m|h))+$",
@@ -215,39 +25,6 @@
         "1h",
         "1h5m1s"
       ]
-    },
-    "tls_config": {
-      "type": "object",
-      "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint."
-        },
-        "key": {
-          "description": "Configures the private key (pem encoded).",
-          "allOf": [
-            {
-              "$ref": "#/definitions/pem_file"
-            }
-          ]
-        },
-        "cert": {
-          "description": "Configures the public certificate (pem encoded).",
-          "allOf": [
-            {
-              "$ref": "#/definitions/pem_file"
-            }
-          ]
-        },
-        "allow_termination_from": {
-          "type": "array",
-          "description": "Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. Hydra serves http instead of https when this option is set.",
-          "items": {
-            "$ref": "#/definitions/cidr"
-          }
-        }
-      }
     },
     "webhook_config": {
       "type": "object",
@@ -341,96 +118,35 @@
       "description": "Controls the configuration for the http(s) daemon(s).",
       "properties": {
         "public": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json",
-          "properties": {
-            "port": {
-              "default": 4444,
-              "type": "integer",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/portNumber"
-                }
-              ]
+          "allOf": [
+            {
+              "$ref": "ory://serve-config"
             },
-            "host": {
-              "type": "string",
-              "description": "The interface or unix socket Ory Hydra should listen and handle public API requests on. Use the prefix `unix:` to specify a path to a unix socket. Leave empty to listen on all interfaces.",
-              "default": "",
-              "examples": ["localhost"]
-            },
-            "cors": {
-              "$ref": "#/definitions/cors"
-            },
-            "socket": {
-              "$ref": "#/definitions/socket"
-            },
-            "request_log": {
-              "type": "object",
-              "additionalProperties": false,
-              "description": "Access Log configuration for public server.",
+            {
               "properties": {
-                "disable_for_health": {
-                  "type": "boolean",
-                  "description": "Disable access log for health endpoints.",
-                  "default": false
+                "cors": {
+                  "$ref": "ory://cors-config"
                 }
               }
-            },
-            "tls": {
-              "$ref": "#/definitions/tls_config"
             }
-          }
+          ]
         },
         "admin": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "port": {
-              "default": 4445,
-              "type": "integer",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/portNumber"
-                }
-              ]
+          "allOf": [
+            {
+              "$ref": "ory://serve-config"
             },
-            "host": {
-              "type": "string",
-              "description": "The interface or unix socket Ory Hydra should listen and handle administrative API requests on. Use the prefix `unix:` to specify a path to a unix socket. Leave empty to listen on all interfaces.",
-              "default": "",
-              "examples": ["localhost"]
-            },
-            "cors": {
-              "$ref": "#/definitions/cors"
-            },
-            "socket": {
-              "$ref": "#/definitions/socket"
-            },
-            "request_log": {
-              "type": "object",
-              "additionalProperties": false,
-              "description": "Access Log configuration for admin server.",
+            {
               "properties": {
-                "disable_for_health": {
-                  "type": "boolean",
-                  "description": "Disable access log for health endpoints.",
-                  "default": false
+                "cors": {
+                  "$ref": "ory://cors-config"
                 }
               }
-            },
-            "tls": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/tls_config"
-                }
-              ]
             }
-          }
+          ]
         },
         "tls": {
-          "$ref": "#/definitions/tls_config"
+          "$ref": "ory://tls-config"
         },
         "cookies": {
           "type": "object",

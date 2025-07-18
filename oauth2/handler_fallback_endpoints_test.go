@@ -29,9 +29,8 @@ func TestHandlerConsent(t *testing.T) {
 
 	h := reg.OAuth2Handler()
 	r := x.NewRouterAdmin(conf.AdminURL)
-	h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
-		return h
-	})
+	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 

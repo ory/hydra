@@ -386,20 +386,22 @@ func (p *DefaultProvider) LogoutRedirectURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) publicFallbackURL(ctx context.Context, path string) *url.URL {
-	if len(p.PublicURL(ctx).String()) > 0 {
-		return urlx.AppendPaths(p.PublicURL(ctx), path)
+	if publicURL := p.PublicURL(ctx); len(publicURL.String()) > 0 {
+		return urlx.AppendPaths(publicURL, path)
 	}
-	return p.fallbackURL(ctx, path, p.host(PublicInterface), p.port(PublicInterface))
+	return p.fallbackURL(ctx, path, p.ServePublic(ctx))
 }
 
-func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host string, port int) *url.URL {
-	var u url.URL
-	u.Scheme = "http"
-	if tls := p.TLS(ctx, PublicInterface); tls.Enabled() || !p.IsDevelopmentMode(ctx) {
+func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, serve *configx.Serve) *url.URL {
+	u := url.URL{
+		Scheme: "http",
+		Host:   serve.GetAddress(),
+	}
+	if serve.TLS.Enabled || !p.IsDevelopmentMode(ctx) {
 		u.Scheme = "https"
 	}
-	if host == "" {
-		u.Host = fmt.Sprintf("%s:%d", "localhost", port)
+	if serve.Host == "" {
+		u.Host = fmt.Sprintf("%s:%d", "localhost", serve.Port)
 	}
 	u.Path = path
 	return &u
@@ -493,15 +495,13 @@ func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 func (p *DefaultProvider) AdminURL(ctx context.Context) *url.URL {
 	return urlRoot(
 		p.getProvider(ctx).RequestURIF(
-			KeyAdminURL, p.fallbackURL(ctx, "/", p.host(AdminInterface), p.port(AdminInterface)),
+			KeyAdminURL, p.fallbackURL(ctx, "/", p.ServeAdmin(ctx)),
 		),
 	)
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
-	return p.getProvider(ctx).RequestURIF(
-		KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)),
-	)
+	return p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.ServePublic(ctx)))
 }
 
 func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {

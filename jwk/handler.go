@@ -56,20 +56,22 @@ func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{r: r}
 }
 
-func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
-	public.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
+func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
+	r.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	r.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
+}
 
-	admin.GET(KeyHandlerPath+"/:set/:key", h.getJsonWebKey)
-	admin.GET(KeyHandlerPath+"/:set", h.getJsonWebKeySet)
+func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
+	r.GET(KeyHandlerPath+"/:set/:key", h.getJsonWebKey)
+	r.GET(KeyHandlerPath+"/:set", h.getJsonWebKeySet)
 
-	admin.POST(KeyHandlerPath+"/:set", h.createJsonWebKeySet)
+	r.POST(KeyHandlerPath+"/:set", h.createJsonWebKeySet)
 
-	admin.PUT(KeyHandlerPath+"/:set/:key", h.adminUpdateJsonWebKey)
-	admin.PUT(KeyHandlerPath+"/:set", h.setJsonWebKeySet)
+	r.PUT(KeyHandlerPath+"/:set/:key", h.adminUpdateJsonWebKey)
+	r.PUT(KeyHandlerPath+"/:set", h.setJsonWebKeySet)
 
-	admin.DELETE(KeyHandlerPath+"/:set/:key", h.deleteJsonWebKey)
-	admin.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
+	r.DELETE(KeyHandlerPath+"/:set/:key", h.deleteJsonWebKey)
+	r.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
 }
 
 // swagger:route GET /.well-known/jwks.json wellknown discoverJsonWebKeys

@@ -88,7 +88,7 @@ func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
+func (h *Handler) SetPublicRoutes(public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
 
@@ -130,7 +130,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 
 	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.oAuth2DeviceFlow))
 	public.GET(DeviceVerificationPath, h.performOAuth2DeviceVerificationFlow)
+}
 
+func (h *Handler) SetAdminRoutes(admin *httprouterx.RouterAdmin) {
 	admin.POST(IntrospectPath, h.introspectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.deleteOAuth2Token)
 }

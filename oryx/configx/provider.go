@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"strings"
 	"sync"
 	"time"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/knadh/koanf/providers/posflag"
 	"github.com/knadh/koanf/v2"
 	"github.com/pkg/errors"
-	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 
@@ -462,23 +460,6 @@ func (p *Provider) GetF(key string, fallback interface{}) (val interface{}) {
 	}
 
 	return p.Get(key)
-}
-
-func (p *Provider) CORS(prefix string, defaults cors.Options) (cors.Options, bool) {
-	if len(prefix) > 0 {
-		prefix = strings.TrimRight(prefix, ".") + "."
-	}
-
-	return cors.Options{
-		AllowedOrigins:     p.StringsF(prefix+"cors.allowed_origins", defaults.AllowedOrigins),
-		AllowedMethods:     p.StringsF(prefix+"cors.allowed_methods", defaults.AllowedMethods),
-		AllowedHeaders:     p.StringsF(prefix+"cors.allowed_headers", defaults.AllowedHeaders),
-		ExposedHeaders:     p.StringsF(prefix+"cors.exposed_headers", defaults.ExposedHeaders),
-		AllowCredentials:   p.BoolF(prefix+"cors.allow_credentials", defaults.AllowCredentials),
-		OptionsPassthrough: p.BoolF(prefix+"cors.options_passthrough", defaults.OptionsPassthrough),
-		MaxAge:             p.IntF(prefix+"cors.max_age", defaults.MaxAge),
-		Debug:              p.BoolF(prefix+"cors.debug", defaults.Debug),
-	}, p.Bool(prefix + "cors.enabled")
 }
 
 func (p *Provider) TracingConfig(serviceName string) *otelx.Config {

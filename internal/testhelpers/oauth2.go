@@ -59,8 +59,6 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (pu
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, 10*time.Second)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
-	reg.Config().MustSet(ctx, config.PublicInterface.Key(config.KeySuffixTLSEnabled), false)
-	reg.Config().MustSet(ctx, config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
@@ -68,7 +66,8 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (pu
 	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterRoutes(ctx, admin, public)
+	reg.RegisterPublicRoutes(ctx, public)
+	reg.RegisterAdminRoutes(admin)
 
 	publicTS = httptest.NewServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
 		return r.URL.Path

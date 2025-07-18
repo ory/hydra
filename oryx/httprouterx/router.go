@@ -54,7 +54,7 @@ func (r *RouterPublic) Handle(method, path string, handle httprouter.Handle) {
 }
 
 func (r *RouterPublic) HandlerFunc(method, path string, handler http.HandlerFunc) {
-	r.Router.HandlerFunc(method, path, NoCacheHandlerFunc(handler))
+	r.Router.Handler(method, path, NoCacheHandler(handler))
 }
 
 func (r *RouterPublic) Handler(method, path string, handler http.Handler) {
@@ -155,7 +155,7 @@ func (r *RouterAdmin) handleNative(method string, route string, handle http.Hand
 		return
 	}
 
-	r.Router.Handler(method, route, NoCacheHandlerFunc(r.handleRedirect()))
+	r.Router.Handler(method, route, NoCacheHandler(r.handleRedirect()))
 	r.Router.Handler(method, path.Join(r.prefix, route), NoCacheHandler(handle))
 }
 

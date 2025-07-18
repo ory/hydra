@@ -29,9 +29,7 @@ func TestJWKSDK(t *testing.T) {
 
 	router := x.NewRouterAdmin(conf.AdminURL)
 	h := NewHandler(reg)
-	h.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
-		return h
-	})
+	h.SetAdminRoutes(router)
 	server := httptest.NewServer(router)
 	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
 

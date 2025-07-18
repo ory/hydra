@@ -6,6 +6,7 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -69,9 +70,8 @@ func TestRevoke(t *testing.T) {
 
 	handler := reg.OAuth2Handler()
 	router := x.NewRouterAdmin(conf.AdminURL)
-	handler.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
-		return h
-	})
+	handler.SetPublicRoutes(&httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler { return h })
+	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)
 	defer server.Close()
 
@@ -123,13 +123,14 @@ func TestRevoke(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			_, err := client.OAuth2API.RevokeOAuth2Token(
+			resp, err := client.OAuth2API.RevokeOAuth2Token(
 				context.WithValue(
 					context.Background(),
 					hydra.ContextBasicAuth,
 					hydra.BasicAuth{UserName: "my-client", Password: "foobar"},
 				)).Token(c.token).Execute()
-			require.NoError(t, err)
+			body, _ := io.ReadAll(resp.Body)
+			require.NoErrorf(t, err, "body: %s", body)
 
 			if c.assert != nil {
 				c.assert(t)

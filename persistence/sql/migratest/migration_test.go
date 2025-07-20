@@ -70,7 +70,7 @@ func TestMigrations(t *testing.T) {
 		for db, dsn := range map[string]string{
 			"postgres":  dockertest.RunTestPostgreSQL(t),
 			"mysql":     dockertest.RunTestMySQL(t),
-			"cockroach": dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.1"),
+			"cockroach": dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.2"),
 		} {
 			wg.Add(1)
 			go func() {

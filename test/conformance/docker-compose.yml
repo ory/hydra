@@ -24,8 +24,9 @@ services:
         source: ./test/conformance/hydra/config
         target: /etc/config/hydra
 
+  # https://www.mongodb.com/resources/products/mongodb-version-history
   mongodb:
-    image: mongo:4.2
+    image: mongo:4.4
     networks:
       - intranet
     volumes:

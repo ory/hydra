@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 RUN apk -U --no-cache add build-base
 
@@ -13,7 +13,7 @@ ADD . .
 
 RUN go build -o /usr/bin/eventlogger ./watcherx/integrationtest
 
-FROM alpine:3.11
+FROM alpine:3.22
 
 COPY --from=builder /usr/bin/eventlogger /usr/bin/eventlogger
 

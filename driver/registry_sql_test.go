@@ -9,9 +9,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
@@ -68,13 +67,12 @@ func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	c.MustSet(ctx, config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(ctx, config.HSMEnabled, "false")
 
-	registry, err := NewRegistryWithoutInit(c, l)
+	r, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		t.Errorf("Failed to create registry: %s", err)
 		return
 	}
 
-	r := registry.(*RegistrySQL)
 	r.initialPing = failedPing(errors.New("snizzles"))
 
 	_ = r.Init(context.Background(), true, false, &contextx.TestContextualizer{}, nil, nil)
@@ -132,15 +130,13 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	c.MustSet(context.Background(), config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(context.Background(), config.HSMEnabled, "false")
-	reg, err := NewRegistryWithoutInit(c, l)
-	r := reg.(*RegistrySQL)
+	r, err := NewRegistryWithoutInit(c, l)
+	require.NoError(t, err)
 	r.initialPing = sussessfulPing()
-	if err := r.Init(context.Background(), true, false, &contextx.Default{}, nil, nil); err != nil {
-		t.Fatalf("unable to init registry: %s", err)
-	}
+	require.NoError(t, r.Init(context.Background(), true, false, &contextx.Default{}, nil, nil))
 	assert.NoError(t, err)
-	assert.IsType(t, &sql.Persister{}, reg.KeyManager())
-	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
+	assert.IsType(t, &sql.Persister{}, r.KeyManager())
+	assert.IsType(t, &sql.Persister{}, r.SoftwareKeyManager())
 }
 
 func TestDbUnknownTableColumns(t *testing.T) {

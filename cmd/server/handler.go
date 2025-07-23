@@ -143,7 +143,7 @@ func adminServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Opt
 	}
 
 	for _, mw := range sl.HTTPMiddlewares() {
-		n.UseFunc(mw)
+		n.Use(mw)
 	}
 	n.UseFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		cfg, enabled := d.Config().CORSAdmin(r.Context())
@@ -190,7 +190,7 @@ func publicServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Op
 	}
 
 	for _, mw := range sl.HTTPMiddlewares() {
-		n.UseFunc(mw)
+		n.Use(mw)
 	}
 	n.UseFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		cfg, enabled := d.Config().CORSPublic(r.Context())

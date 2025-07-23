@@ -90,7 +90,7 @@ func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logru
 	return registry, nil
 }
 
-func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*RegistrySQL, error) {
 	registry := NewRegistrySQL(
 		c, l, config.Version, config.Commit, config.Date,
 	)

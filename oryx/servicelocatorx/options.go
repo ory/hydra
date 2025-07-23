@@ -4,12 +4,10 @@
 package servicelocatorx
 
 import (
-	"net/http"
-
-	"github.com/ory/x/contextx"
-
+	"github.com/urfave/negroni"
 	"google.golang.org/grpc"
 
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
 )
 
@@ -17,7 +15,7 @@ type (
 	Options struct {
 		logger                 *logrusx.Logger
 		contextualizer         contextx.Contextualizer
-		httpMiddlewares        []func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
+		httpMiddlewares        []negroni.Handler
 		grpcUnaryInterceptors  []grpc.UnaryServerInterceptor
 		grpcStreamInterceptors []grpc.StreamServerInterceptor
 	}
@@ -36,7 +34,7 @@ func WithContextualizer(ctxer contextx.Contextualizer) Option {
 	}
 }
 
-func WithHTTPMiddlewares(m ...func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)) Option {
+func WithHTTPMiddlewares(m ...negroni.Handler) Option {
 	return func(o *Options) {
 		o.httpMiddlewares = m
 	}
@@ -62,7 +60,7 @@ func (o *Options) Contextualizer() contextx.Contextualizer {
 	return o.contextualizer
 }
 
-func (o *Options) HTTPMiddlewares() []func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func (o *Options) HTTPMiddlewares() []negroni.Handler {
 	return o.httpMiddlewares
 }
 

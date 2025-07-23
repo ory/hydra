@@ -8,6 +8,9 @@ on:
   pull_request:
   merge_group:
 
+env:
+  GO_VERSION: "1.24"
+
 # Cancel in-progress runs in current workflow.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,9 +27,9 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: ${{ env.GO_VERSION }}
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
@@ -57,15 +60,15 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:latest-v25.1 start-single-node --insecure
+            cockroachdb/cockroach:latest-v25.2 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
         with:
           fetch-depth: 2
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: ${{ env.GO_VERSION }}
       - run: go list -json > go.list
       - name: Run nancy
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
@@ -98,9 +101,9 @@ jobs:
       HSM_PIN: 1234
     steps:
       - uses: ory/ci/checkout@master
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: ${{ env.GO_VERSION }}
       - name: Setup HSM libs and packages
         run: |
           sudo apt install -y softhsm2 opensc
@@ -143,13 +146,13 @@ jobs:
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
-            cockroachdb/cockroach:latest-v25.1 start-single-node --insecure
+            cockroachdb/cockroach:latest-v25.2 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
+          go-version: ${{ env.GO_VERSION }}
       - uses: actions/cache@v4
         with:
           path: ./test/e2e/hydra

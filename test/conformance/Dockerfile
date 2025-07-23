@@ -1,12 +1,14 @@
+# TODO: Use official Docker image https://gitlab.com/openid/conformance-suite/-/blob/master/Dockerfile
 FROM maven:3-jdk-11
 
 WORKDIR /usr/src/mymaven
 
-RUN wget https://gitlab.com/openid/conformance-suite/-/archive/release-v4.1.4/conformance-suite-release-v4.1.4.zip && \
-  unzip conformance-suite-release-v4.1.4.zip -d . && \
-  rm conformance-suite-release-v4.1.4.zip && \
-  find conformance-suite-release-v4.1.4 -maxdepth 1 -mindepth 1 -exec mv {} . \; && \
-  rmdir conformance-suite-release-v4.1.4
+# https://gitlab.com/openid/conformance-suite/-/tags
+RUN wget https://gitlab.com/openid/conformance-suite/-/archive/release-v4.1.45/conformance-suite-release-v4.1.45.zip && \
+  unzip conformance-suite-release-v4.1.45.zip -d . && \
+  rm conformance-suite-release-v4.1.45.zip && \
+  find conformance-suite-release-v4.1.45 -maxdepth 1 -mindepth 1 -exec mv {} . \; && \
+  rmdir conformance-suite-release-v4.1.45
 
 RUN mvn -B clean package -DskipTests && \
     apt-get update && apt-get install -y \

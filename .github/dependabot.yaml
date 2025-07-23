@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: docker
+    directories:
+      - .docker
+      - oryx/watcherx/integrationtest
+      - test/conformance
+      - test/conformance/httpd
+      - test/conformance/hydra
+      - test/e2e/oauth2-client
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker-compose
+    directories:
+      - test/conformance
+      - test/e2e
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: gomod
+    directories:
+      - /
+      - internal/httpclient
+      - oryx
+      - oryx/randx/strength
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directories:
+      - /
+      - oryx
+      - test/e2e/oauth2-client
+    schedule:
+      interval: weekly

@@ -53,6 +53,6 @@ services:
     restart: unless-stopped
 
   jaeger:
-    image: jaegertracing/all-in-one:1_7_0
+    image: jaegertracing/all-in-one:1.71.0
     ports:
       - "9411:9411"

@@ -143,7 +143,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCsrfSessionName(name),
+					name:      legacyCSRFSessionName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -155,7 +155,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCsrfSessionName(name),
+					name:      legacyCSRFSessionName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -168,7 +168,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCsrfSessionName(name),
+					name:      legacyCSRFSessionName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -186,7 +186,7 @@ func TestValidateCsrfSession(t *testing.T) {
 					sameSite:  http.SameSiteNoneMode,
 				},
 				{
-					name:      legacyCsrfSessionName(name),
+					name:      legacyCSRFSessionName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -203,7 +203,7 @@ func TestValidateCsrfSession(t *testing.T) {
 					sameSite:  http.SameSiteNoneMode,
 				},
 				{
-					name:      legacyCsrfSessionName(name),
+					name:      legacyCSRFSessionName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -243,7 +243,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				assert.NoError(t, err, "failed to save cookie %s", c.name)
 			}
 
-			err := ValidateCsrfSession(r, config, store, name, tc.csrfValue, new(flow.Flow))
+			err := ValidateCSRFSession(t.Context(), r, config, store, name, tc.csrfValue, new(flow.Flow))
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {
@@ -380,7 +380,7 @@ func TestCreateCsrfSession(t *testing.T) {
 			config.EXPECT().CookieSecure(gomock.Any()).Return(tc.secure).AnyTimes()
 			config.EXPECT().CookieDomain(gomock.Any()).Return(tc.domain).AnyTimes()
 
-			err := createCsrfSession(rr, req, config, store, tc.name, "value", tc.maxAge)
+			err := createCSRFSession(t.Context(), rr, req, config, store, tc.name, "value", tc.maxAge)
 			assert.NoError(t, err)
 
 			cookies := make(map[string]cookie)

@@ -6,7 +6,6 @@ package mapx
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math"
 	"time"
 )
@@ -30,22 +29,25 @@ func GetString[K comparable](values map[K]any, key K) (string, error) {
 
 // GetStringSlice returns a string slice for a given key in values.
 func GetStringSlice[K comparable](values map[K]any, key K) ([]string, error) {
-	if v, ok := values[key]; !ok {
-		return []string{}, ErrKeyDoesNotExist
-	} else if sv, ok := v.([]string); ok {
-		return sv, nil
-	} else if sv, ok := v.([]any); ok {
-		vs := make([]string, len(sv))
-		for k, v := range sv {
-			vv, ok := v.(string)
+	v, ok := values[key]
+	if !ok {
+		return nil, ErrKeyDoesNotExist
+	}
+	switch v := v.(type) {
+	case []string:
+		return v, nil
+	case []any:
+		vs := make([]string, len(v))
+		for k, v := range v {
+			var ok bool
+			vs[k], ok = v.(string)
 			if !ok {
-				return []string{}, ErrKeyCanNotBeTypeAsserted
+				return nil, ErrKeyCanNotBeTypeAsserted
 			}
-			vs[k] = vv
 		}
 		return vs, nil
 	}
-	return []string{}, ErrKeyCanNotBeTypeAsserted
+	return nil, ErrKeyCanNotBeTypeAsserted
 }
 
 // GetTime returns a string slice for a given key in values.
@@ -55,18 +57,25 @@ func GetTime[K comparable](values map[K]any, key K) (time.Time, error) {
 		return time.Time{}, ErrKeyDoesNotExist
 	}
 
-	if sv, ok := v.(time.Time); ok {
-		return sv, nil
-	} else if sv, ok := v.(int64); ok {
-		return time.Unix(sv, 0), nil
-	} else if sv, ok := v.(int32); ok {
-		return time.Unix(int64(sv), 0), nil
-	} else if sv, ok := v.(int); ok {
-		return time.Unix(int64(sv), 0), nil
-	} else if sv, ok := v.(float64); ok {
-		return time.Unix(int64(sv), 0), nil
-	} else if sv, ok := v.(float32); ok {
-		return time.Unix(int64(sv), 0), nil
+	switch v := v.(type) {
+	case time.Time:
+		return v, nil
+	case int64:
+		return time.Unix(v, 0), nil
+	case int32:
+		return time.Unix(int64(v), 0), nil
+	case int:
+		return time.Unix(int64(v), 0), nil
+	case float64:
+		if v < math.MinInt64 || v > math.MaxInt64 {
+			return time.Time{}, errors.New("value is out of range")
+		}
+		return time.Unix(int64(v), 0), nil
+	case float32:
+		if v < math.MinInt64 || v > math.MaxInt64 {
+			return time.Time{}, errors.New("value is out of range")
+		}
+		return time.Unix(int64(v), 0), nil
 	}
 
 	return time.Time{}, ErrKeyCanNotBeTypeAsserted
@@ -166,13 +175,18 @@ func GetFloat32Default[K comparable](values map[K]any, key K, defaultValue float
 
 // GetFloat32 returns a float32 for a given key in values.
 func GetFloat32[K comparable](values map[K]any, key K) (float32, error) {
-	if v, ok := values[key]; !ok {
+	v, ok := values[key]
+	if !ok {
 		return 0, ErrKeyDoesNotExist
-	} else if j, ok := v.(json.Number); ok {
-		v, err := j.Float64()
-		return float32(v), err
-	} else if sv, ok := v.(float32); ok {
-		return sv, nil
+	}
+	switch v := v.(type) {
+	case json.Number:
+		f, err := v.Float64()
+		return float32(f), err
+	case float32:
+		return v, nil
+	case float64:
+		return float32(v), nil
 	}
 	return 0, ErrKeyCanNotBeTypeAsserted
 }
@@ -188,12 +202,17 @@ func GetFloat64Default[K comparable](values map[K]any, key K, defaultValue float
 
 // GetFloat64 returns a float64 for a given key in values.
 func GetFloat64[K comparable](values map[K]any, key K) (float64, error) {
-	if v, ok := values[key]; !ok {
+	v, ok := values[key]
+	if !ok {
 		return 0, ErrKeyDoesNotExist
-	} else if j, ok := v.(json.Number); ok {
-		return j.Float64()
-	} else if sv, ok := v.(float64); ok {
-		return sv, nil
+	}
+	switch v := v.(type) {
+	case json.Number:
+		return v.Float64()
+	case float32:
+		return float64(v), nil
+	case float64:
+		return v, nil
 	}
 	return 0, ErrKeyCanNotBeTypeAsserted
 }
@@ -212,39 +231,4 @@ func GetStringSliceDefault[K comparable](values map[K]any, key K, defaultValue [
 		return s
 	}
 	return defaultValue
-}
-
-// KeyStringToInterface converts map[string]any to map[any]any
-// Deprecated: with generics, this should not be necessary anymore.
-func KeyStringToInterface(i map[string]any) map[any]any {
-	o := make(map[any]any)
-	for k, v := range i {
-		o[k] = v
-	}
-	return o
-}
-
-// ToJSONMap converts all map[any]any occurrences (nested as well) to map[string]any.
-// Deprecated: with generics, this should not be necessary anymore.
-func ToJSONMap(i any) any {
-	switch t := i.(type) {
-	case []any:
-		for k, v := range t {
-			t[k] = ToJSONMap(v)
-		}
-		return t
-	case map[string]any:
-		for k, v := range t {
-			t[k] = ToJSONMap(v)
-		}
-		return t
-	case map[any]any:
-		res := make(map[string]any)
-		for k, v := range t {
-			res[fmt.Sprintf("%s", k)] = ToJSONMap(v)
-		}
-		return res
-	}
-
-	return i
 }

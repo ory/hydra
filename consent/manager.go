@@ -34,7 +34,7 @@ type (
 		RevokeConsentSessionByID(ctx context.Context, consentRequestID string) error
 
 		VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.AcceptOAuth2ConsentRequest, error)
-		FindGrantedAndRememberedConsentRequest(ctx context.Context, client, user string) (*flow.AcceptOAuth2ConsentRequest, error)
+		FindGrantedAndRememberedConsentRequest(ctx context.Context, client, user string) (*flow.Flow, error)
 		FindSubjectsGrantedConsentRequests(ctx context.Context, user string, pageOpts ...keysetpagination.Option) ([]flow.AcceptOAuth2ConsentRequest, *keysetpagination.Paginator, error)
 		FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) ([]flow.AcceptOAuth2ConsentRequest, *keysetpagination.Paginator, error)
 		CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)

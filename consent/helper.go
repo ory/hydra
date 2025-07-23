@@ -9,7 +9,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/flow"
 )
 
 func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {
@@ -24,13 +23,13 @@ func sanitizeClient(c *client.Client) *client.Client {
 	return cc
 }
 
-func matchScopes(scopeStrategy fosite.ScopeStrategy, cs *flow.AcceptOAuth2ConsentRequest, requestedScope []string) *flow.AcceptOAuth2ConsentRequest {
+func matchScopes(scopeStrategy fosite.ScopeStrategy, grantedScope, requestedScope []string) bool {
 	for _, scope := range requestedScope {
-		if !scopeStrategy(cs.GrantedScope, scope) {
-			return nil
+		if !scopeStrategy(grantedScope, scope) {
+			return false
 		}
 	}
-	return cs
+	return true
 }
 
 func caseInsensitiveFilterParam(q url.Values, key string) url.Values {

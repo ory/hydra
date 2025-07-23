@@ -795,7 +795,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, cl.ID, f.Subject)
 			require.NoError(t, err)
-			assert.Equal(t, hcr.ConsentRequestID, actual.ConsentRequestID)
+			assert.EqualValues(t, hcr.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }
@@ -1477,7 +1477,7 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
 			require.NoError(t, err)
-			assert.Equal(t, hcr.ConsentRequestID, actual.ConsentRequestID)
+			assert.EqualValues(t, hcr.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }

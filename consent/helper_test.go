@@ -40,38 +40,27 @@ func TestSanitizeClient(t *testing.T) {
 
 func TestMatchScopes(t *testing.T) {
 	for k, tc := range []struct {
-		granted    *flow.AcceptOAuth2ConsentRequest
-		requested  []string
-		expectedID string
-	}{
-		{
-			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-			requested:  []string{"foo", "bar"},
-			expectedID: "1",
-		},
-		{
-			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-			requested:  []string{"foo", "bar", "baz"},
-			expectedID: "",
-		},
-		{
-			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-			requested:  []string{"foo"},
-			expectedID: "1",
-		},
-		{
-			granted:    &flow.AcceptOAuth2ConsentRequest{ConsentRequestID: "1", GrantedScope: []string{"foo", "bar"}},
-			requested:  []string{"zab", "baz"},
-			expectedID: "",
-		},
-	} {
+		granted, requested []string
+		expected           bool
+	}{{
+		granted:   []string{"foo", "bar"},
+		requested: []string{"foo", "bar"},
+		expected:  true,
+	}, {
+		granted:   []string{"foo", "bar"},
+		requested: []string{"foo", "bar", "baz"},
+		expected:  false,
+	}, {
+		granted:   []string{"foo", "bar"},
+		requested: []string{"foo"},
+		expected:  true,
+	}, {
+		granted:   []string{"foo", "bar"},
+		requested: []string{"zab", "baz"},
+		expected:  false,
+	}} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			actual := matchScopes(fosite.ExactScopeStrategy, tc.granted, tc.requested)
-			if tc.expectedID == "" {
-				assert.Nil(t, actual)
-				return
-			}
-			assert.Equal(t, tc.expectedID, actual.ConsentRequestID)
+			assert.Equal(t, tc.expected, matchScopes(fosite.ExactScopeStrategy, tc.granted, tc.requested))
 		})
 	}
 }

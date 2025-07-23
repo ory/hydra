@@ -568,7 +568,7 @@ func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *
 
 }
 
-func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.AcceptOAuth2ConsentRequest, err error) {
+func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequest")
 	defer otelx.End(span, &err)
 
@@ -592,7 +592,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, 
 	if len(fs) == 0 {
 		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
-	return fs[0].GetHandledConsentRequest(), nil
+	return &fs[0], nil
 }
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.AcceptOAuth2ConsentRequest, _ *keysetpagination.Paginator, err error) {

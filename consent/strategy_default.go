@@ -544,7 +544,7 @@ func (s *DefaultStrategy) requestConsent(
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "consent") {
-		return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+		return s.forwardConsentRequest(ctx, w, r, ar, f, false)
 	}
 
 	// https://tools.ietf.org/html/rfc6749
@@ -570,9 +570,9 @@ func (s *DefaultStrategy) requestConsent(
 		// This is tracked as issue: https://github.com/ory/hydra/issues/866
 		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
 		if f.DeviceChallengeID != "" {
-			return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+			return s.forwardConsentRequest(ctx, w, r, ar, f, false)
 		} else if !(ar.GetRedirectURI().Scheme == "https" || (fosite.IsLocalhost(ar.GetRedirectURI()) && ar.GetRedirectURI().Scheme == "http")) {
-			return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+			return s.forwardConsentRequest(ctx, w, r, ar, f, false)
 		}
 	}
 
@@ -583,18 +583,15 @@ func (s *DefaultStrategy) requestConsent(
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
-	consentSession, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequest(ctx, ar.GetClient().GetID(), f.Subject)
+	previousConsent, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequest(ctx, ar.GetClient().GetID(), f.Subject)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
-		return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+		return s.forwardConsentRequest(ctx, w, r, ar, f, false)
 	} else if err != nil {
 		return err
 	}
 
-	if found := matchScopes(s.r.Config().GetScopeStrategy(ctx), consentSession, ar.GetRequestedScopes()); found != nil {
-		return s.forwardConsentRequest(ctx, w, r, ar, f, found)
-	}
-
-	return s.forwardConsentRequest(ctx, w, r, ar, f, nil)
+	canSkip := matchScopes(s.r.Config().GetScopeStrategy(ctx), previousConsent.GrantedScope, ar.GetRequestedScopes())
+	return s.forwardConsentRequest(ctx, w, r, ar, f, canSkip)
 }
 
 func (s *DefaultStrategy) forwardConsentRequest(
@@ -603,16 +600,12 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	r *http.Request,
 	ar fosite.AuthorizeRequester,
 	f *flow.Flow,
-	previousConsent *flow.AcceptOAuth2ConsentRequest,
+	canSkipConsent bool,
 ) error {
 	as := f.GetHandledLoginRequest()
-	skip := false
-	if previousConsent != nil {
-		skip = true
-	}
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
-	if stringslice.Has(prompt, "none") && !skip {
+	if stringslice.Has(prompt, "none") && !canSkipConsent {
 		return errorsx.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 
@@ -629,7 +622,7 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		AMR:                    as.AMR,
 		Verifier:               verifier,
 		CSRF:                   csrf,
-		Skip:                   skip,
+		Skip:                   canSkipConsent,
 		RequestedScope:         []string(ar.GetRequestedScopes()),
 		RequestedAudience:      []string(ar.GetRequestedAudience()),
 		Subject:                as.Subject,

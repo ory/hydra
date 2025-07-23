@@ -11,6 +11,7 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch/v5"
 	"github.com/gobwas/glob"
+	"github.com/pkg/errors"
 
 	"github.com/ory/x/pointerx"
 )
@@ -43,33 +44,34 @@ func isElementAccess(path string) bool {
 	return false
 }
 
-// ApplyJSONPatch applies a JSON patch to an object. It returns an error if the
-// patch is invalid or if the patch includes paths that are denied. denyPaths is
-// a list of path globs (interpreted with [glob.Compile] that are not allowed to
+// ApplyJSONPatch applies a JSON patch to an object and returns the modified
+// object. The original object is not modified. It returns an error if the patch
+// is invalid or if the patch includes paths that are denied. denyPaths is a
+// list of path globs (interpreted with [glob.Compile] that are not allowed to
 // be patched.
-func ApplyJSONPatch(p json.RawMessage, object interface{}, denyPaths ...string) error {
+func ApplyJSONPatch[T any](p json.RawMessage, object T, denyPaths ...string) (result T, err error) {
 	patch, err := jsonpatch.DecodePatch(p)
 	if err != nil {
-		return err
+		return result, errors.WithStack(err)
 	}
 
 	denyPattern := fmt.Sprintf("{%s}", strings.ToLower(strings.Join(denyPaths, ",")))
 	matcher, err := glob.Compile(denyPattern, '/')
 	if err != nil {
-		return err
+		return result, errors.WithStack(err)
 	}
 
 	for _, op := range patch {
 		// Some operations are buggy, see https://github.com/evanphx/json-patch/pull/158
 		if isUnsupported(op) {
-			return fmt.Errorf("unsupported operation: %s", op.Kind())
+			return result, errors.Errorf("unsupported operation: %s", op.Kind())
 		}
 		path, err := op.Path()
 		if err != nil {
-			return fmt.Errorf("error parsing patch operations: %v", err)
+			return result, errors.Errorf("error parsing patch operations: %v", err)
 		}
 		if matcher.Match(strings.ToLower(path)) {
-			return fmt.Errorf("patch includes denied path: %s", path)
+			return result, errors.Errorf("patch includes denied path: %s", path)
 		}
 
 		// JSON patch officially rejects replacing paths that don't exist, but we want to be more tolerant.
@@ -81,7 +83,7 @@ func ApplyJSONPatch(p json.RawMessage, object interface{}, denyPaths ...string) 
 
 	original, err := json.Marshal(object)
 	if err != nil {
-		return err
+		return result, errors.WithStack(err)
 	}
 
 	options := jsonpatch.NewApplyOptions()
@@ -89,8 +91,9 @@ func ApplyJSONPatch(p json.RawMessage, object interface{}, denyPaths ...string) 
 
 	modified, err := patch.ApplyWithOptions(original, options)
 	if err != nil {
-		return err
+		return result, errors.WithStack(err)
 	}
 
-	return json.Unmarshal(modified, object)
+	err = json.Unmarshal(modified, &result)
+	return result, errors.WithStack(err)
 }

@@ -5,6 +5,7 @@ package client_test
 
 import (
 	"context"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -12,11 +13,14 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	goauth2 "golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
@@ -64,11 +68,19 @@ func TestClientSDK(t *testing.T) {
 
 	routerAdmin := x.NewRouterAdmin(conf.AdminURL)
 	routerPublic := x.NewRouterPublic()
-	handler := client.NewHandler(r)
-	handler.SetPublicRoutes(routerPublic)
-	handler.SetAdminRoutes(routerAdmin)
+	clHandler := client.NewHandler(r)
+	clHandler.SetPublicRoutes(routerPublic)
+	clHandler.SetAdminRoutes(routerAdmin)
+	o2Handler := oauth2.NewHandler(r, conf)
+	o2Handler.SetPublicRoutes(routerPublic, func(h http.Handler) http.Handler { return h })
+	o2Handler.SetAdminRoutes(routerAdmin)
+
 	server := httptest.NewServer(routerAdmin)
+	t.Cleanup(server.Close)
+	publicServer := httptest.NewServer(routerPublic)
+	t.Cleanup(publicServer.Close)
 	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
+	conf.MustSet(ctx, config.KeyOAuth2TokenURL, publicServer.URL+"/oauth2/token")
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
@@ -210,22 +222,44 @@ func TestClientSDK(t *testing.T) {
 	})
 
 	t.Run("case=patch should not alter secret if not requested", func(t *testing.T) {
-		op := "replace"
-		path := "/client_uri"
-		value := "http://foo.bar"
-
-		client := createTestClient("")
-		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(createTestClient("")).Execute()
 		require.NoError(t, err)
-		client.ClientId = created.ClientId
+		require.Equal(t, "secret", *created.ClientSecret)
 
-		result1, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		cc := clientcredentials.Config{
+			ClientID:     *created.ClientId,
+			ClientSecret: "secret",
+			TokenURL:     conf.OAuth2TokenURL(t.Context()).String(),
+			AuthStyle:    goauth2.AuthStyleInHeader,
+		}
+		token, err := cc.Token(t.Context())
 		require.NoError(t, err)
-		result2, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
-		require.NoError(t, err)
+		require.NotZero(t, token.AccessToken)
 
-		// secret hashes shouldn't change between these PUT calls
-		require.Equal(t, result1.ClientSecret, result2.ClientSecret)
+		ignoreFields := []string{"registration_access_token", "registration_client_uri", "updated_at"}
+
+		patchedURI, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *created.ClientId).JsonPatch([]hydra.JsonPatch{{Op: "replace", Path: "/client_uri", Value: "http://foo.bar"}}).Execute()
+		require.NoError(t, err)
+		require.Nil(t, patchedURI.ClientSecret, "client secret should not be returned in the response if it wasn't changed")
+		assertx.EqualAsJSONExcept(t, created, patchedURI, append(ignoreFields, "client_uri", "client_secret"), "client unchanged except client_uri; client_secret should not be returned")
+
+		token2, err := cc.Token(t.Context())
+		require.NoError(t, err)
+		require.NotZero(t, token2.AccessToken)
+		require.NotEqual(t, token.AccessToken, token2.AccessToken, "Got a new token after patching, with unchanged secret")
+
+		patchedSecret, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *created.ClientId).JsonPatch([]hydra.JsonPatch{{Op: "replace", Path: "/client_secret", Value: "newsecret"}}).Execute()
+		require.NoError(t, err)
+		require.Equal(t, "newsecret", *patchedSecret.ClientSecret, "client secret should be returned if it was changed")
+		assertx.EqualAsJSONExcept(t, patchedURI, patchedSecret, append(ignoreFields, "client_secret"), "client unchanged except secret")
+
+		_, err = cc.Token(t.Context())
+		require.ErrorContains(t, err, "Client authentication failed", "should not be able to get a token with the old secret")
+
+		cc.ClientSecret = "newsecret"
+		token3, err := cc.Token(t.Context())
+		require.NoError(t, err, "should be able to get a token with the new secret")
+		require.NotZero(t, token3.AccessToken, "Got a new token after patching with new secret")
 	})
 
 	t.Run("case=patch client that has JSONWebKeysURI", func(t *testing.T) {

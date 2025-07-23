@@ -428,15 +428,16 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request, ps h
 	}
 
 	id := ps.ByName("id")
-	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	client, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	oldSecret := c.Secret
+	oldSecret := client.Secret
 
-	if err := jsonx.ApplyJSONPatch(patchJSON, c, "/id"); err != nil {
+	client, err = jsonx.ApplyJSONPatch(patchJSON, client, "/id")
+	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -445,16 +446,16 @@ func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request, ps h
 	// GetConcreteClient returns a client with the hashed secret, however updateClient expects
 	// an empty secret if the secret hasn't changed. As such we need to check if the patch has
 	// updated the secret or not
-	if oldSecret == c.Secret {
-		c.Secret = ""
+	if oldSecret == client.Secret {
+		client.Secret = ""
 	}
 
-	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+	if err := h.updateClient(r.Context(), client, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	h.r.Writer().Write(w, r, c)
+	h.r.Writer().Write(w, r, client)
 }
 
 // Paginated OAuth2 Client List Response
@@ -573,7 +574,7 @@ type adminGetOAuth2Client struct {
 //	  200: oAuth2Client
 //	  default: errorOAuth2Default
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
+	id := ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -683,7 +684,7 @@ type deleteOAuth2Client struct {
 //	  204: emptyResponse
 //	  default: genericError
 func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
+	id := ps.ByName("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -723,7 +724,7 @@ type setOAuth2ClientLifespans struct {
 //	  200: oAuth2Client
 //	  default: genericError
 func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
+	id := ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

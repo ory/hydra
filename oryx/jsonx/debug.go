@@ -6,6 +6,7 @@ package jsonx
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 )
 
 // Anonymize takes a JSON byte array and anonymizes its content by
@@ -30,7 +31,7 @@ func Anonymize(data []byte, except ...string) []byte {
 
 func anonymize(obj map[string]any, except ...string) {
 	for k, v := range obj {
-		if k == "schemas" || k == "id" {
+		if slices.Contains(except, k) {
 			continue
 		}
 

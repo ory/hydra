@@ -93,7 +93,7 @@ func SnapshotT(t *testing.T, actual interface{}, except ...ExceptOpt) {
 	).SnapshotT(t, compare)
 }
 
-// SnapshotTExcept
+// SnapshotTExcept is deprecated in favor of SnapshotT with ExceptOpt.
 //
 // DEPRECATED: please use SnapshotT instead
 func SnapshotTExcept(t *testing.T, actual interface{}, except []string) {

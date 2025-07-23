@@ -42,6 +42,15 @@ func (h *Handler) SetRoutes(r router) {
 	r.GET(MetricsPrometheusPath, h.Metrics)
 }
 
+type muxrouter interface {
+	GET(path string, handle http.HandlerFunc)
+}
+
+// SetMuxRoutes registers this handler's routes on a ServeMux.
+func (h *Handler) SetMuxRoutes(mux muxrouter) {
+	mux.GET(MetricsPrometheusPath, promhttp.Handler().ServeHTTP)
+}
+
 // Metrics outputs prometheus metrics
 //
 // swagger:route GET /metrics/prometheus metadata prometheus

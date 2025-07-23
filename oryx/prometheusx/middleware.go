@@ -5,6 +5,7 @@ package prometheusx
 
 import (
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -61,7 +62,16 @@ func (pmm *MetricsManager) RegisterRouter(router *httprouter.Router) {
 	pmm.routers.data = append(pmm.routers.data, router)
 }
 
+var paramPlaceHolderRE = regexp.MustCompile(`\{[a-zA-Z0-9_-]+\}`)
+
 func (pmm *MetricsManager) getLabelForPath(r *http.Request) string {
+	// If the request came through a http.ServeMux, it already has a pattern that we
+	// can use as a label. We just need to replace all path parameters with a generic
+	// placeholder and remove the trailing slash pattern.
+	if p := r.Pattern; p != "" {
+		return paramPlaceHolderRE.ReplaceAllString(strings.TrimSuffix(p, "/{$}"), "{param}")
+	}
+
 	// looking for a match in one of registered routers
 	pmm.routers.Lock()
 	defer pmm.routers.Unlock()

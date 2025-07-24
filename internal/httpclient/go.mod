@@ -4,7 +4,7 @@ go 1.23.0
 
 toolchain go1.24.4
 
-require golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
+require golang.org/x/oauth2 v0.30.0
 
 require (
 	github.com/golang/protobuf v1.5.0 // indirect

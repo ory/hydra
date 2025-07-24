@@ -24,8 +24,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/requirex"
+	"github.com/ory/x/configx"
 )
 
 func BenchmarkClientCredentials(b *testing.B) {
@@ -35,8 +34,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, configx.WithValue(config.KeyAccessTokenStrategy, "opaque")).WithTracer(tracer)
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 
 	var newCustomClient = func(b *testing.B, c *hc.Client) (*hc.Client, clientcredentials.Config) {
@@ -86,7 +84,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 			assert.EqualValues(b, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
 
 			assert.EqualValues(b, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)
-			requirex.EqualTime(b, expectedExp, time.Unix(res.Get("exp").Int(), 0), time.Second)
+			assert.WithinDuration(b, expectedExp, time.Unix(res.Get("exp").Int(), 0), time.Second)
 
 			assert.EqualValues(b, encodeOr(b, conf.EndpointParams["audience"], "[]"), res.Get("aud").Raw, "%s", res.Raw)
 

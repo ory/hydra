@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/persistence/sql"
+	"github.com/ory/hydra/v2/spec"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
@@ -34,49 +35,39 @@ var defaultConfig = map[string]any{
 	config.KeyGetSystemSecret:                []string{"000000000000000000000000000000000000000000000000"},
 	config.KeyGetCookieSecrets:               []string{"000000000000000000000000000000000000000000000000"},
 	config.KeyLogLevel:                       "trace",
+	config.KeyDevelopmentMode:                true,
 	"serve.public.host":                      "localhost",
 }
 
-func NewConfigurationWithDefaults() *config.DefaultProvider {
-	return config.MustNew(context.Background(), logrusx.New("", ""),
+func NewConfigurationWithDefaults(t testing.TB, opts ...configx.OptionModifier) *config.DefaultProvider {
+	allOpts := append([]configx.OptionModifier{
 		configx.SkipValidation(),
 		configx.WithValues(defaultConfig),
 		configx.WithValue("log.leak_sensitive_values", true),
-	)
+	}, opts...)
+	p, err := configx.New(t.Context(), spec.ConfigValidationSchema, allOpts...)
+	require.NoError(t, err)
+	return config.NewCustom(logrusx.New("", ""), p, contextx.NewTestConfigProvider(spec.ConfigValidationSchema, allOpts...))
 }
 
-func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
-	return config.MustNew(context.Background(), logrusx.New("", ""),
-		configx.SkipValidation(),
-		configx.WithValues(defaultConfig),
-	)
+func NewRegistryMemory(t testing.TB, configOpts ...configx.OptionModifier) driver.Registry {
+	return NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, configOpts...)
 }
 
-func NewRegistryMemory(t testing.TB, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {
-	return registryFactory(t, dbal.NewSQLiteTestDatabase(t), c, true, ctxer)
+func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate bool, configOpts ...configx.OptionModifier) driver.Registry {
+	return registryFactory(t,
+		NewConfigurationWithDefaults(t, append(
+			[]configx.OptionModifier{configx.WithValue(config.KeyDSN, dsn)},
+			configOpts...,
+		)...), migrate)
 }
 
-func NewMockedRegistry(t testing.TB, ctxer contextx.Contextualizer) driver.Registry {
-	return registryFactory(t, dbal.NewSQLiteTestDatabase(t), NewConfigurationWithDefaults(), true, ctxer)
-}
-
-func NewRegistrySQLFromURL(t testing.TB, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
-	return registryFactory(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
-}
-
-func registryFactory(t testing.TB, url string, c *config.DefaultProvider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
-	return RegistryFactory(t, url, c, !migrate, migrate, ctxer)
-}
-
-func RegistryFactory(t testing.TB, url string, c *config.DefaultProvider, networkInit, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+func registryFactory(t testing.TB, c *config.DefaultProvider, migrate bool) driver.Registry {
 	ctx := t.Context()
 	sql.SilenceMigrations = true
-	c.MustSet(ctx, config.KeyLogLevel, "trace")
-	c.MustSet(ctx, config.KeyDSN, url)
-	c.MustSet(ctx, "dev", true)
 	l := logrusx.New("test_hydra", "master", logrusx.WithConfigurator(c.Source(ctx)))
 
-	r, err := driver.NewRegistryFromDSN(ctx, c, l, networkInit, migrate, ctxer)
+	r, err := driver.NewRegistryFromDSN(ctx, c, l, !migrate, migrate, &contextx.Default{})
 	require.NoError(t, err)
 
 	return r
@@ -146,12 +137,12 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 
 func ConnectDatabases(t *testing.T, migrate bool) map[string]driver.Registry {
 	regs := make(map[string]driver.Registry)
-	regs["memory"] = NewRegistryMemory(t, NewConfigurationWithDefaults(), &contextx.Default{})
+	regs["memory"] = NewRegistryMemory(t)
 	if !testing.Short() {
 		pg, mysql, crdb := ConnectDatabasesURLs(t)
-		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, &contextx.Default{})
-		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, &contextx.Default{})
-		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, &contextx.Default{})
+		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate)
+		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate)
+		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate)
 	}
 	return regs
 }

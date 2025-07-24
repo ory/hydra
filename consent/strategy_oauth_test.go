@@ -16,38 +16,33 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/exp/slices"
-	"golang.org/x/oauth2"
-
-	"github.com/ory/x/pointerx"
-
-	"github.com/tidwall/gjson"
-
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/x/contextx"
+	"github.com/tidwall/gjson"
+	"golang.org/x/exp/slices"
+	"golang.org/x/oauth2"
 
 	"github.com/ory/fosite"
-	"github.com/ory/x/urlx"
-	"github.com/ory/x/uuidx"
-
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
+	"github.com/ory/x/uuidx"
 )
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
-	reg.Config().MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeyAccessTokenStrategy:            "opaque",
+		config.KeyConsentRequestMaxAge:           time.Hour,
+		config.KeyScopeStrategy:                  "exact",
+		config.KeySubjectTypesSupported:          []string{"pairwise", "public"},
+		config.KeySubjectIdentifierAlgorithmSalt: "76d5d2bf-747f-4592-9fbd-d2b895a54b3a",
+	}))
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -1112,7 +1107,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 func TestStrategyDeviceLoginConsent(t *testing.T) {
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
 	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)

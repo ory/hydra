@@ -12,30 +12,27 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
+	"github.com/go-jose/go-jose/v3"
 	"github.com/hashicorp/go-retryablehttp"
-
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/x/httpx"
-
-	jose "github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/fosite"
 	. "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/httpx"
 )
 
 func TestValidate(t *testing.T) {
 	ctx := context.Background()
-	c := testhelpers.NewConfigurationWithDefaults()
-	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
-	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeySubjectTypesSupported: []string{"pairwise", "public"},
+		config.KeyDefaultClientScope:    []string{"openid"},
+	}))
 	v := NewValidator(reg)
 
 	dec := json.NewDecoder(strings.NewReader(validJWKS))
@@ -150,7 +147,7 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise"})
+				reg.Config().MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(reg)
 			},
 			in: &Client{ID: "foo"},
@@ -199,7 +196,7 @@ func (f *fakeHTTP) HTTPClient(_ context.Context, opts ...httpx.ResilientOptions)
 }
 
 func TestValidateSectorIdentifierURL(t *testing.T) {
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	var payload string
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -280,18 +277,17 @@ const validJWKS = `
 `
 
 func TestValidateIPRanges(t *testing.T) {
-	ctx := context.Background()
-	c := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t)
 
 	v := NewValidator(reg)
-	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, true)
+	reg.Config().MustSet(t.Context(), config.KeyClientHTTPNoPrivateIPRanges, true)
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{}))
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{JSONWebKeysURI: "https://localhost:1234"}), "invalid_client_metadata")
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{BackChannelLogoutURI: "https://localhost:1234"}), "invalid_client_metadata")
 	require.ErrorContains(t, v.ValidateDynamicRegistration(ctx, &Client{RequestURIs: []string{"https://google", "https://localhost:1234"}}), "invalid_client_metadata")
 
-	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, false)
+	reg.Config().MustSet(t.Context(), config.KeyClientHTTPNoPrivateIPRanges, false)
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{}))
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{JSONWebKeysURI: "https://localhost:1234"}))
 	require.NoError(t, v.ValidateDynamicRegistration(ctx, &Client{BackChannelLogoutURI: "https://localhost:1234"}))
@@ -299,13 +295,11 @@ func TestValidateIPRanges(t *testing.T) {
 }
 
 func TestValidateDynamicRegistration(t *testing.T) {
-	ctx := context.Background()
-	c := testhelpers.NewConfigurationWithDefaults()
-	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
-	reg := testhelpers.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeySubjectTypesSupported: []string{"pairwise", "public"},
+		config.KeyDefaultClientScope:    []string{"openid"},
+	}))
 
-	testCtx := context.TODO()
 	v := NewValidator(reg)
 	for k, tc := range []struct {
 		in        *Client
@@ -318,7 +312,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 				ID:                     "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
-				Metadata:               []byte("{\"access_token_ttl\":10}"),
+				Metadata:               []byte(`{"access_token_ttl":10}`),
 			},
 			expectErr: true,
 		},
@@ -327,7 +321,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 				ID:                     "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
-				Metadata:               []byte("{\"id_token_ttl\":10}"),
+				Metadata:               []byte(`{"id_token_ttl":10}`),
 			},
 			expectErr: true,
 		},
@@ -336,7 +330,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 				ID:                     "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
-				Metadata:               []byte("{\"anything\":10}"),
+				Metadata:               []byte(`{"anything":10}`),
 			},
 			expectErr: true,
 		},
@@ -357,7 +351,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 					return v
 				}
 			}
-			err := tc.v(t).ValidateDynamicRegistration(testCtx, tc.in)
+			err := tc.v(t).ValidateDynamicRegistration(t.Context(), tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

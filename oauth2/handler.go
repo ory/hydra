@@ -81,10 +81,10 @@ type Handler struct {
 	c *config.DefaultProvider
 }
 
-func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
+func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{
 		r: r,
-		c: c,
+		c: r.Config(),
 	}
 }
 

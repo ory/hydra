@@ -10,7 +10,6 @@ import (
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -40,7 +39,7 @@ func TestManagers(t *testing.T) {
 		t.Run("suite="+tc.name, func(t *testing.T) {
 			for k, r := range testhelpers.ConnectDatabases(t, false) {
 				t.Run("database="+k, func(t *testing.T) {
-					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true, &contextx.Default{})
+					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true)
 					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
 
 					if k != "memory" {

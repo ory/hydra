@@ -44,7 +44,7 @@ import (
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
@@ -1860,11 +1860,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
-			conf := testhelpers.NewConfigurationWithDefaults()
-			conf.MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
-			conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-			conf.MustSet(ctx, config.KeyAccessTokenStrategy, strat.d)
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+				config.KeyAccessTokenLifespan: time.Second * 2,
+				config.KeyScopeStrategy:       "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
+				config.KeyAccessTokenStrategy: strat.d,
+			}))
 			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
@@ -1875,7 +1875,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 			reg.WithConsentStrategy(consentStrategy)
 			handler := reg.OAuth2Handler()
-			handler.SetAdminRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL))
+			handler.SetAdminRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", reg.Config().AdminURL))
 			handler.SetPublicRoutes(router, func(h http.Handler) http.Handler { return h })
 
 			var callbackHandler httprouter.Handle
@@ -2241,12 +2241,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, nil)
 
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -2284,11 +2284,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
@@ -2319,11 +2319,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -2349,11 +2349,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
@@ -2379,11 +2379,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								defer hs.Close()
 
 								if hookType == "legacy" {
-									conf.MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyRefreshTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, nil)
 								} else {
-									conf.MustSet(ctx, config.KeyTokenHook, hs.URL)
-									defer conf.MustSet(ctx, config.KeyTokenHook, nil)
+									reg.Config().MustSet(ctx, config.KeyTokenHook, hs.URL)
+									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)

@@ -26,7 +26,6 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/sqlxx"
 )
@@ -47,8 +46,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := testhelpers.NewConfigurationWithDefaults()
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t)
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -61,8 +59,8 @@ func TestGetLogoutRequest(t *testing.T) {
 				}))
 			}
 
-			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin(conf.AdminURL)
+			h := NewHandler(reg, reg.Config())
+			r := x.NewRouterAdmin(reg.Config().AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -102,8 +100,7 @@ func TestGetLoginRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := testhelpers.NewConfigurationWithDefaults()
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t)
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -126,8 +123,8 @@ func TestGetLoginRequest(t *testing.T) {
 				}
 			}
 
-			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin(conf.AdminURL)
+			h := NewHandler(reg, reg.Config())
+			r := x.NewRouterAdmin(reg.Config().AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -168,8 +165,7 @@ func TestGetConsentRequest(t *testing.T) {
 			challenge := "challenge" + key
 			requestURL := "http://192.0.2.1"
 
-			conf := testhelpers.NewConfigurationWithDefaults()
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t)
 
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
@@ -210,9 +206,9 @@ func TestGetConsentRequest(t *testing.T) {
 				}
 			}
 
-			h := NewHandler(reg, conf)
+			h := NewHandler(reg, reg.Config())
 
-			r := x.NewRouterAdmin(conf.AdminURL)
+			r := x.NewRouterAdmin(reg.Config().AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -242,8 +238,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		challenge := "challenge"
 		requestURL := "http://192.0.2.1"
 
-		conf := testhelpers.NewConfigurationWithDefaults()
-		reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+		reg := testhelpers.NewRegistryMemory(t)
 
 		cl := &client.Client{ID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
@@ -257,8 +252,8 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		challenge, err = f.ToLoginChallenge(ctx, reg)
 		require.NoError(t, err)
 
-		h := NewHandler(reg, conf)
-		r := x.NewRouterAdmin(conf.AdminURL)
+		h := NewHandler(reg, reg.Config())
+		r := x.NewRouterAdmin(reg.Config().AdminURL)
 		h.SetRoutes(r)
 		ts := httptest.NewServer(r)
 		defer ts.Close()
@@ -310,8 +305,7 @@ func TestAcceptDeviceRequest(t *testing.T) {
 	challenge := "challenge"
 	requestURL := "https://hydra.example.com/" + oauth2.DeviceVerificationPath
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 
 	cl := &client.Client{ID: "client"}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
@@ -325,8 +319,8 @@ func TestAcceptDeviceRequest(t *testing.T) {
 	challenge, err = f.ToDeviceChallenge(ctx, reg)
 	require.NoError(t, err)
 
-	h := NewHandler(reg, conf)
-	r := x.NewRouterAdmin(conf.AdminURL)
+	h := NewHandler(reg, reg.Config())
+	r := x.NewRouterAdmin(reg.Config().AdminURL)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)
@@ -346,8 +340,7 @@ func TestAcceptDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 	userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
 	require.NoError(t, err)
-	reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
-	require.NoError(t, err)
+	require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest))
 
 	acceptUserCode := &hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode}
 
@@ -375,8 +368,7 @@ func TestAcceptDuplicateDeviceRequest(t *testing.T) {
 	challenge := "challenge"
 	requestURL := "https://hydra.example.com/" + oauth2.DeviceVerificationPath
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 
 	cl := &client.Client{ID: "client"}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
@@ -390,8 +382,8 @@ func TestAcceptDuplicateDeviceRequest(t *testing.T) {
 	challenge, err = f.ToDeviceChallenge(ctx, reg)
 	require.NoError(t, err)
 
-	h := NewHandler(reg, conf)
-	r := x.NewRouterAdmin(conf.AdminURL)
+	h := NewHandler(reg, reg.Config())
+	r := x.NewRouterAdmin(reg.Config().AdminURL)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)
@@ -411,8 +403,7 @@ func TestAcceptDuplicateDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 	userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(ctx)
 	require.NoError(t, err)
-	reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest)
-	require.NoError(t, err)
+	require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(ctx, deviceCodesig, sig, deviceRequest))
 
 	acceptUserCode := &hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode}
 
@@ -452,8 +443,7 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 	challenge := "challenge"
 	requestURL := "https://hydra.example.com/" + oauth2.DeviceVerificationPath
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 
 	cl := &client.Client{ID: "client"}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
@@ -467,8 +457,8 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 	challenge, err = f.ToDeviceChallenge(ctx, reg)
 	require.NoError(t, err)
 
-	h := NewHandler(reg, conf)
-	r := x.NewRouterAdmin(conf.AdminURL)
+	h := NewHandler(reg, reg.Config())
+	r := x.NewRouterAdmin(reg.Config().AdminURL)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)

@@ -4,6 +4,7 @@
 package oauth2_test
 
 import (
+	"cmp"
 	"context"
 	"flag"
 	"net/http"
@@ -36,9 +37,8 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/stringsx"
 )
 
 var (
@@ -75,13 +75,14 @@ func BenchmarkAuthCode(b *testing.B) {
 
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
 
-	dsn := stringsx.Coalesce(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
+	dsn := cmp.Or(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
 	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, new(contextx.Default)).WithTracer(tracer)
-	reg.Config().MustSet(ctx, config.KeyLogLevel, "error")
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, configx.WithValues(map[string]any{
+		config.KeyLogLevel:            "error",
+		config.KeyAccessTokenStrategy: "opaque",
+		config.KeyRefreshTokenHook:    "",
+	})).WithTracer(tracer)
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")

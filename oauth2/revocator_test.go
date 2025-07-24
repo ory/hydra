@@ -23,7 +23,6 @@ import (
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/httprouterx"
 )
 
@@ -59,17 +58,16 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 func TestRevoke(t *testing.T) {
 	t.Parallel()
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 
-	testhelpers.MustEnsureRegistryKeys(context.Background(), reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(t.Context(), reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)
 	now := time.Now().UTC().Round(time.Second)
 
 	handler := reg.OAuth2Handler()
-	router := x.NewRouterAdmin(conf.AdminURL)
+	router := x.NewRouterAdmin(reg.Config().AdminURL)
 	handler.SetPublicRoutes(&httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler { return h })
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

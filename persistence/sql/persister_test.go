@@ -116,14 +116,9 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 func TestManagersNextGen(t *testing.T) {
 	t.Parallel()
 
-	regs := make(map[string]driver.Registry)
-	if !testing.Short() {
-		regs = testhelpers.ConnectDatabases(t, true)
-	}
+	regs := testhelpers.ConnectDatabases(t, true)
 
-	regs["memory"] = testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{})
-
-	ctx := context.Background()
+	ctx := t.Context()
 	networks := make([]uuid.UUID, 5)
 	for k := range networks {
 		nid := uuid.Must(uuid.NewV4())
@@ -152,17 +147,17 @@ func TestManagers(t *testing.T) {
 	regs1, regs2 := make(map[string]driver.Registry), make(map[string]driver.Registry)
 
 	sqlite := dbal.NewSQLiteTestDatabase(t)
-	regs1["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, true, &contextx.Default{})
-	regs2["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, false, &contextx.Default{})
+	regs1["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, true)
+	regs2["memory"] = testhelpers.NewRegistrySQLFromURL(t, sqlite, false)
 
 	if !testing.Short() {
 		pg, mysql, crdb := testhelpers.ConnectDatabasesURLs(t)
-		regs1["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, true, &contextx.Default{})
-		regs2["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, false, &contextx.Default{})
-		regs1["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, true, &contextx.Default{})
-		regs2["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, false, &contextx.Default{})
-		regs1["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, true, &contextx.Default{})
-		regs2["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, false, &contextx.Default{})
+		regs1["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, true)
+		regs2["postgres"] = testhelpers.NewRegistrySQLFromURL(t, pg, false)
+		regs1["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, true)
+		regs2["mysql"] = testhelpers.NewRegistrySQLFromURL(t, mysql, false)
+		regs1["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, true)
+		regs2["cockroach"] = testhelpers.NewRegistrySQLFromURL(t, crdb, false)
 	}
 
 	network1NID, network2NID := uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())

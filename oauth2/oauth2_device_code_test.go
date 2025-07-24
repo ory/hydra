@@ -12,9 +12,6 @@ import (
 	"time"
 
 	"github.com/pborman/uuid"
-
-	"github.com/ory/fosite/token/jwt"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -22,22 +19,22 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
+	"github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/requirex"
 )
 
 func TestDeviceAuthRequest(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.New()
@@ -103,7 +100,7 @@ func TestDeviceTokenRequest(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.New()
@@ -233,10 +230,11 @@ func TestDeviceTokenRequest(t *testing.T) {
 func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeyAccessTokenStrategy: "opaque",
+		config.KeyRefreshTokenHook:    "",
+	}))
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -355,7 +353,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
 		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
 		require.NoError(t, err)
-		requirex.EqualTime(t, expectedExp, time.Unix(actualExp, 0), time.Second)
+		assert.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second)
 	}
 
 	assertIDToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedSubject, expectedNonce string, expectedExp time.Time) gjson.Result {
@@ -370,7 +368,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
-		requirex.EqualTime(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
+		assert.WithinDuration(t, expectedExp, time.Unix(claims.Get("exp").Int(), 0), 2*time.Second)
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
 		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
@@ -416,7 +414,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
-		requirex.EqualTime(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
+		assert.WithinDuration(t, expectedExp, time.Unix(i.Get("exp").Int(), 0), time.Second)
 		assert.EqualValues(t, `bar`, i.Get("ext.foo").String(), "%s", i)
 		assert.EqualValues(t, scopes, i.Get("scp").Raw, "%s", i)
 		return i
@@ -431,7 +429,8 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		_, conf := newDeviceClient(t, reg)
 		resp, err := getDeviceCode(t, conf, nil, oauth2.SetAuthURLParam("audience", "https://not-ory-api/"))
 		require.Error(t, err)
-		devErr := err.(*oauth2.RetrieveError)
+		var devErr *oauth2.RetrieveError
+		require.ErrorAs(t, err, &devErr)
 		require.Nil(t, resp)
 		require.Equal(t, devErr.Response.StatusCode, http.StatusBadRequest)
 	})
@@ -648,7 +647,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			require.NoError(t, err)
 
 			body := introspectAccessToken(t, conf, token, subject)
-			requirex.EqualTime(t, iat.Add(expectedLifespans.DeviceAuthorizationGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+			assert.WithinDuration(t, iat.Add(expectedLifespans.DeviceAuthorizationGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 			assertJWTAccessToken(t, strategy, conf, token, subject, iat.Add(expectedLifespans.DeviceAuthorizationGrantAccessTokenLifespan.Duration), `["hydra","offline","openid"]`)
 			assertIDToken(t, token, conf, subject, nonce, iat.Add(expectedLifespans.DeviceAuthorizationGrantIDTokenLifespan.Duration))
@@ -669,7 +668,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 				require.NotEqual(t, token.Extra("id_token"), refreshedToken.Extra("id_token"))
 
 				body := introspectAccessToken(t, conf, refreshedToken, subject)
-				requirex.EqualTime(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
+				assert.WithinDuration(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
 					i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)

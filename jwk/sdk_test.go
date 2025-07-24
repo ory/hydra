@@ -9,29 +9,26 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	. "github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
 )
 
 func TestJWKSDK(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 
-	router := x.NewRouterAdmin(conf.AdminURL)
+	router := x.NewRouterAdmin(reg.Config().AdminURL)
 	h := NewHandler(reg)
 	h.SetAdminRoutes(router)
 	server := httptest.NewServer(router)
-	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
+	reg.Config().MustSet(ctx, config.KeyAdminURL, server.URL)
 
 	sdk := hydra.NewAPIClient(hydra.NewConfiguration())
 	sdk.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
@@ -65,7 +62,7 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("UpdateJwkSetKey", func(t *testing.T) {
-			if conf.HSMEnabled() {
+			if reg.Config().HSMEnabled() {
 				t.Skip("Skipping test. Keys cannot be updated when Hardware Security Module is enabled")
 			}
 			require.Len(t, resultKeys.Keys, 1)
@@ -107,7 +104,7 @@ func TestJWKSDK(t *testing.T) {
 		resultKeys, _, err := sdk.JwkAPI.GetJsonWebKeySet(ctx, "set-foo2").Execute()
 		t.Run("GetJwkSet after create", func(t *testing.T) {
 			require.NoError(t, err)
-			if conf.HSMEnabled() {
+			if reg.Config().HSMEnabled() {
 				require.Len(t, resultKeys.Keys, 1)
 				assert.Equal(t, expectedKid, resultKeys.Keys[0].Kid)
 				assert.Equal(t, "RS256", resultKeys.Keys[0].Alg)
@@ -119,7 +116,7 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("UpdateJwkSet", func(t *testing.T) {
-			if conf.HSMEnabled() {
+			if reg.Config().HSMEnabled() {
 				t.Skip("Skipping test. Keys cannot be updated when Hardware Security Module is enabled")
 			}
 			require.Len(t, resultKeys.Keys, 1)

@@ -211,16 +211,19 @@ func NewCustom(l *logrusx.Logger, p *configx.Provider, ctxt contextx.Contextuali
 	return &DefaultProvider{l: l, p: p, c: ctxt}
 }
 
+// Deprecated: use context-based test setters
 func (p *DefaultProvider) Set(ctx context.Context, key string, value interface{}) error {
 	return p.getProvider(ctx).Set(key, value)
 }
 
+// Deprecated: use context-based test setters
 func (p *DefaultProvider) MustSet(ctx context.Context, key string, value interface{}) {
 	if err := p.Set(ctx, key, value); err != nil {
 		p.l.WithError(err).Fatalf("Unable to set \"%s\" to \"%s\".", key, value)
 	}
 }
 
+// Deprecated: use context-based test setters
 func (p *DefaultProvider) Delete(ctx context.Context, key string) {
 	p.getProvider(ctx).Delete(key)
 }
@@ -255,26 +258,23 @@ func (p *DefaultProvider) MirrorTopLevelClaims(ctx context.Context) bool {
 }
 
 func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalSources ...AccessTokenStrategySource) []string {
-	types := stringslice.Filter(
-		p.getProvider(ctx).StringsF(KeySubjectTypesSupported, []string{"public"}),
-		func(s string) bool {
-			return !(s == "public" || s == "pairwise")
-		},
-	)
-
-	if len(types) == 0 {
-		types = []string{"public"}
+	public, pairwise := false, false
+	for _, t := range p.getProvider(ctx).StringsF(KeySubjectTypesSupported, []string{"public"}) {
+		switch t {
+		case "public":
+			public = true
+		case "pairwise":
+			pairwise = true
+		}
 	}
 
-	if stringslice.Has(types, "pairwise") {
+	// when neither public nor pairwise are set, force public
+	public = public || !pairwise
+
+	if pairwise {
 		if p.AccessTokenStrategy(ctx, additionalSources...) == AccessTokenJWTStrategy {
 			p.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.supported_types" (e.g. oidc.subject_identifiers.supported_types=public) or set strategies.access_token to "opaque".`)
-			types = stringslice.Filter(
-				types,
-				func(s string) bool {
-					return !(s == "public")
-				},
-			)
+			pairwise = false
 		} else if len(p.SubjectIdentifierAlgorithmSalt(ctx)) < 8 {
 			p.l.Fatalf(
 				`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`,
@@ -283,6 +283,13 @@ func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalS
 		}
 	}
 
+	types := make([]string, 0, 2)
+	if public {
+		types = append(types, "public")
+	}
+	if pairwise {
+		types = append(types, "pairwise")
+	}
 	return types
 }
 

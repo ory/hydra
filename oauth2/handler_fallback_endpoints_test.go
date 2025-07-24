@@ -4,7 +4,6 @@
 package oauth2_test
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -16,19 +15,17 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
 )
 
 func TestHandlerConsent(t *testing.T) {
 	t.Parallel()
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	conf.MustSet(context.Background(), config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY"))
 
 	h := reg.OAuth2Handler()
-	r := x.NewRouterAdmin(conf.AdminURL)
+	r := x.NewRouterAdmin(reg.Config().AdminURL)
 	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)

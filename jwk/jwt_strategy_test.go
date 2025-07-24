@@ -9,28 +9,25 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/internal/testhelpers"
 	. "github.com/ory/hydra/v2/jwk"
-	"github.com/ory/x/contextx"
 )
 
 func TestJWTStrategy(t *testing.T) {
 	for _, alg := range []string{"RS256", "ES256", "ES512"} {
 		t.Run("case="+alg, func(t *testing.T) {
-			conf := testhelpers.NewConfigurationWithDefaults()
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t)
 			m := reg.KeyManager()
 
 			_, err := m.GenerateAndPersistKeySet(context.Background(), "foo-set", "foo", alg, "sig")
 			require.NoError(t, err)
 
-			s := NewDefaultJWTSigner(conf, reg, "foo-set")
+			s := NewDefaultJWTSigner(reg, "foo-set")
 			a, b, err := s.Generate(context.Background(), jwt.MapClaims{"foo": "bar"}, &jwt.Headers{})
 			require.NoError(t, err)
 			assert.NotEmpty(t, a)

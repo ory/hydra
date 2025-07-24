@@ -23,7 +23,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/uuidx"
@@ -60,18 +60,18 @@ var defaultIgnoreFields = []string{"client_id", "registration_access_token", "re
 
 func TestClientSDK(t *testing.T) {
 	ctx := context.Background()
-	conf := testhelpers.NewConfigurationWithDefaults()
-	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"public"})
-	conf.MustSet(ctx, config.KeyDefaultClientScope, []string{"foo", "bar"})
-	conf.MustSet(ctx, config.KeyPublicAllowDynamicRegistration, true)
-	r := testhelpers.NewRegistryMemory(t, conf, &contextx.Static{C: conf.Source(ctx)})
+	r := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeySubjectTypesSupported:          []string{"public"},
+		config.KeyDefaultClientScope:             []string{"foo", "bar"},
+		config.KeyPublicAllowDynamicRegistration: true,
+	}))
 
-	routerAdmin := x.NewRouterAdmin(conf.AdminURL)
+	routerAdmin := x.NewRouterAdmin(r.Config().AdminURL)
 	routerPublic := x.NewRouterPublic()
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
 	clHandler.SetAdminRoutes(routerAdmin)
-	o2Handler := oauth2.NewHandler(r, conf)
+	o2Handler := oauth2.NewHandler(r)
 	o2Handler.SetPublicRoutes(routerPublic, func(h http.Handler) http.Handler { return h })
 	o2Handler.SetAdminRoutes(routerAdmin)
 
@@ -79,8 +79,8 @@ func TestClientSDK(t *testing.T) {
 	t.Cleanup(server.Close)
 	publicServer := httptest.NewServer(routerPublic)
 	t.Cleanup(publicServer.Close)
-	conf.MustSet(ctx, config.KeyAdminURL, server.URL)
-	conf.MustSet(ctx, config.KeyOAuth2TokenURL, publicServer.URL+"/oauth2/token")
+	r.Config().MustSet(ctx, config.KeyAdminURL, server.URL)
+	r.Config().MustSet(ctx, config.KeyOAuth2TokenURL, publicServer.URL+"/oauth2/token")
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: server.URL}}
@@ -88,7 +88,7 @@ func TestClientSDK(t *testing.T) {
 	t.Run("case=client default scopes are set", func(t *testing.T) {
 		result, _, err := c.OAuth2API.CreateOAuth2Client(ctx).OAuth2Client(hydra.OAuth2Client{}).Execute()
 		require.NoError(t, err)
-		assert.EqualValues(t, conf.DefaultClientScope(ctx), strings.Split(*result.Scope, " "))
+		assert.EqualValues(t, r.Config().DefaultClientScope(ctx), strings.Split(*result.Scope, " "))
 
 		_, err = c.OAuth2API.DeleteOAuth2Client(ctx, *result.ClientId).Execute()
 		require.NoError(t, err)
@@ -212,12 +212,12 @@ func TestClientSDK(t *testing.T) {
 		path := "/id"
 		value := "foo"
 
-		client := createTestClient("")
-		created, res, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		cl := createTestClient("")
+		created, res, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(cl).Execute()
 		require.NoError(t, err, "%s", ioutilx.MustReadAll(res.Body))
-		client.ClientId = created.ClientId
+		cl.ClientId = created.ClientId
 
-		_, _, err = c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		_, _, err = c.OAuth2API.PatchOAuth2Client(context.Background(), *cl.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.Error(t, err)
 	})
 
@@ -229,7 +229,7 @@ func TestClientSDK(t *testing.T) {
 		cc := clientcredentials.Config{
 			ClientID:     *created.ClientId,
 			ClientSecret: "secret",
-			TokenURL:     conf.OAuth2TokenURL(t.Context()).String(),
+			TokenURL:     r.Config().OAuth2TokenURL(t.Context()).String(),
 			AuthStyle:    goauth2.AuthStyleInHeader,
 		}
 		token, err := cc.Token(t.Context())
@@ -267,13 +267,13 @@ func TestClientSDK(t *testing.T) {
 		path := "/client_name"
 		value := "test"
 
-		client := createTestClient("")
-		client.SetJwksUri("https://example.org/.well-known/jwks.json")
-		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(client).Execute()
+		cl := createTestClient("")
+		cl.SetJwksUri("https://example.org/.well-known/jwks.json")
+		created, _, err := c.OAuth2API.CreateOAuth2Client(context.Background()).OAuth2Client(cl).Execute()
 		require.NoError(t, err)
-		client.ClientId = created.ClientId
+		cl.ClientId = created.ClientId
 
-		result, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *client.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
+		result, _, err := c.OAuth2API.PatchOAuth2Client(context.Background(), *cl.ClientId).JsonPatch([]hydra.JsonPatch{{Op: op, Path: path, Value: value}}).Execute()
 		require.NoError(t, err)
 		require.Equal(t, value, pointerx.Deref(result.ClientName))
 	})

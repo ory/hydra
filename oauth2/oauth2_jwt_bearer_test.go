@@ -32,15 +32,14 @@ import (
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 )
 
 func TestJWTBearer(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyAccessTokenStrategy, "opaque"))
 	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.Must(uuid.NewV4()).String()
@@ -149,7 +148,7 @@ func TestJWTBearer(t *testing.T) {
 		PublicKey:       trust.PublicKey{Set: set, KeyID: kid},
 	}
 	require.NoError(t, reg.GrantManager().CreateGrant(ctx, trustGrant, keys.Keys[0].Public()))
-	signer := jwk.NewDefaultJWTSigner(reg.Config(), reg, set)
+	signer := jwk.NewDefaultJWTSigner(reg, set)
 	signer.GetPrivateKey = func(ctx context.Context) (interface{}, error) {
 		return keys.Keys[0], nil
 	}
@@ -212,7 +211,7 @@ func TestJWTBearer(t *testing.T) {
 	t.Run("case=unable to exchange token with an invalid key", func(t *testing.T) {
 		keys, err := jwk.GenerateJWK(ctx, jose.RS256, kid, "sig")
 		require.NoError(t, err)
-		signer := jwk.NewDefaultJWTSigner(reg.Config(), reg, set)
+		signer := jwk.NewDefaultJWTSigner(reg, set)
 		signer.GetPrivateKey = func(ctx context.Context) (interface{}, error) {
 			return keys.Keys[0], nil
 		}

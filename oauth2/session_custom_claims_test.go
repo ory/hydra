@@ -15,6 +15,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/x/contextx"
 )
 
 func createSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, extra map[string]interface{}) oauth2.Session {
@@ -39,11 +40,10 @@ func createSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvide
 func TestCustomClaimsInSession(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	c := testhelpers.NewConfigurationWithDefaults()
+	c := testhelpers.NewConfigurationWithDefaults(t)
 
 	t.Run("no_custom_claims", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{})
 
 		session := createSessionWithCustomClaims(ctx, c, nil)
 		claims := session.GetJWTClaims().ToMapClaims()
@@ -57,7 +57,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.Empty(t, claims["ext"])
 	})
 	t.Run("custom_claim_gets_mirrored", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"foo"})
 		extra := map[string]interface{}{"foo": "bar"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -81,7 +81,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "bar", extClaims["foo"])
 	})
 	t.Run("only_non_reserved_claims_get_mirrored", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo", "iss", "sub"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"foo", "iss", "sub"})
 		extra := map[string]interface{}{"foo": "bar", "iss": "hydra.remote", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -112,7 +112,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "another-alice", extClaims["sub"])
 	})
 	t.Run("no_custom_claims_in_config", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{})
 		extra := map[string]interface{}{"foo": "bar", "iss": "hydra.remote", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -141,7 +141,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "hydra.remote", extClaims["iss"])
 	})
 	t.Run("more_config_claims_than_given", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo", "baz", "bar", "iss"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"foo", "baz", "bar", "iss"})
 		extra := map[string]interface{}{"foo": "foo_value", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -169,7 +169,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "another-alice", extClaims["sub"])
 	})
 	t.Run("less_config_claims_than_given", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo", "sub"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"foo", "sub"})
 		extra := map[string]interface{}{"foo": "foo_value", "bar": "bar_value", "baz": "baz_value", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -199,7 +199,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "another-alice", extClaims["sub"])
 	})
 	t.Run("unused_config_claims", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"foo", "bar"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"foo", "bar"})
 		extra := map[string]interface{}{"foo": "foo_value", "baz": "baz_value", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)
@@ -229,7 +229,7 @@ func TestCustomClaimsInSession(t *testing.T) {
 		assert.EqualValues(t, "another-alice", extClaims["sub"])
 	})
 	t.Run("config_claims_contain_reserved_claims", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyAllowedTopLevelClaims, []string{"iss", "sub"})
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyAllowedTopLevelClaims, []string{"iss", "sub"})
 		extra := map[string]interface{}{"iss": "hydra.remote", "sub": "another-alice"}
 
 		session := createSessionWithCustomClaims(ctx, c, extra)

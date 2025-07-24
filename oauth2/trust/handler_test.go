@@ -28,7 +28,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"
 )
 
@@ -45,12 +45,12 @@ type HandlerTestSuite struct {
 
 // Setup will run before the tests in the suite are run.
 func (s *HandlerTestSuite) SetupTest() {
-	conf := testhelpers.NewConfigurationWithDefaults()
-	conf.MustSet(context.Background(), config.KeySubjectTypesSupported, []string{"public"})
-	conf.MustSet(context.Background(), config.KeyDefaultClientScope, []string{"foo", "bar"})
-	s.registry = testhelpers.NewRegistryMemory(s.T(), conf, &contextx.Default{})
+	s.registry = testhelpers.NewRegistryMemory(s.T(), configx.WithValues(map[string]any{
+		config.KeySubjectTypesSupported: []string{"public"},
+		config.KeyDefaultClientScope:    []string{"foo", "bar"},
+	}))
 
-	router := x.NewRouterAdmin(conf.AdminURL)
+	router := x.NewRouterAdmin(s.registry.Config().AdminURL)
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)

@@ -7,17 +7,13 @@ import (
 	"context"
 	"net"
 
-	"github.com/ory/x/josex"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
-
-	"github.com/ory/fosite"
-	"github.com/ory/hydra/v2/driver/config"
-
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/x/josex"
 )
 
 type JWTSigner interface {
@@ -29,12 +25,11 @@ type JWTSigner interface {
 type DefaultJWTSigner struct {
 	*jwt.DefaultSigner
 	r     InternalRegistry
-	c     *config.DefaultProvider
 	setID string
 }
 
-func NewDefaultJWTSigner(c *config.DefaultProvider, r InternalRegistry, setID string) *DefaultJWTSigner {
-	j := &DefaultJWTSigner{c: c, r: r, setID: setID, DefaultSigner: &jwt.DefaultSigner{}}
+func NewDefaultJWTSigner(r InternalRegistry, setID string) *DefaultJWTSigner {
+	j := &DefaultJWTSigner{r: r, setID: setID, DefaultSigner: &jwt.DefaultSigner{}}
 	j.DefaultSigner.GetPrivateKey = j.getPrivateKey
 	return j
 }

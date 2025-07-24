@@ -25,14 +25,11 @@ func newJanitorCmd() *cobra.Command {
 }
 
 func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
-	ctx := context.Background()
-	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
+	ctx := t.Context()
 
-	require.True(t, len(testCycles) > 0)
-
-	for k, v := range testCycles {
+	for k, v := range testhelpers.NotAfterTestCycles {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, k)
 			require.NoError(t, err)
 
@@ -63,10 +60,8 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 	ctx := context.Background()
 
-	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
-
-	for k, v := range testCycles {
-		jt := testhelpers.NewConsentJanitorTestHelper(k)
+	for k, v := range testhelpers.NotAfterTestCycles {
+		jt := testhelpers.NewConsentJanitorTestHelper(t, k)
 		reg, err := jt.GetRegistry(ctx, k)
 		require.NoError(t, err)
 
@@ -102,7 +97,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 	t.Run("case=login-consent-timeout", func(t *testing.T) {
 		t.Run("case=login-timeout", func(t *testing.T) {
 			ctx := context.Background()
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, t.Name())
 			require.NoError(t, err)
 
@@ -124,7 +119,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 
 		t.Run("case=consent-timeout", func(t *testing.T) {
 			ctx := context.Background()
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, t.Name())
 			require.NoError(t, err)
 
@@ -150,7 +145,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 		ctx := context.Background()
 
 		t.Run("case=login-rejection", func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, t.Name())
 			require.NoError(t, err)
 
@@ -171,7 +166,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 		})
 
 		t.Run("case=consent-rejection", func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, t.Name())
 			require.NoError(t, err)
 
@@ -267,14 +262,11 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 }
 
 func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
-	ctx := context.Background()
-	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
+	ctx := t.Context()
 
-	require.True(t, len(testCycles) > 0)
-
-	for k, v := range testCycles {
+	for k, v := range testhelpers.NotAfterTestCycles {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			jt := testhelpers.NewConsentJanitorTestHelper(t, t.Name())
 			reg, err := jt.GetRegistry(ctx, k)
 			require.NoError(t, err)
 

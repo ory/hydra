@@ -10,10 +10,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/go-jose/go-jose/v3"
-
+	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
@@ -21,7 +19,6 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/cmdx"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/snapshotx"
 )
 
@@ -39,7 +36,7 @@ func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	cmdx.RegisterHTTPClientFlags(cmd.Flags())

@@ -55,7 +55,7 @@ func getClientID(body string) string {
 
 func TestHandler(t *testing.T) {
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	h := client.NewHandler(reg)
 	reg.WithContextualizer(&contextx.TestContextualizer{})
 

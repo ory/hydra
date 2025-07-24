@@ -14,7 +14,7 @@ import (
 
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/healthx"
 )
 
@@ -68,12 +68,7 @@ func TestPublicHealthHandler(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			conf := testhelpers.NewConfigurationWithDefaults()
-			for k, v := range tc.config {
-				conf.MustSet(ctx, k, v)
-			}
-
-			reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+			reg := testhelpers.NewRegistryMemory(t, configx.WithValues(tc.config))
 
 			public := x.NewRouterPublic()
 			reg.RegisterPublicRoutes(ctx, public)

@@ -9,20 +9,16 @@ import (
 	"io"
 	"time"
 
-	"github.com/ory/x/servicelocatorx"
-
-	"github.com/ory/hydra/v2/persistence"
-
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/flagx"
-
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/servicelocatorx"
 )
 
 const (

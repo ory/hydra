@@ -16,23 +16,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-
-	"github.com/ory/fosite/token/jwt"
-
 	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/x/httpx"
-	"github.com/ory/x/ioutilx"
-
+	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/ioutilx"
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
@@ -56,6 +54,11 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 }
 
 func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+	public, admin := NewConfigurableOAuth2Server(ctx, t, reg)
+	return public.Server, admin.Server
+}
+
+func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *contextx.ConfigurableTestServer) {
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, 10*time.Second)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
@@ -69,12 +72,12 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (pu
 	reg.RegisterPublicRoutes(ctx, public)
 	reg.RegisterAdminRoutes(admin)
 
-	publicTS = httptest.NewServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+	publicTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
 		return r.URL.Path
 	})))
 	t.Cleanup(publicTS.Close)
 
-	adminTS = httptest.NewServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
+	adminTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
 		return r.URL.Path
 	})))
 	t.Cleanup(adminTS.Close)

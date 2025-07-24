@@ -26,7 +26,6 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -35,7 +34,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
+	reg := testhelpers.NewRegistryMemory(t)
 	reg.WithKratos(fakeKratos)
 	reg.WithExtraFositeFactories([]fositex.Factory{compose.OAuth2ResourceOwnerPasswordCredentialsFactory})
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)

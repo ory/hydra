@@ -24,6 +24,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
 
@@ -38,7 +39,6 @@ type JanitorConsentTestHelper struct {
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest
 	conf                 *config.DefaultProvider
-	Lifespan             time.Duration
 }
 
 type createGrantRequest struct {
@@ -48,14 +48,15 @@ type createGrantRequest struct {
 
 const lifespan = time.Hour
 
-func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
-	conf := NewConfigurationWithDefaults()
-	conf.MustSet(context.Background(), config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(context.Background(), config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(context.Background(), config.KeyAccessTokenLifespan, lifespan)
-	conf.MustSet(context.Background(), config.KeyRefreshTokenLifespan, lifespan)
-	conf.MustSet(context.Background(), config.KeyConsentRequestMaxAge, lifespan)
-	conf.MustSet(context.Background(), config.KeyLogLevel, "trace")
+func NewConsentJanitorTestHelper(t *testing.T, uniqueName string, opts ...configx.OptionModifier) *JanitorConsentTestHelper {
+	conf := NewConfigurationWithDefaults(t, append([]configx.OptionModifier{configx.WithValues(map[string]any{
+		config.KeyScopeStrategy:        "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
+		config.KeyIssuerURL:            "http://hydra.localhost",
+		config.KeyAccessTokenLifespan:  lifespan,
+		config.KeyRefreshTokenLifespan: lifespan,
+		config.KeyConsentRequestMaxAge: lifespan,
+		config.KeyLogLevel:             "trace",
+	})}, opts...)...)
 
 	return &JanitorConsentTestHelper{
 		uniqueName:           uniqueName,
@@ -65,7 +66,6 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 		flushAccessRequests:  getAccessRequests(uniqueName, lifespan),
 		flushRefreshRequests: getRefreshRequests(uniqueName, lifespan),
 		flushGrants:          getGrantRequests(uniqueName, lifespan),
-		Lifespan:             lifespan,
 	}
 }
 
@@ -77,12 +77,14 @@ func (j *JanitorConsentTestHelper) GetConfig() *config.DefaultProvider {
 	return j.conf
 }
 
+var NotAfterTestCycles = map[string]time.Duration{
+	"notAfter24h":   lifespan * 24,
+	"notAfter1h30m": lifespan + time.Hour/2,
+	"notAfterNow":   0,
+}
+
 func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Duration {
-	return map[string]time.Duration{
-		"notAfter24h":   j.Lifespan * 24,
-		"notAfter1h30m": j.Lifespan + time.Hour/2,
-		"notAfterNow":   0,
-	}
+	return map[string]time.Duration{}
 }
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
@@ -556,18 +558,14 @@ func JanitorTests(
 		if parallel {
 			t.Parallel()
 		}
-		ctx := context.Background()
 
-		jt := NewConsentJanitorTestHelper(network + t.Name())
+		jt := NewConsentJanitorTestHelper(t, network+t.Name())
 
-		reg.Config().MustSet(context.Background(), config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan(ctx))
+		ctx := contextx.WithConfigValue(t.Context(), config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan(t.Context()))
 
 		t.Run("case=flush-consent-request-not-after", func(t *testing.T) {
-
-			notAfterTests := jt.GetNotAfterTestCycles()
-
-			for k, v := range notAfterTests {
-				jt := NewConsentJanitorTestHelper(network + k)
+			for k, v := range NotAfterTestCycles {
+				jt := NewConsentJanitorTestHelper(t, network+k)
 				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 					notAfter := time.Now().Round(time.Second).Add(-v)
 					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
@@ -588,7 +586,7 @@ func JanitorTests(
 		})
 
 		t.Run("case=flush-consent-request-limit", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper(network + "limit")
+			jt := NewConsentJanitorTestHelper(t, network+"limit")
 
 			t.Run("case=limit", func(t *testing.T) {
 				// setup
@@ -605,7 +603,7 @@ func JanitorTests(
 		})
 
 		t.Run("case=flush-consent-request-rejection", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper(network + "loginRejection")
+			jt := NewConsentJanitorTestHelper(t, network+"loginRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "loginRejection"), func(t *testing.T) {
 				// setup
@@ -620,7 +618,7 @@ func JanitorTests(
 				t.Run("step=validate", jt.LoginRejectionValidate(ctx, consentManager))
 			})
 
-			jt = NewConsentJanitorTestHelper(network + "consentRejection")
+			jt = NewConsentJanitorTestHelper(t, network+"consentRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "consentRejection"), func(t *testing.T) {
 				// setup
@@ -638,7 +636,7 @@ func JanitorTests(
 		})
 
 		t.Run("case=flush-consent-request-timeout", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper(network + "loginTimeout")
+			jt := NewConsentJanitorTestHelper(t, network+"loginTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "login-timeout"), func(t *testing.T) {
 
@@ -655,7 +653,7 @@ func JanitorTests(
 
 			})
 
-			jt = NewConsentJanitorTestHelper(network + "consentTimeout")
+			jt = NewConsentJanitorTestHelper(t, network+"consentTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "consent-timeout"), func(t *testing.T) {
 

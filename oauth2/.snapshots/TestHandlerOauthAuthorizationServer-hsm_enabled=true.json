@@ -77,8 +77,8 @@
     "openid"
   ],
   "subject_types_supported": [
-    "pairwise",
-    "public"
+    "public",
+    "pairwise"
   ],
   "token_endpoint": "http://hydra.localhost/oauth2/token",
   "token_endpoint_auth_methods_supported": [

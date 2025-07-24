@@ -16,29 +16,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/internal/kratos"
-	"github.com/ory/x/pointerx"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
 	jwtgo "github.com/ory/fosite/token/jwt"
-
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/pointerx"
 )
 
 func TestLogoutFlows(t *testing.T) {
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeyAccessTokenStrategy:  "opaque",
+		config.KeyConsentRequestMaxAge: time.Hour,
+	}))
 
 	reg.WithKratos(fakeKratos)
 

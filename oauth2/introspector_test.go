@@ -20,17 +20,17 @@ import (
 	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	conf := testhelpers.NewConfigurationWithDefaults()
-	conf.MustSet(ctx, config.KeyScopeStrategy, "wildcard")
-	conf.MustSet(ctx, config.KeyIssuerURL, "https://foobariss")
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+		config.KeyScopeStrategy: "wildcard",
+		config.KeyIssuerURL:     "https://foobariss",
+	}))
 
 	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
@@ -42,7 +42,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	router := x.NewRouterAdmin(conf.AdminURL)
+	router := x.NewRouterAdmin(reg.Config().AdminURL)
 	handler := reg.OAuth2Handler()
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

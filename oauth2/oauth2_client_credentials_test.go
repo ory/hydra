@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -27,16 +26,14 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/requirex"
+	"github.com/ory/x/configx"
 )
 
 func TestClientCredentials(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	reg := testhelpers.NewMockedRegistry(t, &contextx.Default{})
-	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyAccessTokenStrategy, "opaque"))
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	var newCustomClient = func(t *testing.T, c *hc.Client) (*hc.Client, clientcredentials.Config) {
@@ -86,7 +83,7 @@ func TestClientCredentials(t *testing.T) {
 			assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
 
 			assert.EqualValues(t, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)
-			requirex.EqualTime(t, expectedExp, time.Unix(res.Get("exp").Int(), 0), 2*time.Second)
+			assert.WithinDuration(t, expectedExp, time.Unix(res.Get("exp").Int(), 0), 2*time.Second)
 
 			assert.EqualValues(t, encodeOr(t, conf.EndpointParams["audience"], "[]"), res.Get("aud").Raw, "%s", res.Raw)
 

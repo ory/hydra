@@ -18,15 +18,13 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/configx"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
-	conf := testhelpers.NewConfigurationWithDefaults()
-	reg := testhelpers.NewRegistryMemory(t, conf, &contextx.Default{})
-	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName}))
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
@@ -37,7 +35,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
 		t.Parallel()
-		if conf.HSMEnabled() {
+		if reg.Config().HSMEnabled() {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
 		IDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
@@ -65,7 +63,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		t.Parallel()
 		var IDKS *jose.JSONWebKeySet
 
-		if conf.HSMEnabled() {
+		if reg.Config().HSMEnabled() {
 			var err error
 			IDKS, err = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
 			require.NoError(t, err, "problem in generating keys")
@@ -84,7 +82,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
-		if conf.HSMEnabled() {
+		if reg.Config().HSMEnabled() {
 			require.GreaterOrEqual(t, len(known.Keys), 2)
 		} else {
 			require.GreaterOrEqual(t, len(known.Keys), 1)

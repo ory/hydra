@@ -578,7 +578,7 @@ func (m *RegistrySQL) OpenIDJWTStrategy() jwk.JWTSigner {
 		return m.oidcs
 	}
 
-	m.oidcs = jwk.NewDefaultJWTSigner(m.Config(), m, x.OpenIDConnectKeyName)
+	m.oidcs = jwk.NewDefaultJWTSigner(m, x.OpenIDConnectKeyName)
 	return m.oidcs
 }
 
@@ -587,7 +587,7 @@ func (m *RegistrySQL) AccessTokenJWTStrategy() jwk.JWTSigner {
 		return m.ats
 	}
 
-	m.ats = jwk.NewDefaultJWTSigner(m.Config(), m, x.OAuth2JWTKeyName)
+	m.ats = jwk.NewDefaultJWTSigner(m, x.OAuth2JWTKeyName)
 	return m.ats
 }
 
@@ -695,7 +695,7 @@ func (m *RegistrySQL) ConsentHandler() *consent.Handler {
 
 func (m *RegistrySQL) OAuth2Handler() *oauth2.Handler {
 	if m.oah == nil {
-		m.oah = oauth2.NewHandler(m, m.Config())
+		m.oah = oauth2.NewHandler(m)
 	}
 	return m.oah
 }

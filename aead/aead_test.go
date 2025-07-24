@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/x/configx"
 )
 
 func secret(t *testing.T) string {
@@ -43,8 +44,7 @@ func TestAEAD(t *testing.T) {
 			t.Run("case=without-rotation", func(t *testing.T) {
 				t.Parallel()
 				ctx := context.Background()
-				c := testhelpers.NewConfigurationWithDefaults()
-				c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+				c := testhelpers.NewConfigurationWithDefaults(t, configx.WithValue(config.KeyGetSystemSecret, []string{secret(t)}))
 				a := NewCipher(c)
 
 				plain := []byte(uuid.New())
@@ -63,8 +63,7 @@ func TestAEAD(t *testing.T) {
 			t.Run("case=wrong-secret", func(t *testing.T) {
 				t.Parallel()
 				ctx := context.Background()
-				c := testhelpers.NewConfigurationWithDefaults()
-				c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+				c := testhelpers.NewConfigurationWithDefaults(t, configx.WithValue(config.KeyGetSystemSecret, []string{secret(t)}))
 				a := NewCipher(c)
 
 				ct, err := a.Encrypt(ctx, []byte(uuid.New()), nil)
@@ -78,9 +77,8 @@ func TestAEAD(t *testing.T) {
 			t.Run("case=with-rotation", func(t *testing.T) {
 				t.Parallel()
 				ctx := context.Background()
-				c := testhelpers.NewConfigurationWithDefaults()
 				old := secret(t)
-				c.MustSet(ctx, config.KeyGetSystemSecret, []string{old})
+				c := testhelpers.NewConfigurationWithDefaults(t, configx.WithValue(config.KeyGetSystemSecret, []string{old}))
 				a := NewCipher(c)
 
 				plain := []byte(uuid.New())
@@ -106,8 +104,7 @@ func TestAEAD(t *testing.T) {
 			t.Run("case=with-rotation-wrong-secret", func(t *testing.T) {
 				t.Parallel()
 				ctx := context.Background()
-				c := testhelpers.NewConfigurationWithDefaults()
-				c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+				c := testhelpers.NewConfigurationWithDefaults(t, configx.WithValue(config.KeyGetSystemSecret, []string{secret(t)}))
 				a := NewCipher(c)
 
 				plain := []byte(uuid.New())
@@ -123,8 +120,7 @@ func TestAEAD(t *testing.T) {
 			t.Run("suite=with additional data", func(t *testing.T) {
 				t.Parallel()
 				ctx := context.Background()
-				c := testhelpers.NewConfigurationWithDefaults()
-				c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+				c := testhelpers.NewConfigurationWithDefaults(t, configx.WithValue(config.KeyGetSystemSecret, []string{secret(t)}))
 				a := NewCipher(c)
 
 				plain := []byte(uuid.New())

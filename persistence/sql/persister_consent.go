@@ -25,6 +25,7 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
+	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
@@ -724,10 +725,16 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 		trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
-	if err := p.Connection(ctx).RawQuery(
+	conn := p.Connection(ctx)
+	columns := popx.DBColumns[client.Client](&popx.PrefixQuoter{Prefix: "c.", Quoter: conn.Dialect})
+	if conn.Dialect.Name() == "mysql" {
+		columns = "c.*" // MySQL does not support this.
+	}
+
+	if err := conn.RawQuery(
 		/* #nosec G201 - channel can either be "front" or "back" */
 		fmt.Sprintf(`
-SELECT DISTINCT c.* FROM hydra_client as c
+SELECT DISTINCT %s FROM hydra_client as c
 JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
 	f.subject=? AND
@@ -736,6 +743,7 @@ WHERE
 	f.login_session_id = ? AND
 	f.nid = ? AND
 	c.nid = ?`,
+			columns,
 			channel,
 			channel,
 		),

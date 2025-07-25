@@ -46,13 +46,13 @@ Before running this command on an existing database, create a back up!`,
 }
 
 func NewMigrateSQLDownCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
-	return popx.NewMigrateSQLDownCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLDown)
+	return popx.NewMigrateSQLDownCmd(cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLDown)
 }
 
 func NewMigrateSQLStatusCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
-	return popx.NewMigrateSQLStatusCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateStatus)
+	return popx.NewMigrateSQLStatusCmd(cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateStatus)
 }
 
 func NewMigrateSQLUpCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
-	return popx.NewMigrateSQLUpCmd("hydra", cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLUp)
+	return popx.NewMigrateSQLUpCmd(cli.NewHandler(slOpts, dOpts, cOpts).Migration.MigrateSQLUp)
 }

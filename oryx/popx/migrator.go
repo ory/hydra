@@ -75,10 +75,7 @@ type Migrator struct {
 
 // MigrationIsCompatible returns true if the migration is compatible with the current database.
 func (m *Migrator) MigrationIsCompatible(dialect string, mi Migration) bool {
-	if mi.DBType == "all" || mi.DBType == dialect {
-		return true
-	}
-	return false
+	return mi.DBType == "all" || mi.DBType == dialect
 }
 
 // Up runs pending "up" migrations and applies them to the database.

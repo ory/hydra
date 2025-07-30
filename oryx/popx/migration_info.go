@@ -34,8 +34,6 @@ type Migration struct {
 	RunnerNoTx func(Migration, *pop.Connection) error
 	// Content is the raw content of the migration file
 	Content string
-	// Autocommit is true if the migration should be run outside of a transaction
-	Autocommit bool
 }
 
 func (m Migration) Valid() error {
@@ -51,15 +49,11 @@ func (m Migration) Valid() error {
 // Migrations is a collection of Migration
 type Migrations []Migration
 
-func (mfs Migrations) Len() int {
-	return len(mfs)
-}
+func (mfs Migrations) Len() int           { return len(mfs) }
+func (mfs Migrations) Less(i, j int) bool { return compareMigration(mfs[i], mfs[j]) < 0 }
+func (mfs Migrations) Swap(i, j int)      { mfs[i], mfs[j] = mfs[j], mfs[i] }
 
-func (mfs Migrations) Less(i, j int) bool {
-	return CompareMigration(mfs[i], mfs[j]) < 0
-}
-
-func CompareMigration(a, b Migration) int {
+func compareMigration(a, b Migration) int {
 	if a.Version == b.Version {
 		// Force "all" to be greater.
 		if a.DBType == "all" && b.DBType != "all" {
@@ -73,11 +67,7 @@ func CompareMigration(a, b Migration) int {
 	return strings.Compare(a.Version, b.Version)
 }
 
-func (mfs Migrations) Swap(i, j int) {
-	mfs[i], mfs[j] = mfs[j], mfs[i]
-}
-
-func (mfs Migrations) SortAndFilter(dialect string, modifiers ...func(sort.Interface) sort.Interface) Migrations {
+func (mfs Migrations) sortAndFilter(dialect string, modifiers ...func(sort.Interface) sort.Interface) Migrations {
 	// We need to sort mfs in order to push the dbType=="all" migrations
 	// to the back.
 	m := make(Migrations, len(mfs))
@@ -111,4 +101,20 @@ func (mfs Migrations) SortAndFilter(dialect string, modifiers ...func(sort.Inter
 
 	sort.Sort(mod)
 	return vsf
+}
+
+func (mfs Migrations) find(version, dbType string) *Migration {
+	var candidate *Migration
+	for _, m := range mfs {
+		if m.Version == version {
+			switch m.DBType {
+			case "all":
+				// there might still be a more specific migration for the dbType
+				candidate = &m
+			case dbType:
+				return &m
+			}
+		}
+	}
+	return candidate
 }

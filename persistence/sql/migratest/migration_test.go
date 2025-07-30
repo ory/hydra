@@ -109,7 +109,8 @@ func TestMigrations(t *testing.T) {
 
 			tm, err := popx.NewMigrationBox(
 				sql.Migrations,
-				popx.NewMigrator(c, l, nil, 1*time.Minute),
+				c, l,
+				popx.WithPerMigrationTimeout(time.Minute),
 				popx.WithTestdata(t, os.DirFS("./testdata")))
 			require.NoError(t, err)
 			require.NoError(t, tm.Up(ctx))

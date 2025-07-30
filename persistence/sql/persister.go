@@ -128,7 +128,7 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		r:               r,
 		config:          config,
 		l:               r.Logger(),
-		p:               networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
+		p:               networkx.NewManager(c, r.Logger()),
 	}, nil
 }
 

@@ -28,7 +28,7 @@ var Migrations embed.FS
 
 var SilenceMigrations = false
 
-func (p *Persister) migrationBox(ctx context.Context) (*popx.MigrationBox, error) {
+func (p *Persister) migrationBox() (*popx.MigrationBox, error) {
 	logger := p.r.Logger()
 	if SilenceMigrations {
 		inner, _ := test.NewNullLogger()
@@ -36,7 +36,7 @@ func (p *Persister) migrationBox(ctx context.Context) (*popx.MigrationBox, error
 	}
 	return popx.NewMigrationBox(
 		fsx.Merge(append([]fs.FS{Migrations}, p.extraMigrations...)...),
-		popx.NewMigrator(p.conn.WithContext(ctx), logger, p.r.Tracer(ctx), 0),
+		p.conn, logger,
 		popx.WithGoMigrations(p.goMigrations))
 }
 
@@ -45,7 +45,7 @@ func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses
 		return p.mbs, nil
 	}
 
-	mb, err := p.migrationBox(ctx)
+	mb, err := p.migrationBox()
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses
 }
 
 func (p *Persister) MigrateDown(ctx context.Context, steps int) error {
-	mb, err := p.migrationBox(ctx)
+	mb, err := p.migrationBox()
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (p *Persister) MigrateUp(ctx context.Context) error {
 	if err := p.migrateOldMigrationTables(); err != nil {
 		return err
 	}
-	mb, err := p.migrationBox(ctx)
+	mb, err := p.migrationBox()
 	if err != nil {
 		return err
 	}

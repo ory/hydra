@@ -12,7 +12,6 @@ import (
 	"github.com/ory/pop/v6"
 
 	"github.com/ory/x/logrusx"
-	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 )
@@ -26,18 +25,15 @@ var Migrations embed.FS
 type Manager struct {
 	c *pop.Connection
 	l *logrusx.Logger
-	t *otelx.Tracer
 }
 
 func NewManager(
 	c *pop.Connection,
 	l *logrusx.Logger,
-	t *otelx.Tracer,
 ) *Manager {
 	return &Manager{
 		c: c,
 		l: l,
-		t: t,
 	}
 }
 
@@ -61,7 +57,7 @@ func (m *Manager) Determine(ctx context.Context) (*Network, error) {
 //
 // Deprecated: use fsx.Merge() instead to merge your local migrations with the ones exported here
 func (m *Manager) MigrateUp(ctx context.Context) error {
-	mm, err := popx.NewMigrationBox(Migrations, popx.NewMigrator(m.c.WithContext(ctx), m.l, m.t, 0))
+	mm, err := popx.NewMigrationBox(Migrations, m.c.WithContext(ctx), m.l)
 	if err != nil {
 		return errors.WithStack(err)
 	}

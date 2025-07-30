@@ -86,13 +86,13 @@ func MigrateSQLUp(cmd *cobra.Command, p MigrationProvider) (err error) {
 		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
 		return cmdx.FailSilently(cmd)
 	}
-	_ = status.Write(cmd.OutOrStdout())
+	cmdx.PrintTable(cmd, status)
 
 	_, _ = fmt.Fprintf(cmd.OutOrStdout(), "\nThe SQL statements to be executed from top to bottom are:\n\n")
 	for i := range status {
 		if status[i].State == Pending {
 			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "------------ %s - %s ------------\n", status[i].Version, status[i].Name)
-			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n", status[i].Content)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n", status[i].ContentUp)
 		}
 	}
 
@@ -193,14 +193,14 @@ func MigrateSQLDown(cmd *cobra.Command, p MigrationProvider) (err error) {
 			if steps > 0 && count <= steps {
 				status[i].State = "Rollback"
 				rollingBack++
-				contents = append(contents, status[i].Content)
+				contents = append(contents, status[i].ContentDown)
 			}
 		}
 	}
 
 	// print migration status
 	_, _ = fmt.Fprintln(cmd.OutOrStdout(), "The migration plan is as follows:")
-	_ = status.Write(cmd.OutOrStdout())
+	cmdx.PrintTable(cmd, status)
 
 	if rollingBack < 1 {
 		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "")
@@ -215,7 +215,7 @@ func MigrateSQLDown(cmd *cobra.Command, p MigrationProvider) (err error) {
 	for i := len(status) - 1; i >= 0; i-- {
 		if status[i].State == "Rollback" {
 			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "------------ %s - %s ------------\n", status[i].Version, status[i].Name)
-			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n", status[i].Content)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n", status[i].ContentDown)
 		}
 	}
 

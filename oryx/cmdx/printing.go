@@ -206,24 +206,18 @@ func PrintJSONAble(cmd *cobra.Command, d interface{ String() string }) {
 }
 
 func getQuiet(cmd *cobra.Command) bool {
-	q, err := cmd.Flags().GetBool(FlagQuiet)
 	// ignore the error here as we use this function also when the flag might not be registered
-	if err != nil {
-		return false
-	}
+	q, _ := cmd.Flags().GetBool(FlagQuiet)
 	return q
 }
 
 func getFormat(cmd *cobra.Command) format {
-	q := getQuiet(cmd)
-
-	if q {
+	if getQuiet(cmd) {
 		return FormatQuiet
 	}
 
-	f, err := cmd.Flags().GetString(FlagFormat)
-	// unexpected error
-	Must(err, "flag access error: %s", err)
+	// ignore the error here as we use this function also when the flag might not be registered
+	f, _ := cmd.Flags().GetString(FlagFormat)
 
 	switch {
 	case f == string(FormatTable):

@@ -412,6 +412,17 @@ func (p *Provider) Float64F(key string, fallback float64) (val float64) {
 	return p.Float64(key)
 }
 
+func (p *Provider) Float64PtrF(key string, fallback float64) (val *float64) {
+	p.l.RLock()
+	defer p.l.RUnlock()
+
+	if !p.Koanf.Exists(key) {
+		return &fallback
+	}
+	out := p.Float64(key)
+	return &out
+}
+
 func (p *Provider) DurationF(key string, fallback time.Duration) (val time.Duration) {
 	p.l.RLock()
 	defer p.l.RUnlock()
@@ -471,21 +482,21 @@ func (p *Provider) TracingConfig(serviceName string) *otelx.Config {
 			Jaeger: otelx.JaegerConfig{
 				Sampling: otelx.JaegerSampling{
 					ServerURL:    p.String("tracing.providers.jaeger.sampling.server_url"),
-					TraceIdRatio: p.Float64F("tracing.providers.jaeger.sampling.trace_id_ratio", 1),
+					TraceIdRatio: p.Float64PtrF("tracing.providers.jaeger.sampling.trace_id_ratio", 1.0),
 				},
 				LocalAgentAddress: p.String("tracing.providers.jaeger.local_agent_address"),
 			},
 			Zipkin: otelx.ZipkinConfig{
 				ServerURL: p.String("tracing.providers.zipkin.server_url"),
 				Sampling: otelx.ZipkinSampling{
-					SamplingRatio: p.Float64("tracing.providers.zipkin.sampling.sampling_ratio"),
+					SamplingRatio: p.Float64PtrF("tracing.providers.zipkin.sampling.sampling_ratio",0.0),
 				},
 			},
 			OTLP: otelx.OTLPConfig{
 				ServerURL: p.String("tracing.providers.otlp.server_url"),
 				Insecure:  p.Bool("tracing.providers.otlp.insecure"),
 				Sampling: otelx.OTLPSampling{
-					SamplingRatio: p.Float64F("tracing.providers.otlp.sampling.sampling_ratio", 1),
+					SamplingRatio: p.Float64PtrF("tracing.providers.otlp.sampling.sampling_ratio", 1.0),
 				},
 				AuthorizationHeader: p.String("tracing.providers.otlp.authorization_header"),
 			},

@@ -51,10 +51,13 @@ func SetupJaeger(t *Tracer, tracerName string, c *Config) (trace.Tracer, error) 
 	}
 
 	samplingServerURL := c.Providers.Jaeger.Sampling.ServerURL
-	traceIdRatio := c.Providers.Jaeger.Sampling.TraceIdRatio
 
-	sampler := sdktrace.TraceIDRatioBased(traceIdRatio)
-
+	var sampler sdktrace.Sampler
+	if c.Providers.Jaeger.Sampling.TraceIdRatio != nil {
+		sampler = sdktrace.TraceIDRatioBased(*c.Providers.Jaeger.Sampling.TraceIdRatio)
+	} else {
+		sampler = sdktrace.TraceIDRatioBased(1)
+	}
 	if samplingServerURL != "" {
 		sampler = jaegerremote.New(
 			"jaegerremote",

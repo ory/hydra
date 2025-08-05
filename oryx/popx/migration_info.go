@@ -54,53 +54,38 @@ func (mfs Migrations) Less(i, j int) bool { return compareMigration(mfs[i], mfs[
 func (mfs Migrations) Swap(i, j int)      { mfs[i], mfs[j] = mfs[j], mfs[i] }
 
 func compareMigration(a, b Migration) int {
-	if a.Version == b.Version {
-		// Force "all" to be greater.
-		if a.DBType == "all" && b.DBType != "all" {
-			return 1
-		} else if a.DBType != "all" && b.DBType == "all" {
-			return -1
-		} else {
-			return strings.Compare(a.DBType, b.DBType)
-		}
+	if a.Version != b.Version {
+		return strings.Compare(a.Version, b.Version)
 	}
-	return strings.Compare(a.Version, b.Version)
+	// Force "all" to be greater.
+	if a.DBType == "all" && b.DBType != "all" {
+		return 1
+	} else if a.DBType != "all" && b.DBType == "all" {
+		return -1
+	}
+	return strings.Compare(a.DBType, b.DBType)
 }
 
-func (mfs Migrations) sortAndFilter(dialect string, modifiers ...func(sort.Interface) sort.Interface) Migrations {
-	// We need to sort mfs in order to push the dbType=="all" migrations
-	// to the back.
-	m := make(Migrations, len(mfs))
-	copy(m, mfs)
-	sort.Sort(m)
-
-	vsf := make(Migrations, 0, len(m))
-	for k, v := range m {
-		if v.DBType == "all" {
-			// Add "all" only if we can not find a more specific migration for the dialect.
-			var hasSpecific bool
-			for kk, vv := range m {
-				if v.Version == vv.Version && kk != k && vv.DBType == dialect {
-					hasSpecific = true
-					break
-				}
+func (mfs Migrations) sortAndFilter(dialect string) Migrations {
+	usable := make(map[string]Migration, len(mfs))
+	for _, v := range mfs {
+		if v.DBType == dialect {
+			usable[v.Version] = v
+		} else if v.DBType == "all" {
+			// Add "all" only if we do not have a more specific migration for the dialect.
+			// If a more specific migration is found later, it will override this one.
+			if _, ok := usable[v.Version]; !ok {
+				usable[v.Version] = v
 			}
-
-			if !hasSpecific {
-				vsf = append(vsf, v)
-			}
-		} else if v.DBType == dialect {
-			vsf = append(vsf, v)
 		}
 	}
 
-	mod := sort.Interface(vsf)
-	for _, m := range modifiers {
-		mod = m(mod)
+	filtered := make(Migrations, 0, len(usable))
+	for k := range usable {
+		filtered = append(filtered, usable[k])
 	}
-
-	sort.Sort(mod)
-	return vsf
+	sort.Sort(filtered)
+	return filtered
 }
 
 func (mfs Migrations) find(version, dbType string) *Migration {

@@ -11,7 +11,6 @@ import (
 	"os"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 	"time"
 
@@ -154,7 +153,8 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 		}
 		steps = min(steps, count)
 
-		mfs := mb.migrationsDown.sortAndFilter(c.Dialect.Name(), sort.Reverse)
+		mfs := mb.migrationsDown.sortAndFilter(c.Dialect.Name())
+		slices.Reverse(mfs)
 		if len(mfs) > count {
 			// skip all migrations that were not yet applied
 			mfs = mfs[len(mfs)-count:]

@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"regexp"
 	"slices"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -267,10 +268,11 @@ func (mb *MigrationBox) findMigrations(
 	})
 
 	// Sort descending.
-	slices.SortFunc(mb.migrationsDown, func(a, b Migration) int { return -compareMigration(a, b) })
+	sort.Sort(mb.migrationsDown)
+	slices.Reverse(mb.migrationsDown)
 
 	// Sort ascending.
-	slices.SortFunc(mb.migrationsUp, compareMigration)
+	sort.Sort(mb.migrationsUp)
 
 	return err
 }

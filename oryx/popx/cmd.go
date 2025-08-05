@@ -186,14 +186,12 @@ func MigrateSQLDown(cmd *cobra.Command, p MigrationProvider) (err error) {
 	// Now we need to rollback the last `steps` migrations that have a status of "Applied":
 	var count int
 	var rollingBack int
-	var contents []string
 	for i := len(status) - 1; i >= 0; i-- {
 		if status[i].State == Applied {
 			count++
 			if steps > 0 && count <= steps {
 				status[i].State = "Rollback"
 				rollingBack++
-				contents = append(contents, status[i].ContentDown)
 			}
 		}
 	}

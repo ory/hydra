@@ -102,6 +102,18 @@ func (m *Middleware) ExcludePaths(paths ...string) *Middleware {
 	return m
 }
 
+func (m *Middleware) Wrap(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		m.ServeHTTP(rw, r, handler.ServeHTTP)
+	})
+}
+
+func (m *Middleware) WrapFunc(handler http.HandlerFunc) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		m.ServeHTTP(rw, r, handler)
+	}
+}
+
 func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	if m.Before == nil {
 		m.Before = DefaultBefore

@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"slices"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -222,8 +223,8 @@ func PublicKey(key crypto.PrivateKey) interface{ Equal(x crypto.PublicKey) bool 
 }
 
 // CreateSelfSignedTLSCertificate creates a self-signed TLS certificate.
-func CreateSelfSignedTLSCertificate(key interface{}) (*tls.Certificate, error) {
-	c, err := CreateSelfSignedCertificate(key)
+func CreateSelfSignedTLSCertificate(key interface{}, opts ...CertificateOpts) (*tls.Certificate, error) {
+	c, err := CreateSelfSignedCertificate(key, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +245,7 @@ func CreateSelfSignedTLSCertificate(key interface{}) (*tls.Certificate, error) {
 }
 
 // CreateSelfSignedCertificate creates a self-signed x509 certificate.
-func CreateSelfSignedCertificate(key interface{}) (cert *x509.Certificate, err error) {
+func CreateSelfSignedCertificate(key interface{}, opts ...CertificateOpts) (cert *x509.Certificate, err error) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
@@ -263,14 +264,16 @@ func CreateSelfSignedCertificate(key interface{}) (cert *x509.Certificate, err e
 		},
 		NotBefore:             time.Now().UTC(),
 		NotAfter:              time.Now().UTC().Add(time.Hour * 24 * 31),
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		BasicConstraintsValid: true,
+		IsCA:                  true,
+		DNSNames:              []string{"localhost"},
+	}
+	for _, opt := range opts {
+		opt(certificate)
 	}
 
-	certificate.IsCA = true
-	certificate.KeyUsage |= x509.KeyUsageCertSign
-	certificate.DNSNames = append(certificate.DNSNames, "localhost")
 	der, err := x509.CreateCertificate(rand.Reader, certificate, certificate, PublicKey(key), key)
 	if err != nil {
 		return cert, errors.Errorf("failed to create certificate: %s", err)
@@ -291,6 +294,61 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	}
 	return &pem.Block{Type: "PRIVATE KEY", Bytes: b}, nil
 }
+
+// NewClientCert creates a new client TLS certificate signed by the given CA.
+func NewClientCert(CAcert *x509.Certificate, CAkey crypto.PrivateKey, opts ...CertificateOpts) (*tls.Certificate, error) {
+	if !slices.Contains(CAcert.ExtKeyUsage, x509.ExtKeyUsageClientAuth) {
+		return nil, errors.Errorf("the CA certificate does not have the client authentication extended key usage (OID 1.3.6.1.5.5.7.3.2) set")
+	}
+	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
+	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
+	if err != nil {
+		return nil, errors.Errorf("failed to generate serial number: %s", err)
+	}
+
+	key, err := rsa.GenerateKey(rand.Reader, 3072)
+	if err != nil {
+		return nil, errors.Errorf("failed to generate private key: %s", err)
+	}
+
+	template := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{"Ory GmbH"},
+			CommonName:   "ORY",
+		},
+		Issuer:                CAcert.Subject,
+		NotBefore:             time.Now().UTC(),
+		NotAfter:              CAcert.NotAfter,
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  false,
+	}
+	for _, opt := range opts {
+		opt(template)
+	}
+
+	der, err := x509.CreateCertificate(rand.Reader, template, CAcert, PublicKey(key), CAkey)
+	if err != nil {
+		return nil, errors.Errorf("failed to create certificate: %s", err)
+	}
+
+	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+	pemBlock, err := PEMBlockForKey(key)
+	if err != nil {
+		return nil, err
+	}
+	pemKey := pem.EncodeToMemory(pemBlock)
+
+	cert, err := tls.X509KeyPair(pemCert, pemKey)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return &cert, nil
+}
+
+type CertificateOpts func(*x509.Certificate)
 
 // CreateSelfSignedCertificateForTest writes a new, self-signed TLS
 // certificate+key (in PEM format) to a temporary location on disk and returns

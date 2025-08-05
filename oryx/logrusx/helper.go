@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -275,4 +276,18 @@ func (l *Logger) PopLogger(lvl logging.Level, s string, args ...interface{}) {
 	if ok {
 		l.WithField("source", "pop").Logf(level, s, args...)
 	}
+}
+
+func (l *Logger) StdLogger(lvl logrus.Level) *log.Logger {
+	return log.New(writer{l.Logger, lvl}, "", 0)
+}
+
+type writer struct {
+	l   *logrus.Logger
+	lvl logrus.Level
+}
+
+func (w writer) Write(p []byte) (n int, err error) {
+	w.l.Log(w.lvl, strings.TrimSuffix(string(p), "\n"))
+	return len(p), nil
 }

@@ -209,7 +209,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 

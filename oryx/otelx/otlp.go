@@ -41,10 +41,7 @@ func SetupOTLP(t *Tracer, tracerName string, c *Config) (trace.Tracer, error) {
 	if err != nil {
 		return nil, err
 	}
-	var sampler sdktrace.Sampler
-	if c.Providers.OTLP.Sampling.SamplingRatio != nil {
-		sampler = sdktrace.ParentBased(sdktrace.TraceIDRatioBased(*c.Providers.OTLP.Sampling.SamplingRatio))
-	}
+
 	tpOpts := []sdktrace.TracerProviderOption{
 		sdktrace.WithBatcher(exp),
 		sdktrace.WithResource(resource.NewWithAttributes(
@@ -52,7 +49,9 @@ func SetupOTLP(t *Tracer, tracerName string, c *Config) (trace.Tracer, error) {
 			semconv.ServiceName(c.ServiceName),
 			semconv.DeploymentEnvironmentName(c.DeploymentEnvironment),
 		)),
-		sdktrace.WithSampler(sampler),
+		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased(
+			c.Providers.OTLP.Sampling.SamplingRatio,
+		))),
 	}
 
 	tp := sdktrace.NewTracerProvider(tpOpts...)

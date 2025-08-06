@@ -27,16 +27,16 @@ type OTLPConfig struct {
 }
 
 type JaegerSampling struct {
-	ServerURL    string   `json:"server_url"`
-	TraceIdRatio *float64 `json:"trace_id_ratio"`
+	ServerURL    string  `json:"server_url"`
+	TraceIdRatio float64 `json:"trace_id_ratio"`
 }
 
 type ZipkinSampling struct {
-	SamplingRatio *float64 `json:"sampling_ratio"`
+	SamplingRatio float64 `json:"sampling_ratio"`
 }
 
 type OTLPSampling struct {
-	SamplingRatio *float64 `json:"sampling_ratio"`
+	SamplingRatio float64 `json:"sampling_ratio"`
 }
 
 type ProvidersConfig struct {
@@ -61,7 +61,6 @@ const ConfigSchemaID = "ory://tracing-config"
 // The interface is specified instead of `jsonschema.Compiler` to allow the use of any jsonschema library fork or version.
 func AddConfigSchema(c interface {
 	AddResource(url string, r io.Reader) error
-},
-) error {
+}) error {
 	return c.AddResource(ConfigSchemaID, bytes.NewBufferString(ConfigSchema))
 }

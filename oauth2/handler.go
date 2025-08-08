@@ -699,15 +699,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 		interim["jti"] = uuid.New()
 		interim["iat"] = time.Now().Unix()
 
-		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
-		if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-
-		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, interim, &jwt.Headers{
-			Extra: map[string]interface{}{"kid": keyID},
-		})
+		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, interim, &jwt.Headers{})
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -1183,17 +1175,6 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
 		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) ||
 		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
-		var accessTokenKeyID string
-		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
-			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
-			if err != nil {
-				h.logOrAudit(err, r)
-				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
-				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
-				return
-			}
-		}
-
 		// only for client_credentials, otherwise Authentication is included in session
 		if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) {
 			session.Subject = accessRequest.GetClient().GetID()
@@ -1211,7 +1192,6 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
-		session.KID = accessTokenKeyID
 		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(ctx).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
@@ -1402,21 +1382,6 @@ func (h *Handler) updateSessionWithRequest(
 		request.GrantAudience(audience)
 	}
 
-	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
-	if err != nil {
-		x.LogError(r, err, h.r.Logger())
-		return nil, err
-	}
-
-	var accessTokenKeyID string
-	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(request.GetClient())) == "jwt" {
-		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
-		if err != nil {
-			x.LogError(r, err, h.r.Logger())
-			return nil, err
-		}
-	}
-
 	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), consent.ConsentRequest.Subject, consent.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
@@ -1454,13 +1419,9 @@ func (h *Handler) updateSessionWithRequest(
 		session.DefaultSession = &openid.DefaultSession{}
 	}
 	session.DefaultSession.Claims = claims
-	session.DefaultSession.Headers = &jwt.Headers{Extra: map[string]interface{}{
-		// required for lookup on jwk endpoint
-		"kid": openIDKeyID,
-	}}
+	session.DefaultSession.Headers = jwt.NewHeaders()
 	session.DefaultSession.Subject = consent.ConsentRequest.Subject
 	session.Extra = consent.Session.AccessToken
-	session.KID = accessTokenKeyID
 	session.ClientID = request.GetClient().GetID()
 	session.ConsentChallenge = consent.ConsentRequestID
 	session.ExcludeNotBeforeClaim = h.c.ExcludeNotBeforeClaim(ctx)
@@ -1621,13 +1582,7 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	signingKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
-		return
-	}
 	headers := jwt.NewHeaders()
-	headers.Add("kid", signingKeyID)
 	mapClaims, err := vcClaims.ToMapClaims()
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))

@@ -35,7 +35,6 @@
     "subject": "foo@bar.com"
   },
   "extra": {},
-  "kid": "public:hydra.jwt.access-token",
   "client_id": "auth-code-client",
   "consent_challenge": "2261efbd447044a1b2f76b05c6aca164",
   "exclude_not_before_claim": false,

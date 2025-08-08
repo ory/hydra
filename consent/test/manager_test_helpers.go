@@ -366,7 +366,7 @@ func TestHelperNID(r interface {
 		assert.Nil(t, ls)
 		ls, err = t1ValidNID.DeleteLoginSession(ctx, testLS.ID)
 		require.NoError(t, err)
-		assert.Equal(t, testLS.ID, ls.ID)
+		assert.EqualValues(t, testLS.ID, ls.ID)
 	}
 }
 
@@ -452,7 +452,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					got, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got.ID)
-					assert.Equal(t, tc.s.AuthenticatedAt, got.AuthenticatedAt) // this was updated from confirm...
+					assert.EqualValues(t, tc.s.AuthenticatedAt, got.AuthenticatedAt) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
 					// Make sure AuthAt does not equal...
@@ -467,7 +467,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					got2, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got2.ID)
-					assert.Equal(t, updatedAuth2.Unix(), time.Time(got2.AuthenticatedAt).Unix()) // this was updated from confirm...
+					assert.EqualValues(t, updatedAuth2.Unix(), time.Time(got2.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, "some-other-subject", got2.Subject)
 				})
 			}
@@ -555,7 +555,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			for _, challenge := range challenges {
 				authReq, err := m.GetDeviceUserAuthRequest(ctx, challenge)
 				require.NoError(t, err)
-				assert.Equal(t, authReq.WasHandled, false)
+				assert.EqualValues(t, authReq.WasHandled, false)
 			}
 		})
 
@@ -657,9 +657,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
 					require.NoError(t, err)
-					compareConsentRequest(t, consentRequest, got2.ConsentRequest)
-					assert.Equal(t, consentRequest.ConsentRequestID, got2.ConsentRequestID)
-					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
+					compareConsentRequest(t, consentRequest, got2.GetHandledConsentRequest().ConsentRequest)
+					assert.EqualValues(t, consentRequest.ConsentRequestID, got2.ConsentRequestID)
+					assert.EqualValues(t, h.GrantedAudience, got2.GrantedAudience)
 
 					t.Run("sub=detect double-submit for consent verifier", func(t *testing.T) {
 						_, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
@@ -667,10 +667,10 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					})
 
 					if tc.hasError {
-						assert.True(t, got2.HasError())
+						assert.True(t, got2.ConsentError.IsError())
 					}
-					assert.Equal(t, tc.remember, got2.Remember)
-					assert.Equal(t, tc.rememberFor, got2.RememberFor)
+					assert.EqualValues(t, tc.remember, got2.ConsentRemember)
+					assert.EqualValues(t, tc.rememberFor, *got2.ConsentRememberFor)
 				})
 			}
 
@@ -776,24 +776,24 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
 				"",
-				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
 				"",
-				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID, RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 
 			for i, tc := range []struct {
@@ -883,13 +883,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				{
 					subject:    cr1.Subject,
 					sid:        makeID("fk-login-session", network, "rv1"),
-					consentIDs: []string{handledConsentRequest1.ConsentRequestID},
+					consentIDs: []string{handledConsentRequest1.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    cr2.Subject,
 					sid:        makeID("fk-login-session", network, "rv2"),
-					consentIDs: []string{handledConsentRequest2.ConsentRequestID},
+					consentIDs: []string{handledConsentRequest2.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{
@@ -908,14 +908,14 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						require.Len(t, consents, len(tc.consentIDs))
 						assert.True(t, nextPage.IsLast())
 						for _, cs := range consents {
-							assert.Contains(t, tc.consentIDs, cs.ConsentRequestID)
-							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())
+							assert.Contains(t, tc.consentIDs, cs.ConsentRequestID.String())
+							assert.Contains(t, tc.clients, cs.Client.GetID())
 						}
 					}
 
 					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
 					require.NoError(t, err)
-					assert.Equal(t, n, len(tc.consentIDs))
+					assert.EqualValues(t, n, len(tc.consentIDs))
 
 				})
 			}
@@ -927,12 +927,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			}{
 				{
 					subject:           "subjectrv1",
-					consentRequestIDs: []string{handledConsentRequest1.ConsentRequestID},
+					consentRequestIDs: []string{handledConsentRequest1.ConsentRequestID.String()},
 					clients:           []string{"fk-client-rv1"},
 				},
 				{
 					subject:           "subjectrv2",
-					consentRequestIDs: []string{handledConsentRequest2.ConsentRequestID},
+					consentRequestIDs: []string{handledConsentRequest2.ConsentRequestID.String()},
 					clients:           []string{"fk-client-rv2"},
 				},
 				{
@@ -950,14 +950,14 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						require.Len(t, consents, len(tc.consentRequestIDs))
 						assert.True(t, nextPage.IsLast())
 						for _, cs := range consents {
-							assert.Contains(t, tc.consentRequestIDs, cs.ConsentRequestID)
-							assert.Contains(t, tc.clients, cs.ConsentRequest.Client.GetID())
+							assert.Contains(t, tc.consentRequestIDs, cs.ConsentRequestID.String())
+							assert.Contains(t, tc.clients, cs.Client.GetID())
 						}
 					}
 
 					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
 					require.NoError(t, err)
-					assert.Equal(t, n, len(tc.consentRequestIDs))
+					assert.EqualValues(t, n, len(tc.consentRequestIDs))
 
 				})
 			}
@@ -975,7 +975,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 				got, err := m.GetForcedObfuscatedLoginSession(ctx, "fk-client-1", "obfuscated-1")
 				require.NoError(t, err)
-				require.NotEqual(t, got.NID, uuid.Nil)
+				require.NotEqualValues(t, got.NID, uuid.Nil)
 				got.NID = uuid.Nil
 				assert.EqualValues(t, expect, got)
 
@@ -987,7 +987,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				require.NoError(t, m.CreateForcedObfuscatedLoginSession(ctx, expect))
 
 				got, err = m.GetForcedObfuscatedLoginSession(ctx, "fk-client-1", "obfuscated-2")
-				require.NotEqual(t, got.NID, uuid.Nil)
+				require.NotEqualValues(t, got.NID, uuid.Nil)
 				got.NID = uuid.Nil
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
@@ -1064,9 +1064,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 								if e.GetID() == a.GetID() {
 									found = true
 								}
-								assert.Equal(t, e.GetID(), a.GetID())
-								assert.Equal(t, e.FrontChannelLogoutURI, a.FrontChannelLogoutURI)
-								assert.Equal(t, e.BackChannelLogoutURI, a.BackChannelLogoutURI)
+								assert.EqualValues(t, e.GetID(), a.GetID())
+								assert.EqualValues(t, e.FrontChannelLogoutURI, a.FrontChannelLogoutURI)
+								assert.EqualValues(t, e.BackChannelLogoutURI, a.BackChannelLogoutURI)
 							}
 							require.True(t, found)
 						}

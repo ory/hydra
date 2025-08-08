@@ -791,7 +791,7 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 			actual, nextPage, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t1, f.Subject)
 			require.NoError(t, err)
 			require.Len(t, actual, 1)
-			assert.Equal(t, hcr.ConsentRequestID, actual[0].ConsentRequestID)
+			assert.Equal(t, hcr.ConsentRequestID, actual[0].ConsentRequestID.String())
 			assert.True(t, nextPage.IsLast())
 		})
 	}

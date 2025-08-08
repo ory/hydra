@@ -389,7 +389,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *f
 	return f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""), nil
 }
 
-func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, err error) {
+func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer otelx.End(span, &err)
 
@@ -409,7 +409,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return f.GetHandledConsentRequest(), nil
+	return f, nil
 }
 
 func (p *Persister) HandleLoginRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledLoginRequest) (lr *flow.LoginRequest, err error) {
@@ -596,7 +596,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, 
 	return &fs[0], nil
 }
 
-func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.AcceptOAuth2ConsentRequest, _ *keysetpagination.Paginator, err error) {
+func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer otelx.End(span, &err)
 
@@ -622,17 +622,12 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 	if len(fs) == 0 {
 		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
+
 	fs, nextPage := keysetpagination.Result(fs, paginator)
-
-	rs := make([]flow.AcceptOAuth2ConsentRequest, len(fs))
-	for i := range fs {
-		rs[i] = *(fs[i].GetHandledConsentRequest())
-	}
-
-	return rs, nextPage, nil
+	return fs, nextPage, nil
 }
 
-func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) (_ []flow.AcceptOAuth2ConsentRequest, _ *keysetpagination.Paginator, err error) {
+func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
@@ -661,13 +656,7 @@ func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Contex
 	}
 
 	fs, nextPage := keysetpagination.Result(fs, paginator)
-
-	rs := make([]flow.AcceptOAuth2ConsentRequest, len(fs))
-	for i := range fs {
-		rs[i] = *(fs[i].GetHandledConsentRequest())
-	}
-
-	return rs, nextPage, nil
+	return fs, nextPage, nil
 }
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (n int, err error) {

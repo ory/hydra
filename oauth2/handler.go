@@ -754,7 +754,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	// If there were multiple flows created for the same user_code then we may end up with multiple flow objects
 	// persisted to the database, while only one of them was actually used to validate the user_code
 	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
-	consentSession, f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
+	f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		return
@@ -776,7 +776,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	}
 
 	req.SetUserCodeState(fosite.UserCodeAccepted)
-	session, err := h.updateSessionWithRequest(ctx, consentSession, f, r, req, req.GetSession().(*Session))
+	session, err := h.updateSessionWithRequest(ctx, f, r, req, req.GetSession().(*Session))
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
@@ -1289,7 +1289,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	acceptConsentSession, flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
+	flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -1304,8 +1304,8 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	authorizeRequest.SetID(acceptConsentSession.ConsentRequestID)
-	session, err := h.updateSessionWithRequest(ctx, acceptConsentSession, flow, r, authorizeRequest, nil)
+	authorizeRequest.SetID(flow.ConsentRequestID.String())
+	session, err := h.updateSessionWithRequest(ctx, flow, r, authorizeRequest, nil)
 	if err != nil {
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
@@ -1388,17 +1388,16 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 // If any errors occur, they are logged.
 func (h *Handler) updateSessionWithRequest(
 	ctx context.Context,
-	consent *flow.AcceptOAuth2ConsentRequest,
 	flow *flow.Flow,
 	r *http.Request,
 	request fosite.Requester,
 	session *Session,
 ) (*Session, error) {
-	for _, scope := range consent.GrantedScope {
+	for _, scope := range flow.GrantedScope {
 		request.GrantScope(scope)
 	}
 
-	for _, audience := range consent.GrantedAudience {
+	for _, audience := range flow.GrantedAudience {
 		request.GrantAudience(audience)
 	}
 
@@ -1417,7 +1416,7 @@ func (h *Handler) updateSessionWithRequest(
 		}
 	}
 
-	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), consent.ConsentRequest.Subject, consent.ConsentRequest.ForceSubjectIdentifier)
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), flow.Subject, flow.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		return nil, err
@@ -1426,15 +1425,15 @@ func (h *Handler) updateSessionWithRequest(
 		return nil, err
 	}
 
-	request.SetID(consent.ConsentRequestID)
+	request.SetID(flow.ConsentRequestID.String())
 	claims := &jwt.IDTokenClaims{
 		Subject:                             obfuscatedSubject,
 		Issuer:                              h.c.IssuerURL(ctx).String(),
-		AuthTime:                            time.Time(consent.AuthenticatedAt),
-		RequestedAt:                         consent.RequestedAt,
-		Extra:                               consent.Session.IDToken,
-		AuthenticationContextClassReference: consent.ConsentRequest.ACR,
-		AuthenticationMethodsReferences:     consent.ConsentRequest.AMR,
+		AuthTime:                            time.Time(flow.LoginAuthenticatedAt),
+		RequestedAt:                         flow.RequestedAt,
+		Extra:                               flow.SessionIDToken,
+		AuthenticationContextClassReference: flow.ACR,
+		AuthenticationMethodsReferences:     flow.AMR,
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    request.GetRequestForm().Get("nonce"),
@@ -1444,7 +1443,7 @@ func (h *Handler) updateSessionWithRequest(
 		// This is set by the fosite strategy
 		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
 	}
-	claims.Add("sid", consent.ConsentRequest.LoginSessionID)
+	claims.Add("sid", flow.SessionID)
 
 	if session == nil {
 		session = &Session{}
@@ -1458,11 +1457,11 @@ func (h *Handler) updateSessionWithRequest(
 		// required for lookup on jwk endpoint
 		"kid": openIDKeyID,
 	}}
-	session.DefaultSession.Subject = consent.ConsentRequest.Subject
-	session.Extra = consent.Session.AccessToken
+	session.DefaultSession.Subject = flow.Subject
+	session.Extra = flow.SessionAccessToken
 	session.KID = accessTokenKeyID
 	session.ClientID = request.GetClient().GetID()
-	session.ConsentChallenge = consent.ConsentRequestID
+	session.ConsentChallenge = flow.ConsentRequestID.String()
 	session.ExcludeNotBeforeClaim = h.c.ExcludeNotBeforeClaim(ctx)
 	session.AllowedTopLevelClaims = h.c.AllowedTopLevelClaims(ctx)
 	session.MirrorTopLevelClaims = h.c.MirrorTopLevelClaims(ctx)

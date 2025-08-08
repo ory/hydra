@@ -667,65 +667,60 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	return errors.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWriter, r *http.Request, verifier string) (_ *flow.Flow, err error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyConsent")
 	defer otelx.End(span, &err)
 
 	// We decode the flow here once again because VerifyAndInvalidateConsentRequest does not return the flow
-	f, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
+	decodedFlow, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
 	if err != nil {
-		return nil, nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
-	if f.Client.GetID() != r.URL.Query().Get("client_id") {
-		return nil, nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
+	if decodedFlow.Client.GetID() != r.URL.Query().Get("client_id") {
+		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
-	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
+	verifiedFlow, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrUniqueViolation) {
-		return nil, nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
 	} else if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
+	if verifiedFlow.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
 
-	if session.HasError() {
-		session.Error.SetDefaults(flow.ConsentRequestDeniedErrorName)
-		return nil, nil, errors.WithStack(session.Error.ToRFCError())
+	if verifiedFlow.ConsentError.IsError() {
+		verifiedFlow.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
+		return nil, errors.WithStack(verifiedFlow.ConsentError.ToRFCError())
 	}
 
-	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {
-		return nil, nil, errors.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
+	if time.Time(verifiedFlow.LoginAuthenticatedAt).IsZero() {
+		return nil, errors.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
 	store, err := s.r.CookieStore(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), session.ConsentRequest.Client.CookieSuffix())
-	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, session.ConsentRequest.CSRF, f); err != nil {
-		return nil, nil, err
+	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), verifiedFlow.Client.CookieSuffix())
+	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, verifiedFlow.ConsentCSRF.String(), decodedFlow); err != nil {
+		return nil, err
 	}
 
-	if session.Session == nil {
-		session.Session = flow.NewConsentRequestSessionData()
+	if verifiedFlow.SessionAccessToken == nil {
+		verifiedFlow.SessionAccessToken = map[string]interface{}{}
 	}
 
-	if session.Session.AccessToken == nil {
-		session.Session.AccessToken = map[string]interface{}{}
+	if verifiedFlow.SessionIDToken == nil {
+		verifiedFlow.SessionIDToken = map[string]interface{}{}
 	}
 
-	if session.Session.IDToken == nil {
-		session.Session.IDToken = map[string]interface{}{}
-	}
-
-	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
-	return session, f, nil
+	return verifiedFlow, nil
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
@@ -1122,7 +1117,7 @@ func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 
 	if errors.Is(lsErr, x.ErrNotFound) {
 		// This is ok (session probably already revoked), do nothing!
-		// Not triggering the back-channel logout because subject is not available
+		// Not triggering the back-channel logout because the subject is not available
 		// See https://github.com/ory/hydra/pull/3450#discussion_r1127798485
 		return nil
 	} else if lsErr != nil {
@@ -1147,7 +1142,7 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	w http.ResponseWriter,
 	r *http.Request,
 	req fosite.AuthorizeRequester,
-) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+) (_ *flow.Flow, err error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2AuthorizationRequest")
 	defer otelx.End(span, &err)
 
@@ -1155,23 +1150,23 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(
 	consentVerifier := strings.TrimSpace(req.GetRequestForm().Get("consent_verifier"))
 	if loginVerifier == "" && consentVerifier == "" {
 		// ok, we need to process this request and redirect to the original endpoint
-		return nil, nil, s.requestAuthentication(ctx, w, r, req, nil)
+		return nil, s.requestAuthentication(ctx, w, r, req, nil)
 	} else if loginVerifier != "" {
 		f, err := s.verifyAuthentication(ctx, w, r, req, loginVerifier)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		// ok, we need to process this request and redirect to auth endpoint
-		return nil, f, s.requestConsent(ctx, w, r, req, f)
+		return f, s.requestConsent(ctx, w, r, req, f)
 	}
 
-	consentSession, f, err := s.verifyConsent(ctx, w, r, consentVerifier)
+	f, err := s.verifyConsent(ctx, w, r, consentVerifier)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return consentSession, f, nil
+	return f, nil
 }
 
 // HandleOAuth2DeviceAuthorizationRequest handles the device authorization flow
@@ -1179,7 +1174,7 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
-) (_ *flow.AcceptOAuth2ConsentRequest, _ *flow.Flow, err error) {
+) (_ *flow.Flow, err error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.HandleOAuth2DeviceAuthorizationRequest")
 	defer otelx.End(span, &err)
 
@@ -1199,13 +1194,13 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	var deviceFlow *flow.Flow
 	if deviceVerifier == "" && loginVerifier == "" && consentVerifier == "" {
 		// No verifiers are set, let's start by requesting the device verifier first.
-		return nil, nil, s.requestDevice(ctx, w, r)
+		return nil, s.requestDevice(ctx, w, r)
 	} else if deviceVerifier != "" && loginVerifier == "" && consentVerifier == "" {
 		// Device verifier is set, but login and consent are not. So we need to verify the device.
 		var err error
 		deviceFlow, err = s.verifyDevice(ctx, w, r, deviceVerifier)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		ar.RequestedScope = fosite.Arguments(deviceFlow.RequestedScope)
@@ -1215,13 +1210,13 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	// Validate client_id
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
-		return nil, nil, errors.WithStack(fosite.ErrInvalidClient.WithHintf(`Query parameter 'client_id' is missing.`))
+		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHintf(`Query parameter 'client_id' is missing.`))
 	}
 	c, err := s.r.ClientManager().GetConcreteClient(ctx, clientID)
 	if errors.Is(err, x.ErrNotFound) {
-		return nil, nil, errors.WithStack(fosite.ErrInvalidClient.WithWrap(err).WithHintf(`Client does not exist`))
+		return nil, errors.WithStack(fosite.ErrInvalidClient.WithWrap(err).WithHintf(`Client does not exist`))
 	} else if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Fake an authorization request to instantiate the flow.
@@ -1231,28 +1226,19 @@ func (s *DefaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 	if loginVerifier == "" && consentVerifier == "" {
 		// Here we end up if the device has been verified, but login and verification are still missing.
 		// Let's request authentication.
-		return nil, nil, s.requestAuthentication(ctx, w, r, ar, deviceFlow)
+		return nil, s.requestAuthentication(ctx, w, r, ar, deviceFlow)
 	} else if loginVerifier != "" {
 		// Login verification was given, let's verify!
 		f, err := s.verifyAuthentication(ctx, w, r, ar, loginVerifier)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		// ok, we need to process this request and redirect to consent endpoint
-		return nil, f, s.requestConsent(ctx, w, r, ar, f)
+		return f, s.requestConsent(ctx, w, r, ar, f)
 	}
 
-	// Here we end up when consent verifier is set, so we verify the consent.
-	var consentSession *flow.AcceptOAuth2ConsentRequest
-	var f *flow.Flow
-
-	consentSession, f, err = s.verifyConsent(ctx, w, r, consentVerifier)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return consentSession, f, err
+	return s.verifyConsent(ctx, w, r, consentVerifier)
 }
 
 func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {

@@ -217,7 +217,7 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var requests []flow.AcceptOAuth2ConsentRequest
+	var requests []flow.Flow
 	var nextPage *keysetpagination.Paginator
 	if loginSessionID := r.URL.Query().Get("login_session_id"); len(loginSessionID) == 0 {
 		requests, nextPage, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, pageOpts...)
@@ -232,10 +232,10 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	sessions := make([]flow.OAuth2ConsentSession, len(requests))
-	for i := range requests {
-		sessions[i] = flow.OAuth2ConsentSession(requests[i])
-		sessions[i].ConsentRequest.Client = sanitizeClient(sessions[i].ConsentRequest.Client)
+	// For legacy reasons, this API returns the format like below. Internally, we keep a different format.
+	sessions := make([]*flow.OAuth2ConsentSession, len(requests))
+	for i, f := range requests {
+		sessions[i] = f.ToListConsentSessionResponse()
 	}
 
 	keysetpagination.SetLinkHeader(w, pageKeys, r.URL, nextPage)

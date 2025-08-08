@@ -685,3 +685,27 @@ func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvid
 	}
 	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
 }
+
+func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {
+	s := &OAuth2ConsentSession{
+		ConsentRequestID:   f.ConsentRequestID.String(),
+		GrantedScope:       f.GrantedScope,
+		GrantedAudience:    f.GrantedAudience,
+		Session:            &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
+		Remember:           f.ConsentRemember,
+		HandledAt:          f.ConsentHandledAt,
+		WasHandled:         f.ConsentWasHandled,
+		Context:            f.Context,
+		ConsentRequest:     f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
+		Error:              f.ConsentError,
+		RequestedAt:        f.RequestedAt,
+		AuthenticatedAt:    f.LoginAuthenticatedAt,
+		SessionIDToken:     f.SessionIDToken,
+		SessionAccessToken: f.SessionAccessToken,
+	}
+	if f.ConsentRememberFor != nil && *f.ConsentRememberFor > 0 {
+		s.RememberFor = *f.ConsentRememberFor
+	}
+	s.ConsentRequest.Client.Secret = "" // do not leak client secret in response
+	return s
+}

@@ -122,7 +122,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 		t.Run("case=introspect token", func(t *testing.T) {
 			// Introspected token should have hook and identity_id claims
-			i := testhelpers.IntrospectToken(t, oauth2Config, token.AccessToken, adminTS)
+			i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 			assert.True(t, i.Get("active").Bool(), "%s", i)
 			assert.Equal(t, kratos.FakeUsername, i.Get("ext.username").String(), "%s", i)
 			assert.Equal(t, kratos.FakeIdentityID, i.Get("sub").String(), "%s", i)

@@ -23,7 +23,6 @@ import (
 	hc "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 )
 
@@ -76,7 +75,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 	}
 
 	var inspectToken = func(b *testing.B, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
-		introspection := testhelpers.IntrospectToken(b, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token.AccessToken, admin)
+		introspection := testhelpers.IntrospectToken(b, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
 			assert.EqualValues(b, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
@@ -103,10 +102,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 			return
 		}
 
-		body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
-		require.NoError(b, err)
-
-		jwtClaims := gjson.ParseBytes(body)
+		jwtClaims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(b, token.AccessToken))
 		assert.NotEmpty(b, jwtClaims.Get("jti").String())
 		assert.EqualValues(b, encodeOr(b, conf.Scopes, "[]"), jwtClaims.Get("scp").Raw, "%s", introspection.Raw)
 		check(jwtClaims)

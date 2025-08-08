@@ -16,7 +16,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -191,11 +190,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
 			assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) gjson.Result {
-				introspect := testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS)
-				actualExp, err := strconv.ParseInt(introspect.Get("exp").String(), 10, 64)
-				require.NoError(t, err, "%s", introspect)
+				introspect := testhelpers.IntrospectToken(t, token.RefreshToken, adminTS)
 				if !expectedExp.IsZero() {
-					require.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second*3)
+					require.WithinDuration(t, expectedExp, time.Unix(introspect.Get("exp").Int(), 0), time.Second*3)
 				}
 				return introspect
 			}
@@ -205,10 +202,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.True(t, ok)
 				assert.NotEmpty(t, idt)
 
-				body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
-				require.NoError(t, err)
-
-				claims := gjson.ParseBytes(body)
+				claims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, idt))
 				assert.Truef(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 				assert.Truef(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 				assert.Truef(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
@@ -236,7 +230,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 			introspectAccessToken := func(t *testing.T, conf *oauth2.Config, token *oauth2.Token, expectedSubject string) gjson.Result {
 				require.NotEmpty(t, token.AccessToken)
-				i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+				i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 				assert.True(t, i.Get("active").Bool(), "%s", i)
 				assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 				assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
@@ -253,10 +247,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				}
 				require.Len(t, parts, 3)
 
-				body, err := x.DecodeSegment(parts[1])
-				require.NoError(t, err)
-
-				i := gjson.ParseBytes(body)
+				i := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, token.AccessToken))
 				assert.NotEmpty(t, i.Get("jti").String())
 				assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 				assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
@@ -320,7 +311,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						})
 
 						t.Run("followup=original access token is no longer valid", func(t *testing.T) {
-							i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+							i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 							assert.False(t, i.Get("active").Bool(), "%s", i)
 						})
 
@@ -329,7 +320,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							assert.Error(t, err)
 						})
 
-						t.Run("followup=but fail subsequent refresh because expiry was reached", func(t *testing.T) {
+						t.Run("followup=but fail subsequent refresh because reuse was detected", func(t *testing.T) {
 							// Force golang to refresh token
 							refreshedToken.Expiry = refreshedToken.Expiry.Add(-time.Hour * 24)
 							_, err := conf.TokenSource(context.Background(), refreshedToken).Token()
@@ -795,7 +786,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						require.WithinDuration(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 						t.Run("followup=original access token is no longer valid", func(t *testing.T) {
-							i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+							i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 							assert.False(t, i.Get("active").Bool(), "%s", i)
 						})
 
@@ -1295,14 +1286,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.NoError(t, err)
 
 				// Access and refresh tokens from both flows should be active
-				at := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+				at := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 				assert.True(t, at.Get("active").Bool(), "%s", at)
-				rt := testhelpers.IntrospectToken(t, conf, token.RefreshToken, adminTS)
+				rt := testhelpers.IntrospectToken(t, token.RefreshToken, adminTS)
 				assert.True(t, rt.Get("active").Bool(), "%s", rt)
 
-				at2 := testhelpers.IntrospectToken(t, conf, token2.AccessToken, adminTS)
+				at2 := testhelpers.IntrospectToken(t, token2.AccessToken, adminTS)
 				assert.True(t, at2.Get("active").Bool(), "%s", at2)
-				rt2 := testhelpers.IntrospectToken(t, conf, token2.RefreshToken, adminTS)
+				rt2 := testhelpers.IntrospectToken(t, token2.RefreshToken, adminTS)
 				assert.True(t, rt2.Get("active").Bool(), "%s", rt2)
 
 				// extract consent request id from first access token
@@ -1322,15 +1313,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				require.NoError(t, err)
 
 				// first token chain should be inactive
-				at = testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+				at = testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 				assert.False(t, at.Get("active").Bool(), "%s", at)
-				rt = testhelpers.IntrospectToken(t, conf, token.RefreshToken, adminTS)
+				rt = testhelpers.IntrospectToken(t, token.RefreshToken, adminTS)
 				assert.False(t, rt.Get("active").Bool(), "%s", rt)
 
 				// second token chain should still be active
-				at2 = testhelpers.IntrospectToken(t, conf, token2.AccessToken, adminTS)
+				at2 = testhelpers.IntrospectToken(t, token2.AccessToken, adminTS)
 				assert.True(t, at2.Get("active").Bool(), "%s", at2)
-				rt2 = testhelpers.IntrospectToken(t, conf, token2.RefreshToken, adminTS)
+				rt2 = testhelpers.IntrospectToken(t, token2.RefreshToken, adminTS)
 				assert.True(t, rt2.Get("active").Bool(), "%s", rt2)
 			})
 
@@ -1393,7 +1384,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 					assertInactive := func(t *testing.T, token string, c *oauth2.Config) {
 						t.Helper()
-						at := testhelpers.IntrospectToken(t, conf, token, adminTS)
+						at := testhelpers.IntrospectToken(t, token, adminTS)
 						assert.False(t, at.Get("active").Bool(), "%s", at)
 					}
 
@@ -1689,10 +1680,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 							allTokens[actual.AccessToken], allTokens[actual.RefreshToken] = struct{}{}, struct{}{}
 
-							i := testhelpers.IntrospectToken(t, conf, actual.AccessToken, adminTS)
+							i := testhelpers.IntrospectToken(t, actual.AccessToken, adminTS)
 							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
 
-							i = testhelpers.IntrospectToken(t, conf, actual.RefreshToken, adminTS)
+							i = testhelpers.IntrospectToken(t, actual.RefreshToken, adminTS)
 							assert.Truef(t, i.Get("active").Bool(), "token %d:\ntoken:%+v\nresult:%s", k, actual, i)
 						}
 						assert.Len(t, allTokens, (1+nRefreshes)*2)
@@ -1934,11 +1925,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							return
 						}
 
-						body, err := x.DecodeSegment(strings.Split(token, ".")[1])
-						require.NoError(t, err)
-
 						data := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &data))
+						require.NoError(t, json.Unmarshal(testhelpers.InsecureDecodeJWT(t, token), &data))
 
 						assert.EqualValues(t, "app-client", data["client_id"])
 						assert.EqualValues(t, "foo", data["sub"])
@@ -2133,17 +2121,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							t.Skip()
 						}
 
-						body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
-						require.NoError(t, err)
-
 						origPayload := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &origPayload))
-
-						body, err = x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
-						require.NoError(t, err)
+						require.NoError(t, json.Unmarshal(testhelpers.InsecureDecodeJWT(t, token.AccessToken), &origPayload))
 
 						refreshedPayload := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &refreshedPayload))
+						require.NoError(t, json.Unmarshal(testhelpers.InsecureDecodeJWT(t, refreshedToken.AccessToken), &refreshedPayload))
 
 						if tc.checkExpiry {
 							assert.NotEqual(t, refreshedPayload["exp"], origPayload["exp"])
@@ -2257,18 +2239,10 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 								require.NoError(t, err)
 								require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
-								accessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								accessTokenClaims := testhelpers.IntrospectToken(t, refreshedToken.AccessToken, ts)
 								require.Equalf(t, hookType, accessTokenClaims.Get("ext.hooked").String(), "%+v", accessTokenClaims)
 
-								idTokenBody, err := x.DecodeSegment(
-									strings.Split(
-										gjson.GetBytes(body, "id_token").String(),
-										".",
-									)[1],
-								)
-								require.NoError(t, err)
-
-								require.Equal(t, gjson.GetBytes(idTokenBody, "hooked").String(), hookType)
+								require.Equal(t, hookType, gjson.GetBytes(testhelpers.InsecureDecodeJWT(t, gjson.GetBytes(body, "id_token").Str), "hooked").String())
 							}
 						}
 						t.Run("hook=legacy", run("legacy"))
@@ -2291,7 +2265,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 									defer reg.Config().MustSet(ctx, config.KeyTokenHook, nil)
 								}
 
-								origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								origAccessTokenClaims := testhelpers.IntrospectToken(t, refreshedToken.AccessToken, ts)
 
 								res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 								require.NoError(t, err)
@@ -2302,7 +2276,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 								require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
-								refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, refreshedToken.AccessToken, ts)
+								refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, refreshedToken.AccessToken, ts)
 								assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
 							}
 						}
@@ -2464,7 +2438,7 @@ func newOAuth2Client(
 	callbackURL string,
 	opts ...func(*client.Client),
 ) (*client.Client, *oauth2.Config) {
-	ctx := context.Background()
+	ctx := t.Context()
 	secret := uuid.New()
 	c := &client.Client{
 		Secret:        secret,

@@ -25,7 +25,6 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 )
 
@@ -75,7 +74,7 @@ func TestClientCredentials(t *testing.T) {
 	}
 
 	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
-		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token.AccessToken, admin)
+		introspection := testhelpers.IntrospectToken(t, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
 			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
@@ -102,10 +101,7 @@ func TestClientCredentials(t *testing.T) {
 			return
 		}
 
-		body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
-		require.NoError(t, err)
-
-		jwtClaims := gjson.ParseBytes(body)
+		jwtClaims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, token.AccessToken))
 		assert.NotEmpty(t, jwtClaims.Get("jti").String())
 		assert.EqualValues(t, encodeOr(t, conf.Scopes, "[]"), jwtClaims.Get("scp").Raw, "%s", introspection.Raw)
 		check(jwtClaims)
@@ -228,13 +224,13 @@ func TestClientCredentials(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
 				reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, strategy)
-				cl, conf := newClient(t)
+				_, conf := newClient(t)
 				conf.Scopes = []string{}
 				token, err := getToken(t, conf)
 				require.NoError(t, err)
 				expected := time.Now().Add(duration)
 				assert.WithinDuration(t, expected, token.Expiry, 5*time.Second)
-				introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token.AccessToken, admin)
+				introspection := testhelpers.IntrospectToken(t, token.AccessToken, admin)
 				assert.WithinDuration(t, expected, time.Unix(introspection.Get("exp").Int(), 0), 5*time.Second)
 			}
 		}

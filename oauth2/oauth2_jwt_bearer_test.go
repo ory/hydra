@@ -5,6 +5,7 @@ package oauth2_test
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -31,7 +32,6 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 )
 
@@ -68,7 +68,7 @@ func TestJWTBearer(t *testing.T) {
 	}
 
 	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, grant trust.Grant, checkExtraClaims bool) {
-		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token.AccessToken, admin)
+		introspection := testhelpers.IntrospectToken(t, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
 			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
@@ -95,15 +95,13 @@ func TestJWTBearer(t *testing.T) {
 			return
 		}
 
-		body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
-		require.NoError(t, err)
-		jwtClaims := gjson.ParseBytes(body)
+		jwtClaims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, token.AccessToken))
 		assert.NotEmpty(t, jwtClaims.Get("jti").String())
 		assert.NotEmpty(t, jwtClaims.Get("iss").String())
 		assert.NotEmpty(t, jwtClaims.Get("client_id").String())
 		assert.EqualValues(t, "offline_access", introspection.Get("scope").String(), "%s", introspection.Raw)
 
-		header, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[0])
+		header, err := base64.RawURLEncoding.DecodeString(strings.Split(token.AccessToken, ".")[0])
 		require.NoError(t, err)
 		jwtHeader := gjson.ParseBytes(header)
 		assert.NotEmpty(t, jwtHeader.Get("kid").String())

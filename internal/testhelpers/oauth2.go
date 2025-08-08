@@ -6,8 +6,10 @@ package testhelpers
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -53,17 +55,19 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 	return token
 }
 
+// NewOAuth2Server
+// Deprecated: use NewConfigurableOAuth2Server instead
 func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
-	public, admin := NewConfigurableOAuth2Server(ctx, t, reg)
-	return public.Server, admin.Server
-}
-
-func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *contextx.ConfigurableTestServer) {
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, 10*time.Second)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
+	public, admin := NewConfigurableOAuth2Server(ctx, t, reg)
+	return public.Server, admin.Server
+}
+
+func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *contextx.ConfigurableTestServer) {
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
 	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
@@ -91,24 +95,23 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 	require.True(t, ok)
 	assert.NotEmpty(t, idt)
 
-	body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
-	require.NoError(t, err)
-
-	return gjson.ParseBytes(body)
+	return gjson.ParseBytes(InsecureDecodeJWT(t, idt))
 }
 
-func IntrospectToken(t testing.TB, conf *oauth2.Config, token string, adminTS *httptest.Server) gjson.Result {
+func IntrospectToken(t testing.TB, token string, adminTS *httptest.Server) gjson.Result {
 	require.NotEmpty(t, token)
 
 	req := httpx.MustNewRequest("POST", adminTS.URL+"/admin/oauth2/introspect",
 		strings.NewReader((url.Values{"token": {token}}).Encode()),
 		"application/x-www-form-urlencoded")
 
-	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
 	res, err := adminTS.Client().Do(req)
 	require.NoError(t, err)
 	defer res.Body.Close()
-	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
+	body, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+	require.Equalf(t, http.StatusOK, res.StatusCode, "Response body: %s", body)
+	return gjson.ParseBytes(body)
 }
 
 func RevokeToken(t testing.TB, conf *oauth2.Config, token string, publicTS *httptest.Server) gjson.Result {
@@ -240,4 +243,13 @@ func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	//s.t.Logf("%s %s\nWith Cookies: %v", r.Method, r.URL.String(), r.Cookies())
 
 	return otelhttp.DefaultClient.Transport.RoundTrip(r)
+}
+
+// InsecureDecodeJWT decodes a JWT payload without checking the signature.
+func InsecureDecodeJWT(t require.TestingT, token string) []byte {
+	parts := strings.Split(token, ".")
+	require.Len(t, parts, 3)
+	dec, err := base64.RawURLEncoding.DecodeString(parts[1])
+	require.NoErrorf(t, err, "failed to decode JWT payload: %s", parts[1])
+	return dec
 }

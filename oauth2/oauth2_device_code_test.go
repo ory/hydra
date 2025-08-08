@@ -6,7 +6,6 @@ package oauth2_test
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -351,8 +350,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	assertRefreshToken := func(t *testing.T, token *oauth2.Token, c *oauth2.Config, expectedExp time.Time) {
-		actualExp, err := strconv.ParseInt(testhelpers.IntrospectToken(t, c, token.RefreshToken, adminTS).Get("exp").String(), 10, 64)
-		require.NoError(t, err)
+		actualExp := testhelpers.IntrospectToken(t, token.RefreshToken, adminTS).Get("exp").Int()
 		assert.WithinDuration(t, expectedExp, time.Unix(actualExp, 0), time.Second)
 	}
 
@@ -361,10 +359,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		require.True(t, ok)
 		assert.NotEmpty(t, idt)
 
-		body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
-		require.NoError(t, err)
-
-		claims := gjson.ParseBytes(body)
+		claims := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, idt))
 		assert.True(t, time.Now().After(time.Unix(claims.Get("iat").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
@@ -386,7 +381,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 
 	introspectAccessToken := func(t *testing.T, conf *oauth2.Config, token *oauth2.Token, expectedSubject string) gjson.Result {
 		require.NotEmpty(t, token.AccessToken)
-		i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+		i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 		assert.True(t, i.Get("active").Bool(), "%s", i)
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
@@ -403,10 +398,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		}
 		require.Len(t, parts, 3)
 
-		body, err := x.DecodeSegment(parts[1])
-		require.NoError(t, err)
-
-		i := gjson.ParseBytes(body)
+		i := gjson.ParseBytes(testhelpers.InsecureDecodeJWT(t, token.AccessToken))
 		assert.NotEmpty(t, i.Get("jti").String())
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
@@ -559,7 +551,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 				})
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
-					i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+					i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 					assert.False(t, i.Get("active").Bool(), "%s", i)
 				})
 
@@ -671,7 +663,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 				assert.WithinDuration(t, iat.Add(expectedLifespans.RefreshTokenGrantAccessTokenLifespan.Duration), time.Unix(body.Get("exp").Int(), 0), time.Second)
 
 				t.Run("followup=original access token is no longer valid", func(t *testing.T) {
-					i := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+					i := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 					assert.False(t, i.Get("active").Bool(), "%s", i)
 				})
 

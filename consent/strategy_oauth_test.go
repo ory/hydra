@@ -316,7 +316,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			token, err := conf.Exchange(context.Background(), code)
 			require.NoError(t, err)
 
-			claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+			claims := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 			assert.Equalf(t, `"bar"`, claims.Get("ext.foo").Raw, "%s", claims.Raw)      // Raw rather than .Int() or .Value() to verify the exact JSON payload
 			assert.Equalf(t, "1723546027", claims.Get("ext.ts1").Raw, "%s", claims.Raw) // must round-trip as integer
 
@@ -947,7 +947,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 				assert.EqualValues(t, hash, uiClaims.Get("sub").String())
 
 				// Access token data must not be obfuscated
-				atClaims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+				atClaims := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 				assert.EqualValues(t, subject, atClaims.Get("sub").String())
 			})
 		}
@@ -983,7 +983,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		assert.EqualValues(t, obfuscated, uiClaims.Get("sub").String())
 
 		// Access token data must not be obfuscated
-		atClaims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+		atClaims := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 		assert.EqualValues(t, subject, atClaims.Get("sub").String())
 	})
 
@@ -1200,7 +1200,7 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 			token, err := conf.DeviceAccessToken(ctx, devResp)
 			require.NoError(t, err)
 
-			claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+			claims := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 			assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
 
 			idClaims := testhelpers.DecodeIDToken(t, token)
@@ -1286,7 +1286,7 @@ func TestStrategyDeviceLoginConsent(t *testing.T) {
 		token, err := conf.DeviceAccessToken(ctx, devResp)
 		require.NoError(t, err)
 
-		claims := testhelpers.IntrospectToken(t, conf, token.AccessToken, adminTS)
+		claims := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 		assert.Equal(t, "bar", claims.Get("ext.foo").String(), "%s", claims.Raw)
 
 		idClaims := testhelpers.DecodeIDToken(t, token)

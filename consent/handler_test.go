@@ -186,13 +186,11 @@ func TestGetConsentRequest(t *testing.T) {
 				require.NoError(t, err)
 				challenge, err = f.ToConsentChallenge(ctx, reg)
 				require.NoError(t, err)
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(ctx, f, &flow.OAuth2ConsentRequest{
-					Client:           cl,
-					ConsentRequestID: challenge,
-					Verifier:         challenge,
-					CSRF:             challenge,
-					LoginChallenge:   sqlxx.NullString(lr.ID),
-				}))
+				f.State = flow.FlowStateConsentInitialized
+				f.ConsentRequestID = sqlxx.NullString(challenge)
+				f.ConsentVerifier = sqlxx.NullString(challenge)
+				f.ConsentCSRF = sqlxx.NullString(challenge)
+				f.ID = lr.ID
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{

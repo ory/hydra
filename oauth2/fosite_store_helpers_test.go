@@ -131,8 +131,9 @@ func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 			RequestedAt:          time.Now(),
 		})
 	require.NoError(t, err)
-	err = x.ConsentManager().CreateConsentRequest(ctx, f, cr)
-	require.NoError(t, err)
+
+	f.State = flow.FlowStateConsentInitialized
+	f.ConsentRequestID = sqlxx.NullString(cr.ConsentRequestID)
 
 	_, err = f.ToConsentVerifier(ctx, x)
 	require.NoError(t, err)

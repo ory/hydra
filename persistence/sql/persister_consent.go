@@ -171,28 +171,6 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-// CreateConsentRequest configures fields that are introduced or changed in the
-// consent request. It doesn't touch fields that would be copied from the login
-// request.
-func (p *Persister) CreateConsentRequest(ctx context.Context, f *flow.Flow, req *flow.OAuth2ConsentRequest) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentRequest")
-	defer otelx.End(span, &err)
-
-	if f == nil {
-		return errorsx.WithStack(x.ErrNotFound.WithDebug("Flow is nil"))
-	}
-	if f.ID != req.LoginChallenge.String() || f.NID != p.NetworkID(ctx) {
-		return errorsx.WithStack(x.ErrNotFound)
-	}
-	f.State = flow.FlowStateConsentInitialized
-	f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
-	f.ConsentSkip = req.Skip
-	f.ConsentVerifier = sqlxx.NullString(req.Verifier)
-	f.ConsentCSRF = sqlxx.NullString(req.CSRF)
-
-	return nil
-}
-
 func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlowByConsentChallenge")
 	defer otelx.End(span, &err)

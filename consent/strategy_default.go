@@ -599,44 +599,16 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	f *flow.Flow,
 	canSkipConsent bool,
 ) error {
-	as := f.GetHandledLoginRequest()
-
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if slices.Contains(prompt, "none") && !canSkipConsent {
 		return errors.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 
-	// Set up csrf/challenge/verifier values
-	verifier := strings.Replace(uuid.New(), "-", "", -1)
-	consentRequestID := strings.Replace(uuid.New(), "-", "", -1)
-	csrf := strings.Replace(uuid.New(), "-", "", -1)
-
-	cl := sanitizeClientFromRequest(ar)
-
-	consentRequest := &flow.OAuth2ConsentRequest{
-		ConsentRequestID:       consentRequestID,
-		ACR:                    as.ACR,
-		AMR:                    as.AMR,
-		Verifier:               verifier,
-		CSRF:                   csrf,
-		Skip:                   canSkipConsent,
-		RequestedScope:         []string(ar.GetRequestedScopes()),
-		RequestedAudience:      []string(ar.GetRequestedAudience()),
-		Subject:                as.Subject,
-		Client:                 cl,
-		RequestURL:             as.LoginRequest.RequestURL,
-		AuthenticatedAt:        as.AuthenticatedAt,
-		RequestedAt:            as.RequestedAt,
-		ForceSubjectIdentifier: as.ForceSubjectIdentifier,
-		OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
-		LoginSessionID:         as.LoginRequest.SessionID,
-		LoginChallenge:         sqlxx.NullString(as.LoginRequest.ID),
-		Context:                as.Context,
-	}
-	err := s.r.ConsentManager().CreateConsentRequest(ctx, f, consentRequest)
-	if err != nil {
-		return errors.WithStack(err)
-	}
+	f.State = flow.FlowStateConsentInitialized
+	f.ConsentRequestID = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
+	f.ConsentSkip = canSkipConsent
+	f.ConsentVerifier = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
+	f.ConsentCSRF = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
 
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
 	if err != nil {
@@ -648,12 +620,12 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return err
 	}
 
-	if f.Client.GetID() != cl.GetID() {
+	if f.Client.GetID() != ar.GetClient().GetID() {
 		return errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
-	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), cl.CookieSuffix())
-	if err := createCSRFSession(ctx, w, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, csrf, s.c.ConsentRequestMaxAge(ctx)); err != nil {
+	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), f.Client.CookieSuffix())
+	if err := createCSRFSession(ctx, w, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, f.ConsentCSRF.String(), s.c.ConsentRequestMaxAge(ctx)); err != nil {
 		return errors.WithStack(err)
 	}
 

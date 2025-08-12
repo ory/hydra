@@ -275,8 +275,11 @@ func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip 
 		CSRF:             uuid.Must(uuid.NewV4()).String(),
 	}
 
-	require.NoError(t, m.CreateConsentRequest(context.Background(), f, c))
-
+	f.State = flow.FlowStateConsentInitialized
+	f.ConsentRequestID = sqlxx.NullString(c.ConsentRequestID)
+	f.ConsentSkip = c.Skip
+	f.ConsentVerifier = sqlxx.NullString(c.Verifier)
+	f.ConsentCSRF = sqlxx.NullString(c.CSRF)
 	return c
 }
 
@@ -636,9 +639,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 					consentChallenge = x.Must(f.ToConsentChallenge(ctx, deps))
 
-					err = m.CreateConsentRequest(ctx, f, consentRequest)
-					require.NoError(t, err)
-
 					got1, err := m.GetConsentRequest(ctx, consentChallenge)
 					require.NoError(t, err)
 					compareConsentRequest(t, consentRequest, got1)
@@ -759,11 +759,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_ = clientManager.CreateClient(ctx, cr1.Client)
 			_ = clientManager.CreateClient(ctx, cr2.Client)
 
-			err := m.CreateConsentRequest(ctx, f1, cr1)
-			require.NoError(t, err)
-			err = m.CreateConsentRequest(ctx, f2, cr2)
-			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(ctx, f1, hcr1)
+			_, err := m.HandleConsentRequest(ctx, f1, hcr1)
 			require.NoError(t, err)
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
 			require.NoError(t, err)
@@ -861,10 +857,17 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_ = clientManager.CreateClient(ctx, cr1.Client)
 			_ = clientManager.CreateClient(ctx, cr2.Client)
 
-			err = m.CreateConsentRequest(ctx, f1, cr1)
-			require.NoError(t, err)
-			err = m.CreateConsentRequest(ctx, f2, cr2)
-			require.NoError(t, err)
+			f1.State = flow.FlowStateConsentInitialized
+			f2.State = flow.FlowStateConsentInitialized
+			f1.ConsentRequestID = sqlxx.NullString(cr1.ConsentRequestID)
+			f2.ConsentRequestID = sqlxx.NullString(cr2.ConsentRequestID)
+			f1.ConsentSkip = cr1.Skip
+			f2.ConsentSkip = cr2.Skip
+			f1.ConsentVerifier = sqlxx.NullString(cr1.Verifier)
+			f2.ConsentVerifier = sqlxx.NullString(cr2.Verifier)
+			f1.ConsentCSRF = sqlxx.NullString(cr1.CSRF)
+			f2.ConsentCSRF = sqlxx.NullString(cr2.CSRF)
+
 			_, err = m.HandleConsentRequest(ctx, f1, hcr1)
 			require.NoError(t, err)
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
@@ -1186,8 +1189,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				Verifier:             uuid.Must(uuid.NewV4()).String(),
 				CSRF:                 uuid.Must(uuid.NewV4()).String(),
 			}
-			err = m.CreateConsentRequest(ctx, f, expected)
-			require.NoError(t, err)
+
+			f.ConsentRequestID = sqlxx.NullString(expected.ConsentRequestID)
 
 			consentChallenge, err := f.ToConsentChallenge(ctx, deps)
 			require.NoError(t, err)

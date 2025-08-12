@@ -559,16 +559,16 @@ func (ns *NullDuration) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (ns Duration) IsZero() bool                { return time.Duration(ns) == 0 }
+func (ns Duration) IsZero() bool                { return ns == 0 }
 func (m StringSliceJSONFormat) IsZero() bool    { return len(m) == 0 }
 func (n StringSlicePipeDelimiter) IsZero() bool { return len(n) == 0 }
-func (ns NullBool) IsZero() bool                { return !ns.Valid }
-func (ns FalsyNullBool) IsZero() bool           { return !ns.Valid }
+func (ns NullBool) IsZero() bool                { return !ns.Valid || !ns.Bool }
+func (ns FalsyNullBool) IsZero() bool           { return !ns.Valid || !ns.Bool }
 func (ns NullString) IsZero() bool              { return len(ns) == 0 }
 func (ns NullTime) IsZero() bool                { return time.Time(ns).IsZero() }
 func (n MapStringInterface) IsZero() bool       { return len(n) == 0 }
 func (m JSONArrayRawMessage) IsZero() bool      { return len(m) == 0 || string(m) == "[]" }
 func (m JSONRawMessage) IsZero() bool           { return len(m) == 0 || string(m) == "null" }
 func (m NullJSONRawMessage) IsZero() bool       { return len(m) == 0 || string(m) == "null" }
-func (ns NullInt64) IsZero() bool               { return !ns.Valid }
-func (ns NullDuration) IsZero() bool            { return !ns.Valid }
+func (ns NullInt64) IsZero() bool               { return !ns.Valid || ns.Int == 0 }
+func (ns NullDuration) IsZero() bool            { return !ns.Valid || ns.Duration == 0 }

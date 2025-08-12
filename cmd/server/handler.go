@@ -46,14 +46,14 @@ func ensureNoMemoryDSN(r driver.Registry) {
 	}
 }
 
-func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(ctx, sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
+		d, err := driver.New(ctx, sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
 		if err != nil {
 			return err
 		}
@@ -67,14 +67,14 @@ func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifi
 	}
 }
 
-func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
 		if err != nil {
 			return err
 		}
@@ -88,14 +88,14 @@ func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModif
 	}
 }
 
-func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) func(cmd *cobra.Command, args []string) error {
+func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
 		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithOptions(append(cOpts, configx.WithFlags(cmd.Flags()))...)))
+		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
 		if err != nil {
 			return err
 		}

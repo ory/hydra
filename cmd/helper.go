@@ -4,20 +4,11 @@
 package cmd
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/tomnomnom/linkheader"
 )
-
-var osExit = os.Exit
-
-func fatal(message string, args ...interface{}) {
-	fmt.Printf(message+"\n", args...)
-	osExit(1)
-}
 
 func getPageToken(resp *http.Response) string {
 	for _, link := range linkheader.Parse(resp.Header.Get("Link")) {

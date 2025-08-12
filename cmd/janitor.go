@@ -13,7 +13,7 @@ import (
 	"github.com/ory/x/configx"
 )
 
-func NewJanitorCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *cobra.Command {
+func NewJanitorCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "janitor [[database_url]]",
 		Short:   "This command cleans up stale database rows.",
@@ -62,8 +62,8 @@ Janitor can be used in several ways.
 
 		hydra janitor --tokens --requests --grants {database-url}
 `,
-		RunE: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.RunE,
-		Args: cli.NewHandler(slOpts, dOpts, cOpts).Janitor.Args,
+		RunE: cli.NewHandler(slOpts, dOpts).Janitor.RunE,
+		Args: cli.NewHandler(slOpts, dOpts).Janitor.Args,
 	}
 	cmd.Flags().Int(cli.Limit, 10000, "Limit the number of records retrieved from database for deletion.")
 	cmd.Flags().Int(cli.BatchSize, 100, "Define how many records are deleted with each iteration.")

@@ -19,13 +19,12 @@ import (
 )
 
 type (
-	Options struct {
-		preload  bool
-		validate bool
-		opts     []configx.OptionModifier
-		config   *config.DefaultProvider
-		// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
-		skipNetworkInit   bool
+	options struct {
+		noPreload,
+		noValidate,
+		skipNetworkInit bool
+		configOpts        []configx.OptionModifier
+		config            *config.DefaultProvider
 		tracerWrapper     TracerWrapper
 		extraMigrations   []fs.FS
 		goMigrations      []popx.Migration
@@ -33,17 +32,13 @@ type (
 		registryModifiers []RegistryModifier
 		inspect           func(Registry) error
 	}
-	OptionsModifier func(*Options)
+	OptionsModifier func(*options)
 
 	TracerWrapper func(*otelx.Tracer) *otelx.Tracer
 )
 
-func NewOptions(opts []OptionsModifier) *Options {
-	o := &Options{
-		validate: true,
-		preload:  true,
-		opts:     []configx.OptionModifier{},
-	}
+func newOptions(opts []OptionsModifier) *options {
+	o := &options{}
 	for _, f := range opts {
 		f(o)
 	}
@@ -51,14 +46,14 @@ func NewOptions(opts []OptionsModifier) *Options {
 }
 
 func WithConfig(config *config.DefaultProvider) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.config = config
 	}
 }
 
-func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
-	return func(o *Options) {
-		o.opts = append(o.opts, opts...)
+func WithConfigOptions(opts ...configx.OptionModifier) OptionsModifier {
+	return func(o *options) {
+		o.configOpts = append(o.configOpts, opts...)
 	}
 }
 
@@ -66,58 +61,58 @@ func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
 //
 // This does not affect schema validation!
 func DisableValidation() OptionsModifier {
-	return func(o *Options) {
-		o.validate = false
+	return func(o *options) {
+		o.noValidate = true
 	}
 }
 
 // DisablePreloading will not preload the config.
 func DisablePreloading() OptionsModifier {
-	return func(o *Options) {
-		o.preload = false
+	return func(o *options) {
+		o.noPreload = true
 	}
 }
 
 func SkipNetworkInit() OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.skipNetworkInit = true
 	}
 }
 
 // WithTracerWrapper sets a function that wraps the tracer.
 func WithTracerWrapper(wrapper TracerWrapper) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.tracerWrapper = wrapper
 	}
 }
 
 // WithExtraMigrations specifies additional database migration.
 func WithExtraMigrations(m ...fs.FS) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.extraMigrations = append(o.extraMigrations, m...)
 	}
 }
 
 func WithGoMigrations(m ...popx.Migration) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.goMigrations = append(o.goMigrations, m...)
 	}
 }
 
 func WithExtraFositeFactories(f ...fositex.Factory) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.fositexFactories = append(o.fositexFactories, f...)
 	}
 }
 
 func Inspect(f func(Registry) error) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.inspect = f
 	}
 }
 
 func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
-	o := NewOptions(opts)
+	o := newOptions(opts)
 
 	l := sl.Logger()
 	if l == nil {
@@ -128,14 +123,14 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 	c := o.config
 	if c == nil {
 		var err error
-		c, err = config.New(ctx, l, o.opts...)
+		c, err = config.New(ctx, l, o.configOpts...)
 		if err != nil {
 			l.WithError(err).Error("Unable to instantiate configuration.")
 			return nil, err
 		}
 	}
 
-	if o.validate {
+	if !o.noValidate {
 		if err := config.Validate(ctx, l, c); err != nil {
 			return nil, err
 		}
@@ -165,7 +160,7 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 	}
 
 	// Avoid cold cache issues on boot:
-	if o.preload {
+	if !o.noPreload {
 		CallRegistry(ctx, r)
 	}
 

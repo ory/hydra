@@ -38,14 +38,12 @@ const (
 type JanitorHandler struct {
 	slOpts []servicelocatorx.Option
 	dOpts  []driver.OptionsModifier
-	cOpts  []configx.OptionModifier
 }
 
-func NewJanitorHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *JanitorHandler {
+func NewJanitorHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *JanitorHandler {
 	return &JanitorHandler{
 		slOpts: slOpts,
 		dOpts:  dOpts,
-		cOpts:  cOpts,
 	}
 }
 
@@ -122,7 +120,7 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 	do := append(dOpts,
 		driver.DisableValidation(),
 		driver.DisablePreloading(),
-		driver.WithOptions(co...),
+		driver.WithConfigOptions(co...),
 	)
 
 	d, err := driver.New(ctx, sl, do)

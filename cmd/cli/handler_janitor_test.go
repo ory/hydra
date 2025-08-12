@@ -21,7 +21,7 @@ import (
 )
 
 func newJanitorCmd() *cobra.Command {
-	return cmd.NewRootCmd(nil, nil, nil)
+	return cmd.NewRootCmd(nil, nil)
 }
 
 func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
@@ -189,29 +189,29 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 }
 
 func TestJanitorHandler_Arguments(t *testing.T) {
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		"memory",
 	)
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyTokens),
 		"memory",
 	)
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyGrants),
 		"memory",
 	)
 
-	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		"memory")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests or --grants to be set")
 
-	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil),
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "1000"),
@@ -219,7 +219,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory",
 	)
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "0"),
@@ -227,7 +227,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "-100"),
@@ -235,7 +235,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "0"),
@@ -243,7 +243,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.BatchSize, "-100"),
@@ -251,7 +251,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
 
-	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil, nil), nil,
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(nil, nil), nil,
 		"janitor",
 		fmt.Sprintf("--%s", cli.OnlyRequests),
 		fmt.Sprintf("--%s=%s", cli.Limit, "100"),

@@ -10,5 +10,5 @@ import (
 )
 
 func TestUsageStrings(t *testing.T) {
-	cmdx.AssertUsageTemplates(t, NewRootCmd(nil, nil, nil))
+	cmdx.AssertUsageTemplates(t, NewRootCmd(nil, nil))
 }

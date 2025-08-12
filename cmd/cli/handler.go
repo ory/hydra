@@ -5,7 +5,6 @@ package cli
 
 import (
 	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/x/configx"
 	"github.com/ory/x/servicelocatorx"
 )
 
@@ -14,9 +13,9 @@ type Handler struct {
 	Janitor   *JanitorHandler
 }
 
-func NewHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier, cOpts []configx.OptionModifier) *Handler {
+func NewHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *Handler {
 	return &Handler{
-		Migration: newMigrateHandler(slOpts, dOpts, cOpts),
-		Janitor:   NewJanitorHandler(slOpts, dOpts, cOpts),
+		Migration: newMigrateHandler(slOpts, dOpts),
+		Janitor:   NewJanitorHandler(slOpts, dOpts),
 	}
 }

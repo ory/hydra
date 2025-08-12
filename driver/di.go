@@ -40,7 +40,7 @@ type WritableRegistry interface {
 type RegistryModifier func(r Registry) error
 
 func WithRegistryModifiers(f ...RegistryModifier) OptionsModifier {
-	return func(o *Options) {
+	return func(o *options) {
 		o.registryModifiers = f
 	}
 }

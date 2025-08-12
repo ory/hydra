@@ -455,7 +455,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.
 
 	loginSession.NID = p.NetworkID(ctx)
 	loginSession.AuthenticatedAt = sqlxx.NullTime(time.Time(loginSession.AuthenticatedAt).Truncate(time.Second))
-	loginSession.ExpiresAt = sqlxx.NullTime(time.Now().Truncate(time.Second).Add(p.config.GetAuthenticationSessionLifespan(ctx)))
+	loginSession.ExpiresAt = sqlxx.NullTime(time.Now().Truncate(time.Second).Add(p.config.GetAuthenticationSessionLifespan(ctx)).UTC())
 
 	if p.Connection(ctx).Dialect.Name() == "mysql" {
 		// MySQL does not support UPSERT.

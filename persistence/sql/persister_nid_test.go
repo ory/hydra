@@ -187,6 +187,10 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls))
 			actual := &flow.LoginSession{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, ls.ID))
+
+			require.True(t, time.Time(ls.AuthenticatedAt).UTC().Equal(time.Time(actual.AuthenticatedAt).UTC()))
+			require.True(t, time.Time(ls.ExpiresAt).UTC().Equal(time.Time(actual.ExpiresAt).UTC()))
+
 			exp, _ := json.Marshal(ls)
 			act, _ := json.Marshal(actual)
 			require.JSONEq(t, string(exp), string(act))

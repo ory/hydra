@@ -386,20 +386,6 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 	}
 }
 
-func (s *PersisterTestSuite) TestCreateLoginRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			lr := flow.LoginRequest{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now()}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
-			require.NoError(t, err)
-			require.Equal(t, s.t1NID, f.NID)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestCreateLoginSession() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
@@ -1133,12 +1119,7 @@ func (s *PersisterTestSuite) TestGetLoginRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			cl := &client.Client{ID: "client-id"}
-			lr := flow.LoginRequest{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now()}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
-			require.NoError(t, err)
-			require.Equal(t, s.t1NID, f.NID)
+			f := flow.Flow{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now(), NID: s.t1NID}
 
 			challenge := x.Must(f.ToLoginChallenge(s.t1, r))
 

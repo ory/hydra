@@ -183,6 +183,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *flow.LoginRequ
 	}
 
 	f = flow.NewFlow(c)
+	f.NID = uuid.FromStringOrNil(network)
 
 	var err = &flow.RequestDeniedError{
 		Name:        "error_name" + key,
@@ -305,8 +306,6 @@ func SaneMockAuthRequest(t *testing.T, m consent.Manager, ls *flow.LoginSession,
 		ID:       uuid.Must(uuid.NewV4()).String(),
 		Verifier: uuid.Must(uuid.NewV4()).String(),
 	}
-	_, err := m.CreateLoginRequest(context.Background(), c)
-	require.NoError(t, err)
 	return c
 }
 
@@ -323,15 +322,16 @@ func TestHelperNID(r interface {
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
 	}
-	testLR := flow.LoginRequest{
-		ID:          "2022-03-11-lr-nid-test-1",
-		Subject:     "2022-03-11-test-1-sub",
-		Verifier:    "2022-03-11-test-1-ver",
-		RequestedAt: time.Now(),
-		Client:      &client.Client{ID: "2022-03-11-client-nid-test-1"},
+	testLR := flow.Flow{
+		ID:            "2022-03-11-lr-nid-test-1",
+		Subject:       "2022-03-11-test-1-sub",
+		LoginVerifier: "2022-03-11-test-1-ver",
+		RequestedAt:   time.Now(),
+		Client:        &client.Client{ID: "2022-03-11-client-nid-test-1"},
+		NID:           t1ValidNID.NetworkID(context.Background()),
+		State:         flow.FlowStateLoginInitialized,
 	}
 	testHLR := flow.HandledLoginRequest{
-		LoginRequest:           &testLR,
 		RememberFor:            120,
 		Remember:               true,
 		ID:                     testLR.ID,
@@ -350,19 +350,16 @@ func TestHelperNID(r interface {
 		require.Error(t, t2InvalidNID.CreateLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.CreateLoginSession(ctx, &testLS))
 
-		_, err := t2InvalidNID.CreateLoginRequest(ctx, &testLR)
-		require.Error(t, err)
-		f, err := t1ValidNID.CreateLoginRequest(ctx, &testLR)
+		var err error
+		testLR.ID, err = testLR.ToLoginChallenge(ctx, r)
 		require.NoError(t, err)
-
-		testLR.ID = x.Must(f.ToLoginChallenge(ctx, r))
 		_, err = t2InvalidNID.GetLoginRequest(ctx, testLR.ID)
 		require.Error(t, err)
 		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)
 		require.NoError(t, err)
-		_, err = t2InvalidNID.HandleLoginRequest(ctx, f, testLR.ID, &testHLR)
+		_, err = t2InvalidNID.HandleLoginRequest(ctx, &testLR, testLR.ID, &testHLR)
 		require.Error(t, err)
-		_, err = t1ValidNID.HandleLoginRequest(ctx, f, testLR.ID, &testHLR)
+		_, err = t1ValidNID.HandleLoginRequest(ctx, &testLR, testLR.ID, &testHLR)
 		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
@@ -409,9 +406,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
 				}
-
-				_, err := m.CreateLoginRequest(ctx, lr[k])
-				require.NoError(t, err)
 			}
 		})
 
@@ -585,9 +579,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					_, err := m.GetLoginRequest(ctx, loginChallenge)
 					require.Error(t, err)
 
-					f, err = m.CreateLoginRequest(ctx, c)
-					require.NoError(t, err)
-
+					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 
 					got1, err := m.GetLoginRequest(ctx, loginChallenge)
@@ -847,10 +839,10 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
-			f1, err := m.CreateLoginRequest(ctx, lr["rv1"])
-			require.NoError(t, err)
-			f2, err := m.CreateLoginRequest(ctx, lr["rv2"])
-			require.NoError(t, err)
+			f1 := flow.NewFlow(lr["rv1"])
+			f1.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
+			f2 := flow.NewFlow(lr["rv2"])
+			f2.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 
 			cr1, hcr1, _ := MockConsentRequest("rv1", true, 0, false, false, false, "fk-login-challenge", network)
 			cr2, hcr2, _ := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
@@ -873,7 +865,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				flow.WithConsentCSRF(cr2.CSRF),
 			)
 
-			_, err = m.HandleConsentRequest(ctx, f1, hcr1)
+			_, err := m.HandleConsentRequest(ctx, f1, hcr1)
 			require.NoError(t, err)
 			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
 			require.NoError(t, err)
@@ -1169,18 +1161,17 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, m.CreateLoginSession(ctx, &s))
 			require.NoError(t, m.ConfirmLoginSession(ctx, &s))
 
-			lr := &flow.LoginRequest{
-				ID:              uuid.Must(uuid.NewV4()).String(),
-				Subject:         uuid.Must(uuid.NewV4()).String(),
-				Verifier:        uuid.Must(uuid.NewV4()).String(),
-				Client:          cl,
-				AuthenticatedAt: sqlxx.NullTime(time.Now()),
-				RequestedAt:     time.Now(),
-				SessionID:       sqlxx.NullString(s.ID),
+			f := &flow.Flow{
+				ID:                   uuid.Must(uuid.NewV4()).String(),
+				Subject:              uuid.Must(uuid.NewV4()).String(),
+				LoginVerifier:        uuid.Must(uuid.NewV4()).String(),
+				Client:               cl,
+				LoginAuthenticatedAt: sqlxx.NullTime(time.Now()),
+				RequestedAt:          time.Now(),
+				SessionID:            sqlxx.NullString(s.ID),
+				NID:                  deps.Contextualizer().Network(ctx, uuid.Nil),
 			}
 
-			f, err := m.CreateLoginRequest(ctx, lr)
-			require.NoError(t, err)
 			expected := &flow.OAuth2ConsentRequest{
 				ConsentRequestID:     uuid.Must(uuid.NewV4()).String(),
 				Skip:                 true,
@@ -1189,7 +1180,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				Client:               cl,
 				ClientID:             cl.ID,
 				RequestURL:           "",
-				LoginChallenge:       sqlxx.NullString(lr.ID),
+				LoginChallenge:       sqlxx.NullString(f.ID),
 				LoginSessionID:       sqlxx.NullString(s.ID),
 				Verifier:             uuid.Must(uuid.NewV4()).String(),
 				CSRF:                 uuid.Must(uuid.NewV4()).String(),

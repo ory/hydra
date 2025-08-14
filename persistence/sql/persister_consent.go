@@ -274,46 +274,6 @@ func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context
 	return f.GetHandledDeviceUserAuthRequest(), nil
 }
 
-func (p *Persister) CreateLoginRequestFromDeviceRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequestFromDeviceRequest")
-	defer otelx.End(span, &err)
-
-	f.ID = req.ID
-	f.LoginSkip = req.Skip
-	f.Subject = req.Subject
-	f.SessionID = req.SessionID
-	f.LoginWasUsed = req.WasHandled
-	f.ForceSubjectIdentifier = req.ForceSubjectIdentifier
-	f.LoginVerifier = req.Verifier
-	f.LoginCSRF = req.CSRF
-	f.LoginAuthenticatedAt = req.AuthenticatedAt
-	f.RequestedAt = req.RequestedAt
-	f.State = flow.FlowStateLoginInitialized
-
-	nid := p.NetworkID(ctx)
-	if nid == uuid.Nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	}
-	f.NID = nid
-
-	return f, nil
-}
-
-func (p *Persister) CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginRequest")
-	defer otelx.End(span, &err)
-
-	f := flow.NewFlow(req)
-
-	nid := p.NetworkID(ctx)
-	if nid == uuid.Nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
-	}
-	f.NID = nid
-
-	return f, nil
-}
-
 func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlow")
 	defer otelx.End(span, &err)

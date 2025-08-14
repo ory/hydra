@@ -105,13 +105,17 @@ func TestGetLoginRequest(t *testing.T) {
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
-				f, err := reg.ConsentManager().CreateLoginRequest(context.Background(), &flow.LoginRequest{
-					Client:      cl,
+
+				f := &flow.Flow{
 					ID:          challenge,
+					Client:      cl,
 					RequestURL:  requestURL,
 					RequestedAt: time.Now(),
-				})
-				require.NoError(t, err)
+					State:       flow.FlowStateLoginInitialized,
+					NID:         reg.Persister().NetworkID(ctx),
+				}
+
+				var err error
 				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
 
@@ -170,14 +174,17 @@ func TestGetConsentRequest(t *testing.T) {
 			if tc.exists {
 				cl := &client.Client{ID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-				lr := &flow.LoginRequest{
+
+				f := &flow.Flow{
 					ID:          "login-" + challenge,
 					Client:      cl,
 					RequestURL:  requestURL,
 					RequestedAt: time.Now(),
+					State:       flow.FlowStateLoginInitialized,
+					NID:         reg.Persister().NetworkID(ctx),
 				}
-				f, err := reg.ConsentManager().CreateLoginRequest(ctx, lr)
-				require.NoError(t, err)
+
+				var err error
 				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
 				_, err = reg.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
@@ -242,14 +249,15 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 
 		cl := &client.Client{ID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, cl))
-		f, err := reg.ConsentManager().CreateLoginRequest(ctx, &flow.LoginRequest{
+		f := flow.Flow{
 			Client:      cl,
 			ID:          challenge,
 			RequestURL:  requestURL,
 			RequestedAt: time.Now(),
-		})
-		require.NoError(t, err)
-		challenge, err = f.ToLoginChallenge(ctx, reg)
+			NID:         reg.Persister().NetworkID(ctx),
+			State:       flow.FlowStateLoginInitialized,
+		}
+		challenge, err := f.ToLoginChallenge(ctx, reg)
 		require.NoError(t, err)
 
 		h := NewHandler(reg, reg.Config())

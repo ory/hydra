@@ -57,36 +57,6 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 	}
 }
 
-func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
-	ctx := context.Background()
-
-	for k, v := range testhelpers.NotAfterTestCycles {
-		jt := testhelpers.NewConsentJanitorTestHelper(t, k)
-		reg, err := jt.GetRegistry(ctx, k)
-		require.NoError(t, err)
-
-		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-			// Setup the test
-			t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
-			// Run the cleanup routine
-			t.Run("step=cleanup", func(t *testing.T) {
-				cmdx.ExecNoErr(t, newJanitorCmd(),
-					"janitor",
-					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
-					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
-				)
-			})
-
-			notAfter := time.Now().Round(time.Second).Add(-v)
-			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
-			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg))
-		})
-	}
-
-}
-
 func TestJanitorHandler_Arguments(t *testing.T) {
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil),
 		"janitor",

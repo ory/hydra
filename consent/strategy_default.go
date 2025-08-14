@@ -256,35 +256,46 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 
 	// Set the session
 	cl := sanitizeClientFromRequest(ar)
-	loginRequest := &flow.LoginRequest{
-		ID:                challenge,
-		Verifier:          verifier,
-		CSRF:              csrf,
-		Skip:              skip,
-		RequestedScope:    []string(ar.GetRequestedScopes()),
-		RequestedAudience: []string(ar.GetRequestedAudience()),
-		Subject:           subject,
-		Client:            cl,
-		RequestURL:        requestURL,
-		AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
-		RequestedAt:       time.Now().Truncate(time.Second).UTC(),
-		SessionID:         sqlxx.NullString(sessionID),
-		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
-			IDTokenHintClaims: idTokenHintClaims,
-			ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
-			UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
-			Display:           ar.GetRequestForm().Get("display"),
-			LoginHint:         ar.GetRequestForm().Get("login_hint"),
-		},
-	}
-	var err error
+
 	if f == nil {
-		f, err = s.r.ConsentManager().CreateLoginRequest(ctx, loginRequest)
+		// Regular grant
+		f = &flow.Flow{
+			ID:                challenge,
+			RequestedScope:    []string(ar.GetRequestedScopes()),
+			RequestedAudience: []string(ar.GetRequestedAudience()),
+			LoginSkip:         skip,
+			Subject:           subject,
+			OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
+				IDTokenHintClaims: idTokenHintClaims,
+				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
+				UILocales:         stringsx.Splitx(ar.GetRequestForm().Get("ui_locales"), " "),
+				Display:           ar.GetRequestForm().Get("display"),
+				LoginHint:         ar.GetRequestForm().Get("login_hint"),
+			},
+			Client:               cl,
+			ClientID:             cl.ID,
+			RequestURL:           requestURL,
+			SessionID:            sqlxx.NullString(sessionID),
+			LoginWasUsed:         false,
+			LoginVerifier:        verifier,
+			LoginCSRF:            csrf,
+			LoginAuthenticatedAt: sqlxx.NullTime(authenticatedAt),
+			RequestedAt:          time.Now().Truncate(time.Second).UTC(),
+			State:                flow.FlowStateLoginInitialized,
+			NID:                  s.r.ConsentManager().NetworkID(ctx),
+		}
 	} else {
-		f, err = s.r.ConsentManager().CreateLoginRequestFromDeviceRequest(ctx, f, loginRequest)
-	}
-	if err != nil {
-		return err
+		// Device auth grant
+		f.ID = challenge
+		f.LoginSkip = skip
+		f.Subject = subject
+		f.SessionID = sqlxx.NullString(sessionID)
+		f.LoginVerifier = verifier
+		f.LoginCSRF = csrf
+		f.LoginAuthenticatedAt = sqlxx.NullTime(authenticatedAt)
+		f.RequestedAt = time.Now().Truncate(time.Second).UTC()
+		f.State = flow.FlowStateLoginInitialized
+		f.NID = s.r.ConsentManager().NetworkID(ctx)
 	}
 
 	store, err := s.r.CookieStore(ctx)

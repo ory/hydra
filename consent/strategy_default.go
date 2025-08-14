@@ -604,11 +604,12 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return errors.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 
-	f.State = flow.FlowStateConsentInitialized
-	f.ConsentRequestID = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
-	f.ConsentSkip = canSkipConsent
-	f.ConsentVerifier = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
-	f.ConsentCSRF = sqlxx.NullString(strings.Replace(uuid.New(), "-", "", -1))
+	f.ToStateConsentInitialized(
+		flow.WithConsentRequestID(strings.Replace(uuid.New(), "-", "", -1)),
+		flow.WithConsentSkip(canSkipConsent),
+		flow.WithConsentVerifier(strings.Replace(uuid.New(), "-", "", -1)),
+		flow.WithConsentCSRF(strings.Replace(uuid.New(), "-", "", -1)),
+	)
 
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
 	if err != nil {

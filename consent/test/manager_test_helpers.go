@@ -275,11 +275,13 @@ func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip 
 		CSRF:             uuid.Must(uuid.NewV4()).String(),
 	}
 
-	f.State = flow.FlowStateConsentInitialized
-	f.ConsentRequestID = sqlxx.NullString(c.ConsentRequestID)
-	f.ConsentSkip = c.Skip
-	f.ConsentVerifier = sqlxx.NullString(c.Verifier)
-	f.ConsentCSRF = sqlxx.NullString(c.CSRF)
+	f.ToStateConsentInitialized(
+		flow.WithConsentRequestID(c.ConsentRequestID),
+		flow.WithConsentSkip(c.Skip),
+		flow.WithConsentVerifier(c.Verifier),
+		flow.WithConsentCSRF(c.CSRF),
+	)
+
 	return c
 }
 
@@ -857,16 +859,19 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_ = clientManager.CreateClient(ctx, cr1.Client)
 			_ = clientManager.CreateClient(ctx, cr2.Client)
 
-			f1.State = flow.FlowStateConsentInitialized
-			f2.State = flow.FlowStateConsentInitialized
-			f1.ConsentRequestID = sqlxx.NullString(cr1.ConsentRequestID)
-			f2.ConsentRequestID = sqlxx.NullString(cr2.ConsentRequestID)
-			f1.ConsentSkip = cr1.Skip
-			f2.ConsentSkip = cr2.Skip
-			f1.ConsentVerifier = sqlxx.NullString(cr1.Verifier)
-			f2.ConsentVerifier = sqlxx.NullString(cr2.Verifier)
-			f1.ConsentCSRF = sqlxx.NullString(cr1.CSRF)
-			f2.ConsentCSRF = sqlxx.NullString(cr2.CSRF)
+			f1.ToStateConsentInitialized(
+				flow.WithConsentRequestID(cr1.ConsentRequestID),
+				flow.WithConsentSkip(cr1.Skip),
+				flow.WithConsentVerifier(cr1.Verifier),
+				flow.WithConsentCSRF(cr1.CSRF),
+			)
+
+			f2.ToStateConsentInitialized(
+				flow.WithConsentRequestID(cr2.ConsentRequestID),
+				flow.WithConsentSkip(cr2.Skip),
+				flow.WithConsentVerifier(cr2.Verifier),
+				flow.WithConsentCSRF(cr2.CSRF),
+			)
 
 			_, err = m.HandleConsentRequest(ctx, f1, hcr1)
 			require.NoError(t, err)

@@ -120,7 +120,7 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	return errorsx.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
+func NewPersister(c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
 	return &Persister{
 		conn:            c,
 		extraMigrations: extraMigrations,

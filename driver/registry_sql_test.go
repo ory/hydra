@@ -5,10 +5,19 @@ package driver
 
 import (
 	"context"
+	"errors"
+	"io"
 	"math/rand"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 
+	"github.com/ory/x/sqlcon/dockertest"
+
+	"github.com/gorilla/sessions"
+	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -16,58 +25,56 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/sqlcon/dockertest"
-
-	"errors"
-	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
-
-	"github.com/ory/x/randx"
-
 	"github.com/ory/x/httpx"
-
-	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
-	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/randx"
 )
 
-func TestGetJWKSFetcherStrategyHostEnforcment(t *testing.T) {
-	ctx := context.Background()
-	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
-	c.MustSet(ctx, config.KeyDSN, "memory")
-	c.MustSet(ctx, config.HSMEnabled, "false")
-	c.MustSet(ctx, config.KeyClientHTTPNoPrivateIPRanges, true)
+func init() {
+	sql.SilenceMigrations = true
+}
 
-	registry, err := NewRegistryWithoutInit(c, l)
+func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
+	t.Parallel()
+
+	registry, err := New(t.Context(), WithConfigOptions(
+		configx.WithValues(map[string]any{
+			config.KeyDSN:                         "memory",
+			config.HSMEnabled:                     "false",
+			config.KeyClientHTTPNoPrivateIPRanges: true,
+		}),
+		configx.WithConfigFiles("../internal/.hydra.yaml"),
+	))
 	require.NoError(t, err)
 
-	_, err = registry.GetJWKSFetcherStrategy().Resolve(ctx, "http://localhost:8080", true)
+	_, err = registry.GetJWKSFetcherStrategy().Resolve(t.Context(), "http://localhost:8080", true)
 	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
 }
 
 func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
+	t.Parallel()
+
 	// Test ensures any network specific error is logged with a
 	// specific message when attempting to create a new key strategy: issue #2338
 
 	hook := test.Hook{} // Test hook for asserting log messages
-	ctx := context.Background()
 
 	l := logrusx.New("", "", logrusx.WithHook(&hook))
 	l.Logrus().SetOutput(io.Discard)
 	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN
-	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
-	c.MustSet(ctx, config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
-	c.MustSet(ctx, config.HSMEnabled, "false")
+	c := config.MustNew(t, l,
+		configx.WithConfigFiles("../internal/.hydra.yaml"),
+		configx.WithValues(map[string]any{
+			config.KeyDSN:     "postgres://user:password@127.0.0.1:9999/postgres",
+			config.HSMEnabled: false,
+		}),
+	)
 
-	r, err := NewRegistryWithoutInit(c, l)
+	r, err := newRegistryWithoutInit(c, l)
 	if err != nil {
 		t.Errorf("Failed to create registry: %s", err)
 		return
@@ -75,20 +82,29 @@ func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
 
 	r.initialPing = failedPing(errors.New("snizzles"))
 
-	_ = r.Init(context.Background(), true, false, &contextx.TestContextualizer{}, nil, nil)
+	assert.ErrorContains(t,
+		r.Init(t.Context(), true, false, nil, nil),
+		"snizzles",
+	)
 
 	assert.Equal(t, logrus.FatalLevel, hook.LastEntry().Level)
 	assert.Contains(t, hook.LastEntry().Message, "snizzles")
 }
 
 func TestRegistrySQL_CookieStore_MaxAgeZero(t *testing.T) {
+	t.Parallel()
+
 	// Test ensures that CookieStore MaxAge option is equal to zero after initialization
 
-	ctx := context.Background()
-	r := new(RegistrySQL)
-	r.WithConfig(config.MustNew(context.Background(), logrusx.New("", ""), configx.WithValue(config.KeyGetSystemSecret, []string{randx.MustString(32, randx.AlphaNum)})))
+	r, err := New(t.Context(), SkipNetworkInit(), DisableValidation(), WithConfigOptions(
+		configx.WithValues(map[string]any{
+			config.KeyDSN:             dbal.NewSQLiteInMemoryDatabase(t.Name()),
+			config.KeyGetSystemSecret: []string{randx.MustString(32, randx.AlphaNum)},
+		}),
+	))
+	require.NoError(t, err)
 
-	s, err := r.CookieStore(ctx)
+	s, err := r.CookieStore(t.Context())
 	require.NoError(t, err)
 	cs := s.(*sessions.CookieStore)
 
@@ -96,92 +112,95 @@ func TestRegistrySQL_CookieStore_MaxAgeZero(t *testing.T) {
 }
 
 func TestRegistrySQL_HTTPClient(t *testing.T) {
+	t.Parallel()
+
 	ts := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 	}))
 	defer ts.Close()
 
-	t.Setenv("CLIENTS_HTTP_PRIVATE_IP_EXCEPTION_URLS", fmt.Sprintf("[%q]", ts.URL+"/exception/*"))
-
-	ctx := context.Background()
-	r := new(RegistrySQL)
-	r.WithConfig(config.MustNew(
-		ctx,
-		logrusx.New("", ""),
-		configx.WithValues(map[string]interface{}{
-			config.KeyClientHTTPNoPrivateIPRanges: true,
-		}),
-	))
+	r, err := New(t.Context(), SkipNetworkInit(), DisableValidation(), WithConfigOptions(configx.WithValues(map[string]interface{}{
+		config.KeyDSN:                              dbal.NewSQLiteInMemoryDatabase(t.Name()),
+		config.KeyClientHTTPNoPrivateIPRanges:      true,
+		config.KeyClientHTTPPrivateIPExceptionURLs: []string{ts.URL + "/exception/*"},
+	})))
+	require.NoError(t, err)
 
 	t.Run("case=matches exception glob", func(t *testing.T) {
-		res, err := r.HTTPClient(ctx).Get(ts.URL + "/exception/foo")
+		res, err := r.HTTPClient(t.Context()).Get(ts.URL + "/exception/foo")
 		require.NoError(t, err)
 		assert.Equal(t, 200, res.StatusCode)
 	})
 
 	t.Run("case=does not match exception glob", func(t *testing.T) {
-		_, err := r.HTTPClient(ctx).Get(ts.URL + "/foo")
+		_, err := r.HTTPClient(t.Context()).Get(ts.URL + "/foo")
 		require.Error(t, err)
 	})
 }
 
 func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
-	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	c.MustSet(context.Background(), config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
-	c.MustSet(context.Background(), config.HSMEnabled, "false")
-	r, err := NewRegistryWithoutInit(c, l)
+	t.Parallel()
+
+	r, err := New(t.Context(),
+		SkipNetworkInit(),
+		DisableValidation(),
+		WithConfigOptions(
+			configx.SkipValidation(),
+			configx.WithValues(map[string]any{
+				config.KeyDSN:     "postgres://user:password@127.0.0.1:9999/postgres",
+				config.HSMEnabled: false,
+			}),
+		),
+		WithRegistryModifiers(func(r *RegistrySQL) error {
+			r.initialPing = sussessfulPing
+			return nil
+		}),
+	)
 	require.NoError(t, err)
-	r.initialPing = sussessfulPing()
-	require.NoError(t, r.Init(context.Background(), true, false, &contextx.Default{}, nil, nil))
-	assert.NoError(t, err)
 	assert.IsType(t, &sql.Persister{}, r.KeyManager())
 	assert.IsType(t, &sql.Persister{}, r.SoftwareKeyManager())
 }
 
 func TestDbUnknownTableColumns(t *testing.T) {
-	ctx := context.Background()
-	l := logrusx.New("", "")
-	c := config.MustNew(ctx, l, configx.SkipValidation())
-	postgresDsn := dockertest.RunTestPostgreSQL(t)
-	c.MustSet(ctx, config.KeyDSN, postgresDsn)
-	reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
+	t.Parallel()
+
+	dsn := dockertest.RunTestPostgreSQL(t)
+	reg, err := New(t.Context(), WithConfigOptions(configx.WithValue("dsn", dsn)), WithAutoMigrate())
 	require.NoError(t, err)
 
 	statement := `ALTER TABLE "hydra_client" ADD COLUMN IF NOT EXISTS "temp_column" VARCHAR(128) NOT NULL DEFAULT '';`
-	require.NoError(t, reg.Persister().Connection(ctx).RawQuery(statement).Exec())
+	require.NoError(t, reg.Persister().Connection(t.Context()).RawQuery(statement).Exec())
 
 	cl := &client.Client{
 		ID: strconv.Itoa(rand.Int()),
 	}
-	require.NoError(t, reg.Persister().CreateClient(ctx, cl))
-	getClients := func(reg Registry) ([]client.Client, error) {
+	require.NoError(t, reg.Persister().CreateClient(t.Context(), cl))
+	getClients := func(ctx context.Context, reg Registry) ([]client.Client, error) {
 		readClients := make([]client.Client, 0)
 		return readClients, reg.Persister().Connection(ctx).RawQuery(`SELECT * FROM "hydra_client"`).All(&readClients)
 	}
 
 	t.Run("with ignore disabled (default behavior)", func(t *testing.T) {
-		_, err := getClients(reg)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "missing destination name temp_column")
+		_, err := getClients(t.Context(), reg)
+		assert.ErrorContains(t, err, "missing destination name temp_column")
 	})
 
 	t.Run("with ignore enabled", func(t *testing.T) {
-		c.MustSet(ctx, config.KeyDBIgnoreUnknownTableColumns, true)
-		reg, err := NewRegistryFromDSN(ctx, c, l, false, true, &contextx.Default{})
+		reg, err := New(t.Context(), WithConfigOptions(
+			configx.WithValue("dsn", dsn),
+			configx.WithValue(config.KeyDBIgnoreUnknownTableColumns, true),
+		))
 		require.NoError(t, err)
 
-		actual, err := getClients(reg)
+		actual, err := getClients(t.Context(), reg)
 		require.NoError(t, err)
 		assert.Len(t, actual, 1)
 	})
 }
 
-func sussessfulPing() func(r *RegistrySQL) error {
-	return func(r *RegistrySQL) error {
-		// fake that ping is successful
-		return nil
-	}
+func sussessfulPing(r *RegistrySQL) error {
+	// fake that ping is successful
+	return nil
 }
 
 func failedPing(err error) func(r *RegistrySQL) error {

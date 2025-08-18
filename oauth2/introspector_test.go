@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -27,10 +29,10 @@ func TestIntrospectorSDK(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy: "wildcard",
 		config.KeyIssuerURL:     "https://foobariss",
-	}))
+	})))
 
 	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

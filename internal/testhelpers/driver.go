@@ -26,48 +26,47 @@ import (
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var defaultConfig = map[string]any{
-	config.KeyBCryptCost:                     4,
-	config.KeySubjectIdentifierAlgorithmSalt: "00000000",
-	config.KeyGetSystemSecret:                []string{"000000000000000000000000000000000000000000000000"},
-	config.KeyGetCookieSecrets:               []string{"000000000000000000000000000000000000000000000000"},
-	config.KeyLogLevel:                       "trace",
-	config.KeyDevelopmentMode:                true,
-	"serve.public.host":                      "localhost",
+var ConfigDefaults = []configx.OptionModifier{
+	configx.SkipValidation(),
+	configx.WithValues(map[string]any{
+		config.KeyBCryptCost:                     4,
+		config.KeySubjectIdentifierAlgorithmSalt: "00000000",
+		config.KeyGetSystemSecret:                []string{"000000000000000000000000000000000000000000000000"},
+		config.KeyGetCookieSecrets:               []string{"000000000000000000000000000000000000000000000000"},
+		config.KeyLogLevel:                       "trace",
+		config.KeyDevelopmentMode:                true,
+		"serve.public.host":                      "localhost",
+	}),
+	configx.WithValue("log.leak_sensitive_values", true),
 }
 
 func NewConfigurationWithDefaults(t testing.TB, opts ...configx.OptionModifier) *config.DefaultProvider {
-	allOpts := append([]configx.OptionModifier{
-		configx.SkipValidation(),
-		configx.WithValues(defaultConfig),
-		configx.WithValue("log.leak_sensitive_values", true),
-	}, opts...)
-	p, err := configx.New(t.Context(), spec.ConfigValidationSchema, allOpts...)
+	p, err := configx.New(t.Context(), spec.ConfigValidationSchema, append(ConfigDefaults, opts...)...)
 	require.NoError(t, err)
-	return config.NewCustom(logrusx.New("", ""), p, contextx.NewTestConfigProvider(spec.ConfigValidationSchema, allOpts...))
+	return config.NewCustom(logrusx.New("", ""), p, contextx.NewTestConfigProvider(spec.ConfigValidationSchema, append(ConfigDefaults, opts...)...))
 }
 
-func NewRegistryMemory(t testing.TB, configOpts ...configx.OptionModifier) driver.Registry {
-	return NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, configOpts...)
+func NewRegistryMemory(t testing.TB, opts ...driver.OptionsModifier) *driver.RegistrySQL {
+	return NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, opts...)
 }
 
-func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate bool, configOpts ...configx.OptionModifier) driver.Registry {
-	return registryFactory(t,
-		NewConfigurationWithDefaults(t, append(
-			[]configx.OptionModifier{configx.WithValue(config.KeyDSN, dsn)},
-			configOpts...,
-		)...), migrate)
-}
-
-func registryFactory(t testing.TB, c *config.DefaultProvider, migrate bool) driver.Registry {
-	ctx := t.Context()
+func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate bool, opts ...driver.OptionsModifier) *driver.RegistrySQL {
 	sql.SilenceMigrations = true
-	l := logrusx.New("test_hydra", "master", logrusx.WithConfigurator(c.Source(ctx)))
 
-	r, err := driver.NewRegistryFromDSN(ctx, c, l, !migrate, migrate, &contextx.Default{})
+	configOpts := append(ConfigDefaults, configx.WithValue(config.KeyDSN, dsn))
+	regOpts := append([]driver.OptionsModifier{
+		driver.WithConfigOptions(configOpts...),
+		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(contextx.NewTestConfigProvider(spec.ConfigValidationSchema, configOpts...))),
+	}, opts...)
+	if migrate {
+		regOpts = append(regOpts, driver.WithAutoMigrate())
+	}
+
+	r, err := driver.New(t.Context(), regOpts...)
 	require.NoError(t, err)
 
 	return r
@@ -135,14 +134,14 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 	return
 }
 
-func ConnectDatabases(t *testing.T, migrate bool) map[string]driver.Registry {
+func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier) map[string]driver.Registry {
 	regs := make(map[string]driver.Registry)
-	regs["memory"] = NewRegistryMemory(t)
+	regs["memory"] = NewRegistryMemory(t, opts...)
 	if !testing.Short() {
 		pg, mysql, crdb := ConnectDatabasesURLs(t)
-		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate)
-		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate)
-		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate)
+		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, opts...)
+		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, opts...)
+		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, opts...)
 	}
 	return regs
 }

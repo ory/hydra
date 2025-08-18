@@ -26,9 +26,7 @@ import (
 )
 
 func newProvider(t *testing.T, opts ...configx.OptionModifier) *DefaultProvider {
-	p, err := New(t.Context(), logrusx.New("", ""), opts...)
-	require.NoError(t, err)
-	return p
+	return MustNew(t, logrusx.New("", ""), opts...)
 }
 
 func TestSubjectTypesSupported(t *testing.T) {
@@ -426,7 +424,7 @@ func TestLimitAuthSessionLifespan(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
-	c := MustNew(context.Background(), l)
+	c := MustNew(t, l)
 	assert.Equal(t, 30*24*time.Hour, c.GetAuthenticationSessionLifespan(ctx))
 
 	require.NoError(t, c.Set(ctx, KeyAuthenticationSessionLifespan, (time.Hour*24*300).String()))
@@ -437,7 +435,7 @@ func TestCookieSecure(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
-	c := MustNew(context.Background(), l, configx.WithValue(KeyDevelopmentMode, true))
+	c := MustNew(t, l, configx.WithValue(KeyDevelopmentMode, true))
 
 	c.MustSet(ctx, KeyCookieSecure, true)
 	assert.True(t, c.CookieSecure(ctx))
@@ -453,7 +451,7 @@ func TestHookConfigs(t *testing.T) {
 	ctx := context.Background()
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
-	c := MustNew(context.Background(), l, configx.SkipValidation())
+	c := MustNew(t, l, configx.SkipValidation())
 
 	for key, getFunc := range map[string]func(context.Context) *HookConfig{
 		KeyRefreshTokenHook: c.TokenRefreshHookConfig,
@@ -492,7 +490,7 @@ func TestHookConfigs(t *testing.T) {
 func TestJWTBearer(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
-	p := MustNew(context.Background(), l)
+	p := MustNew(t, l)
 
 	ctx := context.Background()
 	// p.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, false)
@@ -505,7 +503,7 @@ func TestJWTBearer(t *testing.T) {
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIDOptional(ctx))
 
-	p2 := MustNew(context.Background(), l)
+	p2 := MustNew(t, l)
 
 	// p2.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, true)
 	p2.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "24h")
@@ -521,7 +519,7 @@ func TestJWTBearer(t *testing.T) {
 func TestJWTScopeClaimStrategy(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(io.Discard)
-	p := MustNew(context.Background(), l)
+	p := MustNew(t, l)
 
 	ctx := context.Background()
 

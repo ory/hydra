@@ -18,6 +18,7 @@ import (
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
@@ -60,11 +61,11 @@ var defaultIgnoreFields = []string{"client_id", "registration_access_token", "re
 
 func TestClientSDK(t *testing.T) {
 	ctx := context.Background()
-	r := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	r := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported:          []string{"public"},
 		config.KeyDefaultClientScope:             []string{"foo", "bar"},
 		config.KeyPublicAllowDynamicRegistration: true,
-	}))
+	})))
 
 	routerAdmin := x.NewRouterAdmin(r.Config().AdminURL)
 	routerPublic := x.NewRouterPublic()

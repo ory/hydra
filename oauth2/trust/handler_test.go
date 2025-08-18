@@ -45,10 +45,10 @@ type HandlerTestSuite struct {
 
 // Setup will run before the tests in the suite are run.
 func (s *HandlerTestSuite) SetupTest() {
-	s.registry = testhelpers.NewRegistryMemory(s.T(), configx.WithValues(map[string]any{
+	s.registry = testhelpers.NewRegistryMemory(s.T(), driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported: []string{"public"},
 		config.KeyDefaultClientScope:    []string{"foo", "bar"},
-	}))
+	})))
 
 	router := x.NewRouterAdmin(s.registry.Config().AdminURL)
 	handler := trust.NewHandler(s.registry)

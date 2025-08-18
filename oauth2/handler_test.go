@@ -15,6 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +43,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost"))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -83,17 +85,17 @@ func TestUserinfo(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
-		config.KeyScopeStrategy:    "",
-		config.KeyAuthCodeLifespan: lifespan,
-		config.KeyIssuerURL:        "http://hydra.localhost",
-	}))
-	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
-	defer ctrl.Finish()
-	reg.WithOAuth2Provider(op)
+	t.Cleanup(ctrl.Finish)
+
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
+		config.KeyScopeStrategy:    "",
+		config.KeyAuthCodeLifespan: lifespan,
+		config.KeyIssuerURL:        "http://hydra.localhost",
+	})), driver.WithOAuth2Provider(op))
+	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	h := reg.OAuth2Handler()
 
@@ -336,14 +338,14 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
 		config.KeySubjectTypesSupported:         []string{"pairwise", "public"},
 		config.KeyOIDCDiscoverySupportedClaims:  []string{"sub"},
 		config.KeyOAuth2ClientRegistrationURL:   "http://client-register/registration",
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
-	}))
+	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
 		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
@@ -382,14 +384,14 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
 		config.KeySubjectTypesSupported:         []string{"pairwise", "public"},
 		config.KeyOIDCDiscoverySupportedClaims:  []string{"sub"},
 		config.KeyOAuth2ClientRegistrationURL:   "http://client-register/registration",
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
-	}))
+	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
 		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 

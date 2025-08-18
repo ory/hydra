@@ -4,12 +4,13 @@
 package oauth2_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/x/configx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -21,8 +22,7 @@ func TestMain(m *testing.M) {
 func TestManagers(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	tests := []struct {
+	for _, tc := range []struct {
 		name                   string
 		enableSessionEncrypted bool
 	}{
@@ -34,14 +34,10 @@ func TestManagers(t *testing.T) {
 			name:                   "EnableSessionEncrypted",
 			enableSessionEncrypted: true,
 		},
-	}
-	for _, tc := range tests {
+	} {
 		t.Run("suite="+tc.name, func(t *testing.T) {
-			for k, r := range testhelpers.ConnectDatabases(t, false) {
+			for k, store := range testhelpers.ConnectDatabases(t, true, driver.WithConfigOptions(configx.WithValue(config.KeyEncryptSessionData, tc.enableSessionEncrypted))) {
 				t.Run("database="+k, func(t *testing.T) {
-					store := testhelpers.NewRegistrySQLFromURL(t, r.Config().DSN(), true)
-					store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
-
 					if k != "memory" {
 						t.Run("testHelperUniqueConstraints", testHelperRequestIDMultiples(store, k))
 						t.Run("case=testFositeSqlStoreTransactionsCommitAccessToken", testFositeSqlStoreTransactionCommitAccessToken(store))

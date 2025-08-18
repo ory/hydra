@@ -14,18 +14,15 @@ import (
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/popx"
-	"github.com/ory/x/servicelocatorx"
 )
 
 type MigrateHandler struct {
-	slOpts []servicelocatorx.Option
-	dOpts  []driver.OptionsModifier
+	dOpts []driver.OptionsModifier
 }
 
-func newMigrateHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *MigrateHandler {
+func newMigrateHandler(dOpts []driver.OptionsModifier) *MigrateHandler {
 	return &MigrateHandler{
-		slOpts: slOpts,
-		dOpts:  dOpts,
+		dOpts: dOpts,
 	}
 }
 
@@ -46,13 +43,12 @@ func (h *MigrateHandler) makePersister(cmd *cobra.Command, args []string) (p per
 
 	d, err := driver.New(
 		cmd.Context(),
-		servicelocatorx.NewOptions(),
-		opts)
+		opts...)
 	if err != nil {
 		return nil, err
 	}
 	if len(d.Config().DSN()) == 0 {
-		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "No DSN provided. Please provide a DSN as the first argument, or set the DSN environment variable.")
+		_, _ = fmt.Fprintln(cmd.ErrOrStderr(), "No DSN provided. Please provide a DSN as the first argument or set the DSN environment variable.")
 		return nil, cmdx.FailSilently(cmd)
 	}
 

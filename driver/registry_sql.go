@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/urfave/negroni"
+
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -19,7 +21,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/fosite"
@@ -46,7 +47,6 @@ import (
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
@@ -87,9 +87,6 @@ type RegistrySQL struct {
 	pmm             *prometheus.MetricsManager
 	oa2mw           func(h http.Handler) http.Handler
 	arhs            []oauth2.AccessRequestHook
-	buildVersion    string
-	buildHash       string
-	buildDate       string
 	r               Registry
 	persister       persistence.Persister
 	jfs             fosite.JWKSFetcherStrategy
@@ -106,6 +103,7 @@ type RegistrySQL struct {
 
 	defaultKeyManager jwk.Manager
 	initialPing       func(r *RegistrySQL) error
+	middlewares       []negroni.Handler
 }
 
 var (
@@ -116,41 +114,22 @@ var (
 // defaultInitialPing is the default function that will be called within RegistrySQL.Init to make sure
 // the database is reachable. It can be injected for test purposes by changing the value
 // of RegistrySQL.initialPing.
-var defaultInitialPing = func(m *RegistrySQL) error {
+func defaultInitialPing(m *RegistrySQL) error {
 	if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, m.Ping); err != nil {
 		m.Logger().Print("Could not ping database: ", err)
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 	return nil
-}
-
-func NewRegistrySQL(
-	c *config.DefaultProvider,
-	l *logrusx.Logger,
-	version, hash, date string,
-) *RegistrySQL {
-	r := &RegistrySQL{
-		buildVersion: version,
-		buildHash:    hash,
-		buildDate:    date,
-		l:            l,
-		conf:         c,
-		initialPing:  defaultInitialPing,
-	}
-
-	return r
 }
 
 func (m *RegistrySQL) Init(
 	ctx context.Context,
 	skipNetworkInit bool,
 	migrate bool,
-	ctxer contextx.Contextualizer,
 	extraMigrations []fs.FS,
 	goMigrations []popx.Migration,
 ) error {
 	if m.persister == nil {
-		m.WithContextualizer(ctxer)
 		var opts []instrumentedsql.Opt
 		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
@@ -184,13 +163,13 @@ func (m *RegistrySQL) Init(
 			},
 		)
 		if err != nil {
-			return errorsx.WithStack(err)
+			return errors.WithStack(err)
 		}
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
-			return errorsx.WithStack(err)
+			return errors.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(ctx, c, m, m.Config(), extraMigrations, goMigrations)
+		p, err := sql.NewPersister(c, m, m.Config(), extraMigrations, goMigrations)
 		if err != nil {
 			return err
 		}
@@ -295,11 +274,6 @@ func (m *RegistrySQL) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
 	return m.jfs
 }
 
-func (m *RegistrySQL) WithContextualizer(ctxer contextx.Contextualizer) Registry {
-	m.ctxer = ctxer
-	return m
-}
-
 func (m *RegistrySQL) Contextualizer() contextx.Contextualizer {
 	if m.ctxer == nil {
 		panic("registry Contextualizer not set")
@@ -354,23 +328,6 @@ func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 
-func (m *RegistrySQL) BuildVersion() string {
-	return m.buildVersion
-}
-
-func (m *RegistrySQL) BuildDate() string {
-	return m.buildDate
-}
-
-func (m *RegistrySQL) BuildHash() string {
-	return m.buildHash
-}
-
-func (m *RegistrySQL) WithConfig(c *config.DefaultProvider) Registry {
-	m.conf = c
-	return m
-}
-
 func (m *RegistrySQL) Writer() herodot.Writer {
 	if m.writer == nil {
 		h := herodot.NewJSONWriter(m.Logger())
@@ -380,36 +337,16 @@ func (m *RegistrySQL) Writer() herodot.Writer {
 	return m.writer
 }
 
-func (m *RegistrySQL) WithLogger(l *logrusx.Logger) Registry {
-	m.l = l
-	return m
-}
-
-func (m *RegistrySQL) WithTracer(t trace.Tracer) Registry {
-	m.trc = new(otelx.Tracer).WithOTLP(t)
-	return m
-}
-
-func (m *RegistrySQL) WithTracerWrapper(wrapper TracerWrapper) Registry {
-	m.tracerWrapper = wrapper
-	return m
-}
-
-func (m *RegistrySQL) WithKratos(k kratos.Client) Registry {
-	m.kratos = k
-	return m
-}
-
 func (m *RegistrySQL) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New("Ory Hydra", m.BuildVersion())
+		m.l = logrusx.New("Ory Hydra", config.Version)
 	}
 	return m.l
 }
 
 func (m *RegistrySQL) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
-		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
+		m.al = logrusx.NewAudit("Ory Hydra", config.Version)
 		m.al.UseConfig(m.Config().Source(contextx.RootContext))
 	}
 	return m.al
@@ -459,7 +396,7 @@ func (m *RegistrySQL) GrantValidator() *trust.GrantValidator {
 
 func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
-		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
+		m.hh = healthx.NewHandler(m.Writer(), config.Version, healthx.ReadyCheckers{
 			"database": func(r *http.Request) error {
 				return m.PingContext(r.Context())
 			},
@@ -632,12 +569,6 @@ func (m *RegistrySQL) ExtraFositeFactories() []fositex.Factory {
 	return m.fositeFactories
 }
 
-func (m *RegistrySQL) WithExtraFositeFactories(f []fositex.Factory) Registry {
-	m.fositeFactories = f
-
-	return m
-}
-
 func (m *RegistrySQL) OAuth2ProviderConfig() fosite.Configurator {
 	if m.oc != nil {
 		return m.oc
@@ -738,7 +669,7 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 
 func (m *RegistrySQL) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManagerWithPrefix("hydra", prometheus.HTTPMetrics, m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManagerWithPrefix("hydra", prometheus.HTTPMetrics, config.Version, config.Commit, config.Date)
 	}
 	return m.pmm
 }
@@ -750,11 +681,6 @@ func (m *RegistrySQL) Persister() persistence.Persister {
 // Config returns the configuration for the given context. It may or may not be the same as the global configuration.
 func (m *RegistrySQL) Config() *config.DefaultProvider {
 	return m.conf
-}
-
-// WithOAuth2Provider forces an oauth2 provider which is only used for testing.
-func (m *RegistrySQL) WithOAuth2Provider(f fosite.OAuth2Provider) {
-	m.fop = f
 }
 
 // WithConsentStrategy forces a consent strategy which is only used for testing.
@@ -770,10 +696,6 @@ func (m *RegistrySQL) AccessRequestHooks() []oauth2.AccessRequestHook {
 		}
 	}
 	return m.arhs
-}
-
-func (m *RegistrySQL) WithHsmContext(h hsm.Context) {
-	m.hsm = h
 }
 
 func (m *RegistrySQL) HSMContext() hsm.Context {
@@ -792,4 +714,8 @@ func (m *RegistrySQL) Kratos() kratos.Client {
 		m.kratos = kratos.New(m)
 	}
 	return m.kratos
+}
+
+func (m *RegistrySQL) HTTPMiddlewares() []negroni.Handler {
+	return m.middlewares
 }

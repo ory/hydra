@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
@@ -22,7 +23,7 @@ import (
 func TestHandlerConsent(t *testing.T) {
 	t.Parallel()
 
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY"))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")))
 
 	h := reg.OAuth2Handler()
 	r := x.NewRouterAdmin(reg.Config().AdminURL)

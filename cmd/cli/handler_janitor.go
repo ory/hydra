@@ -18,7 +18,6 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/servicelocatorx"
 )
 
 const (
@@ -36,14 +35,12 @@ const (
 )
 
 type JanitorHandler struct {
-	slOpts []servicelocatorx.Option
-	dOpts  []driver.OptionsModifier
+	dOpts []driver.OptionsModifier
 }
 
-func NewJanitorHandler(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *JanitorHandler {
+func newJanitorHandler(dOpts []driver.OptionsModifier) *JanitorHandler {
 	return &JanitorHandler{
-		slOpts: slOpts,
-		dOpts:  dOpts,
+		dOpts: dOpts,
 	}
 }
 
@@ -83,10 +80,10 @@ func (*JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 }
 
 func (j *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
-	return purge(cmd, args, servicelocatorx.NewOptions(j.slOpts...), j.dOpts)
+	return purge(cmd, args, j.dOpts)
 }
 
-func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts []driver.OptionsModifier) error {
+func purge(cmd *cobra.Command, args []string, dOpts []driver.OptionsModifier) error {
 	ctx := cmd.Context()
 	var d driver.Registry
 
@@ -123,7 +120,7 @@ func purge(cmd *cobra.Command, args []string, sl *servicelocatorx.Options, dOpts
 		driver.WithConfigOptions(co...),
 	)
 
-	d, err := driver.New(ctx, sl, do)
+	d, err := driver.New(ctx, do...)
 	if err != nil {
 		return errors.Wrap(err, "Could not create driver")
 	}

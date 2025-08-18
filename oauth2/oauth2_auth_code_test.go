@@ -173,15 +173,16 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	ctx := context.Background()
 
-	for dbName, reg := range testhelpers.ConnectDatabases(t, true) {
+	for dbName, reg := range testhelpers.ConnectDatabases(t, true, driver.WithConfigOptions(configx.WithValues(map[string]any{
+		config.KeyAccessTokenStrategy: "opaque",
+		config.KeyRefreshTokenHook:    "",
+	}))) {
 		t.Run("registry="+dbName, func(t *testing.T) {
 			t.Parallel()
 
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OpenIDConnectKeyName))
 			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OAuth2JWTKeyName))
 
-			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
-			reg.Config().MustSet(ctx, config.KeyRefreshTokenHook, "")
 			publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 			publicClient := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -1851,11 +1852,11 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
-			reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 				config.KeyAccessTokenLifespan: time.Second * 2,
 				config.KeyScopeStrategy:       "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 				config.KeyAccessTokenStrategy: strat.d,
-			}))
+			})))
 			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 

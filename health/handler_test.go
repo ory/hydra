@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
@@ -68,7 +69,7 @@ func TestPublicHealthHandler(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			reg := testhelpers.NewRegistryMemory(t, configx.WithValues(tc.config))
+			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(tc.config)))
 
 			public := x.NewRouterPublic()
 			reg.RegisterPublicRoutes(ctx, public)

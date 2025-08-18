@@ -10,6 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +26,7 @@ import (
 func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName}))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {

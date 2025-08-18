@@ -8,11 +8,10 @@ import (
 
 	"github.com/ory/hydra/v2/cmd/server"
 	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/x/servicelocatorx"
 )
 
-// adminCmd represents the admin command
-func NewServeAdminCmd(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) *cobra.Command {
+// NewServeAdminCmd returns a new admin serve command
+func NewServeAdminCmd(dOpts []driver.OptionsModifier) *cobra.Command {
 	return &cobra.Command{
 		Use:   "admin",
 		Short: "Serves Administrative HTTP/2 APIs",
@@ -28,6 +27,6 @@ This command does not work with the "memory" database. Both services (administra
 connection to be able to synchronize.
 
 ` + serveControls,
-		RunE: server.RunServeAdmin(slOpts, dOpts),
+		RunE: server.RunServeAdmin(dOpts),
 	}
 }

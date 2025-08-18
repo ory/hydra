@@ -347,8 +347,6 @@ func TestHelperNID(r interface {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		require.NoError(t, r.ClientManager().CreateClient(ctx, &testClient))
-		require.Error(t, t2InvalidNID.CreateLoginSession(ctx, &testLS))
-		require.NoError(t, t1ValidNID.CreateLoginSession(ctx, &testLS))
 
 		var err error
 		testLR.ID, err = testLR.ToLoginChallenge(ctx, r)

@@ -29,10 +29,10 @@ import (
 
 func TestValidate(t *testing.T) {
 	ctx := context.Background()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported: []string{"pairwise", "public"},
 		config.KeyDefaultClientScope:    []string{"openid"},
-	}))
+	})))
 	v := NewValidator(reg)
 
 	dec := json.NewDecoder(strings.NewReader(validJWKS))
@@ -295,10 +295,10 @@ func TestValidateIPRanges(t *testing.T) {
 }
 
 func TestValidateDynamicRegistration(t *testing.T) {
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported: []string{"pairwise", "public"},
 		config.KeyDefaultClientScope:    []string{"openid"},
-	}))
+	})))
 
 	v := NewValidator(reg)
 	for k, tc := range []struct {

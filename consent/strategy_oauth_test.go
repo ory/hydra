@@ -26,6 +26,7 @@ import (
 	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
@@ -36,13 +37,13 @@ import (
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	ctx := context.Background()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyAccessTokenStrategy:            "opaque",
 		config.KeyConsentRequestMaxAge:           time.Hour,
 		config.KeyScopeStrategy:                  "exact",
 		config.KeySubjectTypesSupported:          []string{"pairwise", "public"},
 		config.KeySubjectIdentifierAlgorithmSalt: "76d5d2bf-747f-4592-9fbd-d2b895a54b3a",
-	}))
+	})))
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())

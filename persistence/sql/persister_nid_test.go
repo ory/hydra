@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -52,12 +54,14 @@ var _ interface {
 } = (*PersisterTestSuite)(nil)
 
 func (s *PersisterTestSuite) SetupSuite() {
+	withCtxer := driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.TestContextualizer{}))
+
 	s.registries = map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true),
+		"memory": testhelpers.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true, withCtxer),
 	}
 
 	if !testing.Short() {
-		s.registries = testhelpers.ConnectDatabases(s.T(), true)
+		s.registries = testhelpers.ConnectDatabases(s.T(), true, withCtxer)
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -67,13 +71,11 @@ func (s *PersisterTestSuite) SetupSuite() {
 	for _, r := range s.registries {
 		require.NoError(s.T(), r.Persister().Connection(context.Background()).Create(&networkx.Network{ID: s.t1NID}))
 		require.NoError(s.T(), r.Persister().Connection(context.Background()).Create(&networkx.Network{ID: s.t2NID}))
-		r.WithContextualizer(&contextx.TestContextualizer{})
 	}
 }
 
 func (s *PersisterTestSuite) TearDownTest() {
 	for _, r := range s.registries {
-		r.WithContextualizer(&contextx.TestContextualizer{})
 		x.DeleteHydraRows(s.T(), r.Persister().Connection(context.Background()))
 	}
 }
@@ -2025,7 +2027,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			r.WithContextualizer(&contextx.Default{})
 			store, ok := r.Persister().(*persistencesql.Persister)
 			require.True(t, ok)
 			original := store.NetworkID(context.Background())

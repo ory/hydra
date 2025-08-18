@@ -5,12 +5,9 @@ package driver
 
 import (
 	"context"
-	"io/fs"
 	"net/http"
 
 	enigma "github.com/ory/fosite/token/hmac"
-	"github.com/ory/x/popx"
-
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/contextx"
@@ -40,9 +37,6 @@ import (
 
 type Registry interface {
 	dbal.Driver
-	WritableRegistry
-
-	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer, extraMigrations []fs.FS, goMigrations []popx.Migration) error
 
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
@@ -77,23 +71,12 @@ type Registry interface {
 	OAuth2HMACStrategy() foauth2.CoreStrategy
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
-	registry, err := NewRegistryWithoutInit(c, l)
-	if err != nil {
-		return nil, err
+func newRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*RegistrySQL, error) {
+	registry := &RegistrySQL{
+		l:           l,
+		conf:        c,
+		initialPing: defaultInitialPing,
 	}
-
-	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer, nil, nil); err != nil {
-		return nil, err
-	}
-
-	return registry, nil
-}
-
-func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*RegistrySQL, error) {
-	registry := NewRegistrySQL(
-		c, l, config.Version, config.Commit, config.Date,
-	)
 
 	if !registry.CanHandle(c.DSN()) {
 		if dbal.IsSQLite(c.DSN()) {
@@ -106,7 +89,7 @@ func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*Regi
 	return registry, nil
 }
 
-func CallRegistry(ctx context.Context, r Registry) {
+func callRegistry(ctx context.Context, r Registry) {
 	r.ClientValidator()
 	r.ClientManager()
 	r.ClientHasher()

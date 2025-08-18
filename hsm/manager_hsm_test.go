@@ -34,7 +34,6 @@ import (
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
 )
 
@@ -42,14 +41,14 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockHsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
-	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
-	c.MustSet(context.Background(), config.KeyDSN, "memory")
-	c.MustSet(context.Background(), config.HSMEnabled, "true")
-	reg, err := driver.NewRegistryWithoutInit(c, l)
+	reg, err := driver.New(t.Context(),
+		driver.WithConfigOptions(configx.WithValues(map[string]any{
+			config.KeyDSN:     "memory",
+			config.HSMEnabled: true,
+		})),
+		driver.WithHSMContext(mockHsmContext),
+	)
 	require.NoError(t, err)
-	reg.WithHsmContext(mockHsmContext)
-	assert.NoError(t, reg.Init(context.Background(), false, true, &contextx.TestContextualizer{}, nil, nil))
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }
@@ -59,7 +58,7 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	keySetPrefix := "application_specific_prefix."
 	c.MustSet(context.Background(), config.HSMKeySetPrefix, keySetPrefix)
 	m := hsm.NewKeyManager(hsmContext, c)
@@ -161,7 +160,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
@@ -342,7 +341,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
@@ -532,7 +531,7 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKey, err := rsa.GenerateKey(rand.Reader, 4096)
@@ -680,7 +679,7 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKeyPair := NewMockSignerDecrypter(ctrl)
@@ -763,7 +762,7 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(context.Background(), l, configx.SkipValidation())
+	c := config.MustNew(t, l, configx.SkipValidation())
 	m := hsm.NewKeyManager(hsmContext, c)
 
 	rsaKeyPair1 := NewMockSignerDecrypter(ctrl)

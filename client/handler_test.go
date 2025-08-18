@@ -13,28 +13,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/x/httprouterx"
-
-	"github.com/tidwall/sjson"
-
 	"github.com/gofrs/uuid"
-	"github.com/tidwall/gjson"
-
-	"github.com/ory/hydra/v2/internal/testhelpers"
-
-	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/x/contextx"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/x/snapshotx"
-
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/snapshotx"
+	"github.com/ory/x/sqlxx"
 )
 
 type responseSnapshot struct {
@@ -57,7 +48,6 @@ func TestHandler(t *testing.T) {
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t)
 	h := client.NewHandler(reg)
-	reg.WithContextualizer(&contextx.TestContextualizer{})
 
 	t.Run("create client registration tokens", func(t *testing.T) {
 		for k, tc := range []struct {

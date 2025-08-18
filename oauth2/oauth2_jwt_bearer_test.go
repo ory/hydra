@@ -26,6 +26,7 @@ import (
 
 	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
@@ -39,7 +40,7 @@ func TestJWTBearer(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyAccessTokenStrategy, "opaque"))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
 	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	secret := uuid.Must(uuid.NewV4()).String()

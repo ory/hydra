@@ -28,7 +28,6 @@ import (
 	"github.com/ory/x/otelx/semconv"
 	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/reqlog"
-	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/tlsx"
 
 	"github.com/ory/hydra/v2/client"
@@ -46,20 +45,19 @@ func ensureNoMemoryDSN(r driver.Registry) {
 	}
 }
 
-func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
+func RunServeAdmin(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
-		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(ctx, sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(ctx, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags())))...)
 		if err != nil {
 			return err
 		}
 		ensureNoMemoryDSN(d)
 
-		srv, err := adminServer(ctx, d, sl, sqa(ctx, d, cmd))
+		srv, err := adminServer(ctx, d, sqa(ctx, d, cmd))
 		if err != nil {
 			return err
 		}
@@ -67,20 +65,19 @@ func RunServeAdmin(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifi
 	}
 }
 
-func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
+func RunServePublic(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
-		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(ctx, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags())))...)
 		if err != nil {
 			return err
 		}
 		ensureNoMemoryDSN(d)
 
-		srv, err := publicServer(ctx, d, sl, sqa(ctx, d, cmd))
+		srv, err := publicServer(ctx, d, sqa(ctx, d, cmd))
 		if err != nil {
 			return err
 		}
@@ -88,14 +85,13 @@ func RunServePublic(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModif
 	}
 }
 
-func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
+func RunServeAll(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		fmt.Println(banner(config.Version))
 
 		ctx := cmd.Context()
-		sl := servicelocatorx.NewOptions(slOpts...)
 
-		d, err := driver.New(cmd.Context(), sl, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags()))))
+		d, err := driver.New(ctx, append(dOpts, driver.WithConfigOptions(configx.WithFlags(cmd.Flags())))...)
 		if err != nil {
 			return err
 		}
@@ -103,11 +99,11 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 		eg, ctx := errgroup.WithContext(ctx)
 		ms := sqa(ctx, d, cmd)
 
-		srvAdmin, err := adminServer(ctx, d, sl, ms)
+		srvAdmin, err := adminServer(ctx, d, ms)
 		if err != nil {
 			return err
 		}
-		srvPublic, err := publicServer(ctx, d, sl, ms)
+		srvPublic, err := publicServer(ctx, d, ms)
 		if err != nil {
 			return err
 		}
@@ -118,7 +114,7 @@ func RunServeAll(slOpts []servicelocatorx.Option, dOpts []driver.OptionsModifier
 	}
 }
 
-func adminServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Options, metricsService *metricsx.Service) (func() error, error) {
+func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServeAdmin(contextx.RootContext)
 
 	n := negroni.New()
@@ -142,7 +138,7 @@ func adminServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Opt
 		n.Use(mw)
 	}
 
-	for _, mw := range sl.HTTPMiddlewares() {
+	for _, mw := range d.HTTPMiddlewares() {
 		n.Use(mw)
 	}
 	n.UseFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -165,7 +161,7 @@ func adminServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Opt
 	}, nil
 }
 
-func publicServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Options, metricsService *metricsx.Service) (func() error, error) {
+func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServePublic(contextx.RootContext)
 
 	n := negroni.New()
@@ -189,7 +185,7 @@ func publicServer(ctx context.Context, d driver.Registry, sl *servicelocatorx.Op
 		n.Use(mw)
 	}
 
-	for _, mw := range sl.HTTPMiddlewares() {
+	for _, mw := range d.HTTPMiddlewares() {
 		n.Use(mw)
 	}
 	n.UseFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

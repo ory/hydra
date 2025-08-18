@@ -350,23 +350,19 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	return f, nil
 }
 
-func (p *Persister) HandleLoginRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledLoginRequest) (lr *flow.LoginRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleLoginRequest")
+func (p *Persister) UpdateFlowWithHandledLoginRequest(ctx context.Context, f *flow.Flow, r *flow.HandledLoginRequest) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateFlowWithHandledLoginRequest")
 	defer otelx.End(span, &err)
 
 	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	r.ID = f.ID
-	err = f.HandleLoginRequest(r)
-	if err != nil {
-		return nil, err
-	}
 
-	return p.GetLoginRequest(ctx, challenge)
+	return f.UpdateFlowWithHandledLoginRequest(r)
 }
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (_ *flow.HandledLoginRequest, err error) {

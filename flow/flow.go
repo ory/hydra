@@ -396,7 +396,7 @@ func NewFlow(r *LoginRequest) *Flow {
 	}
 }
 
-func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
+func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	if f.LoginWasUsed {
 		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
 	}

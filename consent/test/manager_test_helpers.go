@@ -357,9 +357,9 @@ func TestHelperNID(r interface {
 		require.Error(t, err)
 		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)
 		require.NoError(t, err)
-		_, err = t2InvalidNID.HandleLoginRequest(ctx, &testLR, testLR.ID, &testHLR)
+		err = t2InvalidNID.UpdateFlowWithHandledLoginRequest(ctx, &testLR, &testHLR)
 		require.Error(t, err)
-		_, err = t1ValidNID.HandleLoginRequest(ctx, &testLR, testLR.ID, &testHLR)
+		err = t1ValidNID.UpdateFlowWithHandledLoginRequest(ctx, &testLR, &testHLR)
 		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
@@ -587,9 +587,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					assert.False(t, got1.WasHandled)
 					compareAuthenticationRequest(t, c, got1)
 
-					got1, err = m.HandleLoginRequest(ctx, f, loginChallenge, h)
+					err = m.UpdateFlowWithHandledLoginRequest(ctx, f, h)
 					require.NoError(t, err)
-					compareAuthenticationRequest(t, c, got1)
 
 					loginVerifier := x.Must(f.ToLoginVerifier(ctx, deps))
 

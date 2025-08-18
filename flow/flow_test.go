@@ -214,9 +214,9 @@ func TestFlow_NewFlow(t *testing.T) {
 	})
 }
 
-func TestFlow_HandleLoginRequest(t *testing.T) {
+func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 	t.Run(
-		"HandleLoginRequest should ignore RequestedAt in its argument and copy the other fields",
+		"UpdateFlowWithHandledLoginRequest should ignore RequestedAt in its argument and copy the other fields",
 		func(t *testing.T) {
 			f := Flow{}
 			assert.NoError(t, faker.FakeData(&f))
@@ -229,7 +229,7 @@ func TestFlow_HandleLoginRequest(t *testing.T) {
 			r.ForceSubjectIdentifier = f.ForceSubjectIdentifier
 			f.LoginWasUsed = false
 
-			assert.NoError(t, f.HandleLoginRequest(&r))
+			assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&r))
 
 			actual := f.GetHandledLoginRequest()
 			assert.NotEqual(t, r.RequestedAt, actual.RequestedAt)
@@ -247,7 +247,7 @@ func TestFlow_InvalidateLoginRequest(t *testing.T) {
 			Subject:    "t3-sub",
 			WasHandled: false,
 		})
-		assert.NoError(t, f.HandleLoginRequest(&HandledLoginRequest{
+		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
 			WasHandled: false,
@@ -262,7 +262,7 @@ func TestFlow_InvalidateLoginRequest(t *testing.T) {
 			Subject:    "t3-sub",
 			WasHandled: false,
 		})
-		assert.NoError(t, f.HandleLoginRequest(&HandledLoginRequest{
+		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
 			WasHandled: true,

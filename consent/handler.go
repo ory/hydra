@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/pkg/errors"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
@@ -27,6 +25,7 @@ import (
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
+	"github.com/pkg/errors"
 )
 
 type Handler struct {
@@ -496,13 +495,12 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &handledLoginRequest)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+	if err := h.r.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &handledLoginRequest); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	ru, err := url.Parse(request.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -514,7 +512,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	events.Trace(ctx, events.LoginAccepted, events.WithClientID(request.Client.GetID()), events.WithSubject(handledLoginRequest.Subject))
+	events.Trace(ctx, events.LoginAccepted, events.WithClientID(f.Client.GetID()), events.WithSubject(handledLoginRequest.Subject))
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
@@ -596,13 +594,12 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
+	if err := h.r.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &flow.HandledLoginRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: ar.RequestedAt,
-	})
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+	}); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -612,13 +609,13 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	ru, err := url.Parse(request.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	events.Trace(ctx, events.LoginRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+	events.Trace(ctx, events.LoginRejected, events.WithClientID(f.Client.GetID()), events.WithSubject(f.Subject))
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),

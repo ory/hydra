@@ -47,7 +47,7 @@ type (
 		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error
 
 		GetLoginRequest(ctx context.Context, challenge string) (*flow.LoginRequest, error)
-		HandleLoginRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledLoginRequest) (*flow.LoginRequest, error)
+		UpdateFlowWithHandledLoginRequest(ctx context.Context, f *flow.Flow, r *flow.HandledLoginRequest) error
 		VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.HandledLoginRequest, error)
 
 		CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error

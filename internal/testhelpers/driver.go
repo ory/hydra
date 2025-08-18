@@ -134,8 +134,8 @@ func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {
 	return
 }
 
-func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier) map[string]driver.Registry {
-	regs := make(map[string]driver.Registry)
+func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier) map[string]*driver.RegistrySQL {
+	regs := make(map[string]*driver.RegistrySQL)
 	regs["memory"] = NewRegistryMemory(t, opts...)
 	if !testing.Short() {
 		pg, mysql, crdb := ConnectDatabasesURLs(t)
@@ -146,7 +146,7 @@ func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier
 	return regs
 }
 
-func MustEnsureRegistryKeys(ctx context.Context, r driver.Registry, key string) {
+func MustEnsureRegistryKeys(ctx context.Context, r *driver.RegistrySQL, key string) {
 	if err := jwk.EnsureAsymmetricKeypairExists(ctx, r, string(jose.ES256), key); err != nil {
 		panic(err)
 	}

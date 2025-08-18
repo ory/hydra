@@ -33,7 +33,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/uuidx"
@@ -41,7 +40,7 @@ import (
 
 type PersisterTestSuite struct {
 	suite.Suite
-	registries map[string]driver.Registry
+	registries map[string]*driver.RegistrySQL
 	t1         context.Context
 	t2         context.Context
 	t1NID      uuid.UUID
@@ -56,13 +55,7 @@ var _ interface {
 func (s *PersisterTestSuite) SetupSuite() {
 	withCtxer := driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.TestContextualizer{}))
 
-	s.registries = map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true, withCtxer),
-	}
-
-	if !testing.Short() {
-		s.registries = testhelpers.ConnectDatabases(s.T(), true, withCtxer)
-	}
+	s.registries = testhelpers.ConnectDatabases(s.T(), true, withCtxer)
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
 	s.t1 = contextx.SetNIDContext(context.Background(), s.t1NID)

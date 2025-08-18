@@ -365,24 +365,23 @@ func (p *Persister) UpdateFlowWithHandledLoginRequest(ctx context.Context, f *fl
 	return f.UpdateFlowWithHandledLoginRequest(r)
 }
 
-func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (_ *flow.HandledLoginRequest, err error) {
+func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
 	defer otelx.End(span, &err)
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
 	if err != nil {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
 	}
 
 	if err := f.InvalidateLoginRequest(); err != nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
-	d := f.GetHandledLoginRequest()
 
-	return &d, nil
+	return f, nil
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (_ *flow.LoginSession, err error) {

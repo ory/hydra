@@ -374,25 +374,19 @@ func (s *DefaultStrategy) verifyAuthentication(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyAuthentication")
 	defer otelx.End(span, &err)
 
-	// We decode the flow from the cookie again because VerifyAndInvalidateLoginRequest does not return the flow
-	f, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
-	if err != nil {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier is invalid."))
-	}
-
-	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
+	f, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
 	}
 
-	if session.HasError() {
-		session.Error.SetDefaults(flow.LoginRequestDeniedErrorName)
-		return nil, errors.WithStack(session.Error.ToRFCError())
+	if f.LoginError.IsError() {
+		f.LoginError.SetDefaults(flow.LoginRequestDeniedErrorName)
+		return nil, errors.WithStack(f.LoginError.ToRFCError())
 	}
 
-	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+	if f.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
 
@@ -401,30 +395,21 @@ func (s *DefaultStrategy) verifyAuthentication(
 		return nil, err
 	}
 
-	clientSpecificCookieNameLoginCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameLoginCSRF(ctx), session.LoginRequest.Client.CookieSuffix())
-	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameLoginCSRF, session.LoginRequest.CSRF, f); err != nil {
+	clientSpecificCookieNameLoginCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameLoginCSRF(ctx), f.Client.CookieSuffix())
+	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameLoginCSRF, f.LoginCSRF, f); err != nil {
 		return nil, err
 	}
 
-	if session.LoginRequest.Skip && !session.Remember {
+	if f.LoginSkip && !f.LoginRemember {
 		return nil, errors.WithStack(fosite.ErrServerError.WithHint("The login request was previously remembered and can only be forgotten using the reject feature."))
 	}
 
-	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
-		// Revoke the session because there's clearly a mix up wrt the subject that's being authenticated
-		if err := s.revokeAuthenticationSession(ctx, w, r); err != nil {
-			return nil, err
-		}
-
-		return nil, errors.WithStack(fosite.ErrServerError.WithHint("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
-	}
-
-	subjectIdentifier, err := s.ObfuscateSubjectIdentifier(ctx, req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
+	subjectIdentifier, err := s.ObfuscateSubjectIdentifier(ctx, req.GetClient(), f.Subject, f.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
 
-	sessionID := session.LoginRequest.SessionID.String()
+	sessionID := f.SessionID.String()
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -444,11 +429,11 @@ func (s *DefaultStrategy) verifyAuthentication(
 					Subject:     subjectIdentifier,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
-					AuthTime:    time.Time(session.AuthenticatedAt),
-					RequestedAt: session.RequestedAt,
+					AuthTime:    time.Time(f.LoginAuthenticatedAt),
+					RequestedAt: f.RequestedAt,
 				},
 				Headers: &jwt.Headers{},
-				Subject: session.Subject,
+				Subject: f.Subject,
 			},
 		},
 	}); errors.Is(err, fosite.ErrLoginRequired) {
@@ -462,23 +447,23 @@ func (s *DefaultStrategy) verifyAuthentication(
 		return nil, err
 	}
 
-	if session.ForceSubjectIdentifier != "" {
+	if f.ForceSubjectIdentifier != "" {
 		if err := s.r.ConsentManager().CreateForcedObfuscatedLoginSession(ctx, &ForcedObfuscatedLoginSession{
-			Subject:           session.Subject,
+			Subject:           f.Subject,
 			ClientID:          req.GetClient().GetID(),
-			SubjectObfuscated: session.ForceSubjectIdentifier,
+			SubjectObfuscated: f.ForceSubjectIdentifier,
 		}); err != nil {
 			return nil, err
 		}
 	}
 
 	rememberFor := s.r.Config().GetAuthenticationSessionLifespan(ctx)
-	if session.RememberFor > 0 {
-		rememberFor = min(time.Second*time.Duration(session.RememberFor), rememberFor)
+	if f.LoginRememberFor > 0 {
+		rememberFor = min(time.Second*time.Duration(f.LoginRememberFor), rememberFor)
 	}
 
-	if !session.LoginRequest.Skip {
-		if time.Time(session.AuthenticatedAt).IsZero() {
+	if !f.LoginSkip {
+		if time.Time(f.LoginAuthenticatedAt).IsZero() {
 			return nil, errors.WithStack(fosite.ErrServerError.WithHint(
 				"Expected the handled login request to contain a valid authenticated_at value but it was zero. " +
 					"This is a bug which should be reported to https://github.com/ory/hydra."))
@@ -486,10 +471,10 @@ func (s *DefaultStrategy) verifyAuthentication(
 
 		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, &flow.LoginSession{
 			ID:                        sessionID,
-			AuthenticatedAt:           session.AuthenticatedAt,
-			Subject:                   session.Subject,
-			IdentityProviderSessionID: sqlxx.NullString(session.IdentityProviderSessionID),
-			Remember:                  session.Remember,
+			AuthenticatedAt:           f.LoginAuthenticatedAt,
+			Subject:                   f.Subject,
+			IdentityProviderSessionID: f.IdentityProviderSessionID,
+			Remember:                  f.LoginRemember,
 			ExpiresAt:                 sqlxx.NullTime(time.Now().Add(rememberFor).UTC()),
 		}); err != nil {
 			if errors.Is(err, sqlcon.ErrUniqueViolation) {
@@ -499,7 +484,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 		}
 	}
 
-	if !session.Remember && !session.LoginRequest.Skip {
+	if !f.LoginRemember && !f.LoginSkip {
 		// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
 		// wants us to store a cookie. So let's bust the authentication session (if one exists).
 		if err := s.revokeAuthenticationSession(ctx, w, r); err != nil {
@@ -507,7 +492,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 		}
 	}
 
-	if !session.Remember || session.LoginRequest.Skip && !session.ExtendSessionLifespan {
+	if !f.LoginRemember || f.LoginSkip && !f.LoginExtendSessionLifespan {
 		// If the user doesn't want to remember the session, we do not store a cookie.
 		// If login was skipped, it means an authentication cookie was present and
 		// we don't want to touch it (in order to preserve its original expiry date)
@@ -518,8 +503,8 @@ func (s *DefaultStrategy) verifyAuthentication(
 	cookie, _ := store.Get(r, s.c.SessionCookieName(ctx))
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.MaxAge = int(s.c.GetAuthenticationSessionLifespan(ctx).Seconds())
-	if session.RememberFor > 0 {
-		cookie.Options.MaxAge = session.RememberFor
+	if f.LoginRememberFor > 0 {
+		cookie.Options.MaxAge = f.LoginRememberFor
 	}
 	cookie.Options.HttpOnly = true
 	cookie.Options.Path = s.c.SessionCookiePath(ctx)

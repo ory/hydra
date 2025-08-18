@@ -592,7 +592,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 					got2, err := m.VerifyAndInvalidateLoginRequest(ctx, loginVerifier)
 					require.NoError(t, err)
-					compareAuthenticationRequest(t, c, got2.LoginRequest)
+					compareAuthenticationRequestFlow(t, c, got2)
 
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 					got1, err = m.GetLoginRequest(ctx, loginChallenge)
@@ -1226,6 +1226,18 @@ func compareAuthenticationRequest(t *testing.T, a, b *flow.LoginRequest) {
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
 	assert.EqualValues(t, a.CSRF, b.CSRF)
 	assert.EqualValues(t, a.Skip, b.Skip)
+	assert.EqualValues(t, a.SessionID, b.SessionID)
+}
+
+func compareAuthenticationRequestFlow(t *testing.T, a *flow.LoginRequest, b *flow.Flow) {
+	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
+	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)
+	assert.EqualValues(t, a.Subject, b.Subject)
+	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)
+	assert.EqualValues(t, a.Verifier, b.LoginVerifier)
+	assert.EqualValues(t, a.RequestURL, b.RequestURL)
+	assert.EqualValues(t, a.CSRF, b.LoginCSRF)
+	assert.EqualValues(t, a.Skip, b.LoginSkip)
 	assert.EqualValues(t, a.SessionID, b.SessionID)
 }
 

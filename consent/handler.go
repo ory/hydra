@@ -18,7 +18,6 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
@@ -489,7 +488,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	}
 	handledLoginRequest.RequestedAt = loginRequest.RequestedAt
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsLoginChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -588,7 +587,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsLoginChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -774,7 +773,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -882,7 +881,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -1117,7 +1116,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsDeviceChallenge)
+	f, err := h.decodeFlowWithClient(ctx, challenge, flow.AsDeviceChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -1189,8 +1188,8 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	})
 }
 
-func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flowctx.CodecOption) (*flow.Flow, error) {
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
+func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flow.CodecOption) (*flow.Flow, error) {
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
 	if err != nil {
 		return nil, err
 	}

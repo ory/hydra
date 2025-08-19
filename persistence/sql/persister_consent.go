@@ -19,7 +19,6 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/otelx"
@@ -174,7 +173,7 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlowByConsentChallenge")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flow.AsConsentChallenge)
 	if err != nil {
 		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
@@ -220,7 +219,7 @@ func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge stri
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceUserAuthRequest")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsDeviceChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flow.AsDeviceChallenge)
 	if err != nil {
 		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
@@ -258,7 +257,7 @@ func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateDeviceUserAuthRequest")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsDeviceVerifier)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsDeviceVerifier)
 	if err != nil {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
 	}
@@ -291,7 +290,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge, flowctx.AsLoginChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge, flow.AsLoginChallenge)
 	if err != nil {
 		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
@@ -330,7 +329,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsConsentVerifier)
 	if err != nil {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
@@ -368,7 +367,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
 	defer otelx.End(span, &err)
 
-	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsLoginVerifier)
+	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsLoginVerifier)
 	if err != nil {
 		return nil, errors.WithStack(sqlcon.ErrNoRows)
 	}

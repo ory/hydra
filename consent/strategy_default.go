@@ -22,14 +22,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/mapx"
 	"github.com/ory/x/otelx"
@@ -641,7 +639,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	defer otelx.End(span, &err)
 
 	// We decode the flow here once again because VerifyAndInvalidateConsentRequest does not return the flow
-	decodedFlow, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
+	decodedFlow, err := flow.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flow.AsConsentVerifier)
 	if err != nil {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
@@ -1292,7 +1290,7 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 	defer otelx.End(span, &err)
 
 	// We decode the flow from the cookie again because VerifyAndInvalidateDeviceRequest does not return the flow
-	f, err := flowctx.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flowctx.AsDeviceVerifier)
+	f, err := flow.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flow.AsDeviceVerifier)
 	if err != nil {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier is invalid."))
 	}

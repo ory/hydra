@@ -6,8 +6,6 @@ package persistence
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/jwk"
@@ -33,14 +31,10 @@ type (
 		Connection(context.Context) *pop.Connection
 		Transaction(context.Context, func(ctx context.Context, c *pop.Connection) error) error
 		Ping(context.Context) error
-		Networker
+		DetermineNetwork(ctx context.Context) (*networkx.Network, error)
+		x.Networker
 	}
 	Provider interface {
 		Persister() Persister
-	}
-
-	Networker interface {
-		NetworkID(ctx context.Context) uuid.UUID
-		DetermineNetwork(ctx context.Context) (*networkx.Network, error)
 	}
 )

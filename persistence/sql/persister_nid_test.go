@@ -1110,25 +1110,6 @@ func (s *PersisterTestSuite) TestGetGrants() {
 	}
 }
 
-func (s *PersisterTestSuite) TestGetLoginRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			f := flow.Flow{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now(), NID: s.t1NID}
-
-			challenge := x.Must(f.ToLoginChallenge(s.t1, r))
-
-			actual, err := r.Persister().GetLoginRequest(s.t2, challenge)
-			require.Error(t, err)
-			require.Nil(t, actual)
-
-			actual, err = r.Persister().GetLoginRequest(s.t1, challenge)
-			require.NoError(t, err)
-			require.NotNil(t, actual)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestGetLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {

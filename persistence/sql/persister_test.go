@@ -208,7 +208,7 @@ func TestManagers(t *testing.T) {
 			)
 		}
 		t.Run("package=consent/manager="+k+"/case=nid",
-			test.TestHelperNID(r1, r1.ConsentManager(), rInv.ConsentManager()),
+			test.TestHelperNID(r1.ConsentManager(), rInv.ConsentManager()),
 		)
 	}
 }

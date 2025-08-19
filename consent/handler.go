@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/pagination/tokenpagination"
 	"github.com/ory/x/sqlxx"
@@ -353,6 +354,9 @@ type getOAuth2LoginRequest struct {
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2LoginRequest")
+	defer otelx.End(span, &err)
 	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -363,28 +367,24 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	if request.WasHandled {
+
+	if f.LoginWasUsed {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
-			RedirectTo: request.RequestURL,
+			RedirectTo: f.RequestURL,
 		})
 		return
 	}
 
-	if request.RequestedScope == nil {
-		request.RequestedScope = []string{}
-	}
-
-	if request.RequestedAudience == nil {
-		request.RequestedAudience = []string{}
-	}
-
-	request.Client = sanitizeClient(request.Client)
-	h.r.Writer().Write(w, r, request)
+	// Keep compatibility with the old / existing login request format.
+	lr := f.GetLoginRequest()
+	lr.ID = challenge // The ID of the login request is the AEAD challenge.
+	lr.Client.Secret = ""
+	h.r.Writer().Write(w, r, lr)
 }
 
 // Accept OAuth 2.0 Login Request
@@ -431,7 +431,9 @@ type acceptOAuth2LoginRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.acceptOAuth2LoginRequest")
+	defer otelx.End(span, &err)
 
 	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
@@ -442,30 +444,29 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	var handledLoginRequest flow.HandledLoginRequest
+	var payload flow.HandledLoginRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&handledLoginRequest); err != nil {
+	if err := d.Decode(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
-	if handledLoginRequest.Subject == "" {
+	if payload.Subject == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
 		return
 	}
 
-	handledLoginRequest.ID = challenge
-	loginRequest, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
-	} else if loginRequest.Subject != "" && handledLoginRequest.Subject != loginRequest.Subject {
+	} else if f.Subject != "" && payload.Subject != f.Subject {
 		// The subject that was confirmed by the login screen does not match what we
 		// remembered in the session cookie. We handle this gracefully by redirecting the
 		// original authorization request URL, but attaching "prompt=login" to the query.
 		// This forces the user to log in again.
-		requestURL, err := url.Parse(loginRequest.RequestURL)
+		requestURL, err := url.Parse(f.RequestURL)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -476,24 +477,20 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if loginRequest.Skip {
-		handledLoginRequest.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		handledLoginRequest.AuthenticatedAt = loginRequest.AuthenticatedAt
+	if f.LoginSkip {
+		payload.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
+		payload.AuthenticatedAt = f.LoginAuthenticatedAt
 	} else {
-		handledLoginRequest.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+		payload.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
 			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
 			Truncate(time.Second))
-		loginRequest.AuthenticatedAt = handledLoginRequest.AuthenticatedAt
+		f.LoginAuthenticatedAt = payload.AuthenticatedAt
 	}
-	handledLoginRequest.RequestedAt = loginRequest.RequestedAt
+	payload.RequestedAt = f.RequestedAt
 
-	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsLoginChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if err := h.r.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &handledLoginRequest); err != nil {
+	// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
+	payload.ID = f.ID
+	if err := f.UpdateFlowWithHandledLoginRequest(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
@@ -510,7 +507,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	events.Trace(ctx, events.LoginAccepted, events.WithClientID(f.Client.GetID()), events.WithSubject(handledLoginRequest.Subject))
+	events.Trace(ctx, events.LoginAccepted, events.WithClientID(f.Client.GetID()), events.WithSubject(payload.Subject))
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
@@ -559,43 +556,41 @@ type rejectOAuth2LoginRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.rejectOAuth2LoginRequest")
+	defer otelx.End(span, &err)
 
 	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
+
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
-	var p flow.RequestDeniedError
+	var payload flow.RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err := d.Decode(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
-	p.Valid = true
-	p.SetDefaults(flow.LoginRequestDeniedErrorName)
-	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
+	payload.Valid = true
+	payload.SetDefaults(flow.LoginRequestDeniedErrorName)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsLoginChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if err := h.r.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &flow.HandledLoginRequest{
-		Error:       &p,
-		ID:          challenge,
-		RequestedAt: ar.RequestedAt,
+	if err := f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{
+		Error: &payload,
+		// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
+		ID:          f.ID,
+		RequestedAt: f.RequestedAt,
 	}); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return

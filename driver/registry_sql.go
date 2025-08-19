@@ -619,6 +619,10 @@ func (m *RegistrySQL) ConsentHandler() *consent.Handler {
 	return m.coh
 }
 
+func (m *RegistrySQL) Networker() x.Networker {
+	return m.persister
+}
+
 func (m *RegistrySQL) OAuth2Handler() *oauth2.Handler {
 	if m.oah == nil {
 		m.oah = oauth2.NewHandler(m)

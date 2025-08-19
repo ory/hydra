@@ -123,7 +123,7 @@ func TestGetLoginRequest(t *testing.T) {
 				require.NoError(t, err)
 
 				if tc.handled {
-					err := reg.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &flow.HandledLoginRequest{ID: challenge, WasHandled: true})
+					err := f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{ID: f.ID, WasHandled: true})
 					require.NoError(t, err)
 					challenge, err = f.ToLoginChallenge(ctx, reg)
 					require.NoError(t, err)
@@ -191,8 +191,8 @@ func TestGetConsentRequest(t *testing.T) {
 				var err error
 				challenge, err = f.ToLoginChallenge(ctx, reg)
 				require.NoError(t, err)
-				err = reg.ConsentManager().UpdateFlowWithHandledLoginRequest(ctx, f, &flow.HandledLoginRequest{
-					ID: challenge,
+				err = f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{
+					ID: f.ID,
 				})
 				require.NoError(t, err)
 				challenge, err = f.ToConsentChallenge(ctx, reg)

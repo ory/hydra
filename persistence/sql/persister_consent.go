@@ -286,28 +286,6 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow
 	return &f, nil
 }
 
-func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) (_ *flow.LoginRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetLoginRequest")
-	defer otelx.End(span, &err)
-
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge, flow.AsLoginChallenge)
-	if err != nil {
-		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound)
-	}
-	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
-	}
-	lr := f.GetLoginRequest()
-	// Restore the short challenge ID, which was previously sent to the encoded flow,
-	// to make sure that the challenge ID in the returned flow matches the param.
-	lr.ID = loginChallenge
-
-	return lr, nil
-}
-
 func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *flow.AcceptOAuth2ConsentRequest) (_ *flow.OAuth2ConsentRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
 	defer otelx.End(span, &err)
@@ -346,21 +324,6 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	}
 
 	return f, nil
-}
-
-func (p *Persister) UpdateFlowWithHandledLoginRequest(ctx context.Context, f *flow.Flow, r *flow.HandledLoginRequest) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateFlowWithHandledLoginRequest")
-	defer otelx.End(span, &err)
-
-	if f == nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return errors.WithStack(x.ErrNotFound)
-	}
-	r.ID = f.ID
-
-	return f.UpdateFlowWithHandledLoginRequest(r)
 }
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {

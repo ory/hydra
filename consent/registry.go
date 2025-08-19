@@ -18,6 +18,8 @@ type InternalRegistry interface {
 	x.RegistryCookieStore
 	x.RegistryLogger
 	x.HTTPClientProvider
+	x.TracingProvider
+	x.NetworkProvider
 	kratos.Provider
 	Registry
 	client.Registry

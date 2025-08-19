@@ -10,25 +10,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
+	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/hydra/v2/consent"
-	"github.com/ory/hydra/v2/oauth2"
-
 	"github.com/ory/hydra/v2/aead"
+	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
-
-	"github.com/gofrs/uuid"
+	"github.com/ory/x/sqlxx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/x/sqlxx"
-
-	"github.com/ory/fosite"
-
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/x"
 )
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *flow.OAuth2ConsentRequest, h *flow.AcceptOAuth2ConsentRequest, f *flow.Flow) {
@@ -313,52 +309,14 @@ func makeID(base string, network string, key string) string {
 	return fmt.Sprintf("%s-%s-%s", base, network, key)
 }
 
-func TestHelperNID(r interface {
-	client.ManagerProvider
-	FlowCipher() *aead.XChaCha20Poly1305
-}, t1ValidNID consent.Manager, t2InvalidNID consent.Manager) func(t *testing.T) {
-	testClient := client.Client{ID: "2022-03-11-client-nid-test-1"}
+func TestHelperNID(t1ValidNID consent.Manager, t2InvalidNID consent.Manager) func(t *testing.T) {
 	testLS := flow.LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
 	}
-	testLR := flow.Flow{
-		ID:            "2022-03-11-lr-nid-test-1",
-		Subject:       "2022-03-11-test-1-sub",
-		LoginVerifier: "2022-03-11-test-1-ver",
-		RequestedAt:   time.Now(),
-		Client:        &client.Client{ID: "2022-03-11-client-nid-test-1"},
-		NID:           t1ValidNID.NetworkID(context.Background()),
-		State:         flow.FlowStateLoginInitialized,
-	}
-	testHLR := flow.HandledLoginRequest{
-		RememberFor:            120,
-		Remember:               true,
-		ID:                     testLR.ID,
-		RequestedAt:            testLR.RequestedAt,
-		AuthenticatedAt:        sqlxx.NullTime(time.Now()),
-		Error:                  nil,
-		Subject:                testLR.Subject,
-		ACR:                    "acr",
-		ForceSubjectIdentifier: "2022-03-11-test-1-forced-sub",
-		WasHandled:             false,
-	}
-
 	return func(t *testing.T) {
 		ctx := context.Background()
-		require.NoError(t, r.ClientManager().CreateClient(ctx, &testClient))
 
-		var err error
-		testLR.ID, err = testLR.ToLoginChallenge(ctx, r)
-		require.NoError(t, err)
-		_, err = t2InvalidNID.GetLoginRequest(ctx, testLR.ID)
-		require.Error(t, err)
-		_, err = t1ValidNID.GetLoginRequest(ctx, testLR.ID)
-		require.NoError(t, err)
-		err = t2InvalidNID.UpdateFlowWithHandledLoginRequest(ctx, &testLR, &testHLR)
-		require.Error(t, err)
-		err = t1ValidNID.UpdateFlowWithHandledLoginRequest(ctx, &testLR, &testHLR)
-		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
 		ls, err := t2InvalidNID.DeleteLoginSession(ctx, testLS.ID)
@@ -373,6 +331,9 @@ func TestHelperNID(r interface {
 type Deps interface {
 	FlowCipher() *aead.XChaCha20Poly1305
 	contextx.Provider
+	x.TracingProvider
+	x.NetworkProvider
+	config.Provider
 }
 
 func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
@@ -574,18 +535,18 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
 					loginChallenge := x.Must(f.ToLoginChallenge(ctx, deps))
 
-					_, err := m.GetLoginRequest(ctx, loginChallenge)
+					_, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
 					require.Error(t, err)
 
 					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 
-					got1, err := m.GetLoginRequest(ctx, loginChallenge)
+					got1, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
 					require.NoError(t, err)
-					assert.False(t, got1.WasHandled)
-					compareAuthenticationRequest(t, c, got1)
+					assert.False(t, got1.LoginWasUsed)
+					compareAuthenticationRequest(t, c, got1.GetLoginRequest())
 
-					err = m.UpdateFlowWithHandledLoginRequest(ctx, f, h)
+					err = f.UpdateFlowWithHandledLoginRequest(h)
 					require.NoError(t, err)
 
 					loginVerifier := x.Must(f.ToLoginVerifier(ctx, deps))
@@ -595,7 +556,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					compareAuthenticationRequestFlow(t, c, got2)
 
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
-					got1, err = m.GetLoginRequest(ctx, loginChallenge)
+					got1, err = flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
 					require.NoError(t, err)
 				})
 			}

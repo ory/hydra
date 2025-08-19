@@ -55,6 +55,7 @@ type Registry interface {
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
+	x.NetworkProvider
 	FlowCipher() *aead.XChaCha20Poly1305
 
 	kratos.Provider

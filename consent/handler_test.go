@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 
 	"github.com/stretchr/testify/require"
@@ -27,6 +28,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -60,9 +62,10 @@ func TestGetLogoutRequest(t *testing.T) {
 			}
 
 			h := NewHandler(reg, reg.Config())
-			r := x.NewRouterAdmin(reg.Config().AdminURL)
+			metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+			r := x.NewRouterAdmin(metrics)
 			h.SetRoutes(r)
-			ts := httptest.NewServer(r)
+			ts := httptest.NewServer(r.Mux)
 			defer ts.Close()
 
 			c := &http.Client{}
@@ -128,9 +131,10 @@ func TestGetLoginRequest(t *testing.T) {
 			}
 
 			h := NewHandler(reg, reg.Config())
-			r := x.NewRouterAdmin(reg.Config().AdminURL)
+			metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+			r := x.NewRouterAdmin(metrics)
 			h.SetRoutes(r)
-			ts := httptest.NewServer(r)
+			ts := httptest.NewServer(r.Mux)
 			defer ts.Close()
 
 			c := &http.Client{}
@@ -215,9 +219,10 @@ func TestGetConsentRequest(t *testing.T) {
 
 			h := NewHandler(reg, reg.Config())
 
-			r := x.NewRouterAdmin(reg.Config().AdminURL)
+			metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+			r := x.NewRouterAdmin(metrics)
 			h.SetRoutes(r)
-			ts := httptest.NewServer(r)
+			ts := httptest.NewServer(r.Mux)
 			defer ts.Close()
 
 			c := &http.Client{}
@@ -261,9 +266,10 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, err)
 
 		h := NewHandler(reg, reg.Config())
-		r := x.NewRouterAdmin(reg.Config().AdminURL)
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := x.NewRouterAdmin(metrics)
 		h.SetRoutes(r)
-		ts := httptest.NewServer(r)
+		ts := httptest.NewServer(r.Mux)
 		defer ts.Close()
 
 		c := &http.Client{}
@@ -328,9 +334,10 @@ func TestAcceptDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg, reg.Config())
-	r := x.NewRouterAdmin(reg.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	r := x.NewRouterAdmin(metrics)
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
+	ts := httptest.NewServer(r.Mux)
 	t.Cleanup(ts.Close)
 
 	c := &http.Client{}
@@ -391,9 +398,10 @@ func TestAcceptDuplicateDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg, reg.Config())
-	r := x.NewRouterAdmin(reg.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	r := x.NewRouterAdmin(metrics)
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
+	ts := httptest.NewServer(r.Mux)
 	t.Cleanup(ts.Close)
 
 	c := &http.Client{}
@@ -466,9 +474,10 @@ func TestAcceptCodeDeviceRequestFailure(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg, reg.Config())
-	r := x.NewRouterAdmin(reg.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	r := x.NewRouterAdmin(metrics)
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
+	ts := httptest.NewServer(r.Mux)
 	t.Cleanup(ts.Close)
 
 	c := &http.Client{}

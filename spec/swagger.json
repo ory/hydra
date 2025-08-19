@@ -2814,7 +2814,7 @@
       }
     },
     "keysetPaginationRequestParameters": {
-      "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "description": "For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
       "type": "object",
       "title": "Pagination Request Parameters",
       "properties": {

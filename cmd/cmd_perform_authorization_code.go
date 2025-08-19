@@ -20,7 +20,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
@@ -31,6 +30,7 @@ import (
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/randx"
 	"github.com/ory/x/tlsx"
@@ -237,7 +237,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 			}
 			authCodeURL, state := generateAuthCodeURL()
 
-			r := httprouter.New()
+			r := httprouterx.NewRouterPublic()
 			var tlsc *tls.Config
 			if isSSL {
 				key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -254,7 +254,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			server := graceful.WithDefaults(&http.Server{
 				Addr:    fmt.Sprintf(":%d", port),
-				Handler: r, TLSConfig: tlsc,
+				Handler: r.Mux, TLSConfig: tlsc,
 				ReadHeaderTimeout: time.Second * 5,
 			})
 			var shutdown = func() {
@@ -264,11 +264,11 @@ and success, unless if the --no-shutdown flag is provided.`,
 				_ = server.Shutdown(ctx)
 			}
 
-			r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+			r.GET("/", func(w http.ResponseWriter, r *http.Request) {
 				_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
 			})
 
-			r.GET("/perform-flow", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+			r.GET("/perform-flow", func(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, authCodeURL, http.StatusFound)
 			})
 
@@ -355,7 +355,7 @@ type router struct {
 	noShutdown     bool
 }
 
-func (rt *router) loginGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) loginGET(w http.ResponseWriter, r *http.Request) {
 	req, raw, err := rt.cl.OAuth2API.GetOAuth2LoginRequest(r.Context()).
 		LoginChallenge(r.URL.Query().Get("login_challenge")).
 		Execute()
@@ -397,7 +397,7 @@ func (rt *router) loginGET(w http.ResponseWriter, r *http.Request, _ httprouter.
 	})
 }
 
-func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -448,7 +448,7 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request, _ httprouter
 	}
 }
 
-func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) consentGET(w http.ResponseWriter, r *http.Request) {
 	req, raw, err := rt.cl.OAuth2API.GetOAuth2ConsentRequest(r.Context()).
 		ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 		Execute()
@@ -523,7 +523,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request, _ httproute
 	})
 }
 
-func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -569,7 +569,7 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 }
 
-func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) callback(w http.ResponseWriter, r *http.Request) {
 	defer rt.onDone()
 
 	if len(r.URL.Query().Get("error")) > 0 {
@@ -628,7 +628,7 @@ func (rt *router) callback(w http.ResponseWriter, r *http.Request, _ httprouter.
 	})
 }
 
-func (rt *router) callbackPOSTForm(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (rt *router) callbackPOSTForm(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

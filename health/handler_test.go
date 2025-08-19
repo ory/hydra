@@ -74,7 +74,7 @@ func TestPublicHealthHandler(t *testing.T) {
 			public := x.NewRouterPublic()
 			reg.RegisterPublicRoutes(ctx, public)
 
-			ts := httptest.NewServer(public)
+			ts := httptest.NewServer(public.Mux)
 
 			tc.verifyResponse(t, doCORSRequest(t, ts.URL+healthx.AliveCheckPath))
 			tc.verifyResponse(t, doCORSRequest(t, ts.URL+healthx.ReadyCheckPath))

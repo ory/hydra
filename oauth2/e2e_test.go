@@ -93,7 +93,7 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 						})
 
 					// check access token
-					introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS.Server)
+					introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 					require.True(t, introspected.Get("active").Bool())
 					testhelpers.AssertAccessToken(t, introspected, sub, cl.ID)
 					assert.Equal(t, "extra access token value", introspected.Get("ext.key_access").Str)
@@ -136,7 +136,7 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 					require.NotEqual(t, token.Extra("id_token"), refreshed.Extra("id_token"))
 
 					// check access token
-					introspected := testhelpers.IntrospectToken(t, refreshed.AccessToken, adminTS.Server)
+					introspected := testhelpers.IntrospectToken(t, refreshed.AccessToken, adminTS)
 					require.True(t, introspected.Get("active").Bool())
 					testhelpers.AssertAccessToken(t, introspected, sub, cl.ID)
 					assert.Equal(t, "extra access token value", introspected.Get("ext.key_access").Str)
@@ -155,9 +155,9 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 					assert.Equal(t, "extra id token value", idToken.Get("key_id").Str)
 
 					t.Run("original tokens are invalidated", func(t *testing.T) {
-						introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS.Server)
+						introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 						assert.False(t, introspected.Get("active").Bool(), introspected.Raw)
-						introspected = testhelpers.IntrospectToken(t, token.RefreshToken, adminTS.Server)
+						introspected = testhelpers.IntrospectToken(t, token.RefreshToken, adminTS)
 						assert.False(t, introspected.Get("active").Bool(), introspected.Raw)
 					})
 				})
@@ -180,7 +180,7 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 					expectedAud, err := json.Marshal(cl.Audience)
 					require.NoError(t, err)
 
-					introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS.Server)
+					introspected := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
 					require.True(t, introspected.Get("active").Bool())
 					testhelpers.AssertAccessToken(t, introspected, sub, cl.ID)
 					assert.JSONEq(t, string(expectedAud), introspected.Get("aud").Raw)

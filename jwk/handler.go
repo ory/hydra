@@ -6,15 +6,16 @@ package jwk
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/herodot"
-	"github.com/ory/x/httprouterx"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/x/stringslice"
@@ -22,7 +23,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 
 	jose "github.com/go-jose/go-jose/v3"
-	"github.com/julienschmidt/httprouter"
 )
 
 const (
@@ -55,21 +55,21 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
-	r.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	r.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
+	r.Handle("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	r.Handle("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
 }
 
 func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
-	r.GET(KeyHandlerPath+"/:set/:key", h.getJsonWebKey)
-	r.GET(KeyHandlerPath+"/:set", h.getJsonWebKeySet)
+	r.GET(KeyHandlerPath+"/{set}/{key}", h.getJsonWebKey)
+	r.GET(KeyHandlerPath+"/{set}", h.getJsonWebKeySet)
 
-	r.POST(KeyHandlerPath+"/:set", h.createJsonWebKeySet)
+	r.POST(KeyHandlerPath+"/{set}", h.createJsonWebKeySet)
 
-	r.PUT(KeyHandlerPath+"/:set/:key", h.adminUpdateJsonWebKey)
-	r.PUT(KeyHandlerPath+"/:set", h.setJsonWebKeySet)
+	r.PUT(KeyHandlerPath+"/{set}/{key}", h.adminUpdateJsonWebKey)
+	r.PUT(KeyHandlerPath+"/{set}", h.setJsonWebKeySet)
 
-	r.DELETE(KeyHandlerPath+"/:set/:key", h.deleteJsonWebKey)
-	r.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
+	r.DELETE(KeyHandlerPath+"/{set}/{key}", h.deleteJsonWebKey)
+	r.DELETE(KeyHandlerPath+"/{set}", h.adminDeleteJsonWebKeySet)
 }
 
 // swagger:route GET /.well-known/jwks.json wellknown discoverJsonWebKeys
@@ -164,9 +164,9 @@ type getJsonWebKey struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
-func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var setName = ps.ByName("set")
-	var keyName = ps.ByName("key")
+func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request) {
+	var setName = r.PathValue("set")
+	var keyName = r.PathValue("key")
 
 	keys, err := h.r.KeyManager().GetKey(r.Context(), setName, keyName)
 	if err != nil {
@@ -210,8 +210,8 @@ type getJsonWebKeySet struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
-func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var setName = ps.ByName("set")
+func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
+	var setName = r.PathValue("set")
 
 	keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
 	if err != nil {
@@ -287,9 +287,9 @@ type createJsonWebKeySetBody struct {
 //	Responses:
 //	  201: jsonWebKeySet
 //	  default: errorOAuth2
-func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keyRequest createJsonWebKeySetBody
-	var set = ps.ByName("set")
+	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
@@ -298,7 +298,7 @@ func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps
 
 	if keys, err := h.r.KeyManager().GenerateAndPersistKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
 		keys = ExcludeOpaquePrivateKeys(keys)
-		h.r.Writer().WriteCreated(w, r, urlx.AppendPaths(h.r.Config().IssuerURL(r.Context()), "/keys/"+set).String(), keys)
+		h.r.Writer().WriteCreated(w, r, urlx.AppendPaths(h.r.Config().IssuerURL(r.Context()), "keys", url.PathEscape(set)).String(), keys)
 	} else {
 		h.r.Writer().WriteError(w, r, err)
 	}
@@ -339,9 +339,9 @@ type setJsonWebKeySet struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
-func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keySet jose.JSONWebKeySet
-	var set = ps.ByName("set")
+	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
@@ -397,9 +397,9 @@ type setJsonWebKey struct {
 //	Responses:
 //	  200: jsonWebKey
 //	  default: errorOAuth2
-func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request) {
 	var key jose.JSONWebKey
-	var set = ps.ByName("set")
+	var set = r.PathValue("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
@@ -445,8 +445,8 @@ type deleteJsonWebKeySet struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var setName = ps.ByName("set")
+func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
+	var setName = r.PathValue("set")
 
 	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -496,9 +496,9 @@ type deleteJsonWebKey struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var setName = ps.ByName("set")
-	var keyName = ps.ByName("key")
+func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request) {
+	var setName = r.PathValue("set")
+	var keyName = r.PathValue("key")
 
 	if err := h.r.KeyManager().DeleteKey(r.Context(), setName, keyName); err != nil {
 		h.r.Writer().WriteError(w, r, err)

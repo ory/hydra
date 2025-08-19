@@ -21,6 +21,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/urlx"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
@@ -32,7 +33,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 		return h
 	})
-	testServer := httptest.NewServer(router)
+	testServer := httptest.NewServer(router.Mux)
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
@@ -42,7 +43,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		}
 		IDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
-		res, err := http.Get(testServer.URL + JWKPath)
+		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close()
 
@@ -77,7 +78,7 @@ func TestHandlerWellKnown(t *testing.T) {
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
 
-		res, err := http.Get(testServer.URL + JWKPath)
+		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close()
 

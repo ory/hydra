@@ -30,6 +30,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/prometheusx"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -50,12 +51,13 @@ func (s *HandlerTestSuite) SetupTest() {
 		config.KeyDefaultClientScope:    []string{"foo", "bar"},
 	})))
 
-	router := x.NewRouterAdmin(s.registry.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	router := x.NewRouterAdmin(metrics)
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)
 	jwkHandler.SetAdminRoutes(router)
-	s.server = httptest.NewServer(router)
+	s.server = httptest.NewServer(router.Mux)
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: s.server.URL}}

@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+	"github.com/urfave/negroni"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/oauth2"
 
@@ -32,9 +33,10 @@ import (
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/uuidx"
 )
 
@@ -66,28 +68,41 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
-	public, admin := NewConfigurableOAuth2Server(ctx, t, reg)
-	return public.Server, admin.Server
+	return NewConfigurableOAuth2Server(ctx, t, reg)
 }
 
-func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL) (publicTS, adminTS *contextx.ConfigurableTestServer) {
-	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
-
+func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterPublicRoutes(ctx, public)
-	reg.RegisterAdminRoutes(admin)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	{
+		n := negroni.New()
+		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+		n.UseFunc(httprouterx.NoCacheNegroni)
+		n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-	publicTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
-		return r.URL.Path
-	})))
-	t.Cleanup(publicTS.Close)
+		router := x.NewRouterAdmin(metrics)
+		reg.RegisterAdminRoutes(router)
+		n.UseHandler(router.Mux)
 
-	adminTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
-		return r.URL.Path
-	})))
-	t.Cleanup(adminTS.Close)
+		adminTS = httptest.NewServer(n)
+		t.Cleanup(adminTS.Close)
+		reg.Config().MustSet(ctx, config.KeyAdminURL, adminTS.URL)
+	}
+	{
+		n := negroni.New()
+		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+		n.UseFunc(httprouterx.NoCacheNegroni)
+
+		router := x.NewRouterPublic()
+		reg.RegisterPublicRoutes(ctx, router)
+		n.UseHandler(router.Mux)
+
+		publicTS = httptest.NewServer(n)
+		t.Cleanup(publicTS.Close)
+		reg.Config().MustSet(ctx, config.KeyAdminURL, publicTS.URL)
+	}
 
 	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
 	return publicTS, adminTS

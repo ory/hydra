@@ -34,6 +34,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/snapshotx"
 )
 
@@ -62,10 +63,11 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
 
-	r := x.NewRouterAdmin(reg.Config().AdminURL)
-	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	r := httprouterx.NewRouterAdmin(metrics)
+	h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
-	ts := httptest.NewServer(r)
+	ts := httptest.NewServer(r.Mux)
 	defer ts.Close()
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -99,10 +101,11 @@ func TestUserinfo(t *testing.T) {
 
 	h := reg.OAuth2Handler()
 
-	router := x.NewRouterAdmin(reg.Config().AdminURL)
-	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler { return h })
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	router := httprouterx.NewRouterAdmin(metrics)
+	h.SetPublicRoutes(httprouterx.RouterAdminToPublic(router), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(router)
-	ts := httptest.NewServer(router)
+	ts := httptest.NewServer(router.Mux)
 	defer ts.Close()
 
 	for k, tc := range []struct {
@@ -351,10 +354,11 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		r := x.NewRouterAdmin(reg.Config().AdminURL)
-		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdmin(metrics)
+		h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
-		ts := httptest.NewServer(r)
+		ts := httptest.NewServer(r.Mux)
 		defer ts.Close()
 
 		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
@@ -397,10 +401,11 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		r := x.NewRouterAdmin(reg.Config().AdminURL)
-		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdmin(metrics)
+		h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
-		ts := httptest.NewServer(r)
+		ts := httptest.NewServer(r.Mux)
 		defer ts.Close()
 
 		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")

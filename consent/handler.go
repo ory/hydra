@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -123,7 +122,7 @@ type revokeOAuth2ConsentSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	var (
 		subject          = r.URL.Query().Get("subject")
 		client           = r.URL.Query().Get("client")
@@ -201,7 +200,7 @@ type listOAuth2ConsentSessions struct {
 //	Responses:
 //	  200: oAuth2ConsentSessions
 //	  default: errorOAuth2
-func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -287,7 +286,7 @@ type revokeOAuth2LoginSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request) {
 	sid := r.URL.Query().Get("sid")
 	subject := r.URL.Query().Get("subject")
 
@@ -353,7 +352,7 @@ type getOAuth2LoginRequest struct {
 //	  200: oAuth2LoginRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -431,7 +430,7 @@ type acceptOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := cmp.Or(
@@ -559,7 +558,7 @@ type rejectOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := cmp.Or(
@@ -661,7 +660,7 @@ type getOAuth2ConsentRequest struct {
 //	  200: oAuth2ConsentRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -743,7 +742,7 @@ type acceptOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := cmp.Or(
@@ -853,7 +852,7 @@ type adminRejectOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := cmp.Or(
@@ -947,7 +946,7 @@ type acceptOAuth2LogoutRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -992,7 +991,7 @@ type rejectOAuth2LogoutRequest struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -1032,7 +1031,7 @@ type getOAuth2LogoutRequest struct {
 //	  200: oAuth2LogoutRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -1088,7 +1087,7 @@ type verifyUserCodeRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := r.URL.Query().Get("device_challenge")

@@ -1,4 +1,0 @@
-{
-  "error": "The request was malformed or contained invalid parameters",
-  "error_description": "It is not allowed to choose your own OAuth2 Client secret."
-}

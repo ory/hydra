@@ -304,9 +304,7 @@ func (m *RegistrySQL) addPublicCORSOnHandler(ctx context.Context) func(http.Hand
 }
 
 func (m *RegistrySQL) RegisterPublicRoutes(ctx context.Context, public *httprouterx.RouterPublic) {
-	m.PrometheusManager().RegisterRouter(public.Router)
-
-	m.HealthHandler().SetHealthRoutes(public.Router, false, healthx.WithMiddleware(m.addPublicCORSOnHandler(ctx)))
+	m.HealthHandler().SetHealthRoutes(public, false, healthx.WithMiddleware(m.addPublicCORSOnHandler(ctx)))
 
 	m.KeyHandler().SetPublicRoutes(public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetPublicRoutes(public)
@@ -314,11 +312,8 @@ func (m *RegistrySQL) RegisterPublicRoutes(ctx context.Context, public *httprout
 }
 
 func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
-	m.PrometheusManager().RegisterRouter(admin.Router)
-
-	m.HealthHandler().SetHealthRoutes(admin.Router, true)
-	m.HealthHandler().SetVersionRoutes(admin.Router)
-
+	m.HealthHandler().SetHealthRoutes(admin, true)
+	m.HealthHandler().SetVersionRoutes(admin)
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)

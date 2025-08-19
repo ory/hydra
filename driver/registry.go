@@ -8,10 +8,11 @@ import (
 	"net/http"
 
 	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/httprouterx"
 
 	"github.com/ory/hydra/v2/oauth2/trust"
 

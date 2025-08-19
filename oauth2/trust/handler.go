@@ -6,10 +6,10 @@ package trust
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
+	"github.com/ory/x/urlx"
 )
 
 const (
@@ -32,10 +33,10 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
-	admin.GET(grantJWTBearerPath+"/:id", h.getTrustedOAuth2JwtGrantIssuer)
+	admin.GET(grantJWTBearerPath+"/{id}", h.getTrustedOAuth2JwtGrantIssuer)
 	admin.GET(grantJWTBearerPath, h.adminListTrustedOAuth2JwtGrantIssuers)
 	admin.POST(grantJWTBearerPath, h.trustOAuth2JwtGrantIssuer)
-	admin.DELETE(grantJWTBearerPath+"/:id", h.deleteTrustedOAuth2JwtGrantIssuer)
+	admin.DELETE(grantJWTBearerPath+"/{id}", h.deleteTrustedOAuth2JwtGrantIssuer)
 }
 
 // Trust OAuth2 JWT Bearer Grant Type Issuer Request Body
@@ -104,7 +105,7 @@ type trustOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  201: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
-func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	var grantRequest createGrantRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {
@@ -141,7 +142,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID.String(), &grant)
+	h.registry.Writer().WriteCreated(w, r, urlx.MustJoin(grantJWTBearerPath, url.PathEscape(grant.ID.String())), &grant)
 }
 
 // Get Trusted OAuth2 JWT Bearer Grant Type Issuer Request
@@ -175,8 +176,8 @@ type getTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
-func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	rawID := ps.ByName("id")
+func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
+	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r,
@@ -226,8 +227,8 @@ type deleteTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
-func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	rawID := ps.ByName("id")
+func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
+	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
 	if err != nil {
 		h.registry.Writer().WriteError(w, r,
@@ -275,7 +276,7 @@ type listTrustedOAuth2JwtGrantIssuers struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuers
 //	  default: genericError
-func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request) {
 	optionalIssuer := r.URL.Query().Get("issuer")
 
 	pageKeys := h.registry.Config().GetPaginationEncryptionKeys(r.Context())

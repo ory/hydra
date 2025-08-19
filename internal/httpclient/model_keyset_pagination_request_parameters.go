@@ -18,7 +18,7 @@ import (
 // checks if the KeysetPaginationRequestParameters type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &KeysetPaginationRequestParameters{}
 
-// KeysetPaginationRequestParameters The `Link` HTTP header contains multiple links (`first`, `next`) formatted as: `<https://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250&page_token=>; rel=\"first\"`  For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// KeysetPaginationRequestParameters For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 type KeysetPaginationRequestParameters struct {
 	// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageSize *int64 `json:"page_size,omitempty"`

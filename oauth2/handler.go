@@ -17,7 +17,6 @@ import (
 	"time"
 
 	jwtV5 "github.com/golang-jwt/jwt/v5"
-	"github.com/julienschmidt/httprouter"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
@@ -88,8 +87,8 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetPublicRoutes(public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
-	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
+	public.Handle("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.oauth2TokenExchange)))
 
 	public.GET(AuthPath, h.oAuth2Authorize)
 	public.POST(AuthPath, h.oAuth2Authorize)
@@ -114,20 +113,20 @@ func (h *Handler) SetPublicRoutes(public *httprouterx.RouterPublic, corsMiddlewa
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 
-	public.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)))
-	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
-	public.Handler("OPTIONS", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
-	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
-	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
+	public.Handle("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)))
+	public.Handle("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
+	public.Handle("OPTIONS", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("GET", OauthAuthorizationServerPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
+	public.Handle("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
+	public.Handle("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
 
-	public.Handler("OPTIONS", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
+	public.Handle("OPTIONS", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
+	public.Handle("POST", VerifiableCredentialsPath, corsMiddleware(http.HandlerFunc(h.createVerifiableCredential)))
 
-	public.Handler("POST", DeviceAuthPath, http.HandlerFunc(h.oAuth2DeviceFlow))
+	public.POST(DeviceAuthPath, h.oAuth2DeviceFlow)
 	public.GET(DeviceVerificationPath, h.performOAuth2DeviceVerificationFlow)
 }
 
@@ -151,7 +150,7 @@ func (h *Handler) SetAdminRoutes(admin *httprouterx.RouterAdmin) {
 //
 //	Responses:
 //	  302: emptyResponse
-func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
@@ -736,7 +735,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 //	Responses:
 //	  302: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request) {
 	var (
 		ctx = r.Context()
 		err error
@@ -990,7 +989,7 @@ type introspectOAuth2Token struct {
 //	Responses:
 //	  200: introspectedOAuth2Token
 //	  default: errorOAuth2
-func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
 
@@ -1278,7 +1277,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 //
 //	302: emptyResponse
 //	default: errorOAuth2
-func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
@@ -1349,7 +1348,7 @@ type deleteOAuth2Token struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))

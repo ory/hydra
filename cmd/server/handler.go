@@ -22,6 +22,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
@@ -29,6 +30,7 @@ import (
 	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/reqlog"
 	"github.com/ory/x/tlsx"
+	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
@@ -126,6 +128,9 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheusx.MetricsPrometheusPath)
 	}
 
+	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+	n.UseFunc(httprouterx.NoCacheNegroni)
+	n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
 	n.Use(d.PrometheusManager())
@@ -151,10 +156,10 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	})
 	n.Use(metricsService)
 
-	router := x.NewRouterAdmin(d.Config().AdminURL)
+	router := httprouterx.NewRouterAdmin(d.PrometheusManager())
 	d.RegisterAdminRoutes(router)
 
-	n.UseHandler(router)
+	n.UseHandler(router.Mux)
 
 	return func() error {
 		return serve(ctx, d, cfg, n, "admin")
@@ -174,6 +179,8 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
+	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+	n.UseFunc(httprouterx.NoCacheNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
 	n.Use(d.PrometheusManager())
@@ -201,7 +208,7 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 	router := x.NewRouterPublic()
 	d.RegisterPublicRoutes(ctx, router)
 
-	n.UseHandler(router)
+	n.UseHandler(router.Mux)
 	return func() error {
 		return serve(ctx, d, cfg, n, "public")
 	}, nil
@@ -223,7 +230,7 @@ func sqa(ctx context.Context, d driver.Registry, cmd *cobra.Command) *metricsx.S
 				"/admin" + jwk.KeyHandlerPath,
 				jwk.WellKnownKeysPath,
 
-				"/admin" + client.ClientsHandlerPath,
+				urlx.MustJoin("/admin", client.ClientsHandlerPath),
 				client.DynClientsHandlerPath,
 
 				oauth2.DefaultConsentPath,

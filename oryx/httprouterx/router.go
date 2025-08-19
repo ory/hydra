@@ -10,165 +10,158 @@ import (
 	"path"
 	"strings"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/urfave/negroni"
 )
 
-// RouterPublic wraps httprouter.Router
+const AdminPrefix = "/admin"
+
+// RouterPublic wraps httprouter.Mux
 type RouterPublic struct {
-	*httprouter.Router
+	Mux *http.ServeMux
 }
 
 // NewRouterPublic returns a public router.
 func NewRouterPublic() *RouterPublic {
-	return &RouterPublic{
-		Router: httprouter.New(),
-	}
+	return &RouterPublic{Mux: http.NewServeMux()}
 }
 
-func (r *RouterPublic) GET(path string, handle httprouter.Handle) {
-	r.Handle("GET", path, NoCacheHandle(handle))
+func (r *RouterPublic) GET(path string, handle http.HandlerFunc) {
+	r.Handle("GET", path, handle)
 }
 
-func (r *RouterPublic) HEAD(path string, handle httprouter.Handle) {
-	r.Handle("HEAD", path, NoCacheHandle(handle))
+func (r *RouterPublic) HEAD(path string, handle http.HandlerFunc) {
+	r.Handle("HEAD", path, handle)
 }
 
-func (r *RouterPublic) POST(path string, handle httprouter.Handle) {
-	r.Handle("POST", path, NoCacheHandle(handle))
+func (r *RouterPublic) POST(path string, handle http.HandlerFunc) {
+	r.Handle("POST", path, handle)
 }
 
-func (r *RouterPublic) PUT(path string, handle httprouter.Handle) {
-	r.Handle("PUT", path, NoCacheHandle(handle))
+func (r *RouterPublic) PUT(path string, handle http.HandlerFunc) {
+	r.Handle("PUT", path, handle)
 }
 
-func (r *RouterPublic) PATCH(path string, handle httprouter.Handle) {
-	r.Handle("PATCH", path, NoCacheHandle(handle))
+func (r *RouterPublic) PATCH(path string, handle http.HandlerFunc) {
+	r.Handle("PATCH", path, handle)
 }
 
-func (r *RouterPublic) DELETE(path string, handle httprouter.Handle) {
-	r.Handle("DELETE", path, NoCacheHandle(handle))
+func (r *RouterPublic) DELETE(path string, handle http.HandlerFunc) {
+	r.Handle("DELETE", path, handle)
 }
 
-func (r *RouterPublic) Handle(method, path string, handle httprouter.Handle) {
-	r.Router.Handle(method, path, NoCacheHandle(handle))
+func (r *RouterPublic) Handle(method, path string, handle http.Handler) {
+	r.Mux.Handle((method + " " + path), handle)
 }
 
-func (r *RouterPublic) HandlerFunc(method, path string, handler http.HandlerFunc) {
-	r.Router.Handler(method, path, NoCacheHandler(handler))
+func (r *RouterPublic) HandleFunc(method, path string, handler http.HandlerFunc) {
+	r.Mux.HandleFunc(method+" "+path, handler)
 }
 
 func (r *RouterPublic) Handler(method, path string, handler http.Handler) {
-	r.Router.Handler(method, path, NoCacheHandler(handler))
+	r.Mux.Handle(method+" "+path, handler)
 }
 
 type baseURLProvider func(ctx context.Context) *url.URL
 
 // RouterAdmin is a router able to prefix routes
 type RouterAdmin struct {
-	*httprouter.Router
-	prefix          string
-	baseURLProvider baseURLProvider
+	Mux            *http.ServeMux
+	prefix         string
+	metricsHandler negroni.Handler
 }
 
 // NewRouterAdmin creates a new admin router.
-func NewRouterAdmin() *RouterAdmin {
+func NewRouterAdmin(metricsHandler negroni.Handler) *RouterAdmin {
 	return &RouterAdmin{
-		Router: httprouter.New(),
+		Mux:            http.NewServeMux(),
+		prefix:         AdminPrefix,
+		metricsHandler: metricsHandler,
 	}
 }
 
-// NewRouterAdminWithPrefixAndRouter wraps NewRouterAdminWithPrefix and additionally sets the base router.
-func NewRouterAdminWithPrefixAndRouter(root *httprouter.Router, prefix string, baseURLProvider baseURLProvider) *RouterAdmin {
-	router := NewRouterAdminWithPrefix(prefix, baseURLProvider)
-	router.Router = root
-	return router
+func RouterAdminToPublic(r *RouterAdmin) *RouterPublic {
+	return &RouterPublic{
+		Mux: r.Mux,
+	}
 }
 
 // NewRouterAdminWithPrefix creates a new router with is prefixed.
 //
 //	NewRouterAdminWithPrefix("/admin", func(context.Context) *url.URL { return &url.URL{/*...*/} })
-func NewRouterAdminWithPrefix(prefix string, baseURLProvider baseURLProvider) *RouterAdmin {
+func NewRouterAdminWithPrefix(prefix string) *RouterAdmin {
 	if prefix != "" {
 		prefix = "/" + strings.TrimPrefix(strings.TrimSuffix(prefix, "/"), "/")
 	}
 
 	return &RouterAdmin{
-		Router:          httprouter.New(),
-		prefix:          prefix,
-		baseURLProvider: baseURLProvider,
+		Mux:    http.NewServeMux(),
+		prefix: prefix,
 	}
 }
 
-func (r *RouterAdmin) GET(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) GET(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodGet, route, handle)
 }
 
-func (r *RouterAdmin) HEAD(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) HEAD(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodHead, route, handle)
 }
 
-func (r *RouterAdmin) POST(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) POST(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodPost, route, handle)
 }
 
-func (r *RouterAdmin) PUT(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) PUT(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodPut, route, handle)
 }
 
-func (r *RouterAdmin) PATCH(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) PATCH(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodPatch, route, handle)
 }
 
-func (r *RouterAdmin) DELETE(route string, handle httprouter.Handle) {
+func (r *RouterAdmin) DELETE(route string, handle http.HandlerFunc) {
 	r.handle(http.MethodDelete, route, handle)
 }
 
-func (r *RouterAdmin) Handle(method, route string, handle httprouter.Handle) {
+func (r *RouterAdmin) Handle(method, route string, handle http.HandlerFunc) {
 	r.handle(method, route, handle)
 }
 
-func (r *RouterAdmin) HandlerFunc(method, route string, handler http.HandlerFunc) {
-	r.handleNative(method, route, handler)
+func (r *RouterAdmin) HandleFunc(method, route string, handler http.HandlerFunc) {
+	r.handle(method, route, handler)
 }
 
 func (r *RouterAdmin) Handler(method, route string, handler http.Handler) {
-	r.Router.Handler(method, path.Join(r.prefix, route), NoCacheHandler(handler))
+	r.handle(method, route, handler)
 }
 
-func (r *RouterAdmin) Lookup(method, route string) {
-	r.Router.Lookup(method, path.Join(r.prefix, route))
+func (router *RouterAdmin) handle(method string, route string, handler http.Handler) {
+	router.Mux.HandleFunc(method+" "+path.Join(router.prefix, route), func(w http.ResponseWriter, r *http.Request) {
+		// In order the get the right metrics for the right path, `r.Pattern` must have been filled by the http router.
+		// This is the case at this point, but not before e.g. when the prometheus middleware runs as a negroni middleware:
+		// the http router has not run yet and `r.Pattern` is empty.
+		router.metricsHandler.ServeHTTP(w, r, handler.ServeHTTP)
+	})
 }
 
-func (r *RouterAdmin) handle(method string, route string, handle httprouter.Handle) {
-	if len(r.prefix) == 0 {
-		r.Router.Handle(method, route, NoCacheHandle(handle))
-		return
+func TrimTrailingSlashNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+
+	next(rw, r)
+}
+
+func NoCacheNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	if r.Method == "GET" {
+		rw.Header().Set("Cache-Control", "private, no-cache, no-store, must-revalidate")
 	}
 
-	r.Router.Handler(method, route, NoCacheHandler(r.handleRedirect()))
-	r.Router.Handle(method, path.Join(r.prefix, route), NoCacheHandle(handle))
+	next(rw, r)
 }
 
-func (r *RouterAdmin) handleNative(method string, route string, handle http.Handler) {
-	if len(r.prefix) == 0 {
-		r.Router.Handler(method, route, NoCacheHandler(handle))
-		return
+func AddAdminPrefixIfNotPresentNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	if !strings.HasPrefix(r.URL.Path, AdminPrefix) {
+		r.URL.Path = path.Join(AdminPrefix, r.URL.Path)
 	}
 
-	r.Router.Handler(method, route, NoCacheHandler(r.handleRedirect()))
-	r.Router.Handler(method, path.Join(r.prefix, route), NoCacheHandler(handle))
-}
-
-func (r *RouterAdmin) handleRedirect() http.HandlerFunc {
-	return func(w http.ResponseWriter, rr *http.Request) {
-		baseURL := r.baseURLProvider(rr.Context())
-
-		dest := *rr.URL
-		dest.Host = baseURL.Host
-		dest.Scheme = baseURL.Scheme
-		dest.Path = strings.TrimPrefix(dest.Path, r.prefix)
-		dest.Path = path.Join(baseURL.Path, r.prefix, dest.Path)
-
-		http.Redirect(w, rr, dest.String(), http.StatusTemporaryRedirect)
-	}
+	next(rw, r)
 }

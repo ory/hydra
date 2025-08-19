@@ -22,7 +22,6 @@ import (
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/popx"
@@ -61,7 +60,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			Where(whereStmt, whereArgs...).
 			Select("consent_challenge_id").
 			All(&fs); errors.Is(err, sql.ErrNoRows) {
-			return errorsx.WithStack(x.ErrNotFound)
+			return errors.WithStack(x.ErrNotFound)
 		} else if err != nil {
 			return sqlcon.HandleError(err)
 		}
@@ -98,7 +97,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			Where("nid = ?", nid).
 			Where("consent_challenge_id IN (?)", ids...).
 			Delete(new(flow.Flow)); errors.Is(err, sql.ErrNoRows) {
-			return errorsx.WithStack(x.ErrNotFound)
+			return errors.WithStack(x.ErrNotFound)
 		} else if err != nil {
 			return sqlcon.HandleError(err)
 		}
@@ -120,7 +119,7 @@ func (p *Persister) RevokeSubjectLoginSession(ctx context.Context, subject strin
 	//
 	// count, _ := rows.RowsAffected()
 	// if count == 0 {
-	// 	 return errorsx.WithStack(x.ErrNotFound)
+	// 	 return errors.WithStack(x.ErrNotFound)
 	// }
 
 	return nil
@@ -163,7 +162,7 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 		obfuscated,
 		p.NetworkID(ctx),
 	).First(&s); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -177,13 +176,13 @@ func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge str
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
 	if err != nil {
-		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
+		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
+		return nil, errors.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
+		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
 
 	return f, nil
@@ -196,7 +195,7 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ 
 	f, err := p.GetFlowByConsentChallenge(ctx, challenge)
 	if err != nil {
 		if errors.Is(err, sqlcon.ErrNoRows) {
-			return nil, errorsx.WithStack(x.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, err
 	}
@@ -223,13 +222,13 @@ func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge stri
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flowctx.AsDeviceChallenge)
 	if err != nil {
-		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
+		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired, please try again."))
+		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired, please try again."))
 	}
 
 	return f.GetDeviceUserAuthRequest(), nil
@@ -241,10 +240,10 @@ func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flo
 	defer otelx.End(span, &err)
 
 	if f == nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	err = f.HandleDeviceUserAuthRequest(r)
 	if err != nil {
@@ -261,14 +260,14 @@ func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsDeviceVerifier)
 	if err != nil {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
 	}
 
 	if err = f.InvalidateDeviceRequest(); err != nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 
 	return f.GetHandledDeviceUserAuthRequest(), nil
@@ -281,7 +280,7 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow
 	var f flow.Flow
 	if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(x.ErrNotFound)
+			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
@@ -294,13 +293,13 @@ func (p *Persister) GetLoginRequest(ctx context.Context, loginChallenge string) 
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), loginChallenge, flowctx.AsLoginChallenge)
 	if err != nil {
-		return nil, errorsx.WithStack(x.ErrNotFound.WithWrap(err))
+		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
+		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired, please try again."))
 	}
 	lr := f.GetLoginRequest()
 	// Restore the short challenge ID, which was previously sent to the encoded flow,
@@ -333,14 +332,14 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 
 	f, err := flowctx.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flowctx.AsConsentVerifier)
 	if err != nil {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errorsx.WithStack(sqlcon.ErrNoRows)
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
 	}
 
 	if err = f.InvalidateConsentRequest(); err != nil {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 
 	if err = p.Connection(ctx).Create(f); err != nil {
@@ -395,7 +394,7 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionF
 	var s flow.LoginSession
 
 	if err := p.QueryWithNetwork(ctx).Where("remember = TRUE").Find(&s, id); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -448,7 +447,7 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginS
 
 	nid := p.NetworkID(ctx)
 	if nid == uuid.Nil {
-		return errorsx.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	session.NID = nid
 
@@ -684,7 +683,7 @@ func (p *Persister) CreateLogoutRequest(ctx context.Context, request *flow.Logou
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLogoutRequest")
 	defer otelx.End(span, &err)
 
-	return errorsx.WithStack(p.CreateWithNetwork(ctx, request))
+	return errors.WithStack(p.CreateWithNetwork(ctx, request))
 }
 
 func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (_ *flow.LogoutRequest, err error) {
@@ -706,9 +705,9 @@ func (p *Persister) RejectLogoutRequest(ctx context.Context, challenge string) (
 		RawQuery("UPDATE hydra_oauth2_logout_request SET rejected=true, accepted=false WHERE challenge=? AND nid = ?", challenge, p.NetworkID(ctx)).
 		ExecWithCount()
 	if count == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	} else {
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 }
 
@@ -735,7 +734,7 @@ WHERE nid = ?
 		p.NetworkID(ctx),
 		verifier,
 	).ExecWithCount(); count == 0 && err == nil {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -749,7 +748,7 @@ WHERE nid = ?
 	// If the expiry is unset, we are in a legacy use case (allow logout).
 	// TODO: Remove this in the future.
 	!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
-		return nil, errorsx.WithStack(flow.ErrorLogoutFlowExpired)
+		return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
 	}
 
 	return &lr, nil
@@ -834,7 +833,7 @@ func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.
 		return errors.WithStack(sqlcon.HandleError(err))
 	}
 	if n == 0 {
-		return errorsx.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 
 	return nil

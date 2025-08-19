@@ -18,7 +18,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/jsonx"
 	"github.com/ory/x/openapix"
@@ -149,7 +148,7 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 	}
 	c, err := h.CreateClient(r, h.r.ClientValidator().ValidateDynamicRegistration, true)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -159,12 +158,12 @@ func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
+		return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err))
 	}
 
 	if isDynamic {
 		if c.Secret != "" {
-			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
+			return nil, errors.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
 		// We do not allow to set the client ID for dynamic clients.
 		c.ID = uuidx.NewV4().String()
@@ -252,7 +251,7 @@ type setOAuth2Client struct {
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -351,12 +350,12 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request, p
 
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
 		return
 	}
 
 	if c.Secret != "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
 		return
 	}
 
@@ -733,7 +732,7 @@ func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Reques
 
 	var ls Lifespans
 	if err := json.NewDecoder(r.Body).Decode(&ls); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 

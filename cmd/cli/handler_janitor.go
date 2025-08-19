@@ -16,7 +16,6 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/flagx"
 )
 
@@ -175,7 +174,7 @@ type cleanupRoutine func(ctx context.Context, notAfter time.Time, limit int, bat
 func cleanup(out io.Writer, cr cleanupRoutine, routineName string) cleanupRoutine {
 	return func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 		if err := cr(ctx, notAfter, limit, batchSize); err != nil {
-			return errors.Wrap(errorsx.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
+			return errors.Wrap(errors.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
 		}
 		fmt.Fprintf(out, "Successfully completed Janitor run on %s\n", routineName)
 		return nil

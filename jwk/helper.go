@@ -18,8 +18,6 @@ import (
 
 	"github.com/ory/x/josex"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/hydra/v2/x"
 
 	jose "github.com/go-jose/go-jose/v3"
@@ -140,13 +138,13 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	case *ecdsa.PrivateKey:
 		b, err := x509.MarshalECPrivateKey(k)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
 	case ed25519.PrivateKey:
 		b, err := x509.MarshalPKCS8PrivateKey(k)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 		return &pem.Block{Type: "PRIVATE KEY", Bytes: b}, nil
 	default:

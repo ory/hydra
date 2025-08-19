@@ -19,7 +19,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/x/errorsx"
 )
 
 // AccessRequestHook is called when an access token request is performed.
@@ -89,7 +88,7 @@ func applyAuth(req *retryablehttp.Request, auth *config.Auth) error {
 func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, hookConfig *config.HookConfig, reqBodyBytes []byte, session *Session) error {
 	req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookConfig.URL, bytes.NewReader(reqBodyBytes))
 	if err != nil {
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
 				WithDescription("An error occurred while preparing the token hook.").
@@ -97,7 +96,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 		)
 	}
 	if err := applyAuth(req, hookConfig.Auth); err != nil {
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
 				WithDescription("An error occurred while applying the token hook authentication.").
@@ -107,7 +106,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 
 	resp, err := reg.HTTPClient(ctx).Do(req)
 	if err != nil {
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
 				WithDescription("An error occurred while executing the token hook.").
@@ -124,13 +123,13 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 		// Token is permitted without overriding session data
 		return nil
 	case http.StatusForbidden:
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrAccessDenied.
 				WithDescription("The token hook target responded with an error.").
 				WithDebugf("Token hook responded with HTTP status code: %s", resp.Status),
 		)
 	default:
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrServerError.
 				WithDescription("The token hook target responded with an error.").
 				WithDebugf("Token hook responded with HTTP status code: %s", resp.Status),
@@ -139,7 +138,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 
 	var respBody TokenHookResponse
 	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
-		return errorsx.WithStack(
+		return errors.WithStack(
 			fosite.ErrServerError.
 				WithWrap(err).
 				WithDescription("The token hook target responded with an error.").
@@ -186,7 +185,7 @@ func TokenHook(reg interface {
 
 		reqBodyBytes, err := json.Marshal(&reqBody)
 		if err != nil {
-			return errorsx.WithStack(
+			return errors.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
 					WithDescription("An error occurred while encoding the token hook.").

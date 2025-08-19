@@ -4,6 +4,7 @@
 package oauth2
 
 import (
+	"cmp"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -31,11 +32,9 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/josex"
 	"github.com/ory/x/otelx"
-	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
 )
 
@@ -666,7 +665,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 
 	c, ok := ar.GetClient().(*client.Client)
 	if !ok {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client.")))
 		return
 	}
 
@@ -718,7 +717,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	} else if c.UserinfoSignedResponseAlg == "" || c.UserinfoSignedResponseAlg == "none" {
 		h.r.Writer().Write(w, r, interim)
 	} else {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
 		return
 	}
 }
@@ -996,17 +995,17 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
 
 	if r.Method != "POST" {
-		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
-		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	} else if len(r.PostForm) == 0 {
-		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
+		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
@@ -1019,7 +1018,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
 		x.LogAudit(r, err, h.r.Logger())
-		err := errorsx.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
+		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	}
@@ -1042,7 +1041,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 
 	session, ok := resp.GetAccessRequester().GetSession().(*Session)
 	if !ok {
-		err := errorsx.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
+		err := errors.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
@@ -1076,7 +1075,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request, 
 		TokenUse:          string(resp.GetTokenUse()),
 		NotBefore:         resp.GetAccessRequester().GetRequestedAt().Unix(),
 	}); err != nil {
-		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
+		x.LogError(r, errors.WithStack(err), h.r.Logger())
 	}
 
 	events.Trace(ctx,
@@ -1353,7 +1352,7 @@ type deleteOAuth2Token struct {
 func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))
 		return
 	}
 
@@ -1509,18 +1508,18 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if tokenType != fosite.AccessToken {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The provided token is not an access token.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The provided token is not an access token.")))
 		return
 	}
 
 	var request CreateVerifiableCredentialRequestBody
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHint("Unable to decode request body.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHint("Unable to decode request body.")))
 		return
 	}
 
 	if request.Format != "jwt_vc_json" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The format %q is not supported.", request.Format)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The format %q is not supported.", request.Format)))
 		return
 	}
 	if request.Proof == nil {
@@ -1544,25 +1543,25 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	if request.Proof.ProofType != "jwt" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The proof type %q is not supported.", request.Proof.ProofType)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The proof type %q is not supported.", request.Proof.ProofType)))
 		return
 	}
 
 	header, _, ok := strings.Cut(request.Proof.JWT, ".")
 	if !ok {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT in the proof is malformed.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT in the proof is malformed.")))
 		return
 	}
 
 	rawHeader, err := jwtV5.NewParser().DecodeSegment(header)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT header in the proof is malformed.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT header in the proof is malformed.")))
 		return
 	}
 	jwk := gjson.GetBytes(rawHeader, "jwk").String()
 	proofJWK, err := josex.LoadJSONWebKey([]byte(jwk), true)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWK in the JWT header is malformed.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWK in the JWT header is malformed.")))
 		return
 	}
 
@@ -1570,13 +1569,13 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		return proofJWK, nil
 	})
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT was not signed with the correct key supplied in the JWK header.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The JWT was not signed with the correct key supplied in the JWK header.")))
 		return
 	}
 
 	nonce, ok := token.Claims["nonce"].(string)
 	if !ok {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf(`The JWT did not contain the "nonce" claim.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHintf(`The JWT did not contain the "nonce" claim.`)))
 		return
 	}
 
@@ -1590,7 +1589,7 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 
 	proofJWKJSON, err := json.Marshal(proofJWK)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -1599,7 +1598,7 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 	vcClaims := &VerifableCredentialClaims{
 		RegisteredClaims: jwtV5.RegisteredClaims{
 			Issuer:    session.Claims.Issuer,
-			ID:        stringsx.Coalesce(session.Claims.JTI, uuid.New()),
+			ID:        cmp.Or(session.Claims.JTI, uuid.New()),
 			IssuedAt:  jwtV5.NewNumericDate(session.Claims.IssuedAt),
 			NotBefore: jwtV5.NewNumericDate(session.Claims.IssuedAt),
 			ExpiresAt: jwtV5.NewNumericDate(session.Claims.IssuedAt.Add(1 * time.Hour)),
@@ -1622,19 +1621,19 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 
 	signingKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 	headers := jwt.NewHeaders()
 	headers.Add("kid", signingKeyID)
 	mapClaims, err := vcClaims.ToMapClaims()
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, mapClaims, headers)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 

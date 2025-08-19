@@ -7,9 +7,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 )
 
@@ -33,16 +34,16 @@ func (p *Persister) IsNonceValid(ctx context.Context, accessToken, nonce string)
 	aad := []byte(aadAccessTokenPrefix + accessToken)
 	plaintext, err := p.r.FlowCipher().Decrypt(ctx, nonce, aad)
 	if err != nil {
-		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce is invalid."))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce is invalid."))
 	}
 
 	exp, err := x.BytesToInt(plaintext)
 	if err != nil {
-		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce is invalid.")) // should never happen
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce is invalid.")) // should never happen
 	}
 
 	if exp < time.Now().Unix() {
-		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce has expired."))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("The nonce has expired."))
 	}
 
 	return nil

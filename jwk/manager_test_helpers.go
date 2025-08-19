@@ -12,17 +12,17 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/assertx"
-	"github.com/ory/x/errorsx"
 )
 
 func RandomBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
-		return []byte{}, errorsx.WithStack(err)
+		return []byte{}, errors.WithStack(err)
 	}
 	return bytes, nil
 }

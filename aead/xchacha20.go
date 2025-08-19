@@ -11,9 +11,8 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/chacha20poly1305"
-
-	"github.com/ory/x/errorsx"
 )
 
 var _ Cipher = (*XChaCha20Poly1305)(nil)
@@ -36,18 +35,18 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 
 	aead, err := chacha20poly1305.NewX(key)
 	if err != nil {
-		return "", errorsx.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	// Make sure the size calculation does not overflow.
 	if len(plaintext) > math.MaxInt-aead.NonceSize()-aead.Overhead() {
-		return "", errorsx.WithStack(fmt.Errorf("plaintext too large"))
+		return "", errors.WithStack(fmt.Errorf("plaintext too large"))
 	}
 
 	nonce := make([]byte, aead.NonceSize(), aead.NonceSize()+len(plaintext)+aead.Overhead())
 	_, err = cryptorand.Read(nonce)
 	if err != nil {
-		return "", errorsx.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	ciphertext := aead.Seal(nonce, nonce, plaintext, additionalData)
@@ -57,17 +56,17 @@ func (x *XChaCha20Poly1305) Encrypt(ctx context.Context, plaintext, additionalDa
 func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
 	msg, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	if len(msg) < chacha20poly1305.NonceSizeX {
-		return nil, errorsx.WithStack(fmt.Errorf("malformed ciphertext: too short"))
+		return nil, errors.WithStack(fmt.Errorf("malformed ciphertext: too short"))
 	}
 	nonce, ciphered := msg[:chacha20poly1305.NonceSizeX], msg[chacha20poly1305.NonceSizeX:]
 
 	keys, err := allKeys(ctx, x.d)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	var aead cipher.AEAD
@@ -82,5 +81,5 @@ func (x *XChaCha20Poly1305) Decrypt(ctx context.Context, ciphertext string, aad 
 		}
 	}
 
-	return nil, errorsx.WithStack(err)
+	return nil, errors.WithStack(err)
 }

@@ -21,12 +21,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	pkgerr "github.com/pkg/errors"
+
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/randx"
@@ -206,6 +207,6 @@ func sussessfulPing(r *RegistrySQL) error {
 func failedPing(err error) func(r *RegistrySQL) error {
 	return func(r *RegistrySQL) error {
 		r.Logger().Fatal(err.Error())
-		return errorsx.WithStack(err)
+		return pkgerr.WithStack(err)
 	}
 }

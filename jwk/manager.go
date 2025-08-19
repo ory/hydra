@@ -13,7 +13,6 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/errorsx"
 
 	jose "github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
@@ -90,18 +89,18 @@ func (d SQLDataRows) ToJWK(ctx context.Context, r interface {
 	for _, d := range d {
 		key, err := r.KeyCipher().Decrypt(ctx, d.Key, nil)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 
 		var c jose.JSONWebKey
 		if err := json.Unmarshal(key, &c); err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 		keys.Keys = append(keys.Keys, c)
 	}
 
 	if len(keys.Keys) == 0 {
-		return nil, errorsx.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	return keys, nil

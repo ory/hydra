@@ -10,8 +10,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,7 +28,7 @@ func TestErrorEnhancer(t *testing.T) {
 			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{
-			in:  errorsx.WithStack(sqlcon.ErrNoRows),
+			in:  errors.WithStack(sqlcon.ErrNoRows),
 			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{
@@ -46,7 +44,7 @@ func TestErrorEnhancer(t *testing.T) {
 			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\"}",
 		},
 		{
-			in:  errorsx.WithStack(fosite.ErrInvalidRequest),
+			in:  errors.WithStack(fosite.ErrInvalidRequest),
 			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\"}",
 		},
 	} {

@@ -17,8 +17,6 @@ import (
 
 	"github.com/ory/x/urlx"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/x/stringslice"
 
 	"github.com/ory/hydra/v2/x"
@@ -294,7 +292,7 @@ func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -346,7 +344,7 @@ func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps ht
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
@@ -404,7 +402,7 @@ func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, 
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 

@@ -7,8 +7,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
@@ -84,7 +85,7 @@ func RefreshTokenHook(reg interface {
 
 		reqBodyBytes, err := json.Marshal(&reqBody)
 		if err != nil {
-			return errorsx.WithStack(
+			return errors.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
 					WithDescription("An error occurred while encoding the token hook.").

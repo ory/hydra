@@ -6,12 +6,13 @@ package oauth2_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/x/pointerx"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/x/pointerx"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"

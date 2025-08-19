@@ -4,10 +4,9 @@
 package cmd
 
 import (
+	"cmp"
 	"fmt"
 	"time"
-
-	"github.com/ory/x/stringsx"
 
 	"golang.org/x/oauth2"
 )
@@ -29,7 +28,7 @@ func (i outputOAuth2Token) Columns() []string {
 
 	return []string{
 		i.AccessToken,
-		stringsx.Coalesce(i.RefreshToken, "<empty>"),
+		cmp.Or(i.RefreshToken, "<empty>"),
 		printIDToken,
 		i.Expiry.Round(time.Second).String(),
 	}

@@ -4,6 +4,7 @@
 package consent
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -20,12 +21,10 @@ import (
 	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/httprouterx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/pagination/tokenpagination"
 	"github.com/ory/x/sqlxx"
-	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
 )
 
@@ -156,7 +155,7 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
 
 	default:
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Invalid combination of query parameters.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Invalid combination of query parameters.")))
 		return
 	}
 
@@ -294,7 +293,7 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 	subject := r.URL.Query().Get("subject")
 
 	if sid == "" && subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Either 'subject' or 'sid' query parameters need to be defined.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Either 'subject' or 'sid' query parameters need to be defined.`)))
 		return
 	}
 
@@ -356,13 +355,13 @@ type getOAuth2LoginRequest struct {
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -436,12 +435,12 @@ type acceptOAuth2LoginRequest struct {
 func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -449,12 +448,12 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&handledLoginRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
 	if handledLoginRequest.Subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
 		return
 	}
 
@@ -564,12 +563,12 @@ type rejectOAuth2LoginRequest struct {
 func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -577,7 +576,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
@@ -664,12 +663,12 @@ type getOAuth2ConsentRequest struct {
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -748,12 +747,12 @@ type acceptOAuth2ConsentRequest struct {
 func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -761,13 +760,13 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
 	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -783,7 +782,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 
 	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &p)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	} else if hr.Skip {
 		p.Remember = false
@@ -858,12 +857,12 @@ type adminRejectOAuth2ConsentRequest struct {
 func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -871,7 +870,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
@@ -879,7 +878,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.SetDefaults(flow.ConsentRequestDeniedErrorName)
 	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -897,7 +896,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
 	})
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -950,7 +949,7 @@ type acceptOAuth2LogoutRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -995,7 +994,7 @@ type rejectOAuth2LogoutRequest struct {
 //	  204: emptyResponse
 //	  default: errorOAuth2
 func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -1035,7 +1034,7 @@ type getOAuth2LogoutRequest struct {
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -1095,7 +1094,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 
 	challenge := r.URL.Query().Get("device_challenge")
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'device_challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'device_challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -1103,12 +1102,12 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&reqBody); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode request body: %s", err.Error())))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode request body: %s", err.Error())))
 		return
 	}
 
 	if reqBody.UserCode == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
 		return
 	}
 
@@ -1154,7 +1153,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	// Append the client_id to the original RequestURL, as it is needed for the login flow
 	reqURL, err := url.Parse(f.RequestURL)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 

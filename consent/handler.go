@@ -38,12 +38,8 @@ const (
 	SessionsPath = "/oauth2/auth/sessions"
 )
 
-func NewHandler(
-	r InternalRegistry,
-) *Handler {
-	return &Handler{
-		r: r,
-	}
+func NewHandler(r InternalRegistry) *Handler {
+	return &Handler{r: r}
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {

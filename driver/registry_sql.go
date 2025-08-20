@@ -60,14 +60,9 @@ import (
 )
 
 type RegistrySQL struct {
-	l               *logrusx.Logger
-	al              *logrusx.Logger
+	l, al           *logrusx.Logger
 	conf            *config.DefaultProvider
-	ch              *client.Handler
 	fh              fosite.Hasher
-	jwtGrantH       *trust.Handler
-	jwtGrantV       *trust.GrantValidator
-	kh              *jwk.Handler
 	cv              *client.Validator
 	ctxer           contextx.Contextualizer
 	hh              *healthx.Handler
@@ -79,17 +74,11 @@ type RegistrySQL struct {
 	hsm             hsm.Context
 	forv            *openid.OpenIDConnectRequestValidator
 	fop             fosite.OAuth2Provider
-	coh             *consent.Handler
-	oah             *oauth2.Handler
 	sia             map[string]consent.SubjectIdentifierAlgorithm
 	trc             *otelx.Tracer
 	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
-	pmm             *prometheus.MetricsManager
-	oa2mw           func(h http.Handler) http.Handler
 	arhs            []oauth2.AccessRequestHook
-	r               Registry
 	persister       persistence.Persister
-	jfs             fosite.JWKSFetcherStrategy
 	oc              fosite.Configurator
 	oidcs           jwk.JWTSigner
 	ats             jwk.JWTSigner
@@ -108,7 +97,7 @@ type RegistrySQL struct {
 
 var (
 	_ contextx.Provider = (*RegistrySQL)(nil)
-	_ Registry          = (*RegistrySQL)(nil)
+	_ registry          = (*RegistrySQL)(nil)
 )
 
 // defaultInitialPing is the default function that will be called within RegistrySQL.Init to make sure
@@ -265,27 +254,11 @@ func (m *RegistrySQL) GrantManager() trust.GrantManager {
 	return m.Persister()
 }
 
-func (m *RegistrySQL) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
-	if m.jfs == nil {
-		m.jfs = fosite.NewDefaultJWKSFetcherStrategy(fosite.JWKSFetcherWithHTTPClientSource(func(ctx context.Context) *retryablehttp.Client {
-			return m.HTTPClient(ctx)
-		}))
-	}
-	return m.jfs
-}
-
 func (m *RegistrySQL) Contextualizer() contextx.Contextualizer {
 	if m.ctxer == nil {
 		panic("registry Contextualizer not set")
 	}
 	return m.ctxer
-}
-
-func (m *RegistrySQL) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
-	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(m)
-	}
-	return m.oa2mw
 }
 
 func (m *RegistrySQL) addPublicCORSOnHandler(ctx context.Context) func(http.Handler) http.Handler {
@@ -306,9 +279,10 @@ func (m *RegistrySQL) addPublicCORSOnHandler(ctx context.Context) func(http.Hand
 func (m *RegistrySQL) RegisterPublicRoutes(ctx context.Context, public *httprouterx.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(public, false, healthx.WithMiddleware(m.addPublicCORSOnHandler(ctx)))
 
-	m.KeyHandler().SetPublicRoutes(public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetPublicRoutes(public)
-	m.OAuth2Handler().SetPublicRoutes(public, m.OAuth2AwareMiddleware())
+	corsMW := oauth2cors.Middleware(m)
+	jwk.NewHandler(m).SetPublicRoutes(public, corsMW)
+	client.NewHandler(m).SetPublicRoutes(public)
+	oauth2.NewHandler(m).SetPublicRoutes(public, corsMW)
 }
 
 func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
@@ -316,11 +290,11 @@ func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
 	m.HealthHandler().SetVersionRoutes(admin)
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
-	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetAdminRoutes(admin)
-	m.ClientHandler().SetAdminRoutes(admin)
-	m.OAuth2Handler().SetAdminRoutes(admin)
-	m.JWTGrantHandler().SetRoutes(admin)
+	consent.NewHandler(m).SetRoutes(admin)
+	jwk.NewHandler(m).SetAdminRoutes(admin)
+	client.NewHandler(m).SetAdminRoutes(admin)
+	oauth2.NewHandler(m).SetAdminRoutes(admin)
+	trust.NewHandler(m).SetRoutes(admin)
 }
 
 func (m *RegistrySQL) Writer() herodot.Writer {
@@ -354,39 +328,11 @@ func (m *RegistrySQL) ClientHasher() fosite.Hasher {
 	return m.fh
 }
 
-func (m *RegistrySQL) ClientHandler() *client.Handler {
-	if m.ch == nil {
-		m.ch = client.NewHandler(m)
-	}
-	return m.ch
-}
-
 func (m *RegistrySQL) ClientValidator() *client.Validator {
 	if m.cv == nil {
 		m.cv = client.NewValidator(m)
 	}
 	return m.cv
-}
-
-func (m *RegistrySQL) KeyHandler() *jwk.Handler {
-	if m.kh == nil {
-		m.kh = jwk.NewHandler(m)
-	}
-	return m.kh
-}
-
-func (m *RegistrySQL) JWTGrantHandler() *trust.Handler {
-	if m.jwtGrantH == nil {
-		m.jwtGrantH = trust.NewHandler(m)
-	}
-	return m.jwtGrantH
-}
-
-func (m *RegistrySQL) GrantValidator() *trust.GrantValidator {
-	if m.jwtGrantV == nil {
-		m.jwtGrantV = trust.NewGrantValidator()
-	}
-	return m.jwtGrantV
 }
 
 func (m *RegistrySQL) HealthHandler() *healthx.Handler {
@@ -422,7 +368,7 @@ func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 
 func (m *RegistrySQL) ConsentStrategy() consent.Strategy {
 	if m.cos == nil {
-		m.cos = consent.NewStrategy(m, m.Config())
+		m.cos = consent.NewStrategy(m)
 	}
 	return m.cos
 }
@@ -497,66 +443,52 @@ func (m *RegistrySQL) HTTPClient(ctx context.Context, opts ...httpx.ResilientOpt
 }
 
 func (m *RegistrySQL) OAuth2Provider() fosite.OAuth2Provider {
-	if m.fop != nil {
-		return m.fop
+	if m.fop == nil {
+		m.fop = fosite.NewOAuth2Provider(m.OAuth2Storage(), m.OAuth2ProviderConfig())
 	}
-
-	m.fop = fosite.NewOAuth2Provider(m.OAuth2Storage(), m.OAuth2ProviderConfig())
 	return m.fop
 }
 
 func (m *RegistrySQL) OpenIDJWTStrategy() jwk.JWTSigner {
-	if m.oidcs != nil {
-		return m.oidcs
+	if m.oidcs == nil {
+		m.oidcs = jwk.NewDefaultJWTSigner(m, x.OpenIDConnectKeyName)
 	}
-
-	m.oidcs = jwk.NewDefaultJWTSigner(m, x.OpenIDConnectKeyName)
 	return m.oidcs
 }
 
 func (m *RegistrySQL) AccessTokenJWTStrategy() jwk.JWTSigner {
-	if m.ats != nil {
-		return m.ats
+	if m.ats == nil {
+		m.ats = jwk.NewDefaultJWTSigner(m, x.OAuth2JWTKeyName)
 	}
-
-	m.ats = jwk.NewDefaultJWTSigner(m, x.OAuth2JWTKeyName)
 	return m.ats
 }
 
 func (m *RegistrySQL) OAuth2EnigmaStrategy() *hmac.HMACStrategy {
-	if m.enigmaHMAC != nil {
-		return m.enigmaHMAC
+	if m.enigmaHMAC == nil {
+		m.enigmaHMAC = &hmac.HMACStrategy{Config: m.OAuth2Config()}
 	}
-
-	m.enigmaHMAC = &hmac.HMACStrategy{Config: m.OAuth2Config()}
 	return m.enigmaHMAC
 }
 
 func (m *RegistrySQL) OAuth2HMACStrategy() foauth2.CoreStrategy {
-	if m.hmacs != nil {
-		return m.hmacs
+	if m.hmacs == nil {
+		m.hmacs = foauth2.NewHMACSHAStrategy(m.OAuth2EnigmaStrategy(), m.OAuth2Config())
 	}
-
-	m.hmacs = foauth2.NewHMACSHAStrategy(m.OAuth2EnigmaStrategy(), m.OAuth2Config())
 	return m.hmacs
 }
 
 // RFC8628HMACStrategy returns the rfc8628 strategy
 func (m *RegistrySQL) RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy {
-	if m.deviceHmac != nil {
-		return m.deviceHmac
+	if m.deviceHmac == nil {
+		m.deviceHmac = compose.NewDeviceStrategy(m.OAuth2Config())
 	}
-
-	m.deviceHmac = compose.NewDeviceStrategy(m.OAuth2Config())
 	return m.deviceHmac
 }
 
 func (m *RegistrySQL) OAuth2Config() *fositex.Config {
-	if m.fc != nil {
-		return m.fc
+	if m.fc == nil {
+		m.fc = fositex.NewConfig(m)
 	}
-
-	m.fc = fositex.NewConfig(m)
 	return m.fc
 }
 
@@ -608,26 +540,8 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 	return m.forv
 }
 
-func (m *RegistrySQL) AudienceStrategy() fosite.AudienceMatchingStrategy {
-	return fosite.DefaultAudienceMatchingStrategy
-}
-
-func (m *RegistrySQL) ConsentHandler() *consent.Handler {
-	if m.coh == nil {
-		m.coh = consent.NewHandler(m)
-	}
-	return m.coh
-}
-
 func (m *RegistrySQL) Networker() x.Networker {
 	return m.persister
-}
-
-func (m *RegistrySQL) OAuth2Handler() *oauth2.Handler {
-	if m.oah == nil {
-		m.oah = oauth2.NewHandler(m)
-	}
-	return m.oah
 }
 
 func (m *RegistrySQL) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
@@ -666,13 +580,6 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 	return m.trc
 }
 
-func (m *RegistrySQL) PrometheusManager() *prometheus.MetricsManager {
-	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManagerWithPrefix("hydra", prometheus.HTTPMetrics, config.Version, config.Commit, config.Date)
-	}
-	return m.pmm
-}
-
 func (m *RegistrySQL) Persister() persistence.Persister {
 	return m.persister
 }
@@ -702,10 +609,6 @@ func (m *RegistrySQL) HSMContext() hsm.Context {
 		m.hsm = hsm.NewContext(m.Config(), m.l)
 	}
 	return m.hsm
-}
-
-func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
-	return m.OAuth2Provider().(*fosite.Fosite)
 }
 
 func (m *RegistrySQL) Kratos() kratos.Client {

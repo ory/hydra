@@ -40,7 +40,7 @@ var lock sync.Mutex
 // GetOrCreateTLSCertificate returns a function for use with
 // "net/tls".Config.GetCertificate. If the certificate and key are read from
 // disk, they will be automatically reloaded until stopReload is close()'d.
-func GetOrCreateTLSCertificate(ctx context.Context, d driver.Registry, tlsConfig configx.TLS, ifaceName string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func GetOrCreateTLSCertificate(ctx context.Context, d *driver.RegistrySQL, tlsConfig configx.TLS, ifaceName string) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	lock.Lock()
 	defer lock.Unlock()
 

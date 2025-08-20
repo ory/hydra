@@ -47,12 +47,9 @@ type DefaultStrategy struct {
 	r InternalRegistry
 }
 
-func NewStrategy(
-	r InternalRegistry,
-	c *config.DefaultProvider,
-) *DefaultStrategy {
+func NewStrategy(r InternalRegistry) *DefaultStrategy {
 	return &DefaultStrategy{
-		c: c,
+		c: r.Config(),
 		r: r,
 	}
 }

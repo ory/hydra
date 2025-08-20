@@ -118,7 +118,7 @@ func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := h.registry.GrantValidator().Validate(grantRequest); err != nil {
+	if err := validateGrant(grantRequest); err != nil {
 		h.registry.Writer().WriteError(w, r, err)
 		return
 	}

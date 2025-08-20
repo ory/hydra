@@ -36,9 +36,7 @@ const (
 )
 
 func NewHandler(r InternalRegistry) *Handler {
-	return &Handler{
-		r: r,
-	}
+	return &Handler{r: r}
 }
 
 func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {

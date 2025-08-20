@@ -4,13 +4,15 @@
 package internal
 
 import (
-	"context"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 )
 
-func AddFositeExamples(r driver.Registry) {
+func AddFositeExamples(t *testing.T, r *driver.RegistrySQL) {
 	for _, c := range []client.Client{
 		{
 			ID:            "my-client",
@@ -30,8 +32,6 @@ func AddFositeExamples(r driver.Registry) {
 		},
 	} {
 		// #nosec G601
-		if err := r.ClientManager().CreateClient(context.Background(), &c); err != nil {
-			panic(err)
-		}
+		require.NoError(t, r.ClientManager().CreateClient(t.Context(), &c))
 	}
 }

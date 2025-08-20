@@ -5,14 +5,7 @@ package trust
 
 import "github.com/pkg/errors"
 
-type GrantValidator struct {
-}
-
-func NewGrantValidator() *GrantValidator {
-	return &GrantValidator{}
-}
-
-func (v *GrantValidator) Validate(request createGrantRequest) error {
+func validateGrant(request createGrantRequest) error {
 	if request.Issuer == "" {
 		return errors.WithStack(ErrMissingRequiredParameter.WithHint("Field 'issuer' is required."))
 	}

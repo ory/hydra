@@ -74,7 +74,7 @@ func getAuthorizeCode(t *testing.T, conf *oauth2.Config, c *http.Client, params 
 	return q.Get("code"), resp
 }
 
-func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg driver.Registry, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
+func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg *driver.RegistrySQL, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		rr, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
@@ -112,7 +112,7 @@ func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APICl
 	}
 }
 
-func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg driver.Registry, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest) *hydra.AcceptOAuth2ConsentRequest) http.HandlerFunc {
+func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg *driver.RegistrySQL, subject string, checkRequestPayload func(*hydra.OAuth2ConsentRequest) *hydra.AcceptOAuth2ConsentRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		challenge := r.URL.Query().Get("consent_challenge")
 		rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
@@ -1722,7 +1722,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 }
 
-func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce string, accessToken *oauth2.Token, alg jose.SignatureAlgorithm) {
+func assertCreateVerifiableCredential(t *testing.T, reg *driver.RegistrySQL, nonce string, accessToken *oauth2.Token, alg jose.SignatureAlgorithm) {
 	// Build a proof from the nonce.
 	pubKey, privKey, err := josex.NewSigningKey(alg, 0)
 	require.NoError(t, err)
@@ -1745,7 +1745,7 @@ func assertCreateVerifiableCredential(t *testing.T, reg driver.Registry, nonce s
 	assertClaimsContainPublicKey(t, claims, pubKeyJWK)
 }
 
-func claimsFromVCResponse(t *testing.T, reg driver.Registry, vc *hydraoauth2.VerifiableCredentialResponse) (*jwt.Token, *hydraoauth2.VerifableCredentialClaims) {
+func claimsFromVCResponse(t *testing.T, reg *driver.RegistrySQL, vc *hydraoauth2.VerifiableCredentialResponse) (*jwt.Token, *hydraoauth2.VerifableCredentialClaims) {
 	ctx := context.Background()
 	token, err := jwt.ParseWithClaims(vc.Credential, new(hydraoauth2.VerifableCredentialClaims), func(token *jwt.Token) (interface{}, error) {
 		kid, found := token.Header["kid"]
@@ -1776,7 +1776,7 @@ func assertClaimsContainPublicKey(t *testing.T, claims *hydraoauth2.VerifableCre
 
 func createVerifiableCredential(
 	t *testing.T,
-	reg driver.Registry,
+	reg *driver.RegistrySQL,
 	token *oauth2.Token,
 	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
 ) (vcRes *hydraoauth2.VerifiableCredentialResponse, _ error) {
@@ -1805,7 +1805,7 @@ func createVerifiableCredential(
 
 func doPrimingRequest(
 	t *testing.T,
-	reg driver.Registry,
+	reg *driver.RegistrySQL,
 	token *oauth2.Token,
 	createVerifiableCredentialReq *hydraoauth2.CreateVerifiableCredentialRequestBody,
 ) (*hydraoauth2.VerifiableCredentialPrimingResponse, error) {
@@ -1864,7 +1864,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			consentStrategy := &consentMock{}
 
 			reg.WithConsentStrategy(consentStrategy)
-			handler := reg.OAuth2Handler()
+			handler := hydraoauth2.NewHandler(reg)
 			var callbackHandler http.HandlerFunc
 
 			var adminTs *httptest.Server

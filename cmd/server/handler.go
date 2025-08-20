@@ -41,7 +41,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 )
 
-func ensureNoMemoryDSN(r driver.Registry) {
+func ensureNoMemoryDSN(r *driver.RegistrySQL) {
 	if r.Config().DSN() == "memory" {
 		r.Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
@@ -116,6 +116,8 @@ func RunServeAll(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args [
 	}
 }
 
+var prometheusManager = prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+
 func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServeAdmin(contextx.RootContext)
 
@@ -133,7 +135,7 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
-	n.Use(d.PrometheusManager())
+	n.Use(prometheusManager)
 
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
@@ -156,7 +158,7 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	})
 	n.Use(metricsService)
 
-	router := httprouterx.NewRouterAdmin(d.PrometheusManager())
+	router := httprouterx.NewRouterAdmin(prometheusManager)
 	d.RegisterAdminRoutes(router)
 
 	n.UseHandler(router.Mux)
@@ -183,7 +185,7 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 	n.UseFunc(httprouterx.NoCacheNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
-	n.Use(d.PrometheusManager())
+	n.Use(prometheusManager)
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
 		if err != nil {
@@ -214,7 +216,7 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 	}, nil
 }
 
-func sqa(ctx context.Context, d driver.Registry, cmd *cobra.Command) *metricsx.Service {
+func sqa(ctx context.Context, d *driver.RegistrySQL, cmd *cobra.Command) *metricsx.Service {
 	return metricsx.New(
 		cmd,
 		d.Logger(),
@@ -286,7 +288,7 @@ func sqa(ctx context.Context, d driver.Registry, cmd *cobra.Command) *metricsx.S
 
 func serve(
 	ctx context.Context,
-	d driver.Registry,
+	d *driver.RegistrySQL,
 	cfg *configx.Serve,
 	handler http.Handler,
 	ifaceName string,

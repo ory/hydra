@@ -17,5 +17,4 @@ type InternalRegistry interface {
 
 type Registry interface {
 	GrantManager() GrantManager
-	GrantValidator() *GrantValidator
 }

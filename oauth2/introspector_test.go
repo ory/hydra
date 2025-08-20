@@ -11,16 +11,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/driver"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
+	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/prometheusx"
@@ -36,7 +36,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	})))
 
 	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
-	internal.AddFositeExamples(reg)
+	internal.AddFositeExamples(t, reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)
 
@@ -47,7 +47,7 @@ func TestIntrospectorSDK(t *testing.T) {
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	router := x.NewRouterAdmin(metrics)
-	handler := reg.OAuth2Handler()
+	handler := oauth2.NewHandler(reg)
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router.Mux)
 	defer server.Close()

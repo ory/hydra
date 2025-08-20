@@ -46,10 +46,8 @@ type Validator struct {
 	r validatorRegistry
 }
 
-func NewValidator(registry validatorRegistry) *Validator {
-	return &Validator{
-		r: registry,
-	}
+func NewValidator(r validatorRegistry) *Validator {
+	return &Validator{r: r}
 }
 
 func (v *Validator) Validate(ctx context.Context, c *Client) error {

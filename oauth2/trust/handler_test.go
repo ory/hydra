@@ -38,7 +38,7 @@ import (
 // returns the current testing context.
 type HandlerTestSuite struct {
 	suite.Suite
-	registry    driver.Registry
+	registry    *driver.RegistrySQL
 	server      *httptest.Server
 	hydraClient *hydra.APIClient
 	publicKey   *rsa.PublicKey

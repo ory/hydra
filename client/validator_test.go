@@ -185,7 +185,7 @@ func TestValidate(t *testing.T) {
 }
 
 type fakeHTTP struct {
-	driver.Registry
+	*driver.RegistrySQL
 	c *http.Client
 }
 
@@ -205,7 +205,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := NewValidator(&fakeHTTP{Registry: reg, c: ts.Client()})
+	v := NewValidator(&fakeHTTP{RegistrySQL: reg, c: ts.Client()})
 	for k, tc := range []struct {
 		p         string
 		r         []string

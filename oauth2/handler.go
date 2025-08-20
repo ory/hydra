@@ -1229,7 +1229,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, audience := range accessRequest.GetRequestedAudience() {
-			if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
+			if fosite.DefaultAudienceMatchingStrategy(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
 				accessRequest.GrantAudience(audience)
 			}
 		}

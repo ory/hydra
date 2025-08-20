@@ -32,7 +32,7 @@ func base64EncodedPGPPublicKey(t *testing.T) string {
 	return base64.StdEncoding.EncodeToString(gpgPublicKey)
 }
 
-func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.Server, driver.Registry) {
+func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.Server, *driver.RegistrySQL) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -45,7 +45,7 @@ func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.
 	return public, admin, reg
 }
 
-func setup(t *testing.T, cmd *cobra.Command) driver.Registry {
+func setup(t *testing.T, cmd *cobra.Command) *driver.RegistrySQL {
 	_, admin, reg := setupRoutes(t, cmd)
 	require.NoError(t, cmd.Flags().Set(cmdx.FlagEndpoint, admin.URL))
 	require.NoError(t, cmd.Flags().Set(cmdx.FlagFormat, string(cmdx.FormatJSON)))
@@ -61,7 +61,7 @@ var snapshotExcludedClientFields = []snapshotx.ExceptOpt{
 	snapshotx.ExceptNestedKeys("updated_at"),
 }
 
-func createClientCredentialsClient(t *testing.T, reg driver.Registry) *client.Client {
+func createClientCredentialsClient(t *testing.T, reg *driver.RegistrySQL) *client.Client {
 	return createClient(t, reg, &client.Client{
 		GrantTypes:              []string{"client_credentials"},
 		TokenEndpointAuthMethod: "client_secret_basic",
@@ -69,7 +69,7 @@ func createClientCredentialsClient(t *testing.T, reg driver.Registry) *client.Cl
 	})
 }
 
-func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
+func createClient(t *testing.T, reg *driver.RegistrySQL, c *client.Client) *client.Client {
 	if c == nil {
 		c = &client.Client{TokenEndpointAuthMethod: "client_secret_post", Secret: uuid.Must(uuid.NewV4()).String()}
 	}
@@ -79,7 +79,7 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	return c
 }
 
-func createJWK(t *testing.T, reg driver.Registry, set string, alg string) jose.JSONWebKey {
+func createJWK(t *testing.T, reg *driver.RegistrySQL, set string, alg string) jose.JSONWebKey {
 	c, err := reg.KeyManager().GenerateAndPersistKeySet(context.Background(), set, "", alg, "sig")
 	require.NoError(t, err)
 	return c.Keys[0]

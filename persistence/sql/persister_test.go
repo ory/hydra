@@ -33,7 +33,7 @@ func init() {
 	})
 }
 
-func testRegistry(t *testing.T, k string, t1 driver.Registry, t2 driver.Registry) {
+func testRegistry(t *testing.T, k string, t1, t2 *driver.RegistrySQL) {
 	t.Run("package=client/manager="+k, func(t *testing.T) {
 		t.Run("case=create-get-update-delete", client.TestHelperCreateGetUpdateDeleteClient(k, t1.Persister().Connection(context.Background()), t1.ClientManager(), t2.ClientManager()))
 

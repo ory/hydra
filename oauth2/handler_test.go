@@ -99,7 +99,7 @@ func TestUserinfo(t *testing.T) {
 	})), driver.WithOAuth2Provider(op))
 	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
-	h := reg.OAuth2Handler()
+	h := oauth2.NewHandler(reg)
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	router := httprouterx.NewRouterAdmin(metrics)

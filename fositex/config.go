@@ -28,7 +28,6 @@ type configDependencies interface {
 	config.Provider
 	persistence.Provider
 	x.HTTPClientProvider
-	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 	ClientHasher() fosite.Hasher
 	ExtraFositeFactories() []Factory
 }
@@ -43,6 +42,7 @@ type Config struct {
 	tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
 	revocationHandlers         fosite.RevocationHandlers
 	deviceEndpointHandlers     fosite.DeviceEndpointHandlers
+	jwksFetcherStrategy        fosite.JWKSFetcherStrategy
 
 	*config.DefaultProvider
 }
@@ -68,11 +68,10 @@ var defaultFactories = []Factory{
 }
 
 func NewConfig(deps configDependencies) *Config {
-	c := &Config{
+	return &Config{
 		deps:            deps,
 		DefaultProvider: deps.Config(),
 	}
-	return c
 }
 
 func (c *Config) LoadDefaultHandlers(strategy interface{}) {
@@ -98,7 +97,12 @@ func (c *Config) LoadDefaultHandlers(strategy interface{}) {
 }
 
 func (c *Config) GetJWKSFetcherStrategy(context.Context) fosite.JWKSFetcherStrategy {
-	return c.deps.GetJWKSFetcherStrategy()
+	if c.jwksFetcherStrategy == nil {
+		c.jwksFetcherStrategy = fosite.NewDefaultJWKSFetcherStrategy(fosite.JWKSFetcherWithHTTPClientSource(
+			func(ctx context.Context) *retryablehttp.Client { return c.deps.HTTPClient(ctx) },
+		))
+	}
+	return c.jwksFetcherStrategy
 }
 
 func (c *Config) GetHTTPClient(ctx context.Context) *retryablehttp.Client {
@@ -122,7 +126,7 @@ func (c *Config) GetRevocationHandlers(context.Context) fosite.RevocationHandler
 }
 
 // GetDeviceEndpointHandlers returns the deviceEndpointHandlers
-func (c *Config) GetDeviceEndpointHandlers(ctx context.Context) fosite.DeviceEndpointHandlers {
+func (c *Config) GetDeviceEndpointHandlers(context.Context) fosite.DeviceEndpointHandlers {
 	return c.deviceEndpointHandlers
 }
 

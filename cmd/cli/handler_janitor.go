@@ -84,7 +84,6 @@ func (j *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 
 func purge(cmd *cobra.Command, args []string, dOpts []driver.OptionsModifier) error {
 	ctx := cmd.Context()
-	var d driver.Registry
 
 	co := []configx.OptionModifier{
 		configx.WithFlags(cmd.Flags()),

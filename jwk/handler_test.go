@@ -29,7 +29,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
 	router := x.NewRouterPublic()
-	h := reg.KeyHandler()
+	h := jwk.NewHandler(reg)
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 		return h
 	})

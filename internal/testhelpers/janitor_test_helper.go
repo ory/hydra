@@ -61,7 +61,7 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 	return map[string]time.Duration{}
 }
 
-func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
+func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (*driver.RegistrySQL, error) {
 	return driver.New(ctx, driver.WithConfigOptions(
 		configx.WithValues(map[string]any{
 			config.KeyScopeStrategy:        "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",

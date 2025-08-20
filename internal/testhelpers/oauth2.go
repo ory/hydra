@@ -40,11 +40,11 @@ import (
 	"github.com/ory/x/uuidx"
 )
 
-func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
+func NewIDToken(t *testing.T, reg *driver.RegistrySQL, subject string) string {
 	return NewIDTokenWithExpiry(t, reg, subject, time.Hour)
 }
 
-func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp time.Duration) string {
+func NewIDTokenWithExpiry(t *testing.T, reg *driver.RegistrySQL, subject string, exp time.Duration) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), jwt.IDTokenClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(exp),
@@ -54,7 +54,7 @@ func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp
 	return token
 }
 
-func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaims) string {
+func NewIDTokenWithClaims(t *testing.T, reg *driver.RegistrySQL, claims jwt.MapClaims) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
@@ -71,7 +71,7 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL)
 	return NewConfigurableOAuth2Server(ctx, t, reg)
 }
 
-func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL) (publicTS, adminTS *httptest.Server) {
 	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 

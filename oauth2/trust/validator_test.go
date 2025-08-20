@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/fosite"
 )
 
 func TestEmptyIssuerIsInvalid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "",
 		Subject:         "valid-subject",
@@ -23,14 +25,12 @@ func TestEmptyIssuerIsInvalid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err == nil {
-		t.Error("an empty issuer should not be valid")
-	}
+	err := &fosite.RFC6749Error{}
+	require.ErrorAs(t, validateGrant(r), &err)
+	assert.Equal(t, "Field 'issuer' is required.", err.HintField)
 }
 
 func TestEmptySubjectAndNoAnySubjectFlagIsInvalid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "",
@@ -41,14 +41,12 @@ func TestEmptySubjectAndNoAnySubjectFlagIsInvalid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err == nil {
-		t.Error("an empty subject should not be valid")
-	}
+	err := &fosite.RFC6749Error{}
+	require.ErrorAs(t, validateGrant(r), &err)
+	assert.Equal(t, "One of 'subject' or 'allow_any_subject' field must be set.", err.HintField)
 }
 
 func TestEmptySubjectWithAnySubjectFlagIsValid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "",
@@ -59,14 +57,10 @@ func TestEmptySubjectWithAnySubjectFlagIsValid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err != nil {
-		t.Error("an empty subject with the allow_any_subject flag should be valid")
-	}
+	assert.NoError(t, validateGrant(r))
 }
 
 func TestNonEmptySubjectWithAnySubjectFlagIsInvalid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "some-issuer",
@@ -77,14 +71,12 @@ func TestNonEmptySubjectWithAnySubjectFlagIsInvalid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err == nil {
-		t.Error("a non empty subject with the allow_any_subject flag should not be valid")
-	}
+	err := &fosite.RFC6749Error{}
+	require.ErrorAs(t, validateGrant(r), &err)
+	assert.Equal(t, "Both 'subject' and 'allow_any_subject' fields cannot be set at the same time.", err.HintField)
 }
 
 func TestEmptyExpiresAtIsInvalid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "valid-subject",
@@ -95,14 +87,12 @@ func TestEmptyExpiresAtIsInvalid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err == nil {
-		t.Error("an empty expiration should not be valid")
-	}
+	err := &fosite.RFC6749Error{}
+	require.ErrorAs(t, validateGrant(r), &err)
+	assert.Equal(t, "Field 'expires_at' is required.", err.HintField)
 }
 
 func TestEmptyPublicKeyIdIsInvalid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "valid-subject",
@@ -113,14 +103,12 @@ func TestEmptyPublicKeyIdIsInvalid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err == nil {
-		t.Error("an empty public key id should not be valid")
-	}
+	err := &fosite.RFC6749Error{}
+	require.ErrorAs(t, validateGrant(r), &err)
+	assert.Equal(t, "Field 'jwk' must contain JWK with kid header.", err.HintField)
 }
 
 func TestIsValid(t *testing.T) {
-	v := GrantValidator{}
-
 	r := createGrantRequest{
 		Issuer:          "valid-issuer",
 		Subject:         "valid-subject",
@@ -131,7 +119,5 @@ func TestIsValid(t *testing.T) {
 		},
 	}
 
-	if err := v.Validate(r); err != nil {
-		t.Error("A request with an issuer, a subject, an expiration and a public key should be valid")
-	}
+	assert.NoError(t, validateGrant(r))
 }

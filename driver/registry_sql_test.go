@@ -40,7 +40,7 @@ func init() {
 func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	t.Parallel()
 
-	registry, err := New(t.Context(), WithConfigOptions(
+	r, err := New(t.Context(), WithConfigOptions(
 		configx.WithValues(map[string]any{
 			config.KeyDSN:                         "memory",
 			config.HSMEnabled:                     "false",
@@ -50,7 +50,7 @@ func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	_, err = registry.GetJWKSFetcherStrategy().Resolve(t.Context(), "http://localhost:8080", true)
+	_, err = r.OAuth2Config().GetJWKSFetcherStrategy(t.Context()).Resolve(t.Context(), "http://localhost:8080", true)
 	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
 }
 
@@ -135,7 +135,7 @@ func TestRegistrySQL_HTTPClient(t *testing.T) {
 
 	t.Run("case=does not match exception glob", func(t *testing.T) {
 		_, err := r.HTTPClient(t.Context()).Get(ts.URL + "/foo")
-		require.Error(t, err)
+		assert.ErrorContains(t, err, "prohibited IP address")
 	})
 }
 
@@ -176,7 +176,7 @@ func TestDbUnknownTableColumns(t *testing.T) {
 		ID: strconv.Itoa(rand.Int()),
 	}
 	require.NoError(t, reg.Persister().CreateClient(t.Context(), cl))
-	getClients := func(ctx context.Context, reg Registry) ([]client.Client, error) {
+	getClients := func(ctx context.Context, reg *RegistrySQL) ([]client.Client, error) {
 		readClients := make([]client.Client, 0)
 		return readClients, reg.Persister().Connection(ctx).RawQuery(`SELECT * FROM "hydra_client"`).All(&readClients)
 	}

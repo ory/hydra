@@ -12,8 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/x/snapshotx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
@@ -22,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlxx"
 )
 

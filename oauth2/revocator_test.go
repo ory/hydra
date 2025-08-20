@@ -63,13 +63,13 @@ func TestRevoke(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	testhelpers.MustEnsureRegistryKeys(t.Context(), reg, x.OpenIDConnectKeyName)
-	internal.AddFositeExamples(reg)
+	internal.AddFositeExamples(t, reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)
 	now := time.Now().UTC().Round(time.Second)
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	handler := reg.OAuth2Handler()
+	handler := oauth2.NewHandler(reg)
 	router := httprouterx.NewRouterAdmin(metrics)
 	handler.SetPublicRoutes(httprouterx.RouterAdminToPublic(router), func(h http.Handler) http.Handler { return h })
 	handler.SetAdminRoutes(router)

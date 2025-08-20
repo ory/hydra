@@ -32,7 +32,6 @@ type InternalRegistry interface {
 type Registry interface {
 	OAuth2Storage() x.FositeStorer
 	OAuth2Provider() fosite.OAuth2Provider
-	AudienceStrategy() fosite.AudienceMatchingStrategy
 	AccessTokenJWTStrategy() jwk.JWTSigner
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 	AccessRequestHooks() []AccessRequestHook

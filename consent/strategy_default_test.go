@@ -75,7 +75,7 @@ func checkAndAcceptConsentHandler(t *testing.T, apiClient *hydra.APIClient, cb f
 	}
 }
 
-func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
+func makeOAuth2Request(t *testing.T, reg *driver.RegistrySQL, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
 	ctx := context.Background()
 	if hc == nil {
 		hc = testhelpers.NewEmptyJarClient(t)
@@ -92,7 +92,7 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }
 
-func makeOAuth2DeviceAuthRequest(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, scope string) (gjson.Result, *http.Response) {
+func makeOAuth2DeviceAuthRequest(t *testing.T, reg *driver.RegistrySQL, hc *http.Client, oc *client.Client, scope string) (gjson.Result, *http.Response) {
 	ctx := context.Background()
 	if hc == nil {
 		hc = testhelpers.NewEmptyJarClient(t)
@@ -118,7 +118,7 @@ func makeOAuth2DeviceAuthRequest(t *testing.T, reg driver.Registry, hc *http.Cli
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }
 
-func makeOAuth2DeviceVerificationRequest(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
+func makeOAuth2DeviceVerificationRequest(t *testing.T, reg *driver.RegistrySQL, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
 	ctx := context.Background()
 	if hc == nil {
 		hc = testhelpers.NewEmptyJarClient(t)
@@ -132,7 +132,7 @@ func makeOAuth2DeviceVerificationRequest(t *testing.T, reg driver.Registry, hc *
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }
 
-func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
+func createClient(t *testing.T, reg *driver.RegistrySQL, c *client.Client) *client.Client {
 	secret := uuid.Must(uuid.NewV4()).String()
 	c.Secret = secret
 	c.Scope = "openid offline"
@@ -142,7 +142,7 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	return c
 }
 
-func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
+func newAuthCookieJar(t *testing.T, reg *driver.RegistrySQL, u, sessionID string) http.CookieJar {
 	ctx := context.Background()
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
@@ -162,7 +162,7 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	return cj
 }
 
-func genIDToken(t *testing.T, reg driver.Registry, c jwt.MapClaims) string {
+func genIDToken(t *testing.T, reg *driver.RegistrySQL, c jwt.MapClaims) string {
 	r, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r

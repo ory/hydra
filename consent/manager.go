@@ -26,9 +26,6 @@ func (ForcedObfuscatedLoginSession) TableName() string {
 
 type (
 	Manager interface {
-		GetConsentRequest(ctx context.Context, challenge string) (*flow.OAuth2ConsentRequest, error)
-		HandleConsentRequest(ctx context.Context, f *flow.Flow, r *flow.AcceptOAuth2ConsentRequest) (*flow.OAuth2ConsentRequest, error)
-
 		RevokeSubjectConsentSession(ctx context.Context, user string) error
 		RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 		RevokeConsentSessionByID(ctx context.Context, consentRequestID string) error

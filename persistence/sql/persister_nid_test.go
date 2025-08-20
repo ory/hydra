@@ -700,8 +700,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			}
 
 			f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
-			_, err := r.Persister().HandleConsentRequest(s.t1, f, hcr)
-			require.NoError(t, err)
+			require.NoError(t, f.HandleConsentRequest(hcr))
 
 			f.ConsentWasHandled = true
 			f.State = flow.FlowStateConsentUsed
@@ -728,29 +727,13 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
-			req := &flow.OAuth2ConsentRequest{
-				ConsentRequestID: f.ConsentRequestID.String(),
-				LoginChallenge:   sqlxx.NullString(f.ID),
-				Skip:             false,
-				Verifier:         "verifier",
-				CSRF:             "csrf",
-			}
-
-			hcr := &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: req.ConsentRequestID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			}
-			_, err := r.Persister().HandleConsentRequest(s.t1, f, hcr)
-			require.NoError(t, err)
-
-			_, _, err = r.Persister().FindSubjectsGrantedConsentRequests(s.t2, f.Subject)
+			_, _, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t2, f.Subject)
 			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
 
 			actual, nextPage, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t1, f.Subject)
 			require.NoError(t, err)
 			require.Len(t, actual, 1)
-			assert.Equal(t, hcr.ConsentRequestID, actual[0].ConsentRequestID.String())
+			assert.Equal(t, f.ConsentRequestID.String(), actual[0].ConsentRequestID.String())
 			assert.True(t, nextPage.IsLast())
 		})
 	}
@@ -991,36 +974,6 @@ func (s *PersisterTestSuite) TestGetConcreteGrant() {
 	}
 }
 
-func (s *PersisterTestSuite) TestGetConsentRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			cl := &client.Client{ID: "client-id"}
-			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
-			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
-
-			req := &flow.OAuth2ConsentRequest{
-				Challenge:        x.Must(f.ToConsentChallenge(s.t1, r)),
-				ConsentRequestID: f.GetConsentRequest("").ConsentRequestID,
-				LoginChallenge:   sqlxx.NullString(f.ID),
-				Skip:             false,
-				Verifier:         "verifier",
-				CSRF:             "csrf",
-			}
-
-			actual, err := r.Persister().GetConsentRequest(s.t2, req.Challenge)
-			require.Error(t, err)
-			require.Nil(t, actual)
-
-			actual, err = r.Persister().GetConsentRequest(s.t1, req.Challenge)
-			require.NoError(t, err)
-			require.NotNil(t, actual)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestGetFlow() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
@@ -1038,29 +991,6 @@ func (s *PersisterTestSuite) TestGetFlow() {
 			require.Error(t, err)
 
 			_, err = store.GetFlow(s.t1, f.ID)
-			require.NoError(t, err)
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestGetFlowByConsentChallenge() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			cl := &client.Client{ID: "client-id"}
-			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
-			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &flow.LoginSession{ID: sessionID}))
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-
-			store, ok := r.Persister().(*persistencesql.Persister)
-			require.True(t, ok)
-
-			challenge := x.Must(f.ToConsentChallenge(s.t1, r))
-
-			_, err := store.GetFlowByConsentChallenge(s.t2, challenge)
-			require.Error(t, err)
-
-			_, err = store.GetFlowByConsentChallenge(s.t1, challenge)
 			require.NoError(t, err)
 		})
 	}
@@ -1302,39 +1232,25 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 
-			req := &flow.OAuth2ConsentRequest{
-				ConsentRequestID: "consent-request-id",
-				LoginChallenge:   sqlxx.NullString(f.ID),
-				Skip:             false,
-				Verifier:         "verifier",
-				CSRF:             "csrf",
-			}
+			f.ConsentRequestID = "consent-request-id"
 
-			hcr := &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: req.ConsentRequestID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			}
-
-			f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
-
-			actualCR, err := r.Persister().HandleConsentRequest(s.t2, f, hcr)
-			require.Error(t, err)
-			require.Nil(t, actualCR)
 			actual, err := r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
 			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
 			assert.Nil(t, actual)
 
-			actualCR, err = r.Persister().HandleConsentRequest(s.t1, f, hcr)
-			require.NoError(t, err)
-			require.NotNil(t, actualCR)
+			require.NoError(t, f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
+				ConsentRequestID: f.ConsentRequestID.String(),
+				HandledAt:        sqlxx.NullTime(time.Now()),
+				Remember:         true,
+			}))
 
 			f.ConsentWasHandled = true
 			f.State = flow.FlowStateConsentUsed
+
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
 			require.NoError(t, err)
-			assert.EqualValues(t, hcr.ConsentRequestID, actual.ConsentRequestID)
+			assert.EqualValues(t, f.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }
@@ -1415,25 +1331,6 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
 			t2f2.ConsentRequestID = sqlxx.NullString(t2f2.ID)
 
-			_, err := r.Persister().HandleConsentRequest(s.t1, t1f1, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t1f1.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, t2f1, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t2f1.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, t2f2, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t2f2.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
-
 			cs, err := r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)
 			require.Equal(t, 1, len(cs))
@@ -1478,25 +1375,6 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 			t1f1.ConsentRequestID = sqlxx.NullString(t1f1.ID)
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
 			t2f2.ConsentRequestID = sqlxx.NullString(t2f2.ID)
-
-			_, err := r.Persister().HandleConsentRequest(s.t1, t1f1, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t1f1.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, t2f1, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t2f1.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
-			_, err = r.Persister().HandleConsentRequest(s.t2, t2f2, &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: t2f2.ID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
-			})
-			require.NoError(t, err)
 
 			cs, err := r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())
 			require.NoError(t, err)

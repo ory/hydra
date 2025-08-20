@@ -22,17 +22,14 @@ type decodeDependencies interface {
 	x.TracingProvider
 }
 
-func DecodeFromLoginChallenge(ctx context.Context, d decodeDependencies, loginChallenge string) (_ *Flow, err error) {
-	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeFromLoginChallenge")
-	defer otelx.End(span, &err)
-
-	f, err := Decode[Flow](ctx, d.FlowCipher(), loginChallenge, AsLoginChallenge)
+func decodeChallenge(ctx context.Context, d decodeDependencies, challenge string, p purpose) (_ *Flow, err error) {
+	f, err := Decode[Flow](ctx, d.FlowCipher(), challenge, withPurpose(p))
 	if err != nil {
 		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
 	}
 
 	if f.NID != d.Networker().NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound)
+		return nil, errors.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
 	}
 
 	if f.RequestedAt.Add(d.Config().ConsentRequestMaxAge(ctx)).Before(time.Now()) {
@@ -40,4 +37,18 @@ func DecodeFromLoginChallenge(ctx context.Context, d decodeDependencies, loginCh
 	}
 
 	return f, nil
+}
+
+func DecodeFromLoginChallenge(ctx context.Context, d decodeDependencies, challenge string) (_ *Flow, err error) {
+	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeFromLoginChallenge")
+	defer otelx.End(span, &err)
+
+	return decodeChallenge(ctx, d, challenge, loginChallenge)
+}
+
+func DecodeFromConsentChallenge(ctx context.Context, d decodeDependencies, challenge string) (_ *Flow, err error) {
+	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeFromConsentChallenge")
+	defer otelx.End(span, &err)
+
+	return decodeChallenge(ctx, d, challenge, consentChallenge)
 }

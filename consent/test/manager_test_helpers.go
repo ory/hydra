@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/aead"
@@ -20,11 +23,8 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *flow.OAuth2ConsentRequest, h *flow.AcceptOAuth2ConsentRequest, f *flow.Flow) {
@@ -239,8 +239,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow,
 		HandledAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
-	_, err := m.HandleConsentRequest(context.Background(), f, h)
-	require.NoError(t, err)
+	require.NoError(t, f.HandleConsentRequest(h))
 
 	return h
 }
@@ -584,26 +583,11 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					_ = clientManager.CreateClient(ctx, consentRequest.Client) // Ignore errors that are caused by duplication
 					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
 
-					consentChallenge := makeID("challenge", network, tc.key)
-
-					_, err := m.GetConsentRequest(ctx, consentChallenge)
-					require.Error(t, err)
-
-					consentChallenge = x.Must(f.ToConsentChallenge(ctx, deps))
-
-					got1, err := m.GetConsentRequest(ctx, consentChallenge)
-					require.NoError(t, err)
-					compareConsentRequest(t, consentRequest, got1)
-					assert.False(t, got1.WasHandled)
-
-					got1, err = m.HandleConsentRequest(ctx, f, h)
-					require.NoError(t, err)
-					assertx.TimeDifferenceLess(t, time.Now(), time.Time(h.HandledAt), 5)
-					compareConsentRequest(t, consentRequest, got1)
+					require.NoError(t, f.HandleConsentRequest(h))
+					assert.WithinDuration(t, time.Now(), time.Time(h.HandledAt), 5*time.Second)
 
 					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}
-					_, err = m.HandleConsentRequest(ctx, f, h)
-					require.NoError(t, err)
+					require.NoError(t, f.HandleConsentRequest(h))
 
 					consentVerifier := x.Must(f.ToConsentVerifier(ctx, deps))
 
@@ -711,10 +695,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_ = clientManager.CreateClient(ctx, cr1.Client)
 			_ = clientManager.CreateClient(ctx, cr2.Client)
 
-			_, err := m.HandleConsentRequest(ctx, f1, hcr1)
-			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
-			require.NoError(t, err)
+			require.NoError(t, f1.HandleConsentRequest(hcr1))
+			require.NoError(t, f2.HandleConsentRequest(hcr2))
 
 			crr1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
@@ -778,13 +760,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						require.NoError(t, m.RevokeSubjectClientConsentSession(ctx, tc.subject, tc.client))
 					}
 
-					for _, id := range tc.ids {
-						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
-							_, err := m.GetConsentRequest(ctx, id)
-							assert.True(t, errors.Is(err, x.ErrNotFound))
-						})
-					}
-
 					r, err := fositeManager.GetAccessTokenSession(ctx, tc.at, nil)
 					assert.Error(t, err, "%+v", r)
 					r, err = fositeManager.GetRefreshTokenSession(ctx, tc.rt, nil)
@@ -823,10 +798,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				flow.WithConsentCSRF(cr2.CSRF),
 			)
 
-			_, err := m.HandleConsentRequest(ctx, f1, hcr1)
-			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(ctx, f2, hcr2)
-			require.NoError(t, err)
+			require.NoError(t, f1.HandleConsentRequest(hcr1))
+			require.NoError(t, f2.HandleConsentRequest(hcr2))
 			handledConsentRequest1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
 			require.NoError(t, err)
 			handledConsentRequest2, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f2.ToConsentVerifier(ctx, deps)))
@@ -1119,46 +1092,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, m.CreateLoginSession(ctx, &s))
 			require.NoError(t, m.ConfirmLoginSession(ctx, &s))
 
-			f := &flow.Flow{
-				ID:                   uuid.Must(uuid.NewV4()).String(),
-				Subject:              uuid.Must(uuid.NewV4()).String(),
-				LoginVerifier:        uuid.Must(uuid.NewV4()).String(),
-				Client:               cl,
-				LoginAuthenticatedAt: sqlxx.NullTime(time.Now()),
-				RequestedAt:          time.Now(),
-				SessionID:            sqlxx.NullString(s.ID),
-				NID:                  deps.Contextualizer().Network(ctx, uuid.Nil),
-			}
-
-			expected := &flow.OAuth2ConsentRequest{
-				ConsentRequestID:     uuid.Must(uuid.NewV4()).String(),
-				Skip:                 true,
-				Subject:              subject,
-				OpenIDConnectContext: nil,
-				Client:               cl,
-				ClientID:             cl.ID,
-				RequestURL:           "",
-				LoginChallenge:       sqlxx.NullString(f.ID),
-				LoginSessionID:       sqlxx.NullString(s.ID),
-				Verifier:             uuid.Must(uuid.NewV4()).String(),
-				CSRF:                 uuid.Must(uuid.NewV4()).String(),
-			}
-
-			f.ConsentRequestID = sqlxx.NullString(expected.ConsentRequestID)
-
-			consentChallenge, err := f.ToConsentChallenge(ctx, deps)
+			_, err := m.DeleteLoginSession(ctx, s.ID)
 			require.NoError(t, err)
-
-			result, err := m.GetConsentRequest(ctx, consentChallenge)
-			require.NoError(t, err)
-			assert.EqualValues(t, expected.ConsentRequestID, result.ConsentRequestID)
-
-			_, err = m.DeleteLoginSession(ctx, s.ID)
-			require.NoError(t, err)
-
-			result, err = m.GetConsentRequest(ctx, consentChallenge)
-			require.NoError(t, err)
-			assert.EqualValues(t, expected.ConsentRequestID, result.ConsentRequestID)
 		})
 	}
 }

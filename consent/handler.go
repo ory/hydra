@@ -353,6 +353,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) 
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2LoginRequest")
 	defer otelx.End(span, &err)
+
 	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -652,6 +653,10 @@ type getOAuth2ConsentRequest struct {
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2ConsentRequest")
+	defer otelx.End(span, &err)
+
 	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -661,28 +666,23 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
+	f, err := flow.DecodeFromConsentChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	if request.WasHandled {
+
+	if f.ConsentWasHandled {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
-			RedirectTo: request.RequestURL,
+			RedirectTo: f.RequestURL,
 		})
 		return
 	}
 
-	if request.RequestedScope == nil {
-		request.RequestedScope = []string{}
-	}
-
-	if request.RequestedAudience == nil {
-		request.RequestedAudience = []string{}
-	}
-
-	request.Client = sanitizeClient(request.Client)
-	h.r.Writer().Write(w, r, request)
+	// Transform flow to the existing API format.
+	req := f.GetConsentRequest(challenge)
+	req.Client.Secret = ""
+	h.r.Writer().Write(w, r, req)
 }
 
 // Accept OAuth 2.0 Consent Request
@@ -734,7 +734,9 @@ type acceptOAuth2ConsentRequest struct {
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
 func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.acceptOAuth2ConsentRequest")
+	defer otelx.End(span, &err)
 
 	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
@@ -745,39 +747,32 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var p flow.AcceptOAuth2ConsentRequest
+	var payload flow.AcceptOAuth2ConsentRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err := d.Decode(&payload); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
-	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
+	f, err := flow.DecodeFromConsentChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	p.ConsentRequestID = cr.ConsentRequestID
-	p.RequestedAt = cr.RequestedAt
-	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
+	payload.ConsentRequestID = f.ConsentRequestID.String()
+	payload.RequestedAt = f.RequestedAt
+	payload.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &p)
-	if err != nil {
+	if err := f.HandleConsentRequest(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
-	} else if hr.Skip {
-		p.Remember = false
+	} else if f.ConsentSkip {
+		payload.Remember = false
 	}
 
-	ru, err := url.Parse(hr.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -789,8 +784,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	events.Trace(ctx, events.ConsentAccepted, events.WithClientID(cr.Client.GetID()), events.WithSubject(cr.Subject))
-
+	events.Trace(ctx, events.ConsentAccepted, events.WithClientID(f.Client.GetID()), events.WithSubject(f.Subject))
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),
 	})
@@ -855,41 +849,33 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var p flow.RequestDeniedError
+	var payload flow.RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err := d.Decode(&payload); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
-	p.Valid = true
-	p.SetDefaults(flow.ConsentRequestDeniedErrorName)
-	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
+	payload.Valid = true
+	payload.SetDefaults(flow.ConsentRequestDeniedErrorName)
+	f, err := flow.DecodeFromConsentChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	cr := f.GetConsentRequest(challenge)
-
-	request, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
-		Error:            &p,
-		ConsentRequestID: cr.ConsentRequestID,
-		RequestedAt:      hr.RequestedAt,
+	if err := f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
+		Error:            &payload,
+		ConsentRequestID: f.ConsentRequestID.String(),
+		RequestedAt:      f.RequestedAt,
 		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
-	})
-	if err != nil {
+	}); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	ru, err := url.Parse(request.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -901,7 +887,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	events.Trace(ctx, events.ConsentRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+	events.Trace(ctx, events.ConsentRejected, events.WithClientID(f.Client.GetID()), events.WithSubject(f.Subject))
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {verifier}}).String(),

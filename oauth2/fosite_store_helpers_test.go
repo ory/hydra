@@ -23,7 +23,6 @@ import (
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -105,49 +104,9 @@ var flushRequests = []*fosite.Request{
 
 func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
 	cl := &client.Client{ID: "foobar"}
-	cr := &flow.OAuth2ConsentRequest{
-		Client:               cl,
-		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
-		LoginChallenge:       sqlxx.NullString(id),
-		ConsentRequestID:     id,
-		Verifier:             id,
-		CSRF:                 id,
-		AuthenticatedAt:      sqlxx.NullTime(time.Now()),
-		RequestedAt:          time.Now(),
+	if _, err := x.ClientManager().GetClient(t.Context(), cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
+		require.NoError(t, x.ClientManager().CreateClient(t.Context(), cl))
 	}
-
-	ctx := t.Context()
-	if _, err := x.ClientManager().GetClient(ctx, cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
-		require.NoError(t, x.ClientManager().CreateClient(ctx, cl))
-	}
-
-	f := &flow.Flow{
-		Client:               cl,
-		OpenIDConnectContext: new(flow.OAuth2ConsentRequestOpenIDConnectContext),
-		ID:                   id,
-		LoginVerifier:        id,
-		LoginAuthenticatedAt: sqlxx.NullTime(time.Now()),
-		RequestedAt:          time.Now(),
-		NID:                  x.Persister().NetworkID(t.Context()),
-	}
-
-	f.ToStateConsentInitialized(
-		flow.WithConsentRequestID(cr.ConsentRequestID),
-	)
-
-	_, err := f.ToConsentVerifier(ctx, x)
-	require.NoError(t, err)
-
-	_, err = x.ConsentManager().HandleConsentRequest(ctx, f, &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:   cr,
-		Session:          new(flow.AcceptOAuth2ConsentRequestSession),
-		AuthenticatedAt:  sqlxx.NullTime(time.Now()),
-		ConsentRequestID: cr.ConsentRequestID,
-		RequestedAt:      time.Now(),
-		HandledAt:        sqlxx.NullTime(time.Now()),
-	})
-
-	require.NoError(t, err)
 }
 
 func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *testing.T) {

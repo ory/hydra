@@ -169,39 +169,6 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-func (p *Persister) GetFlowByConsentChallenge(ctx context.Context, challenge string) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlowByConsentChallenge")
-	defer otelx.End(span, &err)
-
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flow.AsConsentChallenge)
-	if err != nil {
-		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound.WithDescription("Network IDs are not matching."))
-	}
-	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
-	}
-
-	return f, nil
-}
-
-func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (_ *flow.OAuth2ConsentRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConsentRequest")
-	defer otelx.End(span, &err)
-
-	f, err := p.GetFlowByConsentChallenge(ctx, challenge)
-	if err != nil {
-		if errors.Is(err, sqlcon.ErrNoRows) {
-			return nil, errors.WithStack(x.ErrNotFound)
-		}
-		return nil, err
-	}
-
-	return f.GetConsentRequest(challenge), nil
-}
-
 // CreateDeviceUserAuthRequest creates a new flow from a DeviceUserAuthRequest.
 func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceUserAuthRequest")
@@ -284,23 +251,6 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow
 		return nil, sqlcon.HandleError(err)
 	}
 	return &f, nil
-}
-
-func (p *Persister) HandleConsentRequest(ctx context.Context, f *flow.Flow, r *flow.AcceptOAuth2ConsentRequest) (_ *flow.OAuth2ConsentRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleConsentRequest")
-	defer otelx.End(span, &err)
-
-	if f == nil {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound)
-	}
-	if err := f.HandleConsentRequest(r); err != nil {
-		return nil, err
-	}
-
-	return f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""), nil
 }
 
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {

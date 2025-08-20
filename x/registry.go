@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/ory/herodot"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"

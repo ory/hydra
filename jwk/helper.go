@@ -58,7 +58,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		return nil, err
 	}
 
-	privKey, privKeyErr := FindPrivateKey(keys)
+	privKey, privKeyErr := FindPrivateKeyWithUse(keys, "sig")
 	if privKeyErr == nil {
 		return privKey, nil
 	} else {
@@ -69,7 +69,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 			return nil, err
 		}
 
-		privKey, err := FindPrivateKey(keys)
+		privKey, err := FindPrivateKeyWithUse(keys, "sig")
 		if err != nil {
 			return nil, err
 		}
@@ -100,6 +100,32 @@ func FindPrivateKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 	}
 
 	return First(keys.Keys), nil
+}
+
+// FindPublicKeyWithUse finds the first public key in the set that has the specified use.
+// This allows for more precise key selection when multiple keys with different purposes exist.
+// For example, use "sig" to find signing keys or "enc" to find encryption keys.
+func FindPublicKeyWithUse(set *jose.JSONWebKeySet, use string) (key *jose.JSONWebKey, err error) {
+	keys := ExcludePrivateKeys(set)
+	for _, k := range keys.Keys {
+		if k.Use == use {
+			return &k, nil
+		}
+	}
+	return nil, errors.New("key not found")
+}
+
+// FindPrivateKeyWithUse finds the first private key in the set that has the specified use.
+// This allows for more precise key selection when multiple keys with different purposes exist.
+// For example, use "sig" to find signing keys or "enc" to find encryption keys.
+func FindPrivateKeyWithUse(set *jose.JSONWebKeySet, use string) (key *jose.JSONWebKey, err error) {
+	keys := ExcludePublicKeys(set)
+	for _, k := range keys.Keys {
+		if k.Use == use {
+			return &k, nil
+		}
+	}
+	return nil, errors.New("key not found")
 }
 
 func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {

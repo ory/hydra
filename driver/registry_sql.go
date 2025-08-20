@@ -614,7 +614,7 @@ func (m *RegistrySQL) AudienceStrategy() fosite.AudienceMatchingStrategy {
 
 func (m *RegistrySQL) ConsentHandler() *consent.Handler {
 	if m.coh == nil {
-		m.coh = consent.NewHandler(m, m.Config())
+		m.coh = consent.NewHandler(m)
 	}
 	return m.coh
 }

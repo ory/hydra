@@ -36,6 +36,8 @@ import (
 )
 
 func TestStrategyLoginConsentNext(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyAccessTokenStrategy:            "opaque",
@@ -1107,6 +1109,8 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 }
 
 func TestStrategyDeviceLoginConsent(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t)
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")

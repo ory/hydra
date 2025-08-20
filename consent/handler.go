@@ -15,7 +15,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
@@ -29,7 +28,6 @@ import (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.DefaultProvider
 }
 
 const (
@@ -42,10 +40,8 @@ const (
 
 func NewHandler(
 	r InternalRegistry,
-	c *config.DefaultProvider,
 ) *Handler {
 	return &Handler{
-		c: c,
 		r: r,
 	}
 }
@@ -954,7 +950,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 	}
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 

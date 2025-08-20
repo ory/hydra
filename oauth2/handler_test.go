@@ -15,6 +15,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -32,6 +34,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/snapshotx"
 )
 
@@ -41,7 +44,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost"))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -60,10 +63,11 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
 
-	r := x.NewRouterAdmin(reg.Config().AdminURL)
-	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	r := httprouterx.NewRouterAdmin(metrics)
+	h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
-	ts := httptest.NewServer(r)
+	ts := httptest.NewServer(r.Mux)
 	defer ts.Close()
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -83,24 +87,25 @@ func TestUserinfo(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
-		config.KeyScopeStrategy:    "",
-		config.KeyAuthCodeLifespan: lifespan,
-		config.KeyIssuerURL:        "http://hydra.localhost",
-	}))
-	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
-	defer ctrl.Finish()
-	reg.WithOAuth2Provider(op)
+	t.Cleanup(ctrl.Finish)
+
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
+		config.KeyScopeStrategy:    "",
+		config.KeyAuthCodeLifespan: lifespan,
+		config.KeyIssuerURL:        "http://hydra.localhost",
+	})), driver.WithOAuth2Provider(op))
+	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 	h := reg.OAuth2Handler()
 
-	router := x.NewRouterAdmin(reg.Config().AdminURL)
-	h.SetPublicRoutes(&httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler { return h })
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	router := httprouterx.NewRouterAdmin(metrics)
+	h.SetPublicRoutes(httprouterx.RouterAdminToPublic(router), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(router)
-	ts := httptest.NewServer(router)
+	ts := httptest.NewServer(router.Mux)
 	defer ts.Close()
 
 	for k, tc := range []struct {
@@ -336,23 +341,24 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
 		config.KeySubjectTypesSupported:         []string{"pairwise", "public"},
 		config.KeyOIDCDiscoverySupportedClaims:  []string{"sub"},
 		config.KeyOAuth2ClientRegistrationURL:   "http://client-register/registration",
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
-	}))
+	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
 		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg)
 
-		r := x.NewRouterAdmin(reg.Config().AdminURL)
-		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdmin(metrics)
+		h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
-		ts := httptest.NewServer(r)
+		ts := httptest.NewServer(r.Mux)
 		defer ts.Close()
 
 		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
@@ -382,23 +388,24 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
 		config.KeySubjectTypesSupported:         []string{"pairwise", "public"},
 		config.KeyOIDCDiscoverySupportedClaims:  []string{"sub"},
 		config.KeyOAuth2ClientRegistrationURL:   "http://client-register/registration",
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
-	}))
+	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
 		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg)
 
-		r := x.NewRouterAdmin(reg.Config().AdminURL)
-		h.SetPublicRoutes(&httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler { return h })
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdmin(metrics)
+		h.SetPublicRoutes(httprouterx.RouterAdminToPublic(r), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
-		ts := httptest.NewServer(r)
+		ts := httptest.NewServer(r.Mux)
 		defer ts.Close()
 
 		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")

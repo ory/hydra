@@ -12,8 +12,6 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/errorsx"
 )
 
 type AESGCM struct {
@@ -38,7 +36,7 @@ func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) 
 
 	ciphertext, err := aesGCMEncrypt(plaintext, aeadKey(key), additionalData)
 	if err != nil {
-		return "", errorsx.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	return base64.URLEncoding.EncodeToString(ciphertext), nil
@@ -47,12 +45,12 @@ func (c *AESGCM) Encrypt(ctx context.Context, plaintext, additionalData []byte) 
 func (c *AESGCM) Decrypt(ctx context.Context, ciphertext string, aad []byte) (plaintext []byte, err error) {
 	msg, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	keys, err := allKeys(ctx, c.c)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	for _, key := range keys {
@@ -71,7 +69,7 @@ func (c *AESGCM) decrypt(ciphertext []byte, key, additionalData []byte) ([]byte,
 
 	plaintext, err := aesGCMDecrypt(ciphertext, aeadKey(key), additionalData)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return plaintext, nil

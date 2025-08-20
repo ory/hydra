@@ -12,7 +12,6 @@ import (
 
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/sqlcon"
@@ -396,7 +395,7 @@ func NewFlow(r *LoginRequest) *Flow {
 	}
 }
 
-func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
+func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	if f.LoginWasUsed {
 		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
 	}
@@ -646,12 +645,12 @@ type CipherProvider interface {
 
 // ToDeviceChallenge converts the flow into a device challenge.
 func (f *Flow) ToDeviceChallenge(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsDeviceChallenge)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsDeviceChallenge)
 }
 
 // ToDeviceVerifier converts the flow into a device verifier.
 func (f *Flow) ToDeviceVerifier(ctx context.Context, cipherProvider CipherProvider) (string, error) {
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsDeviceVerifier)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsDeviceVerifier)
 }
 
 // ToLoginChallenge converts the flow into a login challenge.
@@ -659,7 +658,7 @@ func (f Flow) ToLoginChallenge(ctx context.Context, cipherProvider CipherProvide
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginChallenge)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsLoginChallenge)
 }
 
 // ToLoginVerifier converts the flow into a login verifier.
@@ -667,7 +666,7 @@ func (f Flow) ToLoginVerifier(ctx context.Context, cipherProvider CipherProvider
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsLoginVerifier)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsLoginVerifier)
 }
 
 // ToConsentChallenge converts the flow into a consent challenge.
@@ -675,7 +674,7 @@ func (f Flow) ToConsentChallenge(ctx context.Context, cipherProvider CipherProvi
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentChallenge)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsConsentChallenge)
 }
 
 // ToConsentVerifier converts the flow into a consent verifier.
@@ -683,7 +682,7 @@ func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvid
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
 	}
-	return flowctx.Encode(ctx, cipherProvider.FlowCipher(), f, flowctx.AsConsentVerifier)
+	return Encode(ctx, cipherProvider.FlowCipher(), f, AsConsentVerifier)
 }
 
 func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {

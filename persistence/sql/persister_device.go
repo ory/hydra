@@ -18,7 +18,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -63,13 +62,13 @@ func (r *DeviceRequestSQL) toRequest(ctx context.Context, session fosite.Session
 		var err error
 		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess), nil)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 	}
 
 	if session != nil {
 		if err := json.Unmarshal(sess, session); err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 	} else {
 		p.l.Debugf("Got an empty session in toRequest")
@@ -82,7 +81,7 @@ func (r *DeviceRequestSQL) toRequest(ctx context.Context, session fosite.Session
 
 	val, err := url.ParseQuery(r.Form)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return &fosite.DeviceRequest{
@@ -112,13 +111,13 @@ func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSi
 
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	if p.config.EncryptSessionData(ctx) {
 		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
 		if err != nil {
-			return nil, errorsx.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
 		session = []byte(ciphertext)
 	}
@@ -207,7 +206,7 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 
 	r := DeviceRequestSQL{}
 	if err = p.QueryWithNetwork(ctx).Where("device_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrNotFound)
+		return nil, errors.WithStack(fosite.ErrNotFound)
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -217,7 +216,7 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 		if err != nil {
 			return nil, err
 		}
-		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+		return fr, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
 	return r.toRequest(ctx, session, p)
@@ -230,7 +229,7 @@ func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, request
 
 	r := DeviceRequestSQL{}
 	if err = p.QueryWithNetwork(ctx).Where("request_id = ?", requestID).First(&r); errors.Is(err, sql.ErrNoRows) {
-		return nil, "", errorsx.WithStack(fosite.ErrNotFound)
+		return nil, "", errors.WithStack(fosite.ErrNotFound)
 	} else if err != nil {
 		return nil, "", sqlcon.HandleError(err)
 	}
@@ -240,7 +239,7 @@ func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, request
 		if err != nil {
 			return nil, "", err
 		}
-		return fr, r.ID, errorsx.WithStack(fosite.ErrInactiveToken)
+		return fr, r.ID, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
 	fr, err := r.toRequest(ctx, session, p)

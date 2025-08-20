@@ -4,34 +4,30 @@
 package consent
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/pagination/tokenpagination"
 	"github.com/ory/x/sqlxx"
-	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
 )
 
 type Handler struct {
 	r InternalRegistry
-	c *config.DefaultProvider
 }
 
 const (
@@ -44,10 +40,8 @@ const (
 
 func NewHandler(
 	r InternalRegistry,
-	c *config.DefaultProvider,
 ) *Handler {
 	return &Handler{
-		c: c,
 		r: r,
 	}
 }
@@ -125,7 +119,7 @@ type revokeOAuth2ConsentSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	var (
 		subject          = r.URL.Query().Get("subject")
 		client           = r.URL.Query().Get("client")
@@ -156,7 +150,7 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject))
 
 	default:
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Invalid combination of query parameters.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Invalid combination of query parameters.")))
 		return
 	}
 
@@ -203,7 +197,7 @@ type listOAuth2ConsentSessions struct {
 //	Responses:
 //	  200: oAuth2ConsentSessions
 //	  default: errorOAuth2
-func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -289,12 +283,12 @@ type revokeOAuth2LoginSessions struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request) {
 	sid := r.URL.Query().Get("sid")
 	subject := r.URL.Query().Get("subject")
 
 	if sid == "" && subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Either 'subject' or 'sid' query parameters need to be defined.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Either 'subject' or 'sid' query parameters need to be defined.`)))
 		return
 	}
 
@@ -355,39 +349,38 @@ type getOAuth2LoginRequest struct {
 //	  200: oAuth2LoginRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2LoginRequest")
+	defer otelx.End(span, &err)
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
-	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	if request.WasHandled {
+
+	if f.LoginWasUsed {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
-			RedirectTo: request.RequestURL,
+			RedirectTo: f.RequestURL,
 		})
 		return
 	}
 
-	if request.RequestedScope == nil {
-		request.RequestedScope = []string{}
-	}
-
-	if request.RequestedAudience == nil {
-		request.RequestedAudience = []string{}
-	}
-
-	request.Client = sanitizeClient(request.Client)
-	h.r.Writer().Write(w, r, request)
+	// Keep compatibility with the old / existing login request format.
+	lr := f.GetLoginRequest()
+	lr.ID = challenge // The ID of the login request is the AEAD challenge.
+	lr.Client.Secret = ""
+	h.r.Writer().Write(w, r, lr)
 }
 
 // Accept OAuth 2.0 Login Request
@@ -433,42 +426,43 @@ type acceptOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := r.Context()
+func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.acceptOAuth2LoginRequest")
+	defer otelx.End(span, &err)
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
-	var handledLoginRequest flow.HandledLoginRequest
+	var payload flow.HandledLoginRequest
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&handledLoginRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+	if err := d.Decode(&payload); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
-	if handledLoginRequest.Subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
+	if payload.Subject == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
 		return
 	}
 
-	handledLoginRequest.ID = challenge
-	loginRequest, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
-	} else if loginRequest.Subject != "" && handledLoginRequest.Subject != loginRequest.Subject {
+	} else if f.Subject != "" && payload.Subject != f.Subject {
 		// The subject that was confirmed by the login screen does not match what we
 		// remembered in the session cookie. We handle this gracefully by redirecting the
 		// original authorization request URL, but attaching "prompt=login" to the query.
 		// This forces the user to log in again.
-		requestURL, err := url.Parse(loginRequest.RequestURL)
+		requestURL, err := url.Parse(f.RequestURL)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -479,30 +473,25 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if loginRequest.Skip {
-		handledLoginRequest.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		handledLoginRequest.AuthenticatedAt = loginRequest.AuthenticatedAt
+	if f.LoginSkip {
+		payload.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
+		payload.AuthenticatedAt = f.LoginAuthenticatedAt
 	} else {
-		handledLoginRequest.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+		payload.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
 			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
 			Truncate(time.Second))
-		loginRequest.AuthenticatedAt = handledLoginRequest.AuthenticatedAt
+		f.LoginAuthenticatedAt = payload.AuthenticatedAt
 	}
-	handledLoginRequest.RequestedAt = loginRequest.RequestedAt
+	payload.RequestedAt = f.RequestedAt
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
+	// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
+	payload.ID = f.ID
+	if err := f.UpdateFlowWithHandledLoginRequest(&payload); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &handledLoginRequest)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
-		return
-	}
-
-	ru, err := url.Parse(request.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -514,7 +503,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	events.Trace(ctx, events.LoginAccepted, events.WithClientID(request.Client.GetID()), events.WithSubject(handledLoginRequest.Subject))
+	events.Trace(ctx, events.LoginAccepted, events.WithClientID(f.Client.GetID()), events.WithSubject(payload.Subject))
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
 	})
@@ -562,47 +551,44 @@ type rejectOAuth2LoginRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	ctx := r.Context()
+func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
+	var err error
+	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.rejectOAuth2LoginRequest")
+	defer otelx.End(span, &err)
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
+
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
-	var p flow.RequestDeniedError
+	var payload flow.RequestDeniedError
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
+	if err := d.Decode(&payload); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
-	p.Valid = true
-	p.SetDefaults(flow.LoginRequestDeniedErrorName)
-	ar, err := h.r.ConsentManager().GetLoginRequest(ctx, challenge)
+	payload.Valid = true
+	payload.SetDefaults(flow.LoginRequestDeniedErrorName)
+	f, err := flow.DecodeFromLoginChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsLoginChallenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	request, err := h.r.ConsentManager().HandleLoginRequest(ctx, f, challenge, &flow.HandledLoginRequest{
-		Error:       &p,
-		ID:          challenge,
-		RequestedAt: ar.RequestedAt,
-	})
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+	if err := f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{
+		Error: &payload,
+		// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
+		ID:          f.ID,
+		RequestedAt: f.RequestedAt,
+	}); err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -612,13 +598,13 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	ru, err := url.Parse(request.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	events.Trace(ctx, events.LoginRejected, events.WithClientID(request.Client.GetID()), events.WithSubject(request.Subject))
+	events.Trace(ctx, events.LoginRejected, events.WithClientID(f.Client.GetID()), events.WithSubject(f.Subject))
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {verifier}}).String(),
@@ -665,13 +651,13 @@ type getOAuth2ConsentRequest struct {
 //	  200: oAuth2ConsentRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -747,15 +733,15 @@ type acceptOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -763,13 +749,13 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
 	cr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -777,7 +763,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -785,7 +771,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 
 	hr, err := h.r.ConsentManager().HandleConsentRequest(ctx, f, &p)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	} else if hr.Skip {
 		p.Remember = false
@@ -857,15 +843,15 @@ type adminRejectOAuth2ConsentRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	challenge := stringsx.Coalesce(
+	challenge := cmp.Or(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -873,7 +859,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
@@ -881,11 +867,11 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	p.SetDefaults(flow.ConsentRequestDeniedErrorName)
 	hr, err := h.r.ConsentManager().GetConsentRequest(ctx, challenge)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flowctx.AsConsentChallenge)
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, flow.AsConsentChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -899,7 +885,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
 	})
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -951,8 +937,8 @@ type acceptOAuth2LogoutRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -964,7 +950,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 	}
 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 
@@ -996,8 +982,8 @@ type rejectOAuth2LogoutRequest struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
-func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -1036,8 +1022,8 @@ type getOAuth2LogoutRequest struct {
 //	  200: oAuth2LogoutRequest
 //	  410: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	challenge := stringsx.Coalesce(
+func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
+	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),
 	)
@@ -1092,12 +1078,12 @@ type verifyUserCodeRequest struct {
 //	Responses:
 //	  200: oAuth2RedirectTo
 //	  default: errorOAuth2
-func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	challenge := r.URL.Query().Get("device_challenge")
 	if challenge == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'device_challenge' is not defined but should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'device_challenge' is not defined but should have been.`)))
 		return
 	}
 
@@ -1105,12 +1091,12 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&reqBody); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode request body: %s", err.Error())))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode request body: %s", err.Error())))
 		return
 	}
 
 	if reqBody.UserCode == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'user_code' must not be empty.")))
 		return
 	}
 
@@ -1120,7 +1106,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	f, err := h.decodeFlowWithClient(ctx, challenge, flowctx.AsDeviceChallenge)
+	f, err := h.decodeFlowWithClient(ctx, challenge, flow.AsDeviceChallenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -1156,7 +1142,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	// Append the client_id to the original RequestURL, as it is needed for the login flow
 	reqURL, err := url.Parse(f.RequestURL)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
 
@@ -1192,8 +1178,8 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request, 
 	})
 }
 
-func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flowctx.CodecOption) (*flow.Flow, error) {
-	f, err := flowctx.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
+func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flow.CodecOption) (*flow.Flow, error) {
+	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
 	if err != nil {
 		return nil, err
 	}

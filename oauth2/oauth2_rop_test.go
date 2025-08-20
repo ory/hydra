@@ -19,9 +19,9 @@ import (
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
@@ -34,10 +34,11 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
-	reg := testhelpers.NewRegistryMemory(t)
-	reg.WithKratos(fakeKratos)
-	reg.WithExtraFositeFactories([]fositex.Factory{compose.OAuth2ResourceOwnerPasswordCredentialsFactory})
-	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
+	reg := testhelpers.NewRegistryMemory(t,
+		driver.WithKratosClient(fakeKratos),
+		driver.WithExtraFositeFactories(compose.OAuth2ResourceOwnerPasswordCredentialsFactory),
+	)
+	publicTS, adminTS := testhelpers.NewOAuth2Server(t.Context(), t, reg)
 
 	secret := uuid.Must(uuid.NewV4()).String()
 	audience := sqlxx.StringSliceJSONFormat{"https://aud.example.com"}

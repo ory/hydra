@@ -12,17 +12,17 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/assertx"
-	"github.com/ory/x/errorsx"
 )
 
 func RandomBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
-		return []byte{}, errorsx.WithStack(err)
+		return []byte{}, errors.WithStack(err)
 	}
 	return bytes, nil
 }
@@ -197,56 +197,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 	}
 }
 
-func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) func(t *testing.T) {
-	return func(t *testing.T) {
-		ctx := t.Context()
-
-		_, err := t1.GetKeySet(ctx, "foo")
-		require.Error(t, err)
-		_, err = t2.GetKeySet(ctx, "foo")
-		require.Error(t, err)
-
-		_, err = t1.GenerateAndPersistKeySet(ctx, "foo", "bar", alg, "sig")
-		require.NoError(t, err)
-		keys, err := t1.GetKeySet(ctx, "foo")
-		require.NoError(t, err)
-		_, err = t2.GetKeySet(ctx, "foo")
-		require.Error(t, err)
-
-		err = t2.DeleteKeySet(ctx, "foo")
-		require.Error(t, err)
-		err = t1.DeleteKeySet(ctx, "foo")
-		require.NoError(t, err)
-		_, err = t1.GetKeySet(ctx, "foo")
-		require.Error(t, err)
-
-		err = t1.AddKeySet(ctx, "foo", keys)
-		require.NoError(t, err)
-		err = t2.DeleteKeySet(ctx, "foo")
-		require.Error(t, err)
-
-		for i := range keys.Keys {
-			keys.Keys[i].Use = "enc"
-		}
-		err = t1.UpdateKeySet(ctx, "foo", keys)
-		require.Error(t, err)
-		for i := range keys.Keys {
-			keys.Keys[i].Use = "err"
-		}
-		err = t2.UpdateKeySet(ctx, "foo", keys)
-		require.Error(t, err)
-		updated, err := t1.GetKeySet(ctx, "foo")
-		require.NoError(t, err)
-		for i := range updated.Keys {
-			assert.EqualValues(t, "enc", updated.Keys[i].Use)
-		}
-
-		err = t1.DeleteKeySet(ctx, "foo")
-		require.Error(t, err)
-	}
-}
-
-func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
+func TestHelperNID(t1ValidNID, t2InvalidNID Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		jwks, err := GenerateJWK(ctx, jose.RS256, "2022-03-11-ks-1-kid", "test")

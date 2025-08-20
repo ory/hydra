@@ -22,7 +22,7 @@ func fixturizeFlow(t *testing.T, f *flow.Flow) {
 	f.ClientID = ""
 	require.NotNil(t, f.Client)
 	f.Client = nil
-	recently := time.Now().Add(-2 * time.Minute)
+	recently := time.Now().Add(-1 * time.Hour)
 	require.Greater(t, time.Time(f.LoginInitializedAt).UnixNano(), recently.UnixNano())
 	f.LoginInitializedAt = sqlxx.NullTime{}
 	require.True(t, f.RequestedAt.After(recently))

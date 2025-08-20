@@ -20,6 +20,7 @@ import (
 
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/tlsx"
 
 	"github.com/ory/hydra/v2/cmd/server"
@@ -30,23 +31,20 @@ import (
 )
 
 func TestGetOrCreateTLSCertificate(t *testing.T) {
-	ctx := t.Context()
 	certPath, keyPath, cert, priv := testhelpers.GenerateTLSCertificateFilesForTests(t)
 	logger := logrusx.New("", "")
 	logger.Logger.ExitFunc = func(code int) { t.Fatalf("Logger called os.Exit(%v)", code) }
-	cfg := config.MustNew(
-		ctx,
-		logger,
-		configx.WithValues(map[string]interface{}{
+	d, err := driver.New(t.Context(),
+		driver.WithConfigOptions(configx.WithValues(map[string]interface{}{
 			"dsn":                 config.DSNMemory,
 			"serve.tls.enabled":   true,
 			"serve.tls.cert.path": certPath,
 			"serve.tls.key.path":  keyPath,
-		}),
+		})),
+		driver.WithServiceLocatorOptions(servicelocatorx.WithLogger(logger)),
 	)
-	d, err := driver.NewRegistryWithoutInit(cfg, logger)
 	require.NoError(t, err)
-	getCert := server.GetOrCreateTLSCertificate(ctx, d, d.Config().ServeAdmin(ctx).TLS, "admin")
+	getCert := server.GetOrCreateTLSCertificate(t.Context(), d, d.Config().ServeAdmin(t.Context()).TLS, "admin")
 	require.NotNil(t, getCert)
 	tlsCert, err := getCert(nil)
 	require.NoError(t, err)
@@ -102,7 +100,6 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 }
 
 func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
-	ctx := t.Context()
 	certPath, keyPath, cert, priv := testhelpers.GenerateTLSCertificateFilesForTests(t)
 	certPEM, err := os.ReadFile(certPath)
 	require.NoError(t, err)
@@ -111,23 +108,14 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 	require.NoError(t, err)
 	keyBase64 := base64.StdEncoding.EncodeToString(keyPEM)
 
-	logger := logrusx.New("", "")
-	logger.Logger.ExitFunc = func(code int) { t.Fatalf("Logger called os.Exit(%v)", code) }
-	hook := test.NewLocal(logger.Logger)
-	_ = hook
-	cfg := config.MustNew(
-		ctx,
-		logger,
-		configx.WithValues(map[string]interface{}{
-			"dsn":                   config.DSNMemory,
-			"serve.tls.enabled":     true,
-			"serve.tls.cert.base64": certBase64,
-			"serve.tls.key.base64":  keyBase64,
-		}),
-	)
-	d, err := driver.NewRegistryWithoutInit(cfg, logger)
+	d, err := driver.New(t.Context(), driver.WithConfigOptions(configx.WithValues(map[string]interface{}{
+		"dsn":                   config.DSNMemory,
+		"serve.tls.enabled":     true,
+		"serve.tls.cert.base64": certBase64,
+		"serve.tls.key.base64":  keyBase64,
+	})))
 	require.NoError(t, err)
-	getCert := server.GetOrCreateTLSCertificate(ctx, d, d.Config().ServeAdmin(ctx).TLS, "admin")
+	getCert := server.GetOrCreateTLSCertificate(t.Context(), d, d.Config().ServeAdmin(t.Context()).TLS, "admin")
 	require.NotNil(t, getCert)
 	tlsCert, err := getCert(nil)
 	require.NoError(t, err)

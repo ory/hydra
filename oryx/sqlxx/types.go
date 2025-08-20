@@ -125,7 +125,7 @@ type NullBool struct {
 
 // Scan implements the Scanner interface.
 func (ns *NullBool) Scan(value interface{}) error {
-	var d = sql.NullBool{}
+	d := sql.NullBool{}
 	if err := d.Scan(value); err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ type FalsyNullBool struct {
 
 // Scan implements the Scanner interface.
 func (ns *FalsyNullBool) Scan(value interface{}) error {
-	var d = sql.NullBool{}
+	d := sql.NullBool{}
 	if err := d.Scan(value); err != nil {
 		return err
 	}
@@ -458,7 +458,7 @@ type NullInt64 struct {
 
 // Scan implements the Scanner interface.
 func (ns *NullInt64) Scan(value interface{}) error {
-	var d = sql.NullInt64{}
+	d := sql.NullInt64{}
 	if err := d.Scan(value); err != nil {
 		return err
 	}
@@ -507,7 +507,7 @@ type NullDuration struct {
 
 // Scan implements the Scanner interface.
 func (ns *NullDuration) Scan(value interface{}) error {
-	var d = sql.NullInt64{}
+	d := sql.NullInt64{}
 	if err := d.Scan(value); err != nil {
 		return err
 	}

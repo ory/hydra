@@ -4,24 +4,20 @@
 package x
 
 import (
-	"context"
-	"net/url"
-
-	"github.com/julienschmidt/httprouter"
+	"github.com/urfave/negroni"
 
 	"github.com/ory/x/httprouterx"
-
 	"github.com/ory/x/serverx"
 )
 
 func NewRouterPublic() *httprouterx.RouterPublic {
-	router := httprouter.New()
-	router.NotFound = serverx.DefaultNotFoundHandler
-	return httprouterx.NewRouterPublic()
+	router := httprouterx.NewRouterPublic()
+	router.Mux.HandleFunc("/", serverx.DefaultNotFoundHandler)
+	return router
 }
 
-func NewRouterAdmin(f func(context.Context) *url.URL) *httprouterx.RouterAdmin {
-	router := httprouterx.NewRouterAdminWithPrefix("/admin", f)
-	router.NotFound = serverx.DefaultNotFoundHandler
+func NewRouterAdmin(metricsHandler negroni.Handler) *httprouterx.RouterAdmin {
+	router := httprouterx.NewRouterAdmin(metricsHandler)
+	router.Mux.HandleFunc("/", serverx.DefaultNotFoundHandler)
 	return router
 }

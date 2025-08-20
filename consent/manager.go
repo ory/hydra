@@ -46,11 +46,7 @@ type (
 		RevokeSubjectLoginSession(ctx context.Context, user string) error
 		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error
 
-		CreateLoginRequest(ctx context.Context, req *flow.LoginRequest) (*flow.Flow, error)
-		CreateLoginRequestFromDeviceRequest(ctx context.Context, f *flow.Flow, req *flow.LoginRequest) (*flow.Flow, error)
-		GetLoginRequest(ctx context.Context, challenge string) (*flow.LoginRequest, error)
-		HandleLoginRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledLoginRequest) (*flow.LoginRequest, error)
-		VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.HandledLoginRequest, error)
+		VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.Flow, error)
 
 		CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error
 		GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error)
@@ -68,6 +64,8 @@ type (
 		GetDeviceUserAuthRequest(ctx context.Context, challenge string) (*flow.DeviceUserAuthRequest, error)
 		HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (*flow.DeviceUserAuthRequest, error)
 		VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error)
+
+		NetworkID(ctx context.Context) uuid.UUID
 	}
 
 	ManagerProvider interface {

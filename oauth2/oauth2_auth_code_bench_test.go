@@ -33,6 +33,7 @@ import (
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
@@ -78,11 +79,16 @@ func BenchmarkAuthCode(b *testing.B) {
 	dsn := cmp.Or(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
 	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, configx.WithValues(map[string]any{
-		config.KeyLogLevel:            "error",
-		config.KeyAccessTokenStrategy: "opaque",
-		config.KeyRefreshTokenHook:    "",
-	})).WithTracer(tracer)
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true,
+		driver.WithConfigOptions(configx.WithValues(map[string]any{
+			config.KeyLogLevel:                  "error",
+			config.KeyAccessTokenStrategy:       "opaque",
+			config.KeyRefreshTokenHook:          "",
+			"tracing.providers.otlp.server_url": "http://localhost:4318",
+			"tracing.providers.otlp.insecure":   true,
+		})),
+		driver.WithTracer(tracer),
+	)
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")

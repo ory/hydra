@@ -17,7 +17,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
@@ -25,10 +24,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/contextx"
-	"github.com/ory/x/logrusx"
-
-	"github.com/ory/x/sqlxx"
+	"github.com/ory/x/dbal"
 )
 
 type JanitorConsentTestHelper struct {
@@ -38,7 +34,6 @@ type JanitorConsentTestHelper struct {
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest
-	conf                 *config.DefaultProvider
 }
 
 type createGrantRequest struct {
@@ -48,33 +43,12 @@ type createGrantRequest struct {
 
 const lifespan = time.Hour
 
-func NewConsentJanitorTestHelper(t *testing.T, uniqueName string, opts ...configx.OptionModifier) *JanitorConsentTestHelper {
-	conf := NewConfigurationWithDefaults(t, append([]configx.OptionModifier{configx.WithValues(map[string]any{
-		config.KeyScopeStrategy:        "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
-		config.KeyIssuerURL:            "http://hydra.localhost",
-		config.KeyAccessTokenLifespan:  lifespan,
-		config.KeyRefreshTokenLifespan: lifespan,
-		config.KeyConsentRequestMaxAge: lifespan,
-		config.KeyLogLevel:             "trace",
-	})}, opts...)...)
-
+func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 	return &JanitorConsentTestHelper{
-		uniqueName:           uniqueName,
-		conf:                 conf,
-		flushLoginRequests:   genLoginRequests(uniqueName, lifespan),
-		flushConsentRequests: genConsentRequests(uniqueName, lifespan),
 		flushAccessRequests:  getAccessRequests(uniqueName, lifespan),
 		flushRefreshRequests: getRefreshRequests(uniqueName, lifespan),
 		flushGrants:          getGrantRequests(uniqueName, lifespan),
 	}
-}
-
-func (j *JanitorConsentTestHelper) GetDSN() string {
-	return j.conf.DSN()
-}
-
-func (j *JanitorConsentTestHelper) GetConfig() *config.DefaultProvider {
-	return j.conf
 }
 
 var NotAfterTestCycles = map[string]time.Duration{
@@ -88,8 +62,19 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 }
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
-	j.conf.MustSet(ctx, config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
-	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true, &contextx.Default{})
+	return driver.New(ctx, driver.WithConfigOptions(
+		configx.WithValues(map[string]any{
+			config.KeyScopeStrategy:        "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
+			config.KeyIssuerURL:            "https://hydra.localhost",
+			config.KeyAccessTokenLifespan:  lifespan,
+			config.KeyRefreshTokenLifespan: lifespan,
+			config.KeyConsentRequestMaxAge: lifespan,
+			config.KeyLogLevel:             "trace",
+			config.KeyDSN:                  dbal.NewSQLiteInMemoryDatabase(dbname),
+			config.KeyGetSystemSecret:      []string{"0000000000000000"},
+		}),
+		configx.SkipValidation(),
+	))
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {
@@ -108,7 +93,7 @@ func (j *JanitorConsentTestHelper) AccessTokenNotAfterValidate(ctx context.Conte
 		var err error
 		ds := new(oauth2.Session)
 
-		accessTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.GetAccessTokenLifespan(ctx))
+		accessTokenLifespan := time.Now().Round(time.Second).Add(-lifespan)
 
 		for _, r := range j.flushAccessRequests {
 			t.Logf("access flush check: %s", r.ID)
@@ -137,7 +122,7 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 		var err error
 		ds := new(oauth2.Session)
 
-		refreshTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.GetRefreshTokenLifespan(ctx))
+		refreshTokenLifespan := time.Now().Round(time.Second).Add(-lifespan)
 
 		for _, r := range j.flushRefreshRequests {
 			t.Logf("refresh flush check: %s", r.ID)
@@ -182,136 +167,16 @@ func (j *JanitorConsentTestHelper) GrantNotAfterValidate(ctx context.Context, no
 	}
 }
 
-func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, reg interface {
-	consent.ManagerProvider
-	client.ManagerProvider
-	flow.CipherProvider
-}) func(t *testing.T) {
-	cl := reg.ClientManager()
-	cm := reg.ConsentManager()
-
-	return func(t *testing.T) {
-		var (
-			err error
-			f   *flow.Flow
-		)
-
-		// Create login requests
-		for _, r := range j.flushLoginRequests {
-			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			f, err = cm.CreateLoginRequest(ctx, r)
-			require.NoError(t, err)
-
-			// Reject each request
-			f.RequestedAt = time.Now() // we won't handle expired flows
-			f.LoginAuthenticatedAt = r.AuthenticatedAt
-			challenge := x.Must(f.ToLoginChallenge(ctx, reg))
-
-			_, err = cm.HandleLoginRequest(ctx, f, challenge, consent.NewHandledLoginRequest(
-				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
-			require.NoError(t, err)
-		}
-	}
+func (j *JanitorConsentTestHelper) GetConsentRequestLifespan() time.Duration {
+	return lifespan
 }
 
-func (j *JanitorConsentTestHelper) LimitValidate(ctx context.Context, cm consent.Manager) func(t *testing.T) {
-	return func(t *testing.T) {
-		// flush-login-2 and 3 should be cleared now
-		for _, r := range j.flushLoginRequests {
-			t.Logf("check login: %s", r.ID)
-			_, err := cm.GetLoginRequest(ctx, r.ID)
-			// No Requests should have been persisted.
-			require.Error(t, err)
-		}
-	}
+func (j *JanitorConsentTestHelper) GetAccessTokenLifespan() time.Duration {
+	return lifespan
 }
 
-func (j *JanitorConsentTestHelper) LoginConsentNotAfterSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
-	return func(t *testing.T) {
-		var (
-			f   *flow.Flow
-			err error
-		)
-		for _, r := range j.flushLoginRequests {
-			require.NoError(t, cl.CreateClient(ctx, r.Client))
-			f, err = cm.CreateLoginRequest(ctx, r)
-			require.NoError(t, err)
-		}
-
-		for _, r := range j.flushConsentRequests {
-			f.ID = r.LoginChallenge.String()
-		}
-	}
-}
-
-func (j *JanitorConsentTestHelper) LoginConsentNotAfterValidate(
-	ctx context.Context,
-	notAfter time.Time,
-	consentRequestLifespan time.Time,
-	reg interface {
-		consent.ManagerProvider
-		flow.CipherProvider
-	},
-) func(t *testing.T) {
-	return func(t *testing.T) {
-		var (
-			err error
-			f   *flow.Flow
-		)
-
-		for _, r := range j.flushLoginRequests {
-			isExpired := r.RequestedAt.Before(consentRequestLifespan)
-			t.Logf("login flush check:\nNotAfter: %s\nLoginRequest: %s\nis expired: %v\n%+v\n",
-				notAfter.String(), consentRequestLifespan.String(), isExpired, r)
-
-			f = x.Must(reg.ConsentManager().CreateLoginRequest(ctx, r))
-			loginChallenge := x.Must(f.ToLoginChallenge(ctx, reg))
-
-			_, err = reg.ConsentManager().GetLoginRequest(ctx, loginChallenge)
-			// if the lowest between notAfter and consent-request-lifespan is greater than requested_at
-			// then the it should expect the value to be deleted.
-			if isExpired {
-				// value has been deleted here
-				require.Error(t, err)
-			} else {
-				// value has not been deleted here
-				require.NoError(t, err)
-			}
-		}
-
-		for _, r := range j.flushConsentRequests {
-			isExpired := r.RequestedAt.Before(consentRequestLifespan)
-			t.Logf("consent flush check:\nNotAfter: %s\nConsentRequest: %s\nis expired: %v\n%+v\n",
-				notAfter.String(), consentRequestLifespan.String(), isExpired, r)
-
-			f.ID = r.LoginChallenge.String()
-			f.RequestedAt = r.RequestedAt
-			consentChallenge := x.Must(f.ToConsentChallenge(ctx, reg))
-
-			_, err = reg.ConsentManager().GetConsentRequest(ctx, consentChallenge)
-			// if the lowest between notAfter and consent-request-lifespan is greater than requested_at
-			// then the it should expect the value to be deleted.
-			if isExpired {
-				// value has been deleted here
-				require.Error(t, err)
-			} else {
-				// value has not been deleted here
-				require.NoError(t, err)
-			}
-		}
-	}
-}
-
-func (j *JanitorConsentTestHelper) GetConsentRequestLifespan(ctx context.Context) time.Duration {
-	return j.conf.ConsentRequestMaxAge(ctx)
-}
-
-func (j *JanitorConsentTestHelper) GetAccessTokenLifespan(ctx context.Context) time.Duration {
-	return j.conf.GetAccessTokenLifespan(ctx)
-}
-
-func (j *JanitorConsentTestHelper) GetRefreshTokenLifespan(ctx context.Context) time.Duration {
-	return j.conf.GetRefreshTokenLifespan(ctx)
+func (j *JanitorConsentTestHelper) GetRefreshTokenLifespan() time.Duration {
+	return lifespan
 }
 
 func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan time.Time, requestedAt time.Time) bool {
@@ -329,71 +194,6 @@ func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan ti
 	// true: value has been deleted
 	// false: value still exists
 	return lesser.Unix() > requestedAt.Unix()
-}
-
-func JanitorTests(
-	reg interface {
-		ConsentManager() consent.Manager
-		OAuth2Storage() x.FositeStorer
-		config.Provider
-		client.ManagerProvider
-		flow.CipherProvider
-	},
-	network string,
-	parallel bool,
-) func(t *testing.T) {
-	return func(t *testing.T) {
-		consentManager := reg.ConsentManager()
-		clientManager := reg.ClientManager()
-		fositeManager := reg.OAuth2Storage()
-
-		if parallel {
-			t.Parallel()
-		}
-
-		jt := NewConsentJanitorTestHelper(t, network+t.Name())
-
-		ctx := contextx.WithConfigValue(t.Context(), config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan(t.Context()))
-
-		t.Run("case=flush-consent-request-not-after", func(t *testing.T) {
-			for k, v := range NotAfterTestCycles {
-				jt := NewConsentJanitorTestHelper(t, network+k)
-				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-					notAfter := time.Now().Round(time.Second).Add(-v)
-					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
-
-					// setup test
-					t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, consentManager, clientManager))
-
-					// run the cleanup routine
-					t.Run("step=cleanup", func(t *testing.T) {
-						require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, notAfter, 1000, 100))
-					})
-
-					// validate test
-					t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentRequestLifespan, reg))
-				})
-
-			}
-		})
-
-		t.Run("case=flush-consent-request-limit", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper(t, network+"limit")
-
-			t.Run("case=limit", func(t *testing.T) {
-				// setup
-				t.Run("step=setup", jt.LimitSetup(ctx, reg))
-
-				// cleanup
-				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 2, 1))
-				})
-
-				// validate
-				t.Run("step=validate", jt.LimitValidate(ctx, consentManager))
-			})
-		})
-	}
 }
 
 func getAccessRequests(uniqueName string, lifespan time.Duration) []*fosite.Request {
@@ -478,91 +278,6 @@ func getRefreshRequests(uniqueName string, lifespan time.Duration) []*fosite.Acc
 					"refresh_token": []string{fmt.Sprintf("%s.%s", fmt.Sprintf("%s_flush-refresh-3", uniqueName), tokenSignature)},
 				},
 			},
-		},
-	}
-}
-
-func genLoginRequests(uniqueName string, lifespan time.Duration) []*flow.LoginRequest {
-	return []*flow.LoginRequest{
-		{
-			ID:             fmt.Sprintf("%s_flush-login-1", uniqueName),
-			RequestedScope: []string{"foo", "bar"},
-			Subject:        fmt.Sprintf("%s_flush-login-1", uniqueName),
-			Client: &client.Client{
-				ID:           fmt.Sprintf("%s_flush-login-consent-1", uniqueName),
-				RedirectURIs: []string{"http://redirect"},
-			},
-			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second)),
-			Verifier:        fmt.Sprintf("%s_flush-login-1", uniqueName),
-		},
-		{
-			ID:             fmt.Sprintf("%s_flush-login-2", uniqueName),
-			RequestedScope: []string{"foo", "bar"},
-			Subject:        fmt.Sprintf("%s_flush-login-2", uniqueName),
-			Client: &client.Client{
-				ID:           fmt.Sprintf("%s_flush-login-consent-2", uniqueName),
-				RedirectURIs: []string{"http://redirect"},
-			},
-			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + 10*time.Minute)),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-(lifespan + 10*time.Minute))),
-			Verifier:        fmt.Sprintf("%s_flush-login-2", uniqueName),
-		},
-		{
-			ID:             fmt.Sprintf("%s_flush-login-3", uniqueName),
-			RequestedScope: []string{"foo", "bar"},
-			Subject:        fmt.Sprintf("%s_flush-login-3", uniqueName),
-			Client: &client.Client{
-				ID:           fmt.Sprintf("%s_flush-login-consent-3", uniqueName),
-				RedirectURIs: []string{"http://redirect"},
-			},
-			RequestURL:      "http://redirect",
-			RequestedAt:     time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-(lifespan + time.Hour))),
-			Verifier:        fmt.Sprintf("%s_flush-login-3", uniqueName),
-		},
-	}
-}
-
-func genConsentRequests(uniqueName string, lifespan time.Duration) []*flow.OAuth2ConsentRequest {
-	return []*flow.OAuth2ConsentRequest{
-		{
-			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-1", uniqueName),
-			RequestedScope:       []string{"foo", "bar"},
-			Subject:              fmt.Sprintf("%s_flush-consent-1", uniqueName),
-			OpenIDConnectContext: nil,
-			ClientID:             fmt.Sprintf("%s_flush-login-consent-1", uniqueName),
-			RequestURL:           "http://redirect",
-			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-1", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second),
-			Verifier:             fmt.Sprintf("%s_flush-consent-1", uniqueName),
-			CSRF:                 fmt.Sprintf("%s_flush-consent-1", uniqueName),
-		},
-		{
-			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-2", uniqueName),
-			RequestedScope:       []string{"foo", "bar"},
-			Subject:              fmt.Sprintf("%s_flush-consent-2", uniqueName),
-			OpenIDConnectContext: nil,
-			ClientID:             fmt.Sprintf("%s_flush-login-consent-2", uniqueName),
-			RequestURL:           "http://redirect",
-			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-2", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-			Verifier:             fmt.Sprintf("%s_flush-consent-2", uniqueName),
-			CSRF:                 fmt.Sprintf("%s_flush-consent-2", uniqueName),
-		},
-		{
-			ConsentRequestID:     fmt.Sprintf("%s_flush-consent-3", uniqueName),
-			RequestedScope:       []string{"foo", "bar"},
-			Subject:              fmt.Sprintf("%s_flush-consent-3", uniqueName),
-			OpenIDConnectContext: nil,
-			ClientID:             fmt.Sprintf("%s_flush-login-consent-3", uniqueName),
-			RequestURL:           "http://redirect",
-			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-3", uniqueName)),
-			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-			Verifier:             fmt.Sprintf("%s_flush-consent-3", uniqueName),
-			CSRF:                 fmt.Sprintf("%s_flush-consent-3", uniqueName),
 		},
 	}
 }

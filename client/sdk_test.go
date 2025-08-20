@@ -18,6 +18,7 @@ import (
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
@@ -26,6 +27,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/uuidx"
 )
 
@@ -60,13 +62,14 @@ var defaultIgnoreFields = []string{"client_id", "registration_access_token", "re
 
 func TestClientSDK(t *testing.T) {
 	ctx := context.Background()
-	r := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	r := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported:          []string{"public"},
 		config.KeyDefaultClientScope:             []string{"foo", "bar"},
 		config.KeyPublicAllowDynamicRegistration: true,
-	}))
+	})))
 
-	routerAdmin := x.NewRouterAdmin(r.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	routerAdmin := x.NewRouterAdmin(metrics)
 	routerPublic := x.NewRouterPublic()
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
@@ -75,9 +78,9 @@ func TestClientSDK(t *testing.T) {
 	o2Handler.SetPublicRoutes(routerPublic, func(h http.Handler) http.Handler { return h })
 	o2Handler.SetAdminRoutes(routerAdmin)
 
-	server := httptest.NewServer(routerAdmin)
+	server := httptest.NewServer(routerAdmin.Mux)
 	t.Cleanup(server.Close)
-	publicServer := httptest.NewServer(routerPublic)
+	publicServer := httptest.NewServer(routerPublic.Mux)
 	t.Cleanup(publicServer.Close)
 	r.Config().MustSet(ctx, config.KeyAdminURL, server.URL)
 	r.Config().MustSet(ctx, config.KeyOAuth2TokenURL, publicServer.URL+"/oauth2/token")

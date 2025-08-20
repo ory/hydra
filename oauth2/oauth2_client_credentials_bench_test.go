@@ -21,6 +21,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
@@ -33,7 +34,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, configx.WithValue(config.KeyAccessTokenStrategy, "opaque")).WithTracer(tracer)
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, driver.WithTracer(tracer), driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 
 	var newCustomClient = func(b *testing.B, c *hc.Client) (*hc.Client, clientcredentials.Config) {

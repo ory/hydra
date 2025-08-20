@@ -7,11 +7,16 @@ import (
 	"context"
 	"crypto/sha512"
 	"fmt"
+	"maps"
 	"math"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -177,11 +182,10 @@ func (p *DefaultProvider) HasherPBKDF2Config(ctx context.Context) *hasherx.PBKDF
 	}
 }
 
-func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *DefaultProvider {
-	p, err := New(ctx, l, opts...)
-	if err != nil {
-		l.WithError(err).Fatalf("Unable to load config.")
-	}
+func MustNew(t testing.TB, l *logrusx.Logger, opts ...configx.OptionModifier) *DefaultProvider {
+	ctxt := contextx.NewTestConfigProvider(spec.ConfigValidationSchema, opts...)
+	p, err := New(t.Context(), l, ctxt, opts...)
+	require.NoError(t, err)
 	return p
 }
 
@@ -189,7 +193,7 @@ func (p *DefaultProvider) getProvider(ctx context.Context) *configx.Provider {
 	return p.c.Config(ctx, p.p)
 }
 
-func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*DefaultProvider, error) {
+func New(ctx context.Context, l *logrusx.Logger, ctxt contextx.Contextualizer, opts ...configx.OptionModifier) (*DefaultProvider, error) {
 	opts = append(
 		[]configx.OptionModifier{
 			configx.WithStderrValidationReporter(),
@@ -203,7 +207,7 @@ func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier)
 	if err != nil {
 		return nil, err
 	}
-	return NewCustom(l, p, &contextx.Default{}), nil
+	return NewCustom(l, p, ctxt), nil
 }
 
 func NewCustom(l *logrusx.Logger, p *configx.Provider, ctxt contextx.Contextualizer) *DefaultProvider {
@@ -438,12 +442,7 @@ func (p *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
 	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
 	profile, ok := userCodeEtropy[k]
 	if !ok {
-		keys := []string{}
-		for k := range userCodeEtropy {
-			keys = append(keys, k)
-		}
-
-		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
+		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, strings.Join(slices.Collect(maps.Keys(userCodeEtropy)), ", ")))
 		return 0
 	}
 	return profile.Length

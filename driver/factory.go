@@ -7,10 +7,16 @@ import (
 	"context"
 	"io/fs"
 
+	"go.opentelemetry.io/otel/trace"
+
+	"github.com/ory/fosite"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
+	"github.com/ory/hydra/v2/hsm"
+	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
@@ -22,15 +28,20 @@ type (
 	options struct {
 		noPreload,
 		noValidate,
+		autoMigrate,
 		skipNetworkInit bool
-		configOpts        []configx.OptionModifier
-		config            *config.DefaultProvider
-		tracerWrapper     TracerWrapper
-		extraMigrations   []fs.FS
-		goMigrations      []popx.Migration
-		fositexFactories  []fositex.Factory
-		registryModifiers []RegistryModifier
-		inspect           func(Registry) error
+		configOpts         []configx.OptionModifier
+		tracerWrapper      TracerWrapper
+		extraMigrations    []fs.FS
+		goMigrations       []popx.Migration
+		fositexFactories   []fositex.Factory
+		registryModifiers  []RegistryModifier
+		inspect            func(*RegistrySQL) error
+		serviceLocatorOpts []servicelocatorx.Option
+		hsmContext         hsm.Context
+		kratos             kratos.Client
+		tracer             trace.Tracer
+		fop                fosite.OAuth2Provider
 	}
 	OptionsModifier func(*options)
 
@@ -43,12 +54,6 @@ func newOptions(opts []OptionsModifier) *options {
 		f(o)
 	}
 	return o
-}
-
-func WithConfig(config *config.DefaultProvider) OptionsModifier {
-	return func(o *options) {
-		o.config = config
-	}
 }
 
 func WithConfigOptions(opts ...configx.OptionModifier) OptionsModifier {
@@ -105,29 +110,61 @@ func WithExtraFositeFactories(f ...fositex.Factory) OptionsModifier {
 	}
 }
 
-func Inspect(f func(Registry) error) OptionsModifier {
+func Inspect(f func(*RegistrySQL) error) OptionsModifier {
 	return func(o *options) {
 		o.inspect = f
 	}
 }
 
-func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifier) (Registry, error) {
+func WithServiceLocatorOptions(opts ...servicelocatorx.Option) OptionsModifier {
+	return func(o *options) {
+		o.serviceLocatorOpts = append(o.serviceLocatorOpts, opts...)
+	}
+}
+
+func WithAutoMigrate() OptionsModifier {
+	return func(o *options) {
+		o.autoMigrate = true
+	}
+}
+
+func WithHSMContext(h hsm.Context) OptionsModifier {
+	return func(o *options) {
+		o.hsmContext = h
+	}
+}
+
+func WithKratosClient(k kratos.Client) OptionsModifier {
+	return func(o *options) {
+		o.kratos = k
+	}
+}
+
+func WithTracer(t trace.Tracer) OptionsModifier {
+	return func(o *options) {
+		o.tracer = t
+	}
+}
+
+func WithOAuth2Provider(p fosite.OAuth2Provider) OptionsModifier {
+	return func(o *options) {
+		o.fop = p
+	}
+}
+
+func New(ctx context.Context, opts ...OptionsModifier) (*RegistrySQL, error) {
 	o := newOptions(opts)
+	sl := servicelocatorx.NewOptions(o.serviceLocatorOpts...)
 
 	l := sl.Logger()
 	if l == nil {
 		l = logrusx.New("Ory Hydra", config.Version)
 	}
 
-	ctxter := sl.Contextualizer()
-	c := o.config
-	if c == nil {
-		var err error
-		c, err = config.New(ctx, l, o.configOpts...)
-		if err != nil {
-			l.WithError(err).Error("Unable to instantiate configuration.")
-			return nil, err
-		}
+	c, err := config.New(ctx, l, sl.Contextualizer(), o.configOpts...)
+	if err != nil {
+		l.WithError(err).Error("Unable to instantiate configuration.")
+		return nil, err
 	}
 
 	if !o.noValidate {
@@ -136,17 +173,20 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 		}
 	}
 
-	r, err := NewRegistryWithoutInit(c, l)
+	r, err := newRegistryWithoutInit(c, l)
 	if err != nil {
 		l.WithError(err).Error("Unable to create service registry.")
 		return nil, err
 	}
 
-	if o.tracerWrapper != nil {
-		r.WithTracerWrapper(o.tracerWrapper)
-	}
-
-	r.WithExtraFositeFactories(o.fositexFactories)
+	r.tracerWrapper = o.tracerWrapper
+	r.fositeFactories = o.fositexFactories
+	r.hsm = o.hsmContext
+	r.middlewares = sl.HTTPMiddlewares()
+	r.ctxer = sl.Contextualizer()
+	r.kratos = o.kratos
+	r.trc = new(otelx.Tracer).WithOTLP(o.tracer)
+	r.fop = o.fop
 
 	for _, f := range o.registryModifiers {
 		if err := f(r); err != nil {
@@ -154,14 +194,14 @@ func New(ctx context.Context, sl *servicelocatorx.Options, opts []OptionsModifie
 		}
 	}
 
-	if err = r.Init(ctx, o.skipNetworkInit, false, ctxter, o.extraMigrations, o.goMigrations); err != nil {
+	if err = r.Init(ctx, o.skipNetworkInit, o.autoMigrate, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")
 		return nil, err
 	}
 
 	// Avoid cold cache issues on boot:
 	if !o.noPreload {
-		CallRegistry(ctx, r)
+		callRegistry(ctx, r)
 	}
 
 	if o.inspect != nil {

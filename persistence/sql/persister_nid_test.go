@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/servicelocatorx"
+
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +33,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/uuidx"
@@ -39,7 +40,7 @@ import (
 
 type PersisterTestSuite struct {
 	suite.Suite
-	registries map[string]driver.Registry
+	registries map[string]*driver.RegistrySQL
 	t1         context.Context
 	t2         context.Context
 	t1NID      uuid.UUID
@@ -52,13 +53,9 @@ var _ interface {
 } = (*PersisterTestSuite)(nil)
 
 func (s *PersisterTestSuite) SetupSuite() {
-	s.registries = map[string]driver.Registry{
-		"memory": testhelpers.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true),
-	}
+	withCtxer := driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.TestContextualizer{}))
 
-	if !testing.Short() {
-		s.registries = testhelpers.ConnectDatabases(s.T(), true)
-	}
+	s.registries = testhelpers.ConnectDatabases(s.T(), true, withCtxer)
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
 	s.t1 = contextx.SetNIDContext(context.Background(), s.t1NID)
@@ -67,13 +64,11 @@ func (s *PersisterTestSuite) SetupSuite() {
 	for _, r := range s.registries {
 		require.NoError(s.T(), r.Persister().Connection(context.Background()).Create(&networkx.Network{ID: s.t1NID}))
 		require.NoError(s.T(), r.Persister().Connection(context.Background()).Create(&networkx.Network{ID: s.t2NID}))
-		r.WithContextualizer(&contextx.TestContextualizer{})
 	}
 }
 
 func (s *PersisterTestSuite) TearDownTest() {
 	for _, r := range s.registries {
-		r.WithContextualizer(&contextx.TestContextualizer{})
 		x.DeleteHydraRows(s.T(), r.Persister().Connection(context.Background()))
 	}
 }
@@ -382,20 +377,6 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
 			require.Equal(t, s.t1NID, actual.NID)
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestCreateLoginRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			lr := flow.LoginRequest{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now()}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
-			require.NoError(t, err)
-			require.Equal(t, s.t1NID, f.NID)
 		})
 	}
 }
@@ -1125,30 +1106,6 @@ func (s *PersisterTestSuite) TestGetGrants() {
 			require.NoError(t, err)
 			assert.Len(t, actual, 1)
 			assert.True(t, nextPage.IsLast())
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestGetLoginRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			cl := &client.Client{ID: "client-id"}
-			lr := flow.LoginRequest{ID: "lr-id", ClientID: cl.ID, RequestedAt: time.Now()}
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f, err := r.ConsentManager().CreateLoginRequest(s.t1, &lr)
-			require.NoError(t, err)
-			require.Equal(t, s.t1NID, f.NID)
-
-			challenge := x.Must(f.ToLoginChallenge(s.t1, r))
-
-			actual, err := r.Persister().GetLoginRequest(s.t2, challenge)
-			require.Error(t, err)
-			require.Nil(t, actual)
-
-			actual, err = r.Persister().GetLoginRequest(s.t1, challenge)
-			require.NoError(t, err)
-			require.NotNil(t, actual)
 		})
 	}
 }
@@ -2044,7 +2001,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			r.WithContextualizer(&contextx.Default{})
 			store, ok := r.Persister().(*persistencesql.Persister)
 			require.True(t, ok)
 			original := store.NetworkID(context.Background())

@@ -21,6 +21,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	hc "github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/testhelpers"
@@ -32,7 +33,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValue(config.KeyAccessTokenStrategy, "opaque"))
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	var newCustomClient = func(t *testing.T, c *hc.Client) (*hc.Client, clientcredentials.Config) {

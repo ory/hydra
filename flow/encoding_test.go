@@ -1,7 +1,7 @@
 // Copyright © 2024 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package flowctx_test
+package flow_test
 
 import (
 	"context"
@@ -12,10 +12,10 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/v2/flow"
+
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/flow"
-	"github.com/ory/hydra/v2/oauth2/flowctx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/sqlxx"
 )
@@ -102,7 +102,7 @@ func TestEncoding(t *testing.T) {
 		require.NoError(t, err)
 		t.Logf("Length (JSON): %d", len(j))
 		cp := new(cipherProvider)
-		consentVerifier, err := flowctx.Encode(ctx, cp.FlowCipher(), f, flowctx.AsConsentVerifier)
+		consentVerifier, err := flow.Encode(ctx, cp.FlowCipher(), f, flow.AsConsentVerifier)
 		require.NoError(t, err)
 		t.Logf("Length (JSON+GZIP+AEAD): %d", len(consentVerifier))
 	})

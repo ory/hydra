@@ -21,7 +21,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/otelx"
@@ -97,10 +96,10 @@ func (p *Persister) Commit(ctx context.Context) (err error) {
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
 	if tx.TX == fallback.TX || tx.TX == nil {
-		return errorsx.WithStack(ErrNoTransactionOpen)
+		return errors.WithStack(ErrNoTransactionOpen)
 	}
 
-	return errorsx.WithStack(tx.TX.Commit())
+	return errors.WithStack(tx.TX.Commit())
 }
 
 func (p *Persister) Rollback(ctx context.Context) (err error) {
@@ -114,13 +113,13 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
 	if tx.TX == fallback.TX || tx.TX == nil {
-		return errorsx.WithStack(ErrNoTransactionOpen)
+		return errors.WithStack(ErrNoTransactionOpen)
 	}
 
-	return errorsx.WithStack(tx.TX.Rollback())
+	return errors.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
+func NewPersister(c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
 	return &Persister{
 		conn:            c,
 		extraMigrations: extraMigrations,

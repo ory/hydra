@@ -1,4 +1,0 @@
-{
-  "error": "invalid_request",
-  "error_description": "'skip_consent' cannot be set for dynamic client registration"
-}

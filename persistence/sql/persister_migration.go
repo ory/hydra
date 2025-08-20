@@ -16,7 +16,6 @@ import (
 	"github.com/sirupsen/logrus/hooks/test"
 
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/fsx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
@@ -135,14 +134,14 @@ func (p *Persister) migrateOldMigrationTables() error {
 			// fizz standard version pattern: YYYYMMDDhhmmss
 			migrationNumber, err := strconv.ParseInt(m.ID, 10, 0)
 			if err != nil {
-				return errorsx.WithStack(err)
+				return errors.WithStack(err)
 			}
 
 			/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
 			if err := p.conn.RawQuery(
 				fmt.Sprintf("INSERT INTO schema_migration (version) VALUES ('2019%02d%08d')", i+1, migrationNumber)).
 				Exec(); err != nil {
-				return errorsx.WithStack(err)
+				return errors.WithStack(err)
 			}
 		}
 

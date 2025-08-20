@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
@@ -122,7 +122,7 @@ func (e *RequestDeniedError) Scan(value any) error {
 	}
 
 	if err := json.Unmarshal([]byte(v), e); err != nil {
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	e.Valid = true
@@ -136,7 +136,7 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 
 	value, err := json.Marshal(e)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return string(value), nil
@@ -466,12 +466,12 @@ func (n *OAuth2ConsentRequestOpenIDConnectContext) Scan(value interface{}) error
 	if len(v) == 0 {
 		return nil
 	}
-	return errorsx.WithStack(json.Unmarshal([]byte(v), n))
+	return errors.WithStack(json.Unmarshal([]byte(v), n))
 }
 
 func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error) {
 	value, err := json.Marshal(n)
-	return value, errorsx.WithStack(err)
+	return value, errors.WithStack(err)
 }
 
 // Contains information about an ongoing logout request.

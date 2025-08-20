@@ -14,7 +14,6 @@ import (
 
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/pop/v6"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 )
@@ -52,12 +51,12 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 
 	out, err := json.Marshal(key)
 	if err != nil {
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	encrypted, err := p.r.KeyCipher().Encrypt(ctx, out, nil)
 	if err != nil {
-		return errorsx.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, &jwk.SQLData{
@@ -76,7 +75,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 		for _, key := range keys.Keys {
 			out, err := json.Marshal(key)
 			if err != nil {
-				return errorsx.WithStack(err)
+				return errors.WithStack(err)
 			}
 
 			encrypted, err := p.r.KeyCipher().Encrypt(ctx, out, nil)
@@ -149,12 +148,12 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONWe
 
 	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key, nil)
 	if err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	var c jose.JSONWebKey
 	if err := json.Unmarshal(key, &c); err != nil {
-		return nil, errorsx.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	return &jose.JSONWebKeySet{

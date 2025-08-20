@@ -16,6 +16,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -34,12 +36,12 @@ import (
 func TestLogoutFlows(t *testing.T) {
 	ctx := context.Background()
 	fakeKratos := kratos.NewFake()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
-		config.KeyAccessTokenStrategy:  "opaque",
-		config.KeyConsentRequestMaxAge: time.Hour,
-	}))
-
-	reg.WithKratos(fakeKratos)
+	reg := testhelpers.NewRegistryMemory(t,
+		driver.WithConfigOptions(configx.WithValues(map[string]any{
+			config.KeyAccessTokenStrategy:  "opaque",
+			config.KeyConsentRequestMaxAge: time.Hour,
+		})),
+		driver.WithKratosClient(fakeKratos))
 
 	defaultRedirectedMessage := "redirected to default server"
 	postLogoutCallback := func(w http.ResponseWriter, r *http.Request) {

@@ -30,6 +30,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"
+	"github.com/ory/x/prometheusx"
 )
 
 // Define the suite, and absorb the built-in basic suite
@@ -45,17 +46,18 @@ type HandlerTestSuite struct {
 
 // Setup will run before the tests in the suite are run.
 func (s *HandlerTestSuite) SetupTest() {
-	s.registry = testhelpers.NewRegistryMemory(s.T(), configx.WithValues(map[string]any{
+	s.registry = testhelpers.NewRegistryMemory(s.T(), driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeySubjectTypesSupported: []string{"public"},
 		config.KeyDefaultClientScope:    []string{"foo", "bar"},
-	}))
+	})))
 
-	router := x.NewRouterAdmin(s.registry.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	router := x.NewRouterAdmin(metrics)
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry)
 	jwkHandler.SetAdminRoutes(router)
-	s.server = httptest.NewServer(router)
+	s.server = httptest.NewServer(router.Mux)
 
 	c := hydra.NewAPIClient(hydra.NewConfiguration())
 	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: s.server.URL}}

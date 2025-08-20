@@ -26,7 +26,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -383,7 +382,7 @@ func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string,
 		// valid) access tokens in the database, this should get them.
 		err = p.QueryWithNetwork(ctx).Where("signature = ?", signature).First(&r)
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errorsx.WithStack(fosite.ErrNotFound)
+			return nil, errors.WithStack(fosite.ErrNotFound)
 		}
 	}
 	if err != nil {
@@ -394,7 +393,7 @@ func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string,
 		if err != nil {
 			return nil, err
 		}
-		return fr, errorsx.WithStack(fosite.ErrInactiveToken)
+		return fr, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
 	return r.toRequest(ctx, session, p)
@@ -419,7 +418,7 @@ func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature stri
 				Where("signature = ?", signature).
 				Delete(OAuth2RequestSQL{Table: sqlTableAccess}.TableName()))
 		if errors.Is(err, sqlcon.ErrNoRows) {
-			return errorsx.WithStack(fosite.ErrNotFound)
+			return errors.WithStack(fosite.ErrNotFound)
 		}
 	}
 	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {

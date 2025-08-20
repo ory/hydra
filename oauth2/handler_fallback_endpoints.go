@@ -8,11 +8,9 @@ import (
 	"net/http"
 
 	"github.com/ory/hydra/v2/driver/config"
-
-	"github.com/julienschmidt/httprouter"
 )
 
-func (h *Handler) fallbackHandler(title, heading string, sc int, configKey string) httprouter.Handle {
+func (h *Handler) fallbackHandler(title, heading string, sc int, configKey string) func(w http.ResponseWriter, r *http.Request) {
 	if title == "" {
 		title = "The request could not be executed because a mandatory configuration key is missing or malformed"
 	}
@@ -21,7 +19,7 @@ func (h *Handler) fallbackHandler(title, heading string, sc int, configKey strin
 		heading = "The request could not be executed because a mandatory configuration key is missing or malformed"
 	}
 
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		h.r.Logger().Errorf(`A request failed because configuration key "%s" is missing or malformed.`, configKey)
 
 		t, err := template.New(configKey).Parse(`<html>
@@ -58,7 +56,7 @@ func (h *Handler) fallbackHandler(title, heading string, sc int, configKey strin
 	}
 }
 
-func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.Logger().WithRequest(r).Error("A client requested the default error URL, environment variable URLS_ERROR is probably not set.")
 
 	t, err := template.New("consent").Parse(`

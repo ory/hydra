@@ -5,6 +5,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"testing"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/stringsx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
@@ -53,8 +53,8 @@ func TestImportJWKS(t *testing.T) {
 			actual := gjson.Parse(cmdx.ExecNoErr(t, c, args...))
 			assert.Len(t, actual.Get("keys.0").Array(), 1, "%s", actual.Raw)
 			assert.NotEmpty(t, actual.Get("keys.0.kid").String(), "%s", actual.Raw)
-			assert.NotEmpty(t, stringsx.Coalesce(actual.Get("keys.0.x").String(), actual.Get("keys.0.n").String()), "%s", actual.Raw)
-			assert.Equal(t, stringsx.Coalesce(tc[0], "RS256"), actual.Get("keys.0.alg").String(), "%s", actual.Raw)
+			assert.NotEmpty(t, cmp.Or(actual.Get("keys.0.x").String(), actual.Get("keys.0.n").String()), "%s", actual.Raw)
+			assert.Equal(t, cmp.Or(tc[0], "RS256"), actual.Get("keys.0.alg").String(), "%s", actual.Raw)
 		})
 	}
 

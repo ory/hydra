@@ -20,6 +20,8 @@ func MustJoin(first string, parts ...string) string {
 }
 
 // AppendPaths appends the provided paths to the url.
+// Paths are intentionally *not* URL encoded.
+// The caller is responsible for url encoding, possibly selectively, the required path components with `url.PathEscape`.
 func AppendPaths(u *url.URL, paths ...string) (ep *url.URL) {
 	ep = Copy(u)
 	if len(paths) == 0 {
@@ -29,7 +31,7 @@ func AppendPaths(u *url.URL, paths ...string) (ep *url.URL) {
 	ep.Path = path.Join(append([]string{ep.Path}, paths...)...)
 
 	last := paths[len(paths)-1]
-	if last[len(last)-1] == '/' {
+	if last != "" && last[len(last)-1] == '/' {
 		ep.Path = ep.Path + "/"
 	}
 

@@ -21,6 +21,7 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
@@ -230,10 +231,10 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyAccessTokenStrategy: "opaque",
 		config.KeyRefreshTokenHook:    "",
-	}))
+	})))
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())

@@ -26,10 +26,18 @@ type (
 		NID uuid.UUID
 		C   *configx.Provider
 	}
-	NoOp struct{}
 )
 
-func (d *Static) Network(context.Context, uuid.UUID) uuid.UUID                  { return d.NID }
-func (d *Static) Config(context.Context, *configx.Provider) *configx.Provider   { return d.C }
-func (d *NoOp) Network(_ context.Context, n uuid.UUID) uuid.UUID                { return n }
-func (d *NoOp) Config(_ context.Context, c *configx.Provider) *configx.Provider { return c }
+func (d *Static) Network(_ context.Context, nid uuid.UUID) uuid.UUID {
+	if d.NID == uuid.Nil {
+		return nid
+	}
+	return d.NID
+}
+
+func (d *Static) Config(_ context.Context, c *configx.Provider) *configx.Provider {
+	if d.C == nil {
+		return c
+	}
+	return d.C
+}

@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/driver"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -21,16 +23,17 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/prometheusx"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy: "wildcard",
 		config.KeyIssuerURL:     "https://foobariss",
-	}))
+	})))
 
 	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)
@@ -42,10 +45,11 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	router := x.NewRouterAdmin(reg.Config().AdminURL)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	router := x.NewRouterAdmin(metrics)
 	handler := reg.OAuth2Handler()
 	handler.SetAdminRoutes(router)
-	server := httptest.NewServer(router)
+	server := httptest.NewServer(router.Mux)
 	defer server.Close()
 
 	now := time.Now().UTC().Round(time.Minute)

@@ -39,9 +39,8 @@ type Session struct {
 }
 
 func NewTestSession(t testing.TB, subject string) *Session {
-	ctx := t.Context()
-	provider := config.MustNew(ctx, logrusx.New("", ""))
-	return NewSessionWithCustomClaims(ctx, provider, subject)
+	provider := config.MustNew(t, logrusx.New("", ""))
+	return NewSessionWithCustomClaims(t.Context(), provider, subject)
 }
 
 func NewSessionWithCustomClaims(ctx context.Context, p *config.DefaultProvider, subject string) *Session {

@@ -26,6 +26,7 @@ import (
 	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
@@ -35,14 +36,16 @@ import (
 )
 
 func TestStrategyLoginConsentNext(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
-	reg := testhelpers.NewRegistryMemory(t, configx.WithValues(map[string]any{
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyAccessTokenStrategy:            "opaque",
 		config.KeyConsentRequestMaxAge:           time.Hour,
 		config.KeyScopeStrategy:                  "exact",
 		config.KeySubjectTypesSupported:          []string{"pairwise", "public"},
 		config.KeySubjectIdentifierAlgorithmSalt: "76d5d2bf-747f-4592-9fbd-d2b895a54b3a",
-	}))
+	})))
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 	adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
@@ -110,7 +113,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		makeRequestAndExpectError(
 			t, hc, c, url.Values{"login_verifier": {"does-not-exist"}},
-			"The resource owner or authorization server denied the request. The login verifier is invalid",
+			"The resource owner or authorization server denied the request. The login verifier has already been used, has not been granted, or is invalid.",
 		)
 	})
 
@@ -1106,6 +1109,8 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 }
 
 func TestStrategyDeviceLoginConsent(t *testing.T) {
+	t.Parallel()
+
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t)
 	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")

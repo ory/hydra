@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -22,17 +23,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+	"github.com/urfave/negroni"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/fosite/token/jwt"
+	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/contextx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
+	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/uuidx"
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
@@ -57,34 +62,47 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims jwt.MapClaim
 
 // NewOAuth2Server
 // Deprecated: use NewConfigurableOAuth2Server instead
-func NewOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL) (publicTS, adminTS *httptest.Server) {
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, 10*time.Second)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, 20*time.Second)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
-	public, admin := NewConfigurableOAuth2Server(ctx, t, reg)
-	return public.Server, admin.Server
+	return NewConfigurableOAuth2Server(ctx, t, reg)
 }
 
-func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *contextx.ConfigurableTestServer) {
-	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
-
+func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
 	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterPublicRoutes(ctx, public)
-	reg.RegisterAdminRoutes(admin)
+	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+	{
+		n := negroni.New()
+		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+		n.UseFunc(httprouterx.NoCacheNegroni)
+		n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-	publicTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(public, "public", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
-		return r.URL.Path
-	})))
-	t.Cleanup(publicTS.Close)
+		router := x.NewRouterAdmin(metrics)
+		reg.RegisterAdminRoutes(router)
+		n.UseHandler(router.Mux)
 
-	adminTS = contextx.NewConfigurableTestServer(otelhttp.NewHandler(admin, "admin", otelhttp.WithSpanNameFormatter(func(_ string, r *http.Request) string {
-		return r.URL.Path
-	})))
-	t.Cleanup(adminTS.Close)
+		adminTS = httptest.NewServer(n)
+		t.Cleanup(adminTS.Close)
+		reg.Config().MustSet(ctx, config.KeyAdminURL, adminTS.URL)
+	}
+	{
+		n := negroni.New()
+		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
+		n.UseFunc(httprouterx.NoCacheNegroni)
+
+		router := x.NewRouterPublic()
+		reg.RegisterPublicRoutes(ctx, router)
+		n.UseHandler(router.Mux)
+
+		publicTS = httptest.NewServer(n)
+		t.Cleanup(publicTS.Close)
+		reg.Config().MustSet(ctx, config.KeyAdminURL, publicTS.URL)
+	}
 
 	reg.Config().MustSet(ctx, config.KeyIssuerURL, publicTS.URL)
 	return publicTS, adminTS
@@ -252,4 +270,82 @@ func InsecureDecodeJWT(t require.TestingT, token string) []byte {
 	dec, err := base64.RawURLEncoding.DecodeString(parts[1])
 	require.NoErrorf(t, err, "failed to decode JWT payload: %s", parts[1])
 	return dec
+}
+
+const (
+	ClientCallbackURL = "https://client.ory/callback"
+	LoginURL          = "https://ui.ory/login"
+	ConsentURL        = "https://ui.ory/consent"
+)
+
+func GetExpectRedirect(t *testing.T, cl *http.Client, uri string) *url.URL {
+	resp, err := cl.Get(uri)
+	require.NoError(t, err)
+	require.Equalf(t, 3, resp.StatusCode/100, "status: %d\nresponse: %s", resp.StatusCode, ioutilx.MustReadAll(resp.Body))
+	loc, err := resp.Location()
+	require.NoError(t, err)
+	return loc
+}
+
+func PerformAuthCodeFlow(t *testing.T, cfg *oauth2.Config, admin *hydra.APIClient, lr func(*testing.T, *hydra.OAuth2LoginRequest) hydra.AcceptOAuth2LoginRequest, cr func(*testing.T, *hydra.OAuth2ConsentRequest) hydra.AcceptOAuth2ConsentRequest, authCodeOpts ...oauth2.AuthCodeOption) *oauth2.Token {
+	cl := NewEmptyJarClient(t)
+	cl.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+
+	// start the auth code flow
+	state := uuidx.NewV4().String()
+	loc := GetExpectRedirect(t, cl, cfg.AuthCodeURL(state, authCodeOpts...))
+	require.Equal(t, LoginURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
+
+	// get & submit the login request
+	lReq, _, err := admin.OAuth2API.GetOAuth2LoginRequest(t.Context()).LoginChallenge(loc.Query().Get("login_challenge")).Execute()
+	require.NoError(t, err)
+
+	v, _, err := admin.OAuth2API.AcceptOAuth2LoginRequest(t.Context()).
+		LoginChallenge(lReq.Challenge).
+		AcceptOAuth2LoginRequest(lr(t, lReq)).
+		Execute()
+	require.NoError(t, err)
+
+	loc = GetExpectRedirect(t, cl, v.RedirectTo)
+	require.Equal(t, ConsentURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
+
+	// get & submit the consent request
+	cReq, _, err := admin.OAuth2API.GetOAuth2ConsentRequest(t.Context()).ConsentChallenge(loc.Query().Get("consent_challenge")).Execute()
+	require.NoError(t, err)
+
+	v, _, err = admin.OAuth2API.AcceptOAuth2ConsentRequest(t.Context()).
+		ConsentChallenge(cReq.Challenge).
+		AcceptOAuth2ConsentRequest(cr(t, cReq)).
+		Execute()
+	require.NoError(t, err)
+	loc = GetExpectRedirect(t, cl, v.RedirectTo)
+	// ensure we got redirected to the client callback URL
+	require.Equal(t, ClientCallbackURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
+	require.Equal(t, state, loc.Query().Get("state"))
+
+	// exchange the code for a token
+	code := loc.Query().Get("code")
+	require.NotEmpty(t, code)
+	token, err := cfg.Exchange(t.Context(), code)
+	require.NoError(t, err)
+
+	return token
+}
+
+func AssertTokenValid(t *testing.T, accessOrIDToken gjson.Result, sub string) {
+	assert.Equal(t, sub, accessOrIDToken.Get("sub").Str)
+	assert.WithinDurationf(t, time.Now(), time.Unix(accessOrIDToken.Get("iat").Int(), 0), time.Minute, "%s", accessOrIDToken.Raw)
+	assert.Truef(t, time.Now().Before(time.Unix(accessOrIDToken.Get("exp").Int(), 0)), "%s", accessOrIDToken.Raw)
+}
+
+func AssertAccessToken(t *testing.T, token gjson.Result, sub, clientID string) {
+	AssertTokenValid(t, token, sub)
+	assert.Equalf(t, clientID, token.Get("client_id").Str, "%s", token.Raw)
+	assert.WithinDurationf(t, time.Now(), time.Unix(token.Get("nbf").Int(), 0), time.Minute, "%s", token.Raw)
+}
+
+func AssertIDToken(t *testing.T, token gjson.Result, sub, clientID string) {
+	AssertTokenValid(t, token, sub)
+	assert.Equalf(t, clientID, token.Get("aud.0").Str, "%s", token.Raw)
+	assert.WithinDurationf(t, time.Now(), time.Unix(token.Get("rat").Int(), 0), time.Minute, "%s", token.Raw)
 }

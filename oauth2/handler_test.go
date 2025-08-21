@@ -369,7 +369,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 
-		snapshotOpts := []snapshotx.ExceptOpt{}
+		snapshotOpts := []snapshotx.Opt{}
 		if reg.Config().HSMEnabled() {
 			// The signing algorithm is not stable in the HSM tests, because the key is kept
 			// in the HSM and persists across test runs.
@@ -415,7 +415,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
-		snapshotOpts := []snapshotx.ExceptOpt{}
+		snapshotOpts := []snapshotx.Opt{}
 		if reg.Config().HSMEnabled() {
 			// The signing algorithm is not stable in the HSM tests, because the key is kept
 			// in the HSM and persists across test runs.

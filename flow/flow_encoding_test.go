@@ -21,7 +21,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/sqlxx"
 )
 
 func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
@@ -36,7 +35,7 @@ func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
 			NID: nid,
 		},
 		RequestURL:  "https://example.org/oauth2/auth?client_id=test",
-		SessionID:   sqlxx.NullString("session-123"),
+		SessionID:   "session-123",
 		RequestedAt: time.Now(),
 		State:       state,
 	}

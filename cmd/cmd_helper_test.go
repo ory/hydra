@@ -52,7 +52,7 @@ func setup(t *testing.T, cmd *cobra.Command) *driver.RegistrySQL {
 	return reg
 }
 
-var snapshotExcludedClientFields = []snapshotx.ExceptOpt{
+var snapshotExcludedClientFields = []snapshotx.Opt{
 	snapshotx.ExceptNestedKeys("client_id"),
 	snapshotx.ExceptNestedKeys("registration_access_token"),
 	snapshotx.ExceptNestedKeys("registration_client_uri"),

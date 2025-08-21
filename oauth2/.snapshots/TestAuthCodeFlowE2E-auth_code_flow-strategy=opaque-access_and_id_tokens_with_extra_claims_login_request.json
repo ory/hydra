@@ -1,0 +1,48 @@
+{
+  "client": {
+    "access_token_strategy": "opaque",
+    "allowed_cors_origins": [],
+    "audience": [
+      "audience-1",
+      "audience-2"
+    ],
+    "client_id": "64f78bf1-f388-4eeb-9fee-e7207226c6be-opaque",
+    "client_name": "",
+    "client_secret_expires_at": 0,
+    "client_uri": "",
+    "contacts": [],
+    "grant_types": [
+      "implicit",
+      "refresh_token",
+      "authorization_code",
+      "password",
+      "client_credentials"
+    ],
+    "jwks": {},
+    "logo_uri": "",
+    "metadata": {},
+    "owner": "",
+    "policy_uri": "",
+    "redirect_uris": [
+      "https://client.ory/callback"
+    ],
+    "response_types": [
+      "id_token",
+      "code",
+      "token"
+    ],
+    "scope": "hydra offline openid",
+    "skip_consent": false,
+    "subject_type": "",
+    "tos_uri": ""
+  },
+  "oidc_context": {},
+  "requested_access_token_audience": [],
+  "requested_scope": [
+    "hydra",
+    "offline",
+    "openid"
+  ],
+  "skip": false,
+  "subject": ""
+}

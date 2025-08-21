@@ -11,9 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/x/pointerx"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,13 +19,15 @@ import (
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
-	"github.com/ory/x/uuidx"
-
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/snapshotx"
+	"github.com/ory/x/uuidx"
 )
 
 func TestAuthCodeFlowE2E(t *testing.T) {
@@ -70,19 +69,26 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 				cl, conf := newOAuth2Client(t, reg, testhelpers.ClientCallbackURL, func(c *client.Client) {
 					c.AccessTokenStrategy = accessTokenStrategy
 					c.Audience = []string{"audience-1", "audience-2"}
+					c.ID = "64f78bf1-f388-4eeb-9fee-e7207226c6be-" + accessTokenStrategy
 				})
-				sub := uuidx.NewV4().String()
+				sub := "c6a8ee1c-e0c4-404c-bba7-6a5b8702a2e9"
 
 				t.Run("access and id tokens with extra claims", func(t *testing.T) {
 					token := testhelpers.PerformAuthCodeFlow(t, conf, adminClient,
-						func(*testing.T, *hydra.OAuth2LoginRequest) hydra.AcceptOAuth2LoginRequest {
+						func(t *testing.T, req *hydra.OAuth2LoginRequest) hydra.AcceptOAuth2LoginRequest {
+							snapshotx.SnapshotT(t, req,
+								snapshotx.ExceptPaths("challenge", "client.created_at", "client.updated_at", "session_id", "request_url"),
+								snapshotx.WithName("login_request"))
 							return hydra.AcceptOAuth2LoginRequest{
 								Amr:     []string{"amr1", "amr2"},
 								Acr:     pointerx.Ptr("acr-value"),
 								Subject: sub,
 							}
 						},
-						func(*testing.T, *hydra.OAuth2ConsentRequest) hydra.AcceptOAuth2ConsentRequest {
+						func(t *testing.T, req *hydra.OAuth2ConsentRequest) hydra.AcceptOAuth2ConsentRequest {
+							snapshotx.SnapshotT(t, req,
+								snapshotx.ExceptPaths("challenge", "client.created_at", "client.updated_at", "consent_request_id", "login_challenge", "login_session_id", "request_url"),
+								snapshotx.WithName("consent_request"))
 							return hydra.AcceptOAuth2ConsentRequest{
 								GrantScope: []string{"openid"},
 								Session: &hydra.AcceptOAuth2ConsentRequestSession{

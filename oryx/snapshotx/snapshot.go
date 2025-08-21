@@ -7,93 +7,99 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"testing"
 
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/pretty"
-
-	"github.com/ory/x/stringslice"
-
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 )
 
 type (
-	ExceptOpt interface {
-		apply(t *testing.T, raw []byte) []byte
+	Opt     = func(*options)
+	options struct {
+		modifiers []func(t *testing.T, raw []byte) []byte
+		name      string
 	}
-	exceptPaths      []string
-	exceptNestedKeys []string
-	replacement      struct{ str, replacement string }
 )
 
-func (e exceptPaths) apply(t *testing.T, raw []byte) []byte {
-	for _, ee := range e {
-		var err error
-		raw, err = sjson.DeleteBytes(raw, ee)
-		require.NoError(t, err)
+func ExceptPaths(keys ...string) Opt {
+	return func(o *options) {
+		o.modifiers = append(o.modifiers, func(t *testing.T, raw []byte) []byte {
+			for _, key := range keys {
+				var err error
+				raw, err = sjson.DeleteBytes(raw, key)
+				require.NoError(t, err)
+			}
+			return raw
+		})
 	}
-	return raw
 }
 
-func (e exceptNestedKeys) apply(t *testing.T, raw []byte) []byte {
-	parsed := gjson.ParseBytes(raw)
-	require.True(t, parsed.IsObject() || parsed.IsArray())
-	return deleteMatches(t, "", parsed, e, []string{}, raw)
-}
-
-func (r *replacement) apply(_ *testing.T, raw []byte) []byte {
-	return bytes.ReplaceAll(raw, []byte(r.str), []byte(r.replacement))
-}
-
-func ExceptPaths(keys ...string) ExceptOpt {
-	return exceptPaths(keys)
-}
-
-func ExceptNestedKeys(nestedKeys ...string) ExceptOpt {
-	return exceptNestedKeys(nestedKeys)
-}
-
-func WithReplacement(str, replace string) ExceptOpt {
-	return &replacement{str: str, replacement: replace}
-}
-
-func SnapshotTJSON(t *testing.T, compare []byte, except ...ExceptOpt) {
-	t.Helper()
-	for _, e := range except {
-		compare = e.apply(t, compare)
+func ExceptNestedKeys(nestedKeys ...string) Opt {
+	return func(o *options) {
+		o.modifiers = append(o.modifiers, func(t *testing.T, raw []byte) []byte {
+			parsed := gjson.ParseBytes(raw)
+			require.True(t, parsed.IsObject() || parsed.IsArray())
+			return deleteMatches(t, "", parsed, nestedKeys, []string{}, raw)
+		})
 	}
-
-	cupaloy.New(
-		cupaloy.CreateNewAutomatically(true),
-		cupaloy.FailOnUpdate(true),
-		cupaloy.SnapshotFileExtension(".json"),
-	).SnapshotT(t, pretty.Pretty(compare))
 }
 
-func SnapshotTJSONString(t *testing.T, str string, except ...ExceptOpt) {
-	t.Helper()
-	SnapshotTJSON(t, []byte(str), except...)
+func WithReplacement(str, replace string) Opt {
+	return func(o *options) {
+		o.modifiers = append(o.modifiers, func(t *testing.T, raw []byte) []byte {
+			return bytes.ReplaceAll(raw, []byte(str), []byte(replace))
+		})
+	}
 }
 
-func SnapshotT(t *testing.T, actual interface{}, except ...ExceptOpt) {
+func WithName(name string) Opt {
+	return func(o *options) {
+		o.name = name
+	}
+}
+
+func newOptions(opts ...Opt) *options {
+	o := &options{}
+	for _, opt := range opts {
+		opt(o)
+	}
+	return o
+}
+
+func (o *options) applyModifiers(t *testing.T, compare []byte) []byte {
+	for _, modifier := range o.modifiers {
+		compare = modifier(t, compare)
+	}
+	return compare
+}
+
+var snapshot = cupaloy.New(cupaloy.SnapshotFileExtension(".json"))
+
+func SnapshotTJSON[C ~string | ~[]byte](t *testing.T, compare C, opts ...Opt) {
+	SnapshotT(t, json.RawMessage(compare), opts...)
+}
+
+func SnapshotT(t *testing.T, actual any, opts ...Opt) {
 	t.Helper()
 	compare, err := json.MarshalIndent(actual, "", "  ")
 	require.NoErrorf(t, err, "%+v", actual)
-	for _, e := range except {
-		compare = e.apply(t, compare)
-	}
 
-	cupaloy.New(
-		cupaloy.CreateNewAutomatically(true),
-		cupaloy.FailOnUpdate(true),
-		cupaloy.SnapshotFileExtension(".json"),
-	).SnapshotT(t, compare)
+	o := newOptions(opts...)
+	compare = o.applyModifiers(t, compare)
+
+	if o.name == "" {
+		snapshot.SnapshotT(t, compare)
+	} else {
+		name := strings.ReplaceAll(t.Name()+"_"+o.name, "/", "-")
+		require.NoError(t, snapshot.SnapshotWithName(name, compare))
+	}
 }
 
-// SnapshotTExcept is deprecated in favor of SnapshotT with ExceptOpt.
+// SnapshotTExcept is deprecated in favor of SnapshotT with Opt.
 //
 // DEPRECATED: please use SnapshotT instead
 func SnapshotTExcept(t *testing.T, actual interface{}, except []string) {
@@ -105,11 +111,7 @@ func SnapshotTExcept(t *testing.T, actual interface{}, except []string) {
 		require.NoError(t, err, "%s", e)
 	}
 
-	cupaloy.New(
-		cupaloy.CreateNewAutomatically(true),
-		cupaloy.FailOnUpdate(true),
-		cupaloy.SnapshotFileExtension(".json"),
-	).SnapshotT(t, compare)
+	snapshot.SnapshotT(t, compare)
 }
 
 func deleteMatches(t *testing.T, key string, result gjson.Result, matches []string, parents []string, content []byte) []byte {
@@ -132,33 +134,11 @@ func deleteMatches(t *testing.T, key string, result gjson.Result, matches []stri
 		})
 	}
 
-	if stringslice.Has(matches, key) {
+	if slices.Contains(matches, key) {
 		content, err := sjson.DeleteBytes(content, strings.Join(path, "."))
 		require.NoError(t, err)
 		return content
 	}
 
 	return content
-}
-
-// SnapshotTExceptMatchingKeys works like SnapshotTExcept but deletes keys that match the given matches recursively.
-//
-// So instead of having deeply nested keys like `foo.bar.baz.0.key_to_delete` you can have `key_to_delete` and
-// all occurences of `key_to_delete` will be removed.
-//
-// DEPRECATED: please use SnapshotT instead
-func SnapshotTExceptMatchingKeys(t *testing.T, actual interface{}, matches []string) {
-	t.Helper()
-	compare, err := json.MarshalIndent(actual, "", "  ")
-	require.NoError(t, err, "%+v", actual)
-
-	parsed := gjson.ParseBytes(compare)
-	require.True(t, parsed.IsObject() || parsed.IsArray())
-	compare = deleteMatches(t, "", parsed, matches, []string{}, compare)
-
-	cupaloy.New(
-		cupaloy.CreateNewAutomatically(true),
-		cupaloy.FailOnUpdate(true),
-		cupaloy.SnapshotFileExtension(".json"),
-	).SnapshotT(t, compare)
 }

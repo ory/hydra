@@ -9,6 +9,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/sqlcon"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
@@ -51,4 +53,24 @@ func DecodeFromConsentChallenge(ctx context.Context, d decodeDependencies, chall
 	defer otelx.End(span, &err)
 
 	return decodeChallenge(ctx, d, challenge, consentChallenge)
+}
+
+func DecodeAndInvalidateLoginVerifier(ctx context.Context, d decodeDependencies, verifier string) (_ *Flow, err error) {
+	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeAndInvalidateLoginVerifier")
+	defer otelx.End(span, &err)
+
+	f, err := Decode[Flow](ctx, d.FlowCipher(), verifier, AsLoginVerifier)
+	if err != nil {
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
+	}
+
+	if f.NID != d.Networker().NetworkID(ctx) {
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
+	}
+
+	if err := f.InvalidateLoginRequest(); err != nil {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	}
+
+	return f, nil
 }

@@ -1798,29 +1798,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 	}
 }
 
-func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			sub := uuid.Must(uuid.NewV4()).String()
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			cl := &client.Client{ID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f := newFlow(s.t1NID, cl.ID, sub, sqlxx.NullString(sessionID))
-			f.State = flow.FlowStateLoginUnused
-
-			loginVerifier := x.Must(f.ToLoginVerifier(s.t1, r))
-			_, err := r.ConsentManager().VerifyAndInvalidateLoginRequest(s.t2, loginVerifier)
-			require.Error(t, err)
-			require.Equal(t, flow.FlowStateLoginUnused, f.State)
-			require.Equal(t, false, f.LoginWasUsed)
-			_, err = r.ConsentManager().VerifyAndInvalidateLoginRequest(s.t1, loginVerifier)
-			require.NoError(t, err)
-			require.Equal(t, flow.FlowStateLoginUnused, f.State) // TODO: Delegate reuse detection to external service.
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {

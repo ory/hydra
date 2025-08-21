@@ -369,7 +369,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyAuthentication")
 	defer otelx.End(span, &err)
 
-	f, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
+	f, err := flow.DecodeAndInvalidateLoginVerifier(ctx, s.r, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {

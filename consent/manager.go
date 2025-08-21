@@ -43,8 +43,6 @@ type (
 		RevokeSubjectLoginSession(ctx context.Context, user string) error
 		ConfirmLoginSession(ctx context.Context, loginSession *flow.LoginSession) error
 
-		VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*flow.Flow, error)
-
 		CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error
 		GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error)
 

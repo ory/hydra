@@ -548,11 +548,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					err = f.UpdateFlowWithHandledLoginRequest(h)
 					require.NoError(t, err)
 
-					loginVerifier := x.Must(f.ToLoginVerifier(ctx, deps))
-
-					got2, err := m.VerifyAndInvalidateLoginRequest(ctx, loginVerifier)
-					require.NoError(t, err)
-					compareAuthenticationRequestFlow(t, c, got2)
+					require.NoError(t, f.InvalidateLoginRequest())
+					compareAuthenticationRequestFlow(t, c, f)
 
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 					got1, err = flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)

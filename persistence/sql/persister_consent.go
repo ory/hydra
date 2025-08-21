@@ -276,25 +276,6 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	return f, nil
 }
 
-func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateLoginRequest")
-	defer otelx.End(span, &err)
-
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsLoginVerifier)
-	if err != nil {
-		return nil, errors.WithStack(sqlcon.ErrNoRows)
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(sqlcon.ErrNoRows)
-	}
-
-	if err := f.InvalidateLoginRequest(); err != nil {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	}
-
-	return f, nil
-}
-
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (_ *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRememberedLoginSession")
 	defer otelx.End(span, &err)

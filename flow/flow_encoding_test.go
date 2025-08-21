@@ -21,6 +21,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/snapshotx"
+	"github.com/ory/x/sqlcon"
 )
 
 func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
@@ -232,5 +233,114 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	t.Run("case=fails with empty challenge", func(t *testing.T) {
 		_, err := flow.DecodeFromConsentChallenge(ctx, reg, "")
 		assert.ErrorIs(t, err, x.ErrNotFound)
+	})
+}
+
+func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
+	ctx := context.Background()
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
+		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
+	))
+
+	nid := reg.Networker().NetworkID(ctx)
+
+	t.Run("case=successful decode and invalidate with valid login verifier", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
+		testFlow.LoginWasUsed = false
+
+		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, loginVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
+		require.NoError(t, err)
+
+		// Verify that InvalidateLoginRequest was called
+		assert.True(t, decoded.LoginWasUsed, "LoginWasUsed should be true after invalidation")
+		assert.Equal(t, flow.FlowStateLoginUsed, decoded.State, "State should be FlowStateLoginUsed after invalidation")
+
+		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+	})
+
+	t.Run("case=fails when flow has already been used", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
+		testFlow.LoginWasUsed = true
+
+		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with invalid flow state", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+
+		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with wrong purpose (login challenge instead of verifier)", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
+
+		loginChallenge, err := testFlow.ToLoginChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, loginChallenge)
+
+		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginChallenge)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with wrong purpose (consent challenge instead of verifier)", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+
+		consentChallenge, err := testFlow.ToConsentChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, consentChallenge)
+
+		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, consentChallenge)
+		assert.Error(t, err)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with different network ID", func(t *testing.T) {
+		differentNID := uuid.Must(uuid.NewV4())
+		flowWithDifferentNID := createTestFlow(differentNID, flow.FlowStateLoginUnused)
+
+		loginVerifier, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsLoginVerifier)
+		require.NoError(t, err)
+		require.NotEmpty(t, loginVerifier)
+
+		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, "invalid-verifier")
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with empty verifier", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, "")
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+
+	t.Run("case=works with FlowStateLoginError", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateLoginError)
+
+		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, loginVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
+		require.NoError(t, err)
+		require.NotNil(t, decoded)
+
+		assert.True(t, decoded.LoginWasUsed)
+		assert.Equal(t, flow.FlowStateLoginUsed, decoded.State)
 	})
 }

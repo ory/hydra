@@ -1463,7 +1463,6 @@ func (h *Handler) updateSessionWithRequest(
 	session.ExcludeNotBeforeClaim = h.c.ExcludeNotBeforeClaim(ctx)
 	session.AllowedTopLevelClaims = h.c.AllowedTopLevelClaims(ctx)
 	session.MirrorTopLevelClaims = h.c.MirrorTopLevelClaims(ctx)
-	session.Flow = flow
 
 	return session, nil
 }

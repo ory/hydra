@@ -38,8 +38,8 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 		config.KeyRefreshTokenHook:     "",
 		config.KeyLoginURL:             testhelpers.LoginURL,
 		config.KeyConsentURL:           testhelpers.ConsentURL,
-		config.KeyAccessTokenLifespan:  10 * time.Second,
-		config.KeyRefreshTokenLifespan: 20 * time.Second,
+		config.KeyAccessTokenLifespan:  10 * time.Minute, // allow to debug
+		config.KeyRefreshTokenLifespan: 20 * time.Minute, // allow to debug
 		config.KeyScopeStrategy:        "exact",
 		config.KeyIssuerURL:            "https://hydra.ory",
 	})))

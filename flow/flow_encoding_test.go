@@ -328,7 +328,6 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	})
 
-
 	t.Run("case=works with FlowStateLoginError", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.FlowStateLoginError)
 

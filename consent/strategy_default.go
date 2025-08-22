@@ -308,14 +308,21 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 		return err
 	}
 
-	var baseURL *url.URL
+	var authURL url.URL
 	if slices.Contains(prompt, "registration") {
-		baseURL = s.c.RegistrationURL(ctx)
+		authURL = *s.c.RegistrationURL(ctx)
 	} else {
-		baseURL = s.c.LoginURL(ctx)
+		authURL = *s.c.LoginURL(ctx)
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(baseURL, url.Values{"login_challenge": {encodedFlow}}).String(), http.StatusFound)
+	query := url.Values{"login_challenge": {encodedFlow}}
+	if idSchema := ar.GetRequestForm().Get("identity_schema"); idSchema != "" {
+		query.Set("identity_schema", idSchema)
+	}
+
+	authURL.RawQuery = query.Encode()
+
+	http.Redirect(w, r, authURL.String(), http.StatusFound)
 
 	// generate the verifier
 	return errors.WithStack(ErrAbortOAuth2Request)

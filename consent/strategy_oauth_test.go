@@ -745,6 +745,21 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		assert.Empty(t, res.Request.URL.Query().Get("code"))
 	})
 
+	t.Run("case=should forward the identity schema in the login URL", func(t *testing.T) {
+		c := createDefaultClient(t)
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, "custom-id-schema", r.URL.Query().Get("identity_schema"))
+				w.WriteHeader(http.StatusBadRequest) // We do not want to continue the flow here, we just want to check the query parameter
+			},
+			testhelpers.HTTPServerNoExpectedCallHandler(t))
+
+		_, res := makeOAuth2Request(t, reg, hc, c, url.Values{"identity_schema": {"custom-id-schema"}})
+		assert.EqualValues(t, http.StatusBadRequest, res.StatusCode)
+	})
+
 	t.Run("case=should require re-authentication when parameters mandate it", func(t *testing.T) {
 		// Covers:
 		// - should pass and require re-authentication although session is set (because prompt=login)

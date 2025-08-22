@@ -2,6 +2,9 @@ FROM golang:1.24 AS builder
 
 WORKDIR /go/src/github.com/ory/hydra
 
+COPY oryx/go.mod oryx/go.mod
+COPY oryx/go.sum oryx/go.sum
+                
 
 RUN apt-get update && apt-get upgrade -y &&\
     mkdir -p ./internal/httpclient

@@ -85,7 +85,7 @@ authors:  # updates the AUTHORS file
 # Formats the code
 .PHONY: format
 format: .bin/ory node_modules
-	ory dev headers copyright --type=open-source --exclude=internal/httpclient
+	ory dev headers copyright --type=open-source --exclude=internal/httpclient --exclude=oryx
 	go tool goimports -w --local github.com/ory .
 	npm exec -- prettier --write .
 

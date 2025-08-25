@@ -1,9 +1,9 @@
+version: "2"
+
 linters:
   enable:
     - gosec
-    - govet
-  disable-all: true
-
-issues:
-  exclude-files:
-    - ".+_test.go"
+    - errcheck
+    - ineffassign
+    - staticcheck
+    - unused

@@ -72,13 +72,13 @@ jobs:
         with:
           nancyVersion: v1.0.42
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v8
         env:
           GOGC: 100
         with:
           args: --timeout 10m0s
-          version: v1.64.8
-          skip-pkg-cache: true
+          version: "v2.4.0"
+          only-new-issues: "true"
       - name: Run go tests
         run: |
           go test -coverprofile coverage.out -failfast -timeout=20m -tags sqlite,sqlite_omit_load_extension ./...

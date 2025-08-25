@@ -160,7 +160,6 @@ Class | Method | HTTP request | Description
  - [OAuth2ConsentRequest](docs/OAuth2ConsentRequest.md)
  - [OAuth2ConsentRequestOpenIDConnectContext](docs/OAuth2ConsentRequestOpenIDConnectContext.md)
  - [OAuth2ConsentSession](docs/OAuth2ConsentSession.md)
- - [OAuth2ConsentSessionExpiresAt](docs/OAuth2ConsentSessionExpiresAt.md)
  - [OAuth2LoginRequest](docs/OAuth2LoginRequest.md)
  - [OAuth2LogoutRequest](docs/OAuth2LogoutRequest.md)
  - [OAuth2RedirectTo](docs/OAuth2RedirectTo.md)

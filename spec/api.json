@@ -1063,31 +1063,6 @@
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
           },
-          "expires_at": {
-            "properties": {
-              "access_token": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "authorize_code": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "id_token": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "par_context": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "refresh_token": {
-                "format": "date-time",
-                "type": "string"
-              }
-            },
-            "type": "object"
-          },
           "grant_access_token_audience": {
             "$ref": "#/components/schemas/StringSliceJSONFormat"
           },

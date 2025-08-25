@@ -6,26 +6,6 @@
   path: /components/schemas/acceptOAuth2ConsentRequestSession/properties/id_token/additionalProperties
 - op: remove
   path: /components/schemas/acceptOAuth2ConsentRequestSession/properties/id_token/type
-- op: replace
-  path: /components/schemas/oAuth2ConsentSession/properties/expires_at
-  value:
-    type: object
-    properties:
-      access_token:
-        format: date-time
-        type: string
-      refresh_token:
-        format: date-time
-        type: string
-      authorize_code:
-        format: date-time
-        type: string
-      id_token:
-        format: date-time
-        type: string
-      par_context:
-        format: date-time
-        type: string
 
 - op: replace
   path: /components/schemas/nullDuration

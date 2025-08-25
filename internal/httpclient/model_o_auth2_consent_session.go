@@ -23,12 +23,11 @@ var _ MappedNullable = &OAuth2ConsentSession{}
 type OAuth2ConsentSession struct {
 	ConsentRequest *OAuth2ConsentRequest `json:"consent_request,omitempty"`
 	// ConsentRequestID is the identifier of the consent request that initiated this consent session.
-	ConsentRequestId         *string                        `json:"consent_request_id,omitempty"`
-	Context                  interface{}                    `json:"context,omitempty"`
-	ExpiresAt                *OAuth2ConsentSessionExpiresAt `json:"expires_at,omitempty"`
-	GrantAccessTokenAudience []string                       `json:"grant_access_token_audience,omitempty"`
-	GrantScope               []string                       `json:"grant_scope,omitempty"`
-	HandledAt                *time.Time                     `json:"handled_at,omitempty"`
+	ConsentRequestId         *string     `json:"consent_request_id,omitempty"`
+	Context                  interface{} `json:"context,omitempty"`
+	GrantAccessTokenAudience []string    `json:"grant_access_token_audience,omitempty"`
+	GrantScope               []string    `json:"grant_scope,omitempty"`
+	HandledAt                *time.Time  `json:"handled_at,omitempty"`
 	// Remember Consent  Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
 	Remember *bool `json:"remember,omitempty"`
 	// Remember Consent For  RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
@@ -148,38 +147,6 @@ func (o *OAuth2ConsentSession) HasContext() bool {
 // SetContext gets a reference to the given interface{} and assigns it to the Context field.
 func (o *OAuth2ConsentSession) SetContext(v interface{}) {
 	o.Context = v
-}
-
-// GetExpiresAt returns the ExpiresAt field value if set, zero value otherwise.
-func (o *OAuth2ConsentSession) GetExpiresAt() OAuth2ConsentSessionExpiresAt {
-	if o == nil || IsNil(o.ExpiresAt) {
-		var ret OAuth2ConsentSessionExpiresAt
-		return ret
-	}
-	return *o.ExpiresAt
-}
-
-// GetExpiresAtOk returns a tuple with the ExpiresAt field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *OAuth2ConsentSession) GetExpiresAtOk() (*OAuth2ConsentSessionExpiresAt, bool) {
-	if o == nil || IsNil(o.ExpiresAt) {
-		return nil, false
-	}
-	return o.ExpiresAt, true
-}
-
-// HasExpiresAt returns a boolean if a field has been set.
-func (o *OAuth2ConsentSession) HasExpiresAt() bool {
-	if o != nil && !IsNil(o.ExpiresAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetExpiresAt gets a reference to the given OAuth2ConsentSessionExpiresAt and assigns it to the ExpiresAt field.
-func (o *OAuth2ConsentSession) SetExpiresAt(v OAuth2ConsentSessionExpiresAt) {
-	o.ExpiresAt = &v
 }
 
 // GetGrantAccessTokenAudience returns the GrantAccessTokenAudience field value if set, zero value otherwise.
@@ -392,9 +359,6 @@ func (o OAuth2ConsentSession) ToMap() (map[string]interface{}, error) {
 	}
 	if o.Context != nil {
 		toSerialize["context"] = o.Context
-	}
-	if !IsNil(o.ExpiresAt) {
-		toSerialize["expires_at"] = o.ExpiresAt
 	}
 	if !IsNil(o.GrantAccessTokenAudience) {
 		toSerialize["grant_access_token_audience"] = o.GrantAccessTokenAudience

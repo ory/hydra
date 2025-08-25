@@ -40,7 +40,6 @@ docs/OAuth2ClientTokenLifespans.md
 docs/OAuth2ConsentRequest.md
 docs/OAuth2ConsentRequestOpenIDConnectContext.md
 docs/OAuth2ConsentSession.md
-docs/OAuth2ConsentSessionExpiresAt.md
 docs/OAuth2LoginRequest.md
 docs/OAuth2LogoutRequest.md
 docs/OAuth2RedirectTo.md
@@ -93,7 +92,6 @@ model_o_auth2_client_token_lifespans.go
 model_o_auth2_consent_request.go
 model_o_auth2_consent_request_open_id_connect_context.go
 model_o_auth2_consent_session.go
-model_o_auth2_consent_session_expires_at.go
 model_o_auth2_login_request.go
 model_o_auth2_logout_request.go
 model_o_auth2_redirect_to.go

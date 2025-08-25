@@ -3736,12 +3736,6 @@ components:
           requested_scope:
           - requested_scope
           - requested_scope
-        expires_at:
-          access_token: 2000-01-23T04:56:07.000+00:00
-          refresh_token: 2000-01-23T04:56:07.000+00:00
-          par_context: 2000-01-23T04:56:07.000+00:00
-          id_token: 2000-01-23T04:56:07.000+00:00
-          authorize_code: 2000-01-23T04:56:07.000+00:00
         session:
           access_token: ""
           id_token: ""
@@ -3764,8 +3758,6 @@ components:
         context:
           title: "JSONRawMessage represents a json.RawMessage that works well with\
             \ JSON, SQL, and Swagger."
-        expires_at:
-          $ref: '#/components/schemas/oAuth2ConsentSession_expires_at'
         grant_access_token_audience:
           items:
             type: string
@@ -5057,30 +5049,6 @@ components:
       properties:
         version:
           description: The version of Ory Hydra.
-          type: string
-      type: object
-    oAuth2ConsentSession_expires_at:
-      example:
-        access_token: 2000-01-23T04:56:07.000+00:00
-        refresh_token: 2000-01-23T04:56:07.000+00:00
-        par_context: 2000-01-23T04:56:07.000+00:00
-        id_token: 2000-01-23T04:56:07.000+00:00
-        authorize_code: 2000-01-23T04:56:07.000+00:00
-      properties:
-        access_token:
-          format: date-time
-          type: string
-        authorize_code:
-          format: date-time
-          type: string
-        id_token:
-          format: date-time
-          type: string
-        par_context:
-          format: date-time
-          type: string
-        refresh_token:
-          format: date-time
           type: string
       type: object
   securitySchemes:

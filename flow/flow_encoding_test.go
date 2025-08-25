@@ -4,7 +4,6 @@
 package flow_test
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -43,7 +42,7 @@ func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
 }
 
 func TestDecodeFromLoginChallenge(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
 		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
 	))
@@ -80,21 +79,7 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
-		differentNID := uuid.Must(uuid.NewV4())
-		flowWithDifferentNID := &flow.Flow{
-			ID:                uuid.Must(uuid.NewV4()).String(),
-			NID:               differentNID,
-			RequestedScope:    []string{"openid"},
-			RequestedAudience: []string{"https://api.example.org"},
-			Subject:           "test-subject",
-			Client: &client.Client{
-				ID:  uuid.Must(uuid.NewV4()).String(),
-				NID: differentNID,
-			},
-			RequestURL:  "https://example.org/oauth2/auth",
-			RequestedAt: time.Now(),
-			State:       flow.FlowStateLoginInitialized,
-		}
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateLoginInitialized)
 
 		loginChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsLoginChallenge)
 		require.NoError(t, err)
@@ -105,20 +90,8 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := &flow.Flow{
-			ID:                uuid.Must(uuid.NewV4()).String(),
-			NID:               nid,
-			RequestedScope:    []string{"openid"},
-			RequestedAudience: []string{"https://api.example.org"},
-			Subject:           "test-subject",
-			Client: &client.Client{
-				ID:  uuid.Must(uuid.NewV4()).String(),
-				NID: nid,
-			},
-			RequestURL:  "https://example.org/oauth2/auth",
-			RequestedAt: time.Now().Add(-2 * time.Hour), // 2 hours ago, beyond the 1 hour max age
-			State:       flow.FlowStateLoginInitialized,
-		}
+		expiredFlow := createTestFlow(nid, flow.FlowStateLoginInitialized)
+		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
 
 		loginChallenge, err := expiredFlow.ToLoginChallenge(ctx, reg)
 		require.NoError(t, err)
@@ -140,7 +113,7 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 }
 
 func TestDecodeFromConsentChallenge(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
 		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
 	))
@@ -177,21 +150,7 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
-		differentNID := uuid.Must(uuid.NewV4())
-		flowWithDifferentNID := &flow.Flow{
-			ID:                uuid.Must(uuid.NewV4()).String(),
-			NID:               differentNID,
-			RequestedScope:    []string{"openid"},
-			RequestedAudience: []string{"https://api.example.org"},
-			Subject:           "test-subject",
-			Client: &client.Client{
-				ID:  uuid.Must(uuid.NewV4()).String(),
-				NID: differentNID,
-			},
-			RequestURL:  "https://example.org/oauth2/auth",
-			RequestedAt: time.Now(),
-			State:       flow.FlowStateConsentInitialized,
-		}
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateConsentInitialized)
 
 		consentChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsConsentChallenge)
 		require.NoError(t, err)
@@ -202,20 +161,8 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := &flow.Flow{
-			ID:                uuid.Must(uuid.NewV4()).String(),
-			NID:               nid,
-			RequestedScope:    []string{"openid"},
-			RequestedAudience: []string{"https://api.example.org"},
-			Subject:           "test-subject",
-			Client: &client.Client{
-				ID:  uuid.Must(uuid.NewV4()).String(),
-				NID: nid,
-			},
-			RequestURL:  "https://example.org/oauth2/auth",
-			RequestedAt: time.Now().Add(-2 * time.Hour), // 2 hours ago, beyond the 1 hour max age
-			State:       flow.FlowStateConsentInitialized,
-		}
+		expiredFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
 
 		consentChallenge, err := expiredFlow.ToConsentChallenge(ctx, reg)
 		require.NoError(t, err)
@@ -237,7 +184,7 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 }
 
 func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
 		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
 	))
@@ -294,18 +241,6 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	})
 
-	t.Run("case=fails with wrong purpose (consent challenge instead of verifier)", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
-
-		consentChallenge, err := testFlow.ToConsentChallenge(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, consentChallenge)
-
-		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, consentChallenge)
-		assert.Error(t, err)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
-	})
-
 	t.Run("case=fails with different network ID", func(t *testing.T) {
 		differentNID := uuid.Must(uuid.NewV4())
 		flowWithDifferentNID := createTestFlow(differentNID, flow.FlowStateLoginUnused)
@@ -341,5 +276,101 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 
 		assert.True(t, decoded.LoginWasUsed)
 		assert.Equal(t, flow.FlowStateLoginUsed, decoded.State)
+	})
+}
+
+func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
+		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
+	))
+
+	nid := reg.Networker().NetworkID(ctx)
+
+	t.Run("case=successful decode and invalidate with valid consent verifier", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
+		testFlow.ConsentWasHandled = false
+
+		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, consentVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
+		require.NoError(t, err)
+
+		// Verify that InvalidateConsentRequest was called
+		assert.True(t, decoded.ConsentWasHandled, "ConsentWasHandled should be true after invalidation")
+		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State, "State should be FlowStateConsentUsed after invalidation")
+
+		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+	})
+
+	t.Run("case=fails when flow has already been used", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
+		testFlow.ConsentWasHandled = true
+
+		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with invalid flow state", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateLoginInitialized)
+
+		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with wrong purpose (consent challenge instead of verifier)", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
+
+		consentChallenge, err := testFlow.ToConsentChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, consentChallenge)
+
+		_, err = flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentChallenge)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=fails with different network ID", func(t *testing.T) {
+		differentNID := uuid.Must(uuid.NewV4())
+		flowWithDifferentNID := createTestFlow(differentNID, flow.FlowStateConsentUnused)
+
+		consentVerifier, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsConsentVerifier)
+		require.NoError(t, err)
+		require.NotEmpty(t, consentVerifier)
+
+		_, err = flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateConsentVerifier(ctx, reg, "invalid-verifier")
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=fails with empty verifier", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateConsentVerifier(ctx, reg, "")
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=works with FlowStateConsentError", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.FlowStateConsentError)
+
+		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, consentVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
+		require.NoError(t, err)
+		require.NotNil(t, decoded)
+
+		assert.True(t, decoded.ConsentWasHandled)
+		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State)
 	})
 }

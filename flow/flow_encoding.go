@@ -9,12 +9,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/x/sqlcon"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/sqlcon"
 )
 
 type decodeDependencies interface {
@@ -69,6 +68,26 @@ func DecodeAndInvalidateLoginVerifier(ctx context.Context, d decodeDependencies,
 	}
 
 	if err := f.InvalidateLoginRequest(); err != nil {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
+	}
+
+	return f, nil
+}
+
+func DecodeAndInvalidateConsentVerifier(ctx context.Context, d decodeDependencies, verifier string) (_ *Flow, err error) {
+	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeAndInvalidateLoginVerifier")
+	defer otelx.End(span, &err)
+
+	f, err := Decode[Flow](ctx, d.FlowCipher(), verifier, AsConsentVerifier)
+	if err != nil {
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
+	}
+
+	if f.NID != d.Networker().NetworkID(ctx) {
+		return nil, errors.WithStack(sqlcon.ErrNoRows)
+	}
+
+	if err = f.InvalidateConsentRequest(); err != nil {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
 

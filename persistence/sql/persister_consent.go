@@ -253,27 +253,15 @@ func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow
 	return &f, nil
 }
 
-func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateConsentRequest")
+func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentSession")
 	defer otelx.End(span, &err)
 
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsConsentVerifier)
-	if err != nil {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
-	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(sqlcon.ErrNoRows)
+		return errors.WithStack(sqlcon.ErrNoRows)
 	}
 
-	if err = f.InvalidateConsentRequest(); err != nil {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	}
-
-	if err = p.Connection(ctx).Create(f); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
-
-	return f, nil
+	return sqlcon.HandleError(p.Connection(ctx).Create(f))
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (_ *flow.LoginSession, err error) {

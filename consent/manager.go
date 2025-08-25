@@ -30,7 +30,7 @@ type (
 		RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 		RevokeConsentSessionByID(ctx context.Context, consentRequestID string) error
 
-		VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*flow.Flow, error)
+		CreateConsentSession(ctx context.Context, f *flow.Flow) error
 		FindGrantedAndRememberedConsentRequest(ctx context.Context, client, user string) (*flow.Flow, error)
 		FindSubjectsGrantedConsentRequests(ctx context.Context, user string, pageOpts ...keysetpagination.Option) ([]flow.Flow, *keysetpagination.Paginator, error)
 		FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) ([]flow.Flow, *keysetpagination.Paginator, error)

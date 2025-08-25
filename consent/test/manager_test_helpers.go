@@ -586,24 +586,21 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}
 					require.NoError(t, f.HandleConsentRequest(h))
 
-					consentVerifier := x.Must(f.ToConsentVerifier(ctx, deps))
-
-					got2, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
-					require.NoError(t, err)
-					compareConsentRequest(t, consentRequest, got2.GetHandledConsentRequest().ConsentRequest)
-					assert.EqualValues(t, consentRequest.ConsentRequestID, got2.ConsentRequestID)
-					assert.EqualValues(t, h.GrantedAudience, got2.GrantedAudience)
+					require.NoError(t, f.InvalidateConsentRequest())
+					require.NoError(t, m.CreateConsentSession(ctx, f))
+					compareConsentRequest(t, consentRequest, f.GetHandledConsentRequest().ConsentRequest)
+					assert.EqualValues(t, consentRequest.ConsentRequestID, f.ConsentRequestID)
+					assert.EqualValues(t, h.GrantedAudience, f.GrantedAudience)
 
 					t.Run("sub=detect double-submit for consent verifier", func(t *testing.T) {
-						_, err := m.VerifyAndInvalidateConsentRequest(ctx, consentVerifier)
-						require.Error(t, err)
+						require.Error(t, m.CreateConsentSession(ctx, f))
 					})
 
 					if tc.hasError {
-						assert.True(t, got2.ConsentError.IsError())
+						assert.True(t, f.ConsentError.IsError())
 					}
-					assert.EqualValues(t, tc.remember, got2.ConsentRemember)
-					assert.EqualValues(t, tc.rememberFor, *got2.ConsentRememberFor)
+					assert.EqualValues(t, tc.remember, f.ConsentRemember)
+					assert.EqualValues(t, tc.rememberFor, *f.ConsentRememberFor)
 				})
 			}
 
@@ -695,32 +692,33 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.NoError(t, f1.HandleConsentRequest(hcr1))
 			require.NoError(t, f2.HandleConsentRequest(hcr2))
 
-			crr1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
-			require.NoError(t, err)
-			crr2, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f2.ToConsentVerifier(ctx, deps)))
-			require.NoError(t, err)
+			require.NoError(t, f1.InvalidateConsentRequest())
+			require.NoError(t, f2.InvalidateConsentRequest())
+
+			require.NoError(t, m.CreateConsentSession(ctx, f1))
+			require.NoError(t, m.CreateConsentSession(ctx, f2))
 
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva1"),
-				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: f1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva1"),
 				"",
-				&fosite.Request{Client: cr1.Client, ID: crr1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr1.Client, ID: f1.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateAccessTokenSession(
 				ctx,
 				makeID("", network, "trva2"),
-				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: f2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(
 				ctx,
 				makeID("", network, "rrva2"),
 				"",
-				&fosite.Request{Client: cr2.Client, ID: crr2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: cr2.Client, ID: f2.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
 			))
 
 			for i, tc := range []struct {
@@ -797,10 +795,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 			require.NoError(t, f1.HandleConsentRequest(hcr1))
 			require.NoError(t, f2.HandleConsentRequest(hcr2))
-			handledConsentRequest1, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f1.ToConsentVerifier(ctx, deps)))
-			require.NoError(t, err)
-			handledConsentRequest2, err := m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f2.ToConsentVerifier(ctx, deps)))
-			require.NoError(t, err)
+
+			require.NoError(t, f1.InvalidateConsentRequest())
+			require.NoError(t, f2.InvalidateConsentRequest())
+
+			require.NoError(t, m.CreateConsentSession(ctx, f1))
+			require.NoError(t, m.CreateConsentSession(ctx, f2))
 
 			for i, tc := range []struct {
 				subject    string
@@ -811,13 +811,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				{
 					subject:    cr1.Subject,
 					sid:        makeID("fk-login-session", network, "rv1"),
-					consentIDs: []string{handledConsentRequest1.ConsentRequestID.String()},
+					consentIDs: []string{f1.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    cr2.Subject,
 					sid:        makeID("fk-login-session", network, "rv2"),
-					consentIDs: []string{handledConsentRequest2.ConsentRequestID.String()},
+					consentIDs: []string{f2.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{
@@ -855,12 +855,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			}{
 				{
 					subject:           "subjectrv1",
-					consentRequestIDs: []string{handledConsentRequest1.ConsentRequestID.String()},
+					consentRequestIDs: []string{f1.ConsentRequestID.String()},
 					clients:           []string{"fk-client-rv1"},
 				},
 				{
 					subject:           "subjectrv2",
-					consentRequestIDs: []string{handledConsentRequest2.ConsentRequestID.String()},
+					consentRequestIDs: []string{f2.ConsentRequestID.String()},
 					clients:           []string{"fk-client-rv2"},
 				},
 				{
@@ -970,8 +970,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						f.NID = deps.Contextualizer().Network(ctx, uuid.Nil)
 						cr := SaneMockConsentRequest(t, m, f, false)
 						_ = SaneMockHandleConsentRequest(t, m, f, cr, time.Time{}, 0, false, false)
-						_, err = m.VerifyAndInvalidateConsentRequest(ctx, x.Must(f.ToConsentVerifier(ctx, deps)))
-						require.NoError(t, err)
+
+						require.NoError(t, f.InvalidateConsentRequest())
+						require.NoError(t, m.CreateConsentSession(ctx, f))
 
 						sessions[k] = *ls
 					})

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ory/x/servicelocatorx"
+	"github.com/ory/x/sqlcon"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
@@ -1785,15 +1786,13 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 			f.ConsentWasHandled = false
 			f.State = flow.FlowStateConsentUnused
 
-			consentVerifier := x.Must(f.ToConsentVerifier(s.t1, r))
+			require.NoError(t, f.InvalidateConsentRequest())
 
-			_, err := r.ConsentManager().VerifyAndInvalidateConsentRequest(s.t2, consentVerifier)
-			require.Error(t, err)
-			require.Equal(t, flow.FlowStateConsentUnused, f.State)
-			require.Equal(t, false, f.ConsentWasHandled)
-			_, err = r.ConsentManager().VerifyAndInvalidateConsentRequest(s.t1, consentVerifier)
+			err := r.ConsentManager().CreateConsentSession(s.t2, f)
+			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+
+			err = r.ConsentManager().CreateConsentSession(s.t1, f)
 			require.NoError(t, err)
-			require.Equal(t, flow.FlowStateConsentUnused, f.State) // TODO: Delegate reuse detection to external service.
 		})
 	}
 }

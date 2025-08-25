@@ -1,0 +1,125 @@
+{
+  "i": "test-flow-id",
+  "rs": [
+    "scope1",
+    "scope2"
+  ],
+  "ra": [
+    "https://api.example.org/v1",
+    "https://api.example.org/v2"
+  ],
+  "s": "some-subject@some-idp-somewhere.com",
+  "oc": {
+    "acr_values": [
+      "acr1",
+      "acr2"
+    ],
+    "ui_locales": [
+      "en-US",
+      "en-GB"
+    ],
+    "display": "page",
+    "id_token_hint_claims": {
+      "claim1": "value1",
+      "claim2": "value2"
+    },
+    "login_hint": "some-login-hint"
+  },
+  "c": {
+    "client_id": "test-client-id",
+    "client_name": "some-client-name",
+    "client_secret": "some-supersafe-secret",
+    "redirect_uris": [
+      "https://redirect1.example.org/callback",
+      "https://redirect2.example.org/callback"
+    ],
+    "grant_types": [
+      "authorization_code",
+      "refresh_token"
+    ],
+    "response_types": [
+      "code"
+    ],
+    "scope": "scope1 scope2",
+    "audience": [
+      "https://api.example.org/v1 https://api.example.org/v2"
+    ],
+    "owner": "some-owner",
+    "policy_uri": "https://policy.example.org",
+    "allowed_cors_origins": [
+      "https://cors1.example.org",
+      "https://cors2.example.org"
+    ],
+    "tos_uri": "https://tos.example.org",
+    "client_uri": "https://client.example.org",
+    "logo_uri": "https://logo.example.org",
+    "contacts": [
+      "contact1",
+      "contact2"
+    ],
+    "client_secret_expires_at": 0,
+    "subject_type": "public",
+    "jwks_uri": "https://jwks.example.org",
+    "token_endpoint_auth_method": "client_secret_basic",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z",
+    "metadata": {
+      "client-metadata-key1": "val1"
+    },
+    "access_token_strategy": "jwt",
+    "skip_consent": true,
+    "skip_logout_consent": null,
+    "authorization_code_grant_access_token_lifespan": null,
+    "authorization_code_grant_id_token_lifespan": null,
+    "authorization_code_grant_refresh_token_lifespan": null,
+    "client_credentials_grant_access_token_lifespan": null,
+    "implicit_grant_access_token_lifespan": null,
+    "implicit_grant_id_token_lifespan": null,
+    "jwt_bearer_grant_access_token_lifespan": null,
+    "refresh_token_grant_id_token_lifespan": null,
+    "refresh_token_grant_access_token_lifespan": null,
+    "refresh_token_grant_refresh_token_lifespan": null,
+    "device_authorization_grant_id_token_lifespan": null,
+    "device_authorization_grant_access_token_lifespan": null,
+    "device_authorization_grant_refresh_token_lifespan": null
+  },
+  "r": "https://auth.hydra.local/oauth2/auth?client_id=some-client-id\u0026response_type=code\u0026scope=scope1+scope2\u0026redirect_uri=https%3A%2F%2Fredirect1.example.org%2Fcallback\u0026state=some-state\u0026nonce=some-nonce",
+  "si": "some-session-id",
+  "lc": "test-login-csrf",
+  "li": "2025-01-01T00:00:00Z",
+  "q": 1,
+  "lr": true,
+  "lf": 3600,
+  "ct": {
+    "context-key1": "val1"
+  },
+  "la": null,
+  "du": null,
+  "dh": null,
+  "gs": [
+    "scope1",
+    "scope2"
+  ],
+  "ga": [
+    "https://api.example.org/v1",
+    "https://api.example.org/v2"
+  ],
+  "ce": true,
+  "cf": 3600,
+  "ch": "2025-01-01T00:00:00Z",
+  "cx": null,
+  "st": {
+    "session-id-token-key1": "val1",
+    "session-id-token-key2": "val2",
+    "session-id-token-key3": "val3",
+    "session-id-token-key4": "val4",
+    "session-id-token-key5": "val5"
+  },
+  "sa": {
+    "session-access-token-key1": "val1",
+    "session-access-token-key2": "val2",
+    "session-access-token-key3": "val3",
+    "session-access-token-key4": "val4",
+    "session-access-token-key5": "val5"
+  }
+}

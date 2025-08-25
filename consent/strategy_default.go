@@ -642,17 +642,16 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyConsent")
 	defer otelx.End(span, &err)
 
-	// We decode the flow here once again because VerifyAndInvalidateConsentRequest does not return the flow
-	decodedFlow, err := flow.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flow.AsConsentVerifier)
-	if err != nil {
+	f, err := flow.DecodeAndInvalidateConsentVerifier(ctx, s.r, verifier)
+	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
-	}
-	if decodedFlow.Client.GetID() != r.URL.Query().Get("client_id") {
+	} else if err != nil {
+		return nil, err
+	} else if f.Client.GetID() != r.URL.Query().Get("client_id") {
 		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
-	verifiedFlow, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(ctx, verifier)
-	if errors.Is(err, sqlcon.ErrUniqueViolation) {
+	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
 	} else if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
@@ -660,16 +659,16 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 		return nil, err
 	}
 
-	if verifiedFlow.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
+	if f.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
 
-	if verifiedFlow.ConsentError.IsError() {
-		verifiedFlow.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
-		return nil, errors.WithStack(verifiedFlow.ConsentError.ToRFCError())
+	if f.ConsentError.IsError() {
+		f.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
+		return nil, errors.WithStack(f.ConsentError.ToRFCError())
 	}
 
-	if time.Time(verifiedFlow.LoginAuthenticatedAt).IsZero() {
+	if time.Time(f.LoginAuthenticatedAt).IsZero() {
 		return nil, errors.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
@@ -678,20 +677,20 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 		return nil, err
 	}
 
-	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), verifiedFlow.Client.CookieSuffix())
-	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, verifiedFlow.ConsentCSRF.String(), decodedFlow); err != nil {
+	clientSpecificCookieNameConsentCSRF := fmt.Sprintf("%s_%s", s.r.Config().CookieNameConsentCSRF(ctx), f.Client.CookieSuffix())
+	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, clientSpecificCookieNameConsentCSRF, f.ConsentCSRF.String(), f); err != nil {
 		return nil, err
 	}
 
-	if verifiedFlow.SessionAccessToken == nil {
-		verifiedFlow.SessionAccessToken = map[string]interface{}{}
+	if f.SessionAccessToken == nil {
+		f.SessionAccessToken = map[string]interface{}{}
 	}
 
-	if verifiedFlow.SessionIDToken == nil {
-		verifiedFlow.SessionIDToken = map[string]interface{}{}
+	if f.SessionIDToken == nil {
+		f.SessionIDToken = map[string]interface{}{}
 	}
 
-	return verifiedFlow, nil
+	return f, nil
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {

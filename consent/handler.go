@@ -5,7 +5,6 @@ package consent
 
 import (
 	"cmp"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -1129,7 +1128,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 	}
 
 	f.RequestURL = reqURL.String()
-	if err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, &p); err != nil {
+	if err := f.HandleDeviceUserAuthRequest(&p); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -1150,13 +1149,4 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"device_verifier": {verifier}, "client_id": {userCodeRequest.GetClient().GetID()}}).String(),
 	})
-}
-
-func (h *Handler) decodeFlowWithClient(ctx context.Context, challenge string, opts ...flow.CodecOption) (*flow.Flow, error) {
-	f, err := flow.Decode[flow.Flow](ctx, h.r.FlowCipher(), challenge, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
 }

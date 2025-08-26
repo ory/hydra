@@ -1246,22 +1246,22 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	q = caseInsensitiveFilterParam(q, "user_code")
 	iu.RawQuery = q.Encode()
 
-	f, err := s.r.ConsentManager().CreateDeviceUserAuthRequest(ctx,
-		&flow.DeviceUserAuthRequest{
-			ID:          challenge,
-			Verifier:    verifier,
-			CSRF:        csrf,
-			RequestURL:  iu.String(),
-			RequestedAt: time.Now().Truncate(time.Second).UTC(),
-		})
-	if err != nil {
-		return err
+	f := &flow.Flow{
+		DeviceChallengeID: sqlxx.NullString(challenge),
+		RequestURL:        iu.String(),
+		DeviceVerifier:    sqlxx.NullString(verifier),
+		DeviceCSRF:        sqlxx.NullString(csrf),
+		RequestedAt:       time.Now().Truncate(time.Second).UTC(),
+		DeviceWasUsed:     sqlxx.NullBool{Bool: false, Valid: true},
+		State:             flow.DeviceFlowStateInitialized,
+		NID:               s.r.Networker().NetworkID(ctx),
 	}
 
 	encodedFlow, err := f.ToDeviceChallenge(ctx, s.r)
 	if err != nil {
 		return err
 	}
+
 	store, err := s.r.CookieStore(ctx)
 	if err != nil {
 		return err

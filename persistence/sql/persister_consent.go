@@ -169,37 +169,6 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-// CreateDeviceUserAuthRequest creates a new flow from a DeviceUserAuthRequest.
-func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceUserAuthRequest")
-	defer otelx.End(span, &err)
-
-	nid := p.NetworkID(ctx)
-	f := flow.NewDeviceFlow(req)
-	f.NID = nid
-
-	return f, nil
-}
-
-// HandleDeviceUserAuthRequest uses a HandledDeviceUserAuthRequest to update the flow and returns a DeviceUserAuthRequest.
-func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, r *flow.HandledDeviceUserAuthRequest) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleDeviceUserAuthRequest")
-	defer otelx.End(span, &err)
-
-	if f == nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return errors.WithStack(x.ErrNotFound)
-	}
-	err = f.HandleDeviceUserAuthRequest(r)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // VerifyAndInvalidateDeviceUserAuthRequest verifies a verifier and invalidates the flow.
 func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (_ *flow.HandledDeviceUserAuthRequest, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateDeviceUserAuthRequest")

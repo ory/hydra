@@ -459,8 +459,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.Error(t, err)
 
-			f, err = m.CreateDeviceUserAuthRequest(ctx, c)
-			require.NoError(t, err)
+			f = flow.NewDeviceFlow(c)
+			f.NID = deps.Networker().NetworkID(ctx)
 
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 
@@ -469,7 +469,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			assert.False(t, got1.DeviceWasUsed.Bool)
 			compareDeviceRequestFlow(t, c, got1)
 
-			require.NoError(t, m.HandleDeviceUserAuthRequest(ctx, f, h))
+			require.NoError(t, f.HandleDeviceUserAuthRequest(h))
 			compareDeviceRequestFlow(t, c, f)
 
 			for _, key := range []string{"1", "2", "3", "4", "5", "6", "7"} {
@@ -479,8 +479,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.Error(t, err)
 
-				f, err = m.CreateDeviceUserAuthRequest(ctx, c)
-				require.NoError(t, err)
+				f = flow.NewDeviceFlow(c)
+				f.NID = deps.Networker().NetworkID(ctx)
 
 				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 				challenges = append(challenges, deviceChallenge)
@@ -490,7 +490,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				assert.False(t, got1.DeviceWasUsed.Bool)
 				compareDeviceRequestFlow(t, c, got1)
 
-				require.NoError(t, m.HandleDeviceUserAuthRequest(ctx, f, h))
+				require.NoError(t, f.HandleDeviceUserAuthRequest(h))
 				compareDeviceRequestFlow(t, c, f)
 			}
 

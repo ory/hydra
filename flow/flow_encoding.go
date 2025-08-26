@@ -54,6 +54,13 @@ func DecodeFromConsentChallenge(ctx context.Context, d decodeDependencies, chall
 	return decodeChallenge(ctx, d, challenge, consentChallenge)
 }
 
+func DecodeFromDeviceChallenge(ctx context.Context, d decodeDependencies, challenge string) (_ *Flow, err error) {
+	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeFromDeviceChallenge")
+	defer otelx.End(span, &err)
+
+	return decodeChallenge(ctx, d, challenge, deviceChallenge)
+}
+
 func DecodeAndInvalidateLoginVerifier(ctx context.Context, d decodeDependencies, verifier string) (_ *Flow, err error) {
 	ctx, span := d.Tracer(ctx).Tracer().Start(ctx, "flow.DecodeAndInvalidateLoginVerifier")
 	defer otelx.End(span, &err)

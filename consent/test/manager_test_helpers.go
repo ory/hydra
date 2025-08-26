@@ -456,7 +456,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
 			deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
-			_, err := m.GetDeviceUserAuthRequest(ctx, deviceChallenge)
+			_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.Error(t, err)
 
 			f, err = m.CreateDeviceUserAuthRequest(ctx, c)
@@ -464,20 +464,19 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 
-			got1, err := m.GetDeviceUserAuthRequest(ctx, deviceChallenge)
+			got1, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.NoError(t, err)
-			assert.False(t, got1.WasHandled)
-			compareDeviceRequest(t, c, got1)
+			assert.False(t, got1.DeviceWasUsed.Bool)
+			compareDeviceRequestFlow(t, c, got1)
 
-			got1, err = m.HandleDeviceUserAuthRequest(ctx, f, deviceChallenge, h)
-			require.NoError(t, err)
-			compareDeviceRequest(t, c, got1)
+			require.NoError(t, m.HandleDeviceUserAuthRequest(ctx, f, h))
+			compareDeviceRequestFlow(t, c, f)
 
 			for _, key := range []string{"1", "2", "3", "4", "5", "6", "7"} {
 				c, h, f := MockDeviceRequest(key, network)
 				deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
-				_, err := m.GetDeviceUserAuthRequest(ctx, deviceChallenge)
+				_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.Error(t, err)
 
 				f, err = m.CreateDeviceUserAuthRequest(ctx, c)
@@ -486,14 +485,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 				challenges = append(challenges, deviceChallenge)
 
-				got1, err := m.GetDeviceUserAuthRequest(ctx, deviceChallenge)
+				got1, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.NoError(t, err)
-				assert.False(t, got1.WasHandled)
-				compareDeviceRequest(t, c, got1)
+				assert.False(t, got1.DeviceWasUsed.Bool)
+				compareDeviceRequestFlow(t, c, got1)
 
-				got1, err = m.HandleDeviceUserAuthRequest(ctx, f, deviceChallenge, h)
-				require.NoError(t, err)
-				compareDeviceRequest(t, c, got1)
+				require.NoError(t, m.HandleDeviceUserAuthRequest(ctx, f, h))
+				compareDeviceRequestFlow(t, c, f)
 			}
 
 			DeviceVerifier := x.Must(f.ToDeviceVerifier(ctx, deps))
@@ -504,15 +502,15 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			compareDeviceRequest(t, c, got2.Request)
 
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
-			authReq, err := m.GetDeviceUserAuthRequest(ctx, deviceChallenge)
+			authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.NoError(t, err)
 			c.WasHandled = false
-			compareDeviceRequest(t, c, authReq)
+			compareDeviceRequestFlow(t, c, authReq)
 
 			for _, challenge := range challenges {
-				authReq, err := m.GetDeviceUserAuthRequest(ctx, challenge)
+				authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, challenge)
 				require.NoError(t, err)
-				assert.EqualValues(t, authReq.WasHandled, false)
+				assert.False(t, authReq.DeviceWasUsed.Bool)
 			}
 		})
 
@@ -1144,6 +1142,17 @@ func compareDeviceRequest(t *testing.T, a, b *flow.DeviceUserAuthRequest) {
 	assert.EqualValues(t, a.RequestedAudience, b.RequestedAudience)
 	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)
 	assert.EqualValues(t, a.WasHandled, b.WasHandled)
+}
+
+func compareDeviceRequestFlow(t *testing.T, a *flow.DeviceUserAuthRequest, b *flow.Flow) {
+	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
+	assert.EqualValues(t, a.CSRF, b.DeviceCSRF.String())
+	assert.EqualValues(t, a.RequestURL, b.RequestURL)
+	assert.EqualValues(t, a.Verifier, b.DeviceVerifier.String())
+	assert.EqualValues(t, a.HandledAt, b.DeviceHandledAt)
+	assert.EqualValues(t, a.RequestedAudience, b.RequestedAudience)
+	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)
+	assert.EqualValues(t, a.WasHandled, b.DeviceWasUsed.Bool)
 }
 
 func compareConsentRequest(t *testing.T, a, b *flow.OAuth2ConsentRequest) {

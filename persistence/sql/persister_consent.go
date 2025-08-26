@@ -181,42 +181,23 @@ func (p *Persister) CreateDeviceUserAuthRequest(ctx context.Context, req *flow.D
 	return f, nil
 }
 
-// GetDeviceUserAuthRequest decodes a challenge into a new DeviceUserAuthRequest.
-func (p *Persister) GetDeviceUserAuthRequest(ctx context.Context, challenge string) (_ *flow.DeviceUserAuthRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceUserAuthRequest")
-	defer otelx.End(span, &err)
-
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), challenge, flow.AsDeviceChallenge)
-	if err != nil {
-		return nil, errors.WithStack(x.ErrNotFound.WithWrap(err))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound)
-	}
-	if f.RequestedAt.Add(p.config.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The device request has expired, please try again."))
-	}
-
-	return f.GetDeviceUserAuthRequest(), nil
-}
-
 // HandleDeviceUserAuthRequest uses a HandledDeviceUserAuthRequest to update the flow and returns a DeviceUserAuthRequest.
-func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (_ *flow.DeviceUserAuthRequest, err error) {
+func (p *Persister) HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, r *flow.HandledDeviceUserAuthRequest) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.HandleDeviceUserAuthRequest")
 	defer otelx.End(span, &err)
 
 	if f == nil {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Flow was nil"))
 	}
 	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(x.ErrNotFound)
+		return errors.WithStack(x.ErrNotFound)
 	}
 	err = f.HandleDeviceUserAuthRequest(r)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return p.GetDeviceUserAuthRequest(ctx, challenge)
+	return nil
 }
 
 // VerifyAndInvalidateDeviceUserAuthRequest verifies a verifier and invalidates the flow.

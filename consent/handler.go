@@ -1082,13 +1082,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	cr, err := h.r.ConsentManager().GetDeviceUserAuthRequest(ctx, challenge)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	f, err := h.decodeFlowWithClient(ctx, challenge, flow.AsDeviceChallenge)
+	f, err := flow.DecodeFromDeviceChallenge(ctx, h.r, challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -1113,7 +1107,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 
 	p := flow.HandledDeviceUserAuthRequest{
 		ID:                  f.DeviceChallengeID.String(),
-		RequestedAt:         cr.RequestedAt,
+		RequestedAt:         f.RequestedAt,
 		HandledAt:           sqlxx.NullTime(time.Now().UTC()),
 		Client:              userCodeRequest.GetClient().(*client.Client),
 		DeviceCodeRequestID: userCodeRequest.GetID(),
@@ -1135,13 +1129,12 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 	}
 
 	f.RequestURL = reqURL.String()
-	hr, err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, challenge, &p)
-	if err != nil {
+	if err := h.r.ConsentManager().HandleDeviceUserAuthRequest(ctx, f, &p); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	ru, err := url.Parse(hr.RequestURL)
+	ru, err := url.Parse(f.RequestURL)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, fosite.ErrInvalidRequest.WithWrap(err).WithHint(`Unable to parse the request_url.`))
 		return
@@ -1154,7 +1147,6 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 	}
 
 	events.Trace(ctx, events.DeviceUserCodeAccepted, events.WithClientID(userCodeRequest.GetClient().GetID()))
-
 	h.r.Writer().Write(w, r, &flow.OAuth2RedirectTo{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"device_verifier": {verifier}, "client_id": {userCodeRequest.GetClient().GetID()}}).String(),
 	})

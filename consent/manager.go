@@ -56,8 +56,7 @@ type (
 		VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*flow.LogoutRequest, error)
 
 		CreateDeviceUserAuthRequest(ctx context.Context, req *flow.DeviceUserAuthRequest) (*flow.Flow, error)
-		GetDeviceUserAuthRequest(ctx context.Context, challenge string) (*flow.DeviceUserAuthRequest, error)
-		HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, challenge string, r *flow.HandledDeviceUserAuthRequest) (*flow.DeviceUserAuthRequest, error)
+		HandleDeviceUserAuthRequest(ctx context.Context, f *flow.Flow, r *flow.HandledDeviceUserAuthRequest) error
 		VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error)
 
 		NetworkID(ctx context.Context) uuid.UUID

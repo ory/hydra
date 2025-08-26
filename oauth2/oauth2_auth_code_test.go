@@ -1867,6 +1867,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			handler := hydraoauth2.NewHandler(reg)
 			var callbackHandler http.HandlerFunc
 
+			metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+
 			var adminTs *httptest.Server
 			{
 				n := negroni.New()
@@ -1874,10 +1876,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.NoCacheNegroni)
 				n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-				metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 				router := x.NewRouterAdmin(metrics)
 				handler.SetAdminRoutes(router)
-				n.UseHandler(router.Mux)
+				n.UseHandler(router)
 
 				adminTs = httptest.NewServer(n)
 				t.Cleanup(adminTs.Close)
@@ -1889,12 +1890,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 				n.UseFunc(httprouterx.NoCacheNegroni)
 
-				router := x.NewRouterPublic()
+				router := x.NewRouterPublic(metrics)
 				router.GET("/callback", func(w http.ResponseWriter, r *http.Request) {
 					callbackHandler(w, r)
 				})
 				handler.SetPublicRoutes(router, func(h http.Handler) http.Handler { return h })
-				n.UseHandler(router.Mux)
+				n.UseHandler(router)
 
 				publicTs = httptest.NewServer(n)
 				t.Cleanup(publicTs.Close)

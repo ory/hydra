@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/urfave/negroni"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -71,10 +73,10 @@ func TestPublicHealthHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(tc.config)))
 
-			public := x.NewRouterPublic()
+			public := x.NewRouterPublic(negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) { next(w, r) }))
 			reg.RegisterPublicRoutes(ctx, public)
 
-			ts := httptest.NewServer(public.Mux)
+			ts := httptest.NewServer(public)
 
 			tc.verifyResponse(t, doCORSRequest(t, ts.URL+healthx.AliveCheckPath))
 			tc.verifyResponse(t, doCORSRequest(t, ts.URL+healthx.ReadyCheckPath))

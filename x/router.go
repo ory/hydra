@@ -10,14 +10,14 @@ import (
 	"github.com/ory/x/serverx"
 )
 
-func NewRouterPublic() *httprouterx.RouterPublic {
-	router := httprouterx.NewRouterPublic()
-	router.Mux.HandleFunc("/", serverx.DefaultNotFoundHandler)
+func NewRouterPublic(metricsHandler negroni.Handler) *httprouterx.RouterPublic {
+	router := httprouterx.NewRouterPublic(metricsHandler)
+	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router
 }
 
 func NewRouterAdmin(metricsHandler negroni.Handler) *httprouterx.RouterAdmin {
-	router := httprouterx.NewRouterAdmin(metricsHandler)
-	router.Mux.HandleFunc("/", serverx.DefaultNotFoundHandler)
+	router := httprouterx.NewRouterAdminWithPrefix(metricsHandler)
+	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router
 }

@@ -141,7 +141,7 @@ func TestHandler(t *testing.T) {
 			router := x.NewRouterAdmin(metrics)
 			h.SetAdminRoutes(router)
 			router.Handler("GET", prometheusx.MetricsPrometheusPath, promhttp.Handler())
-			n.UseHandler(router.Mux)
+			n.UseHandler(router)
 
 			adminTs = httptest.NewServer(n)
 			t.Cleanup(adminTs.Close)
@@ -152,9 +152,9 @@ func TestHandler(t *testing.T) {
 			n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 			n.UseFunc(httprouterx.NoCacheNegroni)
 
-			router := x.NewRouterPublic()
+			router := x.NewRouterPublic(metrics)
 			h.SetPublicRoutes(router)
-			n.UseHandler(router.Mux)
+			n.UseHandler(router)
 
 			publicTs = httptest.NewServer(n)
 			t.Cleanup(publicTs.Close)

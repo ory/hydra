@@ -10,6 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/urfave/negroni"
+
 	"github.com/ory/hydra/v2/driver"
 
 	"github.com/go-jose/go-jose/v3"
@@ -28,12 +30,12 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-	router := x.NewRouterPublic()
+	router := x.NewRouterPublic(negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) { next(w, r) }))
 	h := jwk.NewHandler(reg)
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 		return h
 	})
-	testServer := httptest.NewServer(router.Mux)
+	testServer := httptest.NewServer(router)
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {

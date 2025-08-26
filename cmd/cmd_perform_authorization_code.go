@@ -30,7 +30,6 @@ import (
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/randx"
 	"github.com/ory/x/tlsx"
@@ -237,7 +236,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 			}
 			authCodeURL, state := generateAuthCodeURL()
 
-			r := httprouterx.NewRouterPublic()
+			r := http.NewServeMux()
 			var tlsc *tls.Config
 			if isSSL {
 				key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -254,23 +253,23 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			server := graceful.WithDefaults(&http.Server{
 				Addr:    fmt.Sprintf(":%d", port),
-				Handler: r.Mux, TLSConfig: tlsc,
+				Handler: r, TLSConfig: tlsc,
 				ReadHeaderTimeout: time.Second * 5,
 			})
-			var shutdown = func() {
+			shutdown := func() {
 				time.Sleep(time.Second * 1)
 				ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 				defer cancel()
 				_ = server.Shutdown(ctx)
 			}
 
-			r.GET("/", func(w http.ResponseWriter, r *http.Request) {
+			r.Handle("GET /", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
-			})
+			}))
 
-			r.GET("/perform-flow", func(w http.ResponseWriter, r *http.Request) {
+			r.Handle("GET /perform-flow", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, authCodeURL, http.StatusFound)
-			})
+			}))
 
 			rt := router{
 				cl:    client,
@@ -290,12 +289,12 @@ and success, unless if the --no-shutdown flag is provided.`,
 				noShutdown:     noShutdown,
 			}
 
-			r.GET("/login", rt.loginGET)
-			r.POST("/login", rt.loginPOST)
-			r.GET("/consent", rt.consentGET)
-			r.POST("/consent", rt.consentPOST)
-			r.GET("/callback", rt.callback)
-			r.POST("/callback", rt.callbackPOSTForm)
+			r.Handle("GET /login", http.HandlerFunc(rt.loginGET))
+			r.Handle("POST /login", http.HandlerFunc(rt.loginPOST))
+			r.Handle("GET /consent", http.HandlerFunc(rt.consentGET))
+			r.Handle("POST /consent", http.HandlerFunc(rt.consentPOST))
+			r.Handle("GET /callback", http.HandlerFunc(rt.callback))
+			r.Handle("POST /callback", http.HandlerFunc(rt.callbackPOSTForm))
 
 			if !flagx.MustGetBool(cmd, "no-open") {
 				_ = webbrowser.Open(serverLocation) // ignore errors

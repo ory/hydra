@@ -70,7 +70,7 @@ func TestClientSDK(t *testing.T) {
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	routerAdmin := x.NewRouterAdmin(metrics)
-	routerPublic := x.NewRouterPublic()
+	routerPublic := x.NewRouterPublic(metrics)
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
 	clHandler.SetAdminRoutes(routerAdmin)
@@ -78,9 +78,9 @@ func TestClientSDK(t *testing.T) {
 	o2Handler.SetPublicRoutes(routerPublic, func(h http.Handler) http.Handler { return h })
 	o2Handler.SetAdminRoutes(routerAdmin)
 
-	server := httptest.NewServer(routerAdmin.Mux)
+	server := httptest.NewServer(routerAdmin)
 	t.Cleanup(server.Close)
-	publicServer := httptest.NewServer(routerPublic.Mux)
+	publicServer := httptest.NewServer(routerPublic)
 	t.Cleanup(publicServer.Close)
 	r.Config().MustSet(ctx, config.KeyAdminURL, server.URL)
 	r.Config().MustSet(ctx, config.KeyOAuth2TokenURL, publicServer.URL+"/oauth2/token")

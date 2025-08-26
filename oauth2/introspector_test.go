@@ -49,7 +49,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	router := x.NewRouterAdmin(metrics)
 	handler := oauth2.NewHandler(reg)
 	handler.SetAdminRoutes(router)
-	server := httptest.NewServer(router.Mux)
+	server := httptest.NewServer(router)
 	defer server.Close()
 
 	now := time.Now().UTC().Round(time.Minute)

@@ -70,10 +70,10 @@ func TestRevoke(t *testing.T) {
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	handler := oauth2.NewHandler(reg)
-	router := httprouterx.NewRouterAdmin(metrics)
-	handler.SetPublicRoutes(httprouterx.RouterAdminToPublic(router), func(h http.Handler) http.Handler { return h })
+	router := httprouterx.NewRouterAdminWithPrefix(metrics)
+	handler.SetPublicRoutes(router.ToPublic(), func(h http.Handler) http.Handler { return h })
 	handler.SetAdminRoutes(router)
-	server := httptest.NewServer(router.Mux)
+	server := httptest.NewServer(router)
 	defer server.Close()
 
 	createAccessTokenSession(t, "alice", "my-client", tokens[0].sig, now.Add(time.Hour), reg.OAuth2Storage(), nil)

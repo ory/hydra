@@ -37,7 +37,7 @@ func TestGetLogoutRequest(t *testing.T) {
 	h := NewHandler(reg)
 	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r.Mux)
+	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	cl := &client.Client{
@@ -103,7 +103,7 @@ func TestGetLoginRequest(t *testing.T) {
 	h := NewHandler(reg)
 	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r.Mux)
+	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	cl := &client.Client{
@@ -169,7 +169,7 @@ func TestGetConsentRequest(t *testing.T) {
 	h := NewHandler(reg)
 	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r.Mux)
+	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	cl := &client.Client{
@@ -249,7 +249,7 @@ func TestAcceptLoginRequestDouble(t *testing.T) {
 	h := NewHandler(reg)
 	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r.Mux)
+	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	// marshal User to json
@@ -289,7 +289,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	h := NewHandler(reg)
 	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
 	h.SetRoutes(r)
-	ts := httptest.NewServer(r.Mux)
+	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)
 
 	submitCode := func(t *testing.T, reqBody any, challenge string) *http.Response {

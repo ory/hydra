@@ -29,7 +29,7 @@ func TestJWKSDK(t *testing.T) {
 	router := x.NewRouterAdmin(metrics)
 	h := NewHandler(reg)
 	h.SetAdminRoutes(router)
-	server := httptest.NewServer(router.Mux)
+	server := httptest.NewServer(router)
 	reg.Config().MustSet(ctx, config.KeyAdminURL, server.URL)
 
 	sdk := hydra.NewAPIClient(hydra.NewConfiguration())

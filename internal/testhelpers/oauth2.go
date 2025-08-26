@@ -84,7 +84,7 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 
 		router := x.NewRouterAdmin(metrics)
 		reg.RegisterAdminRoutes(router)
-		n.UseHandler(router.Mux)
+		n.UseHandler(router)
 
 		adminTS = httptest.NewServer(n)
 		t.Cleanup(adminTS.Close)
@@ -95,9 +95,9 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 		n.UseFunc(httprouterx.NoCacheNegroni)
 
-		router := x.NewRouterPublic()
+		router := x.NewRouterPublic(metrics)
 		reg.RegisterPublicRoutes(ctx, router)
-		n.UseHandler(router.Mux)
+		n.UseHandler(router)
 
 		publicTS = httptest.NewServer(n)
 		t.Cleanup(publicTS.Close)

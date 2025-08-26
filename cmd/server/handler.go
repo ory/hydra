@@ -135,7 +135,6 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
-	n.Use(prometheusManager)
 
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
@@ -158,10 +157,10 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	})
 	n.Use(metricsService)
 
-	router := httprouterx.NewRouterAdmin(prometheusManager)
+	router := httprouterx.NewRouterAdminWithPrefix(prometheusManager)
 	d.RegisterAdminRoutes(router)
 
-	n.UseHandler(router.Mux)
+	n.UseHandler(router)
 
 	return func() error {
 		return serve(ctx, d, cfg, n, "admin")
@@ -185,7 +184,6 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 	n.UseFunc(httprouterx.NoCacheNegroni)
 	n.UseFunc(semconv.Middleware)
 	n.Use(logger)
-	n.Use(prometheusManager)
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
 		if err != nil {
@@ -207,10 +205,10 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 	})
 	n.Use(metricsService)
 
-	router := x.NewRouterPublic()
+	router := x.NewRouterPublic(metricsService)
 	d.RegisterPublicRoutes(ctx, router)
 
-	n.UseHandler(router.Mux)
+	n.UseHandler(router)
 	return func() error {
 		return serve(ctx, d, cfg, n, "public")
 	}, nil

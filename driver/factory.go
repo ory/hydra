@@ -7,12 +7,9 @@ import (
 	"context"
 	"io/fs"
 
-	"go.opentelemetry.io/otel/trace"
-
-	"github.com/ory/fosite"
-
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/hsm"
@@ -40,7 +37,6 @@ type (
 		serviceLocatorOpts []servicelocatorx.Option
 		hsmContext         hsm.Context
 		kratos             kratos.Client
-		tracer             trace.Tracer
 		fop                fosite.OAuth2Provider
 	}
 	OptionsModifier func(*options)
@@ -140,12 +136,6 @@ func WithKratosClient(k kratos.Client) OptionsModifier {
 	}
 }
 
-func WithTracer(t trace.Tracer) OptionsModifier {
-	return func(o *options) {
-		o.tracer = t
-	}
-}
-
 func WithOAuth2Provider(p fosite.OAuth2Provider) OptionsModifier {
 	return func(o *options) {
 		o.fop = p
@@ -185,7 +175,6 @@ func New(ctx context.Context, opts ...OptionsModifier) (*RegistrySQL, error) {
 	r.middlewares = sl.HTTPMiddlewares()
 	r.ctxer = sl.Contextualizer()
 	r.kratos = o.kratos
-	r.trc = new(otelx.Tracer).WithOTLP(o.tracer)
 	r.fop = o.fop
 
 	for _, f := range o.registryModifiers {

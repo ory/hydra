@@ -39,6 +39,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/otelx"
 	"github.com/ory/x/pointerx"
 )
 
@@ -87,7 +88,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			"tracing.providers.otlp.server_url": "http://localhost:4318",
 			"tracing.providers.otlp.insecure":   true,
 		})),
-		driver.WithTracer(tracer),
+		driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }),
 	)
 	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
@@ -233,12 +234,12 @@ func BenchmarkAuthCode(b *testing.B) {
 		)
 
 		return func(b *testing.B) {
-			//pop.Debug = true
+			// pop.Debug = true
 			code, _ := getAuthorizeCode(ctx, b, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
 			require.NotEmpty(b, code)
 
 			_, err := conf.Exchange(ctx, code)
-			//pop.Debug = false
+			// pop.Debug = false
 			require.NoError(b, err)
 		}
 	}
@@ -292,7 +293,6 @@ func BenchmarkAuthCode(b *testing.B) {
 		b.ReportMetric((float64(dbSpans(spans)-initialDBSpans))/float64(b.N), "queries/op")
 		b.ReportMetric(float64(b.N)/b.Elapsed().Seconds(), "ops/s")
 	})
-
 }
 
 func profile(t testing.TB) (stop func()) {

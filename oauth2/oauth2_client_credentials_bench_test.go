@@ -25,6 +25,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/otelx"
 )
 
 func BenchmarkClientCredentials(b *testing.B) {
@@ -34,10 +35,12 @@ func BenchmarkClientCredentials(b *testing.B) {
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, driver.WithTracer(tracer), driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true,
+		driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }),
+		driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 
-	var newCustomClient = func(b *testing.B, c *hc.Client) (*hc.Client, clientcredentials.Config) {
+	newCustomClient := func(b *testing.B, c *hc.Client) (*hc.Client, clientcredentials.Config) {
 		unhashedSecret := c.Secret
 		require.NoError(b, reg.ClientManager().CreateClient(ctx, c))
 		return c, clientcredentials.Config{
@@ -49,7 +52,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 		}
 	}
 
-	var newClient = func(b *testing.B) (*hc.Client, clientcredentials.Config) {
+	newClient := func(b *testing.B) (*hc.Client, clientcredentials.Config) {
 		return newCustomClient(b, &hc.Client{
 			Secret:        uuid.Must(uuid.NewV4()).String(),
 			RedirectURIs:  []string{public.URL + "/callback"},
@@ -60,12 +63,12 @@ func BenchmarkClientCredentials(b *testing.B) {
 		})
 	}
 
-	var getToken = func(t *testing.B, conf clientcredentials.Config) (*goauth2.Token, error) {
+	getToken := func(t *testing.B, conf clientcredentials.Config) (*goauth2.Token, error) {
 		conf.AuthStyle = goauth2.AuthStyleInHeader
 		return conf.Token(context.Background())
 	}
 
-	var encodeOr = func(b *testing.B, val interface{}, or string) string {
+	encodeOr := func(b *testing.B, val interface{}, or string) string {
 		out, err := json.Marshal(val)
 		require.NoError(b, err)
 		if string(out) == "null" {
@@ -75,7 +78,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 		return string(out)
 	}
 
-	var inspectToken = func(b *testing.B, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
+	inspectToken := func(b *testing.B, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
 		introspection := testhelpers.IntrospectToken(b, token.AccessToken, admin)
 
 		check := func(res gjson.Result) {
@@ -109,7 +112,7 @@ func BenchmarkClientCredentials(b *testing.B) {
 		check(jwtClaims)
 	}
 
-	var getAndInspectToken = func(b *testing.B, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
+	getAndInspectToken := func(b *testing.B, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time, checkExtraClaims bool) {
 		token, err := getToken(b, conf)
 		require.NoError(b, err)
 		inspectToken(b, token, cl, conf, strategy, expectedExp, checkExtraClaims)

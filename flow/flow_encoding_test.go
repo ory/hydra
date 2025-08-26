@@ -4,6 +4,7 @@
 package flow_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/ory/x/configx"
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
@@ -279,6 +281,175 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 	})
 }
 
+func TestDecodeFromDeviceChallenge(t *testing.T) {
+	ctx := t.Context()
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
+		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
+	))
+
+	nid := reg.Networker().NetworkID(ctx)
+	testFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+
+	t.Run("case=successful decode with valid device challenge", func(t *testing.T) {
+		deviceChallenge, err := testFlow.ToDeviceChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceChallenge)
+
+		decoded, err := flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
+		require.NoError(t, err)
+		require.NotNil(t, decoded)
+
+		assert.Equal(t, testFlow.ID, decoded.ID)
+		assert.Equal(t, testFlow.NID, decoded.NID)
+		assert.Equal(t, testFlow.RequestedScope, decoded.RequestedScope)
+		assert.Equal(t, testFlow.Subject, decoded.Subject)
+
+		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+	})
+
+	t.Run("case=fails with wrong purpose (login challenge instead of device)", func(t *testing.T) {
+		loginChallenge, err := testFlow.ToLoginChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, loginChallenge)
+
+		decoded, err := flow.DecodeFromDeviceChallenge(ctx, reg, loginChallenge)
+		assert.Error(t, err)
+		assert.Nil(t, decoded)
+		assert.ErrorIs(t, err, x.ErrNotFound)
+	})
+
+	t.Run("case=fails with different network ID", func(t *testing.T) {
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.DeviceFlowStateInitialized)
+
+		deviceChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsDeviceChallenge)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceChallenge)
+
+		_, err = flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
+		assert.ErrorIs(t, err, x.ErrNotFound)
+	})
+
+	t.Run("case=fails with expired request", func(t *testing.T) {
+		expiredFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
+
+		deviceChallenge, err := expiredFlow.ToDeviceChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceChallenge)
+
+		_, err = flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
+		assert.ErrorIs(t, err, fosite.ErrRequestUnauthorized)
+	})
+
+	t.Run("case=fails with invalid challenge format", func(t *testing.T) {
+		_, err := flow.DecodeFromDeviceChallenge(ctx, reg, "invalid-challenge")
+		assert.ErrorIs(t, err, x.ErrNotFound)
+	})
+
+	t.Run("case=fails with empty challenge", func(t *testing.T) {
+		_, err := flow.DecodeFromDeviceChallenge(ctx, reg, "")
+		assert.ErrorIs(t, err, x.ErrNotFound)
+	})
+}
+
+func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
+	ctx := context.Background()
+	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
+		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
+	))
+
+	nid := reg.Networker().NetworkID(ctx)
+
+	t.Run("case=successful decode and invalidate with valid device verifier", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
+		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
+
+		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
+		require.NoError(t, err)
+		require.NotNil(t, decoded)
+
+		assert.True(t, decoded.DeviceWasUsed.Bool, "DeviceWasUsed should be true after invalidation")
+		assert.Equal(t, flow.DeviceFlowStateUsed, decoded.State, "State should be DeviceFlowStateUsed after invalidation")
+
+		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+	})
+
+	t.Run("case=fails when flow has already been used", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
+		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: true, Valid: true}
+
+		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with invalid flow state", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+
+		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
+		require.NoError(t, err)
+
+		_, err = flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
+		assert.ErrorIs(t, err, fosite.ErrInvalidRequest)
+	})
+
+	t.Run("case=fails with wrong purpose (device challenge instead of verifier)", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
+
+		deviceChallenge, err := testFlow.ToDeviceChallenge(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceChallenge)
+
+		_, err = flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceChallenge)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=fails with different network ID", func(t *testing.T) {
+		differentNID := uuid.Must(uuid.NewV4())
+		flowWithDifferentNID := createTestFlow(differentNID, flow.DeviceFlowStateUnused)
+		flowWithDifferentNID.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
+
+		deviceVerifier, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsDeviceVerifier)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceVerifier)
+
+		_, err = flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+	})
+
+	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, "invalid-verifier")
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=fails with empty verifier", func(t *testing.T) {
+		_, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, "")
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
+	})
+
+	t.Run("case=works with DeviceFlowStateError", func(t *testing.T) {
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateError)
+		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
+
+		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
+		require.NoError(t, err)
+		require.NotEmpty(t, deviceVerifier)
+
+		decoded, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
+		require.NoError(t, err)
+		require.NotNil(t, decoded)
+
+		assert.True(t, decoded.DeviceWasUsed.Bool)
+		assert.Equal(t, flow.DeviceFlowStateUsed, decoded.State)
+	})
+}
+
 func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
@@ -372,87 +543,5 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 
 		assert.True(t, decoded.ConsentWasHandled)
 		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State)
-	})
-}
-
-func TestDecodeFromDeviceChallenge(t *testing.T) {
-	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(
-		configx.WithValue(config.KeyConsentRequestMaxAge, time.Hour),
-	))
-
-	nid := reg.Networker().NetworkID(ctx)
-	testFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
-
-	t.Run("case=successful decode with valid device challenge", func(t *testing.T) {
-		deviceChallenge, err := testFlow.ToDeviceChallenge(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, deviceChallenge)
-
-		decoded, err := flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
-		require.NoError(t, err)
-		require.NotNil(t, decoded)
-
-		assert.Equal(t, testFlow.ID, decoded.ID)
-		assert.Equal(t, testFlow.NID, decoded.NID)
-		assert.Equal(t, testFlow.RequestedScope, decoded.RequestedScope)
-		assert.Equal(t, testFlow.Subject, decoded.Subject)
-
-		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
-	})
-
-	t.Run("case=fails with wrong purpose (login challenge instead of device)", func(t *testing.T) {
-		loginChallenge, err := testFlow.ToLoginChallenge(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, loginChallenge)
-
-		decoded, err := flow.DecodeFromDeviceChallenge(ctx, reg, loginChallenge)
-		assert.Error(t, err)
-		assert.Nil(t, decoded)
-		assert.ErrorIs(t, err, x.ErrNotFound)
-	})
-
-	t.Run("case=fails with wrong purpose (consent challenge instead of device)", func(t *testing.T) {
-		consentChallenge, err := testFlow.ToConsentChallenge(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, consentChallenge)
-
-		decoded, err := flow.DecodeFromDeviceChallenge(ctx, reg, consentChallenge)
-		assert.Error(t, err)
-		assert.Nil(t, decoded)
-		assert.ErrorIs(t, err, x.ErrNotFound)
-	})
-
-	t.Run("case=fails with different network ID", func(t *testing.T) {
-		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.DeviceFlowStateInitialized)
-
-		deviceChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsDeviceChallenge)
-		require.NoError(t, err)
-		require.NotEmpty(t, deviceChallenge)
-
-		_, err = flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
-		assert.ErrorIs(t, err, x.ErrNotFound)
-	})
-
-	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
-		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
-
-		deviceChallenge, err := expiredFlow.ToDeviceChallenge(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, deviceChallenge)
-
-		_, err = flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
-		assert.ErrorIs(t, err, fosite.ErrRequestUnauthorized)
-	})
-
-	t.Run("case=fails with invalid challenge format", func(t *testing.T) {
-		_, err := flow.DecodeFromDeviceChallenge(ctx, reg, "invalid-challenge")
-		assert.ErrorIs(t, err, x.ErrNotFound)
-	})
-
-	t.Run("case=fails with empty challenge", func(t *testing.T) {
-		_, err := flow.DecodeFromDeviceChallenge(ctx, reg, "")
-		assert.ErrorIs(t, err, x.ErrNotFound)
 	})
 }

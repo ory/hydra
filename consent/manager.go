@@ -55,8 +55,6 @@ type (
 		RejectLogoutRequest(ctx context.Context, challenge string) error
 		VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*flow.LogoutRequest, error)
 
-		VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (*flow.HandledDeviceUserAuthRequest, error)
-
 		NetworkID(ctx context.Context) uuid.UUID
 	}
 

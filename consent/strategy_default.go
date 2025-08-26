@@ -1292,22 +1292,16 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("").Start(ctx, "DefaultStrategy.verifyDevice")
 	defer otelx.End(span, &err)
 
-	// We decode the flow from the cookie again because VerifyAndInvalidateDeviceRequest does not return the flow
-	f, err := flow.Decode[flow.Flow](ctx, s.r.FlowCipher(), verifier, flow.AsDeviceVerifier)
-	if err != nil {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier is invalid."))
-	}
-
-	session, err := s.r.ConsentManager().VerifyAndInvalidateDeviceUserAuthRequest(ctx, verifier)
+	f, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, s.r, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
 	}
 
-	if session.HasError() {
-		session.Error.SetDefaults(flow.DeviceRequestDeniedErrorName)
-		return nil, errors.WithStack(session.Error.ToRFCError())
+	if f.DeviceError.IsError() {
+		f.DeviceError.SetDefaults(flow.DeviceRequestDeniedErrorName)
+		return nil, errors.WithStack(f.DeviceError.ToRFCError())
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -1316,7 +1310,7 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 	}
 
 	cookieNameDeviceCSRF := s.r.Config().CookieNameDeviceCSRF(ctx)
-	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, cookieNameDeviceCSRF, session.Request.CSRF, f); err != nil {
+	if err := ValidateCSRFSession(ctx, r, s.r.Config(), store, cookieNameDeviceCSRF, f.DeviceCSRF.String(), f); err != nil {
 		return nil, err
 	}
 

@@ -169,26 +169,6 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-// VerifyAndInvalidateDeviceUserAuthRequest verifies a verifier and invalidates the flow.
-func (p *Persister) VerifyAndInvalidateDeviceUserAuthRequest(ctx context.Context, verifier string) (_ *flow.HandledDeviceUserAuthRequest, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.VerifyAndInvalidateDeviceUserAuthRequest")
-	defer otelx.End(span, &err)
-
-	f, err := flow.Decode[flow.Flow](ctx, p.r.FlowCipher(), verifier, flow.AsDeviceVerifier)
-	if err != nil {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
-	}
-	if f.NID != p.NetworkID(ctx) {
-		return nil, errors.WithStack(sqlcon.ErrNoRows)
-	}
-
-	if err = f.InvalidateDeviceRequest(); err != nil {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
-	}
-
-	return f.GetHandledDeviceUserAuthRequest(), nil
-}
-
 func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlow")
 	defer otelx.End(span, &err)

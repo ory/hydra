@@ -494,12 +494,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				compareDeviceRequestFlow(t, c, f)
 			}
 
-			DeviceVerifier := x.Must(f.ToDeviceVerifier(ctx, deps))
+			deviceVerifier := x.Must(f.ToDeviceVerifier(ctx, deps))
 
-			got2, err := m.VerifyAndInvalidateDeviceUserAuthRequest(ctx, DeviceVerifier)
+			got2, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, deps, deviceVerifier)
 			require.NoError(t, err)
 			c.WasHandled = true
-			compareDeviceRequest(t, c, got2.Request)
+			compareDeviceRequestFlow(t, c, got2)
 
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 			authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)

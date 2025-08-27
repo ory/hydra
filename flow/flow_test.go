@@ -191,29 +191,6 @@ func TestFlow_GetLoginRequest(t *testing.T) {
 	})
 }
 
-func TestFlow_GetHandledLoginRequest(t *testing.T) {
-	t.Run("GetHandledLoginRequest should set all fields on its return value", func(t *testing.T) {
-		f := Flow{}
-		expected := HandledLoginRequest{}
-		assert.NoError(t, faker.FakeData(&expected))
-		f.setHandledLoginRequest(&expected)
-		actual := f.GetHandledLoginRequest()
-		assert.NotNil(t, actual.LoginRequest)
-		expected.LoginRequest = nil
-		actual.LoginRequest = nil
-		assert.Equal(t, expected, actual)
-	})
-}
-
-func TestFlow_NewFlow(t *testing.T) {
-	t.Run("NewFlow and GetLoginRequest should use all LoginRequest fields", func(t *testing.T) {
-		expected := &LoginRequest{}
-		assert.NoError(t, faker.FakeData(expected))
-		actual := NewFlow(expected).GetLoginRequest()
-		assert.Equal(t, expected, actual)
-	})
-}
-
 func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 	t.Run(
 		"UpdateFlowWithHandledLoginRequest should ignore RequestedAt in its argument and copy the other fields",
@@ -231,22 +208,32 @@ func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 
 			assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&r))
 
-			actual := f.GetHandledLoginRequest()
-			assert.NotEqual(t, r.RequestedAt, actual.RequestedAt)
-			r.LoginRequest = f.GetLoginRequest()
-			actual.RequestedAt = r.RequestedAt
-			assert.Equal(t, r, actual)
+			assert.Equal(t, r.ID, f.ID)
+			assert.Equal(t, r.Subject, f.Subject)
+			assert.Equal(t, r.ForceSubjectIdentifier, f.ForceSubjectIdentifier)
+			assert.NotEqual(t, r.RequestedAt, f.RequestedAt)
+			assert.Equal(t, r.Remember, f.LoginRemember)
+			assert.Equal(t, r.RememberFor, f.LoginRememberFor)
+			assert.Equal(t, r.ExtendSessionLifespan, f.LoginExtendSessionLifespan)
+			assert.Equal(t, r.ACR, f.ACR)
+			assert.Equal(t, r.AMR, f.AMR)
+			assert.Equal(t, r.WasHandled, f.LoginWasUsed)
+			assert.Equal(t, r.Error, f.LoginError)
+			assert.Equal(t, r.AuthenticatedAt, f.LoginAuthenticatedAt)
+			assert.Equal(t, r.IdentityProviderSessionID, f.IdentityProviderSessionID.String())
+			assert.Equal(t, r.Context, f.Context)
 		},
 	)
 }
 
 func TestFlow_InvalidateLoginRequest(t *testing.T) {
 	t.Run("InvalidateLoginRequest should transition the flow into FlowStateLoginUsed", func(t *testing.T) {
-		f := NewFlow(&LoginRequest{
-			ID:         "t3-id",
-			Subject:    "t3-sub",
-			WasHandled: false,
-		})
+		f := Flow{
+			ID:           "t3-id",
+			Subject:      "t3-sub",
+			LoginWasUsed: false,
+			State:        FlowStateLoginInitialized,
+		}
 		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
@@ -257,11 +244,12 @@ func TestFlow_InvalidateLoginRequest(t *testing.T) {
 		assert.Equal(t, true, f.LoginWasUsed)
 	})
 	t.Run("InvalidateLoginRequest should fail when flow.LoginWasUsed is true", func(t *testing.T) {
-		f := NewFlow(&LoginRequest{
-			ID:         "t3-id",
-			Subject:    "t3-sub",
-			WasHandled: false,
-		})
+		f := Flow{
+			ID:           "t3-id",
+			Subject:      "t3-sub",
+			LoginWasUsed: false,
+			State:        FlowStateLoginInitialized,
+		}
 		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
@@ -329,33 +317,14 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 
 	require.NoError(t, fGood.HandleConsentRequest(&expected))
 
-	actual := f.GetHandledConsentRequest()
-	require.NotNil(t, actual.ConsentRequest)
-	expected.ConsentRequest = nil
-	actual.ConsentRequest = nil
-	require.Equal(t, &expected, actual)
-}
-
-func TestFlow_GetHandledConsentRequest(t *testing.T) {
-	t.Run("GetHandledConsentRequest should set all fields on its return value", func(t *testing.T) {
-		f := Flow{}
-		expected := AcceptOAuth2ConsentRequest{}
-
-		assert.NoError(t, faker.FakeData(&expected))
-		expected.ConsentRequest = nil
-		expected.Session = &AcceptOAuth2ConsentRequestSession{
-			IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
-			AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
-		}
-		expected.SessionIDToken = expected.Session.IDToken
-		expected.SessionAccessToken = expected.Session.AccessToken
-
-		f.setHandledConsentRequest(expected)
-		actual := f.GetHandledConsentRequest()
-
-		assert.NotNil(t, actual.ConsentRequest)
-		actual.ConsentRequest = nil
-
-		assert.Equal(t, expected, *actual)
-	})
+	assert.Equal(t, expected.ConsentRequestID, fGood.ConsentRequestID.String())
+	assert.Equal(t, expected.GrantedScope, fGood.GrantedScope)
+	assert.Equal(t, expected.GrantedAudience, fGood.GrantedAudience)
+	assert.Equal(t, expected.HandledAt, fGood.ConsentHandledAt)
+	assert.Equal(t, expected.WasHandled, fGood.ConsentWasHandled)
+	assert.Equal(t, expected.Error, fGood.ConsentError)
+	assert.Equal(t, expected.RequestedAt, fGood.RequestedAt)
+	assert.Equal(t, expected.AuthenticatedAt, fGood.LoginAuthenticatedAt)
+	assert.Equal(t, expected.SessionIDToken, fGood.SessionIDToken)
+	assert.Equal(t, expected.SessionAccessToken, fGood.SessionAccessToken)
 }

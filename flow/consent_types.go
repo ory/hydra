@@ -802,14 +802,6 @@ type AcceptOAuth2ConsentRequestSession struct {
 	IDToken map[string]interface{} `json:"id_token"`
 }
 
-// NewConsentRequestSessionData creates a new AcceptOAuth2ConsentRequestSession.
-func NewConsentRequestSessionData() *AcceptOAuth2ConsentRequestSession {
-	return &AcceptOAuth2ConsentRequestSession{
-		AccessToken: map[string]interface{}{},
-		IDToken:     map[string]interface{}{},
-	}
-}
-
 func (r *AcceptOAuth2ConsentRequestSession) MarshalJSON() ([]byte, error) {
 	type Alias AcceptOAuth2ConsentRequestSession
 	alias := Alias(*r)

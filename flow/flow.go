@@ -373,28 +373,6 @@ func (f *Flow) InvalidateDeviceRequest() error {
 	return nil
 }
 
-func NewFlow(r *LoginRequest) *Flow {
-	return &Flow{
-		ID:                     r.ID,
-		RequestedScope:         r.RequestedScope,
-		RequestedAudience:      r.RequestedAudience,
-		LoginSkip:              r.Skip,
-		Subject:                r.Subject,
-		OpenIDConnectContext:   r.OpenIDConnectContext,
-		Client:                 r.Client,
-		ClientID:               r.ClientID,
-		RequestURL:             r.RequestURL,
-		SessionID:              r.SessionID,
-		LoginWasUsed:           r.WasHandled,
-		ForceSubjectIdentifier: r.ForceSubjectIdentifier,
-		LoginVerifier:          r.Verifier,
-		LoginCSRF:              r.CSRF,
-		LoginAuthenticatedAt:   r.AuthenticatedAt,
-		RequestedAt:            r.RequestedAt,
-		State:                  FlowStateLoginInitialized,
-	}
-}
-
 func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	if f.LoginWasUsed {
 		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
@@ -440,26 +418,6 @@ func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	f.LoginWasUsed = h.WasHandled
 	f.LoginAuthenticatedAt = h.AuthenticatedAt
 	return nil
-}
-
-func (f *Flow) GetHandledLoginRequest() HandledLoginRequest {
-	return HandledLoginRequest{
-		ID:                        f.ID,
-		Remember:                  f.LoginRemember,
-		RememberFor:               f.LoginRememberFor,
-		ExtendSessionLifespan:     f.LoginExtendSessionLifespan,
-		ACR:                       f.ACR,
-		AMR:                       f.AMR,
-		Subject:                   f.Subject,
-		IdentityProviderSessionID: f.IdentityProviderSessionID.String(),
-		ForceSubjectIdentifier:    f.ForceSubjectIdentifier,
-		Context:                   f.Context,
-		WasHandled:                f.LoginWasUsed,
-		Error:                     f.LoginError,
-		LoginRequest:              f.GetLoginRequest(),
-		RequestedAt:               f.RequestedAt,
-		AuthenticatedAt:           f.LoginAuthenticatedAt,
-	}
 }
 
 func (f *Flow) GetLoginRequest() *LoginRequest {
@@ -582,30 +540,6 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		cs.AMR = []string{}
 	}
 	return &cs
-}
-
-func (f *Flow) GetHandledConsentRequest() *AcceptOAuth2ConsentRequest {
-	crf := 0
-	if f.ConsentRememberFor != nil {
-		crf = *f.ConsentRememberFor
-	}
-	return &AcceptOAuth2ConsentRequest{
-		ConsentRequestID:   f.ConsentRequestID.String(),
-		GrantedScope:       f.GrantedScope,
-		GrantedAudience:    f.GrantedAudience,
-		Session:            &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
-		Remember:           f.ConsentRemember,
-		RememberFor:        crf,
-		HandledAt:          f.ConsentHandledAt,
-		WasHandled:         f.ConsentWasHandled,
-		Context:            f.Context,
-		ConsentRequest:     f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
-		Error:              f.ConsentError,
-		RequestedAt:        f.RequestedAt,
-		AuthenticatedAt:    f.LoginAuthenticatedAt,
-		SessionIDToken:     f.SessionIDToken,
-		SessionAccessToken: f.SessionAccessToken,
-	}
 }
 
 func (Flow) TableName() string {

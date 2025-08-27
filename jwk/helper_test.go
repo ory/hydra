@@ -112,6 +112,79 @@ func TestHandlerFindPublicKey(t *testing.T) {
 	})
 }
 
+func TestHandlerFindPublicKeyWithUse(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Test_Helper/Run_FindPublicKeyWithUse_Selects_Sig_Key", func(t *testing.T) {
+		t.Parallel()
+		// Create multiple keys with different uses
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+		encKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key", "enc")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				encKey.Keys[0].Public(), // Put enc key first
+				sigKey.Keys[0].Public(), // Put sig key second
+			},
+		}
+
+		// Should find the sig key, not the first key
+		key, err := jwk.FindPublicKeyWithUse(keySet, "sig")
+		require.NoError(t, err)
+		assert.Equal(t, "sig-key", key.KeyID)
+		assert.Equal(t, "sig", key.Use)
+	})
+
+	t.Run("Test_Helper/Run_FindPublicKeyWithUse_Selects_Enc_Key", func(t *testing.T) {
+		t.Parallel()
+		// Create multiple keys with different uses
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+		encKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key", "enc")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				sigKey.Keys[0].Public(), // Put sig key first
+				encKey.Keys[0].Public(), // Put enc key second
+			},
+		}
+
+		// Should find the enc key, not the first key
+		key, err := jwk.FindPublicKeyWithUse(keySet, "enc")
+		require.NoError(t, err)
+		assert.Equal(t, "enc-key", key.KeyID)
+		assert.Equal(t, "enc", key.Use)
+	})
+
+	t.Run("Test_Helper/Run_FindPublicKeyWithUse_KeyNotFound", func(t *testing.T) {
+		t.Parallel()
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				sigKey.Keys[0].Public(),
+			},
+		}
+
+		// Should not find a key with use "enc"
+		_, err = jwk.FindPublicKeyWithUse(keySet, "enc")
+		require.Error(t, err)
+		assert.True(t, strings.Contains(err.Error(), "key not found"))
+	})
+
+	t.Run("Test_Helper/Run_FindPublicKeyWithUse_EmptyKeySet", func(t *testing.T) {
+		t.Parallel()
+		keySet := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+		_, err := jwk.FindPublicKeyWithUse(keySet, "sig")
+		require.Error(t, err)
+		assert.True(t, strings.Contains(err.Error(), "key not found"))
+	})
+}
+
 func TestHandlerFindPrivateKey(t *testing.T) {
 	t.Parallel()
 	t.Run("Test_Helper/Run_FindPrivateKey_With_RSA", func(t *testing.T) {
@@ -143,6 +216,79 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 	t.Run("Test_Helper/Run_FindPrivateKey_With_KeyNotFound", func(t *testing.T) {
 		keySet := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 		_, err := jwk.FindPublicKey(keySet)
+		require.Error(t, err)
+		assert.True(t, strings.Contains(err.Error(), "key not found"))
+	})
+}
+
+func TestHandlerFindPrivateKeyWithUse(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Test_Helper/Run_FindPrivateKeyWithUse_Selects_Sig_Key", func(t *testing.T) {
+		t.Parallel()
+		// Create multiple keys with different uses
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+		encKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key", "enc")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				encKey.Keys[0], // Put enc key first
+				sigKey.Keys[0], // Put sig key second
+			},
+		}
+
+		// Should find the sig key, not the first key
+		key, err := jwk.FindPrivateKeyWithUse(keySet, "sig")
+		require.NoError(t, err)
+		assert.Equal(t, "sig-key", key.KeyID)
+		assert.Equal(t, "sig", key.Use)
+	})
+
+	t.Run("Test_Helper/Run_FindPrivateKeyWithUse_Selects_Enc_Key", func(t *testing.T) {
+		t.Parallel()
+		// Create multiple keys with different uses
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+		encKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key", "enc")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				sigKey.Keys[0], // Put sig key first
+				encKey.Keys[0], // Put enc key second
+			},
+		}
+
+		// Should find the enc key, not the first key
+		key, err := jwk.FindPrivateKeyWithUse(keySet, "enc")
+		require.NoError(t, err)
+		assert.Equal(t, "enc-key", key.KeyID)
+		assert.Equal(t, "enc", key.Use)
+	})
+
+	t.Run("Test_Helper/Run_FindPrivateKeyWithUse_KeyNotFound", func(t *testing.T) {
+		t.Parallel()
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				sigKey.Keys[0],
+			},
+		}
+
+		// Should not find a key with use "enc"
+		_, err = jwk.FindPrivateKeyWithUse(keySet, "enc")
+		require.Error(t, err)
+		assert.True(t, strings.Contains(err.Error(), "key not found"))
+	})
+
+	t.Run("Test_Helper/Run_FindPrivateKeyWithUse_EmptyKeySet", func(t *testing.T) {
+		t.Parallel()
+		keySet := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+		_, err := jwk.FindPrivateKeyWithUse(keySet, "sig")
 		require.Error(t, err)
 		assert.True(t, strings.Contains(err.Error(), "key not found"))
 	})
@@ -284,4 +430,62 @@ func TestOnlyPublicSDKKeys(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Empty(t, result[0].P)
+}
+
+func TestKeySelectionWithUse(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Test_Helper/Direct_Test_Key_Selection_With_Use", func(t *testing.T) {
+		t.Parallel()
+		// Create multiple keys with different uses
+		sigKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "sig-key", "sig")
+		require.NoError(t, err)
+		encKey, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key", "enc")
+		require.NoError(t, err)
+
+		// Create a keyset with enc key first and sig key second
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				encKey.Keys[0], // Put enc key first
+				sigKey.Keys[0], // Put sig key second
+			},
+		}
+
+		// Test that FindPrivateKeyWithUse selects the correct key, not just the first one
+		selectedKey, err := jwk.FindPrivateKeyWithUse(keySet, "sig")
+		require.NoError(t, err)
+		assert.Equal(t, "sig-key", selectedKey.KeyID)
+		assert.Equal(t, "sig", selectedKey.Use)
+
+		// Verify the old function would have selected the wrong key (first key)
+		firstKey, err := jwk.FindPrivateKey(keySet)
+		require.NoError(t, err)
+		assert.Equal(t, "enc-key", firstKey.KeyID) // This would be the wrong key for signing!
+		assert.Equal(t, "enc", firstKey.Use)
+
+		// Demonstrate the improvement: new function picks the right key for signing
+		assert.NotEqual(t, firstKey.KeyID, selectedKey.KeyID, "New function should select different key than the first one")
+		assert.Equal(t, "sig", selectedKey.Use, "Selected key should have 'sig' use for signing operations")
+	})
+
+	t.Run("Test_Helper/Fallback_Behavior_When_No_Sig_Key_Found", func(t *testing.T) {
+		t.Parallel()
+		// Create keyset with only enc keys
+		encKey1, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key-1", "enc")
+		require.NoError(t, err)
+		encKey2, err := jwk.GenerateJWK(context.Background(), jose.RS256, "enc-key-2", "enc")
+		require.NoError(t, err)
+
+		keySet := &jose.JSONWebKeySet{
+			Keys: []jose.JSONWebKey{
+				encKey1.Keys[0],
+				encKey2.Keys[0],
+			},
+		}
+
+		// Should not find a key with "sig" use
+		_, err = jwk.FindPrivateKeyWithUse(keySet, "sig")
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "key not found")
+	})
 }

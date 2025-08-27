@@ -118,7 +118,7 @@ func RunServeAll(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args [
 
 var prometheusManager = prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 
-func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *metricsx.Service) (func() error, error) {
+func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServeAdmin(contextx.RootContext)
 
 	n := negroni.New()
@@ -155,7 +155,7 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 		}
 		cors.New(cfg).ServeHTTP(w, r, next)
 	})
-	n.Use(metricsService)
+	n.Use(sqaMetrics)
 
 	router := httprouterx.NewRouterAdminWithPrefix(prometheusManager)
 	d.RegisterAdminRoutes(router)
@@ -167,7 +167,7 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, metricsService *met
 	}, nil
 }
 
-func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *metricsx.Service) (func() error, error) {
+func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServePublic(contextx.RootContext)
 
 	n := negroni.New()
@@ -203,9 +203,9 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, metricsService *me
 		}
 		cors.New(cfg).ServeHTTP(w, r, next)
 	})
-	n.Use(metricsService)
+	n.Use(sqaMetrics)
 
-	router := x.NewRouterPublic(metricsService)
+	router := x.NewRouterPublic(prometheusManager)
 	d.RegisterPublicRoutes(ctx, router)
 
 	n.UseHandler(router)

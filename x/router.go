@@ -4,19 +4,18 @@
 package x
 
 import (
-	"github.com/urfave/negroni"
-
 	"github.com/ory/x/httprouterx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/serverx"
 )
 
-func NewRouterPublic(metricsHandler negroni.Handler) *httprouterx.RouterPublic {
+func NewRouterPublic(metricsHandler *prometheusx.MetricsManager) *httprouterx.RouterPublic {
 	router := httprouterx.NewRouterPublic(metricsHandler)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router
 }
 
-func NewRouterAdmin(metricsHandler negroni.Handler) *httprouterx.RouterAdmin {
+func NewRouterAdmin(metricsHandler *prometheusx.MetricsManager) *httprouterx.RouterAdmin {
 	router := httprouterx.NewRouterAdminWithPrefix(metricsHandler)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router

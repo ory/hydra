@@ -9,8 +9,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/urfave/negroni"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -19,6 +17,7 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/prometheusx"
 )
 
 func TestPublicHealthHandler(t *testing.T) {
@@ -73,7 +72,7 @@ func TestPublicHealthHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(tc.config)))
 
-			public := x.NewRouterPublic(negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) { next(w, r) }))
+			public := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
 			reg.RegisterPublicRoutes(ctx, public)
 
 			ts := httptest.NewServer(public)

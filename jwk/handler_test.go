@@ -10,19 +10,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/urfave/negroni"
-
-	"github.com/ory/hydra/v2/driver"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/urlx"
 )
 
@@ -30,7 +28,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-	router := x.NewRouterPublic(negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) { next(w, r) }))
+	router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
 	h := jwk.NewHandler(reg)
 	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
 		return h

@@ -36,8 +36,10 @@ import (
 	"github.com/ory/analytics-go/v5"
 )
 
-var instance *Service
-var lock sync.Mutex
+var (
+	instance *Service
+	lock     sync.Mutex
+)
 
 // Service helps with providing context on metrics.
 type Service struct {
@@ -66,6 +68,7 @@ type Options struct {
 	// DeploymentId represents the cluster id, typically a hash of some unique configuration properties.
 	DeploymentId string
 
+	// DBDialect specifies the database dialect in use (e.g., "postgres", "mysql", "sqlite").
 	DBDialect string
 
 	// When this instance was started
@@ -89,6 +92,9 @@ type Options struct {
 	// BuildTime represents the build time.
 	BuildTime string
 
+	// Hostname is a public URL configured for the service, used to derive hosted name for telemetry.
+	Hostname string
+
 	// Config overrides the analytics.Config. If nil, sensible defaults will be used.
 	Config *analytics.Config
 
@@ -96,8 +102,7 @@ type Options struct {
 	MemoryInterval time.Duration
 }
 
-type void struct {
-}
+type void struct{}
 
 func (v *void) Logf(format string, args ...interface{}) {
 }
@@ -277,6 +282,7 @@ func (sw *Service) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.
 
 	latency := time.Since(start).Milliseconds()
 	path := sw.anonymizePath(r.URL.Path)
+	host := sw.determineURLHost(r.Header.Get("X-Forwarded-Host"), r.Host)
 
 	// Collecting request info
 	stat, _ := httpx.GetResponseMeta(rw)
@@ -286,7 +292,7 @@ func (sw *Service) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.
 		DeploymentId: sw.o.DeploymentId,
 		Project:      sw.o.Service,
 
-		UrlHost:        cmp.Or(r.Header.Get("X-Forwarded-Host"), r.Host),
+		UrlHost:        host,
 		UrlPath:        path,
 		RequestCode:    stat,
 		RequestLatency: int(latency),
@@ -362,4 +368,8 @@ func (sw *Service) anonymizeQuery(query url.Values, salt string) string {
 		}
 	}
 	return query.Encode()
+}
+
+func (sw *Service) determineURLHost(xForwardedHostHeader, hostHeader string) string {
+	return cmp.Or(sw.o.Hostname, xForwardedHostHeader, hostHeader)
 }

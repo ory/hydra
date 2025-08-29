@@ -215,6 +215,12 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 }
 
 func sqa(ctx context.Context, d *driver.RegistrySQL, cmd *cobra.Command) *metricsx.Service {
+	// Safely retrieve public issuer url from config
+	var issuerURL string
+	if u := d.Config().IssuerURL(ctx); u != nil {
+		issuerURL = u.Host
+	}
+
 	return metricsx.New(
 		cmd,
 		d.Logger(),
@@ -280,6 +286,7 @@ func sqa(ctx context.Context, d *driver.RegistrySQL, cmd *cobra.Command) *metric
 				BatchSize:            1000,
 				Interval:             time.Hour * 6,
 			},
+			Hostname: issuerURL,
 		},
 	)
 }

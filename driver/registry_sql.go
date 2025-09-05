@@ -17,7 +17,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/luna-duclos/instrumentedsql"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
@@ -52,7 +51,6 @@ import (
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
-	otelsql "github.com/ory/x/otelx/sql"
 	"github.com/ory/x/popx"
 	prometheus "github.com/ory/x/prometheusx"
 	"github.com/ory/x/resilience"
@@ -119,15 +117,6 @@ func (m *RegistrySQL) Init(
 	goMigrations []popx.Migration,
 ) error {
 	if m.persister == nil {
-		var opts []instrumentedsql.Opt
-		if m.Tracer(ctx).IsLoaded() {
-			opts = []instrumentedsql.Opt{
-				instrumentedsql.WithTracer(otelsql.NewTracer()),
-				instrumentedsql.WithOmitArgs(), // don't risk leaking PII or secrets
-				instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
-			}
-		}
-
 		if m.Config().CGroupsV1AutoMaxProcsEnabled() {
 			_, err := maxprocs.Set(maxprocs.Logger(m.Logger().Infof))
 			if err != nil {
@@ -141,14 +130,13 @@ func (m *RegistrySQL) Init(
 		)
 		c, err := pop.NewConnection(
 			&pop.ConnectionDetails{
-				URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
-				IdlePool:                  idlePool,
-				ConnMaxLifetime:           connMaxLifetime,
-				ConnMaxIdleTime:           connMaxIdleTime,
-				Pool:                      pool,
-				UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
-				InstrumentedDriverOptions: opts,
-				Unsafe:                    m.Config().DbIgnoreUnknownTableColumns(),
+				URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
+				IdlePool:        idlePool,
+				ConnMaxLifetime: connMaxLifetime,
+				ConnMaxIdleTime: connMaxIdleTime,
+				Pool:            pool,
+				TracerProvider:  m.Tracer(ctx).Provider(),
+				Unsafe:          m.Config().DbIgnoreUnknownTableColumns(),
 			},
 		)
 		if err != nil {

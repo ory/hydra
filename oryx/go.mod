@@ -1,6 +1,6 @@
 module github.com/ory/x
 
-go 1.24.6
+go 1.25
 
 require (
 	code.dny.dev/ssrf v0.2.0

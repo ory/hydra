@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
       additional_contexts:
-
+        oryx: ../../x
 
   hydra:
     build:
@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
       additional_contexts:
-
+        oryx: ../../x
     environment:
       ISSUER_URL: https://hydra:4444/
     command: serve -c /etc/config/hydra/hydra.yml all

@@ -21,7 +21,7 @@ services:
       context: .
       dockerfile: .docker/Dockerfile-local-build
       additional_contexts:
-
+        oryx: ../../x
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
@@ -47,7 +47,7 @@ services:
       context: .
       dockerfile: .docker/Dockerfile-local-build
       additional_contexts:
-
+        oryx: ../../x
     environment:
       - DSN=sqlite:///mnt/sqlite/db.sqlite?_fk=true&mode=rwc
     command: migrate -c /etc/config/hydra/hydra.yml sql up -e --yes

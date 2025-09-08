@@ -416,8 +416,8 @@ github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e h1:4tUrC7x4YWR
 github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e/go.mod h1:XWLxVK4un/iuIcrw+6lCeanbF3NZwO5k6RdLeu/loQk=
 github.com/ory/kratos-client-go v1.3.8 h1:S4D5dAURq5C6LbOUU+DgE4ZXxp37IlJG2GngemdF9h0=
 github.com/ory/kratos-client-go v1.3.8/go.mod h1:Dc+ANapsPxu+CfdC0yk8TxmvceCmrvNozW+ZGS/xq5o=
-github.com/ory/pop/v6 v6.3.1-0.20250905152254-368678361c90 h1:3kbr30+TAIIUcVuDAWXGjOD6A3sdmAWybFXPZbgFbyU=
-github.com/ory/pop/v6 v6.3.1-0.20250905152254-368678361c90/go.mod h1:j5NjBkkTA6G03QEAPo2BK9zy9Q69uvdZUuHmDs2A+qA=
+github.com/ory/pop/v6 v6.3.1-0.20250908115552-9923c701fead h1:xEgpKLfFUKq4uR3YEO5qA5WMI7AjrEZZCpFQ4PojYOg=
+github.com/ory/pop/v6 v6.3.1-0.20250908115552-9923c701fead/go.mod h1:PEqjxMcIV87rBhlyDDha76I7/w2W/FHenSq3V3X1A/A=
 github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
 github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.9.5 h1:4yBQzkHv+7BHq2PQUZF3Mx0IYxG7LsP222s7Agd3ve8=

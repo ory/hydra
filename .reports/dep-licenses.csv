@@ -3,4 +3,5 @@
 "github.com/ory/x","Apache-2.0"
 "github.com/stretchr/testify","MIT"
 "go.opentelemetry.io/otel/sdk","Apache-2.0"
+"go.opentelemetry.io/otel/sdk","BSD-3-Clause"
 

@@ -11,15 +11,14 @@ import (
 )
 
 //go:embed 404.html
-var page404HTML []byte
+var page404HTML string
 
 //go:embed 404.json
-var page404JSON []byte
+var page404JSON string
 
 // DefaultNotFoundHandler is a default handler for handling 404 errors.
 var DefaultNotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	var contentType string
-	var body []byte
+	var contentType, body string
 	switch httputil.NegotiateContentType(r, []string{
 		"text/html",
 		"text/plain",
@@ -27,18 +26,18 @@ var DefaultNotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *htt
 	}, "text/html") {
 	case "text/plain":
 		contentType = "text/plain"
-		body = []byte(`Error 404 - The requested route does not exist. Make sure you are using the right path, domain, and port.`) // #nosec
+		body = "Error 404 - The requested route does not exist. Make sure you are using the right path, domain, and port."
 	case "application/json":
 		contentType = "application/json"
-		body = page404JSON // #nosec
-	case "text/html":
-		fallthrough
+		body = page404JSON
 	default:
+		fallthrough
+	case "text/html":
 		contentType = "text/html"
 		body = page404HTML
 	}
 
 	w.Header().Set("Content-Type", contentType+"; charset=utf-8")
 	w.WriteHeader(http.StatusNotFound)
-	_, _ = w.Write(body) // #nosec
+	_, _ = w.Write([]byte(body))
 })

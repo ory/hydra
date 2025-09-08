@@ -6,16 +6,12 @@ services:
       # When running with `run.sh` the cwd is the project's root.
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
-      additional_contexts:
-        oryx: ../../x
 
   hydra:
     build:
       # When running with `run.sh` the cwd is the project's root.
       context: .
       dockerfile: ./test/conformance/hydra/Dockerfile
-      additional_contexts:
-        oryx: ../../x
     environment:
       ISSUER_URL: https://hydra:4444/
     command: serve -c /etc/config/hydra/hydra.yml all

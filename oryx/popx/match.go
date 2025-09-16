@@ -10,7 +10,7 @@ import (
 	"github.com/ory/pop/v6"
 )
 
-var mrx = regexp.MustCompile(
+var MigrationFileRegexp = regexp.MustCompile(
 	`^(\d+)_([^.]+)(\.[a-z0-9]+)?(\.autocommit)?\.(up|down)\.(sql)$`,
 )
 
@@ -26,7 +26,7 @@ type match struct {
 
 // parseMigrationFilename parses a migration filename.
 func parseMigrationFilename(filename string) (*match, error) {
-	matches := mrx.FindAllStringSubmatch(filename, -1)
+	matches := MigrationFileRegexp.FindAllStringSubmatch(filename, -1)
 	if len(matches) == 0 {
 		return nil, nil
 	}

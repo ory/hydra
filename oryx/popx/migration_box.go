@@ -231,8 +231,7 @@ func (mb *MigrationBox) findMigrations(
 		}
 
 		if details == nil {
-			mb.l.Tracef("This is usually ok - ignoring migration file %s because it does not match the file pattern.", info.Name())
-			return nil
+			return errors.WithStack(fmt.Errorf("Found a migration file that does not match the file pattern: filename=%s pattern=%s", info.Name(), MigrationFileRegexp))
 		}
 
 		content, err := fs.ReadFile(dir, p)

@@ -7,22 +7,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 
+	"github.com/go-jose/go-jose/v3"
+	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/herodot"
-
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
-
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/urlx"
-
-	"github.com/ory/x/stringslice"
-
-	"github.com/ory/hydra/v2/x"
-
-	jose "github.com/go-jose/go-jose/v3"
 )
 
 const (
@@ -96,22 +90,24 @@ func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
 //	  default: errorOAuth2
 func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	eg, ctx := errgroup.WithContext(r.Context())
-	wellKnownKeys := stringslice.Unique(h.r.Config().WellKnownKeys(ctx))
-	keys := make(chan *jose.JSONWebKeySet, len(wellKnownKeys))
-	for _, set := range wellKnownKeys {
-		set := set
+	wellKnownKeys := h.r.Config().WellKnownKeys(ctx)
+
+	keys := make([]*jose.JSONWebKeySet, len(wellKnownKeys))
+	nTotalKeys := atomic.Int64{}
+	for i, set := range wellKnownKeys {
 		eg.Go(func() error {
 			k, err := h.r.KeyManager().GetKeySet(ctx, set)
 			if errors.Is(err, x.ErrNotFound) {
 				h.r.Logger().Warnf("JSON Web Key Set %q does not exist yet, generating new key pair...", set)
-				k, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.RS256), "sig")
+				k, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, "", string(jose.RS256), "sig")
 				if err != nil {
 					return err
 				}
 			} else if err != nil {
 				return err
 			}
-			keys <- ExcludePrivateKeys(k)
+			keys[i] = ExcludePrivateKeys(k)
+			nTotalKeys.Add(int64(len(keys[i].Keys)))
 			return nil
 		})
 	}
@@ -119,9 +115,9 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	close(keys)
-	var jwks jose.JSONWebKeySet
-	for k := range keys {
+
+	jwks := jose.JSONWebKeySet{Keys: make([]jose.JSONWebKey, 0, nTotalKeys.Load())}
+	for _, k := range keys {
 		jwks.Keys = append(jwks.Keys, k.Keys...)
 	}
 
@@ -131,9 +127,7 @@ func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 // Get JSON Web Key Request
 //
 // swagger:parameters getJsonWebKey
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getJsonWebKey struct {
+type _ struct {
 	// JSON Web Key Set ID
 	//
 	// in: path
@@ -181,9 +175,7 @@ func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request) {
 // Get JSON Web Key Set Parameters
 //
 // swagger:parameters getJsonWebKeySet
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getJsonWebKeySet struct {
+type _ struct {
 	// JSON Web Key Set ID
 	//
 	// in: path
@@ -226,9 +218,7 @@ func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 // Create JSON Web Key Set Request
 //
 // swagger:parameters createJsonWebKeySet
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type adminCreateJsonWebKeySet struct {
+type _ struct {
 	// The JSON Web Key Set ID
 	//
 	// in: path
@@ -307,9 +297,7 @@ func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 // Set JSON Web Key Set Request
 //
 // swagger:parameters setJsonWebKeySet
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type setJsonWebKeySet struct {
+type _ struct {
 	// The JSON Web Key Set ID
 	//
 	// in: path
@@ -359,9 +347,7 @@ func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 // Set JSON Web Key Request
 //
 // swagger:parameters setJsonWebKey
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type setJsonWebKey struct {
+type _ struct {
 	// The JSON Web Key Set ID
 	//
 	// in: path
@@ -417,9 +403,7 @@ func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request) 
 // Delete JSON Web Key Set Parameters
 //
 // swagger:parameters deleteJsonWebKeySet
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type deleteJsonWebKeySet struct {
+type _ struct {
 	// The JSON Web Key Set
 	// in: path
 	// required: true
@@ -459,9 +443,7 @@ func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Reques
 // Delete JSON Web Key Parameters
 //
 // swagger:parameters deleteJsonWebKey
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type deleteJsonWebKey struct {
+type _ struct {
 	// The JSON Web Key Set
 	// in: path
 	// required: true
@@ -497,8 +479,7 @@ type deleteJsonWebKey struct {
 //	  204: emptyResponse
 //	  default: errorOAuth2
 func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request) {
-	var setName = r.PathValue("set")
-	var keyName = r.PathValue("key")
+	setName, keyName := r.PathValue("set"), r.PathValue("key")
 
 	if err := h.r.KeyManager().DeleteKey(r.Context(), setName, keyName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -510,4 +491,4 @@ func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request) {
 
 // This function will not be called, OPTIONS request will be handled by cors
 // this is just a placeholder.
-func (h *Handler) handleOptions(w http.ResponseWriter, r *http.Request) {}
+func (h *Handler) handleOptions(http.ResponseWriter, *http.Request) {}

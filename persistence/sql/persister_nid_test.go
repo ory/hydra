@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/pointerx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/sqlcon"
 
@@ -101,19 +102,19 @@ func (s *PersisterTestSuite) TestAddKeyGetKeyDeleteKey() {
 	for k, r := range s.registries {
 		s.T().Run("dialect="+k, func(t *testing.T) {
 			ks := "key-set"
-			require.NoError(t, r.Persister().AddKey(s.t1, ks, &key))
-			actual, err := r.Persister().GetKey(s.t2, ks, key.KeyID)
+			require.NoError(t, r.KeyManager().AddKey(s.t1, ks, &key))
+			actual, err := r.KeyManager().GetKey(s.t2, ks, key.KeyID)
 			require.Error(t, err)
 			require.Equal(t, (*jose.JSONWebKeySet)(nil), actual)
-			actual, err = r.Persister().GetKey(s.t1, ks, key.KeyID)
+			actual, err = r.KeyManager().GetKey(s.t1, ks, key.KeyID)
 			require.NoError(t, err)
 			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{key}}, actual)
 
-			require.NoError(t, r.Persister().DeleteKey(s.t2, ks, key.KeyID))
-			_, err = r.Persister().GetKey(s.t1, ks, key.KeyID)
+			require.NoError(t, r.KeyManager().DeleteKey(s.t2, ks, key.KeyID))
+			_, err = r.KeyManager().GetKey(s.t1, ks, key.KeyID)
 			require.NoError(t, err)
-			require.NoError(t, r.Persister().DeleteKey(s.t1, ks, key.KeyID))
-			_, err = r.Persister().GetKey(s.t1, ks, key.KeyID)
+			require.NoError(t, r.KeyManager().DeleteKey(s.t1, ks, key.KeyID))
+			_, err = r.KeyManager().GetKey(s.t1, ks, key.KeyID)
 			require.Error(t, err)
 		})
 	}
@@ -124,19 +125,19 @@ func (s *PersisterTestSuite) TestAddKeySetGetKeySetDeleteKeySet() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			ksID := "key-set"
-			require.NoError(t, r.Persister().AddKeySet(s.t1, ksID, ks))
-			actual, err := r.Persister().GetKeySet(s.t2, ksID)
+			require.NoError(t, r.KeyManager().AddKeySet(s.t1, ksID, ks))
+			actual, err := r.KeyManager().GetKeySet(s.t2, ksID)
 			require.Error(t, err)
 			require.Equal(t, (*jose.JSONWebKeySet)(nil), actual)
-			actual, err = r.Persister().GetKeySet(s.t1, ksID)
+			actual, err = r.KeyManager().GetKeySet(s.t1, ksID)
 			require.NoError(t, err)
 			requireKeySetEqual(t, ks, actual)
 
-			require.NoError(t, r.Persister().DeleteKeySet(s.t2, ksID))
-			_, err = r.Persister().GetKeySet(s.t1, ksID)
+			require.NoError(t, r.KeyManager().DeleteKeySet(s.t2, ksID))
+			_, err = r.KeyManager().GetKeySet(s.t1, ksID)
 			require.NoError(t, err)
-			require.NoError(t, r.Persister().DeleteKeySet(s.t1, ksID))
-			_, err = r.Persister().GetKeySet(s.t1, ksID)
+			require.NoError(t, r.KeyManager().DeleteKeySet(s.t1, ksID))
+			_, err = r.KeyManager().GetKeySet(s.t1, ksID)
 			require.Error(t, err)
 		})
 	}
@@ -252,7 +253,6 @@ func (s *PersisterTestSuite) TestCountGrants() {
 			keySet := uuid.Must(uuid.NewV4()).String()
 			publicKey := newKey(keySet, "use")
 			grant := newGrant(keySet, publicKey.KeyID)
-			require.NoError(t, r.Persister().AddKey(s.t1, keySet, &publicKey))
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, publicKey))
 
 			count, err = r.Persister().CountGrants(s.t1)
@@ -373,8 +373,7 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
 			require.Equal(t, s.t1NID, actual.NID)
@@ -556,8 +555,7 @@ func (s *PersisterTestSuite) TestDeleteGrant() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual := persistencesql.SQLGrant{}
 			require.Error(t, r.Persister().DeleteGrant(s.t2, grant.ID))
@@ -765,15 +763,15 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
-			require.True(t, ok)
-
 			actual := &jwk.SQLData{}
 
-			ks, err := store.GenerateAndPersistKeySet(s.t1, "ks", "kid", "RS256", "use")
+			key, err := jwk.GenerateJWK(s.t1, "RS256", "kid", "use")
 			require.NoError(t, err)
-			require.Error(t, r.Persister().Connection(context.Background()).Where("sid = ? AND kid = ? AND nid = ?", "ks", ks.Keys[0].KeyID, s.t2NID).First(actual))
-			require.NoError(t, r.Persister().Connection(context.Background()).Where("sid = ? AND kid = ? AND nid = ?", "ks", ks.Keys[0].KeyID, s.t1NID).First(actual))
+			require.NoError(t, r.KeyManager().AddKey(s.t1, "ks", pointerx.Ptr(key.Keys[0].Public())))
+
+			err = sqlcon.HandleError(r.Persister().Connection(t.Context()).Where("sid = ? AND kid = ? AND nid = ?", "ks", "kid", s.t2NID).First(actual))
+			require.ErrorIs(t, err, sqlcon.ErrNoRows)
+			require.NoError(t, r.Persister().Connection(t.Context()).Where("sid = ? AND kid = ? AND nid = ?", "ks", "kid", s.t1NID).First(actual))
 		})
 	}
 }
@@ -787,8 +785,7 @@ func (s *PersisterTestSuite) TestFlushInactiveGrants() {
 				ExpiresAt: time.Now().Add(-24 * time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().FlushInactiveGrants(s.t2, time.Now(), 100, 100))
@@ -961,8 +958,7 @@ func (s *PersisterTestSuite) TestGetConcreteGrant() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual, err := r.Persister().GetConcreteGrant(s.t2, grant.ID)
 			require.Error(t, err)
@@ -1025,8 +1021,7 @@ func (s *PersisterTestSuite) TestGetGrants() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual, nextPage, err := r.Persister().GetGrants(s.t2, "")
 			require.NoError(t, err)
@@ -1119,8 +1114,7 @@ func (s *PersisterTestSuite) TestGetPublicKey() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual, err := r.Persister().GetPublicKey(s.t2, grant.Issuer, grant.Subject, grant.PublicKey.KeyID)
 			require.Error(t, err)
@@ -1143,8 +1137,7 @@ func (s *PersisterTestSuite) TestGetPublicKeyScopes() {
 				ExpiresAt: time.Now().Add(time.Hour),
 				PublicKey: trust.PublicKey{Set: "ks-id", KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, "ks-id", ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual, err := r.Persister().GetPublicKeyScopes(s.t2, grant.Issuer, grant.Subject, grant.PublicKey.KeyID)
 			require.Error(t, err)
@@ -1168,8 +1161,7 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 				Issuer:    issuer,
 				PublicKey: trust.PublicKey{Set: issuer, KeyID: ks.Keys[0].KeyID},
 			}
-			require.NoError(t, r.Persister().AddKeySet(s.t1, issuer, ks))
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0]))
+			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 
 			actual, err := r.Persister().GetPublicKeys(s.t2, grant.Issuer, grant.Subject)
 			require.NoError(t, err)
@@ -1697,19 +1689,19 @@ func (s *PersisterTestSuite) TestUpdateKey() {
 		s.T().Run("dialect="+k, func(t *testing.T) {
 			k1 := newKey("test-ks", "test")
 			ks := "key-set"
-			require.NoError(t, r.Persister().AddKey(s.t1, ks, &k1))
-			actual, err := r.Persister().GetKey(s.t1, ks, k1.KeyID)
+			require.NoError(t, r.KeyManager().AddKey(s.t1, ks, &k1))
+			actual, err := r.KeyManager().GetKey(s.t1, ks, k1.KeyID)
 			require.NoError(t, err)
 			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
 
 			k2 := newKey("test-ks", "test")
-			require.NoError(t, r.Persister().UpdateKey(s.t2, ks, &k2))
-			actual, err = r.Persister().GetKey(s.t1, ks, k1.KeyID)
+			require.NoError(t, r.KeyManager().UpdateKey(s.t2, ks, &k2))
+			actual, err = r.KeyManager().GetKey(s.t1, ks, k1.KeyID)
 			require.NoError(t, err)
 			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
 
-			require.NoError(t, r.Persister().UpdateKey(s.t1, ks, &k2))
-			actual, err = r.Persister().GetKey(s.t1, ks, k2.KeyID)
+			require.NoError(t, r.KeyManager().UpdateKey(s.t1, ks, &k2))
+			actual, err = r.KeyManager().GetKey(s.t1, ks, k2.KeyID)
 			require.NoError(t, err)
 			require.NotEqual(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
 		})
@@ -1721,19 +1713,19 @@ func (s *PersisterTestSuite) TestUpdateKeySet() {
 		s.T().Run("dialect="+k, func(t *testing.T) {
 			ks := "key-set"
 			ks1 := newKeySet(ks, "test")
-			require.NoError(t, r.Persister().AddKeySet(s.t1, ks, ks1))
-			actual, err := r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, r.KeyManager().AddKeySet(s.t1, ks, ks1))
+			actual, err := r.KeyManager().GetKeySet(s.t1, ks)
 			require.NoError(t, err)
 			requireKeySetEqual(t, ks1, actual)
 
 			ks2 := newKeySet(ks, "test")
-			require.NoError(t, r.Persister().UpdateKeySet(s.t2, ks, ks2))
-			actual, err = r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, r.KeyManager().UpdateKeySet(s.t2, ks, ks2))
+			actual, err = r.KeyManager().GetKeySet(s.t1, ks)
 			require.NoError(t, err)
 			requireKeySetEqual(t, ks1, actual)
 
-			require.NoError(t, r.Persister().UpdateKeySet(s.t1, ks, ks2))
-			actual, err = r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, r.KeyManager().UpdateKeySet(s.t1, ks, ks2))
+			actual, err = r.KeyManager().GetKeySet(s.t1, ks)
 			require.NoError(t, err)
 			requireKeySetEqual(t, ks2, actual)
 		})
@@ -1855,15 +1847,14 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			store, ok := r.Persister().(*persistencesql.Persister)
+			store1, ok := r.Persister().(*persistencesql.Persister)
 			require.True(t, ok)
-			original := store.NetworkID(context.Background())
+			original := store1.NetworkID(context.Background())
 			expected := uuid.Must(uuid.NewV4())
-			store, ok = store.WithFallbackNetworkID(expected).(*persistencesql.Persister)
-			require.True(t, ok)
+			store2 := store1.WithFallbackNetworkID(expected)
 
 			assert.NotEqual(t, original, expected)
-			assert.Equal(t, expected, store.NetworkID(context.Background()))
+			assert.Equal(t, expected, store2.NetworkID(context.Background()))
 		})
 	}
 }

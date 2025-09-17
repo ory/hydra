@@ -25,8 +25,6 @@ import (
 )
 
 type registry interface {
-	dbal.Driver
-
 	x.HTTPClientProvider
 
 	contextx.Provider

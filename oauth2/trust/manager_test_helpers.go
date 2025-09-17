@@ -4,7 +4,6 @@
 package trust
 
 import (
-	"context"
 	"sort"
 	"testing"
 	"time"
@@ -14,15 +13,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/x/josex"
+	"github.com/ory/x/sqlcon"
+
+	"github.com/ory/hydra/v2/jwk"
 )
 
 func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {
-	tokenServicePubKey1 := jose.JSONWebKey{}
-	tokenServicePubKey2 := jose.JSONWebKey{}
-	mikePubKey := jose.JSONWebKey{}
-
 	return func(t *testing.T) {
 		if parallel {
 			t.Parallel()
@@ -31,24 +28,24 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		kid3 := uuid.Must(uuid.NewV4()).String()
 		set := uuid.Must(uuid.NewV4()).String()
 
-		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
+		key1, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid1, "sig")
 		require.NoError(t, err)
-		tokenServicePubKey1 = josex.ToPublicKey(&keySet.Keys[0])
+		tokenServicePubKey1 := josex.ToPublicKey(&key1.Keys[0])
 
-		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
+		key2, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid2, "sig")
 		require.NoError(t, err)
-		tokenServicePubKey2 = josex.ToPublicKey(&keySet.Keys[0])
+		tokenServicePubKey2 := josex.ToPublicKey(&key2.Keys[0])
 
-		keySet, err = km.GenerateAndPersistKeySet(context.Background(), "https://mike.example.com", kid3, string(jose.RS256), "sig")
+		key3, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid3, "sig")
 		require.NoError(t, err)
-		mikePubKey = josex.ToPublicKey(&keySet.Keys[0])
+		mikePubKey := josex.ToPublicKey(&key3.Keys[0])
 
-		storedGrants, nextPage, err := t1.GetGrants(context.TODO(), "")
+		storedGrants, nextPage, err := t1.GetGrants(t.Context(), "")
 		require.NoError(t, err)
 		assert.Len(t, storedGrants, 0)
 		assert.True(t, nextPage.IsLast())
 
-		count, err := t1.CountGrants(context.TODO())
+		count, err := t1.CountGrants(t.Context())
 		require.NoError(t, err)
 		assert.Equal(t, 0, count)
 
@@ -67,10 +64,9 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 			ExpiresAt: expiresAt,
 		}
 
-		err = t1.CreateGrant(context.TODO(), grant, tokenServicePubKey1)
-		require.NoError(t, err)
+		require.NoError(t, t1.CreateGrant(t.Context(), grant, tokenServicePubKey1))
 
-		storedGrant, err := t1.GetConcreteGrant(context.TODO(), grant.ID)
+		storedGrant, err := t1.GetConcreteGrant(t.Context(), grant.ID)
 		require.NoError(t, err)
 		assert.Equal(t, grant.ID, storedGrant.ID)
 		assert.Equal(t, grant.Issuer, storedGrant.Issuer)
@@ -92,8 +88,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 			CreatedAt: createdAt.Add(time.Minute * 5),
 			ExpiresAt: createdAt.Add(-time.Minute * 5),
 		}
-		err = t1.CreateGrant(context.TODO(), grant2, tokenServicePubKey2)
-		require.NoError(t, err)
+		require.NoError(t, t1.CreateGrant(t.Context(), grant2, tokenServicePubKey2))
 
 		grant3 := Grant{
 			ID:      uuid.Must(uuid.NewV4()),
@@ -108,14 +103,13 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 			ExpiresAt: createdAt.Add(-time.Hour * 24),
 		}
 
-		err = t1.CreateGrant(context.TODO(), grant3, mikePubKey)
-		require.NoError(t, err)
+		require.NoError(t, t1.CreateGrant(t.Context(), grant3, mikePubKey))
 
-		count, err = t1.CountGrants(context.TODO())
+		count, err = t1.CountGrants(t.Context())
 		require.NoError(t, err)
 		assert.Equal(t, 3, count)
 
-		storedGrants, nextPage, err = t1.GetGrants(context.TODO(), "")
+		storedGrants, nextPage, err = t1.GetGrants(t.Context(), "")
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -126,7 +120,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Equal(t, grant3.ID, storedGrants[2].ID)
 		assert.True(t, nextPage.IsLast())
 
-		storedGrants, nextPage, err = t1.GetGrants(context.TODO(), set)
+		storedGrants, nextPage, err = t1.GetGrants(t.Context(), set)
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -136,44 +130,40 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 		assert.True(t, nextPage.IsLast())
 
-		err = t1.DeleteGrant(context.TODO(), grant.ID)
-		require.NoError(t, err)
+		require.NoError(t, t1.DeleteGrant(t.Context(), grant.ID))
 
-		_, err = t1.GetConcreteGrant(context.TODO(), grant.ID)
+		_, err = t1.GetConcreteGrant(t.Context(), grant.ID)
 		require.Error(t, err)
 
-		count, err = t1.CountGrants(context.TODO())
+		count, err = t1.CountGrants(t.Context())
 		require.NoError(t, err)
 		assert.Equal(t, 2, count)
 
-		err = t1.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt, 1000, 100)
-		require.NoError(t, err)
+		require.NoError(t, t1.FlushInactiveGrants(t.Context(), grant2.ExpiresAt, 1000, 100))
 
-		count, err = t1.CountGrants(context.TODO())
+		count, err = t1.CountGrants(t.Context())
 		require.NoError(t, err)
 		assert.Equal(t, 1, count)
 
-		_, err = t1.GetConcreteGrant(context.TODO(), grant2.ID)
+		_, err = t1.GetConcreteGrant(t.Context(), grant2.ID)
 		assert.NoError(t, err)
 	}
 }
 
-func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {
-	pubKey1 := jose.JSONWebKey{}
-	pubKey2 := jose.JSONWebKey{}
-
+func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		set := uuid.Must(uuid.NewV4()).String()
 		kid1, kid2 := uuid.Must(uuid.NewV4()).String(), uuid.Must(uuid.NewV4()).String()
 
 		t.Parallel()
-		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
-		require.NoError(t, err)
-		pubKey1 = josex.ToPublicKey(&keySet.Keys[0])
 
-		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
+		key1, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid1, "sig")
 		require.NoError(t, err)
-		pubKey2 = josex.ToPublicKey(&keySet.Keys[0])
+		pubKey1 := josex.ToPublicKey(&key1.Keys[0])
+
+		key2, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid2, "sig")
+		require.NoError(t, err)
+		pubKey2 := josex.ToPublicKey(&key2.Keys[0])
 
 		createdAt := time.Now()
 		expiresAt := createdAt.AddDate(1, 0, 0)
@@ -190,26 +180,24 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 			ExpiresAt: expiresAt,
 		}
 
-		err = m.CreateGrant(context.TODO(), grant, pubKey1)
-		require.NoError(t, err)
+		require.NoError(t, m.CreateGrant(t.Context(), grant, pubKey1))
 
 		grant.ID = uuid.Must(uuid.NewV4())
-		err = m.CreateGrant(context.TODO(), grant, pubKey1)
-		require.Error(t, err, "error expected, because combination of issuer + subject + key_id must be unique")
+		err = m.CreateGrant(t.Context(), grant, pubKey1)
+		require.ErrorIs(t, err, sqlcon.ErrUniqueViolation, "error expected, because combination of issuer + subject + key_id must be unique")
 
 		grant2 := grant
 		grant2.PublicKey = PublicKey{
 			Set:   set,
 			KeyID: kid2,
 		}
-		err = m.CreateGrant(context.TODO(), grant2, pubKey2)
-		require.NoError(t, err)
+		require.NoError(t, m.CreateGrant(t.Context(), grant2, pubKey2))
 
 		nonExistingGrantID := uuid.Must(uuid.NewV4())
-		err = m.DeleteGrant(context.TODO(), nonExistingGrantID)
+		err = m.DeleteGrant(t.Context(), nonExistingGrantID)
 		require.Error(t, err, "expect error, when deleting non-existing grant")
 
-		_, err = m.GetConcreteGrant(context.TODO(), nonExistingGrantID)
+		_, err = m.GetConcreteGrant(t.Context(), nonExistingGrantID)
 		require.Error(t, err, "expect error, when fetching non-existing grant")
 	}
 }

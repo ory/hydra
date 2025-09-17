@@ -44,8 +44,8 @@ func TestAuthCodeFlowE2E(t *testing.T) {
 		config.KeyIssuerURL:            "https://hydra.ory",
 	})))
 
-	require.NoError(t, jwk.EnsureAsymmetricKeypairExists(t.Context(), reg, string(jose.ES256), x.OpenIDConnectKeyName))
-	require.NoError(t, jwk.EnsureAsymmetricKeypairExists(t.Context(), reg, string(jose.ES256), x.OAuth2JWTKeyName))
+	jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OpenIDConnectKeyName)
+	jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OAuth2JWTKeyName)
 
 	publicTS, adminTS := testhelpers.NewConfigurableOAuth2Server(t.Context(), t, reg)
 	publicClient := hydra.NewAPIClient(hydra.NewConfiguration())

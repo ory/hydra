@@ -103,7 +103,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		return nil, errors.WithStack(err)
 	}
 
-	if p.config.EncryptSessionData(ctx) {
+	if p.r.Config().EncryptSessionData(ctx) {
 		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
 		if err != nil {
 			return nil, err
@@ -136,7 +136,7 @@ func (p *Persister) marshalSession(ctx context.Context, session fosite.Session) 
 		return nil, err
 	}
 
-	if !p.config.EncryptSessionData(ctx) {
+	if !p.r.Config().EncryptSessionData(ctx) {
 		return sessionBytes, nil
 	}
 
@@ -608,13 +608,13 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveAccessTokens")
 	defer otelx.End(span, &err)
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.config.GetAccessTokenLifespan(ctx))
+	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.r.Config().GetAccessTokenLifespan(ctx))
 }
 
 func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveRefreshTokens")
 	defer otelx.End(span, &err)
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.config.GetRefreshTokenLifespan(ctx))
+	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.r.Config().GetRefreshTokenLifespan(ctx))
 }
 
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) (err error) {
@@ -717,7 +717,7 @@ WHERE signature = ? AND nid = ?`
 	}
 
 	var accessTokenSignature sql.NullString
-	if p.conn.Dialect.Name() == dbal.DriverMySQL {
+	if c.Dialect.Name() == dbal.DriverMySQL {
 		// MySQL does not support returning values from an update query, so we need to do two queries.
 		var tokenToRevoke OAuth2RefreshTable
 		if err := c.

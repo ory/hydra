@@ -64,7 +64,6 @@ func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
 
 	l := logrusx.New("", "", logrusx.WithHook(&hook))
 	l.Logrus().SetOutput(io.Discard)
-	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN
 	c := config.MustNew(t, l,
@@ -88,7 +87,7 @@ func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
 		"snizzles",
 	)
 
-	assert.Equal(t, logrus.FatalLevel, hook.LastEntry().Level)
+	assert.Equal(t, logrus.InfoLevel, hook.LastEntry().Level)
 	assert.Contains(t, hook.LastEntry().Message, "snizzles")
 }
 
@@ -158,8 +157,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 		}),
 	)
 	require.NoError(t, err)
-	assert.IsType(t, &sql.Persister{}, r.KeyManager())
-	assert.IsType(t, &sql.Persister{}, r.SoftwareKeyManager())
+	assert.IsType(t, &sql.JWKPersister{}, r.KeyManager())
 }
 
 func TestDbUnknownTableColumns(t *testing.T) {
@@ -199,14 +197,13 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	})
 }
 
-func sussessfulPing(r *RegistrySQL) error {
+func sussessfulPing(context.Context, *logrusx.Logger, *sql.BasePersister) error {
 	// fake that ping is successful
 	return nil
 }
 
-func failedPing(err error) func(r *RegistrySQL) error {
-	return func(r *RegistrySQL) error {
-		r.Logger().Fatal(err.Error())
+func failedPing(err error) func(context.Context, *logrusx.Logger, *sql.BasePersister) error {
+	return func(context.Context, *logrusx.Logger, *sql.BasePersister) error {
 		return pkgerr.WithStack(err)
 	}
 }

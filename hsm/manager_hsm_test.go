@@ -31,7 +31,6 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/hsm"
 	"github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
@@ -50,7 +49,6 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	)
 	require.NoError(t, err)
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
-	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }
 
 func TestKeyManager_HsmKeySetPrefix(t *testing.T) {

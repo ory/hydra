@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/driver"
@@ -54,7 +53,7 @@ func GetOrCreateTLSCertificate(ctx context.Context, d *driver.RegistrySQL, tlsCo
 	}
 
 	// no certificates configured: self-sign a new cert
-	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
+	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.KeyManager(), TlsKeyName, "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 		return nil // in case Fatal is hooked
@@ -68,12 +67,12 @@ func GetOrCreateTLSCertificate(ctx context.Context, d *driver.RegistrySQL, tlsCo
 		}
 
 		AttachCertificate(priv, cert)
-		if err := d.SoftwareKeyManager().DeleteKey(ctx, TlsKeyName, priv.KeyID); err != nil {
+		if err := d.KeyManager().DeleteKey(ctx, TlsKeyName, priv.KeyID); err != nil {
 			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 			return nil // in case Fatal is hooked
 		}
 
-		if err := d.SoftwareKeyManager().AddKey(ctx, TlsKeyName, priv); err != nil {
+		if err := d.KeyManager().AddKey(ctx, TlsKeyName, priv); err != nil {
 			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 			return nil // in case Fatalf is hooked
 		}

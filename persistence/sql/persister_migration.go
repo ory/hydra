@@ -10,11 +10,11 @@ import (
 	"io/fs"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus/hooks/test"
 
+	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/fsx"
 	"github.com/ory/x/logrusx"
@@ -27,24 +27,55 @@ var Migrations embed.FS
 
 var SilenceMigrations = false
 
-func (p *Persister) migrationBox() (*popx.MigrationBox, error) {
-	logger := p.r.Logger()
-	if SilenceMigrations {
-		inner, _ := test.NewNullLogger()
-		logger = logrusx.New("hydra", "", logrusx.UseLogger(inner))
+type (
+	MigrationManager struct {
+		d               migrationDependencies
+		conn            *pop.Connection
+		extraMigrations []fs.FS
+		goMigrations    []popx.Migration
+
+		// cached values
+		mb  *popx.MigrationBox
+		mbs popx.MigrationStatuses
 	}
-	return popx.NewMigrationBox(
-		fsx.Merge(append([]fs.FS{Migrations}, p.extraMigrations...)...),
-		p.conn, logger,
-		popx.WithGoMigrations(p.goMigrations))
+	migrationDependencies interface {
+		x.RegistryLogger
+	}
+)
+
+func NewMigrationManager(c *pop.Connection, d migrationDependencies, extraMigrations []fs.FS, goMigrations []popx.Migration) *MigrationManager {
+	return &MigrationManager{
+		d:               d,
+		conn:            c,
+		extraMigrations: extraMigrations,
+		goMigrations:    goMigrations,
+	}
 }
 
-func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
-	if p.mbs != nil {
-		return p.mbs, nil
+func (m *MigrationManager) migrationBox() (_ *popx.MigrationBox, err error) {
+	if m.mb == nil {
+		logger := m.d.Logger()
+		if SilenceMigrations {
+			inner, _ := test.NewNullLogger()
+			logger = logrusx.New("hydra", "", logrusx.UseLogger(inner))
+		}
+		m.mb, err = popx.NewMigrationBox(
+			fsx.Merge(append([]fs.FS{Migrations}, m.extraMigrations...)...),
+			m.conn, logger,
+			popx.WithGoMigrations(m.goMigrations))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return m.mb, nil
+}
+
+func (m *MigrationManager) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
+	if m.mbs != nil {
+		return m.mbs, nil
 	}
 
-	mb, err := p.migrationBox()
+	mb, err := m.migrationBox()
 	if err != nil {
 		return nil, err
 	}
@@ -54,33 +85,33 @@ func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses
 	}
 
 	if !status.HasPending() {
-		p.mbs = status
+		m.mbs = status
 	}
 
 	return status, nil
 }
 
-func (p *Persister) MigrateDown(ctx context.Context, steps int) error {
-	mb, err := p.migrationBox()
+func (m *MigrationManager) MigrateDown(ctx context.Context, steps int) error {
+	mb, err := m.migrationBox()
 	if err != nil {
 		return err
 	}
 	return mb.Down(ctx, steps)
 }
 
-func (p *Persister) MigrateUp(ctx context.Context) error {
-	if err := p.migrateOldMigrationTables(); err != nil {
+func (m *MigrationManager) MigrateUp(ctx context.Context) error {
+	if err := m.migrateOldMigrationTables(); err != nil {
 		return err
 	}
-	mb, err := p.migrationBox()
+	mb, err := m.migrationBox()
 	if err != nil {
 		return err
 	}
 	return mb.Up(ctx)
 }
 
-func (p *Persister) PrepareMigration(_ context.Context) error {
-	return p.migrateOldMigrationTables()
+func (m *MigrationManager) PrepareMigration(_ context.Context) error {
+	return m.migrateOldMigrationTables()
 }
 
 type oldTableName string
@@ -92,20 +123,14 @@ const (
 	oauth2MigrationTableName  oldTableName = "hydra_oauth2_migration"
 )
 
-// this type is copied from sql-migrate to remove the dependency
-type OldMigrationRecord struct {
-	ID        string    `db:"id"`
-	AppliedAt time.Time `db:"applied_at"`
-}
-
 // this function is idempotent
-func (p *Persister) migrateOldMigrationTables() error {
-	if err := p.conn.RawQuery(fmt.Sprintf("SELECT * FROM %s", clientMigrationTableName)).Exec(); err != nil {
+func (m *MigrationManager) migrateOldMigrationTables() error {
+	if err := m.conn.RawQuery(fmt.Sprintf("SELECT * FROM %s", clientMigrationTableName)).Exec(); err != nil {
 		// assume there are no old migration tables => done
 		return nil
 	}
 
-	if err := pop.CreateSchemaMigrations(p.conn); err != nil {
+	if err := pop.CreateSchemaMigrations(m.conn); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -118,10 +143,10 @@ func (p *Persister) migrateOldMigrationTables() error {
 		// https://github.com/jackc/pgx/issues/110
 		// https://github.com/flynn/flynn/issues/2235
 		// get old migrations
-		var migrations []OldMigrationRecord
+		var migrations []string
 
 		/* #nosec G201 table is static */
-		if err := p.conn.RawQuery(fmt.Sprintf("SELECT * FROM %s", table)).All(&migrations); err != nil {
+		if err := m.conn.RawQuery(fmt.Sprintf("SELECT id FROM %s", table)).All(&migrations); err != nil {
 			if strings.Contains(err.Error(), string(table)) {
 				continue
 			}
@@ -129,16 +154,16 @@ func (p *Persister) migrateOldMigrationTables() error {
 		}
 
 		// translate migrations
-		for _, m := range migrations {
+		for _, migration := range migrations {
 			// mark the migration as run for fizz
 			// fizz standard version pattern: YYYYMMDDhhmmss
-			migrationNumber, err := strconv.ParseInt(m.ID, 10, 0)
+			migrationNumber, err := strconv.ParseInt(migration, 10, 0)
 			if err != nil {
 				return errors.WithStack(err)
 			}
 
 			/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
-			if err := p.conn.RawQuery(
+			if err := m.conn.RawQuery(
 				fmt.Sprintf("INSERT INTO schema_migration (version) VALUES ('2019%02d%08d')", i+1, migrationNumber)).
 				Exec(); err != nil {
 				return errors.WithStack(err)
@@ -146,7 +171,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 		}
 
 		// delete old migration table
-		if err := p.conn.RawQuery(fmt.Sprintf("DROP TABLE %s", table)).Exec(); err != nil {
+		if err := m.conn.RawQuery(fmt.Sprintf("DROP TABLE %s", table)).Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}
 	}

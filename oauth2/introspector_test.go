@@ -29,13 +29,12 @@ import (
 func TestIntrospectorSDK(t *testing.T) {
 	t.Parallel()
 
-	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy: "wildcard",
 		config.KeyIssuerURL:     "https://foobariss",
 	})))
 
-	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(t, reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)

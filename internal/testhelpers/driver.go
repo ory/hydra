@@ -4,7 +4,6 @@
 package testhelpers
 
 import (
-	"context"
 	"regexp"
 	"strings"
 	"sync"
@@ -146,8 +145,6 @@ func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier
 	return regs
 }
 
-func MustEnsureRegistryKeys(ctx context.Context, r *driver.RegistrySQL, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(ctx, r, string(jose.ES256), key); err != nil {
-		panic(err)
-	}
+func MustEnsureRegistryKeys(t testing.TB, r *driver.RegistrySQL, key string) {
+	jwk.EnsureAsymmetricKeypairExists(t, r, string(jose.ES256), key)
 }

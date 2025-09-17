@@ -72,8 +72,8 @@ func NewOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL)
 }
 
 func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.RegistrySQL) (publicTS, adminTS *httptest.Server) {
-	MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
-	MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
+	MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
+	MustEnsureRegistryKeys(t, reg, x.OAuth2JWTKeyName)
 
 	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	{

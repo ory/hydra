@@ -9,15 +9,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/x"
-
-	jose "github.com/go-jose/go-jose/v3"
-	"github.com/gofrs/uuid"
-
-	"github.com/ory/fosite"
 )
 
 var ErrUnsupportedKeyAlgorithm = &fosite.RFC6749Error{
@@ -58,6 +56,9 @@ type (
 
 		DeleteKeySet(ctx context.Context, set string) error
 	}
+	ManagerProvider interface {
+		KeyManager() Manager
+	}
 
 	SQLData struct {
 		ID  uuid.UUID `db:"pk"`
@@ -78,16 +79,14 @@ func (d SQLData) TableName() string {
 	return "hydra_jwk"
 }
 
-func (d SQLDataRows) ToJWK(ctx context.Context, r interface {
-	KeyCipher() *aead.AESGCM
-}) (keys *jose.JSONWebKeySet, err error) {
+func (d SQLDataRows) ToJWK(ctx context.Context, aes *aead.AESGCM) (keys *jose.JSONWebKeySet, err error) {
 	if len(d) == 0 {
 		return nil, errors.Wrap(x.ErrNotFound, "")
 	}
 
 	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range d {
-		key, err := r.KeyCipher().Decrypt(ctx, d.Key, nil)
+		key, err := aes.Decrypt(ctx, d.Key, nil)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}

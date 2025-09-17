@@ -64,7 +64,6 @@ type RegistrySQL struct {
 	cv              *client.Validator
 	ctxer           contextx.Contextualizer
 	hh              *healthx.Handler
-	migrationStatus *popx.MigrationStatuses
 	kc              *aead.AESGCM
 	flowc           *aead.XChaCha20Poly1305
 	cos             consent.Strategy
@@ -76,7 +75,7 @@ type RegistrySQL struct {
 	trc             *otelx.Tracer
 	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
 	arhs            []oauth2.AccessRequestHook
-	persister       persistence.Persister
+	basePersister   *sql.BasePersister
 	oc              fosite.Configurator
 	oidcs           jwk.JWTSigner
 	ats             jwk.JWTSigner
@@ -87,10 +86,11 @@ type RegistrySQL struct {
 	publicCORS      *cors.Cors
 	kratos          kratos.Client
 	fositeFactories []fositex.Factory
+	migrator        *sql.MigrationManager
 
-	defaultKeyManager jwk.Manager
-	initialPing       func(r *RegistrySQL) error
-	middlewares       []negroni.Handler
+	keyManager  jwk.Manager
+	initialPing func(ctx context.Context, l *logrusx.Logger, p *sql.BasePersister) error
+	middlewares []negroni.Handler
 }
 
 var (
@@ -101,12 +101,10 @@ var (
 // defaultInitialPing is the default function that will be called within RegistrySQL.Init to make sure
 // the database is reachable. It can be injected for test purposes by changing the value
 // of RegistrySQL.initialPing.
-func defaultInitialPing(m *RegistrySQL) error {
-	if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, m.Ping); err != nil {
-		m.Logger().Print("Could not ping database: ", err)
-		return errors.WithStack(err)
-	}
-	return nil
+func defaultInitialPing(ctx context.Context, l *logrusx.Logger, p *sql.BasePersister) error {
+	return errors.WithStack(resilience.Retry(l, 5*time.Second, 5*time.Minute, func() error {
+		return p.Ping(ctx)
+	}))
 }
 
 func (m *RegistrySQL) Init(
@@ -116,7 +114,7 @@ func (m *RegistrySQL) Init(
 	extraMigrations []fs.FS,
 	goMigrations []popx.Migration,
 ) error {
-	if m.persister == nil {
+	if m.basePersister == nil {
 		if m.Config().CGroupsV1AutoMaxProcsEnabled() {
 			_, err := maxprocs.Set(maxprocs.Logger(m.Logger().Infof))
 			if err != nil {
@@ -146,21 +144,13 @@ func (m *RegistrySQL) Init(
 			return errors.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(c, m, m.Config(), extraMigrations, goMigrations)
-		if err != nil {
-			return err
-		}
-		m.persister = p
-		if err := m.initialPing(m); err != nil {
+		m.basePersister = sql.NewBasePersister(c, m)
+		if err := m.initialPing(ctx, m.Logger(), m.basePersister); err != nil {
+			m.Logger().Print("Could not ping database: ", err)
 			return err
 		}
 
-		if m.Config().HSMEnabled() {
-			hardwareKeyManager := hsm.NewKeyManager(m.HSMContext(), m.Config())
-			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
-		} else {
-			m.defaultKeyManager = m.persister
-		}
+		m.migrator = sql.NewMigrationManager(c, m, extraMigrations, goMigrations)
 
 		// if dsn is memory we have to run the migrations on every start
 		// use case - such as
@@ -168,37 +158,26 @@ func (m *RegistrySQL) Init(
 		// - shared connection
 		// - shared but unique in the same process
 		// see: https://sqlite.org/inmemorydb.html
-		if dbal.IsMemorySQLite(m.Config().DSN()) {
-			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
-			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
-			if err := p.MigrateUp(context.Background()); err != nil {
-				return err
-			}
-		} else if migrate {
-			if err := p.MigrateUp(context.Background()); err != nil {
+		switch {
+		case dbal.IsMemorySQLite(m.Config().DSN()):
+			m.Logger().Println("Hydra is running migrations on every startup as DSN is memory.")
+			m.Logger().Println("This means your data is lost when Hydra terminates.")
+			fallthrough
+		case migrate:
+			if err := m.migrator.MigrateUp(ctx); err != nil {
 				return err
 			}
 		}
 
-		if skipNetworkInit {
-			m.persister = p
-		} else {
-			net, err := p.DetermineNetwork(ctx)
+		if !skipNetworkInit {
+			net, err := m.basePersister.DetermineNetwork(ctx)
 			if err != nil {
 				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
 				return err
 			}
 
-			m.persister = p.WithFallbackNetworkID(net.ID)
+			m.basePersister = m.basePersister.WithFallbackNetworkID(net.ID)
 		}
-
-		if m.Config().HSMEnabled() {
-			hardwareKeyManager := hsm.NewKeyManager(m.HSMContext(), m.Config())
-			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
-		} else {
-			m.defaultKeyManager = m.persister
-		}
-
 	}
 
 	return nil
@@ -211,11 +190,7 @@ func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
 }
 
 func (m *RegistrySQL) PingContext(ctx context.Context) error {
-	return m.Persister().Ping(ctx)
-}
-
-func (m *RegistrySQL) Ping() error {
-	return m.PingContext(context.Background())
+	return m.basePersister.Ping(ctx)
 }
 
 func (m *RegistrySQL) ClientManager() client.Manager {
@@ -231,11 +206,16 @@ func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
-	return m.defaultKeyManager
-}
-
-func (m *RegistrySQL) SoftwareKeyManager() jwk.Manager {
-	return m.Persister()
+	if m.keyManager == nil {
+		softwareKeyManager := &sql.JWKPersister{BasePersister: m.basePersister}
+		if m.Config().HSMEnabled() {
+			hardwareKeyManager := hsm.NewKeyManager(m.HSMContext(), m.Config())
+			m.keyManager = jwk.NewManagerStrategy(hardwareKeyManager, softwareKeyManager)
+		} else {
+			m.keyManager = softwareKeyManager
+		}
+	}
+	return m.keyManager
 }
 
 func (m *RegistrySQL) GrantManager() trust.GrantManager {
@@ -330,11 +310,7 @@ func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 				return m.PingContext(r.Context())
 			},
 			"migrations": func(r *http.Request) error {
-				if m.migrationStatus != nil && !m.migrationStatus.HasPending() {
-					return nil
-				}
-
-				status, err := m.Persister().MigrationStatus(r.Context())
+				status, err := m.migrator.MigrationStatus(r.Context())
 				if err != nil {
 					return err
 				}
@@ -344,8 +320,6 @@ func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 					m.Logger().WithField("status", fmt.Sprintf("%+v", status)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
 					return err
 				}
-
-				m.migrationStatus = &status
 				return nil
 			},
 		})
@@ -529,7 +503,7 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 }
 
 func (m *RegistrySQL) Networker() x.Networker {
-	return m.persister
+	return m.basePersister
 }
 
 func (m *RegistrySQL) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
@@ -569,7 +543,7 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 }
 
 func (m *RegistrySQL) Persister() persistence.Persister {
-	return m.persister
+	return sql.NewPersister(m.basePersister, m)
 }
 
 // Config returns the configuration for the given context. It may or may not be the same as the global configuration.
@@ -608,4 +582,8 @@ func (m *RegistrySQL) Kratos() kratos.Client {
 
 func (m *RegistrySQL) HTTPMiddlewares() []negroni.Handler {
 	return m.middlewares
+}
+
+func (m *RegistrySQL) Migrator() *sql.MigrationManager {
+	return m.migrator
 }

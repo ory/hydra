@@ -1021,8 +1021,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 			require.NoError(t, err)
 			require.Len(t, storedKeySet.Keys, 0)
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			storedKeySet, err = grantStorage.GetPublicKeys(ctx, issuer, subject)
 			require.NoError(t, err)
@@ -1053,9 +1052,9 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 			issuer := uuid.Must(uuid.NewV4()).String()
 			subject := "maria+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 
-			keySet1ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet1ToReturn, err := jwk.GenerateJWK(t.Context(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
-			require.NoError(t, grantManager.CreateGrant(context.Background(), trust.Grant{
+			require.NoError(t, grantManager.CreateGrant(t.Context(), trust.Grant{
 				ID:              uuid.Must(uuid.NewV4()),
 				Issuer:          issuer,
 				Subject:         subject,
@@ -1066,7 +1065,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}, keySet1ToReturn.Keys[0].Public()))
 
-			keySet2ToReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet2ToReturn, err := jwk.GenerateJWK(t.Context(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, grantManager.CreateGrant(ctx, trust.Grant{
 				ID:              uuid.Must(uuid.NewV4()),
@@ -1126,8 +1125,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, grant.PublicKey.KeyID)
 			require.NoError(t, err)
@@ -1163,8 +1161,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			_, err = grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
 			require.NoError(t, err)
@@ -1200,8 +1197,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			// All three get methods should only return the public key when using the valid subject
 			_, err = grantStorage.GetPublicKey(ctx, issuer, "any-subject-1", publicKey.KeyID)
@@ -1241,8 +1237,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			// All three get methods should always return the public key
 			_, err = grantStorage.GetPublicKey(ctx, issuer, "any-subject-1", publicKey.KeyID)
@@ -1274,8 +1269,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(-1, 0, 0),
 			}
 
-			err = grantManager.CreateGrant(ctx, grant, publicKey)
-			require.NoError(t, err)
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
 
 			keys, err := grantStorage.GetPublicKeys(ctx, issuer, "any-subject-3")
 			require.NoError(t, err)

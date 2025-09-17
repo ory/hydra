@@ -62,7 +62,7 @@ func (c *AESGCM) Decrypt(ctx context.Context, ciphertext string, aad []byte) (pl
 	return nil, err
 }
 
-func (c *AESGCM) decrypt(ciphertext []byte, key, additionalData []byte) ([]byte, error) {
+func (*AESGCM) decrypt(ciphertext, key, additionalData []byte) ([]byte, error) {
 	if len(key) != 32 {
 		return nil, errors.Errorf("key must be exactly 32 long bytes, got %d bytes", len(key))
 	}

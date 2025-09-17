@@ -220,7 +220,7 @@ func (p *Persister) ConfirmLoginSession(ctx context.Context, loginSession *flow.
 
 	loginSession.NID = p.NetworkID(ctx)
 	loginSession.AuthenticatedAt = sqlxx.NullTime(time.Time(loginSession.AuthenticatedAt).Truncate(time.Second))
-	loginSession.ExpiresAt = sqlxx.NullTime(time.Now().Truncate(time.Second).Add(p.config.GetAuthenticationSessionLifespan(ctx)).UTC())
+	loginSession.ExpiresAt = sqlxx.NullTime(time.Now().Truncate(time.Second).Add(p.r.Config().GetAuthenticationSessionLifespan(ctx)).UTC())
 
 	if p.Connection(ctx).Dialect.Name() == "mysql" {
 		// MySQL does not support UPSERT.
@@ -573,7 +573,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var f flow.Flow
 
 	// The value of notAfter should be the minimum between input parameter and request max expire based on its configured age
-	requestMaxExpire := time.Now().Add(-p.config.ConsentRequestMaxAge(ctx))
+	requestMaxExpire := time.Now().Add(-p.r.Config().ConsentRequestMaxAge(ctx))
 	if requestMaxExpire.Before(notAfter) {
 		notAfter = requestMaxExpire
 	}

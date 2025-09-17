@@ -181,8 +181,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		t.Run("registry="+dbName, func(t *testing.T) {
 			t.Parallel()
 
-			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OpenIDConnectKeyName))
-			require.NoError(t, jwk.EnsureAsymmetricKeypairExists(ctx, reg, string(jose.ES256), x.OAuth2JWTKeyName))
+			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OpenIDConnectKeyName)
+			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OAuth2JWTKeyName)
 
 			publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
@@ -1858,8 +1858,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 				config.KeyScopeStrategy:       "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 				config.KeyAccessTokenStrategy: strat.d,
 			})))
-			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
-			testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OAuth2JWTKeyName)
+			testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
+			testhelpers.MustEnsureRegistryKeys(t, reg, x.OAuth2JWTKeyName)
 
 			consentStrategy := &consentMock{}
 

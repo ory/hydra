@@ -136,10 +136,10 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 	}
 }
 
-func (j *JanitorConsentTestHelper) GrantNotAfterSetup(ctx context.Context, gr trust.GrantManager) func(t *testing.T) {
+func (j *JanitorConsentTestHelper) GrantNotAfterSetup(ctx context.Context, gm trust.GrantManager) func(t *testing.T) {
 	return func(t *testing.T) {
 		for _, fg := range j.flushGrants {
-			require.NoError(t, gr.CreateGrant(ctx, fg.grant, fg.pk))
+			require.NoError(t, gm.CreateGrant(ctx, fg.grant, fg.pk))
 		}
 	}
 }

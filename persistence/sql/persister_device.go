@@ -114,7 +114,7 @@ func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSi
 		return nil, errors.WithStack(err)
 	}
 
-	if p.config.EncryptSessionData(ctx) {
+	if p.r.Config().EncryptSessionData(ctx) {
 		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session, nil)
 		if err != nil {
 			return nil, errors.WithStack(err)

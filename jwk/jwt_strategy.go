@@ -8,7 +8,6 @@ import (
 	"net"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -35,7 +34,7 @@ func NewDefaultJWTSigner(r InternalRegistry, setID string) *DefaultJWTSigner {
 }
 
 func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKey, err error) {
-	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, uuid.Must(uuid.NewV4()).String(), string(jose.RS256))
+	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, string(jose.RS256))
 	if err == nil {
 		return private, nil
 	}

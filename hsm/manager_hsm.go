@@ -19,8 +19,8 @@ import (
 	"github.com/ThalesGroup/crypto11"
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
+	"github.com/gofrs/uuid"
 	"github.com/miekg/pkcs11"
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -74,8 +74,8 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 		return nil, err
 	}
 
-	if len(kid) == 0 {
-		kid = uuid.New()
+	if kid == "" {
+		kid = uuid.Must(uuid.NewV4()).String()
 	}
 
 	privateAttrSet, publicAttrSet, err := getKeyPairAttributes(kid, set, use)
@@ -83,20 +83,20 @@ func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg
 		return nil, err
 	}
 
-	switch {
-	case alg == "RS256":
+	switch alg {
+	case "RS256":
 		key, err := m.GenerateRSAKeyPairWithAttributes(publicAttrSet, privateAttrSet, 4096)
 		if err != nil {
 			return nil, err
 		}
 		return createKeySet(key, kid, alg, use)
-	case alg == "ES256":
+	case "ES256":
 		key, err := m.GenerateECDSAKeyPairWithAttributes(publicAttrSet, privateAttrSet, elliptic.P256())
 		if err != nil {
 			return nil, err
 		}
 		return createKeySet(key, kid, alg, use)
-	case alg == "ES512":
+	case "ES512":
 		key, err := m.GenerateECDSAKeyPairWithAttributes(publicAttrSet, privateAttrSet, elliptic.P521())
 		if err != nil {
 			return nil, err
@@ -280,8 +280,7 @@ func (m *KeyManager) getKeySetAttributes(ctx context.Context, key crypto11.Signe
 	return string(kid), alg, use, nil
 }
 
-func getKeyPairAttributes(kid string, set string, use string) (crypto11.AttributeSet, crypto11.AttributeSet, error) {
-
+func getKeyPairAttributes(kid, set, use string) (crypto11.AttributeSet, crypto11.AttributeSet, error) {
 	privateAttrSet, err := crypto11.NewAttributeSetWithIDAndLabel([]byte(kid), []byte(set))
 	if err != nil {
 		return nil, nil, err

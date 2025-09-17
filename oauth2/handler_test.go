@@ -86,8 +86,6 @@ func TestHandlerDeleteHandler(t *testing.T) {
 func TestUserinfo(t *testing.T) {
 	t.Parallel()
 
-	ctx := t.Context()
-
 	ctrl := gomock.NewController(t)
 	op := NewMockOAuth2Provider(ctrl)
 	t.Cleanup(ctrl.Finish)
@@ -97,7 +95,7 @@ func TestUserinfo(t *testing.T) {
 		config.KeyAuthCodeLifespan: lifespan,
 		config.KeyIssuerURL:        "http://hydra.localhost",
 	})), driver.WithOAuth2Provider(op))
-	testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 
 	h := oauth2.NewHandler(reg)
 
@@ -340,7 +338,6 @@ func TestUserinfo(t *testing.T) {
 func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
-	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
@@ -350,7 +347,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
 	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
-		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+		testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg)
 
@@ -387,7 +384,6 @@ func TestHandlerWellKnown(t *testing.T) {
 func TestHandlerOauthAuthorizationServer(t *testing.T) {
 	t.Parallel()
 
-	ctx := t.Context()
 	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(map[string]any{
 		config.KeyScopeStrategy:                 "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 		config.KeyIssuerURL:                     "http://hydra.localhost",
@@ -397,7 +393,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 		config.KeyOIDCDiscoveryUserinfoEndpoint: "/userinfo",
 	})))
 	t.Run(fmt.Sprintf("hsm_enabled=%v", reg.Config().HSMEnabled()), func(t *testing.T) {
-		testhelpers.MustEnsureRegistryKeys(ctx, reg, x.OpenIDConnectKeyName)
+		testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 
 		h := oauth2.NewHandler(reg)
 

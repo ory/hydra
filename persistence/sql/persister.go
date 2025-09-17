@@ -6,7 +6,6 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"io/fs"
 	"reflect"
 
 	"github.com/gofrs/uuid"
@@ -17,6 +16,7 @@ import (
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/kratos"
+	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
@@ -27,8 +27,8 @@ import (
 	"github.com/ory/x/popx"
 )
 
-var _ persistence.Persister = new(Persister)
-var _ storage.Transactional = new(Persister)
+var _ persistence.Persister = (*Persister)(nil)
+var _ storage.Transactional = (*Persister)(nil)
 
 var (
 	ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
@@ -40,16 +40,9 @@ const skipCommitKey skipCommitContextKey = 0
 
 type (
 	Persister struct {
-		conn            *pop.Connection
-		extraMigrations []fs.FS
-		goMigrations    []popx.Migration
-		mb              *popx.MigrationBox
-		mbs             popx.MigrationStatuses
-		r               Dependencies
-		config          *config.DefaultProvider
-		l               *logrusx.Logger
-		fallbackNID     uuid.UUID
-		p               *networkx.Manager
+		*BasePersister
+		r Dependencies
+		l *logrusx.Logger
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
@@ -61,10 +54,22 @@ type (
 		x.TracingProvider
 		config.Provider
 	}
+	BasePersister struct {
+		c           *pop.Connection
+		fallbackNID uuid.UUID
+		d           baseDependencies
+	}
+	baseDependencies interface {
+		x.RegistryLogger
+		x.TracingProvider
+		contextx.Provider
+		config.Provider
+		jwk.ManagerProvider
+	}
 )
 
-func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
+func (p *BasePersister) BeginTX(ctx context.Context) (_ context.Context, err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
 	defer otelx.End(span, &err)
 
 	fallback := &pop.Connection{TX: &pop.Tx{}}
@@ -72,7 +77,7 @@ func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) 
 		return context.WithValue(ctx, skipCommitKey, true), nil // no-op
 	}
 
-	tx, err := p.conn.Store.TransactionContextOptions(ctx, &sql.TxOptions{
+	tx, err := p.c.Store.TransactionContextOptions(ctx, &sql.TxOptions{
 		Isolation: sql.LevelRepeatableRead,
 		ReadOnly:  false,
 	})
@@ -80,13 +85,13 @@ func (p *Persister) BeginTX(ctx context.Context) (_ context.Context, err error) 
 		TX:      tx,
 		Store:   tx,
 		ID:      uuid.Must(uuid.NewV4()).String(),
-		Dialect: p.conn.Dialect,
+		Dialect: p.c.Dialect,
 	}
 	return popx.WithTransaction(ctx, c), err
 }
 
-func (p *Persister) Commit(ctx context.Context) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
+func (p *BasePersister) Commit(ctx context.Context) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
 	defer otelx.End(span, &err)
 
 	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
@@ -102,8 +107,8 @@ func (p *Persister) Commit(ctx context.Context) (err error) {
 	return errors.WithStack(tx.TX.Commit())
 }
 
-func (p *Persister) Rollback(ctx context.Context) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
+func (p *BasePersister) Rollback(ctx context.Context) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
 	defer otelx.End(span, &err)
 
 	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
@@ -119,33 +124,33 @@ func (p *Persister) Rollback(ctx context.Context) (err error) {
 	return errors.WithStack(tx.TX.Rollback())
 }
 
-func NewPersister(c *pop.Connection, r Dependencies, config *config.DefaultProvider, extraMigrations []fs.FS, goMigrations []popx.Migration) (*Persister, error) {
+func NewPersister(base *BasePersister, r Dependencies) *Persister {
 	return &Persister{
-		conn:            c,
-		extraMigrations: extraMigrations,
-		goMigrations:    goMigrations,
-		r:               r,
-		config:          config,
-		l:               r.Logger(),
-		p:               networkx.NewManager(c, r.Logger()),
-	}, nil
+		BasePersister: base,
+		r:             r,
+		l:             r.Logger(),
+	}
 }
 
-func (p *Persister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
-	return p.p.Determine(ctx)
+func NewBasePersister(c *pop.Connection, d baseDependencies) *BasePersister {
+	return &BasePersister{c: c, d: d}
 }
 
-func (p Persister) WithFallbackNetworkID(nid uuid.UUID) persistence.Persister {
+func (p *BasePersister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
+	return networkx.Determine(p.Connection(ctx))
+}
+
+func (p BasePersister) WithFallbackNetworkID(nid uuid.UUID) *BasePersister {
 	p.fallbackNID = nid
 	return &p
 }
 
-func (p *Persister) CreateWithNetwork(ctx context.Context, v interface{}) error {
+func (p *BasePersister) CreateWithNetwork(ctx context.Context, v interface{}) error {
 	p.mustSetNetwork(ctx, v)
 	return p.Connection(ctx).Create(v)
 }
 
-func (p *Persister) UpdateWithNetwork(ctx context.Context, v interface{}) (int64, error) {
+func (p *BasePersister) UpdateWithNetwork(ctx context.Context, v interface{}) (int64, error) {
 	p.mustSetNetwork(ctx, v)
 
 	m := pop.NewModel(v, ctx)
@@ -158,22 +163,21 @@ func (p *Persister) UpdateWithNetwork(ctx context.Context, v interface{}) (int64
 	return p.Connection(ctx).Where(m.IDField()+" = ? AND nid = ?", m.ID(), p.NetworkID(ctx)).UpdateQuery(v, cs...)
 }
 
-func (p *Persister) NetworkID(ctx context.Context) uuid.UUID {
-	return p.r.Contextualizer().Network(ctx, p.fallbackNID)
+func (p *BasePersister) NetworkID(ctx context.Context) uuid.UUID {
+	return p.d.Contextualizer().Network(ctx, p.fallbackNID)
 }
 
-func (p *Persister) QueryWithNetwork(ctx context.Context) *pop.Query {
+func (p *BasePersister) QueryWithNetwork(ctx context.Context) *pop.Query {
 	return p.Connection(ctx).Where("nid = ?", p.NetworkID(ctx))
 }
 
-func (p *Persister) Connection(ctx context.Context) *pop.Connection {
-	return popx.GetConnection(ctx, p.conn)
+func (p *BasePersister) Connection(ctx context.Context) *pop.Connection {
+	return popx.GetConnection(ctx, p.c)
 }
 
-func (p *Persister) Ping(ctx context.Context) error        { return p.conn.Store.SQLDB().PingContext(ctx) }
-func (p *Persister) PingContext(ctx context.Context) error { return p.conn.Store.PingContext(ctx) }
+func (p *BasePersister) Ping(ctx context.Context) error { return p.c.Store.SQLDB().PingContext(ctx) }
 
-func (p *Persister) mustSetNetwork(ctx context.Context, v interface{}) {
+func (p *BasePersister) mustSetNetwork(ctx context.Context, v interface{}) {
 	rv := reflect.ValueOf(v)
 
 	if rv.Kind() != reflect.Ptr || (rv.Kind() == reflect.Ptr && rv.Elem().Kind() != reflect.Struct) {
@@ -186,6 +190,6 @@ func (p *Persister) mustSetNetwork(ctx context.Context, v interface{}) {
 	nf.Set(reflect.ValueOf(p.NetworkID(ctx)))
 }
 
-func (p *Persister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
-	return popx.Transaction(ctx, p.conn, f)
+func (p *BasePersister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
+	return popx.Transaction(ctx, p.c, f)
 }

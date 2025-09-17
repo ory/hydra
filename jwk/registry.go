@@ -4,7 +4,6 @@
 package jwk
 
 import (
-	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/x"
 )
@@ -17,7 +16,5 @@ type InternalRegistry interface {
 
 type Registry interface {
 	config.Provider
-	KeyManager() Manager
-	SoftwareKeyManager() Manager
-	KeyCipher() *aead.AESGCM
+	ManagerProvider
 }

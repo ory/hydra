@@ -62,7 +62,7 @@ func TestRevoke(t *testing.T) {
 
 	reg := testhelpers.NewRegistryMemory(t)
 
-	testhelpers.MustEnsureRegistryKeys(t.Context(), reg, x.OpenIDConnectKeyName)
+	testhelpers.MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(t, reg)
 
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)

@@ -6,7 +6,6 @@ package sql
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
@@ -19,22 +18,22 @@ import (
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/stringsx"
+	"github.com/ory/x/sqlxx"
 )
 
 var _ trust.GrantManager = &Persister{}
 
 type SQLGrant struct {
-	ID              uuid.UUID `db:"id"`
-	NID             uuid.UUID `db:"nid"`
-	Issuer          string    `db:"issuer"`
-	Subject         string    `db:"subject"`
-	AllowAnySubject bool      `db:"allow_any_subject"`
-	Scope           string    `db:"scope"`
-	KeySet          string    `db:"key_set"`
-	KeyID           string    `db:"key_id"`
-	CreatedAt       time.Time `db:"created_at"`
-	ExpiresAt       time.Time `db:"expires_at"`
+	ID              uuid.UUID                      `db:"id"`
+	NID             uuid.UUID                      `db:"nid"`
+	Issuer          string                         `db:"issuer"`
+	Subject         string                         `db:"subject"`
+	AllowAnySubject bool                           `db:"allow_any_subject"`
+	Scope           sqlxx.StringSlicePipeDelimiter `db:"scope"`
+	KeySet          string                         `db:"key_set"`
+	KeyID           string                         `db:"key_id"`
+	CreatedAt       time.Time                      `db:"created_at"`
+	ExpiresAt       time.Time                      `db:"expires_at"`
 }
 
 func (SQLGrant) TableName() string {
@@ -47,12 +46,12 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 
 	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
-		if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
+		if _, err := p.d.KeyManager().GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
 			if !errors.Is(err, sqlcon.ErrNoRows) {
 				return sqlcon.HandleError(err)
 			}
 
-			if err = p.AddKey(ctx, g.PublicKey.Set, &publicKey); err != nil {
+			if err = p.d.KeyManager().AddKey(ctx, g.PublicKey.Set, &publicKey); err != nil {
 				return sqlcon.HandleError(err)
 			}
 		}
@@ -88,7 +87,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id uuid.UUID) (err error) {
 			return sqlcon.HandleError(err)
 		}
 
-		return p.DeleteKey(ctx, grant.PublicKey.Set, grant.PublicKey.KeyID)
+		return p.d.KeyManager().DeleteKey(ctx, grant.PublicKey.Set, grant.PublicKey.KeyID)
 	})
 }
 
@@ -132,8 +131,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKey")
 	defer otelx.End(span, &err)
 
-	var data SQLGrant
-	tableName := data.TableName()
+	tableName := SQLGrant{}.TableName()
 	// Index hint.
 	if p.Connection(ctx).Dialect.Name() == "cockroach" {
 		tableName += "@hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx"
@@ -143,12 +141,13 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	query := p.Connection(ctx).RawQuery(sql,
 		keyId, p.NetworkID(ctx), issuer, subject,
 	)
-	if err := query.First(&data); err != nil {
+	var keySetID string
+	if err := query.First(&keySetID); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
 	// TODO: Consider merging this query with the one above using a `JOIN`.
-	keySet, err := p.GetKey(ctx, data.KeySet, keyId)
+	keySet, err := p.d.KeyManager().GetKey(ctx, keySetID, keyId)
 	if err != nil {
 		return nil, err
 	}
@@ -160,13 +159,14 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeys")
 	defer otelx.End(span, &err)
 
+	q := p.QueryWithNetwork(ctx)
 	expiresAt := "expires_at > NOW()"
-	if p.conn.Dialect.Name() == "sqlite3" {
+	if q.Connection.Dialect.Name() == "sqlite3" {
 		expiresAt = "expires_at > datetime('now')"
 	}
 
 	grantsData := make([]SQLGrant, 0)
-	query := p.QueryWithNetwork(ctx).
+	query := q.
 		Select("key_id").
 		Where(expiresAt).
 		Where("issuer = ?", issuer).
@@ -213,15 +213,14 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return js.ToJWK(ctx, p.r)
+	return js.ToJWK(ctx, p.r.KeyCipher())
 }
 
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) (_ []string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeyScopes")
 	defer otelx.End(span, &err)
 
-	var data SQLGrant
-	tableName := data.TableName()
+	tableName := SQLGrant{}.TableName()
 	// Index hint.
 	if p.Connection(ctx).Dialect.Name() == "cockroach" {
 		tableName += "@hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx"
@@ -231,11 +230,12 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	query := p.Connection(ctx).RawQuery(sql,
 		keyId, p.NetworkID(ctx), issuer, subject,
 	)
-	if err := query.First(&data); err != nil {
+	var scopes sqlxx.StringSlicePipeDelimiter
+	if err := query.First(&scopes); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return stringsx.Splitx(data.Scope, "|"), nil
+	return scopes, nil
 }
 
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (ok bool, err error) {
@@ -263,7 +263,7 @@ func (SQLGrant) fromGrant(g trust.Grant) SQLGrant {
 		Issuer:          g.Issuer,
 		Subject:         g.Subject,
 		AllowAnySubject: g.AllowAnySubject,
-		Scope:           strings.Join(g.Scope, "|"),
+		Scope:           g.Scope,
 		KeySet:          g.PublicKey.Set,
 		KeyID:           g.PublicKey.KeyID,
 		CreatedAt:       g.CreatedAt,
@@ -277,7 +277,7 @@ func (d SQLGrant) toGrant() trust.Grant {
 		Issuer:          d.Issuer,
 		Subject:         d.Subject,
 		AllowAnySubject: d.AllowAnySubject,
-		Scope:           stringsx.Splitx(d.Scope, "|"),
+		Scope:           d.Scope,
 		PublicKey: trust.PublicKey{
 			Set:   d.KeySet,
 			KeyID: d.KeyID,

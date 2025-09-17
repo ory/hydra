@@ -10,7 +10,7 @@ import (
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/persistence"
+	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/popx"
@@ -26,7 +26,7 @@ func newMigrateHandler(dOpts []driver.OptionsModifier) *MigrateHandler {
 	}
 }
 
-func (h *MigrateHandler) makePersister(cmd *cobra.Command, args []string) (p persistence.Persister, err error) {
+func (h *MigrateHandler) makeMigrationManager(cmd *cobra.Command, args []string) (*sql.MigrationManager, error) {
 	opts := append([]driver.OptionsModifier{
 		driver.WithConfigOptions(
 			configx.SkipValidation(),
@@ -52,11 +52,11 @@ func (h *MigrateHandler) makePersister(cmd *cobra.Command, args []string) (p per
 		return nil, cmdx.FailSilently(cmd)
 	}
 
-	return d.Persister(), nil
+	return d.Migrator(), nil
 }
 
 func (h *MigrateHandler) MigrateSQLUp(cmd *cobra.Command, args []string) (err error) {
-	p, err := h.makePersister(cmd, args)
+	p, err := h.makeMigrationManager(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (h *MigrateHandler) MigrateSQLUp(cmd *cobra.Command, args []string) (err er
 }
 
 func (h *MigrateHandler) MigrateSQLDown(cmd *cobra.Command, args []string) (err error) {
-	p, err := h.makePersister(cmd, args)
+	p, err := h.makeMigrationManager(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (h *MigrateHandler) MigrateSQLDown(cmd *cobra.Command, args []string) (err 
 }
 
 func (h *MigrateHandler) MigrateStatus(cmd *cobra.Command, args []string) error {
-	p, err := h.makePersister(cmd, args)
+	p, err := h.makeMigrationManager(cmd, args)
 	if err != nil {
 		return err
 	}

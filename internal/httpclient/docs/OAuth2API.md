@@ -444,7 +444,7 @@ No authorization required
 
 ## DeleteOAuth2Token
 
-> DeleteOAuth2Token(ctx).ClientId(clientId).Execute()
+> DeleteOAuth2Token(ctx).ClientId(clientId).Subject(subject).Execute()
 
 Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
 
@@ -463,11 +463,12 @@ import (
 )
 
 func main() {
-	clientId := "clientId_example" // string | OAuth 2.0 Client ID
+	clientId := "clientId_example" // string | OAuth 2.0 Client ID (optional)
+	subject := "subject_example" // string | OAuth 2.0 Subject (optional)
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	r, err := apiClient.OAuth2API.DeleteOAuth2Token(context.Background()).ClientId(clientId).Execute()
+	r, err := apiClient.OAuth2API.DeleteOAuth2Token(context.Background()).ClientId(clientId).Subject(subject).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error when calling `OAuth2API.DeleteOAuth2Token``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -487,6 +488,7 @@ Other parameters are passed through a pointer to a apiDeleteOAuth2TokenRequest s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **clientId** | **string** | OAuth 2.0 Client ID | 
+ **subject** | **string** | OAuth 2.0 Subject | 
 
 ### Return type
 

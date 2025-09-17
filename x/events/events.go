@@ -87,6 +87,10 @@ func ClientID(clientID string) otelattr.KeyValue {
 	return otelattr.String(attributeKeyOAuth2ClientID, clientID)
 }
 
+func Subject(subject string) otelattr.KeyValue {
+	return otelattr.String(attributeKeyOAuth2Subject, subject)
+}
+
 func RefreshTokenSignature(signature string) otelattr.KeyValue {
 	return otelattr.String(attributeKeyOAuth2RefreshTokenSignature, signature)
 }

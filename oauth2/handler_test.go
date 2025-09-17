@@ -43,44 +43,113 @@ var lifespan = time.Hour
 func TestHandlerDeleteHandler(t *testing.T) {
 	t.Parallel()
 
-	ctx := t.Context()
-	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
+	t.Run("case: delete by client id", func(t *testing.T) {
+		t.Parallel()
 
-	cm := reg.ClientManager()
-	store := reg.OAuth2Storage()
+		ctx := t.Context()
+		reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
 
-	h := oauth2.NewHandler(reg)
+		cm := reg.ClientManager()
+		store := reg.OAuth2Storage()
 
-	deleteRequest := &fosite.Request{
-		ID:             "del-1",
-		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{ID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	}
-	require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
-	require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
+		h := oauth2.NewHandler(reg)
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	r := httprouterx.NewRouterAdminWithPrefix(metrics)
-	h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
-	h.SetAdminRoutes(r)
-	ts := httptest.NewServer(r)
-	defer ts.Close()
+		deleteRequest := &fosite.Request{
+			ID:             "del-1",
+			RequestedAt:    time.Now().Round(time.Second),
+			Client:         &client.Client{ID: "foobar"},
+			RequestedScope: fosite.Arguments{"fa", "ba"},
+			GrantedScope:   fosite.Arguments{"fa", "ba"},
+			Form:           url.Values{"foo": []string{"bar", "baz"}},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		}
+		require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
+		require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
 
-	c := hydra.NewAPIClient(hydra.NewConfiguration())
-	c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdminWithPrefix(metrics)
+		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
+		h.SetAdminRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
 
-	_, err := c.
-		OAuth2API.DeleteOAuth2Token(ctx).
-		ClientId("foobar").Execute()
-	require.NoError(t, err)
+		c := hydra.NewAPIClient(hydra.NewConfiguration())
+		c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
 
-	ds := new(oauth2.Session)
-	_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
-	require.Error(t, err, "not_found")
+		_, err := c.
+			OAuth2API.DeleteOAuth2Token(ctx).
+			ClientId("foobar").Execute()
+		require.NoError(t, err)
+
+		ds := new(oauth2.Session)
+		_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
+		require.Error(t, err, "the access token should not be found")
+	})
+
+	t.Run("case: delete by subject", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := t.Context()
+		reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
+
+		cm := reg.ClientManager()
+		store := reg.OAuth2Storage()
+
+		h := oauth2.NewHandler(reg)
+
+		deleteRequest := &fosite.Request{
+			ID:             "del-2",
+			RequestedAt:    time.Now().Round(time.Second),
+			Client:         &client.Client{ID: "subject-client"},
+			RequestedScope: fosite.Arguments{"a", "b"},
+			GrantedScope:   fosite.Arguments{"a", "b"},
+			Form:           url.Values{},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		}
+		require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
+		require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
+
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdminWithPrefix(metrics)
+		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
+		h.SetAdminRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		c := hydra.NewAPIClient(hydra.NewConfiguration())
+		c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
+
+		_, err := c.
+			OAuth2API.DeleteOAuth2Token(ctx).
+			Subject("bar").
+			Execute()
+		require.NoError(t, err)
+
+		ds := new(oauth2.Session)
+		_, err = store.GetAccessTokenSession(ctx, "del-2", ds)
+		require.Error(t, err, "the access token should not be found")
+	})
+
+	t.Run("case: delete without client_id or subject should fail", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := t.Context()
+		reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyIssuerURL, "http://hydra.localhost")))
+		h := oauth2.NewHandler(reg)
+
+		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+		r := httprouterx.NewRouterAdminWithPrefix(metrics)
+		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
+		h.SetAdminRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		c := hydra.NewAPIClient(hydra.NewConfiguration())
+		c.GetConfig().Servers = hydra.ServerConfigurations{{URL: ts.URL}}
+
+		_, err := c.OAuth2API.DeleteOAuth2Token(ctx).Execute()
+		require.Error(t, err, "deleting an oauth2 token without the required parameters should fail")
+	})
 }
 
 func TestUserinfo(t *testing.T) {

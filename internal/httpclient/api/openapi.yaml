@@ -1265,15 +1265,25 @@ paths:
       - oAuth2
   /admin/oauth2/tokens:
     delete:
-      description: This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0
-        Client from the database.
+      description: |-
+        This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client or Subject from the database.
+
+        Note that you must specify either the `client_id` or the `subject` parameter.
       operationId: deleteOAuth2Token
       parameters:
       - description: OAuth 2.0 Client ID
         explode: true
         in: query
         name: client_id
-        required: true
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: OAuth 2.0 Subject
+        explode: true
+        in: query
+        name: subject
+        required: false
         schema:
           type: string
         style: form

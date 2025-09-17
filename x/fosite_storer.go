@@ -38,6 +38,8 @@ type FositeStorer interface {
 
 	DeleteAccessTokens(ctx context.Context, clientID string) error
 
+	DeleteSubjectAccessTokens(ctx context.Context, subject string) error
+
 	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 
 	// DeleteOpenIDConnectSession deletes an OpenID Connect session.

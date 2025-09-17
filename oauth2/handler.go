@@ -1329,16 +1329,22 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 type deleteOAuth2Token struct {
 	// OAuth 2.0 Client ID
 	//
-	// required: true
 	// in: query
 	ClientID string `json:"client_id"`
+
+	// OAuth 2.0 Subject
+	//
+	// in: query
+	Subject string `json:"subject"`
 }
 
 // swagger:route DELETE /admin/oauth2/tokens oAuth2 deleteOAuth2Token
 //
 // # Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
 //
-// This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.
+// This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client or Subject from the database.
+//
+// Note that you must specify either the `client_id` or the `subject` parameter.
 //
 //	Consumes:
 //	- application/json
@@ -1350,14 +1356,23 @@ type deleteOAuth2Token struct {
 //	  default: errorOAuth2
 func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.URL.Query().Get("client_id")
-	if clientID == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))
+	subject := r.URL.Query().Get("subject")
+
+	if clientID == "" && subject == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameters 'client_id' or 'subject' are not defined but one of them should have been.`)))
 		return
 	}
 
-	if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), clientID); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
+	if clientID != "" {
+		if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), clientID); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	} else {
+		if err := h.r.OAuth2Storage().DeleteSubjectAccessTokens(r.Context(), subject); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)

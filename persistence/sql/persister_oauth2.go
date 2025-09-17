@@ -628,6 +628,17 @@ func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) (er
 	)
 }
 
+func (p *Persister) DeleteSubjectAccessTokens(ctx context.Context, sub string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteSubjectAccessTokens",
+		trace.WithAttributes(events.Subject(sub)),
+	)
+	defer otelx.End(span, &err)
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.QueryWithNetwork(ctx).Where("subject = ?", sub).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
+	)
+}
+
 func handleRetryError(err error) error {
 	if err == nil {
 		return nil

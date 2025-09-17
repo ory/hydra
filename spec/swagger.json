@@ -1426,7 +1426,7 @@
     },
     "/admin/oauth2/tokens": {
       "delete": {
-        "description": "This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.",
+        "description": "This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client or Subject from the database.\n\nNote that you must specify either the `client_id` or the `subject` parameter.",
         "consumes": [
           "application/json"
         ],
@@ -1444,8 +1444,13 @@
             "type": "string",
             "description": "OAuth 2.0 Client ID",
             "name": "client_id",
-            "in": "query",
-            "required": true
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "OAuth 2.0 Subject",
+            "name": "subject",
+            "in": "query"
           }
         ],
         "responses": {

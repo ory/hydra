@@ -790,11 +790,18 @@ type ApiDeleteOAuth2TokenRequest struct {
 	ctx        context.Context
 	ApiService *OAuth2APIService
 	clientId   *string
+	subject    *string
 }
 
 // OAuth 2.0 Client ID
 func (r ApiDeleteOAuth2TokenRequest) ClientId(clientId string) ApiDeleteOAuth2TokenRequest {
 	r.clientId = &clientId
+	return r
+}
+
+// OAuth 2.0 Subject
+func (r ApiDeleteOAuth2TokenRequest) Subject(subject string) ApiDeleteOAuth2TokenRequest {
+	r.subject = &subject
 	return r
 }
 
@@ -805,7 +812,9 @@ func (r ApiDeleteOAuth2TokenRequest) Execute() (*http.Response, error) {
 /*
 DeleteOAuth2Token Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
 
-This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client from the database.
+This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0 Client or Subject from the database.
+
+Note that you must specify either the `client_id` or the `subject` parameter.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiDeleteOAuth2TokenRequest
@@ -835,11 +844,13 @@ func (a *OAuth2APIService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenReques
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.clientId == nil {
-		return nil, reportError("clientId is required and must be specified")
-	}
 
-	parameterAddToHeaderOrQuery(localVarQueryParams, "client_id", r.clientId, "")
+	if r.clientId != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "client_id", r.clientId, "")
+	}
+	if r.subject != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "subject", r.subject, "")
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

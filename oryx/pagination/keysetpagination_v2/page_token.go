@@ -34,7 +34,7 @@ type (
 func (t PageToken) Columns() []Column { return t.cols }
 
 // Encrypt encrypts the page token using the first key in the provided keyset.
-// It panics if no keys are provided.
+// It uses a fallback key if no keys are provided.
 func (t PageToken) Encrypt(keys [][32]byte) string {
 	key := fallbackEncryptionKey
 	if len(keys) > 0 {

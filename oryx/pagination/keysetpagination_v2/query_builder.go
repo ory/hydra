@@ -41,6 +41,13 @@ func Paginate[I any](p *Paginator) pop.ScopeFunc {
 			return quote(tableName) + "." + quote(name)
 		}
 		where, args, order := BuildWhereAndOrder(p.PageToken().Columns(), quoteAndContextualize)
+		// IMPORTANT: Ensures correct query logic by grouping conditions.
+		// Without parentheses, `WHERE otherCond AND pageCond1 OR pageCond2` would be
+		// evaluated as `(otherCond = ? AND pageCond1) OR pageCond2`, potentially returning
+		// rows that do not match `otherCond`.
+		// We fix it by forcing the query to be: `WHERE otherCond AND (paginationCond1 OR paginationCond2)`.
+		where = "(" + where + ")"
+
 		return q.
 			Where(where, args...).
 			Order(order).

@@ -309,23 +309,46 @@ func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *
 	}
 
 	return &session, nil
-
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.Flow, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequest")
 	defer otelx.End(span, &err)
 
-	var f flow.Flow
-	err = p.QueryWithNetwork(ctx).
-		Where("state = ?", flow.FlowStateConsentUsed).
-		Where("subject = ?", subject).
-		Where("client_id = ?", client).
-		Where("consent_skip = FALSE").
-		Where("consent_error = '{}'").
-		Where("consent_remember = TRUE").
-		Order("requested_at DESC").
-		First(&f)
+	f := flow.Flow{}
+	conn := p.Connection(ctx)
+
+	// apply index hint
+	tableName := applyTableNameWithIndexHint(conn, f.TableName(), "hydra_oauth2_flow_previous_consents_idx")
+
+	// prepare columns
+	cols := popx.DBColumns[flow.Flow](conn.Dialect)
+
+	// prepare sql statement
+	q := fmt.Sprintf(`
+SELECT %s FROM %s 
+WHERE nid = ?
+AND state = ?
+AND subject = ?
+AND client_id = ?
+AND consent_skip = FALSE
+AND consent_error = '{}'
+AND consent_remember = TRUE
+ORDER BY requested_at DESC
+LIMIT 1`,
+		cols,
+		tableName,
+	)
+
+	// query first record
+	err = conn.RawQuery(q,
+		p.NetworkID(ctx),
+		flow.FlowStateConsentUsed,
+		subject,
+		client,
+	).First(&f)
+
+	// handle error
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	} else if err != nil {
@@ -337,6 +360,19 @@ func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, 
 		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
 	return &fs[0], nil
+}
+
+func applyTableNameWithIndexHint(conn *pop.Connection, table string, index string) string {
+	switch conn.Dialect.Name() {
+	case "cockroach":
+		return table + "@" + index
+	case "sqlite3":
+		return table + " INDEXED BY " + index
+	case "mysql":
+		return table + " USE INDEX(" + index + ")"
+	default:
+		return table
+	}
 }
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {

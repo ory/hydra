@@ -4,7 +4,6 @@
 package metricsx
 
 import (
-	"cmp"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -18,27 +17,32 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/httpx"
-
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/ory/x/configx"
-
+	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/resilience"
+	"github.com/ory/x/urlx"
 
 	"github.com/ory/analytics-go/v5"
 )
 
+const (
+	XForwardedHostHeader = "X-Forwarded-Host"
+	AuthorityHeader      = ":authority"
+)
+
 var (
-	instance *Service
-	lock     sync.Mutex
+	instance     *Service
+	lock         sync.Mutex
+	knownHeaders = []string{AuthorityHeader, XForwardedHostHeader}
 )
 
 // Service helps with providing context on metrics.
@@ -282,16 +286,15 @@ func (sw *Service) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.
 
 	latency := time.Since(start).Milliseconds()
 	path := sw.anonymizePath(r.URL.Path)
-	host := sw.determineURLHost(r.Header.Get("X-Forwarded-Host"), r.Host)
+	host := urlx.ExtractPublicAddress(sw.o.Hostname, r.Header.Get(XForwardedHostHeader), r.Host)
 
 	// Collecting request info
 	stat, _ := httpx.GetResponseMeta(rw)
 
 	if err := sw.c.Enqueue(analytics.Page{
-		InstanceId:   sw.instanceId,
-		DeploymentId: sw.o.DeploymentId,
-		Project:      sw.o.Service,
-
+		InstanceId:     sw.instanceId,
+		DeploymentId:   sw.o.DeploymentId,
+		Project:        sw.o.Service,
 		UrlHost:        host,
 		UrlPath:        path,
 		RequestCode:    stat,
@@ -316,11 +319,21 @@ func (sw *Service) UnaryInterceptor(ctx context.Context, req interface{}, info *
 
 	latency := time.Since(start).Milliseconds()
 
-	if err := sw.c.Enqueue(analytics.Page{
-		InstanceId:   sw.instanceId,
-		DeploymentId: sw.o.DeploymentId,
-		Project:      sw.o.Service,
+	hosts := []string{sw.o.Hostname}
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		for _, h := range knownHeaders {
+			if v := md.Get(h); len(v) > 0 {
+				hosts = append(hosts, v[0])
+			}
+		}
+	}
+	host := urlx.ExtractPublicAddress(hosts...)
 
+	if err := sw.c.Enqueue(analytics.Page{
+		InstanceId:     sw.instanceId,
+		DeploymentId:   sw.o.DeploymentId,
+		Project:        sw.o.Service,
+		UrlHost:        host,
 		UrlPath:        info.FullMethod,
 		RequestCode:    int(status.Code(err)),
 		RequestLatency: int(latency),
@@ -368,8 +381,4 @@ func (sw *Service) anonymizeQuery(query url.Values, salt string) string {
 		}
 	}
 	return query.Encode()
-}
-
-func (sw *Service) determineURLHost(xForwardedHostHeader, hostHeader string) string {
-	return cmp.Or(sw.o.Hostname, xForwardedHostHeader, hostHeader)
 }

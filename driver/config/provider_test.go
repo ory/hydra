@@ -288,8 +288,8 @@ func TestProviderValidates(t *testing.T) {
 	assert.Equal(t, 5*time.Minute, c.GracefulRefreshTokenRotation(ctx).Period)
 	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGraceReuseCount, "2"))
 	assert.Equal(t, GracefulRefreshTokenRotation{Count: 2, Period: 2 * time.Hour}, c.GracefulRefreshTokenRotation(ctx))
-	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, (time.Hour*24*90).String()))
-	assert.Equal(t, GracefulRefreshTokenRotation{Count: 2, Period: time.Hour * 24 * 30}, c.GracefulRefreshTokenRotation(ctx))
+	require.NoError(t, c.Set(ctx, KeyRefreshTokenRotationGracePeriod, (time.Hour*24*200).String()))
+	assert.Equal(t, GracefulRefreshTokenRotation{Count: 2, Period: time.Hour * 24 * 180}, c.GracefulRefreshTokenRotation(ctx))
 
 	// urls
 	assert.Equal(t, urlx.ParseOrPanic("https://issuer"), c.IssuerURL(ctx))

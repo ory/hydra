@@ -770,20 +770,17 @@ type GracefulRefreshTokenRotation struct {
 }
 
 func (p *DefaultProvider) GracefulRefreshTokenRotation(ctx context.Context) (cfg GracefulRefreshTokenRotation) {
-	switch reuseCount := p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0); {
-	case reuseCount > math.MaxInt32:
-		cfg.Count = math.MaxInt32
-	case reuseCount < 0:
-		cfg.Count = 0
-	default:
-		cfg.Count = int32(reuseCount)
+	//nolint:gosec
+	cfg.Count = int32(x.Clamp(p.getProvider(ctx).IntF(KeyRefreshTokenRotationGraceReuseCount, 0), 0, math.MaxInt32))
+
+	// The maximum value is 5 minutes, unless also a reuse count is configured, in
+	// which case the maximum is 180 days
+	maxPeriod := 5 * time.Minute
+	if cfg.Count > 0 {
+		maxPeriod = 180 * 24 * time.Hour
 	}
-	cfg.Period = p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0)
-	if cfg.Count == 0 && cfg.Period > 5*time.Minute {
-		cfg.Period = 5 * time.Minute
-	} else if cfg.Count > 0 && cfg.Period > 30*24*time.Hour {
-		cfg.Period = 30 * 24 * time.Hour
-	}
+	cfg.Period = x.Clamp(p.getProvider(ctx).DurationF(KeyRefreshTokenRotationGracePeriod, 0), 0, maxPeriod)
+
 	return
 }
 

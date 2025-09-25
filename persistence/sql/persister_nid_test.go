@@ -765,7 +765,7 @@ func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 		s.T().Run(k, func(t *testing.T) {
 			actual := &jwk.SQLData{}
 
-			key, err := jwk.GenerateJWK(s.t1, "RS256", "kid", "use")
+			key, err := jwk.GenerateJWK("RS256", "kid", "use")
 			require.NoError(t, err)
 			require.NoError(t, r.KeyManager().AddKey(s.t1, "ks", pointerx.Ptr(key.Keys[0].Public())))
 
@@ -1908,7 +1908,7 @@ func newLogoutRequest() *flow.LogoutRequest {
 }
 
 func newKey(ksID string, use string) jose.JSONWebKey {
-	ks, err := jwk.GenerateJWK(context.Background(), jose.RS256, ksID, use)
+	ks, err := jwk.GenerateJWK(jose.RS256, ksID, use)
 	if err != nil {
 		panic(err)
 	}
@@ -1916,7 +1916,7 @@ func newKey(ksID string, use string) jose.JSONWebKey {
 }
 
 func newKeySet(id string, use string) *jose.JSONWebKeySet {
-	return x.Must(jwk.GenerateJWK(context.Background(), jose.RS256, id, use))
+	return x.Must(jwk.GenerateJWK(jose.RS256, id, use))
 }
 
 func newLoginSession() *flow.LoginSession {

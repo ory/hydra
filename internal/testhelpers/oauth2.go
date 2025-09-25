@@ -8,11 +8,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
-	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -24,11 +21,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/negroni"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/fosite/token/jwt"
-	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
@@ -37,7 +32,6 @@ import (
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/prometheusx"
-	"github.com/ory/x/uuidx"
 )
 
 func NewIDToken(t *testing.T, reg *driver.RegistrySQL, subject string) string {
@@ -230,39 +224,6 @@ func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 	return ts.URL + "/" + prefix
 }
 
-func NewEmptyCookieJar(t testing.TB) *cookiejar.Jar {
-	c, err := cookiejar.New(&cookiejar.Options{})
-	require.NoError(t, err)
-	return c
-}
-
-func NewEmptyJarClient(t testing.TB) *http.Client {
-	return &http.Client{
-		Jar:       NewEmptyCookieJar(t),
-		Transport: &loggingTransport{t},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			//t.Logf("Redirect to %s", req.URL.String())
-
-			if len(via) >= 20 {
-				for k, v := range via {
-					t.Logf("Failed with redirect (%d): %s", k, v.URL.String())
-				}
-				return errors.New("stopped after 20 redirects")
-			}
-			return nil
-		},
-	}
-}
-
-type loggingTransport struct{ t testing.TB }
-
-func (s *loggingTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	//s.t.Logf("%s %s", r.Method, r.URL.String())
-	//s.t.Logf("%s %s\nWith Cookies: %v", r.Method, r.URL.String(), r.Cookies())
-
-	return otelhttp.DefaultClient.Transport.RoundTrip(r)
-}
-
 // InsecureDecodeJWT decodes a JWT payload without checking the signature.
 func InsecureDecodeJWT(t require.TestingT, token string) []byte {
 	parts := strings.Split(token, ".")
@@ -272,65 +233,10 @@ func InsecureDecodeJWT(t require.TestingT, token string) []byte {
 	return dec
 }
 
-const (
-	ClientCallbackURL = "https://client.ory/callback"
-	LoginURL          = "https://ui.ory/login"
-	ConsentURL        = "https://ui.ory/consent"
+var (
+	NewEmptyCookieJar = x.NewEmptyCookieJar
+	NewEmptyJarClient = x.NewEmptyJarClient
 )
-
-func GetExpectRedirect(t *testing.T, cl *http.Client, uri string) *url.URL {
-	resp, err := cl.Get(uri)
-	require.NoError(t, err)
-	require.Equalf(t, 3, resp.StatusCode/100, "status: %d\nresponse: %s", resp.StatusCode, ioutilx.MustReadAll(resp.Body))
-	loc, err := resp.Location()
-	require.NoError(t, err)
-	return loc
-}
-
-func PerformAuthCodeFlow(t *testing.T, cfg *oauth2.Config, admin *hydra.APIClient, lr func(*testing.T, *hydra.OAuth2LoginRequest) hydra.AcceptOAuth2LoginRequest, cr func(*testing.T, *hydra.OAuth2ConsentRequest) hydra.AcceptOAuth2ConsentRequest, authCodeOpts ...oauth2.AuthCodeOption) *oauth2.Token {
-	cl := NewEmptyJarClient(t)
-	cl.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
-
-	// start the auth code flow
-	state := uuidx.NewV4().String()
-	loc := GetExpectRedirect(t, cl, cfg.AuthCodeURL(state, authCodeOpts...))
-	require.Equal(t, LoginURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
-
-	// get & submit the login request
-	lReq, _, err := admin.OAuth2API.GetOAuth2LoginRequest(t.Context()).LoginChallenge(loc.Query().Get("login_challenge")).Execute()
-	require.NoError(t, err)
-
-	v, _, err := admin.OAuth2API.AcceptOAuth2LoginRequest(t.Context()).
-		LoginChallenge(lReq.Challenge).
-		AcceptOAuth2LoginRequest(lr(t, lReq)).
-		Execute()
-	require.NoError(t, err)
-
-	loc = GetExpectRedirect(t, cl, v.RedirectTo)
-	require.Equal(t, ConsentURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
-
-	// get & submit the consent request
-	cReq, _, err := admin.OAuth2API.GetOAuth2ConsentRequest(t.Context()).ConsentChallenge(loc.Query().Get("consent_challenge")).Execute()
-	require.NoError(t, err)
-
-	v, _, err = admin.OAuth2API.AcceptOAuth2ConsentRequest(t.Context()).
-		ConsentChallenge(cReq.Challenge).
-		AcceptOAuth2ConsentRequest(cr(t, cReq)).
-		Execute()
-	require.NoError(t, err)
-	loc = GetExpectRedirect(t, cl, v.RedirectTo)
-	// ensure we got redirected to the client callback URL
-	require.Equal(t, ClientCallbackURL, fmt.Sprintf("%s://%s%s", loc.Scheme, loc.Host, loc.Path))
-	require.Equal(t, state, loc.Query().Get("state"))
-
-	// exchange the code for a token
-	code := loc.Query().Get("code")
-	require.NotEmpty(t, code)
-	token, err := cfg.Exchange(t.Context(), code)
-	require.NoError(t, err)
-
-	return token
-}
 
 func AssertTokenValid(t *testing.T, accessOrIDToken gjson.Result, sub string) {
 	assert.Equal(t, sub, accessOrIDToken.Get("sub").Str)

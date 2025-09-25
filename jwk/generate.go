@@ -4,18 +4,16 @@
 package jwk
 
 import (
-	"context"
 	"crypto/x509"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/go-jose/go-jose/v3"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/josex"
 )
 
-func GenerateJWK(ctx context.Context, alg jose.SignatureAlgorithm, kid, use string) (*jose.JSONWebKeySet, error) {
+func GenerateJWK(alg jose.SignatureAlgorithm, kid, use string) (*jose.JSONWebKeySet, error) {
 	bits := 0
 	if alg == jose.RS256 || alg == jose.RS384 || alg == jose.RS512 {
 		bits = 4096

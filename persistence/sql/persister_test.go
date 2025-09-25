@@ -75,7 +75,7 @@ func testRegistry(t *testing.T, k string, t1, t2 *driver.RegistrySQL) {
 				} else {
 					kid, err := uuid.NewV4()
 					require.NoError(t, err)
-					ks, err := jwk.GenerateJWK(context.Background(), jose.SignatureAlgorithm(tc.alg), kid.String(), "sig")
+					ks, err := jwk.GenerateJWK(jose.SignatureAlgorithm(tc.alg), kid.String(), "sig")
 					require.NoError(t, err)
 					t.Run("TestManagerKey", jwk.TestHelperManagerKey(t1.KeyManager(), tc.alg, ks, kid.String()))
 					t.Run("Parallel", func(t *testing.T) {

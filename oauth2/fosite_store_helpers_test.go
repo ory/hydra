@@ -1000,7 +1000,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
 
 		t.Run("case=associated key added with grant", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
@@ -1045,14 +1045,14 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=only associated key returns", func(t *testing.T) {
-			keySetToNotReturn, err := jwk.GenerateJWK(context.Background(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySetToNotReturn, err := jwk.GenerateJWK(jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, keyManager.AddKeySet(context.Background(), uuid.Must(uuid.NewV4()).String(), keySetToNotReturn), "adding a random key should not fail")
 
 			issuer := uuid.Must(uuid.NewV4()).String()
 			subject := "maria+" + uuid.Must(uuid.NewV4()).String() + "@example.com"
 
-			keySet1ToReturn, err := jwk.GenerateJWK(t.Context(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet1ToReturn, err := jwk.GenerateJWK(jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, grantManager.CreateGrant(t.Context(), trust.Grant{
 				ID:              uuid.Must(uuid.NewV4()),
@@ -1065,7 +1065,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}, keySet1ToReturn.Keys[0].Public()))
 
-			keySet2ToReturn, err := jwk.GenerateJWK(t.Context(), jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet2ToReturn, err := jwk.GenerateJWK(jose.ES256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 			require.NoError(t, grantManager.CreateGrant(ctx, trust.Grant{
 				ID:              uuid.Must(uuid.NewV4()),
@@ -1108,7 +1108,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
@@ -1144,7 +1144,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
@@ -1180,7 +1180,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=only returns the key when subject matches", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
@@ -1221,7 +1221,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=returns the key when any subject is allowed", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()
@@ -1253,7 +1253,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 		})
 
 		t.Run("case=does not return expired values", func(t *testing.T) {
-			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[0].Public()

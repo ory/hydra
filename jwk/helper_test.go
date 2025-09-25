@@ -48,7 +48,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
 		t.Parallel()
-		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		RSIDKS, err := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(RSIDKS)
 		require.NoError(t, err)
@@ -58,7 +58,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_Opaque", func(t *testing.T) {
 		t.Parallel()
-		key, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		key, err := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		RSIDKS := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{
 			Algorithm:                   "RS256",
 			Use:                         "sig",
@@ -85,7 +85,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
 		t.Parallel()
-		ECDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.ES256, "test-id-2", "sig")
+		ECDSAIDKS, err := jwk.GenerateJWK(jose.ES256, "test-id-2", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(ECDSAIDKS)
 		require.NoError(t, err)
@@ -95,7 +95,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_EdDSA", func(t *testing.T) {
 		t.Parallel()
-		EdDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.EdDSA, "test-id-3", "sig")
+		EdDSAIDKS, err := jwk.GenerateJWK(jose.EdDSA, "test-id-3", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(EdDSAIDKS)
 		require.NoError(t, err)
@@ -115,7 +115,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 func TestHandlerFindPrivateKey(t *testing.T) {
 	t.Parallel()
 	t.Run("Test_Helper/Run_FindPrivateKey_With_RSA", func(t *testing.T) {
-		RSIDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		RSIDKS, _ := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		keys, err := jwk.FindPrivateKey(RSIDKS)
 		require.NoError(t, err)
 		assert.Equal(t, keys.KeyID, "test-id-1")
@@ -123,7 +123,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPrivateKey_With_ECDSA", func(t *testing.T) {
-		ECDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.ES256, "test-id-2", "sig")
+		ECDSAIDKS, err := jwk.GenerateJWK(jose.ES256, "test-id-2", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPrivateKey(ECDSAIDKS)
 		require.NoError(t, err)
@@ -132,7 +132,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_FindPrivateKey_With_EdDSA", func(t *testing.T) {
-		EdDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.EdDSA, "test-id-3", "sig")
+		EdDSAIDKS, err := jwk.GenerateJWK(jose.EdDSA, "test-id-3", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPrivateKey(EdDSAIDKS)
 		require.NoError(t, err)
@@ -151,7 +151,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 func TestPEMBlockForKey(t *testing.T) {
 	t.Parallel()
 	t.Run("Test_Helper/Run_PEMBlockForKey_With_RSA", func(t *testing.T) {
-		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		RSIDKS, err := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		require.NoError(t, err)
 		key, err := jwk.FindPrivateKey(RSIDKS)
 		require.NoError(t, err)
@@ -162,7 +162,7 @@ func TestPEMBlockForKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_PEMBlockForKey_With_ECDSA", func(t *testing.T) {
-		ECDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.ES256, "test-id-2", "sig")
+		ECDSAIDKS, err := jwk.GenerateJWK(jose.ES256, "test-id-2", "sig")
 		require.NoError(t, err)
 		key, err := jwk.FindPrivateKey(ECDSAIDKS)
 		require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestPEMBlockForKey(t *testing.T) {
 	})
 
 	t.Run("Test_Helper/Run_PEMBlockForKey_With_EdDSA", func(t *testing.T) {
-		EdDSAIDKS, err := jwk.GenerateJWK(context.Background(), jose.EdDSA, "test-id-3", "sig")
+		EdDSAIDKS, err := jwk.GenerateJWK(jose.EdDSA, "test-id-3", "sig")
 		require.NoError(t, err)
 		key, err := jwk.FindPrivateKey(EdDSAIDKS)
 		require.NoError(t, err)
@@ -193,7 +193,7 @@ func TestPEMBlockForKey(t *testing.T) {
 
 func TestExcludeOpaquePrivateKeys(t *testing.T) {
 	t.Parallel()
-	opaqueKeys, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+	opaqueKeys, err := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 	assert.NoError(t, err)
 	require.Len(t, opaqueKeys.Keys, 1)
 	opaqueKeys.Keys[0].Key = cryptosigner.Opaque(opaqueKeys.Keys[0].Key.(*rsa.PrivateKey))
@@ -213,7 +213,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 	setID := uuid.NewUUID().String()
 	keyID := uuid.NewUUID().String()
 
-	keySet, err := jwk.GenerateJWK(t.Context(), jose.RS256, keyID, "sig")
+	keySet, err := jwk.GenerateJWK(jose.RS256, keyID, "sig")
 	require.NoError(t, err)
 	require.Len(t, keySet.Keys, 1)
 	keySetWithoutPrivateKey := &jose.JSONWebKeySet{
@@ -272,7 +272,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 }
 
 func TestOnlyPublicSDKKeys(t *testing.T) {
-	set, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+	set, err := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 	require.NoError(t, err)
 
 	out, err := json.Marshal(set.Keys)

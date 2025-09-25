@@ -41,7 +41,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		if reg.Config().HSMEnabled() {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
-		IDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		IDKS, _ := jwk.GenerateJWK(jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
@@ -72,7 +72,7 @@ func TestHandlerWellKnown(t *testing.T) {
 			require.NoError(t, err, "problem in generating keys")
 		} else {
 			var err error
-			IDKS, err = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
+			IDKS, err = jwk.GenerateJWK(jose.RS256, "test-id-2", "sig")
 			require.NoError(t, err, "problem in generating keys")
 			IDKS.Keys[0].KeyID = "test-id-2"
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))

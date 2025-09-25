@@ -38,7 +38,7 @@ func (p *JWKPersister) GenerateAndPersistKeySet(ctx context.Context, set, kid, a
 		kid = uuid.Must(uuid.NewV4()).String()
 	}
 
-	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
+	keys, err := jwk.GenerateJWK(jose.SignatureAlgorithm(alg), kid, use)
 	if err != nil {
 		return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
 	}

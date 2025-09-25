@@ -5,7 +5,6 @@ package server_test
 
 import (
 	"bytes"
-	"context"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
@@ -129,7 +128,7 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 }
 
 func TestCreateSelfSignedCertificate(t *testing.T) {
-	keys, err := jwk.GenerateJWK(context.Background(), jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+	keys, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 	require.NoError(t, err)
 
 	private := keys.Keys[0]

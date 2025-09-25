@@ -4,7 +4,6 @@
 package jwk
 
 import (
-	"context"
 	"testing"
 
 	"github.com/go-jose/go-jose/v3"
@@ -14,7 +13,7 @@ import (
 
 func TestGenerateJWK(t *testing.T) {
 	t.Parallel()
-	jwks, err := GenerateJWK(context.Background(), jose.RS256, "", "")
+	jwks, err := GenerateJWK(jose.RS256, "", "")
 	require.NoError(t, err)
 	assert.NotEmpty(t, jwks.Keys[0].KeyID)
 	assert.EqualValues(t, jose.RS256, jwks.Keys[0].Algorithm)

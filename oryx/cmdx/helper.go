@@ -146,8 +146,16 @@ var _ io.Writer = (*CallbackWriter)(nil)
 
 func prepareCmd(cmd *cobra.Command, stdIn io.Reader, stdOut, stdErr io.Writer, args []string) {
 	cmd.SetIn(stdIn)
-	cmd.SetOut(io.MultiWriter(stdOut, debugStdout))
-	cmd.SetErr(io.MultiWriter(stdErr, debugStderr))
+	outs := []io.Writer{debugStdout}
+	if stdOut != nil {
+		outs = append(outs, stdOut)
+	}
+	cmd.SetOut(io.MultiWriter(outs...))
+	errs := []io.Writer{debugStderr}
+	if stdErr != nil {
+		errs = append(errs, stdErr)
+	}
+	cmd.SetErr(io.MultiWriter(errs...))
 
 	if args == nil {
 		args = []string{}

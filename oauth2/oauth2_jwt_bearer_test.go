@@ -135,7 +135,7 @@ func TestJWTBearer(t *testing.T) {
 	})
 
 	set, kid := uuid.Must(uuid.NewV4()).String(), uuid.Must(uuid.NewV4()).String()
-	keys, err := jwk.GenerateJWK(ctx, jose.RS256, kid, "sig")
+	keys, err := jwk.GenerateJWK(jose.RS256, kid, "sig")
 	require.NoError(t, err)
 	trustGrant := trust.Grant{
 		ID:              uuid.Must(uuid.NewV4()),
@@ -208,7 +208,7 @@ func TestJWTBearer(t *testing.T) {
 	})
 
 	t.Run("case=unable to exchange token with an invalid key", func(t *testing.T) {
-		keys, err := jwk.GenerateJWK(ctx, jose.RS256, kid, "sig")
+		keys, err := jwk.GenerateJWK(jose.RS256, kid, "sig")
 		require.NoError(t, err)
 		signer := jwk.NewDefaultJWTSigner(reg, set)
 		signer.GetPrivateKey = func(ctx context.Context) (interface{}, error) {

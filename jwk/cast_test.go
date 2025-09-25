@@ -4,7 +4,6 @@
 package jwk
 
 import (
-	"context"
 	"testing"
 
 	"github.com/go-jose/go-jose/v3"
@@ -15,7 +14,7 @@ import (
 
 func TestMustRSAPrivate(t *testing.T) {
 	t.Parallel()
-	keys, err := GenerateJWK(context.Background(), jose.RS256, "foo", "sig")
+	keys, err := GenerateJWK(jose.RS256, "foo", "sig")
 	require.NoError(t, err)
 
 	priv := keys.Key("foo")[0]

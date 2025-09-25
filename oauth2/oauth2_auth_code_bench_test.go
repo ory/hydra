@@ -90,9 +90,9 @@ func BenchmarkAuthCode(b *testing.B) {
 		})),
 		driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }),
 	)
-	oauth2Keys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OAuth2JWTKeyName, "sig")
+	oauth2Keys, err := jwk.GenerateJWK(jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
-	oidcKeys, err := jwk.GenerateJWK(ctx, jose.ES256, x.OpenIDConnectKeyName, "sig")
+	oidcKeys, err := jwk.GenerateJWK(jose.ES256, x.OpenIDConnectKeyName, "sig")
 	require.NoError(b, err)
 	_, _ = oauth2Keys, oidcKeys
 	require.NoError(b, reg.KeyManager().UpdateKeySet(ctx, x.OAuth2JWTKeyName, oauth2Keys))

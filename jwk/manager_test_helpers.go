@@ -200,7 +200,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 func TestHelperNID(t1ValidNID, t2InvalidNID Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		jwks, err := GenerateJWK(ctx, jose.RS256, "2022-03-11-ks-1-kid", "test")
+		jwks, err := GenerateJWK(jose.RS256, "2022-03-11-ks-1-kid", "test")
 		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))
 		require.NoError(t, t1ValidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))

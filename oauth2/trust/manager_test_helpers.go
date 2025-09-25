@@ -28,15 +28,15 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		kid3 := uuid.Must(uuid.NewV4()).String()
 		set := uuid.Must(uuid.NewV4()).String()
 
-		key1, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid1, "sig")
+		key1, err := jwk.GenerateJWK(jose.RS256, kid1, "sig")
 		require.NoError(t, err)
 		tokenServicePubKey1 := josex.ToPublicKey(&key1.Keys[0])
 
-		key2, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid2, "sig")
+		key2, err := jwk.GenerateJWK(jose.RS256, kid2, "sig")
 		require.NoError(t, err)
 		tokenServicePubKey2 := josex.ToPublicKey(&key2.Keys[0])
 
-		key3, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid3, "sig")
+		key3, err := jwk.GenerateJWK(jose.RS256, kid3, "sig")
 		require.NoError(t, err)
 		mikePubKey := josex.ToPublicKey(&key3.Keys[0])
 
@@ -157,11 +157,11 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager) func(t *testin
 
 		t.Parallel()
 
-		key1, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid1, "sig")
+		key1, err := jwk.GenerateJWK(jose.RS256, kid1, "sig")
 		require.NoError(t, err)
 		pubKey1 := josex.ToPublicKey(&key1.Keys[0])
 
-		key2, err := jwk.GenerateJWK(t.Context(), jose.RS256, kid2, "sig")
+		key2, err := jwk.GenerateJWK(jose.RS256, kid2, "sig")
 		require.NoError(t, err)
 		pubKey2 := josex.ToPublicKey(&key2.Keys[0])
 

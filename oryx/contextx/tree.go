@@ -3,7 +3,10 @@
 
 package contextx
 
-import "context"
+import (
+	"context"
+	"testing"
+)
 
 type ContextKey int
 
@@ -12,6 +15,10 @@ const (
 )
 
 var RootContext = context.WithValue(context.Background(), ValidContextKey, true)
+
+func TestRootContext(t *testing.T) context.Context {
+	return context.WithValue(t.Context(), ValidContextKey, true)
+}
 
 func IsRootContext(ctx context.Context) bool {
 	is, ok := ctx.Value(ValidContextKey).(bool)

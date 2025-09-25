@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/ssoready/hyrumtoken"
 
@@ -21,13 +22,21 @@ type (
 		cols    []Column
 	}
 	jsonPageToken = struct {
-		ExpiresAt time.Time `json:"e"`
-		Cols      []Column  `json:"c"`
+		ExpiresAt time.Time    `json:"e"`
+		Cols      []jsonColumn `json:"c"`
+	}
+	jsonColumn = struct {
+		Name      string    `json:"n"`
+		Order     Order     `json:"o"`
+		ValueAny  any       `json:"v"`
+		ValueTime time.Time `json:"vt"`
+		ValueUUID uuid.UUID `json:"vu"`
+		ValueInt  int64     `json:"vi"`
 	}
 	Column struct {
-		Name  string `json:"n"`
-		Order Order  `json:"o"`
-		Value any    `json:"v"`
+		Name  string
+		Order Order
+		Value any
 	}
 )
 
@@ -50,7 +59,23 @@ func (t PageToken) MarshalJSON() ([]byte, error) {
 	}
 	toEncode := jsonPageToken{
 		ExpiresAt: now().Add(time.Hour).UTC(),
-		Cols:      t.cols,
+		Cols:      make([]jsonColumn, len(t.cols)),
+	}
+	for i, col := range t.cols {
+		toEncode.Cols[i] = jsonColumn{
+			Name:  col.Name,
+			Order: col.Order,
+		}
+		switch v := col.Value.(type) {
+		case time.Time:
+			toEncode.Cols[i].ValueTime = v
+		case uuid.UUID:
+			toEncode.Cols[i].ValueUUID = v
+		case int64:
+			toEncode.Cols[i].ValueInt = v
+		default:
+			toEncode.Cols[i].ValueAny = v
+		}
 	}
 	return json.Marshal(toEncode)
 }
@@ -62,7 +87,23 @@ func (t *PageToken) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &rawToken); err != nil {
 		return err
 	}
-	t.cols = rawToken.Cols
+	t.cols = make([]Column, len(rawToken.Cols))
+	for i, col := range rawToken.Cols {
+		t.cols[i] = Column{
+			Name:  col.Name,
+			Order: col.Order,
+		}
+		switch {
+		case col.ValueAny != nil:
+			t.cols[i].Value = col.ValueAny
+		case !col.ValueTime.IsZero():
+			t.cols[i].Value = col.ValueTime
+		case col.ValueUUID != uuid.Nil:
+			t.cols[i].Value = col.ValueUUID
+		case col.ValueInt != 0:
+			t.cols[i].Value = col.ValueInt
+		}
+	}
 	now := time.Now
 	if t.testNow != nil {
 		now = t.testNow
@@ -73,6 +114,4 @@ func (t *PageToken) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func NewPageToken(cols ...Column) PageToken {
-	return PageToken{cols: cols}
-}
+func NewPageToken(cols ...Column) PageToken { return PageToken{cols: cols} }

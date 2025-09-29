@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Find closed references
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: "14"
+          node-version: "22"
       - uses: ory/closed-reference-notifier@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

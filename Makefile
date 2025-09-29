@@ -134,7 +134,7 @@ sdk: .bin/ory node_modules
 		--git-host github.com \
 		--api-name-suffix "API" \
 		--global-property apiTests=false
-	(cd internal/httpclient; go mod tidy)
+	(cd internal/httpclient; go get golang.org/x/net@latest; go get google.golang.org/protobuf@latest; go mod tidy)
 
 	make format
 

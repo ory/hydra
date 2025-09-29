@@ -84,7 +84,7 @@ func main() {
 		},
 	}).Get(au)
 	cmdx.CheckResponse(err, http.StatusOK, resp)
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	out, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -118,7 +118,7 @@ func main() {
 	// refreshing the same token twice does not work
 	resp, err = refreshTokenRequest(token)
 	cmdx.CheckResponse(err, http.StatusBadRequest, resp)
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 }
 
 func refreshTokenRequest(token oauth2token) (*http.Response, error) {
@@ -135,7 +135,7 @@ func refreshTokenRequest(token oauth2token) (*http.Response, error) {
 func refreshToken(token oauth2token) (result oauth2token) {
 	resp, err := refreshTokenRequest(token)
 	cmdx.CheckResponse(err, http.StatusOK, resp)
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	cmdx.Must(err, "Unable to decode refresh token: %s", err)
@@ -182,7 +182,7 @@ func checkTokenResponse(token oauth2token) {
 	}
 
 	intro, resp, err := sdk.OAuth2API.IntrospectOAuth2Token(context.Background()).Token(token.AccessToken).Execute()
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 	if err != nil {
 		log.Fatalf("Unable to introspect OAuth2 token: %s", err)
 	}

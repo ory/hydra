@@ -322,7 +322,7 @@ func TestUserinfo(t *testing.T) {
 			req.Header.Set("Authorization", "Bearer access-token")
 			resp, err := http.DefaultClient.Do(req)
 			require.NoError(t, err)
-			defer resp.Body.Close()
+			defer resp.Body.Close() //nolint:errcheck
 			require.EqualValues(t, tc.expectStatusCode, resp.StatusCode)
 			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
@@ -360,7 +360,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
 		require.NoError(t, err)
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 
 		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
@@ -406,7 +406,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 
 		res, err := http.Get(ts.URL + "/.well-known/oauth-authorization-server")
 		require.NoError(t, err)
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 
 		var wellKnownResp hydra.OidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

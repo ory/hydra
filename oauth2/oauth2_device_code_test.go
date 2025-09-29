@@ -206,6 +206,7 @@ func TestDeviceTokenRequest(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run("case="+testCase.description, func(t *testing.T) {
 			code, signature, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(context.TODO())
+			require.NoError(t, err)
 			_, userCodeSignature, err := reg.RFC8628HMACStrategy().GenerateUserCode(context.TODO())
 			require.NoError(t, err)
 
@@ -243,10 +244,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 
 	getDeviceCode := func(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (*oauth2.DeviceAuthResponse, error) {
-		if c == nil {
-			c = testhelpers.NewEmptyJarClient(t)
-		}
-
 		return conf.DeviceAuth(ctx, params...)
 	}
 
@@ -420,7 +417,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=checks if request fails when audience does not match", func(t *testing.T) {
 		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newDeviceClient(t, reg)
-		resp, err := getDeviceCode(t, conf, nil, oauth2.SetAuthURLParam("audience", "https://not-ory-api/"))
+		resp, err := conf.DeviceAuth(ctx, oauth2.SetAuthURLParam("audience", "https://not-ory-api/"))
 		require.Error(t, err)
 		var devErr *oauth2.RetrieveError
 		require.ErrorAs(t, err, &devErr)
@@ -600,7 +597,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			}),
 		)
 
-		resp, err := getDeviceCode(t, conf, nil, oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"))
+		resp, err := conf.DeviceAuth(ctx, oauth2.SetAuthURLParam("audience", "https://api.ory.sh/"))
 		require.NoError(t, err)
 		require.NotEmpty(t, resp.DeviceCode)
 		require.NotEmpty(t, resp.UserCode)
@@ -836,6 +833,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			DeviceChallenge(deviceChallenge).
 			AcceptDeviceUserCodeRequest(payload).
 			Execute()
+		require.NoError(t, err)
 
 		loginFlowResp2, err := hc.Get(acceptResp.RedirectTo)
 		require.NoError(t, err)

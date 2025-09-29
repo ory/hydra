@@ -34,23 +34,6 @@ func (f *Flow) setLoginRequest(r *LoginRequest) {
 	f.RequestedAt = r.RequestedAt
 }
 
-func (f *Flow) setHandledLoginRequest(r *HandledLoginRequest) {
-	f.ID = r.ID
-	f.LoginRemember = r.Remember
-	f.LoginRememberFor = r.RememberFor
-	f.LoginExtendSessionLifespan = r.ExtendSessionLifespan
-	f.ACR = r.ACR
-	f.AMR = r.AMR
-	f.Subject = r.Subject
-	f.IdentityProviderSessionID = sqlxx.NullString(r.IdentityProviderSessionID)
-	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
-	f.Context = r.Context
-	f.LoginWasUsed = r.WasHandled
-	f.LoginError = r.Error
-	f.RequestedAt = r.RequestedAt
-	f.LoginAuthenticatedAt = r.AuthenticatedAt
-}
-
 func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 	f.ConsentRequestID = sqlxx.NullString(r.ConsentRequestID)
 	f.RequestedScope = r.RequestedScope
@@ -72,24 +55,6 @@ func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 	f.ConsentCSRF = sqlxx.NullString(r.CSRF)
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 	f.RequestedAt = r.RequestedAt
-}
-
-func (f *Flow) setHandledConsentRequest(r AcceptOAuth2ConsentRequest) {
-	f.ConsentRequestID = sqlxx.NullString(r.ConsentRequestID)
-	f.GrantedScope = r.GrantedScope
-	f.GrantedAudience = r.GrantedAudience
-	f.ConsentRemember = r.Remember
-	f.ConsentRememberFor = &r.RememberFor
-	f.ConsentHandledAt = r.HandledAt
-	f.ConsentWasHandled = r.WasHandled
-	f.ConsentError = r.Error
-	f.RequestedAt = r.RequestedAt
-	f.LoginAuthenticatedAt = r.AuthenticatedAt
-	f.SessionIDToken = r.SessionIDToken
-	f.SessionAccessToken = r.SessionAccessToken
-	if r.Context != nil {
-		f.Context = r.Context
-	}
 }
 
 func (f *Flow) setDeviceRequest(r *DeviceUserAuthRequest) {

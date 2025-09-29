@@ -183,7 +183,7 @@ func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
 	if err != nil {
 		require.FailNowf(t, "Failed to make POST request. Check that the server is live and that the certificate in test/conformance/ssl is not expired.", "Error: %s\nURL: %s", err, href)
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, esc, res.StatusCode, "%s\n%s", href, body)
@@ -299,7 +299,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 func checkStatus(t *testing.T, testID string) (string, status) {
 	res, err := httpClient.Get(urlx.AppendPaths(server, "/api/info", testID).String())
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equal(t, 200, res.StatusCode, "%s", body)

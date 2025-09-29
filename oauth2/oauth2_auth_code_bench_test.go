@@ -143,7 +143,7 @@ func BenchmarkAuthCode(b *testing.B) {
 		require.NoError(b, err)
 		resp, err := c.Do(req)
 		require.NoError(b, err)
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 
 		q := resp.Request.URL.Query()
 		require.EqualValues(b, state, q.Get("state"))

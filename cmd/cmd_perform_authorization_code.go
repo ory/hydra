@@ -362,7 +362,7 @@ func (rt *router) loginGET(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer raw.Body.Close() // to satisfy linter
+	defer raw.Body.Close() //nolint:errcheck
 
 	if rt.skip && req.GetSkip() {
 		req, res, err := rt.cl.OAuth2API.AcceptOAuth2LoginRequest(r.Context()).
@@ -373,7 +373,7 @@ func (rt *router) loginGET(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 		return
 	}
@@ -407,11 +407,11 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request) {
 			All(true).
 			Execute()
 		if err != nil {
-			fmt.Fprintln(rt.cmd.ErrOrStderr(), "Error revoking previous consents:", err)
+			_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), "Error revoking previous consents:", err)
 		} else {
-			fmt.Fprintln(rt.cmd.ErrOrStderr(), "Revoked all previous consents")
+			_, _ = fmt.Fprintln(rt.cmd.ErrOrStderr(), "Revoked all previous consents")
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 	}
 	switch r.FormValue("action") {
 	case "accept":
@@ -430,7 +430,7 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	case "deny":
@@ -439,7 +439,7 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	default:
@@ -455,7 +455,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer raw.Body.Close() // to satisfy linter
+	defer raw.Body.Close() //nolint:errcheck
 
 	if rt.skip && req.GetSkip() {
 		req, res, err := rt.cl.OAuth2API.AcceptOAuth2ConsentRequest(r.Context()).
@@ -478,7 +478,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 		return
 	}
@@ -497,7 +497,7 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer raw.Body.Close() // to satisfy linter
+	defer raw.Body.Close() //nolint:errcheck
 	prettyPrevConsent, err := prettyJSON(raw.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -549,7 +549,7 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	case "deny":
@@ -560,7 +560,7 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer res.Body.Close() // to satisfy linter
+		defer res.Body.Close() //nolint:errcheck
 		http.Redirect(w, r, req.RedirectTo, http.StatusFound)
 
 	default:

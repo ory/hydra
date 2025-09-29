@@ -1033,7 +1033,7 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request)
 // Verify OAuth 2.0 User Code Request
 //
 // swagger:parameters acceptUserCodeRequest
-type verifyUserCodeRequest struct {
+type _ struct {
 	// in: query
 	// required: true
 	Challenge string `json:"device_challenge"`

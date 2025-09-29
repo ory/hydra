@@ -131,7 +131,7 @@ func (a *OAuth2APIService) AcceptOAuth2ConsentRequestExecute(r ApiAcceptOAuth2Co
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -268,7 +268,7 @@ func (a *OAuth2APIService) AcceptOAuth2LoginRequestExecute(r ApiAcceptOAuth2Logi
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -389,7 +389,7 @@ func (a *OAuth2APIService) AcceptOAuth2LogoutRequestExecute(r ApiAcceptOAuth2Log
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -515,7 +515,7 @@ func (a *OAuth2APIService) AcceptUserCodeRequestExecute(r ApiAcceptUserCodeReque
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -636,7 +636,7 @@ func (a *OAuth2APIService) CreateOAuth2ClientExecute(r ApiCreateOAuth2ClientRequ
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -761,7 +761,7 @@ func (a *OAuth2APIService) DeleteOAuth2ClientExecute(r ApiDeleteOAuth2ClientRequ
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -868,7 +868,7 @@ func (a *OAuth2APIService) DeleteOAuth2TokenExecute(r ApiDeleteOAuth2TokenReques
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -972,7 +972,7 @@ func (a *OAuth2APIService) DeleteTrustedOAuth2JwtGrantIssuerExecute(r ApiDeleteT
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -1078,7 +1078,7 @@ func (a *OAuth2APIService) GetOAuth2ClientExecute(r ApiGetOAuth2ClientRequest) (
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1206,7 +1206,7 @@ func (a *OAuth2APIService) GetOAuth2ConsentRequestExecute(r ApiGetOAuth2ConsentR
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1344,7 +1344,7 @@ func (a *OAuth2APIService) GetOAuth2LoginRequestExecute(r ApiGetOAuth2LoginReque
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1473,7 +1473,7 @@ func (a *OAuth2APIService) GetOAuth2LogoutRequestExecute(r ApiGetOAuth2LogoutReq
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1597,7 +1597,7 @@ func (a *OAuth2APIService) GetTrustedOAuth2JwtGrantIssuerExecute(r ApiGetTrusted
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1728,7 +1728,7 @@ func (a *OAuth2APIService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2Tok
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -1880,7 +1880,7 @@ func (a *OAuth2APIService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsReques
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2037,7 +2037,7 @@ func (a *OAuth2APIService) ListOAuth2ConsentSessionsExecute(r ApiListOAuth2Conse
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2178,7 +2178,7 @@ func (a *OAuth2APIService) ListTrustedOAuth2JwtGrantIssuersExecute(r ApiListTrus
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2290,7 +2290,7 @@ func (a *OAuth2APIService) OAuth2AuthorizeExecute(r ApiOAuth2AuthorizeRequest) (
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2401,7 +2401,7 @@ func (a *OAuth2APIService) OAuth2DeviceFlowExecute(r ApiOAuth2DeviceFlowRequest)
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2559,7 +2559,7 @@ func (a *OAuth2APIService) Oauth2TokenExchangeExecute(r ApiOauth2TokenExchangeRe
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2688,7 +2688,7 @@ func (a *OAuth2APIService) PatchOAuth2ClientExecute(r ApiPatchOAuth2ClientReques
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2807,7 +2807,7 @@ func (a *OAuth2APIService) PerformOAuth2DeviceVerificationFlowExecute(r ApiPerfo
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -2948,7 +2948,7 @@ func (a *OAuth2APIService) RejectOAuth2ConsentRequestExecute(r ApiRejectOAuth2Co
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -3084,7 +3084,7 @@ func (a *OAuth2APIService) RejectOAuth2LoginRequestExecute(r ApiRejectOAuth2Logi
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -3202,7 +3202,7 @@ func (a *OAuth2APIService) RejectOAuth2LogoutRequestExecute(r ApiRejectOAuth2Log
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -3339,7 +3339,7 @@ func (a *OAuth2APIService) RevokeOAuth2ConsentSessionsExecute(r ApiRevokeOAuth2C
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -3464,7 +3464,7 @@ func (a *OAuth2APIService) RevokeOAuth2LoginSessionsExecute(r ApiRevokeOAuth2Log
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -3591,7 +3591,7 @@ func (a *OAuth2APIService) RevokeOAuth2TokenExecute(r ApiRevokeOAuth2TokenReques
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -3712,7 +3712,7 @@ func (a *OAuth2APIService) SetOAuth2ClientExecute(r ApiSetOAuth2ClientRequest) (
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -3854,7 +3854,7 @@ func (a *OAuth2APIService) SetOAuth2ClientLifespansExecute(r ApiSetOAuth2ClientL
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -3972,7 +3972,7 @@ func (a *OAuth2APIService) TrustOAuth2JwtGrantIssuerExecute(r ApiTrustOAuth2JwtG
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err

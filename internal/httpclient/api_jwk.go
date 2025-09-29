@@ -114,7 +114,7 @@ func (a *JwkAPIService) CreateJsonWebKeySetExecute(r ApiCreateJsonWebKeySetReque
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -232,7 +232,7 @@ func (a *JwkAPIService) DeleteJsonWebKeyExecute(r ApiDeleteJsonWebKeyRequest) (*
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -334,7 +334,7 @@ func (a *JwkAPIService) DeleteJsonWebKeySetExecute(r ApiDeleteJsonWebKeySetReque
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
@@ -441,7 +441,7 @@ func (a *JwkAPIService) GetJsonWebKeyExecute(r ApiGetJsonWebKeyRequest) (*JsonWe
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -555,7 +555,7 @@ func (a *JwkAPIService) GetJsonWebKeySetExecute(r ApiGetJsonWebKeySetRequest) (*
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -681,7 +681,7 @@ func (a *JwkAPIService) SetJsonWebKeyExecute(r ApiSetJsonWebKeyRequest) (*JsonWe
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
@@ -803,7 +803,7 @@ func (a *JwkAPIService) SetJsonWebKeySetExecute(r ApiSetJsonWebKeySetRequest) (*
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err

@@ -67,7 +67,7 @@ func getAuthorizeCode(t *testing.T, conf *oauth2.Config, c *http.Client, params 
 	state := uuid.New()
 	resp, err := c.Get(conf.AuthCodeURL(state, params...))
 	require.NoError(t, err)
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	q := resp.Request.URL.Query()
 	require.EqualValues(t, state, q.Get("state"))
@@ -677,7 +677,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						resp, err := tc.client.Get(conf.AuthCodeURL(state))
 						require.NoError(t, err)
 						assert.Equal(t, tc.expectedResponse, resp.Request.URL.Query().Get("error"), "%s", resp.Request.URL.RawQuery)
-						resp.Body.Close()
+						resp.Body.Close() //nolint:errcheck
 					})
 				}
 			})
@@ -1789,7 +1789,7 @@ func createVerifiableCredential(
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
 	res, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	if res.StatusCode != http.StatusOK {
 		var errRes fosite.RFC6749Error
@@ -1820,7 +1820,7 @@ func doPrimingRequest(
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	require.Equal(t, http.StatusBadRequest, res.StatusCode)
 	var vc hydraoauth2.VerifiableCredentialPrimingResponse
 	require.NoError(t, json.NewDecoder(res.Body).Decode(&vc))
@@ -2075,7 +2075,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					resp, err := (&http.Client{Jar: tc.cj}).Do(req)
 					require.NoError(t, err, tc.authURL, publicTs.URL)
-					defer resp.Body.Close()
+					defer resp.Body.Close() //nolint:errcheck
 
 					if tc.expectOAuthAuthError {
 						require.Empty(t, code)
@@ -2103,7 +2103,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}
 
 						var testSuccess = func(response *http.Response) {
-							defer resp.Body.Close()
+							defer resp.Body.Close() //nolint:errcheck
 
 							require.Equal(t, http.StatusOK, resp.StatusCode)
 

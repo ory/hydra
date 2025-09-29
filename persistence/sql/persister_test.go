@@ -44,9 +44,13 @@ func testRegistry(t *testing.T, k string, t1, t2 *driver.RegistrySQL) {
 		t.Run("case=update-two-clients", client.TestHelperUpdateTwoClients(k, t1.ClientManager()))
 	})
 
-	parallel := true
-	if k == "memory" || k == "mysql" || k == "cockroach" { // TODO enable parallel tests for cockroach once we configure the cockroach integration test server to support retry
+	// TODO enable parallel tests for cockroach once we configure the cockroach integration test server to support retry
+	var parallel bool
+	switch k {
+	case "memory", "mysql", "cockroach":
 		parallel = false
+	default:
+		parallel = true
 	}
 
 	t.Run("package=consent/manager="+k, test.ManagerTests(t1, t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))

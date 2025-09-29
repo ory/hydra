@@ -166,7 +166,7 @@ func TestHandler(t *testing.T) {
 	fetch := func(t *testing.T, url string) (string, *http.Response) {
 		res, err := http.Get(url)
 		require.NoError(t, err)
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 		body, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(body), res
@@ -179,7 +179,7 @@ func TestHandler(t *testing.T) {
 		r.Header.Set("Accept", "application/json")
 		res, err := http.DefaultClient.Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 		out, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(out), res
@@ -193,7 +193,7 @@ func TestHandler(t *testing.T) {
 		r.Header.Set("Content-Type", "application/json")
 		res, err := ts.Client().Do(r)
 		require.NoError(t, err)
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 		rb, err := io.ReadAll(res.Body)
 		require.NoError(t, err)
 		return string(rb), res
@@ -257,7 +257,7 @@ func TestHandler(t *testing.T) {
 
 						res, err := publicTs.Client().Do(req)
 						require.NoError(t, err)
-						defer res.Body.Close()
+						defer res.Body.Close() //nolint:errcheck
 
 						body, err := io.ReadAll(res.Body)
 						require.NoError(t, err)

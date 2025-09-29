@@ -22,11 +22,11 @@ func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
 	if filename := flagx.MustGetString(cmd, flagFile); filename != "" {
 		src := cmd.InOrStdin()
 		if filename != "-" {
-			f, err := os.Open(filename)
+			f, err := os.Open(filename) // #nosec G304
 			if err != nil {
 				return hydra.OAuth2Client{}, fmt.Errorf("unable to open file %q: %w", filename, err)
 			}
-			defer f.Close()
+			defer f.Close() //nolint:errcheck
 			src = f
 		}
 		client := hydra.OAuth2Client{}

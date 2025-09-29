@@ -45,7 +45,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)
@@ -80,7 +80,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		res, err := http.Get(urlx.MustJoin(testServer.URL, JWKPath))
 		require.NoError(t, err, "problem in http request")
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint:errcheck
 
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)

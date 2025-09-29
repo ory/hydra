@@ -75,7 +75,7 @@ Please be aware that this command does not update existing clients. If the clien
 
 			streams := map[string]io.Reader{"STDIN": cmd.InOrStdin()}
 			for _, path := range args {
-				contents, err := os.ReadFile(path)
+				contents, err := os.ReadFile(path) // #nosec G304
 				if err != nil {
 					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open file %s: %s", path, err)
 					return cmdx.FailSilently(cmd)

@@ -101,7 +101,7 @@ func (a *WellknownAPIService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKey
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body.Close() //nolint:errcheck
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err

@@ -236,7 +236,7 @@ func (v *Validator) ValidateSectorIdentifierURL(ctx context.Context, location st
 	if err != nil {
 		return errors.WithStack(ErrInvalidClientMetadata.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}
-	defer response.Body.Close()
+	defer response.Body.Close() //nolint:errcheck
 	response.Body = io.NopCloser(io.LimitReader(response.Body, 5<<20 /* 5 MiB */))
 
 	var urls []string

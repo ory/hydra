@@ -113,7 +113,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 				WithDebugf("Unable to execute HTTP Request: %s", err),
 		)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 	resp.Body = io.NopCloser(io.LimitReader(resp.Body, 5<<20 /* 5 MiB */))
 
 	switch resp.StatusCode {

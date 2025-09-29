@@ -19,7 +19,6 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
@@ -28,9 +27,6 @@ import (
 )
 
 type JanitorConsentTestHelper struct {
-	uniqueName           string
-	flushLoginRequests   []*flow.LoginRequest
-	flushConsentRequests []*flow.OAuth2ConsentRequest
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest

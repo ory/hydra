@@ -7,3 +7,15 @@ linters:
     - ineffassign
     - staticcheck
     - unused
+  settings:
+    staticcheck:
+      checks:
+        - "-SA1019"
+  exclusions:
+    rules:
+      - path: '_test\.go'
+        linters:
+          - gosec
+      - path: "internal/httpclient"
+        linters:
+          - errcheck

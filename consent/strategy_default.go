@@ -777,7 +777,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			log.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
 		}
-		defer res.Body.Close()
+		defer res.Body.Close()                                              //nolint:errcheck
 		res.Body = io.NopCloser(io.LimitReader(res.Body, 1<<20 /* 1 MB */)) // in case we ever start to read this response
 
 		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNoContent {

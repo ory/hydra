@@ -45,7 +45,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				streams["STDIN"] = cmd.InOrStdin()
 			} else {
 				for _, path := range args[1:] {
-					contents, err := os.ReadFile(path)
+					contents, err := os.ReadFile(path) // #nosec G304
 					if err != nil {
 						_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open file %s: %s", path, err)
 						return cmdx.FailSilently(cmd)

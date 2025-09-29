@@ -425,7 +425,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		assert.EqualValues(t, http.StatusFound, oauthRes.StatusCode)
 		loginChallengeRedirect, err := oauthRes.Location()
 		require.NoError(t, err)
-		defer oauthRes.Body.Close()
+		defer oauthRes.Body.Close() //nolint:errcheck
 
 		foundLoginCookie := slices.ContainsFunc(oauthRes.Header.Values("set-cookie"), func(sc string) bool {
 			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_login_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
@@ -436,13 +436,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
 		require.NoError(t, err)
-		defer loginChallengeRes.Body.Close()
+		defer loginChallengeRes.Body.Close() //nolint:errcheck
 
 		loginVerifierRedirect, err := loginChallengeRes.Location()
 		require.NoError(t, err)
 		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 		require.NoError(t, err)
-		defer loginVerifierRes.Body.Close()
+		defer loginVerifierRes.Body.Close() //nolint:errcheck
 
 		foundConsentCookie := slices.ContainsFunc(loginVerifierRes.Header.Values("set-cookie"), func(sc string) bool {
 			ok, err := regexp.MatchString(fmt.Sprintf("ory_hydra_consent_csrf_dev_%s=.*Max-Age=%.0f;.*", c.CookieSuffix(), consentRequestMaxAge), sc)
@@ -514,17 +514,17 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			assert.EqualValues(t, http.StatusFound, oauthRes.StatusCode)
 			loginChallengeRedirect, err := oauthRes.Location()
 			require.NoError(t, err)
-			defer oauthRes.Body.Close()
+			defer oauthRes.Body.Close() //nolint:errcheck
 
 			loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
 			require.NoError(t, err)
-			defer loginChallengeRes.Body.Close()
+			defer loginChallengeRes.Body.Close() //nolint:errcheck
 			loginVerifierRedirect, err := loginChallengeRes.Location()
 			require.NoError(t, err)
 
 			loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 			require.NoError(t, err)
-			defer loginVerifierRes.Body.Close()
+			defer loginVerifierRes.Body.Close() //nolint:errcheck
 
 			setCookieHeader := loginVerifierRes.Header.Get("set-cookie")
 			assert.NotNil(t, setCookieHeader)
@@ -603,17 +603,17 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		assert.EqualValues(t, http.StatusFound, oauthRes.StatusCode)
 		loginChallengeRedirect, err := oauthRes.Location()
 		require.NoError(t, err)
-		defer oauthRes.Body.Close()
+		defer oauthRes.Body.Close() //nolint:errcheck
 
 		loginChallengeRes, err := hc.Get(loginChallengeRedirect.String())
 		require.NoError(t, err)
-		defer loginChallengeRes.Body.Close()
+		defer loginChallengeRes.Body.Close() //nolint:errcheck
 
 		loginVerifierRedirect, err := loginChallengeRes.Location()
 		require.NoError(t, err)
 		loginVerifierRes, err := hc.Get(loginVerifierRedirect.String())
 		require.NoError(t, err)
-		defer loginVerifierRes.Body.Close()
+		defer loginVerifierRes.Body.Close() //nolint:errcheck
 
 		setCookieHeader := loginVerifierRes.Header.Get("set-cookie")
 		assert.NotNil(t, setCookieHeader)

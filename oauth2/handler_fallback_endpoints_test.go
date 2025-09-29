@@ -35,7 +35,7 @@ func TestHandlerConsent(t *testing.T) {
 
 	res, err := http.Get(ts.URL + oauth2.DefaultConsentPath)
 	assert.Nil(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	body, err := io.ReadAll(res.Body)
 	assert.Nil(t, err)

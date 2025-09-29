@@ -284,7 +284,7 @@ func TestJWTBearer(t *testing.T) {
 					"assertion":  {token},
 				})
 				require.NoError(t, err)
-				defer res.Body.Close()
+				defer res.Body.Close() //nolint:errcheck
 				body, err := io.ReadAll(res.Body)
 				require.NoError(t, err)
 				require.EqualValues(t, http.StatusOK, res.StatusCode, "%s", body)

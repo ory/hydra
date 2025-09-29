@@ -99,7 +99,7 @@ func TestLogoutFlows(t *testing.T) {
 			resp, err = hc.PostForm(publicTS.URL+"/oauth2/sessions/logout", values)
 		}
 		require.NoError(t, err)
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 
@@ -111,7 +111,7 @@ func TestLogoutFlows(t *testing.T) {
 		resp, err = hc.Do(req)
 
 		require.NoError(t, err)
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 		return string(ioutilx.MustReadAll(resp.Body)), resp
 	}
 

@@ -119,7 +119,7 @@ func IntrospectToken(t testing.TB, token string, adminTS *httptest.Server) gjson
 
 	res, err := adminTS.Client().Do(req)
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	require.Equalf(t, http.StatusOK, res.StatusCode, "Response body: %s", body)
@@ -136,7 +136,7 @@ func RevokeToken(t testing.TB, conf *oauth2.Config, token string, publicTS *http
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
 	res, err := publicTS.Client().Do(req)
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
 }
 
@@ -152,7 +152,7 @@ func UpdateClientTokenLifespans(t *testing.T, conf *oauth2.Config, clientID stri
 	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
 	res, err := adminTS.Client().Do(req)
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	require.Equal(t, res.StatusCode, http.StatusOK)
 }
 
@@ -165,7 +165,7 @@ func Userinfo(t *testing.T, token *oauth2.Token, publicTS *httptest.Server) gjso
 	res, err := publicTS.Client().Do(req)
 	require.NoError(t, err)
 
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
 }
 

@@ -87,7 +87,7 @@ func makeOAuth2Request(t *testing.T, reg *driver.RegistrySQL, hc *http.Client, o
 	values.Add("redirect_uri", oc.GetRedirectURIs()[0])
 	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), values).String())
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }
@@ -113,7 +113,7 @@ func makeOAuth2DeviceAuthRequest(t *testing.T, reg *driver.RegistrySQL, hc *http
 	res, err := hc.Do(req)
 	require.NoError(t, err)
 
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }
@@ -127,7 +127,7 @@ func makeOAuth2DeviceVerificationRequest(t *testing.T, reg *driver.RegistrySQL, 
 	values.Add("client_id", oc.GetID())
 	res, err := hc.Get(urlx.CopyWithQuery(urlx.AppendPaths(reg.Config().PublicURL(ctx), oauth2.DeviceVerificationPath), values).String())
 	require.NoError(t, err)
-	defer res.Body.Close()
+	defer res.Body.Close() //nolint:errcheck
 
 	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
 }

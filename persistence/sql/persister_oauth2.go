@@ -130,24 +130,6 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 	}, nil
 }
 
-func (p *Persister) marshalSession(ctx context.Context, session fosite.Session) ([]byte, error) {
-	sessionBytes, err := json.Marshal(session)
-	if err != nil {
-		return nil, err
-	}
-
-	if !p.r.Config().EncryptSessionData(ctx) {
-		return sessionBytes, nil
-	}
-
-	ciphertext, err := p.r.KeyCipher().Encrypt(ctx, sessionBytes, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(ciphertext), nil
-}
-
 func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (_ *fosite.Request, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.toRequest")
 	defer otelx.End(span, &err)

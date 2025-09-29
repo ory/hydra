@@ -580,20 +580,20 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
 
-			req, err := m.GetAccessTokenSession(ctx, accessTokenSession1, nil)
+			_, err := m.GetAccessTokenSession(ctx, accessTokenSession1, nil)
 			assert.ErrorIs(t, err, fosite.ErrNotFound)
 
-			req, err = m.GetAccessTokenSession(ctx, accessTokenSession2, nil)
+			_, err = m.GetAccessTokenSession(ctx, accessTokenSession2, nil)
 			assert.NoError(t, err, "The second access token is still valid.")
 
-			req, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+			req, err := m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, r.GetID(), req.GetID())
 
 			// We only wait a second, meaning that the token is theoretically still within TTL, but since the
 			// grace period was issued, the token is still valid.
 			time.Sleep(time.Second * 2)
-			req, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
 			assert.Error(t, err)
 		})
 
@@ -649,13 +649,13 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
 			require.NoError(t, m.RotateRefreshToken(ctx, r.GetID(), refreshTokenSession))
 
-			req, err := m.GetAccessTokenSession(ctx, accessTokenSession1, nil)
+			_, err := m.GetAccessTokenSession(ctx, accessTokenSession1, nil)
 			assert.ErrorIs(t, err, fosite.ErrNotFound)
 
-			req, err = m.GetAccessTokenSession(ctx, accessTokenSession2, nil)
+			_, err = m.GetAccessTokenSession(ctx, accessTokenSession2, nil)
 			assert.ErrorIs(t, err, fosite.ErrNotFound)
 
-			req, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
+			req, err := m.GetRefreshTokenSession(ctx, refreshTokenSession, nil)
 			assert.NoError(t, err)
 			assert.Equal(t, r.GetID(), req.GetID())
 

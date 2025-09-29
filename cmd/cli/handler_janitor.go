@@ -175,7 +175,7 @@ func cleanup(out io.Writer, cr cleanupRoutine, routineName string) cleanupRoutin
 		if err := cr(ctx, notAfter, limit, batchSize); err != nil {
 			return errors.Wrap(errors.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
 		}
-		fmt.Fprintf(out, "Successfully completed Janitor run on %s\n", routineName)
+		_, _ = fmt.Fprintf(out, "Successfully completed Janitor run on %s\n", routineName)
 		return nil
 	}
 }

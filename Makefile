@@ -4,7 +4,7 @@ export PATH 		:= .bin:${PATH}
 export PWD 			:= $(shell pwd)
 export IMAGE_TAG 	:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
-GOLANGCI_LINT_VERSION = 1.64.8
+GOLANGCI_LINT_VERSION = 2.4.0
 
 .bin/golangci-lint: Makefile
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v$(GOLANGCI_LINT_VERSION)

@@ -93,7 +93,7 @@ func TestMigrations(t *testing.T) {
 					connections[db] = c
 				}, 20*time.Second, 100*time.Millisecond)
 				t.Cleanup(func() {
-					connections[db].Close()
+					connections[db].Close() //nolint:errcheck
 				})
 			}()
 		}

@@ -137,7 +137,7 @@ func (o *OAuth2ConsentSession) GetContextOk() (*interface{}, bool) {
 
 // HasContext returns a boolean if a field has been set.
 func (o *OAuth2ConsentSession) HasContext() bool {
-	if o != nil && IsNil(o.Context) {
+	if o != nil && !IsNil(o.Context) {
 		return true
 	}
 

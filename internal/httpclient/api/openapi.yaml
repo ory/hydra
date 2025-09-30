@@ -37,13 +37,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKeySet'
+                $ref: "#/components/schemas/jsonWebKeySet"
           description: jsonWebKeySet
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Discover Well-Known JSON Web Keys
       tags:
@@ -61,13 +61,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oidcConfiguration'
+                $ref: "#/components/schemas/oidcConfiguration"
           description: oidcConfiguration
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: OpenID Connect Discovery
       tags:
@@ -125,19 +125,9 @@ paths:
         style: form
       responses:
         "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/oAuth2Client'
-                type: array
-          description: Paginated OAuth2 Client List Response
+          $ref: "#/components/responses/listOAuth2Clients"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: List OAuth 2.0 Clients
       tags:
       - oAuth2
@@ -150,7 +140,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         description: OAuth 2.0 Client Request Body
         required: true
         x-originalParamName: Body
@@ -159,20 +149,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Bad Request Error Response
+          $ref: "#/components/responses/errorOAuth2BadRequest"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: Create OAuth 2.0 Client
       tags:
       - oAuth2
@@ -197,14 +179,12 @@ paths:
         style: simple
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Delete OAuth 2.0 Client
       tags:
@@ -230,14 +210,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: Get an OAuth 2.0 Client
       tags:
       - oAuth2
@@ -263,7 +239,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jsonPatchDocument'
+              $ref: "#/components/schemas/jsonPatchDocument"
         description: OAuth 2.0 Client JSON Patch Body
         required: true
         x-originalParamName: Body
@@ -272,20 +248,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Not Found Error Response
+          $ref: "#/components/responses/errorOAuth2NotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: Patch OAuth 2.0 Client
       tags:
       - oAuth2
@@ -312,7 +280,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         description: OAuth 2.0 Client Request Body
         required: true
         x-originalParamName: Body
@@ -321,26 +289,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Bad Request Error Response
+          $ref: "#/components/responses/errorOAuth2BadRequest"
         "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Not Found Error Response
+          $ref: "#/components/responses/errorOAuth2NotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: Set OAuth 2.0 Client
       tags:
       - oAuth2
@@ -362,20 +318,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2ClientTokenLifespans'
+              $ref: "#/components/schemas/oAuth2ClientTokenLifespans"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Set OAuth2 Client Token Lifespans
       tags:
@@ -398,14 +354,12 @@ paths:
         style: simple
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Delete JSON Web Key Set
       tags:
@@ -430,13 +384,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKeySet'
+                $ref: "#/components/schemas/jsonWebKeySet"
           description: jsonWebKeySet
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Retrieve a JSON Web Key Set
       tags:
@@ -460,7 +414,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createJsonWebKeySet'
+              $ref: "#/components/schemas/createJsonWebKeySet"
         required: true
         x-originalParamName: Body
       responses:
@@ -468,13 +422,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKeySet'
+                $ref: "#/components/schemas/jsonWebKeySet"
           description: jsonWebKeySet
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Create JSON Web Key
       tags:
@@ -498,20 +452,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jsonWebKeySet'
+              $ref: "#/components/schemas/jsonWebKeySet"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKeySet'
+                $ref: "#/components/schemas/jsonWebKeySet"
           description: jsonWebKeySet
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Update a JSON Web Key Set
       tags:
@@ -545,14 +499,12 @@ paths:
         style: simple
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Delete JSON Web Key
       tags:
@@ -583,13 +535,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKeySet'
+                $ref: "#/components/schemas/jsonWebKeySet"
           description: jsonWebKeySet
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Get JSON Web Key
       tags:
@@ -621,20 +573,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/jsonWebKey'
+              $ref: "#/components/schemas/jsonWebKey"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/jsonWebKey'
+                $ref: "#/components/schemas/jsonWebKey"
           description: jsonWebKey
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Set JSON Web Key
       tags:
@@ -667,19 +619,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2ConsentRequest'
+                $ref: "#/components/schemas/oAuth2ConsentRequest"
           description: oAuth2ConsentRequest
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Get OAuth 2.0 Consent Request
       tags:
@@ -717,20 +669,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/acceptOAuth2ConsentRequest'
+              $ref: "#/components/schemas/acceptOAuth2ConsentRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Accept OAuth 2.0 Consent Request
       tags:
@@ -767,20 +719,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rejectOAuth2Request'
+              $ref: "#/components/schemas/rejectOAuth2Request"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Reject OAuth 2.0 Consent Request
       tags:
@@ -801,20 +753,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/acceptDeviceUserCodeRequest'
+              $ref: "#/components/schemas/acceptDeviceUserCodeRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Accepts a device grant user_code request
       tags:
@@ -846,19 +798,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2LoginRequest'
+                $ref: "#/components/schemas/oAuth2LoginRequest"
           description: oAuth2LoginRequest
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Get OAuth 2.0 Login Request
       tags:
@@ -891,20 +843,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/acceptOAuth2LoginRequest'
+              $ref: "#/components/schemas/acceptOAuth2LoginRequest"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Accept OAuth 2.0 Login Request
       tags:
@@ -936,20 +888,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/rejectOAuth2Request'
+              $ref: "#/components/schemas/rejectOAuth2Request"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Reject OAuth 2.0 Login Request
       tags:
@@ -971,19 +923,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2LogoutRequest'
+                $ref: "#/components/schemas/oAuth2LogoutRequest"
           description: oAuth2LogoutRequest
         "410":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Get OAuth 2.0 Session Logout Request
       tags:
@@ -1009,13 +961,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2RedirectTo'
+                $ref: "#/components/schemas/oAuth2RedirectTo"
           description: oAuth2RedirectTo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Accept OAuth 2.0 Session Logout Request
       tags:
@@ -1038,14 +990,12 @@ paths:
         style: form
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Reject OAuth 2.0 Session Logout Request
       tags:
@@ -1103,14 +1053,12 @@ paths:
         style: form
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Revoke OAuth 2.0 Consent Sessions of a Subject
       tags:
@@ -1173,13 +1121,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2ConsentSessions'
+                $ref: "#/components/schemas/oAuth2ConsentSessions"
           description: oAuth2ConsentSessions
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: List OAuth 2.0 Consent Sessions of a Subject
       tags:
@@ -1223,14 +1171,12 @@ paths:
         style: form
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
       tags:
@@ -1246,19 +1192,19 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/introspectOAuth2Token_request'
+              $ref: "#/components/schemas/introspectOAuth2Token_request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/introspectedOAuth2Token'
+                $ref: "#/components/schemas/introspectedOAuth2Token"
           description: introspectedOAuth2Token
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Introspect OAuth2 Access and Refresh Tokens
       tags:
@@ -1279,14 +1225,12 @@ paths:
         style: form
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
       tags:
@@ -1338,13 +1282,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedOAuth2JwtGrantIssuers'
+                $ref: "#/components/schemas/trustedOAuth2JwtGrantIssuers"
           description: trustedOAuth2JwtGrantIssuers
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: List Trusted OAuth2 JWT Bearer Grant Type Issuers
       tags:
@@ -1359,20 +1303,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/trustOAuth2JwtGrantIssuer'
+              $ref: "#/components/schemas/trustOAuth2JwtGrantIssuer"
         x-originalParamName: Body
       responses:
         "201":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedOAuth2JwtGrantIssuer'
+                $ref: "#/components/schemas/trustedOAuth2JwtGrantIssuer"
           description: trustedOAuth2JwtGrantIssuer
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Trust OAuth2 JWT Bearer Grant Type Issuer
       tags:
@@ -1397,14 +1341,12 @@ paths:
         style: simple
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
@@ -1428,13 +1370,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trustedOAuth2JwtGrantIssuer'
+                $ref: "#/components/schemas/trustedOAuth2JwtGrantIssuer"
           description: trustedOAuth2JwtGrantIssuer
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Get Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
@@ -1453,26 +1395,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateVerifiableCredentialRequestBody'
+              $ref: "#/components/schemas/CreateVerifiableCredentialRequestBody"
         x-originalParamName: Body
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/verifiableCredentialResponse'
+                $ref: "#/components/schemas/verifiableCredentialResponse"
           description: verifiableCredentialResponse
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/verifiableCredentialPrimingResponse'
+                $ref: "#/components/schemas/verifiableCredentialPrimingResponse"
           description: verifiableCredentialPrimingResponse
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: Issues a Verifiable Credential
       tags:
@@ -1494,13 +1436,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/healthStatus'
+                $ref: "#/components/schemas/healthStatus"
           description: Ory Hydra is ready to accept connections.
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       summary: Check HTTP Server Status
       tags:
@@ -1522,13 +1464,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/isReady_200_response'
+                $ref: "#/components/schemas/isReady_200_response"
           description: Ory Hydra is ready to accept requests.
         "503":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/isReady_503_response'
+                $ref: "#/components/schemas/isReady_503_response"
           description: Ory Kratos is not yet ready to accept requests.
       summary: Check HTTP Server and Database Status
       tags:
@@ -1544,14 +1486,12 @@ paths:
       operationId: oAuth2Authorize
       responses:
         "302":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: OAuth 2.0 Authorize Endpoint
       tags:
@@ -1569,13 +1509,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/deviceAuthorization'
+                $ref: "#/components/schemas/deviceAuthorization"
           description: deviceAuthorization
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: The OAuth 2.0 Device Authorize Endpoint
       tags:
@@ -1587,14 +1527,12 @@ paths:
       operationId: performOAuth2DeviceVerificationFlow
       responses:
         "302":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       summary: OAuth 2.0 Device Verification Endpoint
       tags:
@@ -1618,7 +1556,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         description: Dynamic Client Registration Request Body
         required: true
         x-originalParamName: Body
@@ -1627,20 +1565,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Bad Request Error Response
+          $ref: "#/components/responses/errorOAuth2BadRequest"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       summary: Register OAuth2 Client using OpenID Dynamic Client Registration
       tags:
       - oidc
@@ -1670,14 +1600,12 @@ paths:
         style: simple
       responses:
         "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/genericError'
+                $ref: "#/components/schemas/genericError"
           description: genericError
       security:
       - bearer: []
@@ -1709,14 +1637,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       security:
       - bearer: []
       summary: Get OAuth2 Client using OpenID Dynamic Client Registration
@@ -1753,7 +1677,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
         description: OAuth 2.0 Client Request Body
         required: true
         x-originalParamName: Body
@@ -1762,20 +1686,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2Client'
+                $ref: "#/components/schemas/oAuth2Client"
           description: oAuth2Client
         "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Not Found Error Response
+          $ref: "#/components/responses/errorOAuth2NotFound"
         default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/errorOAuth2'
-          description: Default Error Response
+          $ref: "#/components/responses/errorOAuth2Default"
       security:
       - bearer: []
       summary: Set OAuth2 Client using OpenID Dynamic Client Registration
@@ -1793,17 +1709,15 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/revokeOAuth2Token_request'
+              $ref: "#/components/schemas/revokeOAuth2Token_request"
       responses:
         "200":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       security:
       - basic: []
@@ -1823,9 +1737,7 @@ paths:
       operationId: revokeOidcSession
       responses:
         "302":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 204.
+          $ref: "#/components/responses/emptyResponse"
       summary: OpenID Connect Front- and Back-channel Enabled Logout
       tags:
       - oidc
@@ -1842,19 +1754,19 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/oauth2TokenExchange_request'
+              $ref: "#/components/schemas/oauth2TokenExchange_request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oAuth2TokenExchange'
+                $ref: "#/components/schemas/oAuth2TokenExchange"
           description: oAuth2TokenExchange
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       security:
       - basic: []
@@ -1877,13 +1789,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/oidcUserInfo'
+                $ref: "#/components/schemas/oidcUserInfo"
           description: oidcUserInfo
         default:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorOAuth2'
+                $ref: "#/components/schemas/errorOAuth2"
           description: errorOAuth2
       security:
       - oauth2: []
@@ -1906,7 +1818,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getVersion_200_response'
+                $ref: "#/components/schemas/getVersion_200_response"
           description: Returns the Ory Hydra version.
       summary: Return Running Software Version.
       tags:
@@ -1921,26 +1833,26 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/errorOAuth2'
+            $ref: "#/components/schemas/errorOAuth2"
       description: Bad Request Error Response
     errorOAuth2Default:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/errorOAuth2'
+            $ref: "#/components/schemas/errorOAuth2"
       description: Default Error Response
     errorOAuth2NotFound:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/errorOAuth2'
+            $ref: "#/components/schemas/errorOAuth2"
       description: Not Found Error Response
     listOAuth2Clients:
       content:
         application/json:
           schema:
             items:
-              $ref: '#/components/schemas/oAuth2Client'
+              $ref: "#/components/schemas/oAuth2Client"
             type: array
       description: Paginated OAuth2 Client List Response
   schemas:
@@ -1957,7 +1869,7 @@ components:
         format:
           type: string
         proof:
-          $ref: '#/components/schemas/VerifiableCredentialProof'
+          $ref: "#/components/schemas/VerifiableCredentialProof"
         types:
           items:
             type: string
@@ -1974,7 +1886,7 @@ components:
             identify the session.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         handled_at:
           format: date-time
           title: NullTime implements sql.NullTime functionality.
@@ -2100,7 +2012,7 @@ components:
           format: int64
           type: integer
         session:
-          $ref: '#/components/schemas/acceptOAuth2ConsentRequestSession'
+          $ref: "#/components/schemas/acceptOAuth2ConsentRequestSession"
       title: The request payload used to accept a consent request.
       type: object
     acceptOAuth2ConsentRequestSession:
@@ -2264,7 +2176,7 @@ components:
       title: Verifiable Credentials Metadata (Draft 00)
       type: object
     deviceAuthorization:
-      description: '# Ory''s OAuth 2.0 Device Authorization API'
+      description: "# Ory's OAuth 2.0 Device Authorization API"
       example:
         user_code: AAAAAA
         device_code: ory_dc_smldfksmdfkl.mslkmlkmlk
@@ -2345,6 +2257,15 @@ components:
           type: integer
       type: object
     genericError:
+      example:
+        reason: User with ID 1234 does not exist.
+        request: d7ef54b1-ec15-46e6-bccb-524b82c035e6
+        code: 404
+        debug: SQL field "foo" is not a bool.
+        details: ""
+        id: id
+        message: The resource could not be found
+        status: Not Found
       properties:
         code:
           description: The status code
@@ -2550,7 +2471,7 @@ components:
     jsonPatchDocument:
       description: A JSONPatchDocument request
       items:
-        $ref: '#/components/schemas/jsonPatch'
+        $ref: "#/components/schemas/jsonPatch"
       type: array
     jsonWebKey:
       example:
@@ -2720,7 +2641,7 @@ components:
             of JWK Sets can choose to assign a meaning to the order for their
             purposes, if desired.
           items:
-            $ref: '#/components/schemas/jsonWebKey'
+            $ref: "#/components/schemas/jsonWebKey"
           type: array
       type: object
     keysetPaginationRequestParameters:
@@ -3052,7 +2973,7 @@ components:
           title: Time duration
           type: string
         jwks:
-          $ref: '#/components/schemas/jsonWebKeySet'
+          $ref: "#/components/schemas/jsonWebKeySet"
         jwks_uri:
           description: |-
             OAuth 2.0 Client JSON Web Key Set URL
@@ -3472,7 +3393,7 @@ components:
           description: Challenge is used to retrieve/accept/deny the consent request.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         consent_request_id:
           description: ConsentRequestID is the ID of the consent request.
           type: string
@@ -3496,7 +3417,7 @@ components:
             channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
           type: string
         oidc_context:
-          $ref: '#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext'
+          $ref: "#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext"
         request_url:
           description: |-
             RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -3750,7 +3671,7 @@ components:
         remember_for: 0
       properties:
         consent_request:
-          $ref: '#/components/schemas/oAuth2ConsentRequest'
+          $ref: "#/components/schemas/oAuth2ConsentRequest"
         consent_request_id:
           description: ConsentRequestID is the identifier of the consent request that
             initiated this consent session.
@@ -3790,13 +3711,13 @@ components:
           format: int64
           type: integer
         session:
-          $ref: '#/components/schemas/acceptOAuth2ConsentRequestSession'
+          $ref: "#/components/schemas/acceptOAuth2ConsentRequestSession"
       title: OAuth 2.0 Consent Session
       type: object
     oAuth2ConsentSessions:
       description: List of OAuth 2.0 Consent Sessions
       items:
-        $ref: '#/components/schemas/oAuth2ConsentSession'
+        $ref: "#/components/schemas/oAuth2ConsentSession"
       type: array
     oAuth2LoginRequest:
       example:
@@ -3934,9 +3855,9 @@ components:
           description: ID is the identifier of the login request.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         oidc_context:
-          $ref: '#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext'
+          $ref: "#/components/schemas/oAuth2ConsentRequestOpenIDConnectContext"
         request_url:
           description: |-
             RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -4104,7 +4025,7 @@ components:
           description: Challenge is the identifier of the logout authentication request.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         expires_at:
           format: date-time
           title: NullTime implements sql.NullTime functionality.
@@ -4315,7 +4236,7 @@ components:
 
             JSON array containing a list of the Verifiable Credentials supported by this authorization server.
           items:
-            $ref: '#/components/schemas/credentialSupportedDraft00'
+            $ref: "#/components/schemas/credentialSupportedDraft00"
           type: array
         device_authorization_endpoint:
           description: OAuth 2.0 Device Authorization Endpoint URL
@@ -4795,7 +4716,7 @@ components:
           example: https://jwt-idp.example.com
           type: string
         jwk:
-          $ref: '#/components/schemas/jsonWebKey'
+          $ref: "#/components/schemas/jsonWebKey"
         scope:
           description: "The \"scope\" contains list of scope values (as described\
             \ in Section 3.3 of OAuth 2.0 [RFC6749])"
@@ -4854,7 +4775,7 @@ components:
           example: https://jwt-idp.example.com
           type: string
         public_key:
-          $ref: '#/components/schemas/trustedOAuth2JwtGrantJsonWebKey'
+          $ref: "#/components/schemas/trustedOAuth2JwtGrantJsonWebKey"
         scope:
           description: "The \"scope\" contains list of scope values (as described\
             \ in Section 3.3 of OAuth 2.0 [RFC6749])"
@@ -4873,7 +4794,7 @@ components:
     trustedOAuth2JwtGrantIssuers:
       description: OAuth2 JWT Bearer Grant Type Issuer Trust Relationships
       items:
-        $ref: '#/components/schemas/trustedOAuth2JwtGrantIssuer'
+        $ref: "#/components/schemas/trustedOAuth2JwtGrantIssuer"
       type: array
     trustedOAuth2JwtGrantJsonWebKey:
       description: OAuth2 JWT Bearer Grant Type Issuer Trusted JSON Web Key
@@ -4895,6 +4816,15 @@ components:
     unexpectedError:
       type: string
     verifiableCredentialPrimingResponse:
+      example:
+        c_nonce_expires_in: 0
+        error_debug: error_debug
+        status_code: 6
+        c_nonce: c_nonce
+        error_description: error_description
+        format: format
+        error: error
+        error_hint: error_hint
       properties:
         c_nonce:
           type: string
@@ -4936,7 +4866,7 @@ components:
             identify the session.
           type: string
         client:
-          $ref: '#/components/schemas/oAuth2Client'
+          $ref: "#/components/schemas/oAuth2Client"
         device_code_request_id:
           type: string
         handled_at:
@@ -4997,6 +4927,9 @@ components:
           type: string
       type: object
     isReady_503_response:
+      example:
+        errors:
+          key: errors
       properties:
         errors:
           additionalProperties:

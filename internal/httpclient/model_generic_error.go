@@ -145,7 +145,7 @@ func (o *GenericError) GetDetailsOk() (*interface{}, bool) {
 
 // HasDetails returns a boolean if a field has been set.
 func (o *GenericError) HasDetails() bool {
-	if o != nil && IsNil(o.Details) {
+	if o != nil && !IsNil(o.Details) {
 		return true
 	}
 

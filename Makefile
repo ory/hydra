@@ -126,7 +126,7 @@ sdk: .bin/ory node_modules
 				spec/swagger.json spec/api.json
 
 	rm -rf "internal/httpclient"
-	npm run openapi-generator-cli -- generate -i "spec/api.json" \
+	npx openapi-generator-cli generate -i "spec/api.json" \
 		-g go \
 		-o "internal/httpclient" \
 		--git-user-id ory \
@@ -134,7 +134,12 @@ sdk: .bin/ory node_modules
 		--git-host github.com \
 		--api-name-suffix "API" \
 		--global-property apiTests=false
-	(cd internal/httpclient; go get golang.org/x/net@latest; go get google.golang.org/protobuf@latest; go mod tidy)
+
+	(cd internal/httpclient;\
+		go get golang.org/x/net@latest;\
+		go get google.golang.org/protobuf@latest;\
+		go get golang.org/x/oauth2@latest;\
+		go mod tidy)
 
 	make format
 

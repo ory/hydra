@@ -145,7 +145,7 @@ func (o *AcceptOAuth2LoginRequest) GetContextOk() (*interface{}, bool) {
 
 // HasContext returns a boolean if a field has been set.
 func (o *AcceptOAuth2LoginRequest) HasContext() bool {
-	if o != nil && IsNil(o.Context) {
+	if o != nil && !IsNil(o.Context) {
 		return true
 	}
 

@@ -26,17 +26,17 @@ type OAuth2Client struct {
 	AllowedCorsOrigins  []string `json:"allowed_cors_origins,omitempty"`
 	Audience            []string `json:"audience,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty"`
+	AuthorizationCodeGrantAccessTokenLifespan *string `json:"authorization_code_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty"`
+	AuthorizationCodeGrantIdTokenLifespan *string `json:"authorization_code_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty"`
+	AuthorizationCodeGrantRefreshTokenLifespan *string `json:"authorization_code_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// OpenID Connect Back-Channel Logout Session Required  Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.
 	BackchannelLogoutSessionRequired *bool `json:"backchannel_logout_session_required,omitempty"`
 	// OpenID Connect Back-Channel Logout URI  RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
 	BackchannelLogoutUri *string `json:"backchannel_logout_uri,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty"`
+	ClientCredentialsGrantAccessTokenLifespan *string `json:"client_credentials_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// OAuth 2.0 Client ID  The ID is immutable. If no ID is provided, a UUID4 will be generated.
 	ClientId *string `json:"client_id,omitempty"`
 	// OAuth 2.0 Client Name  The human-readable name of the client to be presented to the end-user during authorization.
@@ -51,25 +51,25 @@ type OAuth2Client struct {
 	// OAuth 2.0 Client Creation Date  CreatedAt returns the timestamp of the client's creation.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantAccessTokenLifespan *string `json:"device_authorization_grant_access_token_lifespan,omitempty"`
+	DeviceAuthorizationGrantAccessTokenLifespan *string `json:"device_authorization_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantIdTokenLifespan *string `json:"device_authorization_grant_id_token_lifespan,omitempty"`
+	DeviceAuthorizationGrantIdTokenLifespan *string `json:"device_authorization_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	DeviceAuthorizationGrantRefreshTokenLifespan *string `json:"device_authorization_grant_refresh_token_lifespan,omitempty"`
+	DeviceAuthorizationGrantRefreshTokenLifespan *string `json:"device_authorization_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// OpenID Connect Front-Channel Logout Session Required  Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
 	FrontchannelLogoutSessionRequired *bool `json:"frontchannel_logout_session_required,omitempty"`
 	// OpenID Connect Front-Channel Logout URI  RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.
 	FrontchannelLogoutUri *string  `json:"frontchannel_logout_uri,omitempty"`
 	GrantTypes            []string `json:"grant_types,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty"`
+	ImplicitGrantAccessTokenLifespan *string `json:"implicit_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	ImplicitGrantIdTokenLifespan *string        `json:"implicit_grant_id_token_lifespan,omitempty"`
+	ImplicitGrantIdTokenLifespan *string        `json:"implicit_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	Jwks                         *JsonWebKeySet `json:"jwks,omitempty"`
 	// OAuth 2.0 Client JSON Web Key Set URL  URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
 	JwksUri *string `json:"jwks_uri,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty"`
+	JwtBearerGrantAccessTokenLifespan *string `json:"jwt_bearer_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// OAuth 2.0 Client Logo URI  A URL string referencing the client's logo.
 	LogoUri  *string     `json:"logo_uri,omitempty"`
 	Metadata interface{} `json:"metadata,omitempty"`
@@ -80,11 +80,11 @@ type OAuth2Client struct {
 	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris,omitempty"`
 	RedirectUris           []string `json:"redirect_uris,omitempty"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty"`
+	RefreshTokenGrantAccessTokenLifespan *string `json:"refresh_token_grant_access_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty"`
+	RefreshTokenGrantIdTokenLifespan *string `json:"refresh_token_grant_id_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// Specify a time duration in milliseconds, seconds, minutes, hours.
-	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty"`
+	RefreshTokenGrantRefreshTokenLifespan *string `json:"refresh_token_grant_refresh_token_lifespan,omitempty" validate:"regexp=^([0-9]+(ns|us|ms|s|m|h))*$"`
 	// OpenID Connect Dynamic Client Registration Access Token  RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client. It is sent when creating a client using Dynamic Client Registration.
 	RegistrationAccessToken *string `json:"registration_access_token,omitempty"`
 	// OpenID Connect Dynamic Client Registration URL  RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
@@ -1053,7 +1053,7 @@ func (o *OAuth2Client) GetMetadataOk() (*interface{}, bool) {
 
 // HasMetadata returns a boolean if a field has been set.
 func (o *OAuth2Client) HasMetadata() bool {
-	if o != nil && IsNil(o.Metadata) {
+	if o != nil && !IsNil(o.Metadata) {
 		return true
 	}
 

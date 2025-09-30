@@ -75,31 +75,25 @@ type (
 	SQLDataRows []SQLData
 )
 
-func (d SQLData) TableName() string {
-	return "hydra_jwk"
-}
+func (d SQLData) TableName() string { return "hydra_jwk" }
 
 func (d SQLDataRows) ToJWK(ctx context.Context, aes *aead.AESGCM) (keys *jose.JSONWebKeySet, err error) {
 	if len(d) == 0 {
 		return nil, errors.Wrap(x.ErrNotFound, "")
 	}
 
-	keys = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
-	for _, d := range d {
+	keys = &jose.JSONWebKeySet{
+		Keys: make([]jose.JSONWebKey, len(d)),
+	}
+	for i, d := range d {
 		key, err := aes.Decrypt(ctx, d.Key, nil)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 
-		var c jose.JSONWebKey
-		if err := json.Unmarshal(key, &c); err != nil {
+		if err := json.Unmarshal(key, &keys.Keys[i]); err != nil {
 			return nil, errors.WithStack(err)
 		}
-		keys.Keys = append(keys.Keys, c)
-	}
-
-	if len(keys.Keys) == 0 {
-		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	return keys, nil

@@ -147,14 +147,10 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 		WithConfigOptions(
 			configx.SkipValidation(),
 			configx.WithValues(map[string]any{
-				config.KeyDSN:     "postgres://user:password@127.0.0.1:9999/postgres",
+				config.KeyDSN:     "memory",
 				config.HSMEnabled: false,
 			}),
 		),
-		WithRegistryModifiers(func(r *RegistrySQL) error {
-			r.initialPing = sussessfulPing
-			return nil
-		}),
 	)
 	require.NoError(t, err)
 	assert.IsType(t, &sql.JWKPersister{}, r.KeyManager())

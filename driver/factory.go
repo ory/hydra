@@ -177,15 +177,15 @@ func New(ctx context.Context, opts ...OptionsModifier) (*RegistrySQL, error) {
 	r.kratos = o.kratos
 	r.fop = o.fop
 
+	if err = r.Init(ctx, o.skipNetworkInit, o.autoMigrate, o.extraMigrations, o.goMigrations); err != nil {
+		l.WithError(err).Error("Unable to initialize service registry.")
+		return nil, err
+	}
+
 	for _, f := range o.registryModifiers {
 		if err := f(r); err != nil {
 			return nil, err
 		}
-	}
-
-	if err = r.Init(ctx, o.skipNetworkInit, o.autoMigrate, o.extraMigrations, o.goMigrations); err != nil {
-		l.WithError(err).Error("Unable to initialize service registry.")
-		return nil, err
 	}
 
 	// Avoid cold cache issues on boot:

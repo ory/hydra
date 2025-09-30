@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 **Context** | Pointer to **interface{}** |  | [optional] 
 **GrantAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
 **GrantScope** | Pointer to **[]string** |  | [optional] 
-**HandledAt** | Pointer to **time.Time** |  | [optional] 
 **Remember** | Pointer to **bool** | Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope. | [optional] 
 **RememberFor** | Pointer to **int64** | RememberFor sets how long the consent authorization should be remembered for in seconds. If set to &#x60;0&#x60;, the authorization will be remembered indefinitely. | [optional] 
 **Session** | Pointer to [**AcceptOAuth2ConsentRequestSession**](AcceptOAuth2ConsentRequestSession.md) |  | [optional] 
@@ -115,31 +114,6 @@ SetGrantScope sets GrantScope field to given value.
 `func (o *AcceptOAuth2ConsentRequest) HasGrantScope() bool`
 
 HasGrantScope returns a boolean if a field has been set.
-
-### GetHandledAt
-
-`func (o *AcceptOAuth2ConsentRequest) GetHandledAt() time.Time`
-
-GetHandledAt returns the HandledAt field if non-nil, zero value otherwise.
-
-### GetHandledAtOk
-
-`func (o *AcceptOAuth2ConsentRequest) GetHandledAtOk() (*time.Time, bool)`
-
-GetHandledAtOk returns a tuple with the HandledAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetHandledAt
-
-`func (o *AcceptOAuth2ConsentRequest) SetHandledAt(v time.Time)`
-
-SetHandledAt sets HandledAt field to given value.
-
-### HasHandledAt
-
-`func (o *AcceptOAuth2ConsentRequest) HasHandledAt() bool`
-
-HasHandledAt returns a boolean if a field has been set.
 
 ### GetRemember
 

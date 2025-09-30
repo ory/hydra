@@ -35,40 +35,43 @@ import (
 //	CONSENT_UNUSED --> CONSENT_UNUSED
 //	CONSENT_UNUSED --> CONSENT_USED
 //	CONSENT_UNUSED --> CONSENT_ERROR
+
+type State int16
+
 const (
 	// FlowStateLoginInitialized applies before the login app either
 	// accepts or rejects the login request.
-	FlowStateLoginInitialized = int16(1)
+	FlowStateLoginInitialized = State(1)
 
 	// FlowStateLoginUnused indicates that the login has been authenticated, but
 	// the User Agent hasn't picked up the result yet.
-	FlowStateLoginUnused = int16(2)
+	FlowStateLoginUnused = State(2)
 
 	// FlowStateLoginUsed indicates that the User Agent is requesting consent and
 	// Hydra has invalidated the login request. This is a short-lived state
 	// because the transition to FlowStateConsentInitialized should happen while
 	// handling the request that triggered the transition to FlowStateLoginUsed.
-	FlowStateLoginUsed = int16(3)
+	FlowStateLoginUsed = State(3)
 
 	// FlowStateConsentInitialized applies while Hydra waits for a consent request
 	// to be accepted or rejected.
-	FlowStateConsentInitialized = int16(4)
+	FlowStateConsentInitialized = State(4)
 
-	FlowStateConsentUnused = int16(5)
-	FlowStateConsentUsed   = int16(6)
+	FlowStateConsentUnused = State(5)
+	FlowStateConsentUsed   = State(6)
 	// DeviceFlowStateLoginInitialized applies before the login app either
 	// accepts or rejects the login request.
-	DeviceFlowStateInitialized = int16(7)
+	DeviceFlowStateInitialized = State(7)
 
 	// DeviceFlowStateUnused indicates that the login has been authenticated, but
 	// the User Agent hasn't picked up the result yet.
-	DeviceFlowStateUnused = int16(8)
+	DeviceFlowStateUnused = State(8)
 
 	// DeviceFlowStateUsed indicates that the User Agent is requesting consent and
 	// Hydra has invalidated the login request. This is a short-lived state
 	// because the transition to DeviceFlowStateConsentInitialized should happen while
 	// handling the request that triggered the transition to DeviceFlowStateUsed.
-	DeviceFlowStateUsed = int16(9)
+	DeviceFlowStateUsed = State(9)
 
 	// TODO: Refactor error handling to persist error codes instead of JSON
 	// strings. Currently we persist errors as JSON strings in the LoginError
@@ -81,9 +84,9 @@ const (
 	// If the above is implemented, merge the LoginError and ConsentError fields
 	// and use the following FlowStates when converting to/from
 	// [Handled]{Login|Consent}Request:
-	DeviceFlowStateError  = int16(127)
-	FlowStateLoginError   = int16(128)
-	FlowStateConsentError = int16(129)
+	DeviceFlowStateError  = State(127)
+	FlowStateLoginError   = State(128)
+	FlowStateConsentError = State(129)
 )
 
 // Flow is an abstraction used in the persistence layer to unify LoginRequest,
@@ -167,7 +170,7 @@ type Flow struct {
 	LoginInitializedAt sqlxx.NullTime `db:"login_initialized_at" json:"li,omitempty"`
 	RequestedAt        time.Time      `db:"requested_at" json:"ia,omitempty"`
 
-	State int16 `db:"state" json:"q,omitempty"`
+	State State `db:"state" json:"q,omitempty"`
 
 	// LoginRemember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
@@ -219,6 +222,7 @@ type Flow struct {
 	// LoginWasUsed set to true means that the login request was already handled.
 	// This can happen on form double-submit or other errors. If this is set we
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
+	// TODO remove this field as it is implied by the state
 	LoginWasUsed bool `db:"login_was_used" json:"lu,omitempty"`
 
 	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
@@ -233,6 +237,7 @@ type Flow struct {
 	// DeviceVerifier is the device request's CSRF
 	DeviceCSRF sqlxx.NullString `db:"device_csrf" json:"dc,omitempty"`
 	// DeviceWasUsed set to true means that the device request was already handled
+	// TODO remove this field, as it is implied by the state
 	DeviceWasUsed sqlxx.NullBool `db:"device_was_used" json:"du,omitempty"`
 	// DeviceHandledAt contains the timestamp the device user_code verification request was handled
 	DeviceHandledAt sqlxx.NullTime `db:"device_handled_at" json:"dh,omitempty"`
@@ -269,6 +274,7 @@ type Flow struct {
 	// ConsentWasHandled set to true means that the request was already handled.
 	// This can happen on form double-submit or other errors. If this is set we
 	// recommend redirecting the user to `request_url` to re-initiate the flow.
+	// TODO remove this field as it is implied by the state
 	ConsentWasHandled  bool                     `db:"consent_was_used" json:"cw,omitempty"`
 	ConsentError       *RequestDeniedError      `db:"consent_error" json:"cx"`
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-" json:"st"`
@@ -375,15 +381,13 @@ func (f *Flow) InvalidateDeviceRequest() error {
 
 func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	if f.LoginWasUsed {
+		// LoginWasUsed cannot really be true here, as we only set it to true when setting the state to FlowStateLoginUsed.
+		// Hence, LoginWasUsed is redundant and should be derived from the state instead.
 		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
 	}
 
 	if f.State != FlowStateLoginInitialized && f.State != FlowStateLoginUnused && f.State != FlowStateLoginError {
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateLoginInitialized, FlowStateLoginUnused, FlowStateLoginError, f.State)
-	}
-
-	if f.ID != h.ID {
-		return errors.Errorf("flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
 
 	if f.Subject != "" && h.Subject != "" && f.Subject != h.Subject {
@@ -404,7 +408,6 @@ func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 		f.Context = h.Context
 	}
 
-	f.ID = h.ID
 	f.Subject = h.Subject
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
 	f.LoginError = h.Error
@@ -415,8 +418,6 @@ func (f *Flow) UpdateFlowWithHandledLoginRequest(h *HandledLoginRequest) error {
 	f.LoginExtendSessionLifespan = h.ExtendSessionLifespan
 	f.ACR = h.ACR
 	f.AMR = h.AMR
-	f.LoginWasUsed = h.WasHandled
-	f.LoginAuthenticatedAt = h.AuthenticatedAt
 	return nil
 }
 
@@ -448,19 +449,21 @@ func (f *Flow) InvalidateLoginRequest() error {
 		return errors.Errorf("invalid flow state: expected %d or %d, got %d", FlowStateLoginUnused, FlowStateLoginError, f.State)
 	}
 	if f.LoginWasUsed {
+		// This is basically unreachable, see the comment below.
 		return errors.New("login verifier has already been used")
 	}
+
+	// This is the only place where we set LoginWasUsed to true, but we also only here set the state to FlowStateLoginUsed.
+	// Hence, LoginWasUsed is redundant and should be derived from the state instead.
 	f.LoginWasUsed = true
 	f.State = FlowStateLoginUsed
 	return nil
 }
 
 func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
-	if time.Time(r.HandledAt).IsZero() {
-		return errors.New("refusing to handle a consent request with null HandledAt")
-	}
-
 	if f.ConsentWasHandled {
+		// ConsentWasHandled cannot really be true here, as we only set it to true when setting the state to FlowStateConsentUsed.
+		// Hence, ConsentWasHandled is redundant and should be derived from the state instead.
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
 
@@ -468,14 +471,8 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
 
-	if f.ConsentRequestID.String() != r.ConsentRequestID {
-		return errors.Errorf("flow.ConsentRequestID %s doesn't match AcceptOAuth2ConsentRequest.ID %s", f.ConsentRequestID.String(), r.ConsentRequestID)
-	}
-
 	if r.Error != nil {
 		f.State = FlowStateConsentError
-	} else if r.WasHandled {
-		f.State = FlowStateConsentUsed
 	} else {
 		f.State = FlowStateConsentUnused
 	}
@@ -484,8 +481,8 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 	f.GrantedAudience = r.GrantedAudience
 	f.ConsentRemember = r.Remember
 	f.ConsentRememberFor = &r.RememberFor
-	f.ConsentHandledAt = r.HandledAt
-	f.ConsentWasHandled = r.WasHandled
+	f.ConsentWasHandled = false
+	f.ConsentHandledAt = sqlxx.NullTime(time.Now().UTC())
 	f.ConsentError = r.Error
 	if r.Context != nil {
 		f.Context = r.Context
@@ -500,12 +497,16 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 
 func (f *Flow) InvalidateConsentRequest() error {
 	if f.ConsentWasHandled {
+		// This is basically unreachable, see the comment below.
 		return errors.New("consent verifier has already been used")
 	}
+
 	if f.State != FlowStateConsentUnused && f.State != FlowStateConsentError {
 		return errors.Errorf("unexpected flow state: expected %d or %d, got %d", FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
 
+	// This is the only place where we set ConsentWasHandled to true, but we also only here set the state to FlowStateConsentUsed.
+	// Hence, ConsentWasHandled is redundant and should be derived from the state instead.
 	f.ConsentWasHandled = true
 	f.State = FlowStateConsentUsed
 	return nil
@@ -513,28 +514,21 @@ func (f *Flow) InvalidateConsentRequest() error {
 
 func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 	cs := OAuth2ConsentRequest{
-		Challenge:              challenge,
-		ConsentRequestID:       f.ConsentRequestID.String(),
-		RequestedScope:         f.RequestedScope,
-		RequestedAudience:      f.RequestedAudience,
-		Skip:                   f.ConsentSkip,
-		Subject:                f.Subject,
-		OpenIDConnectContext:   f.OpenIDConnectContext,
-		Client:                 f.Client,
-		ClientID:               f.ClientID,
-		RequestURL:             f.RequestURL,
-		LoginChallenge:         sqlxx.NullString(f.ID),
-		LoginSessionID:         f.SessionID,
-		DeviceChallenge:        f.DeviceChallengeID,
-		ACR:                    f.ACR,
-		AMR:                    f.AMR,
-		Context:                f.Context,
-		WasHandled:             f.ConsentWasHandled,
-		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
-		Verifier:               f.ConsentVerifier.String(),
-		CSRF:                   f.ConsentCSRF.String(),
-		AuthenticatedAt:        f.LoginAuthenticatedAt,
-		RequestedAt:            f.RequestedAt,
+		Challenge:            challenge,
+		ConsentRequestID:     f.ConsentRequestID.String(),
+		RequestedScope:       f.RequestedScope,
+		RequestedAudience:    f.RequestedAudience,
+		Skip:                 f.ConsentSkip,
+		Subject:              f.Subject,
+		OpenIDConnectContext: f.OpenIDConnectContext,
+		Client:               f.Client,
+		RequestURL:           f.RequestURL,
+		LoginChallenge:       sqlxx.NullString(f.ID),
+		LoginSessionID:       f.SessionID,
+		DeviceChallenge:      f.DeviceChallengeID,
+		ACR:                  f.ACR,
+		AMR:                  f.AMR,
+		Context:              f.Context,
 	}
 	if cs.AMR == nil {
 		cs.AMR = []string{}

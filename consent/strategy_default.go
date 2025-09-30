@@ -104,7 +104,7 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, nil, sessionID)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionID)
 	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().WithRequest(r).WithError(err).
 			Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
@@ -271,7 +271,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 			ClientID:             cl.ID,
 			RequestURL:           requestURL,
 			SessionID:            sqlxx.NullString(sessionID),
-			LoginWasUsed:         false,
 			LoginVerifier:        verifier,
 			LoginCSRF:            csrf,
 			LoginAuthenticatedAt: sqlxx.NullTime(authenticatedAt),
@@ -955,7 +954,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, nil, hintSid)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
@@ -1083,7 +1082,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, nil, sid)
+	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
 		// This is ok (session probably already revoked), do nothing!

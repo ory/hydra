@@ -64,9 +64,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 // Revoke OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters revokeOAuth2ConsentSessions
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type revokeOAuth2ConsentSessions struct {
+type _ struct {
 	// OAuth 2.0 Consent Subject
 	//
 	// The subject whose consent sessions should be deleted.
@@ -117,27 +115,27 @@ type revokeOAuth2ConsentSessions struct {
 func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	var (
 		subject          = r.URL.Query().Get("subject")
-		client           = r.URL.Query().Get("client")
+		clientID         = r.URL.Query().Get("client")
 		consentRequestID = r.URL.Query().Get("consent_request_id")
 		allClients       = r.URL.Query().Get("all") == "true"
 	)
 
 	switch {
-	case consentRequestID != "" && subject == "" && client == "":
+	case consentRequestID != "" && subject == "" && clientID == "":
 		if err := h.r.ConsentManager().RevokeConsentSessionByID(r.Context(), consentRequestID); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 		events.Trace(r.Context(), events.ConsentRevoked, events.WithConsentRequestID(consentRequestID))
 
-	case consentRequestID == "" && subject != "" && client != "" && !allClients:
-		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
+	case consentRequestID == "" && subject != "" && clientID != "" && !allClients:
+		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, clientID); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
-		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject), events.WithClientID(client))
+		events.Trace(r.Context(), events.ConsentRevoked, events.WithSubject(subject), events.WithClientID(clientID))
 
-	case consentRequestID == "" && subject != "" && client == "" && allClients:
+	case consentRequestID == "" && subject != "" && clientID == "" && allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
@@ -155,9 +153,7 @@ func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Req
 // List OAuth 2.0 Consent Session Parameters
 //
 // swagger:parameters listOAuth2ConsentSessions
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type listOAuth2ConsentSessions struct {
+type _ struct {
 	tokenpagination.RequestParameters
 
 	// The subject to list the consent sessions for.
@@ -234,9 +230,7 @@ func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Reque
 // Revoke OAuth 2.0 Consent Login Sessions Parameters
 //
 // swagger:parameters revokeOAuth2LoginSessions
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type revokeOAuth2LoginSessions struct {
+type _ struct {
 	// OAuth 2.0 Subject
 	//
 	// The subject to revoke authentication sessions for.
@@ -308,9 +302,7 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Login Request
 //
 // swagger:parameters getOAuth2LoginRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getOAuth2LoginRequest struct {
+type _ struct {
 	// OAuth 2.0 Login Request Challenge
 	//
 	// in: query
@@ -382,9 +374,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) 
 // Accept OAuth 2.0 Login Request
 //
 // swagger:parameters acceptOAuth2LoginRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type acceptOAuth2LoginRequest struct {
+type _ struct {
 	// OAuth 2.0 Login Request Challenge
 	//
 	// in: query
@@ -471,17 +461,12 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 
 	if f.LoginSkip {
 		payload.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		payload.AuthenticatedAt = f.LoginAuthenticatedAt
 	} else {
-		payload.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+		f.LoginAuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
 			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
 			Truncate(time.Second))
-		f.LoginAuthenticatedAt = payload.AuthenticatedAt
 	}
-	payload.RequestedAt = f.RequestedAt
 
-	// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
-	payload.ID = f.ID
 	if err := f.UpdateFlowWithHandledLoginRequest(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -508,9 +493,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 // Reject OAuth 2.0 Login Request
 //
 // swagger:parameters rejectOAuth2LoginRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type rejectOAuth2LoginRequest struct {
+type _ struct {
 	// OAuth 2.0 Login Request Challenge
 	//
 	// in: query
@@ -580,9 +563,6 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 
 	if err := f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{
 		Error: &payload,
-		// This used to be in *Persister.UpdateFlowWithHandledLoginRequest and is needed to make UpdateFlowWithHandledLoginRequest pass validation.
-		ID:          f.ID,
-		RequestedAt: f.RequestedAt,
 	}); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -610,9 +590,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 // Get OAuth 2.0 Consent Request
 //
 // swagger:parameters getOAuth2ConsentRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getOAuth2ConsentRequest struct {
+type _ struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
 	// in: query
@@ -683,9 +661,7 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 // Accept OAuth 2.0 Consent Request
 //
 // swagger:parameters acceptOAuth2ConsentRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type acceptOAuth2ConsentRequest struct {
+type _ struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
 	// in: query
@@ -756,15 +732,9 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	payload.ConsentRequestID = f.ConsentRequestID.String()
-	payload.RequestedAt = f.RequestedAt
-	payload.HandledAt = sqlxx.NullTime(time.Now().UTC())
-
 	if err := f.HandleConsentRequest(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
-	} else if f.ConsentSkip {
-		payload.Remember = false
 	}
 
 	ru, err := url.Parse(f.RequestURL)
@@ -788,9 +758,7 @@ func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 // Reject OAuth 2.0 Consent Request
 //
 // swagger:parameters rejectOAuth2ConsentRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type adminRejectOAuth2ConsentRequest struct {
+type _ struct {
 	// OAuth 2.0 Consent Request Challenge
 	//
 	// in: query
@@ -861,10 +829,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
-		Error:            &payload,
-		ConsentRequestID: f.ConsentRequestID.String(),
-		RequestedAt:      f.RequestedAt,
-		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
+		Error: &payload,
 	}); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -892,9 +857,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 // Accept OAuth 2.0 Logout Request
 //
 // swagger:parameters acceptOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type acceptOAuth2LogoutRequest struct {
+type _ struct {
 	// OAuth 2.0 Logout Request Challenge
 	//
 	// in: query
@@ -938,9 +901,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Reject OAuth 2.0 Logout Request
 //
 // swagger:parameters rejectOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type rejectOAuth2LogoutRequest struct {
+type _ struct {
 	// in: query
 	// required: true
 	Challenge string `json:"logout_challenge"`
@@ -980,9 +941,7 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 // Get OAuth 2.0 Logout Request
 //
 // swagger:parameters getOAuth2LogoutRequest
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type getOAuth2LogoutRequest struct {
+type _ struct {
 	// in: query
 	// required: true
 	Challenge string `json:"logout_challenge"`

@@ -26,7 +26,6 @@ func (f *Flow) setLoginRequest(r *LoginRequest) {
 	f.ClientID = r.ClientID
 	f.RequestURL = r.RequestURL
 	f.SessionID = r.SessionID
-	f.LoginWasUsed = r.WasHandled
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
 	f.LoginVerifier = r.Verifier
 	f.LoginCSRF = r.CSRF
@@ -42,19 +41,12 @@ func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 	f.Subject = r.Subject
 	f.OpenIDConnectContext = r.OpenIDConnectContext
 	f.Client = r.Client
-	f.ClientID = r.ClientID
 	f.RequestURL = r.RequestURL
 	f.ID = r.LoginChallenge.String()
 	f.SessionID = r.LoginSessionID
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Context = r.Context
-	f.ConsentWasHandled = r.WasHandled
-	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
-	f.ConsentVerifier = sqlxx.NullString(r.Verifier)
-	f.ConsentCSRF = sqlxx.NullString(r.CSRF)
-	f.LoginAuthenticatedAt = r.AuthenticatedAt
-	f.RequestedAt = r.RequestedAt
 }
 
 func (f *Flow) setDeviceRequest(r *DeviceUserAuthRequest) {
@@ -147,10 +139,15 @@ func TestFlow_HandleDeviceUserAuthRequest(t *testing.T) {
 
 func TestFlow_GetLoginRequest(t *testing.T) {
 	t.Run("GetLoginRequest should set all fields on its return value", func(t *testing.T) {
-		f := Flow{}
 		expected := LoginRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
+		f := Flow{
+			State:        FlowStateLoginUsed,
+			LoginWasUsed: true,
+		}
 		f.setLoginRequest(&expected)
+		expected.WasHandled = true // this depends on the flow state and is not copied from the request
+
 		actual := f.GetLoginRequest()
 		assert.Equal(t, expected, *actual)
 	})
@@ -163,28 +160,23 @@ func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 			f := Flow{}
 			assert.NoError(t, faker.FakeData(&f))
 			f.State = FlowStateLoginInitialized
+			f.LoginWasUsed = false
 
 			r := HandledLoginRequest{}
 			assert.NoError(t, faker.FakeData(&r))
-			r.ID = f.ID
 			r.Subject = f.Subject
 			r.ForceSubjectIdentifier = f.ForceSubjectIdentifier
-			f.LoginWasUsed = false
 
 			assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&r))
 
-			assert.Equal(t, r.ID, f.ID)
 			assert.Equal(t, r.Subject, f.Subject)
 			assert.Equal(t, r.ForceSubjectIdentifier, f.ForceSubjectIdentifier)
-			assert.NotEqual(t, r.RequestedAt, f.RequestedAt)
 			assert.Equal(t, r.Remember, f.LoginRemember)
 			assert.Equal(t, r.RememberFor, f.LoginRememberFor)
 			assert.Equal(t, r.ExtendSessionLifespan, f.LoginExtendSessionLifespan)
 			assert.Equal(t, r.ACR, f.ACR)
 			assert.Equal(t, r.AMR, f.AMR)
-			assert.Equal(t, r.WasHandled, f.LoginWasUsed)
 			assert.Equal(t, r.Error, f.LoginError)
-			assert.Equal(t, r.AuthenticatedAt, f.LoginAuthenticatedAt)
 			assert.Equal(t, r.IdentityProviderSessionID, f.IdentityProviderSessionID.String())
 			assert.Equal(t, r.Context, f.Context)
 		},
@@ -194,35 +186,22 @@ func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 func TestFlow_InvalidateLoginRequest(t *testing.T) {
 	t.Run("InvalidateLoginRequest should transition the flow into FlowStateLoginUsed", func(t *testing.T) {
 		f := Flow{
-			ID:           "t3-id",
-			Subject:      "t3-sub",
-			LoginWasUsed: false,
-			State:        FlowStateLoginInitialized,
+			ID:      "t3-id",
+			Subject: "t3-sub",
+			State:   FlowStateLoginInitialized,
 		}
 		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
-			ID:         "t3-id",
-			Subject:    "t3-sub",
-			WasHandled: false,
+			Subject: "t3-sub",
 		}))
 		assert.NoError(t, f.InvalidateLoginRequest())
 		assert.Equal(t, FlowStateLoginUsed, f.State)
-		assert.Equal(t, true, f.LoginWasUsed)
 	})
-	t.Run("InvalidateLoginRequest should fail when flow.LoginWasUsed is true", func(t *testing.T) {
+	t.Run("InvalidateLoginRequest should fail when flow is in used state", func(t *testing.T) {
 		f := Flow{
-			ID:           "t3-id",
-			Subject:      "t3-sub",
-			LoginWasUsed: false,
-			State:        FlowStateLoginInitialized,
+			Subject: "t3-sub",
+			State:   FlowStateLoginUsed,
 		}
-		assert.NoError(t, f.UpdateFlowWithHandledLoginRequest(&HandledLoginRequest{
-			ID:         "t3-id",
-			Subject:    "t3-sub",
-			WasHandled: true,
-		}))
-		err := f.InvalidateLoginRequest()
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "verifier has already been used")
+		assert.ErrorContains(t, f.InvalidateLoginRequest(), "invalid flow state")
 	})
 }
 
@@ -244,52 +223,39 @@ func TestFlow_HandleConsentRequest(t *testing.T) {
 	expected := AcceptOAuth2ConsentRequest{}
 	require.NoError(t, faker.FakeData(&expected))
 
-	expected.ConsentRequestID = string(f.ConsentRequestID)
-	expected.HandledAt = sqlxx.NullTime(time.Now())
-	expected.RequestedAt = f.RequestedAt
 	expected.Session = &AcceptOAuth2ConsentRequestSession{
 		IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
 		AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
 	}
-	expected.SessionIDToken = expected.Session.IDToken
-	expected.SessionAccessToken = expected.Session.AccessToken
 
 	f.State = FlowStateConsentInitialized
 	f.ConsentWasHandled = false
+	f.ConsentHandledAt = sqlxx.NullTime(time.Now())
 
 	fGood := deepcopy.Copy(f).(Flow)
-	eGood := deepcopy.Copy(expected).(AcceptOAuth2ConsentRequest)
+	fGood.ConsentHandledAt = f.ConsentHandledAt // deepcopy cannot copy time.Time, as it only has unexported fields
 	require.NoError(t, f.HandleConsentRequest(&expected))
 
 	t.Run("HandleConsentRequest should fail when already handled", func(t *testing.T) {
 		fBad := deepcopy.Copy(fGood).(Flow)
-		fBad.ConsentWasHandled = true
-		require.Error(t, fBad.HandleConsentRequest(&expected))
+		fBad.State = FlowStateConsentUsed
+		fBad.ConsentHandledAt = f.ConsentHandledAt // deepcopy cannot copy time.Time, as it only has unexported fields
+		assert.ErrorContains(t, fBad.HandleConsentRequest(&expected), "invalid flow state")
 	})
 
 	t.Run("HandleConsentRequest should fail when State is FlowStateLoginUsed", func(t *testing.T) {
 		fBad := deepcopy.Copy(fGood).(Flow)
 		fBad.State = FlowStateLoginUsed
-		require.Error(t, fBad.HandleConsentRequest(&expected))
-	})
-
-	t.Run("HandleConsentRequest should fail when HandledAt in its argument is zero", func(t *testing.T) {
-		f := deepcopy.Copy(fGood).(Flow)
-		eBad := deepcopy.Copy(eGood).(AcceptOAuth2ConsentRequest)
-		eBad.HandledAt = sqlxx.NullTime(time.Time{})
-		require.Error(t, f.HandleConsentRequest(&eBad))
+		fBad.ConsentHandledAt = f.ConsentHandledAt // deepcopy cannot copy time.Time, as it only has unexported fields
+		require.ErrorContains(t, fBad.HandleConsentRequest(&expected), "invalid flow state")
 	})
 
 	require.NoError(t, fGood.HandleConsentRequest(&expected))
 
-	assert.Equal(t, expected.ConsentRequestID, fGood.ConsentRequestID.String())
 	assert.Equal(t, expected.GrantedScope, fGood.GrantedScope)
 	assert.Equal(t, expected.GrantedAudience, fGood.GrantedAudience)
-	assert.Equal(t, expected.HandledAt, fGood.ConsentHandledAt)
-	assert.Equal(t, expected.WasHandled, fGood.ConsentWasHandled)
+	assert.WithinDuration(t, time.Now(), time.Time(fGood.ConsentHandledAt), 5*time.Second)
 	assert.Equal(t, expected.Error, fGood.ConsentError)
-	assert.Equal(t, expected.RequestedAt, fGood.RequestedAt)
-	assert.Equal(t, expected.AuthenticatedAt, fGood.LoginAuthenticatedAt)
-	assert.Equal(t, expected.SessionIDToken, fGood.SessionIDToken)
-	assert.Equal(t, expected.SessionAccessToken, fGood.SessionAccessToken)
+	assert.EqualValues(t, expected.Session.IDToken, fGood.SessionIDToken)
+	assert.EqualValues(t, expected.Session.AccessToken, fGood.SessionAccessToken)
 }

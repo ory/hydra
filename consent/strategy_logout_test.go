@@ -195,19 +195,19 @@ func TestLogoutFlows(t *testing.T) {
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
 				require.NoError(t, err)
 				if sid != nil {
-					go func() {
-						for i := 0; i < numSidConsumers; i++ {
-							sid <- *res.LoginSessionId
-						}
-					}()
+					for range numSidConsumers {
+						sid <- *res.LoginSessionId
+					}
 				}
 				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(remember)}
 			}))
 
 	}
 
-	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
+	acceptLoginAsAndWatchSid := func(t *testing.T, subject string) <-chan string {
+		sid := make(chan string, 1)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, true, 1)
+		return sid
 	}
 
 	acceptLoginAs := func(t *testing.T, subject string) {
@@ -322,8 +322,7 @@ func TestLogoutFlows(t *testing.T) {
 	})
 
 	t.Run("case=should execute backchannel logout if issued without rp-involvement", func(t *testing.T) {
-		sid := make(chan string)
-		acceptLoginAsAndWatchSid(t, subject, sid)
+		sid := acceptLoginAsAndWatchSid(t, subject)
 
 		logoutWg := newWg(2)
 		setupCheckAndAcceptLogoutHandler(t, logoutWg, nil)
@@ -389,8 +388,7 @@ func TestLogoutFlows(t *testing.T) {
 			t.Run("case="+tc.d, func(t *testing.T) {
 
 				c := createSampleClient(t)
-				sid := make(chan string)
-				acceptLoginAsAndWatchSid(t, subject, sid)
+				sid := acceptLoginAsAndWatchSid(t, subject)
 				browser := createBrowserWithSession(t, c)
 
 				wg := newWg(1)
@@ -436,8 +434,7 @@ func TestLogoutFlows(t *testing.T) {
 		c := createSampleClient(t)
 		run := func(method string, claims jwtgo.MapClaims) func(t *testing.T) {
 			return func(t *testing.T) {
-				sid := make(chan string)
-				acceptLoginAsAndWatchSid(t, subject, sid)
+				sid := acceptLoginAsAndWatchSid(t, subject)
 
 				setupCheckAndAcceptLogoutHandler(t, nil, nil)
 				browser := createBrowserWithSession(t, c)
@@ -507,8 +504,7 @@ func TestLogoutFlows(t *testing.T) {
 
 	t.Run("case=should not append a state param if no state was passed to logout server", func(t *testing.T) {
 		c := createSampleClient(t)
-		sid := make(chan string)
-		acceptLoginAsAndWatchSid(t, subject, sid)
+		sid := acceptLoginAsAndWatchSid(t, subject)
 
 		setupCheckAndAcceptLogoutHandler(t, nil, nil)
 		browser := createBrowserWithSession(t, c)
@@ -534,8 +530,7 @@ func TestLogoutFlows(t *testing.T) {
 	t.Run("case=should return to default post logout because session was revoked in browser context", func(t *testing.T) {
 		fakeKratos.Reset()
 		c := createSampleClient(t)
-		sid := make(chan string)
-		acceptLoginAsAndWatchSid(t, subject, sid)
+		sid := acceptLoginAsAndWatchSid(t, subject)
 
 		wg := newWg(3)
 		fakeKratos.DisableSessionCB = wg.Done
@@ -611,7 +606,7 @@ func TestLogoutFlows(t *testing.T) {
 
 	t.Run("case=should logout in headless flow with session that has remember=false", func(t *testing.T) {
 		fakeKratos.Reset()
-		sid := make(chan string)
+		sid := make(chan string, 1)
 		acceptLoginAsAndWatchSidForConsumers(t, subject, sid, false, 1)
 
 		wg := newWg(1)

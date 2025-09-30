@@ -13,7 +13,6 @@ package openapi
 
 import (
 	"encoding/json"
-	"time"
 )
 
 // checks if the AcceptOAuth2ConsentRequest type satisfies the MappedNullable interface at compile time
@@ -24,7 +23,6 @@ type AcceptOAuth2ConsentRequest struct {
 	Context                  interface{} `json:"context,omitempty"`
 	GrantAccessTokenAudience []string    `json:"grant_access_token_audience,omitempty"`
 	GrantScope               []string    `json:"grant_scope,omitempty"`
-	HandledAt                *time.Time  `json:"handled_at,omitempty"`
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.
 	Remember *bool `json:"remember,omitempty"`
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
@@ -146,38 +144,6 @@ func (o *AcceptOAuth2ConsentRequest) SetGrantScope(v []string) {
 	o.GrantScope = v
 }
 
-// GetHandledAt returns the HandledAt field value if set, zero value otherwise.
-func (o *AcceptOAuth2ConsentRequest) GetHandledAt() time.Time {
-	if o == nil || IsNil(o.HandledAt) {
-		var ret time.Time
-		return ret
-	}
-	return *o.HandledAt
-}
-
-// GetHandledAtOk returns a tuple with the HandledAt field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *AcceptOAuth2ConsentRequest) GetHandledAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.HandledAt) {
-		return nil, false
-	}
-	return o.HandledAt, true
-}
-
-// HasHandledAt returns a boolean if a field has been set.
-func (o *AcceptOAuth2ConsentRequest) HasHandledAt() bool {
-	if o != nil && !IsNil(o.HandledAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetHandledAt gets a reference to the given time.Time and assigns it to the HandledAt field.
-func (o *AcceptOAuth2ConsentRequest) SetHandledAt(v time.Time) {
-	o.HandledAt = &v
-}
-
 // GetRemember returns the Remember field value if set, zero value otherwise.
 func (o *AcceptOAuth2ConsentRequest) GetRemember() bool {
 	if o == nil || IsNil(o.Remember) {
@@ -292,9 +258,6 @@ func (o AcceptOAuth2ConsentRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.GrantScope) {
 		toSerialize["grant_scope"] = o.GrantScope
-	}
-	if !IsNil(o.HandledAt) {
-		toSerialize["handled_at"] = o.HandledAt
 	}
 	if !IsNil(o.Remember) {
 		toSerialize["remember"] = o.Remember

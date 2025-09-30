@@ -1,1 +1,11 @@
-"{\"challenge\":\"\",\"requested_scope\":[],\"requested_access_token_audience\":[],\"skip\":false,\"subject\":\"\",\"oidc_context\":null,\"client\":null,\"request_url\":\"\",\"session_id\":\"\"}"
+{
+  "challenge": "",
+  "requested_scope": [],
+  "requested_access_token_audience": [],
+  "skip": false,
+  "subject": "",
+  "oidc_context": null,
+  "client": null,
+  "request_url": "",
+  "session_id": ""
+}

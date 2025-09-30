@@ -60,7 +60,6 @@ const (
 	RevocationPath   = "/oauth2/revoke"
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 
-	// Device authorization endpoint
 	DeviceAuthPath         = "/oauth2/device/auth"
 	DeviceVerificationPath = "/oauth2/device/verify"
 )
@@ -559,9 +558,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 // OpenID Connect Userinfo
 //
 // swagger:model oidcUserInfo
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type oidcUserInfo struct {
+type _ struct {
 	// Subject - Identifier for the End-User at the IssuerURL.
 	Subject string `json:"sub"`
 
@@ -725,7 +722,7 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 //
 // # OAuth 2.0 Device Verification Endpoint
 //
-// This is the device user verification endpoint. The user is redirected here when trying to login using the device flow.
+// This is the device user verification endpoint. The user is redirected here when trying to log in using the device flow.
 //
 //	Consumes:
 //	- application/x-www-form-urlencoded
@@ -816,9 +813,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 // # Ory's OAuth 2.0 Device Authorization API
 //
 // swagger:model deviceAuthorization
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type deviceAuthorization struct {
+type _ struct {
 	// The device verification code.
 	//
 	// example: ory_dc_smldfksmdfkl.mslkmlkmlk
@@ -861,7 +856,7 @@ type deviceAuthorization struct {
 // # The OAuth 2.0 Device Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
-// OAuth2 is a very popular protocol and a library for your programming language will exists.
+// OAuth2 is a very popular protocol and a library for your programming language will exist.
 //
 // To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
 //
@@ -900,9 +895,7 @@ func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 // Revoke OAuth 2.0 Access or Refresh Token Request
 //
 // swagger:parameters revokeOAuth2Token
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type revokeOAuth2Token struct {
+type _ struct {
 	// in: formData
 	// required: true
 	Token string `json:"token"`
@@ -951,9 +944,7 @@ func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 // Introspect OAuth 2.0 Access or Refresh Token Request
 //
 // swagger:parameters introspectOAuth2Token
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type introspectOAuth2Token struct {
+type _ struct {
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
 	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
@@ -993,12 +984,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) 
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
 
-	if r.Method != "POST" {
-		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
-		x.LogError(r, err, h.r.Logger())
-		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
-		return
-	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
+	if err := r.ParseMultipartForm(1 << 20); err != nil && !errors.Is(err, http.ErrNotMultipart) {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
@@ -1087,9 +1073,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) 
 // OAuth 2.0 Token Exchange Parameters
 //
 // swagger:parameters oauth2TokenExchange
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type performOAuth2TokenFlow struct {
+type _ struct {
 	// in: formData
 	// required: true
 	GrantType string `json:"grant_type"`
@@ -1110,9 +1094,7 @@ type performOAuth2TokenFlow struct {
 // OAuth2 Token Exchange Result
 //
 // swagger:model oAuth2TokenExchange
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type oAuth2TokenExchange struct {
+type _ struct {
 	// The lifetime in seconds of the access token. For
 	// example, the value "3600" denotes that the access token will
 	// expire in one hour from the time the response was generated.
@@ -1287,7 +1269,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flow, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
+	fl, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -1302,8 +1284,8 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authorizeRequest.SetID(flow.ConsentRequestID.String())
-	session, err := h.updateSessionWithRequest(ctx, flow, r, authorizeRequest, nil)
+	authorizeRequest.SetID(fl.ConsentRequestID.String())
+	session, err := h.updateSessionWithRequest(ctx, fl, r, authorizeRequest, nil)
 	if err != nil {
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
@@ -1324,9 +1306,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 // Delete OAuth 2.0 Access Token Parameters
 //
 // swagger:parameters deleteOAuth2Token
-//
-//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
-type deleteOAuth2Token struct {
+type _ struct {
 	// OAuth 2.0 Client ID
 	//
 	// required: true

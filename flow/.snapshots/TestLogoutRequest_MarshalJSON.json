@@ -1,1 +1,9 @@
-"{\"challenge\":\"\",\"subject\":\"\",\"request_url\":\"\",\"rp_initiated\":false,\"expires_at\":null,\"requested_at\":null,\"client\":null}"
+{
+  "challenge": "",
+  "subject": "",
+  "request_url": "",
+  "rp_initiated": false,
+  "expires_at": null,
+  "requested_at": null,
+  "client": null
+}

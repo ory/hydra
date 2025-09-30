@@ -176,10 +176,10 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 	ls := newLoginSession()
 	ls.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC())
 	ls.Remember = true
+	ls.NID = s.t1NID
+
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			require.NoError(t, r.Persister().CreateLoginSession(s.t1, ls))
-
 			// Expects the login session to be confirmed in the correct context.
 			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls))
 			actual := &flow.LoginSession{}
@@ -202,14 +202,13 @@ func (s *PersisterTestSuite) TestConfirmLoginSession() {
 }
 
 func (s *PersisterTestSuite) TestCreateSession() {
-	ls := newLoginSession()
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			persistLoginSession(s.t1, t, r.Persister(), ls)
+			ls := newLoginSession()
+			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, ls))
 			actual := &flow.LoginSession{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, ls.ID))
 			require.Equal(t, s.t1NID, actual.NID)
-			ls.NID = actual.NID
 			require.Equal(t, ls, actual)
 		})
 	}
@@ -260,39 +259,6 @@ func (s *PersisterTestSuite) TestCountGrants() {
 			require.Equal(t, 1, count)
 
 			count, err = r.Persister().CountGrants(s.t2)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestCountSubjectsGrantedConsentRequests() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			sub := uuid.Must(uuid.NewV4()).String()
-			count, err := r.Persister().CountSubjectsGrantedConsentRequests(s.t1, sub)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			count, err = r.Persister().CountSubjectsGrantedConsentRequests(s.t2, sub)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			cl := &client.Client{ID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			f := newFlow(s.t1NID, cl.ID, sub, sqlxx.NullString(sessionID))
-			f.ConsentSkip = false
-			f.ConsentError = &flow.RequestDeniedError{}
-			f.State = flow.FlowStateConsentUnused
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
-
-			count, err = r.Persister().CountSubjectsGrantedConsentRequests(s.t1, sub)
-			require.NoError(t, err)
-			require.Equal(t, 1, count)
-
-			count, err = r.Persister().CountSubjectsGrantedConsentRequests(s.t2, sub)
 			require.NoError(t, err)
 			require.Equal(t, 0, count)
 		})
@@ -376,18 +342,6 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, ks.Keys[0].Public()))
 			actual := persistencesql.SQLGrant{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, grant.ID))
-			require.Equal(t, s.t1NID, actual.NID)
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestCreateLoginSession() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			ls := flow.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
-			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &ls))
-			actual, err := r.Persister().GetRememberedLoginSession(s.t1, &ls, ls.ID)
-			require.NoError(t, err)
 			require.Equal(t, s.t1NID, actual.NID)
 		})
 	}
@@ -574,19 +528,19 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 				Remember:                  true,
 				IdentityProviderSessionID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
 			}
-			persistLoginSession(s.t1, t, r.Persister(), &ls)
+			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, &ls))
 
 			deletedLS, err := r.Persister().DeleteLoginSession(s.t2, ls.ID)
-			require.Error(t, err)
+			require.ErrorIs(t, err, sqlcon.ErrNoRows)
 			assert.Nil(t, deletedLS)
-			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
+			_, err = r.Persister().GetRememberedLoginSession(s.t1, ls.ID)
 			require.NoError(t, err)
 
 			deletedLS, err = r.Persister().DeleteLoginSession(s.t1, ls.ID)
 			require.NoError(t, err)
 			assert.Equal(t, ls, *deletedLS)
-			_, err = r.Persister().GetRememberedLoginSession(s.t1, nil, ls.ID)
-			require.Error(t, err)
+			_, err = r.Persister().GetRememberedLoginSession(s.t1, ls.ID)
+			require.ErrorIs(t, err, x.ErrNotFound)
 		})
 	}
 }
@@ -688,20 +642,13 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 				ConsentRequestID: "consent-request-id",
 				LoginChallenge:   sqlxx.NullString(f.ID),
 				Skip:             false,
-				Verifier:         "verifier",
-				CSRF:             "csrf",
-			}
-
-			hcr := &flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: req.ConsentRequestID,
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
 			}
 
 			f.ConsentRequestID = sqlxx.NullString(req.ConsentRequestID)
-			require.NoError(t, f.HandleConsentRequest(hcr))
+			require.NoError(t, f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
+				Remember: true,
+			}))
 
-			f.ConsentWasHandled = true
 			f.State = flow.FlowStateConsentUsed
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
@@ -711,7 +658,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, cl.ID, f.Subject)
 			require.NoError(t, err)
-			assert.EqualValues(t, hcr.ConsentRequestID, actual.ConsentRequestID)
+			assert.EqualValues(t, req.ConsentRequestID, actual.ConsentRequestID)
 		})
 	}
 }
@@ -971,28 +918,6 @@ func (s *PersisterTestSuite) TestGetConcreteGrant() {
 	}
 }
 
-func (s *PersisterTestSuite) TestGetFlow() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			cl := &client.Client{ID: "client-id"}
-			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
-			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
-			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
-
-			store, ok := r.Persister().(*persistencesql.Persister)
-			require.True(t, ok)
-
-			_, err := store.GetFlow(s.t2, f.ID)
-			require.Error(t, err)
-
-			_, err = store.GetFlow(s.t1, f.ID)
-			require.NoError(t, err)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestGetForcedObfuscatedLoginSession() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
@@ -1200,14 +1125,18 @@ func (s *PersisterTestSuite) TestGetRefreshTokenSession() {
 func (s *PersisterTestSuite) TestGetRememberedLoginSession() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			ls := flow.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
-			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &ls))
+			ls := flow.LoginSession{
+				ID:       uuid.Must(uuid.NewV4()).String(),
+				NID:      s.t1NID,
+				Remember: true,
+			}
+			require.NoError(t, r.Persister().ConfirmLoginSession(s.t1, &ls))
 
-			actual, err := r.Persister().GetRememberedLoginSession(s.t2, &ls, ls.ID)
-			require.Error(t, err)
+			actual, err := r.Persister().GetRememberedLoginSession(s.t2, ls.ID)
+			require.ErrorIs(t, err, x.ErrNotFound)
 			require.Nil(t, actual)
 
-			actual, err = r.Persister().GetRememberedLoginSession(s.t1, &ls, ls.ID)
+			actual, err = r.Persister().GetRememberedLoginSession(s.t1, ls.ID)
 			require.NoError(t, err)
 			require.NotNil(t, actual)
 		})
@@ -1232,9 +1161,7 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			assert.Nil(t, actual)
 
 			require.NoError(t, f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
-				ConsentRequestID: f.ConsentRequestID.String(),
-				HandledAt:        sqlxx.NullTime(time.Now()),
-				Remember:         true,
+				Remember: true,
 			}))
 
 			f.ConsentWasHandled = true
@@ -1775,7 +1702,6 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 			f.ConsentError = &flow.RequestDeniedError{}
 			f.SessionAccessToken = map[string]interface{}{}
 			f.SessionIDToken = map[string]interface{}{}
-			f.ConsentWasHandled = false
 			f.State = flow.FlowStateConsentUnused
 
 			require.NoError(t, f.InvalidateConsentRequest())
@@ -1934,6 +1860,5 @@ func requireKeySetEqual(t *testing.T, expected *jose.JSONWebKeySet, actual *jose
 
 func persistLoginSession(ctx context.Context, t *testing.T, p persistence.Persister, session *flow.LoginSession) {
 	t.Helper()
-	require.NoError(t, p.CreateLoginSession(ctx, session))
-	require.NoError(t, p.Connection(ctx).Create(session))
+	require.NoError(t, p.ConfirmLoginSession(ctx, session))
 }

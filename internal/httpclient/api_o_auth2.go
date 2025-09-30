@@ -2337,7 +2337,7 @@ func (r ApiOAuth2DeviceFlowRequest) Execute() (*DeviceAuthorization, *http.Respo
 OAuth2DeviceFlow The OAuth 2.0 Device Authorize Endpoint
 
 This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
-OAuth2 is a very popular protocol and a library for your programming language will exists.
+OAuth2 is a very popular protocol and a library for your programming language will exist.
 
 To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628
 
@@ -2745,7 +2745,7 @@ func (r ApiPerformOAuth2DeviceVerificationFlowRequest) Execute() (*ErrorOAuth2, 
 /*
 PerformOAuth2DeviceVerificationFlow OAuth 2.0 Device Verification Endpoint
 
-This is the device user verification endpoint. The user is redirected here when trying to login using the device flow.
+This is the device user verification endpoint. The user is redirected here when trying to log in using the device flow.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiPerformOAuth2DeviceVerificationFlowRequest

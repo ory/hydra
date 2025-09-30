@@ -1771,7 +1771,7 @@
     },
     "/oauth2/device/auth": {
       "post": {
-        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628",
+        "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exist.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc8628",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1802,7 +1802,7 @@
     },
     "/oauth2/device/verify": {
       "get": {
-        "description": "This is the device user verification endpoint. The user is redirected here when trying to login using the device flow.",
+        "description": "This is the device user verification endpoint. The user is redirected here when trying to log in using the device flow.",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -2335,9 +2335,6 @@
         "grant_scope": {
           "$ref": "#/definitions/StringSliceJSONFormat"
         },
-        "handled_at": {
-          "$ref": "#/definitions/nullTime"
-        },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
           "type": "boolean"
@@ -2376,7 +2373,7 @@
       ],
       "properties": {
         "acr": {
-          "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
+          "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two-factor authentication.",
           "type": "string"
         },
         "amr": {
@@ -2398,7 +2395,7 @@
           "type": "string"
         },
         "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
+          "description": "Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, they\nwill not be asked to log in again.",
           "type": "boolean"
         },
         "remember_for": {

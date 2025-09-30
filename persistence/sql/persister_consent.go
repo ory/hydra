@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -169,20 +168,6 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-func (p *Persister) GetFlow(ctx context.Context, loginChallenge string) (_ *flow.Flow, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetFlow")
-	defer otelx.End(span, &err)
-
-	var f flow.Flow
-	if err := p.QueryWithNetwork(ctx).Where("login_challenge = ?", loginChallenge).First(&f); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.WithStack(x.ErrNotFound)
-		}
-		return nil, sqlcon.HandleError(err)
-	}
-	return &f, nil
-}
-
 func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentSession")
 	defer otelx.End(span, &err)
@@ -194,16 +179,11 @@ func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err
 	return sqlcon.HandleError(p.Connection(ctx).Create(f))
 }
 
-func (p *Persister) GetRememberedLoginSession(ctx context.Context, loginSessionFromCookie *flow.LoginSession, id string) (_ *flow.LoginSession, err error) {
+func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetRememberedLoginSession")
 	defer otelx.End(span, &err)
 
-	if s := loginSessionFromCookie; s != nil && s.NID == p.NetworkID(ctx) && s.ID == id && s.Remember {
-		return s, nil
-	}
-
 	var s flow.LoginSession
-
 	if err := p.QueryWithNetwork(ctx).Where("remember = TRUE").Find(&s, id); errors.Is(err, sql.ErrNoRows) {
 		return nil, errors.WithStack(x.ErrNotFound)
 	} else if err != nil {
@@ -249,19 +229,6 @@ WHERE hydra_oauth2_authentication_session.id = :id AND hydra_oauth2_authenticati
 	if n == 0 {
 		return errors.WithStack(x.ErrNotFound)
 	}
-	return nil
-}
-
-func (p *Persister) CreateLoginSession(ctx context.Context, session *flow.LoginSession) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateLoginSession")
-	defer otelx.End(span, &err)
-
-	nid := p.NetworkID(ctx)
-	if nid == uuid.Nil {
-		return errors.WithStack(x.ErrNotFound)
-	}
-	session.NID = nid
-
 	return nil
 }
 
@@ -326,7 +293,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, 
 
 	// prepare sql statement
 	q := fmt.Sprintf(`
-SELECT %s FROM %s 
+SELECT %s FROM %s
 WHERE nid = ?
 AND state = ?
 AND subject = ?

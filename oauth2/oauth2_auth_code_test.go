@@ -77,8 +77,8 @@ func getAuthorizeCode(t *testing.T, conf *oauth2.Config, c *http.Client, params 
 func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APIClient, reg *driver.RegistrySQL, subject string, checkRequestPayload func(request *hydra.OAuth2LoginRequest) *hydra.AcceptOAuth2LoginRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		rr, _, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
-		require.NoError(t, err)
+		rr, res, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+		require.NoErrorf(t, err, "%s\n%s", res.Request.URL, ioutilx.MustReadAll(res.Body))
 
 		assert.EqualValues(t, c.GetID(), pointerx.Deref(rr.Client.ClientId))
 		assert.Empty(t, pointerx.Deref(rr.Client.ClientSecret))

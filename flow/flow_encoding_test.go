@@ -25,7 +25,7 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-func createTestFlow(nid uuid.UUID, state int16) *flow.Flow {
+func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 	return &flow.Flow{
 		ID:                "a12bf95e-ccfc-45fc-b10d-1358790772c7",
 		NID:               nid,
@@ -212,7 +212,7 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 	})
 
 	t.Run("case=fails when flow has already been used", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUsed)
 		testFlow.LoginWasUsed = true
 
 		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
@@ -460,7 +460,6 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 
 	t.Run("case=successful decode and invalidate with valid consent verifier", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
-		testFlow.ConsentWasHandled = false
 
 		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -477,7 +476,7 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 	})
 
 	t.Run("case=fails when flow has already been used", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
+		testFlow := createTestFlow(nid, flow.FlowStateConsentUsed)
 		testFlow.ConsentWasHandled = true
 
 		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)

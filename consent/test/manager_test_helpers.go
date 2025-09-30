@@ -24,10 +24,11 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
+	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
-func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *flow.OAuth2ConsentRequest, h *flow.AcceptOAuth2ConsentRequest, f *flow.Flow) {
+func mockConsentRequest(key string, remember bool, rememberFor int, hasError, skip bool, loginChallengeBase, network string) (c *flow.OAuth2ConsentRequest, h *flow.AcceptOAuth2ConsentRequest, f *flow.Flow) {
 	c = &flow.OAuth2ConsentRequest{
 		ConsentRequestID:  makeID("challenge", network, key),
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
@@ -39,17 +40,12 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		Client:                 &client.Client{ID: "fk-client-" + key},
-		RequestURL:             "https://request-url/path" + key,
-		LoginChallenge:         sqlxx.NullString(makeID(loginChallengeBase, network, key)),
-		LoginSessionID:         sqlxx.NullString(makeID("fk-login-session", network, key)),
-		ForceSubjectIdentifier: "forced-subject",
-		Verifier:               makeID("verifier", network, key),
-		CSRF:                   "csrf" + key,
-		ACR:                    "1",
-		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
-		RequestedAt:            time.Now().UTC(),
-		Context:                sqlxx.JSONRawMessage(`{"foo": "bar` + key + `"}`),
+		Client:         &client.Client{ID: "fk-client-" + key},
+		RequestURL:     "https://request-url/path" + key,
+		LoginChallenge: sqlxx.NullString(makeID(loginChallengeBase, network, key)),
+		LoginSessionID: sqlxx.NullString(makeID("fk-login-session", network, key)),
+		ACR:            "1",
+		Context:        sqlxx.JSONRawMessage(`{"foo": "bar` + key + `"}`),
 	}
 
 	f = &flow.Flow{
@@ -60,14 +56,14 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		State:                flow.FlowStateConsentInitialized,
 		ConsentRequestID:     sqlxx.NullString(c.ConsentRequestID),
 		ConsentSkip:          c.Skip,
-		ConsentVerifier:      sqlxx.NullString(c.Verifier),
-		ConsentCSRF:          sqlxx.NullString(c.CSRF),
+		ConsentVerifier:      sqlxx.NullString(makeID("verifier", network, key)),
+		ConsentCSRF:          sqlxx.NullString("csrf" + key),
 		OpenIDConnectContext: c.OpenIDConnectContext,
 		Subject:              c.Subject,
 		RequestedScope:       c.RequestedScope,
 		RequestedAudience:    c.RequestedAudience,
 		RequestURL:           c.RequestURL,
-		RequestedAt:          c.RequestedAt,
+		RequestedAt:          time.Now().UTC(),
 	}
 
 	var err *flow.RequestDeniedError
@@ -82,29 +78,18 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		}
 	}
 
-	var authenticatedAt sqlxx.NullTime
-	if authAt {
-		authenticatedAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Minute))
-	}
-
 	h = &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:   c,
-		RememberFor:      rememberFor,
-		Remember:         remember,
-		ConsentRequestID: makeID("challenge", network, key),
-		RequestedAt:      time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:  authenticatedAt,
-		GrantedScope:     []string{"scopea" + key, "scopeb" + key},
-		GrantedAudience:  []string{"auda" + key, "audb" + key},
-		Error:            err,
-		HandledAt:        sqlxx.NullTime(time.Now().UTC()),
-		// WasUsed:         true,
+		RememberFor:     rememberFor,
+		Remember:        remember,
+		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
+		GrantedAudience: []string{"auda" + key, "audb" + key},
+		Error:           err,
 	}
 
 	return c, h, f
 }
 
-func MockLogoutRequest(key string, withClient bool, network string) (c *flow.LogoutRequest) {
+func mockLogoutRequest(key string, withClient bool, network string) (c *flow.LogoutRequest) {
 	var cl *client.Client
 	if withClient {
 		cl = &client.Client{
@@ -125,7 +110,7 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 	}
 }
 
-func MockDeviceRequest(key string, network string) (c *flow.DeviceUserAuthRequest, h *flow.HandledDeviceUserAuthRequest, f *flow.Flow) {
+func mockDeviceRequest(key, network string) (c *flow.DeviceUserAuthRequest, h *flow.HandledDeviceUserAuthRequest, f *flow.Flow) {
 	cl := &client.Client{ID: "fk-client-" + key}
 	c = &flow.DeviceUserAuthRequest{
 		RequestedAt: time.Now().UTC().Add(-time.Minute),
@@ -159,7 +144,7 @@ func MockDeviceRequest(key string, network string) (c *flow.DeviceUserAuthReques
 	return c, h, f
 }
 
-func MockAuthRequest(key string, authAt bool, network string) (h *flow.HandledLoginRequest, f *flow.Flow) {
+func mockAuthRequest(key, network string) (h *flow.HandledLoginRequest, f *flow.Flow) {
 	f = &flow.Flow{
 		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
@@ -180,18 +165,9 @@ func MockAuthRequest(key string, authAt bool, network string) (h *flow.HandledLo
 		State:          flow.FlowStateLoginInitialized,
 	}
 
-	var authenticatedAt time.Time
-	if authAt {
-		authenticatedAt = time.Now().UTC().Add(-time.Minute)
-	}
-
 	h = &flow.HandledLoginRequest{
-		LoginRequest:    f.GetLoginRequest(),
-		RememberFor:     120,
-		Remember:        true,
-		ID:              makeID("challenge", network, key),
-		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
+		RememberFor: 120,
+		Remember:    true,
 		Error: &flow.RequestDeniedError{
 			Name:        "error_name" + key,
 			Description: "error_description" + key,
@@ -203,13 +179,12 @@ func MockAuthRequest(key string, authAt bool, network string) (h *flow.HandledLo
 		Subject:                f.Subject,
 		ACR:                    "acr",
 		ForceSubjectIdentifier: "forced-subject",
-		WasHandled:             false,
 	}
 
 	return h, f
 }
 
-func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, c *flow.OAuth2ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *flow.AcceptOAuth2ConsentRequest {
+func saneMockHandleConsentRequest(t *testing.T, f *flow.Flow, rememberFor int, remember, hasError bool) *flow.AcceptOAuth2ConsentRequest {
 	var rde *flow.RequestDeniedError
 	if hasError {
 		rde = &flow.RequestDeniedError{
@@ -223,17 +198,11 @@ func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow,
 	}
 
 	h := &flow.AcceptOAuth2ConsentRequest{
-		ConsentRequest:   c,
-		RememberFor:      rememberFor,
-		Remember:         remember,
-		ConsentRequestID: c.ConsentRequestID,
-		RequestedAt:      time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:  sqlxx.NullTime(authAt),
-		GrantedScope:     []string{"scopea", "scopeb"},
-		GrantedAudience:  []string{"auda", "audb"},
-		Error:            rde,
-		WasHandled:       false,
-		HandledAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
+		RememberFor:     rememberFor,
+		Remember:        remember,
+		GrantedScope:    []string{"scopea", "scopeb"},
+		GrantedAudience: []string{"auda", "audb"},
+		Error:           rde,
 	}
 
 	require.NoError(t, f.HandleConsentRequest(h))
@@ -241,54 +210,17 @@ func SaneMockHandleConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow,
 	return h
 }
 
-// SaneMockConsentRequest does the same thing as MockConsentRequest but uses less insanity and implicit dependencies.
-func SaneMockConsentRequest(t *testing.T, m consent.Manager, f *flow.Flow, skip bool) (c *flow.OAuth2ConsentRequest) {
-	c = &flow.OAuth2ConsentRequest{
-		RequestedScope:    []string{"scopea", "scopeb"},
-		RequestedAudience: []string{"auda", "audb"},
-		Skip:              skip,
-		Subject:           f.Subject,
-		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
-			ACRValues: []string{"1", "2"},
-			UILocales: []string{"fr", "de"},
-			Display:   "popup",
-		},
-		Client:                 f.Client,
-		RequestURL:             "https://request-url/path",
-		LoginChallenge:         sqlxx.NullString(f.ID),
-		LoginSessionID:         f.SessionID,
-		ForceSubjectIdentifier: "forced-subject",
-		ACR:                    "1",
-		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
-		RequestedAt:            time.Now().UTC().Add(-time.Hour),
-		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
-
-		ConsentRequestID: uuid.Must(uuid.NewV4()).String(),
-		Verifier:         uuid.Must(uuid.NewV4()).String(),
-		CSRF:             uuid.Must(uuid.NewV4()).String(),
-	}
-
-	f.ToStateConsentInitialized(
-		flow.WithConsentRequestID(c.ConsentRequestID),
-		flow.WithConsentSkip(c.Skip),
-		flow.WithConsentVerifier(c.Verifier),
-		flow.WithConsentCSRF(c.CSRF),
-	)
-
-	return c
-}
-
-func makeID(base string, network string, key string) string {
+func makeID(base, network, key string) string {
 	return fmt.Sprintf("%s-%s-%s", base, network, key)
 }
 
-func TestHelperNID(t1ValidNID consent.Manager, t2InvalidNID consent.Manager) func(t *testing.T) {
+func TestHelperNID(t1ValidNID, t2InvalidNID consent.Manager) func(t *testing.T) {
 	testLS := flow.LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
 	}
 	return func(t *testing.T) {
-		ctx := context.Background()
+		ctx := t.Context()
 
 		require.Error(t, t2InvalidNID.ConfirmLoginSession(ctx, &testLS))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(ctx, &testLS))
@@ -323,10 +255,10 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 				loginSession := &flow.LoginSession{
 					ID:              makeID("fk-login-session", network, k),
+					NID:             m.NetworkID(ctx),
 					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}
-				require.NoError(t, m.CreateLoginSession(ctx, loginSession))
 				require.NoError(t, m.ConfirmLoginSession(ctx, loginSession))
 
 				lr[k] = &flow.Flow{
@@ -343,62 +275,51 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=auth-session", func(t *testing.T) {
-			for _, tc := range []struct {
-				s flow.LoginSession
-			}{
+			for _, s := range []flow.LoginSession{
 				{
-					s: flow.LoginSession{
-						ID:              makeID("session", network, "1"),
-						AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-time.Minute).UTC()),
-						Subject:         "subject1",
-					},
+					ID:              makeID("session", network, "1"),
+					NID:             m.NetworkID(ctx),
+					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-time.Minute).UTC()),
+					Subject:         "subject1",
 				},
 				{
-					s: flow.LoginSession{
-						ID:              makeID("session", network, "2"),
-						AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
-						Subject:         "subject2",
-					},
+					ID:              makeID("session", network, "2"),
+					NID:             m.NetworkID(ctx),
+					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
+					Subject:         "subject2",
 				},
 			} {
-				tc := tc
-				t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
-					_, err := m.GetRememberedLoginSession(ctx, &tc.s, tc.s.ID)
-					require.EqualError(t, err, x.ErrNotFound.Error(), "%#v", err)
+				t.Run("case=create-get-"+s.ID, func(t *testing.T) {
+					_, err := m.GetRememberedLoginSession(ctx, s.ID)
+					require.ErrorIs(t, err, x.ErrNotFound)
 
-					err = m.CreateLoginSession(ctx, &tc.s)
-					require.NoError(t, err)
-
-					_, err = m.GetRememberedLoginSession(ctx, &tc.s, tc.s.ID)
-					require.EqualError(t, err, x.ErrNotFound.Error())
-
-					updatedAuth := time.Time(tc.s.AuthenticatedAt).Add(time.Second)
-					tc.s.AuthenticatedAt = sqlxx.NullTime(updatedAuth)
+					updatedAuth := time.Time(s.AuthenticatedAt).Add(time.Second)
+					s.AuthenticatedAt = sqlxx.NullTime(updatedAuth)
 					require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
-						ID:              tc.s.ID,
+						ID:              s.ID,
 						AuthenticatedAt: sqlxx.NullTime(updatedAuth),
-						Subject:         tc.s.Subject,
+						Subject:         s.Subject,
 						Remember:        true,
 					}))
 
-					got, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
+					got, err := m.GetRememberedLoginSession(ctx, s.ID)
 					require.NoError(t, err)
-					assert.EqualValues(t, tc.s.ID, got.ID)
-					assert.EqualValues(t, tc.s.AuthenticatedAt, got.AuthenticatedAt) // this was updated from confirm...
-					assert.EqualValues(t, tc.s.Subject, got.Subject)
+					assert.EqualValues(t, s.ID, got.ID)
+					assert.EqualValues(t, s.AuthenticatedAt, got.AuthenticatedAt) // this was updated from confirm...
+					assert.EqualValues(t, s.Subject, got.Subject)
 
 					// Make sure AuthAt does not equal...
 					updatedAuth2 := updatedAuth.Add(1 * time.Second).UTC()
 					require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
-						ID:              tc.s.ID,
+						ID:              s.ID,
 						AuthenticatedAt: sqlxx.NullTime(updatedAuth2),
 						Subject:         "some-other-subject",
 						Remember:        true,
 					}))
 
-					got2, err := m.GetRememberedLoginSession(ctx, nil, tc.s.ID)
+					got2, err := m.GetRememberedLoginSession(ctx, s.ID)
 					require.NoError(t, err)
-					assert.EqualValues(t, tc.s.ID, got2.ID)
+					assert.EqualValues(t, s.ID, got2.ID)
 					assert.EqualValues(t, updatedAuth2.Unix(), time.Time(got2.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, "some-other-subject", got2.Subject)
 				})
@@ -418,7 +339,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.id, ls.ID)
 
-					_, err = m.GetRememberedLoginSession(ctx, nil, tc.id)
+					_, err = m.GetRememberedLoginSession(ctx, tc.id)
 					require.Error(t, err)
 				})
 			}
@@ -427,7 +348,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		t.Run("case=device-request", func(t *testing.T) {
 			challenges := make([]string, 0)
 
-			c, h, f := MockDeviceRequest("0", network)
+			c, h, f := mockDeviceRequest("0", network)
 			_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
 			deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
@@ -435,7 +356,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			require.Error(t, err)
 
 			f = flow.NewDeviceFlow(c)
-			f.NID = deps.Networker().NetworkID(ctx)
+			f.NID = m.NetworkID(ctx)
 
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 
@@ -448,14 +369,14 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			compareDeviceRequestFlow(t, c, f)
 
 			for _, key := range []string{"1", "2", "3", "4", "5", "6", "7"} {
-				c, h, f := MockDeviceRequest(key, network)
+				c, h, f := mockDeviceRequest(key, network)
 				deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
 				_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.Error(t, err)
 
 				f = flow.NewDeviceFlow(c)
-				f.NID = deps.Networker().NetworkID(ctx)
+				f.NID = m.NetworkID(ctx)
 
 				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 				challenges = append(challenges, deviceChallenge)
@@ -490,27 +411,24 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=auth-request", func(t *testing.T) {
-			for _, tc := range []struct {
-				key    string
-				authAt bool
-			}{
-				{"1", true},
-				{"2", true},
-				{"3", true},
-				{"4", true},
-				{"5", true},
-				{"6", false},
-				{"7", true},
+			for _, key := range []string{
+				"1",
+				"2",
+				"3",
+				"4",
+				"5",
+				"6",
+				"7",
 			} {
-				t.Run("key="+tc.key, func(t *testing.T) {
-					h, f := MockAuthRequest(tc.key, tc.authAt, network)
+				t.Run("key="+key, func(t *testing.T) {
+					h, f := mockAuthRequest(key, network)
 					_ = clientManager.CreateClient(ctx, f.Client) // Ignore errors that are caused by duplication
 					loginChallenge := x.Must(f.ToLoginChallenge(ctx, deps))
 
 					_, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
 					require.Error(t, err)
 
-					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
+					f.NID = m.NetworkID(ctx)
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 
 					got1, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
@@ -549,12 +467,12 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				{"7", false, 0, false, false, false},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
-					consentRequest, h, f := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt, "challenge", network)
+					consentRequest, h, f := mockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, "challenge", network)
 					_ = clientManager.CreateClient(ctx, consentRequest.Client) // Ignore errors that are caused by duplication
-					f.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
+					f.NID = m.NetworkID(ctx)
 
 					require.NoError(t, f.HandleConsentRequest(h))
-					assert.WithinDuration(t, time.Now(), time.Time(h.HandledAt), 5*time.Second)
+					assert.WithinDuration(t, time.Now(), time.Time(f.ConsentHandledAt), 5*time.Second)
 
 					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}
 					require.NoError(t, f.HandleConsentRequest(h))
@@ -566,7 +484,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					assert.EqualValues(t, h.GrantedAudience, f.GrantedAudience)
 
 					t.Run("sub=detect double-submit for consent verifier", func(t *testing.T) {
-						require.Error(t, m.CreateConsentSession(ctx, f))
+						require.ErrorIs(t, m.CreateConsentSession(ctx, f), sqlcon.ErrUniqueViolation)
 					})
 
 					if tc.hasError {
@@ -605,19 +523,19 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=revoke-auth-request", func(t *testing.T) {
-			require.NoError(t, m.CreateLoginSession(ctx, &flow.LoginSession{
+			require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
 				ID:              makeID("rev-session", network, "-1"),
 				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-1",
 			}))
 
-			require.NoError(t, m.CreateLoginSession(ctx, &flow.LoginSession{
+			require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
 				ID:              makeID("rev-session", network, "-2"),
 				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-2",
 			}))
 
-			require.NoError(t, m.CreateLoginSession(ctx, &flow.LoginSession{
+			require.NoError(t, m.ConfirmLoginSession(ctx, &flow.LoginSession{
 				ID:              makeID("rev-session", network, "-3"),
 				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-1",
@@ -641,7 +559,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
-							_, err := m.GetRememberedLoginSession(ctx, nil, id)
+							_, err := m.GetRememberedLoginSession(ctx, id)
 							assert.EqualError(t, err, x.ErrNotFound.Error())
 						})
 					}
@@ -653,10 +571,10 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		challengerv2 := makeID("challenge", network, "rv2")
 		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
 
-			cr1, hcr1, f1 := MockConsentRequest("rv1", false, 0, false, false, false, "fk-login-challenge", network)
-			cr2, hcr2, f2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
-			f1.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
-			f2.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
+			cr1, hcr1, f1 := mockConsentRequest("rv1", false, 0, false, false, "fk-login-challenge", network)
+			cr2, hcr2, f2 := mockConsentRequest("rv2", false, 0, false, false, "fk-login-challenge", network)
+			f1.NID = m.NetworkID(ctx)
+			f2.NID = m.NetworkID(ctx)
 
 			// Ignore duplication errors
 			_ = clientManager.CreateClient(ctx, cr1.Client)
@@ -740,31 +658,14 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
-			f1 := lr["rv1"]
-			f1.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
-			f2 := lr["rv2"]
-			f2.NID = deps.Contextualizer().Network(context.Background(), uuid.Nil)
-
-			cr1, hcr1, _ := MockConsentRequest("rv1", true, 0, false, false, false, "fk-login-challenge", network)
-			cr2, hcr2, _ := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge", network)
+			_, hcr1, f1 := mockConsentRequest("rv1", true, 0, false, false, "fk-login-challenge", network)
+			f1.NID = m.NetworkID(ctx)
+			_, hcr2, f2 := mockConsentRequest("rv2", false, 0, false, false, "fk-login-challenge", network)
+			f2.NID = m.NetworkID(ctx)
 
 			// Ignore duplicate errors
-			_ = clientManager.CreateClient(ctx, cr1.Client)
-			_ = clientManager.CreateClient(ctx, cr2.Client)
-
-			f1.ToStateConsentInitialized(
-				flow.WithConsentRequestID(cr1.ConsentRequestID),
-				flow.WithConsentSkip(cr1.Skip),
-				flow.WithConsentVerifier(cr1.Verifier),
-				flow.WithConsentCSRF(cr1.CSRF),
-			)
-
-			f2.ToStateConsentInitialized(
-				flow.WithConsentRequestID(cr2.ConsentRequestID),
-				flow.WithConsentSkip(cr2.Skip),
-				flow.WithConsentVerifier(cr2.Verifier),
-				flow.WithConsentCSRF(cr2.CSRF),
-			)
+			_ = clientManager.CreateClient(ctx, f1.Client)
+			_ = clientManager.CreateClient(ctx, f2.Client)
 
 			require.NoError(t, f1.HandleConsentRequest(hcr1))
 			require.NoError(t, f2.HandleConsentRequest(hcr2))
@@ -782,13 +683,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				clients    []string
 			}{
 				{
-					subject:    cr1.Subject,
+					subject:    f1.Subject,
 					sid:        makeID("fk-login-session", network, "rv1"),
 					consentIDs: []string{f1.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
-					subject:    cr2.Subject,
+					subject:    f2.Subject,
 					sid:        makeID("fk-login-session", network, "rv2"),
 					consentIDs: []string{f2.ConsentRequestID.String()},
 					clients:    []string{"fk-client-rv2"},
@@ -915,11 +816,11 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					t.Run(fmt.Sprintf("create/session=%s/subject=%s", id, subject), func(t *testing.T) {
 						ls := &flow.LoginSession{
 							ID:              id,
+							NID:             m.NetworkID(ctx),
 							AuthenticatedAt: sqlxx.NullTime(time.Now()),
 							Subject:         subject,
+							Remember:        true,
 						}
-						require.NoError(t, m.CreateLoginSession(ctx, ls))
-						ls.Remember = true
 						require.NoError(t, m.ConfirmLoginSession(ctx, ls))
 
 						cl := &client.Client{ID: uuid.Must(uuid.NewV4()).String()}
@@ -939,27 +840,29 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						require.NoError(t, clientManager.CreateClient(ctx, cl))
 
 						f := &flow.Flow{
+							NID: m.NetworkID(ctx),
 							OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 								ACRValues: []string{"1", "2"},
 								UILocales: []string{"fr", "de"},
 								Display:   "popup",
 							},
-							RequestedAt:    time.Now().UTC().Add(-time.Hour),
-							Client:         cl,
-							Subject:        ls.Subject,
-							RequestURL:     "https://request-url/path",
-							LoginSkip:      true,
-							RequestedScope: []string{"scopea", "scopeb"},
-							SessionID:      sqlxx.NullString(ls.ID),
+							RequestedAt:      time.Now().UTC().Add(-time.Hour),
+							Client:           cl,
+							Subject:          ls.Subject,
+							RequestURL:       "https://request-url/path",
+							LoginSkip:        true,
+							RequestedScope:   []string{"scopea", "scopeb"},
+							SessionID:        sqlxx.NullString(ls.ID),
+							ConsentRequestID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+							ConsentVerifier:  sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+							ConsentCSRF:      sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
 
 							LoginCSRF:     uuid.Must(uuid.NewV4()).String(),
 							ID:            uuid.Must(uuid.NewV4()).String(),
 							LoginVerifier: uuid.Must(uuid.NewV4()).String(),
-							State:         flow.FlowStateLoginInitialized,
+							State:         flow.FlowStateConsentInitialized,
 						}
-						f.NID = deps.Contextualizer().Network(ctx, uuid.Nil)
-						cr := SaneMockConsentRequest(t, m, f, false)
-						_ = SaneMockHandleConsentRequest(t, m, f, cr, time.Time{}, 0, false, false)
+						_ = saneMockHandleConsentRequest(t, f, 0, false, false)
 
 						require.NoError(t, f.InvalidateConsentRequest())
 						require.NoError(t, m.CreateConsentSession(ctx, f))
@@ -1021,7 +924,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					t.Run("key="+tc.key, func(t *testing.T) {
 						challenge := makeID("challenge", network, tc.key)
 						verifier := makeID("verifier", network, tc.key)
-						c := MockLogoutRequest(tc.key, tc.withClient, network)
+						c := mockLogoutRequest(tc.key, tc.withClient, network)
 						if tc.withClient {
 							require.NoError(t, clientManager.CreateClient(ctx, c.Client)) // Ignore errors that are caused by duplication
 						}
@@ -1077,7 +980,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				Subject:         subject,
 			}
 
-			require.NoError(t, m.CreateLoginSession(ctx, &s))
 			require.NoError(t, m.ConfirmLoginSession(ctx, &s))
 
 			_, err := m.DeleteLoginSession(ctx, s.ID)
@@ -1142,9 +1044,7 @@ func compareConsentRequestFlow(t *testing.T, a *flow.OAuth2ConsentRequest, b *fl
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)
-	assert.EqualValues(t, a.Verifier, b.ConsentVerifier.String())
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)
-	assert.EqualValues(t, a.CSRF, b.ConsentCSRF.String())
 	assert.EqualValues(t, a.Skip, b.ConsentSkip)
 	assert.EqualValues(t, a.LoginChallenge, b.ID)
 	assert.EqualValues(t, a.LoginSessionID, b.SessionID)

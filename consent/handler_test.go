@@ -141,7 +141,8 @@ func TestGetLoginRequest(t *testing.T) {
 	})
 
 	t.Run("handled flow", func(t *testing.T) {
-		require.NoError(t, f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{ID: f.ID, WasHandled: true}))
+		f.State = flow.FlowStateLoginUnused
+		require.NoError(t, f.InvalidateLoginRequest())
 		handledChallenge, err := f.ToLoginChallenge(t.Context(), reg)
 		require.NoError(t, err)
 
@@ -205,11 +206,8 @@ func TestGetConsentRequest(t *testing.T) {
 	})
 
 	t.Run("handled flow", func(t *testing.T) {
-		require.NoError(t, f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
-			ConsentRequestID: consentRequestID,
-			HandledAt:        sqlxx.NullTime(time.Now()),
-			WasHandled:       true,
-		}))
+		f.State = flow.FlowStateConsentUnused
+		require.NoError(t, f.InvalidateConsentRequest())
 		handledChallenge, err := f.ToConsentChallenge(t.Context(), reg)
 		require.NoError(t, err)
 

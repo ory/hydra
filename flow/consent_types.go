@@ -146,9 +146,6 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 //
 // swagger:model acceptOAuth2ConsentRequest
 type AcceptOAuth2ConsentRequest struct {
-	// ConsentRequestID is for internal use only.
-	ConsentRequestID string `json:"-"`
-
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope"`
 
@@ -166,27 +163,12 @@ type AcceptOAuth2ConsentRequest struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
-	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt sqlxx.NullTime `json:"handled_at"`
-
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-"`
-
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context"`
 
-	ConsentRequest  *OAuth2ConsentRequest `json:"-"`
-	Error           *RequestDeniedError   `json:"-"`
-	RequestedAt     time.Time             `json:"-"`
-	AuthenticatedAt sqlxx.NullTime        `json:"-"`
-
-	SessionIDToken     sqlxx.MapStringInterface `json:"-" faker:"-"`
-	SessionAccessToken sqlxx.MapStringInterface `json:"-" faker:"-"`
+	Error *RequestDeniedError `json:"-"`
 }
 
 func (r *AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
@@ -305,10 +287,8 @@ func (r *OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
 //
 // swagger:model acceptOAuth2LoginRequest
 type HandledLoginRequest struct {
-	ID string `json:"-"`
-
-	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
-	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
+	// Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store
+	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, they
 	// will not be asked to log in again.
 	Remember bool `json:"remember"`
 
@@ -326,12 +306,12 @@ type HandledLoginRequest struct {
 	ExtendSessionLifespan bool `json:"extend_session_lifespan"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
-	// to express that, for example, a user authenticated using two factor authentication.
+	// to express that, for example, a user authenticated using two-factor authentication.
 	ACR string `json:"acr"`
 
 	// AMR sets the Authentication Methods References value for this
 	// authentication session. You can use it to specify the method a user used to
-	// authenticate. For example, if the acr indicates a user used two factor
+	// authenticate. For example, if the acr indicates a user used two-factor
 	// authentication, the amr can express they used a software-secured key.
 	AMR sqlxx.StringSliceJSONFormat `json:"amr"`
 
@@ -370,16 +350,7 @@ type HandledLoginRequest struct {
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context"`
 
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-"`
-
-	LoginRequest    *LoginRequest       `json:"-" faker:"-"`
-	Error           *RequestDeniedError `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-"`
+	Error *RequestDeniedError `json:"-"`
 }
 
 func (r *HandledLoginRequest) MarshalJSON() ([]byte, error) {
@@ -721,8 +692,7 @@ type OAuth2ConsentRequest struct {
 	OpenIDConnectContext *OAuth2ConsentRequestOpenIDConnectContext `json:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client   *client.Client `json:"client"`
-	ClientID string         `json:"-"`
+	Client *client.Client `json:"client"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
@@ -754,19 +724,6 @@ type OAuth2ConsentRequest struct {
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty"`
-
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-"`
-
-	// ForceSubjectIdentifier is the value from authentication (if set).
-	ForceSubjectIdentifier string         `json:"-"`
-	Verifier               string         `json:"-"`
-	CSRF                   string         `json:"-"`
-	AuthenticatedAt        sqlxx.NullTime `json:"-"`
-	RequestedAt            time.Time      `json:"-"`
 }
 
 func (r *OAuth2ConsentRequest) MarshalJSON() ([]byte, error) {

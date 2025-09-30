@@ -6,14 +6,14 @@ package cmd
 import (
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
-
-	"github.com/spf13/cobra"
 )
 
 func NewIntrospectTokenCmd() *cobra.Command {
+	var scope []string
 	cmd := &cobra.Command{
 		Use:     "token the-token",
 		Args:    cobra.ExactArgs(1),
@@ -27,7 +27,7 @@ func NewIntrospectTokenCmd() *cobra.Command {
 
 			result, _, err := client.OAuth2API.IntrospectOAuth2Token(cmd.Context()).
 				Token(args[0]).
-				Scope(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " ")).Execute() //nolint:bodyclose
+				Scope(strings.Join(scope, " ")).Execute() //nolint:bodyclose
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}
@@ -36,6 +36,6 @@ func NewIntrospectTokenCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringSlice("scope", []string{}, "Additionally check if the scope was granted.")
+	cmd.Flags().StringSliceVar(&scope, "scope", []string{}, "Additionally check if the scope was granted.")
 	return cmd
 }

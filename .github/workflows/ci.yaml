@@ -24,7 +24,7 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - name: Start service
@@ -63,7 +63,7 @@ jobs:
       - uses: ory/ci/checkout@master
         with:
           fetch-depth: 2
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - run: go list -json > go.list
@@ -98,7 +98,7 @@ jobs:
       HSM_PIN: 1234
     steps:
       - uses: ory/ci/checkout@master
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - name: Setup HSM libs and packages
@@ -147,7 +147,7 @@ jobs:
           docker start cockroach
         name: Start CockroachDB
       - uses: ory/ci/checkout@master
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.25"
       - uses: actions/cache@v4

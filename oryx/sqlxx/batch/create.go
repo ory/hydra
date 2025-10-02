@@ -180,6 +180,16 @@ func OnConflictDoNothing() func(*createOptions) {
 	}
 }
 
+// CreateFromSlice is a helper around Create that accepts a slice of models
+// instead of a slice of model pointers.
+func CreateFromSlice[T any](ctx context.Context, p *TracerConnection, models []T, opts ...option) (err error) {
+	var ptrs []*T
+	for k := range models {
+		ptrs = append(ptrs, &models[k])
+	}
+	return Create(ctx, p, ptrs, opts...)
+}
+
 // Create batch-inserts the given models into the database using a single INSERT statement.
 // The models are either all created or none.
 func Create[T any](ctx context.Context, p *TracerConnection, models []*T, opts ...option) (err error) {

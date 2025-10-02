@@ -3,7 +3,10 @@
 
 package errorsx
 
-import "github.com/pkg/errors"
+import (
+	"github.com/ory/herodot"
+	"github.com/pkg/errors"
+)
 
 // Cause returns the underlying cause of the error, if possible.
 // An error value has a cause if it implements the following
@@ -87,4 +90,11 @@ type IDCarrier interface {
 
 type StackTracer interface {
 	StackTrace() errors.StackTrace
+}
+
+func GetCodeFromHerodotError(err error) (code int, ok bool) {
+	herodotErr := &herodot.DefaultError{}
+	isHerodot := errors.As(err, &herodotErr)
+
+	return herodotErr.CodeField, isHerodot
 }

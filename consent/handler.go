@@ -1064,9 +1064,6 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 	}
 
 	p := flow.HandledDeviceUserAuthRequest{
-		ID:                  f.DeviceChallengeID.String(),
-		RequestedAt:         f.RequestedAt,
-		HandledAt:           sqlxx.NullTime(time.Now().UTC()),
 		Client:              userCodeRequest.GetClient().(*client.Client),
 		DeviceCodeRequestID: userCodeRequest.GetID(),
 		RequestedScope:      []string(userCodeRequest.GetRequestedScopes()),

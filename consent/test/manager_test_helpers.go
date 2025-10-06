@@ -110,38 +110,33 @@ func mockLogoutRequest(key string, withClient bool, network string) (c *flow.Log
 	}
 }
 
-func mockDeviceRequest(key, network string) (c *flow.DeviceUserAuthRequest, h *flow.HandledDeviceUserAuthRequest, f *flow.Flow) {
+func mockDeviceRequest(key, network string) (h *flow.HandledDeviceUserAuthRequest, f *flow.Flow) {
 	cl := &client.Client{ID: "fk-client-" + key}
-	c = &flow.DeviceUserAuthRequest{
-		RequestedAt: time.Now().UTC().Add(-time.Minute),
-		Client:      cl,
-		RequestURL:  "https://request-url/path" + key,
-		ID:          makeID("challenge", network, key),
-		Verifier:    makeID("verifier", network, key),
-		CSRF:        "csrf" + key,
-	}
 
-	f = flow.NewDeviceFlow(c)
-
-	var err = &flow.RequestDeniedError{
-		Name:        "error_name" + key,
-		Description: "error_description" + key,
-		Hint:        "error_hint,omitempty" + key,
-		Code:        100,
-		Debug:       "error_debug,omitempty" + key,
-		Valid:       true,
+	f = &flow.Flow{
+		DeviceChallengeID: sqlxx.NullString(makeID("challenge", network, key)),
+		DeviceVerifier:    sqlxx.NullString(makeID("verifier", network, key)),
+		DeviceCSRF:        sqlxx.NullString("csrf" + key),
+		RequestedAt:       time.Now().UTC().Add(-time.Minute),
+		Client:            cl,
+		RequestURL:        "https://request-url/path" + key,
+		State:             flow.DeviceFlowStateInitialized,
+		Context:           sqlxx.JSONRawMessage("{}"),
 	}
 
 	h = &flow.HandledDeviceUserAuthRequest{
-		ID:          makeID("challenge", network, key),
-		RequestedAt: time.Now().UTC().Add(-time.Minute),
-		Client:      cl,
-		Error:       err,
-		Request:     c,
-		WasHandled:  false,
+		Client: cl,
+		Error: &flow.RequestDeniedError{
+			Name:        "error_name" + key,
+			Description: "error_description" + key,
+			Hint:        "error_hint,omitempty" + key,
+			Code:        100,
+			Debug:       "error_debug,omitempty" + key,
+			Valid:       true,
+		},
 	}
 
-	return c, h, f
+	return h, f
 }
 
 func mockAuthRequest(key, network string) (h *flow.HandledLoginRequest, f *flow.Flow) {
@@ -348,61 +343,62 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 		t.Run("case=device-request", func(t *testing.T) {
 			challenges := make([]string, 0)
 
-			c, h, f := mockDeviceRequest("0", network)
-			_ = clientManager.CreateClient(ctx, c.Client) // Ignore errors that are caused by duplication
+			h, f := mockDeviceRequest("0", network)
+			_ = clientManager.CreateClient(ctx, f.Client) // Ignore errors that are caused by duplication
 			deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
 			_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
-			require.Error(t, err)
+			require.ErrorIs(t, err, x.ErrNotFound)
 
-			f = flow.NewDeviceFlow(c)
 			f.NID = m.NetworkID(ctx)
-
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 
 			got1, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.NoError(t, err)
-			assert.False(t, got1.DeviceWasUsed.Bool)
-			compareDeviceRequestFlow(t, c, got1)
+			got1.Client.NID = f.NID // the client nid is not encoded in the challenge
+			assert.Equal(t, f, got1)
 
 			require.NoError(t, f.HandleDeviceUserAuthRequest(h))
-			compareDeviceRequestFlow(t, c, f)
 
 			for _, key := range []string{"1", "2", "3", "4", "5", "6", "7"} {
-				c, h, f := mockDeviceRequest(key, network)
+				h, f := mockDeviceRequest(key, network)
 				deviceChallenge := x.Must(f.ToDeviceChallenge(ctx, deps))
 
 				_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
-				require.Error(t, err)
+				require.ErrorIs(t, err, x.ErrNotFound)
 
-				f = flow.NewDeviceFlow(c)
 				f.NID = m.NetworkID(ctx)
-
 				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 				challenges = append(challenges, deviceChallenge)
 
 				got1, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.NoError(t, err)
 				assert.False(t, got1.DeviceWasUsed.Bool)
-				compareDeviceRequestFlow(t, c, got1)
+				assert.Equal(t, f, got1)
 
 				require.NoError(t, f.HandleDeviceUserAuthRequest(h))
-				compareDeviceRequestFlow(t, c, f)
 			}
 
 			deviceVerifier := x.Must(f.ToDeviceVerifier(ctx, deps))
 
-			got2, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, deps, deviceVerifier)
-			require.NoError(t, err)
-			c.WasHandled = true
-			compareDeviceRequestFlow(t, c, got2)
-
-			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
-			authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
-			require.NoError(t, err)
-			c.WasHandled = false
-			compareDeviceRequestFlow(t, c, authReq)
-
+			{
+				f := *f
+				got2, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, deps, deviceVerifier)
+				require.NoError(t, err)
+				got2.Client.NID = f.NID // the client nid is not encoded in the challenge
+				f.DeviceWasUsed = sqlxx.NullBool{Bool: true, Valid: true}
+				f.State = flow.DeviceFlowStateUsed
+				assert.Equal(t, &f, got2)
+			}
+			{
+				f := *f
+				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
+				authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
+				require.NoError(t, err)
+				f.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
+				authReq.Client.NID = f.NID // the client nid is not encoded in the challenge
+				assert.Equal(t, &f, authReq)
+			}
 			for _, challenge := range challenges {
 				authReq, err := flow.DecodeFromDeviceChallenge(ctx, deps, challenge)
 				require.NoError(t, err)

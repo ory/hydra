@@ -275,11 +275,12 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 
 	cl := &client.Client{ID: "client"}
 	require.NoError(t, reg.ClientManager().CreateClient(t.Context(), cl))
-	f := flow.NewDeviceFlow(&flow.DeviceUserAuthRequest{
+	f := &flow.Flow{
 		Client:      cl,
 		RequestURL:  requestURL,
 		RequestedAt: time.Now(),
-	})
+		State:       flow.DeviceFlowStateInitialized,
+	}
 	f.NID = reg.Networker().NetworkID(t.Context())
 	challenge, err := f.ToDeviceChallenge(t.Context(), reg)
 	require.NoError(t, err)

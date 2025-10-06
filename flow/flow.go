@@ -281,60 +281,6 @@ type Flow struct {
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-" json:"sa"`
 }
 
-// NewDeviceFlow return a new Flow from a DeviceUserAuthRequest.
-func NewDeviceFlow(r *DeviceUserAuthRequest) *Flow {
-	f := &Flow{
-		DeviceChallengeID: sqlxx.NullString(r.ID),
-		Client:            r.Client,
-		RequestURL:        r.RequestURL,
-		DeviceVerifier:    sqlxx.NullString(r.Verifier),
-		DeviceCSRF:        sqlxx.NullString(r.CSRF),
-		RequestedAt:       r.RequestedAt,
-		RequestedScope:    r.RequestedScope,
-		RequestedAudience: r.RequestedAudience,
-		DeviceWasUsed:     sqlxx.NullBool{Bool: r.WasHandled, Valid: true},
-		DeviceHandledAt:   r.HandledAt,
-		State:             DeviceFlowStateInitialized,
-	}
-	if r.Client != nil {
-		f.ClientID = r.Client.GetID()
-	}
-	return f
-}
-
-// GetDeviceUserAuthRequest return the DeviceUserAuthRequest from a Flow.
-func (f *Flow) GetDeviceUserAuthRequest() *DeviceUserAuthRequest {
-	return &DeviceUserAuthRequest{
-		ID:                f.DeviceChallengeID.String(),
-		Client:            f.Client,
-		RequestURL:        f.RequestURL,
-		Verifier:          f.DeviceVerifier.String(),
-		CSRF:              f.DeviceCSRF.String(),
-		RequestedAt:       f.RequestedAt,
-		RequestedScope:    f.RequestedScope,
-		RequestedAudience: f.RequestedAudience,
-		WasHandled:        f.DeviceWasUsed.Bool,
-		HandledAt:         f.DeviceHandledAt,
-	}
-}
-
-// GetHandledDeviceUserAuthRequest return the HandledDeviceUserAuthRequest from a Flow.
-func (f *Flow) GetHandledDeviceUserAuthRequest() *HandledDeviceUserAuthRequest {
-	return &HandledDeviceUserAuthRequest{
-		ID:                  f.DeviceChallengeID.String(),
-		Client:              f.Client,
-		Request:             f.GetDeviceUserAuthRequest(),
-		DeviceCodeRequestID: f.DeviceCodeRequestID.String(),
-		RequestURL:          f.RequestURL,
-		RequestedAt:         f.RequestedAt,
-		RequestedScope:      f.RequestedScope,
-		RequestedAudience:   f.RequestedAudience,
-		WasHandled:          f.DeviceWasUsed.Bool,
-		HandledAt:           f.DeviceHandledAt,
-		Error:               f.DeviceError,
-	}
-}
-
 // HandleDeviceUserAuthRequest updates the flows fields from a handled request.
 func (f *Flow) HandleDeviceUserAuthRequest(h *HandledDeviceUserAuthRequest) error {
 	if f.DeviceWasUsed.Bool {
@@ -345,10 +291,6 @@ func (f *Flow) HandleDeviceUserAuthRequest(h *HandledDeviceUserAuthRequest) erro
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", DeviceFlowStateInitialized, DeviceFlowStateUnused, DeviceFlowStateError, f.State)
 	}
 
-	if f.DeviceChallengeID.String() != h.ID {
-		return errors.Errorf("flow device challenge ID %s does not match HandledDeviceUserAuthRequest ID %s", f.ID, h.ID)
-	}
-
 	f.State = DeviceFlowStateUnused
 	if h.Error != nil {
 		f.State = DeviceFlowStateError
@@ -356,8 +298,8 @@ func (f *Flow) HandleDeviceUserAuthRequest(h *HandledDeviceUserAuthRequest) erro
 	f.Client = h.Client
 	f.ClientID = h.Client.GetID()
 	f.DeviceCodeRequestID = sqlxx.NullString(h.DeviceCodeRequestID)
-	f.DeviceHandledAt = h.HandledAt
-	f.DeviceWasUsed = sqlxx.NullBool{Bool: h.WasHandled, Valid: true}
+	f.DeviceHandledAt = sqlxx.NullTime(time.Now().UTC())
+	f.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
 	f.RequestedScope = h.RequestedScope
 	f.RequestedAudience = h.RequestedAudience
 	f.DeviceError = h.Error
@@ -615,20 +557,14 @@ func (f Flow) ToConsentVerifier(ctx context.Context, cipherProvider CipherProvid
 
 func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {
 	s := &OAuth2ConsentSession{
-		ConsentRequestID:   f.ConsentRequestID.String(),
-		GrantedScope:       f.GrantedScope,
-		GrantedAudience:    f.GrantedAudience,
-		Session:            &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
-		Remember:           f.ConsentRemember,
-		HandledAt:          f.ConsentHandledAt,
-		WasHandled:         f.ConsentWasHandled,
-		Context:            f.Context,
-		ConsentRequest:     f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
-		Error:              f.ConsentError,
-		RequestedAt:        f.RequestedAt,
-		AuthenticatedAt:    f.LoginAuthenticatedAt,
-		SessionIDToken:     f.SessionIDToken,
-		SessionAccessToken: f.SessionAccessToken,
+		ConsentRequestID: f.ConsentRequestID.String(),
+		GrantedScope:     f.GrantedScope,
+		GrantedAudience:  f.GrantedAudience,
+		Session:          &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
+		Remember:         f.ConsentRemember,
+		HandledAt:        f.ConsentHandledAt,
+		Context:          f.Context,
+		ConsentRequest:   f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
 	}
 	if f.ConsentRememberFor != nil && *f.ConsentRememberFor > 0 {
 		s.RememberFor = *f.ConsentRememberFor

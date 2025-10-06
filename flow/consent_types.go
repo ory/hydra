@@ -240,12 +240,6 @@ type OAuth2ConsentSession struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at"`
 
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-"`
-
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
@@ -255,13 +249,6 @@ type OAuth2ConsentSession struct {
 	//
 	// The consent request that lead to this consent session.
 	ConsentRequest *OAuth2ConsentRequest `json:"consent_request"`
-
-	Error           *RequestDeniedError `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt sqlxx.NullTime      `json:"-"`
-
-	SessionIDToken     sqlxx.MapStringInterface `json:"-"`
-	SessionAccessToken sqlxx.MapStringInterface `json:"-"`
 }
 
 func (r *OAuth2ConsentSession) MarshalJSON() ([]byte, error) {
@@ -542,11 +529,6 @@ type DeviceUserAuthRequest struct {
 //
 // swagger:model verifyUserCodeRequest
 type HandledDeviceUserAuthRequest struct {
-	// ID is the identifier ("device challenge") of the device request. It is used to
-	// identify the session.
-	ID string `json:"challenge"`
-
-	Request *DeviceUserAuthRequest `json:"-" faker:"-"`
 	// RequestURL is the original Device Authorization URL requested.
 	RequestURL string `json:"request_url"`
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
@@ -559,11 +541,7 @@ type HandledDeviceUserAuthRequest struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	Client *client.Client `json:"client"`
 
-	RequestedAt time.Time `json:"-"`
-
-	HandledAt  sqlxx.NullTime      `json:"handled_at"`
-	WasHandled bool                `json:"-"`
-	Error      *RequestDeniedError `json:"-"`
+	Error *RequestDeniedError `json:"-"`
 }
 
 // HasError returns whether the request has errors.

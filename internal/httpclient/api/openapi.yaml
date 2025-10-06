@@ -4856,18 +4856,9 @@ components:
       type: object
     verifyUserCodeRequest:
       properties:
-        challenge:
-          description: |-
-            ID is the identifier ("device challenge") of the device request. It is used to
-            identify the session.
-          type: string
         client:
           $ref: "#/components/schemas/oAuth2Client"
         device_code_request_id:
-          type: string
-        handled_at:
-          format: date-time
-          title: NullTime implements sql.NullTime functionality.
           type: string
         request_url:
           description: RequestURL is the original Device Authorization URL requested.

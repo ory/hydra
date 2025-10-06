@@ -4,10 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Challenge** | Pointer to **string** | ID is the identifier (\&quot;device challenge\&quot;) of the device request. It is used to identify the session. | [optional] 
 **Client** | Pointer to [**OAuth2Client**](OAuth2Client.md) |  | [optional] 
 **DeviceCodeRequestId** | Pointer to **string** |  | [optional] 
-**HandledAt** | Pointer to **time.Time** |  | [optional] 
 **RequestUrl** | Pointer to **string** | RequestURL is the original Device Authorization URL requested. | [optional] 
 **RequestedAccessTokenAudience** | Pointer to **[]string** |  | [optional] 
 **RequestedScope** | Pointer to **[]string** |  | [optional] 
@@ -30,31 +28,6 @@ will change when the set of required properties is changed
 NewVerifyUserCodeRequestWithDefaults instantiates a new VerifyUserCodeRequest object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
-
-### GetChallenge
-
-`func (o *VerifyUserCodeRequest) GetChallenge() string`
-
-GetChallenge returns the Challenge field if non-nil, zero value otherwise.
-
-### GetChallengeOk
-
-`func (o *VerifyUserCodeRequest) GetChallengeOk() (*string, bool)`
-
-GetChallengeOk returns a tuple with the Challenge field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetChallenge
-
-`func (o *VerifyUserCodeRequest) SetChallenge(v string)`
-
-SetChallenge sets Challenge field to given value.
-
-### HasChallenge
-
-`func (o *VerifyUserCodeRequest) HasChallenge() bool`
-
-HasChallenge returns a boolean if a field has been set.
 
 ### GetClient
 
@@ -105,31 +78,6 @@ SetDeviceCodeRequestId sets DeviceCodeRequestId field to given value.
 `func (o *VerifyUserCodeRequest) HasDeviceCodeRequestId() bool`
 
 HasDeviceCodeRequestId returns a boolean if a field has been set.
-
-### GetHandledAt
-
-`func (o *VerifyUserCodeRequest) GetHandledAt() time.Time`
-
-GetHandledAt returns the HandledAt field if non-nil, zero value otherwise.
-
-### GetHandledAtOk
-
-`func (o *VerifyUserCodeRequest) GetHandledAtOk() (*time.Time, bool)`
-
-GetHandledAtOk returns a tuple with the HandledAt field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetHandledAt
-
-`func (o *VerifyUserCodeRequest) SetHandledAt(v time.Time)`
-
-SetHandledAt sets HandledAt field to given value.
-
-### HasHandledAt
-
-`func (o *VerifyUserCodeRequest) HasHandledAt() bool`
-
-HasHandledAt returns a boolean if a field has been set.
 
 ### GetRequestUrl
 

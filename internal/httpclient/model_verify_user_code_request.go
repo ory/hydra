@@ -13,7 +13,6 @@ package openapi
 
 import (
 	"encoding/json"
-	"time"
 )
 
 // checks if the VerifyUserCodeRequest type satisfies the MappedNullable interface at compile time
@@ -21,11 +20,8 @@ var _ MappedNullable = &VerifyUserCodeRequest{}
 
 // VerifyUserCodeRequest struct for VerifyUserCodeRequest
 type VerifyUserCodeRequest struct {
-	// ID is the identifier (\"device challenge\") of the device request. It is used to identify the session.
-	Challenge           *string       `json:"challenge,omitempty"`
 	Client              *OAuth2Client `json:"client,omitempty"`
 	DeviceCodeRequestId *string       `json:"device_code_request_id,omitempty"`
-	HandledAt           *time.Time    `json:"handled_at,omitempty"`
 	// RequestURL is the original Device Authorization URL requested.
 	RequestUrl                   *string  `json:"request_url,omitempty"`
 	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
@@ -47,38 +43,6 @@ func NewVerifyUserCodeRequest() *VerifyUserCodeRequest {
 func NewVerifyUserCodeRequestWithDefaults() *VerifyUserCodeRequest {
 	this := VerifyUserCodeRequest{}
 	return &this
-}
-
-// GetChallenge returns the Challenge field value if set, zero value otherwise.
-func (o *VerifyUserCodeRequest) GetChallenge() string {
-	if o == nil || IsNil(o.Challenge) {
-		var ret string
-		return ret
-	}
-	return *o.Challenge
-}
-
-// GetChallengeOk returns a tuple with the Challenge field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *VerifyUserCodeRequest) GetChallengeOk() (*string, bool) {
-	if o == nil || IsNil(o.Challenge) {
-		return nil, false
-	}
-	return o.Challenge, true
-}
-
-// HasChallenge returns a boolean if a field has been set.
-func (o *VerifyUserCodeRequest) HasChallenge() bool {
-	if o != nil && !IsNil(o.Challenge) {
-		return true
-	}
-
-	return false
-}
-
-// SetChallenge gets a reference to the given string and assigns it to the Challenge field.
-func (o *VerifyUserCodeRequest) SetChallenge(v string) {
-	o.Challenge = &v
 }
 
 // GetClient returns the Client field value if set, zero value otherwise.
@@ -143,38 +107,6 @@ func (o *VerifyUserCodeRequest) HasDeviceCodeRequestId() bool {
 // SetDeviceCodeRequestId gets a reference to the given string and assigns it to the DeviceCodeRequestId field.
 func (o *VerifyUserCodeRequest) SetDeviceCodeRequestId(v string) {
 	o.DeviceCodeRequestId = &v
-}
-
-// GetHandledAt returns the HandledAt field value if set, zero value otherwise.
-func (o *VerifyUserCodeRequest) GetHandledAt() time.Time {
-	if o == nil || IsNil(o.HandledAt) {
-		var ret time.Time
-		return ret
-	}
-	return *o.HandledAt
-}
-
-// GetHandledAtOk returns a tuple with the HandledAt field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *VerifyUserCodeRequest) GetHandledAtOk() (*time.Time, bool) {
-	if o == nil || IsNil(o.HandledAt) {
-		return nil, false
-	}
-	return o.HandledAt, true
-}
-
-// HasHandledAt returns a boolean if a field has been set.
-func (o *VerifyUserCodeRequest) HasHandledAt() bool {
-	if o != nil && !IsNil(o.HandledAt) {
-		return true
-	}
-
-	return false
-}
-
-// SetHandledAt gets a reference to the given time.Time and assigns it to the HandledAt field.
-func (o *VerifyUserCodeRequest) SetHandledAt(v time.Time) {
-	o.HandledAt = &v
 }
 
 // GetRequestUrl returns the RequestUrl field value if set, zero value otherwise.
@@ -283,17 +215,11 @@ func (o VerifyUserCodeRequest) MarshalJSON() ([]byte, error) {
 
 func (o VerifyUserCodeRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Challenge) {
-		toSerialize["challenge"] = o.Challenge
-	}
 	if !IsNil(o.Client) {
 		toSerialize["client"] = o.Client
 	}
 	if !IsNil(o.DeviceCodeRequestId) {
 		toSerialize["device_code_request_id"] = o.DeviceCodeRequestId
-	}
-	if !IsNil(o.HandledAt) {
-		toSerialize["handled_at"] = o.HandledAt
 	}
 	if !IsNil(o.RequestUrl) {
 		toSerialize["request_url"] = o.RequestUrl

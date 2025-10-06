@@ -3891,18 +3891,11 @@
       "type": "object",
       "title": "HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.",
       "properties": {
-        "challenge": {
-          "description": "ID is the identifier (\"device challenge\") of the device request. It is used to\nidentify the session.",
-          "type": "string"
-        },
         "client": {
           "$ref": "#/definitions/oAuth2Client"
         },
         "device_code_request_id": {
           "type": "string"
-        },
-        "handled_at": {
-          "$ref": "#/definitions/nullTime"
         },
         "request_url": {
           "description": "RequestURL is the original Device Authorization URL requested.",

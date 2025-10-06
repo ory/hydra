@@ -1756,18 +1756,11 @@
       },
       "verifyUserCodeRequest": {
         "properties": {
-          "challenge": {
-            "description": "ID is the identifier (\"device challenge\") of the device request. It is used to\nidentify the session.",
-            "type": "string"
-          },
           "client": {
             "$ref": "#/components/schemas/oAuth2Client"
           },
           "device_code_request_id": {
             "type": "string"
-          },
-          "handled_at": {
-            "$ref": "#/components/schemas/nullTime"
           },
           "request_url": {
             "description": "RequestURL is the original Device Authorization URL requested.",

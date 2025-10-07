@@ -178,11 +178,15 @@ install-stable:
 install:
 	go install -tags sqlite,sqlite_omit_load_extension .
 
-.PHONY: post-release
-post-release:
+.PHONY: pre-release
+pre-release:
 	go tool yq e '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
 	go tool yq e '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' -i quickstart.yml
 	go tool yq e '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' -i quickstart.yml
+
+.PHONY: post-release
+post-release:
+	echo "nothing to do"
 
 licenses: .bin/licenses node_modules  # checks open-source licenses
 	.bin/licenses

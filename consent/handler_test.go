@@ -460,11 +460,6 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 			"user_code": userCode,
 			"extra":     "extra",
 		}, challenge)
-		require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
-
-		result := fosite.RFC6749Error{}
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		assert.Contains(t, result.DescriptionField, fosite.ErrInvalidRequest.DescriptionField)
-		assert.Contains(t, result.DescriptionField, "unknown field 'extra'")
+		assert.EqualValues(t, http.StatusOK, resp.StatusCode)
 	})
 }

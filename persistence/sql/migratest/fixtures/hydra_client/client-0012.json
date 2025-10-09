@@ -12,7 +12,7 @@
   "Contacts": [
     "contact-0012_1"
   ],
-  "CreatedAt": "0001-01-01T00:00:00Z",
+  "CreatedAt": "2022-02-15T22:20:20Z",
   "FrontChannelLogoutSessionRequired": false,
   "FrontChannelLogoutURI": "",
   "GrantTypes": [
@@ -87,14 +87,9 @@
   },
   "LogoURI": "http://logo/0012",
   "Metadata": {},
-  "NID": "00000000-0000-0000-0000-000000000000",
+  "NID": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "Name": "Client 0012",
   "Owner": "owner-0012",
-  "PK": {
-    "String": "",
-    "Valid": false
-  },
-  "PKDeprecated": 12,
   "PolicyURI": "http://policy/0012",
   "PostLogoutRedirectURIs": [],
   "RedirectURIs": [
@@ -123,6 +118,6 @@
   "TermsOfServiceURI": "http://tos/0012",
   "TokenEndpointAuthMethod": "token_auth-0012",
   "TokenEndpointAuthSigningAlgorithm": "",
-  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UpdatedAt": "2022-02-15T22:20:20Z",
   "UserinfoSignedResponseAlg": "u_alg-0012"
 }

@@ -6,6 +6,7 @@ package driver
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -13,15 +14,12 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ory/x/sqlcon/dockertest"
-
 	"github.com/gorilla/sessions"
+	pkgerr "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	pkgerr "github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
@@ -30,6 +28,7 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/popx"
 	"github.com/ory/x/randx"
 )
 
@@ -159,11 +158,11 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 func TestDbUnknownTableColumns(t *testing.T) {
 	t.Parallel()
 
-	dsn := dockertest.RunTestPostgreSQL(t)
+	dsn := dbal.NewSQLiteTestDatabase(t)
 	reg, err := New(t.Context(), WithConfigOptions(configx.WithValue("dsn", dsn)), WithAutoMigrate())
 	require.NoError(t, err)
 
-	statement := `ALTER TABLE "hydra_client" ADD COLUMN IF NOT EXISTS "temp_column" VARCHAR(128) NOT NULL DEFAULT '';`
+	statement := `ALTER TABLE "hydra_client" ADD COLUMN "temp_column" VARCHAR(128) NOT NULL DEFAULT '';`
 	require.NoError(t, reg.Persister().Connection(t.Context()).RawQuery(statement).Exec())
 
 	cl := &client.Client{
@@ -172,7 +171,9 @@ func TestDbUnknownTableColumns(t *testing.T) {
 	require.NoError(t, reg.Persister().CreateClient(t.Context(), cl))
 	getClients := func(ctx context.Context, reg *RegistrySQL) ([]client.Client, error) {
 		readClients := make([]client.Client, 0)
-		return readClients, reg.Persister().Connection(ctx).RawQuery(`SELECT * FROM "hydra_client"`).All(&readClients)
+		conn := reg.Persister().Connection(ctx)
+		cols := popx.DBColumns[client.Client](conn.Dialect)
+		return readClients, conn.RawQuery(fmt.Sprintf(`SELECT %s, temp_column FROM "hydra_client"`, cols)).All(&readClients)
 	}
 
 	t.Run("with ignore disabled (default behavior)", func(t *testing.T) {
@@ -191,11 +192,6 @@ func TestDbUnknownTableColumns(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, actual, 1)
 	})
-}
-
-func sussessfulPing(context.Context, *logrusx.Logger, *sql.BasePersister) error {
-	// fake that ping is successful
-	return nil
 }
 
 func failedPing(err error) func(context.Context, *logrusx.Logger, *sql.BasePersister) error {

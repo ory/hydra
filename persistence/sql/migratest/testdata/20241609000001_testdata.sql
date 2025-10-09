@@ -41,7 +41,7 @@ INSERT INTO hydra_client (id,
                           device_authorization_grant_access_token_lifespan,
                           device_authorization_grant_refresh_token_lifespan)
 VALUES ('client-23',
-        (SELECT id FROM networks LIMIT 1), 'Client 23', 'secret-23', '["http://redirect/23_1","http://redirect/23_2"]', '["grant-23_1","grant-23_2"]', '["response-23_1","response-23_2"]', 'scope-23', 'owner-23', 'http://policy/23', 'http://tos/23', 'http://client/23', 'http://logo/23', '["contact-23_1","contact-23_2"]', 0, 'http://sector_id/23', '', 'http://jwks/23', '["http://request/23_1","http://request/23_2"]', 'token_auth-23', 'r_alg-23', 'u_alg-23', 'subject-23', '["http://cors/23_1","http://cors/23_2"]', 0, '["autdience-23_1","autdience-23_2"]', '2023-02-15 23:20:23.004598', '2023-02-15 23:20:23.004598', 'http://front_logout/23', true, '["http://post_redirect/23_1","http://post_redirect/23_2"]', 'http://back_logout/23', true, '{"migration": "23"}', '', '52f38352-7944-4ace-b55c-5aded28f4ba6', '', TRUE, TRUE, 3600, 3600, 3600);
+        '24704dcb-0ab9-4bfa-a84c-405932ae53fe', 'Client 23', 'secret-23', '["http://redirect/23_1","http://redirect/23_2"]', '["grant-23_1","grant-23_2"]', '["response-23_1","response-23_2"]', 'scope-23', 'owner-23', 'http://policy/23', 'http://tos/23', 'http://client/23', 'http://logo/23', '["contact-23_1","contact-23_2"]', 0, 'http://sector_id/23', '', 'http://jwks/23', '["http://request/23_1","http://request/23_2"]', 'token_auth-23', 'r_alg-23', 'u_alg-23', 'subject-23', '["http://cors/23_1","http://cors/23_2"]', 0, '["autdience-23_1","autdience-23_2"]', '2023-02-15 23:20:23', '2023-02-15 23:20:23', 'http://front_logout/23', true, '["http://post_redirect/23_1","http://post_redirect/23_2"]', 'http://back_logout/23', true, '{"migration": "23"}', '', '52f38352-7944-4ace-b55c-5aded28f4ba6', '', TRUE, TRUE, 3600, 3600, 3600);
 
 
 INSERT INTO hydra_oauth2_flow (login_challenge,
@@ -90,7 +90,7 @@ INSERT INTO hydra_oauth2_flow (login_challenge,
                                device_handled_at,
                                device_error)
 VALUES ('challenge-0018',
-        (SELECT id FROM networks LIMIT 1), '["requested_scope-0018_1","requested_scope-0018_2"]', 'verifier-0018', 'csrf-0018', 'subject-0018', 'http://request/0018', true, 'client-21', CURRENT_TIMESTAMP, '{"display": "display-0018"}', NULL, '["requested_audience-0018_1","requested_audience-0018_2"]', CURRENT_TIMESTAMP, 128, true, 15, '{}', 'acr-0018', CURRENT_TIMESTAMP, true, 'force_subject_id-0018', '{"context": "0018"}', '["amr-0018-1","amr-0018-2"]', 'challenge-0018', 'verifier-0018', true, 'csrf-0018', '["granted_scope-0018_1","granted_scope-0018_2"]', true, 15, '{}', '{"session_access_token-0018": "0018"}', '{"session_id_token-0018": "0018"}', true, '["granted_audience-0018_1","granted_audience-0018_2"]', '2025-05-16 12:24', true, 'device-challenge-0018', 'device-request-id-0018', 'device-verifier-0018', 'device-csrf-0018', true, '2025-05-16 12:24', '{}' );
+        '24704dcb-0ab9-4bfa-a84c-405932ae53fe', '["requested_scope-0018_1","requested_scope-0018_2"]', 'verifier-0018', 'csrf-0018', 'subject-0018', 'http://request/0018', true, 'client-21', '2022-02-15 22:20:21', '{"display": "display-0018"}', NULL, '["requested_audience-0018_1","requested_audience-0018_2"]', '2022-02-15 22:20:21', 128, true, 15, '{}', 'acr-0018', '2022-02-15 22:20:21', true, 'force_subject_id-0018', '{"context": "0018"}', '["amr-0018-1","amr-0018-2"]', 'challenge-0018', 'verifier-0018', true, 'csrf-0018', '["granted_scope-0018_1","granted_scope-0018_2"]', true, 15, '{}', '{"session_access_token-0018": "0018"}', '{"session_id_token-0018": "0018"}', true, '["granted_audience-0018_1","granted_audience-0018_2"]', '2025-05-16 12:24', true, 'device-challenge-0018', 'device-request-id-0018', 'device-verifier-0018', 'device-csrf-0018', true, '2025-05-16 12:24', '{}' );
 
 INSERT INTO hydra_oauth2_device_auth_codes (device_code_signature, user_code_signature, request_id, requested_at,
                                             client_id, scope, granted_scope, form_data, session_data, subject,
@@ -102,5 +102,5 @@ VALUES ('device-code-signature-0001', 'user-code-signature-0001', 'request-id-00
         '{"session_data": "0001"}', 'subject-0001', true, 0,
         '["requested_audience-0001_1","requested_audience-0001_2"]',
         '["granted_audience-0001_1","granted_audience-0001_2"]', 'challenge-0018', '2025-05-16 12:24',
-        (SELECT id FROM networks LIMIT 1)
+        '24704dcb-0ab9-4bfa-a84c-405932ae53fe'
   );

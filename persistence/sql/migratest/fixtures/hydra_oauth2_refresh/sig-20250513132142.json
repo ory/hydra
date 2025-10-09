@@ -1,13 +1,13 @@
 {
   "ID": "sig-20250513132142",
-  "NID": "00000000-0000-0000-0000-000000000000",
+  "NID": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "Request": "req-20250513132142",
   "ConsentChallenge": {
     "String": "challenge-0014",
     "Valid": true
   },
-  "RequestedAt": "0001-01-01T00:00:00Z",
-  "Client": "",
+  "RequestedAt": "2025-05-13T13:21:42Z",
+  "Client": "client-0014",
   "Scopes": "scope",
   "GrantedScope": "granted_scope",
   "RequestedAudience": "requested_audience",

@@ -83,14 +83,9 @@
   },
   "LogoURI": "http://logo/0001",
   "Metadata": {},
-  "NID": "00000000-0000-0000-0000-000000000000",
+  "NID": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "Name": "Client 0001",
   "Owner": "owner-0001",
-  "PK": {
-    "String": "",
-    "Valid": false
-  },
-  "PKDeprecated": 1,
   "PolicyURI": "http://policy/0001",
   "PostLogoutRedirectURIs": [],
   "RedirectURIs": [

@@ -12,7 +12,7 @@
   "Contacts": [
     "contact-0014_1"
   ],
-  "CreatedAt": "0001-01-01T00:00:00Z",
+  "CreatedAt": "2022-02-15T22:20:21Z",
   "FrontChannelLogoutSessionRequired": true,
   "FrontChannelLogoutURI": "http://front_logout/0014",
   "GrantTypes": [
@@ -89,14 +89,9 @@
   "Metadata": {
     "migration": "0014"
   },
-  "NID": "00000000-0000-0000-0000-000000000000",
+  "NID": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "Name": "Client 0014",
   "Owner": "owner-0014",
-  "PK": {
-    "String": "",
-    "Valid": false
-  },
-  "PKDeprecated": 14,
   "PolicyURI": "http://policy/0014",
   "PostLogoutRedirectURIs": [
     "http://post_redirect/0014_1"
@@ -127,6 +122,6 @@
   "TermsOfServiceURI": "http://tos/0014",
   "TokenEndpointAuthMethod": "token_auth-0014",
   "TokenEndpointAuthSigningAlgorithm": "",
-  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UpdatedAt": "2022-02-15T22:20:21Z",
   "UserinfoSignedResponseAlg": "u_alg-0014"
 }

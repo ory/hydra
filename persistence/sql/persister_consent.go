@@ -461,10 +461,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 	defer otelx.End(span, &err)
 
 	conn := p.Connection(ctx)
-	columns := popx.DBColumns[client.Client](&popx.PrefixQuoter{Prefix: "c.", Quoter: conn.Dialect})
-	if conn.Dialect.Name() == "mysql" {
-		columns = "c.*" // MySQL does not support this.
-	}
+	columns := popx.DBColumns[client.Client](&popx.AliasQuoter{Alias: "c", Quoter: conn.Dialect})
 
 	if err := conn.RawQuery(
 		/* #nosec G201 - channel can either be "front" or "back" */

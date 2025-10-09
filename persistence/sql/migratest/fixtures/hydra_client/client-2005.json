@@ -12,7 +12,7 @@
   "Contacts": [
     "contact-2005_1"
   ],
-  "CreatedAt": "0001-01-01T00:00:00Z",
+  "CreatedAt": "2022-02-15T22:20:22Z",
   "FrontChannelLogoutSessionRequired": true,
   "FrontChannelLogoutURI": "http://front_logout/2005",
   "GrantTypes": [
@@ -89,14 +89,9 @@
   "Metadata": {
     "migration": "2005"
   },
-  "NID": "00000000-0000-0000-0000-000000000000",
+  "NID": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "Name": "Client 2005",
   "Owner": "owner-2005",
-  "PK": {
-    "String": "",
-    "Valid": false
-  },
-  "PKDeprecated": 2005,
   "PolicyURI": "http://policy/2005",
   "PostLogoutRedirectURIs": [
     "http://post_redirect/2005_1"
@@ -127,6 +122,6 @@
   "TermsOfServiceURI": "http://tos/2005",
   "TokenEndpointAuthMethod": "token_auth-2005",
   "TokenEndpointAuthSigningAlgorithm": "",
-  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UpdatedAt": "2022-02-15T22:20:22Z",
   "UserinfoSignedResponseAlg": "u_alg-2005"
 }

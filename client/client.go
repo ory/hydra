@@ -4,7 +4,6 @@
 package client
 
 import (
-	"database/sql"
 	"strconv"
 	"strings"
 	"time"
@@ -39,14 +38,6 @@ type Client struct {
 	//
 	// The ID is immutable. If no ID is provided, a UUID4 will be generated.
 	ID string `json:"client_id" db:"id"`
-
-	// DEPRECATED: This field is deprecated and will be removed. It serves
-	// no purpose except the database not complaining.
-	PK sql.NullString `json:"-" db:"pk" faker:"-"`
-
-	// DEPRECATED: This field is deprecated and will be removed. It serves
-	// no purpose except the database not complaining.
-	PKDeprecated int64 `json:"-" db:"pk_deprecated"`
 
 	// OAuth 2.0 Client Name
 	//

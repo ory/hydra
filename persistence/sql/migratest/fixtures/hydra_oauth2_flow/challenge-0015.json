@@ -1,6 +1,6 @@
 {
   "i": "challenge-0015",
-  "n": "00000000-0000-0000-0000-000000000000",
+  "n": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
   "rs": [
     "requested_scope-0015_1",
     "requested_scope-0015_2"
@@ -14,12 +14,13 @@
   "oc": {
     "display": "display-0015"
   },
+  "ci": "client-21",
   "r": "http://request/0015",
   "si": "auth_session-0015",
   "lv": "verifier-0015",
   "lc": "csrf-0015",
-  "li": null,
-  "ia": "0001-01-01T00:00:00Z",
+  "li": "2022-02-15T22:20:21Z",
+  "ia": "2022-02-15T22:20:21Z",
   "q": 128,
   "lr": true,
   "lf": 15,
@@ -41,7 +42,7 @@
     "error_debug": "",
     "valid": false
   },
-  "la": null,
+  "la": "2022-02-15T22:20:21Z",
   "du": null,
   "dh": null,
   "cc": "challenge-0015",
@@ -58,7 +59,7 @@
   ],
   "ce": true,
   "cf": 15,
-  "ch": null,
+  "ch": "2022-02-15T22:20:21Z",
   "cw": true,
   "cx": {
     "error": "",

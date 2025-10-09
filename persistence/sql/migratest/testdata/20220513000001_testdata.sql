@@ -38,7 +38,7 @@ INSERT INTO hydra_client (
   registration_access_token_signature)
 VALUES (
   'client-21',
-  (SELECT id FROM networks LIMIT 1),
+  '24704dcb-0ab9-4bfa-a84c-405932ae53fe',
   'Client 21',
   'secret-21',
   '["http://redirect/21_1","http://redirect/21_2"]',
@@ -63,8 +63,8 @@ VALUES (
   '["http://cors/21_1","http://cors/21_2"]',
   0,
   '["autdience-21_1","autdience-21_2"]',
-  '2022-02-15 22:20:23.004598',
-  '2022-02-15 22:20:23.004598',
+  '2022-02-15 22:20:23',
+  '2022-02-15 22:20:23',
   'http://front_logout/21',
   true,
   '["http://post_redirect/21_1","http://post_redirect/21_2"]',
@@ -84,8 +84,8 @@ INSERT INTO hydra_oauth2_authentication_session (
   remember
 ) VALUES (
   'auth_session-0015',
-  (SELECT id FROM networks LIMIT 1),
-  CURRENT_TIMESTAMP,
+  '24704dcb-0ab9-4bfa-a84c-405932ae53fe',
+  '2022-02-15 22:20:21',
   'subject-0015',
   false
 );
@@ -130,7 +130,7 @@ INSERT INTO hydra_oauth2_flow (
   consent_handled_at
 ) VALUES (
   'challenge-0015',
-  (SELECT id FROM networks LIMIT 1),
+  '24704dcb-0ab9-4bfa-a84c-405932ae53fe',
   '["requested_scope-0015_1","requested_scope-0015_2"]',
   'verifier-0015',
   'csrf-0015',
@@ -138,17 +138,17 @@ INSERT INTO hydra_oauth2_flow (
   'http://request/0015',
   true,
   'client-21',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   '{"display": "display-0015"}',
   'auth_session-0015',
   '["requested_audience-0015_1","requested_audience-0015_2"]',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   128,
   true,
   15,
   '{}',
   'acr-0015',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   true,
   'force_subject_id-0015',
   '{"context": "0015"}',
@@ -165,5 +165,5 @@ INSERT INTO hydra_oauth2_flow (
   '{"session_id_token-0015": "0015"}',
   true,
   '["granted_audience-0015_1","granted_audience-0015_2"]',
-  CURRENT_TIMESTAMP
+  '2022-02-15 22:20:21'
 );

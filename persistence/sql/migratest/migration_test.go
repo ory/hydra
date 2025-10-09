@@ -5,7 +5,6 @@ package migratest
 
 import (
 	"context"
-	stdsql "database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -36,7 +35,6 @@ import (
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/ory/x/sqlxx"
 )
 
 func snapshotFor(paths ...string) *cupaloy.Config {
@@ -48,7 +46,7 @@ func snapshotFor(paths ...string) *cupaloy.Config {
 	)
 }
 
-func CompareWithFixture(t *testing.T, actual interface{}, prefix string, id string) {
+func compareWithFixture(t *testing.T, actual interface{}, prefix string, id string) {
 	s := snapshotFor("fixtures", prefix)
 	actualJSON, err := json.MarshalIndent(actual, "", "  ")
 	require.NoError(t, err)
@@ -121,15 +119,12 @@ func TestMigrations(t *testing.T) {
 					require.NoError(t, c.All(&cs))
 					require.Len(t, cs, 20)
 					for _, c := range cs {
-						require.False(t, c.CreatedAt.IsZero())
-						require.False(t, c.UpdatedAt.IsZero())
-						c.CreatedAt = time.Time{} // Some CreatedAt and UpdatedAt values are generated during migrations so we zero them in the fixtures
-						c.UpdatedAt = time.Time{}
-						testhelpersuuid.AssertUUID(t, c.NID)
-						testhelpersuuid.AssertUUID(t, c.PK.String)
-						c.NID = uuid.Nil
-						c.PK = stdsql.NullString{}
-						CompareWithFixture(t, structs.Map(c), "hydra_client", c.ID)
+						if s := time.Since(c.CreatedAt); s > 0 && s < 10*time.Minute {
+							// Some are backfilled with the current time
+							assert.WithinDuration(t, c.CreatedAt, c.UpdatedAt, 5*time.Second)
+							c.CreatedAt, c.UpdatedAt = time.Time{}, time.Time{}
+						}
+						compareWithFixture(t, structs.Map(c), "hydra_client", c.ID)
 					}
 				})
 
@@ -139,12 +134,12 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, js, 7)
 					for _, j := range js {
 						testhelpersuuid.AssertUUID(t, j.ID)
-						testhelpersuuid.AssertUUID(t, j.NID)
 						j.ID = uuid.Nil // Some IDs are generated at migration time so we zero them in the fixtures
-						j.NID = uuid.Nil
-						require.False(t, j.CreatedAt.IsZero())
-						j.CreatedAt = time.Time{}
-						CompareWithFixture(t, j, "hydra_jwk", j.KID)
+						if s := time.Since(j.CreatedAt); s > 0 && s < 10*time.Minute {
+							// Some are backfilled with the current time
+							j.CreatedAt = time.Time{}
+						}
+						compareWithFixture(t, j, "hydra_jwk", j.KID)
 					}
 				})
 
@@ -154,8 +149,9 @@ func TestMigrations(t *testing.T) {
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
-						fixturizeFlow(t, &f)
-						CompareWithFixture(t, f, "hydra_oauth2_flow", f.ID)
+						assert.NotNil(t, f.Client)
+						f.Client = nil // clients are loaded eagerly, nil them for snapshot comparison
+						compareWithFixture(t, f, "hydra_oauth2_flow", f.ID)
 					}
 				})
 
@@ -165,10 +161,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, ss, 17)
 
 					for _, s := range ss {
-						testhelpersuuid.AssertUUID(t, s.NID)
-						s.NID = uuid.Nil
-						s.AuthenticatedAt = sqlxx.NullTime(time.Time{})
-						CompareWithFixture(t, s, "hydra_oauth2_authentication_session", s.ID)
+						compareWithFixture(t, s, "hydra_oauth2_authentication_session", s.ID)
 					}
 				})
 
@@ -178,9 +171,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, ss, 13)
 
 					for _, s := range ss {
-						testhelpersuuid.AssertUUID(t, s.NID)
-						s.NID = uuid.Nil
-						CompareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
+						compareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
 					}
 				})
 
@@ -190,10 +181,9 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, lrs, 7)
 
 					for _, s := range lrs {
-						testhelpersuuid.AssertUUID(t, s.NID)
-						s.NID = uuid.Nil
-						s.Client = nil
-						CompareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
+						assert.NotNil(t, s.Client)
+						s.Client = nil // clients are loaded eagerly, nil them for snapshot comparison
+						compareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
 					}
 				})
 
@@ -202,10 +192,7 @@ func TestMigrations(t *testing.T) {
 					require.NoError(t, c.All(&bjtis))
 					require.Len(t, bjtis, 1)
 					for _, bjti := range bjtis {
-						testhelpersuuid.AssertUUID(t, bjti.NID)
-						bjti.NID = uuid.Nil
-						bjti.Expiry = time.Time{}
-						CompareWithFixture(t, bjti, "hydra_oauth2_jti_blacklist", bjti.ID)
+						compareWithFixture(t, bjti, "hydra_oauth2_jti_blacklist", bjti.ID)
 					}
 				})
 
@@ -215,13 +202,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, as, 13)
 
 					for _, a := range as {
-						testhelpersuuid.AssertUUID(t, a.NID)
-						a.NID = uuid.Nil
-						require.False(t, a.RequestedAt.IsZero())
-						a.RequestedAt = time.Time{}
-						require.NotZero(t, a.Client)
-						a.Client = ""
-						CompareWithFixture(t, a, "hydra_oauth2_access", a.ID)
+						compareWithFixture(t, a, "hydra_oauth2_access", a.ID)
 					}
 				})
 
@@ -231,13 +212,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, rs, 14)
 
 					for _, r := range rs {
-						testhelpersuuid.AssertUUID(t, r.NID)
-						r.NID = uuid.Nil
-						require.False(t, r.RequestedAt.IsZero())
-						r.RequestedAt = time.Time{}
-						require.NotZero(t, r.Client)
-						r.Client = ""
-						CompareWithFixture(t, r, "hydra_oauth2_refresh", r.ID)
+						compareWithFixture(t, r, "hydra_oauth2_refresh", r.ID)
 					}
 				})
 
@@ -247,13 +222,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, cs, 13)
 
 					for _, c := range cs {
-						testhelpersuuid.AssertUUID(t, c.NID)
-						c.NID = uuid.Nil
-						require.False(t, c.RequestedAt.IsZero())
-						c.RequestedAt = time.Time{}
-						require.NotZero(t, c.Client)
-						c.Client = ""
-						CompareWithFixture(t, c, "hydra_oauth2_code", c.ID)
+						compareWithFixture(t, c, "hydra_oauth2_code", c.ID)
 					}
 				})
 
@@ -263,13 +232,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, os, 13)
 
 					for _, o := range os {
-						testhelpersuuid.AssertUUID(t, o.NID)
-						o.NID = uuid.Nil
-						require.False(t, o.RequestedAt.IsZero())
-						o.RequestedAt = time.Time{}
-						require.NotZero(t, o.Client)
-						o.Client = ""
-						CompareWithFixture(t, o, "hydra_oauth2_oidc", o.ID)
+						compareWithFixture(t, o, "hydra_oauth2_oidc", o.ID)
 					}
 				})
 
@@ -279,13 +242,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, ps, 11)
 
 					for _, p := range ps {
-						testhelpersuuid.AssertUUID(t, p.NID)
-						p.NID = uuid.Nil
-						require.False(t, p.RequestedAt.IsZero())
-						p.RequestedAt = time.Time{}
-						require.NotZero(t, p.Client)
-						p.Client = ""
-						CompareWithFixture(t, p, "hydra_oauth2_pkce", p.ID)
+						compareWithFixture(t, p, "hydra_oauth2_pkce", p.ID)
 					}
 				})
 
@@ -295,9 +252,7 @@ func TestMigrations(t *testing.T) {
 					require.Len(t, rs, 1)
 
 					for _, r := range rs {
-						testhelpersuuid.AssertUUID(t, r.NID)
-						r.NID = uuid.Nil
-						CompareWithFixture(t, r, "hydra_oauth2_device_auth_codes", r.ID)
+						compareWithFixture(t, r, "hydra_oauth2_device_auth_codes", r.ID)
 					}
 				})
 

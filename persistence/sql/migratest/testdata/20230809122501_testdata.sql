@@ -7,8 +7,8 @@ INSERT INTO hydra_oauth2_authentication_session (
   identity_provider_session_id
 ) VALUES (
   'auth_session-0017',
-  (SELECT id FROM networks LIMIT 1),
-  CURRENT_TIMESTAMP,
+  '24704dcb-0ab9-4bfa-a84c-405932ae53fe',
+  '2022-02-15 22:20:21',
   'subject-0017',
   true,
   'identity_provider_session_id-0017'
@@ -56,7 +56,7 @@ INSERT INTO hydra_oauth2_flow (
   identity_provider_session_id
 ) VALUES (
   'challenge-0017',
-  (SELECT id FROM networks LIMIT 1),
+  '24704dcb-0ab9-4bfa-a84c-405932ae53fe',
   '["requested_scope-0016_1","requested_scope-0016_2"]',
   'verifier-0017',
   'csrf-0017',
@@ -64,17 +64,17 @@ INSERT INTO hydra_oauth2_flow (
   'http://request/0017',
   true,
   'client-21',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   '{"display": "display-0017"}',
   'auth_session-0017',
   '["requested_audience-0016_1","requested_audience-0016_2"]',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   128,
   true,
   15,
   '{}',
   'acr-0017',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   true,
   'force_subject_id-0017',
   '{"context": "0017"}',
@@ -91,7 +91,7 @@ INSERT INTO hydra_oauth2_flow (
   '{"session_id_token-0017": "0017"}',
   true,
   '["granted_audience-0016_1","granted_audience-0016_2"]',
-  CURRENT_TIMESTAMP,
+  '2022-02-15 22:20:21',
   true,
   'identity_provider_session_id-0017'
 );

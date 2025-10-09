@@ -4,13 +4,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2025-07-03)](#000-2025-07-03)
+- [0.0.0 (2025-10-09)](#000-2025-10-09)
   - [Breaking Changes](#breaking-changes)
   - [Related issue(s)](#related-issues)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-07-03)
+# [0.0.0](https://github.com/ory/hydra/compare/v2.3.0...v0.0.0) (2025-10-09)
 ## Breaking Changes
 
 This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
@@ -40,6 +40,10 @@ If this pull request
 
 
 ### Bug Fixes
+
+* Add repo syncing for polis ([46d17f8](https://github.com/ory/hydra/commit/46d17f8bfdc59e2185e9ce65823eb2652e01f1b8)):
+
+    GitOrigin-RevId: e277a25d594b512b800d39dd18f36ea3d99fcf84
 
 * Allow updating when JWKS URI is set ([#3935](https://github.com/ory/hydra/issues/3935)) ([#3946](https://github.com/ory/hydra/issues/3946)) ([fb1655b](https://github.com/ory/hydra/commit/fb1655ba86077b10141132ed332ba8d6f8c70582)):
 
@@ -71,6 +75,10 @@ If this pull request
     GitOrigin-RevId: 61645585277edd95914705499afd7211a85983eb
 
 * CLI usage help examples ([#3943](https://github.com/ory/hydra/issues/3943)) ([e24f9a7](https://github.com/ory/hydra/commit/e24f9a704c22c72690bc20c498439865181d9239))
+* Copybara script ([7b33358](https://github.com/ory/hydra/commit/7b333585bb44a069bf47267c853aa2e91db0efa3)):
+
+    GitOrigin-RevId: 14665e01451ac5fcdda148b473b8fc35d4fe21ef
+
 * Correct multiple instances of 'stragegy' typo ([#3906](https://github.com/ory/hydra/issues/3906)) ([50eefbc](https://github.com/ory/hydra/commit/50eefbc21c2c43d221b6079bbd78a33ef8c754c4)):
 
     This commit addresses several occurrences where 'strategy' was
@@ -79,6 +87,26 @@ If this pull request
     Additionally, a similar issue was found and corrected in the Ory
     documentation repository (ory/docs), with a corresponding pull request
     submitted.
+
+* Deduplicate down migrations ([02baf36](https://github.com/ory/hydra/commit/02baf364c5f1fe09a74edb879c711983f761dc7f)):
+
+    GitOrigin-RevId: 94c68daeded4f3b6f42d079d71415d8935a74e69
+
+* **deps:** Update go-x ([582a3c5](https://github.com/ory/hydra/commit/582a3c5f2de833a7996812d4873b305d162e1c7b)):
+
+    GitOrigin-RevId: 2d32f7710b9c6111a30f4e0d3cc0abc967d7dfb6
+
+* Escape IPv6 regex string ([0ba326a](https://github.com/ory/hydra/commit/0ba326ad59ab227bc6e9f47a846fbf1ac75c0f1c)):
+
+    GitOrigin-RevId: cf04d7cae93aea32950a149527e2b1319af97b39
+
+* Failing CI in OSS repos ([c900985](https://github.com/ory/hydra/commit/c9009858dc96edbbec1dd256cb1a734beb4f90aa)):
+
+    GitOrigin-RevId: 3d1f84b0f0d006971aea9489322b3e0f32a6a7e3
+
+* Fix expires_at timestamp not in UTC leading to local test failures ([337000a](https://github.com/ory/hydra/commit/337000aacd07a1af6e77918a011903b6f39701a3)):
+
+    GitOrigin-RevId: 560d958391b12ace6db9d4c05074719e96e0329e
 
 * Force autocommit for device auth code migration ([#3991](https://github.com/ory/hydra/issues/3991)) ([29761f4](https://github.com/ory/hydra/commit/29761f4ac7586478ea6f553cb571ac11b0275e6d)), closes [#1234](https://github.com/ory/hydra/issues/1234) [#1234](https://github.com/ory/hydra/issues/1234):
 
@@ -93,19 +121,63 @@ If this pull request
     
     ```
 
+* Force SQL operator precedence in pagination v2 to ensure nid isolation ([43c9be1](https://github.com/ory/hydra/commit/43c9be1b5bfa56831e14dcaea0d766153f6853b8)):
+
+    GitOrigin-RevId: 451cbe6c4322222e36c182b4f7c1ff6cb9396dde
+
+* Hydra CI ([dde63d8](https://github.com/ory/hydra/commit/dde63d87ca5f7b3941131ba9989649dab10d3f85)):
+
+    GitOrigin-RevId: 6dfadcf84bf4901b8867fd1f0bcfa685a0ac8290
+
+* Hydra tracing ([38ee050](https://github.com/ory/hydra/commit/38ee050214499aa96b06dd6b0eb8d18ead9dcd32)):
+
+    GitOrigin-RevId: 44aeb79002934149b6889c4e13697aa178f3d614
+
+* **hydra:** Instrument metrics also on public endpoints ([8aee364](https://github.com/ory/hydra/commit/8aee364805a0fa20cd5d786324efb5c6e5cdfcb5)):
+
+    GitOrigin-RevId: 84ae1df26bd3d9a025655e50792ea7312f250cca
+
+* **hydra:** Use prometheus metrics instead of SQA metrics ([7a6592e](https://github.com/ory/hydra/commit/7a6592e10fc5cd1b00d9bc12ab8c027c4e967293)):
+
+    GitOrigin-RevId: 2ca878d66e4ab101af51bc32f8606ce6c3af0587
+
+* Identity queries ([a30f021](https://github.com/ory/hydra/commit/a30f021fd98969c2dbc31a4dc3e45365d60c1a25)):
+
+    GitOrigin-RevId: b103d25a807c643b521a12d593486d5125f390be
+
 * Ignore flaky keys in Hydra HSM tests ([469b2ad](https://github.com/ory/hydra/commit/469b2ad538865a38738a10f46d270f53d12101ad)):
 
     GitOrigin-RevId: 83312e6544bc33ccc30e1e1e414cc04910429192
 
+* Ignore non SQL files when applying migrations ([38a28d4](https://github.com/ory/hydra/commit/38a28d4169c492f6f5eae7d33347fabad2f04840)):
+
+    GitOrigin-RevId: d71381b874c6e0dea3cba143a6a643334059ce1e
+
+* Include go.mod in vendored oryx ([08a3ab4](https://github.com/ory/hydra/commit/08a3ab43ddb1e2a0df430224f969fe3f0ba161bf)):
+
+    GitOrigin-RevId: 20365bbe6b2cf95ac7973bcca9056455d2cb3803
+
+* Increase refresh token grace period ([50608c2](https://github.com/ory/hydra/commit/50608c296615851e381b078d653b243ca6135d9b)):
+
+    GitOrigin-RevId: 36a5d2a3038209b91452ef7b600c2b28ad8f8e45
+
 * **infrastructure:** Hydra oss CI ([e846541](https://github.com/ory/hydra/commit/e84654185cdfffbf160d5309f744795d15d723f9)):
 
     GitOrigin-RevId: 3df0724e5ea4c81a0f4c481c1a3a34529356d073
+
+* Jsonx.ApplyJSONPatch ([c6fa2a6](https://github.com/ory/hydra/commit/c6fa2a6f17f63e43cfecb576bd2a1c1b58c778ed)):
+
+    GitOrigin-RevId: 43c10801f5051e3d5fbea5f4f5e90394f6da0fbb
 
 * JWT documentation link to point to the correct resource ([#3907](https://github.com/ory/hydra/issues/3907)) ([b746e41](https://github.com/ory/hydra/commit/b746e41eda6dc3fe376b147d146a6fcc7dafb455)):
 
     The previous link in the documentation led to a page unrelated to JWT.
     Updated the URL to https://www.ory.sh/docs/oauth2-oidc/jwt-access-token,
     which provides proper JWT guidance.
+
+* Migration problems ([fe459ea](https://github.com/ory/hydra/commit/fe459ea61391aaac097ceedbc8f171a9fdc356f9)):
+
+    GitOrigin-RevId: 38f30ae2fbc66a36cdeef5bc8b66e4b10ba23fa5
 
 * Migrations on CockroachDB v25+ ([#3994](https://github.com/ory/hydra/issues/3994)) ([38efece](https://github.com/ory/hydra/commit/38efece55be02d722eafef9d0cec06ec12a29d65)), closes [#3964](https://github.com/ory/hydra/issues/3964) [#3993](https://github.com/ory/hydra/issues/3993):
 
@@ -128,7 +200,35 @@ If this pull request
     persistence/sql/src/20220210000001_nid/20220210000001000000_nid.cockroach.up.sql
     ```
 
+* Otlp sampling rate default ([cbd5094](https://github.com/ory/hydra/commit/cbd50947ff7e03a4c32d0ad52acd55b595b393ce)):
+
+    GitOrigin-RevId: 8a01bded7d8eca0ac3a81de793286144aab16426
+
+* Print correct content of down migrations ([4a4a088](https://github.com/ory/hydra/commit/4a4a0880dc6222870b1e177ce04f81842359f922)):
+
+    GitOrigin-RevId: 48b1efa8d3d4f6c6648d3941f67f622fdfb0075c
+
+* Reject invalid migration names ([eb3b6ac](https://github.com/ory/hydra/commit/eb3b6ace6bca3d3692622b544678d73ab8285848)):
+
+    GitOrigin-RevId: 43aeadc2c058c3a35092527f54999083674a2ee8
+
+* Remove strict decoding on consent and login endpoints ([fb7dc75](https://github.com/ory/hydra/commit/fb7dc75d9810d835ce5f04eddcadfb2030f8bfe3)):
+
+    GitOrigin-RevId: 6f1cd36e1ec644ead8885f7493b1b6956df47aee
+
+* Return 404 on schema file not exists ([76079c0](https://github.com/ory/hydra/commit/76079c0da191a902284c015fd9e8e057d09b48f4)):
+
+    GitOrigin-RevId: 398176da632eecdbd95062c7872a90b6c8662006
+
+* Revert "fix: otlp sampling rate default ([#9055](https://github.com/ory/hydra/issues/9055))" ([02e86bc](https://github.com/ory/hydra/commit/02e86bc192c8f693c23aa430481a1e719d8e2e21)):
+
+    GitOrigin-RevId: 9de37a48b68c7ee29caefb01c83f1a78999dc15b
+
 * Revoke by consent request ID ([#3947](https://github.com/ory/hydra/issues/3947)) ([5d8635c](https://github.com/ory/hydra/commit/5d8635c94389ff3c87bfae66afe95105c147bec1)), closes [#3932](https://github.com/ory/hydra/issues/3932) [#3932](https://github.com/ory/hydra/issues/3932) [#3941](https://github.com/ory/hydra/issues/3941)
+* Routes in AX with identity_schema ([5014348](https://github.com/ory/hydra/commit/50143483fd66fb7d545e8a8e2c7e95857f35fbbb)):
+
+    GitOrigin-RevId: ab72dc64c194c06bf0301e87aa829c72022ac41e
+
 * Simplify and fix Copybara sync job ([f998d09](https://github.com/ory/hydra/commit/f998d090ca6408b05524aea5e5f3a79c5d44b1a4)):
 
     GitOrigin-RevId: 115f1ba1aa8f92d9c546046b37d4fb27dacedec8
@@ -136,6 +236,10 @@ If this pull request
 * Tos_uri validation ([#3945](https://github.com/ory/hydra/issues/3945)) ([007e224](https://github.com/ory/hydra/commit/007e22412ae72403415e8b2f2283154b8d88f511)):
 
     Contributes to https://github.com/ory-corp/cloud/issues/7395
+
+* Towards fixing fosite CI ([061d3fb](https://github.com/ory/hydra/commit/061d3fbae416a39b7258905938b1e435f6827d4b)):
+
+    GitOrigin-RevId: b2b15cb088b3cdcfa788920176e92e0e30cc05ba
 
 * Update debian version in httpd test image ([f6720c4](https://github.com/ory/hydra/commit/f6720c4e62f66c245ce8370da40acbc91eca3ffb)):
 
@@ -145,6 +249,22 @@ If this pull request
 
     GitOrigin-RevId: 64950988a466bbdb4f25b8d9f5c416ff591c00bf
 
+* Use batch insert to speed up project changes ([692e41c](https://github.com/ory/hydra/commit/692e41c75446a51e3d38b37f5aada51358e4741a)):
+
+    GitOrigin-RevId: 88cb2bc82c71b9576ba5d21010c4c585a7ad3af9
+
+* Use git hash to render ory x schema references ([0a6ea5b](https://github.com/ory/hydra/commit/0a6ea5b70a4fa4508bd2bfde9c810d38695c3f2a)):
+
+    GitOrigin-RevId: e07209f10a002acbb0df2f66f6f8746279032733
+
+* Use hard-coded fallback key instead of panic ([e1f6450](https://github.com/ory/hydra/commit/e1f645012f43f62928fdc79710b45d935878367f)):
+
+    GitOrigin-RevId: d7a2270bbf5360288199e9632b2eac6cbc29737c
+
+* Use main branch for polis ([6c24e68](https://github.com/ory/hydra/commit/6c24e68995b8eae9ba0b8872867270ef1d35113b)):
+
+    GitOrigin-RevId: 04533493184c6abdc3a211daffd98f6b68e1c9cc
+
 * Using uuid_generate_v4 function ([#3958](https://github.com/ory/hydra/issues/3958)) ([c206066](https://github.com/ory/hydra/commit/c20606606654af975e5d82998956bb998acee576)):
 
     Removing the md5 function for the uuid generation with native pgsql
@@ -153,7 +273,18 @@ If this pull request
     Closes https://github.com/ory/hydra/issues/3844
 
 
+### Code Refactoring
+
+* Move database meta functions to root x folder for reusability ([7e49133](https://github.com/ory/hydra/commit/7e49133f435d6a0f74a63e8f8d03c5d314d7d3c6)):
+
+    GitOrigin-RevId: 30ee938ea5f1d19bac8967e0ebfe2d595ec27d2b
+
+
 ### Features
+
+* Add allowed domains configuration for captcha ([df3f05c](https://github.com/ory/hydra/commit/df3f05c6ffbd3f00e62a33b2b68416ccf2009112)):
+
+    GitOrigin-RevId: 03395362054593f07ff6405c2a747256b5ff528e
 
 * Add error reason to OAuth2TokenExchangeError event ([#3971](https://github.com/ory/hydra/issues/3971)) ([241dd45](https://github.com/ory/hydra/commit/241dd45fa17ed10d1101d890199df47dab4dbce5))
 * Add handler for /.well-known/oauth-authorization-server. ([#3980](https://github.com/ory/hydra/issues/3980)) ([5baca28](https://github.com/ory/hydra/commit/5baca2843a98c222006b27b20e7e6392421ecad8)):
@@ -165,6 +296,10 @@ If this pull request
     configuration items that conform to this endpoint as seen here:
     https://datatracker.ietf.org/doc/html/rfc8414
 
+* Autoconfigure kratos-changefeed ([d92dabe](https://github.com/ory/hydra/commit/d92dabedf2f55d8b74f5898c987c3e6712fb0b16)):
+
+    GitOrigin-RevId: 8e684d3c1ed528798c0c81cc4330858c54a39acf
+
 * **changelog-oel:** Add `hydra debug challenge` command ([a94662f](https://github.com/ory/hydra/commit/a94662f1edc49e662a5e1818dbfd4cac15bd9ead)):
 
     GitOrigin-RevId: 793cf3327696465ea89fdfcf078f26594832a666
@@ -173,9 +308,37 @@ If this pull request
 
     GitOrigin-RevId: 1a115d9e2055bbf9a0bb4ecf7c6a266b2b70a8cd
 
+* **changelog-oel:** Choose identity schema in self-service registration and login flows ([a398b64](https://github.com/ory/hydra/commit/a398b6444bff9476b2768e9e5f840bcf73fff3a6)):
+
+    GitOrigin-RevId: 8d6ee03cc8181d3277100a4b7412a3a113799964
+
+* **changelog-oel:** Improved tracing and metrics for the high-performance SQL connection pool ([17a4c4f](https://github.com/ory/hydra/commit/17a4c4fac55a210282cfed8130ec3d8709714fb5)):
+
+    GitOrigin-RevId: 9480f8997f7641b0f1276ca2ae0f25781428fdbc
+
+* **changelog-oel:** Reduce hydra CPU and memory consumption ([018709e](https://github.com/ory/hydra/commit/018709e32ea23448d751d93cb48cb5325af76115)):
+
+    GitOrigin-RevId: 97616b1f6bf80f358621a85798eeb2ebba6f543a
+
 * **changelog:** Graceful refresh count limit ([470713d](https://github.com/ory/hydra/commit/470713da36862745ca0222c284e0692fa40559ae)):
 
     GitOrigin-RevId: 7f8bf5fee8b06490f888590054d2dcd2f1cf2cba
+
+* **changelog:** Migrate http router to stdlib router ([a147e3b](https://github.com/ory/hydra/commit/a147e3b64007a3c7b2c5dd0351321c1aa92d5b70)):
+
+    GitOrigin-RevId: ebd7ec330a4f7b9826cb70ba36ba2f727ea64c96
+
+* Domain telemetry improvements ([abd5f04](https://github.com/ory/hydra/commit/abd5f04a9886eb3b073ecaf1f0a10663ce21c35c)):
+
+    GitOrigin-RevId: 9a0825160976ff16b7a39024e650ecfaf9ce82a5
+
+* **hydra:** Configurable JWK cache ([994ea18](https://github.com/ory/hydra/commit/994ea185c3b83f99e2268ad829f000f6088630c4)):
+
+    GitOrigin-RevId: df13370ef307aaff3f964f70dc188254c2659eb4
+
+* **hydra:** Split up persister ([bea6b4d](https://github.com/ory/hydra/commit/bea6b4dd4cd227f4674f36885b12fc6afa8ce041)):
+
+    GitOrigin-RevId: 203cf926c1613fcbb20393c5b7d0af25c7aecb15
 
 * Implement RFC 8628 ([#3912](https://github.com/ory/hydra/issues/3912)) ([5215d24](https://github.com/ory/hydra/commit/5215d2482adc6328f6ed78ac7799f1f5243d1e7f)), closes [#3851](https://github.com/ory/hydra/issues/3851) [#3252](https://github.com/ory/hydra/issues/3252) [#3230](https://github.com/ory/hydra/issues/3230) [#2416](https://github.com/ory/hydra/issues/2416):
 
@@ -205,6 +368,10 @@ If this pull request
     implementation can be found
     [here](https://github.com/ory/hydra-login-consent-node/blob/99ca6ad544f64110706c289dda74c7c622ec3110/src/routes/device.ts).
 
+* Improve domain telemetry for OSS (Hydra & Kratos) ([02c5757](https://github.com/ory/hydra/commit/02c575751089688dba55b58b5aec7673796b2c2a)):
+
+    GitOrigin-RevId: b8aebb0ad8bae28ee8295b9052b2f60603244b7e
+
 * Improve oauth2 event data ([#3975](https://github.com/ory/hydra/issues/3975)) ([6da0fd3](https://github.com/ory/hydra/commit/6da0fd327e16d0bf40a5f637766a11b087e7ff1e))
 * Improve openapi spec ([#3908](https://github.com/ory/hydra/issues/3908)) ([4053c9e](https://github.com/ory/hydra/commit/4053c9ecc19f50a3793c595eeb3e242a47bbedf0)), closes [#1234](https://github.com/ory/hydra/issues/1234) [#1234](https://github.com/ory/hydra/issues/1234):
 
@@ -226,6 +393,10 @@ If this pull request
 * Monorepo ([a77b206](https://github.com/ory/hydra/commit/a77b20608238b292192498bc35a20ebd0e47c9f0)):
 
     GitOrigin-RevId: dbb48d171fad1f9b4fd31385f0ef4fb01e39e823
+
+* Move config testhelpers to ory/x ([3a4ba08](https://github.com/ory/hydra/commit/3a4ba084c74cf49a521856f150a8a2c6f3c1aa25)):
+
+    GitOrigin-RevId: fd484445e9715760231f7f86ec212d094e826377
 
 * Revoke Kratos session asynchronously ([#3936](https://github.com/ory/hydra/issues/3936)) ([a0e7ee2](https://github.com/ory/hydra/commit/a0e7ee29298d4f882a7d471e0601b01c6848c40d)):
 
@@ -306,9 +477,17 @@ If this pull request
     POST admin/oauth2/auth/sessions/consent?consent_challenge_id=G_TIM3XABG14UwIgDoT1DRfipjhC1uix
     ```
 
+* Use stdlib HTTP router in Kratos ([8f81931](https://github.com/ory/hydra/commit/8f8193179a39dc142d502fbc559891ffa0385ed8)):
+
+    GitOrigin-RevId: 799513e99acbf43a05fe3113ffda45d2fff2a9e0
+
 * Use vendored jackson ([a0a9062](https://github.com/ory/hydra/commit/a0a906211bce4ced3e1f4324eb9d287ef10892a6)):
 
     GitOrigin-RevId: 591238768218ba2b5af93f91ac7e16f4c170da5b
+
+* Use vendored ory/x ([6581e01](https://github.com/ory/hydra/commit/6581e01679b2e146433061cbaaebb80a0e3905b5)):
+
+    GitOrigin-RevId: 994f3b754946ca5b2bd1bab0fe20532f5d5ab62f
 
 
 ### Performance Improvements
@@ -317,10 +496,57 @@ If this pull request
 
     GitOrigin-RevId: 93e0aca39592dbd249c4df90506fa416bfdcaab4
 
+* Index hint for CRDB consents query ([919b73f](https://github.com/ory/hydra/commit/919b73ff72c9ca154fdb8cea0ac50b944a5f437e)):
+
+    GitOrigin-RevId: 904364440d044c3aca1363a8fc050a7dc85ea540
+
 
 ### Tests
 
+* Add golangci-lint config and GHA ([1209de7](https://github.com/ory/hydra/commit/1209de78736c6730fa84cbf4e7046535aeba094f)):
+
+    GitOrigin-RevId: eb14c9f38e2b98d11a78ee0b90fd8f4f689abd3d
+
+* Ensure current encoded flows stay valid ([f4301e6](https://github.com/ory/hydra/commit/f4301e6d58919288935690576a24cd2dd57ddbb0)):
+
+    GitOrigin-RevId: 0249285c84d30c51f071c07523c48c7cee725515
+
+* **hydra:** Add snapshots for login & consent requests ([687cfae](https://github.com/ory/hydra/commit/687cfae2092b90bcde11b0976b3f944bc8bb9a4a)):
+
+    GitOrigin-RevId: 47d041cf207af6c3e9e21bf3016e5ea0cf044344
+
+* **hydra:** Clean oauth2 session setup ([699e382](https://github.com/ory/hydra/commit/699e38238220f857148b503dfb96d9b057bb4583)):
+
+    GitOrigin-RevId: e05097c7439096cf40fdcf059b3396970b2f1219
+
+* **hydra:** Clean up some helpers ([7840b0e](https://github.com/ory/hydra/commit/7840b0e0aade3b8fac6f1677a75b192e9c094b23)):
+
+    GitOrigin-RevId: 2b93dfbc4c27602a6ad053ccd0f25962f600419f
+
+* **hydra:** Convert custom JWT claim tests to table ([8391d1b](https://github.com/ory/hydra/commit/8391d1bc57a85420f50c2e0b856a509b6784963d)):
+
+    GitOrigin-RevId: c0114d299bdec370104e8ad0b3042d3a3c045bb1
+
+* **hydra:** New and better e2e go tests ([aefe5e2](https://github.com/ory/hydra/commit/aefe5e2663608ec945dc49be466d48c0d43810f2)):
+
+    GitOrigin-RevId: 23a73e451286556fb6b0072c5b348eee137f1310
+
+* **hydra:** Refactor consent handler tests ([4d61925](https://github.com/ory/hydra/commit/4d6192599dc4f1020e8c5418398c6a85820c74cb)):
+
+    GitOrigin-RevId: 77753f8e0018eaef2bc17b73d456de5b7b0585b1
+
 * Parallelize and improve ([#3989](https://github.com/ory/hydra/issues/3989)) ([a47e395](https://github.com/ory/hydra/commit/a47e39513f1f08076849f77517977abffa195364))
+* Resturcture and improve integration tests ([2769a75](https://github.com/ory/hydra/commit/2769a75d0c911803485002c63453f1fdcf967ba6)):
+
+    GitOrigin-RevId: 83dfe53cfc33f0a974d7b2f7eeed81d017d2518c
+
+
+### Unclassified
+
+* Merge 3834fab8c161a7dc98d43f32acf8efd9e6e95352 into 4dae0f4a8785eb36d8dbb27137f6b924c1e0f0b5 ([dc84053](https://github.com/ory/hydra/commit/dc840535c19d58caf130966e00d3d2fe9f3eb577)):
+
+    GitOrigin-RevId: 0c2dcaa065b64d2aafbcfd49c79363a214c5b2aa
+
 
 
 # [2.3.0](https://github.com/ory/hydra/compare/v2.2.0...v2.3.0) (2025-01-17)
@@ -547,10 +773,6 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 
 ### Reverts
 
-* Revert "chore/remove-nsswitch-hosts" ([a9930c0](https://github.com/ory/hydra/commit/a9930c07f60e81aa795ec0809466f34a22e54f4f)):
-
-    This reverts commit 12b08de4c75a25a4b73e89fb9543560ae5483038.
-
 * Revert "chore: Revise scratch image" ([de90d0b](https://github.com/ory/hydra/commit/de90d0b4118950c1270258a3923992c71c53bb18)):
 
     This reverts commit 19ce7f1addff17558ffcb735d1605fb5400f1bb6.
@@ -578,10 +800,6 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 * Revert "chore: `Dockerfile-alpine` - Add commentary" ([a7e6dd5](https://github.com/ory/hydra/commit/a7e6dd56a567f020ef35e15c371692d1f85bd58f)):
 
     This reverts commit b2f202c4d9d176abb7178ce6e0714c7d40c05b59.
-
-* Revert "fix: improve docker set up" ([350ad6a](https://github.com/ory/hydra/commit/350ad6ac1a6c5a081073eb2bbe155e90c2f95e02)):
-
-    This reverts commit 9378b07518cd2e673983e42e52100216647656b5.
 
 * Revert "chore: synchronize workspaces" ([c3e4d59](https://github.com/ory/hydra/commit/c3e4d595f883a69a545fec3dc91c66121bc44a7c)):
 
@@ -622,14 +840,6 @@ Deleting consents no longer returns 404 in certain edge cases but instead always
 * Revert "chore: synchronize workspaces" ([185e54d](https://github.com/ory/hydra/commit/185e54d7aa6cc0206a87c67663aa41fe728ab062)):
 
     This reverts commit 9d222e5f57e930c76e4fcae0278f98743051f913.
-
-* Revert "Update .docker/README.md" ([47f6115](https://github.com/ory/hydra/commit/47f6115122d6df3230ccfb83c9b88de09287e2c6)):
-
-    This reverts commit d9f4fab98a3d9891d79d2a8b11c53ab3f935e8ae.
-
-* Revert "Update .docker/Dockerfile-local-build" ([ea0b6e1](https://github.com/ory/hydra/commit/ea0b6e1ff652b62379fe6b04158095ebb560139c)):
-
-    This reverts commit ba9196e9cd0b1261e3872d9c86f5a6ca64dbbbbd.
 
 * Revert "chore: synchronize workspaces" ([995b4be](https://github.com/ory/hydra/commit/995b4be68e91554007c7d9fd188fe76c16e6ee5e)):
 
@@ -731,7 +941,10 @@ autogen: pin v2.2.0-pre.1 release commit
     * fix: bump golangci-lint
 
 * Improved SSRF protection ([#3669](https://github.com/ory/hydra/issues/3669)) ([24c3be5](https://github.com/ory/hydra/commit/24c3be574a11a76e69f09a24754f20cf644b624c))
-* Incorrect down migration ([#3708](https://github.com/ory/hydra/issues/3708)) ([8812e0e](https://github.com/ory/hydra/commit/8812e0e67b1f192de4ab6819c8f2bb98e6a5b7a7)), closes [/github.com/ory/hydra/pull/3705#discussion_r1471514014](https://github.com//github.com/ory/hydra/pull/3705/issues/discussion_r1471514014)
+* Incorrect down migration ([#3708](https://github.com/ory/hydra/issues/3708)) ([8812e0e](https://github.com/ory/hydra/commit/8812e0e67b1f192de4ab6819c8f2bb98e6a5b7a7)):
+
+    See https://github.com/ory/hydra/pull/3705#discussion_r1471514014
+
 * Remove required mark ([#3693](https://github.com/ory/hydra/issues/3693)) ([3a764a0](https://github.com/ory/hydra/commit/3a764a053a3d7eab698668cf63d387ea76c1db40))
 * Timeout in jwt-bearer grants when too many grants are available ([#3692](https://github.com/ory/hydra/issues/3692)) ([a748797](https://github.com/ory/hydra/commit/a748797761f5503b048df1b57bcc406f16cd40a3))
 * Verifiable credentials JWT format ([#3614](https://github.com/ory/hydra/issues/3614)) ([0176adc](https://github.com/ory/hydra/commit/0176adc17848ab1dd021910ea31202dbdcd51737))
@@ -2165,7 +2378,7 @@ Signed-off-by: Grant Zvolsky <grant@zvolsky.org>
 * Respect local DNS restrictions ([7eb1d1c](https://github.com/ory/hydra/commit/7eb1d1c0ff7189bcd76792ac38e7425e9b7c6f86))
 * **sdk:** Add missing bearer security definition ([a85bc7a](https://github.com/ory/hydra/commit/a85bc7ab52aa6bce20eec52985a465fc31544b57))
 * **sdk:** Type nulls ([fe70395](https://github.com/ory/hydra/commit/fe70395ae58e52a573bfac7385941d4504a1e403))
-* Support alternate hashing algorithms for client secrets ([ddba42f](https://github.com/ory/hydra/commit/ddba42f49837c48d4ee9bf9203ffa81f3b31757c)), closes [rfc6819#section-5](https://github.com/rfc6819/issues/section-5) [/datatracker.ietf.org/doc/html/rfc6819#section-5](https://github.com//datatracker.ietf.org/doc/html/rfc6819/issues/section-5):
+* Support alternate hashing algorithms for client secrets ([ddba42f](https://github.com/ory/hydra/commit/ddba42f49837c48d4ee9bf9203ffa81f3b31757c)):
 
     This patch adds support for hashing client secrets using pbkdf2 instead of bcrypt, which might be a more appropriate algorithm in certain settings. As we assume that most environments fall in this category, we also changed the default to pbkdf2 with 25.000 rounds (roughly 1-3ms per hash on an Apple M1 Max core).
     
@@ -2174,6 +2387,16 @@ Signed-off-by: Grant Zvolsky <grant@zvolsky.org>
     As most client secrets are auto-generated, using high hash costs is not useful. The password (OAuth2 Client Secret) is not user chosen and unlikely to be reused. As such, there is little point in using excessive hash costs to protect users. High hash costs in a system like Ory Hydra will cause high CPU costs from mostly automated traffic (OAuth2 Client interactions). It has also been a point of critizism from some who wish for better RPS on specific endpoints.
     
     Other systems like Keycloak do not [hash client secrets at all](https://groups.google.com/g/keycloak-dev/c/TmsNfnol0_g), referencing more secure authentication mechanisms such as assertion-based client authentication.
+    
+    We and the IETF disagree though, as [rfc6819#section-5.1.4.1.3](https://datatracker.ietf.org/doc/html/rfc6819#section-5.1.4.1.3) states:
+    
+    > The authorization server should not store credentials in clear text.
+       Typical approaches are to store hashes instead or to encrypt
+       credentials.  If the credential lacks a reasonable entropy level
+       (because it is a user password), an additional salt will harden the
+       storage to make offline dictionary attacks more difficult.
+    
+    For that reason, cleartext storage of client secrets is not going to be supported.
 
 * Support ES256 for generating JWTs ([9a080ad](https://github.com/ory/hydra/commit/9a080ad2fa75c932da6ec0a40602cbfdeee8fd94))
 * Switch to otelx ([#3108](https://github.com/ory/hydra/issues/3108)) ([05eaf6d](https://github.com/ory/hydra/commit/05eaf6d3be68f52cbed4de2a8586bfa777d1187f))
@@ -2493,9 +2716,11 @@ Ory Hydra moved from CircleCI to GitHub Actions!
 
 * Add cloud ([76d4d80](https://github.com/ory/hydra/commit/76d4d805b5f25bc5b9f8fdf2ab3b1660968f3ad3))
 * Add options for using SQLite & Cockroach DB to 5min tutorial, fix typo in contribution guidelines ([#2970](https://github.com/ory/hydra/issues/2970)) ([05038de](https://github.com/ory/hydra/commit/05038deebc170258813839ea04caa351aec03639))
-* Recommend to start with one container in prod to complete first-time setup. ([#2945](https://github.com/ory/hydra/issues/2945)) ([e257f3e](https://github.com/ory/hydra/commit/e257f3e6a4549b07533557aab941e5a1aa45337e)), closes [/github.com/ory/hydra/discussions/2943#discussioncomment-1997531](https://github.com//github.com/ory/hydra/discussions/2943/issues/discussioncomment-1997531):
+* Recommend to start with one container in prod to complete first-time setup. ([#2945](https://github.com/ory/hydra/issues/2945)) ([e257f3e](https://github.com/ory/hydra/commit/e257f3e6a4549b07533557aab941e5a1aa45337e)):
 
     This is to ensure multiple concurrent workers don't both generate JWKs needlessly, for example.
+    
+    See https://github.com/ory/hydra/discussions/2943#discussioncomment-1997531
 
 * Update readme ([2b1fb64](https://github.com/ory/hydra/commit/2b1fb6421dd25f38aacc6192895be950874fcb7e))
 
@@ -3030,7 +3255,12 @@ To follow OAuth2 best-practice, refresh tokens will now invalidate the whole acc
     
     This patch phases out the `/oauth2/flush` endpoint as the janitor is better suited for background tasks, is easier to run in a targeted fashion (e.g. as a singleton job), and does not cause HTTP timeouts.
 
-* Flush refresh tokens for service oauth2/flush ([#2373](https://github.com/ory/hydra/issues/2373)) ([b46a14c](https://github.com/ory/hydra/commit/b46a14cd6d260a7dee748de34abfea54908f1a0b)), closes [/github.com/ory/hydra/issues/1574#issuecomment-736684327](https://github.com//github.com/ory/hydra/issues/1574/issues/issuecomment-736684327)
+* Flush refresh tokens for service oauth2/flush ([#2373](https://github.com/ory/hydra/issues/2373)) ([b46a14c](https://github.com/ory/hydra/commit/b46a14cd6d260a7dee748de34abfea54908f1a0b)):
+
+    See https://github.com/ory/hydra/issues/1574#issuecomment-736684327
+    
+    
+
 * Move to go 1.16 and static embed files ([6fa591c](https://github.com/ory/hydra/commit/6fa591c849c3d63b036d7a4001496f42f02b821b))
 * Refresh token reuse detection ([#2383](https://github.com/ory/hydra/issues/2383)) ([bc349f1](https://github.com/ory/hydra/commit/bc349f1fbaf19340081d9a6c097de2b76e848e46)), closes [#2022](https://github.com/ory/hydra/issues/2022):
 
@@ -3980,9 +4210,15 @@ If you haven't yet, consider joining our [Slack family](https://slack.ory.sh)!
 * Add config schema for log.leak_sensitive_values ([#1905](https://github.com/ory/hydra/issues/1905)) ([d954649](https://github.com/ory/hydra/commit/d954649cd382728b7ec8b58b56e75d2f0913d75a))
 * Properly return when subject is empty ([#1909](https://github.com/ory/hydra/issues/1909)) ([5b54519](https://github.com/ory/hydra/commit/5b5451929196eaa09a2fa21b1fbb5797693bf897)), closes [#1842](https://github.com/ory/hydra/issues/1842)
 * Remove duplicated tracing logger ([#1900](https://github.com/ory/hydra/issues/1900)) ([48c2c6d](https://github.com/ory/hydra/commit/48c2c6de27a7ec73c77cb29c86578b8ca78885e8))
-* Same site legacy workaround on iOS 12 ([#1908](https://github.com/ory/hydra/issues/1908)) ([128ad98](https://github.com/ory/hydra/commit/128ad987d548e719b62e789264a82ef5e611ff59)), closes [#1810](https://github.com/ory/hydra/issues/1810) [/github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go#L221](https://github.com//github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go/issues/L221) [/tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4](https://github.com//tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00/issues/section-4) [239226#L118](https://github.com/239226/issues/L118) [#1907](https://github.com/ory/hydra/issues/1907):
+* Same site legacy workaround on iOS 12 ([#1908](https://github.com/ory/hydra/issues/1908)) ([128ad98](https://github.com/ory/hydra/commit/128ad987d548e719b62e789264a82ef5e611ff59)), closes [#1907](https://github.com/ory/hydra/issues/1907):
 
     Enables legacy compatibility on iOS version < 13 and macOS version < 10.15
+    
+    #1810 incorrectly implements https://web.dev/samesite-cookie-recipes/#handling-incompatible-clients
+    
+    Notice Set-cookie: 3pcookie-legacy=value; Secure the cookie does not have the SameSite attribute present. The http.SameSiteDefaultMode used in hydra implementation results in attribute without the value, see https://github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go#L221
+    
+    That triggers the problems with the older iOS and macOS versions, as Apple did not follow the https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4.1 see https://trac.webkit.org/browser/webkit/trunk/Source/WebInspectorUI/UserInterface/Models/Cookie.js?rev=239226#L118
 
 * Use .bin in PATH and improve CI tasks ([#1897](https://github.com/ory/hydra/issues/1897)) ([9c6eba8](https://github.com/ory/hydra/commit/9c6eba8d0611fb4a79820a90c31f72eb578ca3d5))
 
@@ -5642,7 +5878,12 @@ ci: Use yaml in configuration docs runner
     
     
 
-* Bump Golang to 1.12.1 ([#1315](https://github.com/ory/hydra/issues/1315)) ([a073966](https://github.com/ory/hydra/commit/a0739661340f67ff541a4987e1c8bd224d8b9851)), closes [/golang.org/doc/devel/release.html#go1](https://github.com//golang.org/doc/devel/release.html/issues/go1)
+* Bump Golang to 1.12.1 ([#1315](https://github.com/ory/hydra/issues/1315)) ([a073966](https://github.com/ory/hydra/commit/a0739661340f67ff541a4987e1c8bd224d8b9851)):
+
+    https://golang.org/doc/devel/release.html#go1.12.minor
+    
+    
+
 * Bump ory/x to 0.0.35 ([#1267](https://github.com/ory/hydra/issues/1267)) ([b503e15](https://github.com/ory/hydra/commit/b503e151f25021958099e31ba2162d879d3cc7d3)), closes [#1266](https://github.com/ory/hydra/issues/1266)
 * Bump testify and crypto ([#1262](https://github.com/ory/hydra/issues/1262)) ([5eadbe5](https://github.com/ory/hydra/commit/5eadbe5d0409cfc0805cd15d50f57a57cc5e2248))
 * Disable modules temporarily when fetching a tool ([#1302](https://github.com/ory/hydra/issues/1302)) ([bd5b90b](https://github.com/ory/hydra/commit/bd5b90b1a71fb431cc917640acca230bcf09cbfd))

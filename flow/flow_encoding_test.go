@@ -5,6 +5,12 @@ package flow_test
 
 import (
 	"context"
+	"embed"
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,6 +26,9 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/contextx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -31,15 +40,55 @@ func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 		NID:               nid,
 		RequestedScope:    []string{"openid", "profile"},
 		RequestedAudience: []string{"https://api.example.org"},
+		LoginSkip:         true,
 		Subject:           "test-subject",
+		OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
+			ACRValues:         []string{"http://acrvalues.example.org"},
+			UILocales:         []string{"en-US", "en-GB"},
+			Display:           "page",
+			IDTokenHintClaims: map[string]interface{}{"email": "user@example.org"},
+			LoginHint:         "login-hint",
+		},
 		Client: &client.Client{
 			ID:  "a12bf95e-ccfc-45fc-b10d-1358790772c7",
 			NID: nid,
 		},
-		RequestURL:  "https://example.org/oauth2/auth?client_id=test",
-		SessionID:   "session-123",
-		RequestedAt: time.Now(),
-		State:       state,
+		ClientID:                   "a12bf95e-ccfc-45fc-b10d-1358790772c7",
+		RequestURL:                 "https://example.org/oauth2/auth?client_id=test",
+		SessionID:                  "session-123",
+		IdentityProviderSessionID:  "session-id",
+		LoginVerifier:              "login-verifier",
+		LoginCSRF:                  "login-csrf",
+		LoginInitializedAt:         sqlxx.NullTime(time.Date(2025, 10, 9, 12, 51, 0, 0, time.UTC)),
+		RequestedAt:                time.Now(),
+		State:                      state,
+		LoginRemember:              true,
+		LoginRememberFor:           3000,
+		LoginExtendSessionLifespan: true,
+		ACR:                        "http://acrvalues.example.org",
+		AMR:                        []string{"pwd"},
+		ForceSubjectIdentifier:     "forced-subject",
+		Context:                    sqlxx.JSONRawMessage(`{"foo":"bar"}`),
+		LoginWasUsed:               state == flow.FlowStateLoginUsed,
+		LoginAuthenticatedAt:       sqlxx.NullTime(time.Date(2025, 10, 9, 12, 52, 0, 0, time.UTC)),
+		DeviceChallengeID:          "device-challenge",
+		DeviceCodeRequestID:        "device-code-request",
+		DeviceVerifier:             "device-verifier",
+		DeviceCSRF:                 "device-csrf",
+		DeviceWasUsed:              sqlxx.NullBool{Bool: state == flow.DeviceFlowStateUsed, Valid: true},
+		DeviceHandledAt:            sqlxx.NullTime{},
+		ConsentRequestID:           "consent-request",
+		ConsentSkip:                true,
+		ConsentVerifier:            "consent-verifier",
+		ConsentCSRF:                "consent-csrf",
+		GrantedScope:               []string{"openid"},
+		GrantedAudience:            []string{"https://api.example.org"},
+		ConsentRemember:            true,
+		ConsentRememberFor:         pointerx.Ptr(3000),
+		ConsentHandledAt:           sqlxx.NullTime{},
+		ConsentWasHandled:          state == flow.FlowStateConsentUsed,
+		SessionIDToken:             map[string]interface{}{"sub": "test-subject", "foo": "bar"},
+		SessionAccessToken:         map[string]interface{}{"scp": []string{"openid", "profile"}, "aud": []string{"https://api.example.org"}},
 	}
 }
 
@@ -543,4 +592,88 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 		assert.True(t, decoded.ConsentWasHandled)
 		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State)
 	})
+}
+
+var (
+	//go:embed fixtures/legacy_challenges/*.txt
+	LegacyChallenges    embed.FS
+	legacyChallengesNID = uuid.Must(uuid.FromString("34b4dd42-f02b-4448-b066-8e4e6655c0bb"))
+)
+
+func TestCanUseLegacyChallenges(t *testing.T) {
+	reg := testhelpers.NewRegistryMemory(t,
+		driver.WithConfigOptions(
+			configx.WithValue(config.KeyGetSystemSecret, []string{"well-known-fixture-secret"}),
+			configx.WithValue(config.KeyConsentRequestMaxAge, 100*365*24*time.Hour), // 100 years, effectively disabling expiration
+		),
+		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: legacyChallengesNID})),
+	)
+
+	require.NoError(t, fs.WalkDir(LegacyChallenges, "fixtures/legacy_challenges", func(path string, d fs.DirEntry, err error) error {
+		require.NoError(t, err)
+		if d.IsDir() {
+			return nil
+		}
+		t.Run(strings.TrimSuffix(d.Name(), ".txt"), func(t *testing.T) {
+			content, err := fs.ReadFile(LegacyChallenges, path)
+			require.NoError(t, err)
+
+			var f *flow.Flow
+			switch {
+			case strings.Contains(d.Name(), "login"):
+				f, err = flow.DecodeFromLoginChallenge(t.Context(), reg, string(content))
+			case strings.Contains(d.Name(), "consent"):
+				f, err = flow.DecodeFromConsentChallenge(t.Context(), reg, string(content))
+			case strings.Contains(d.Name(), "device"):
+				f, err = flow.DecodeFromDeviceChallenge(t.Context(), reg, string(content))
+			default:
+				t.Fatalf("unknown challenge type in file name: %s", d.Name())
+			}
+			require.NoErrorf(t, err, "failed to decode challenge from file: %s\n%+v", d.Name(), errors.Unwrap(errors.Unwrap(err)))
+
+			snapshotx.SnapshotT(t, f)
+		})
+		return nil
+	}))
+}
+
+func TestUpdateLegacyChallenges(t *testing.T) {
+	t.Skip("this test is used to update the fixtures only, they should not be updated unless we have a breaking change (so probably never)")
+
+	reg := testhelpers.NewRegistryMemory(t,
+		driver.WithConfigOptions(configx.WithValue(config.KeyGetSystemSecret, []string{"well-known-fixture-secret"})),
+		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: legacyChallengesNID})),
+	)
+
+	for name, flowState := range map[string]flow.State{
+		"login_initialized":   flow.FlowStateLoginInitialized,
+		"login_unused":        flow.FlowStateLoginUnused,
+		"login_used":          flow.FlowStateLoginUsed,
+		"login_error":         flow.FlowStateLoginError,
+		"consent_initialized": flow.FlowStateConsentInitialized,
+		"consent_unused":      flow.FlowStateConsentUnused,
+		"consent_used":        flow.FlowStateConsentUsed,
+		"consent_error":       flow.FlowStateConsentError,
+		"device_initialized":  flow.DeviceFlowStateInitialized,
+		"device_unused":       flow.DeviceFlowStateUnused,
+		"device_used":         flow.DeviceFlowStateUsed,
+		"device_error":        flow.DeviceFlowStateError,
+	} {
+		f := createTestFlow(legacyChallengesNID, flowState)
+		var challenge string
+		var err error
+		switch flowState {
+		case flow.FlowStateLoginInitialized, flow.FlowStateLoginUnused, flow.FlowStateLoginUsed, flow.FlowStateLoginError:
+			challenge, err = f.ToLoginChallenge(t.Context(), reg)
+		case flow.FlowStateConsentInitialized, flow.FlowStateConsentUnused, flow.FlowStateConsentUsed, flow.FlowStateConsentError:
+			challenge, err = f.ToConsentChallenge(t.Context(), reg)
+		case flow.DeviceFlowStateInitialized, flow.DeviceFlowStateUnused, flow.DeviceFlowStateUsed, flow.DeviceFlowStateError:
+			challenge, err = f.ToDeviceChallenge(t.Context(), reg)
+		default:
+			t.Fatalf("unknown flow state: %d", flowState)
+		}
+		require.NoError(t, err)
+
+		require.NoError(t, os.WriteFile(fmt.Sprintf("fixtures/legacy_challenges/%s.txt", name), []byte(challenge), 0644))
+	}
 }

@@ -7,8 +7,22 @@
   "ra": [
     "https://api.example.org"
   ],
+  "ls": true,
   "s": "test-subject",
-  "oc": null,
+  "oc": {
+    "acr_values": [
+      "http://acrvalues.example.org"
+    ],
+    "ui_locales": [
+      "en-US",
+      "en-GB"
+    ],
+    "display": "page",
+    "id_token_hint_claims": {
+      "email": "user@example.org"
+    },
+    "login_hint": "login-hint"
+  },
   "c": {
     "client_id": "a12bf95e-ccfc-45fc-b10d-1358790772c7",
     "client_name": "",
@@ -47,15 +61,54 @@
   "ci": "a12bf95e-ccfc-45fc-b10d-1358790772c7",
   "r": "https://example.org/oauth2/auth?client_id=test",
   "si": "session-123",
-  "li": null,
+  "is": "session-id",
+  "lv": "login-verifier",
+  "lc": "login-csrf",
+  "li": "2025-10-09T12:51:00Z",
   "q": 1,
-  "ct": null,
-  "la": null,
-  "du": null,
+  "lr": true,
+  "lf": 3000,
+  "ll": true,
+  "a": "http://acrvalues.example.org",
+  "am": [
+    "pwd"
+  ],
+  "fs": "forced-subject",
+  "ct": {
+    "foo": "bar"
+  },
+  "la": "2025-10-09T12:52:00Z",
+  "di": "device-challenge",
+  "dr": "device-code-request",
+  "dv": "device-verifier",
+  "dc": "device-csrf",
+  "du": false,
   "dh": null,
-  "cf": null,
+  "cc": "consent-request",
+  "cs": true,
+  "cv": "consent-verifier",
+  "cr": "consent-csrf",
+  "gs": [
+    "openid"
+  ],
+  "ga": [
+    "https://api.example.org"
+  ],
+  "ce": true,
+  "cf": 3000,
   "ch": null,
   "cx": null,
-  "st": null,
-  "sa": null
+  "st": {
+    "foo": "bar",
+    "sub": "test-subject"
+  },
+  "sa": {
+    "aud": [
+      "https://api.example.org"
+    ],
+    "scp": [
+      "openid",
+      "profile"
+    ]
+  }
 }

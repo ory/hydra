@@ -1,5 +1,6 @@
 {
   "i": "a12bf95e-ccfc-45fc-b10d-1358790772c7",
+  "n": "34b4dd42-f02b-4448-b066-8e4e6655c0bb",
   "rs": [
     "openid",
     "profile"
@@ -65,7 +66,8 @@
   "lv": "login-verifier",
   "lc": "login-csrf",
   "li": "2025-10-09T12:51:00Z",
-  "q": 3,
+  "ia": "2025-10-09T14:04:36.552604+02:00",
+  "q": 127,
   "lr": true,
   "lf": 3000,
   "ll": true,
@@ -77,7 +79,6 @@
   "ct": {
     "foo": "bar"
   },
-  "lu": true,
   "la": "2025-10-09T12:52:00Z",
   "di": "device-challenge",
   "dr": "device-code-request",

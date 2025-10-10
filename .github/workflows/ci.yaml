@@ -167,19 +167,6 @@ jobs:
           token: ${{ secrets.ORY_BOT_PAT }}
           output-dir: docs/hydra/cli
 
-  changelog:
-    name: Generate changelog
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' || github.ref_name == 'master' }}
-    needs:
-      - test
-      - test-hsm
-      - test-e2e
-    steps:
-      - uses: ory/ci/changelog@master
-        with:
-          token: ${{ secrets.ORY_BOT_PAT }}
-
   release:
     name: Generate release
     runs-on: ubuntu-latest
@@ -189,7 +176,6 @@ jobs:
       - test
       - test-hsm
       - test-e2e
-      - changelog
     steps:
       - uses: ory/ci/releaser@master
         with:
@@ -198,18 +184,6 @@ jobs:
           cosign_pwd: ${{ secrets.COSIGN_PWD }}
           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
           docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  render-version-schema:
-    name: Render version schema
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - release
-    steps:
-      - uses: ory/ci/releaser/render-version-schema@master
-        with:
-          schema-path: .schema/config.schema.json
-          token: ${{ secrets.ORY_BOT_PAT }}
 
   newsletter-draft:
     name: Draft newsletter

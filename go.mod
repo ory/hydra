@@ -3,6 +3,7 @@ module github.com/ory/hydra/v2
 go 1.25
 
 replace (
+	github.com/ory/fosite => github.com/mitar/fosite v0.31.1-0.20251014211448-cb0c65e6d93e
 	github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 	github.com/ory/x => ./oryx
 )
@@ -13,7 +14,7 @@ require (
 	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/fatih/structs v1.1.0
 	github.com/go-faker/faker/v4 v4.6.0
-	github.com/go-jose/go-jose/v3 v3.0.4
+	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.0

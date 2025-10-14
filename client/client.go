@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/gofrs/uuid"
 	"github.com/twmb/murmur3"
 

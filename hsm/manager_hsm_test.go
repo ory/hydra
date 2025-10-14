@@ -18,8 +18,8 @@ import (
 	"testing"
 
 	"github.com/ThalesGroup/crypto11"
-	"github.com/go-jose/go-jose/v3"
-	"github.com/go-jose/go-jose/v3/cryptosigner"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/cryptosigner"
 	"github.com/golang/mock/gomock"
 	"github.com/miekg/pkcs11"
 	"github.com/pborman/uuid"

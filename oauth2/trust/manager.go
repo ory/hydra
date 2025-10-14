@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/gofrs/uuid"
 
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"

@@ -4,7 +4,7 @@
 package cli
 
 import (
-	jose "github.com/go-jose/go-jose/v3"
+	jose "github.com/go-jose/go-jose/v4"
 )
 
 func ToSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {

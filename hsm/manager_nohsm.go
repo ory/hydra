@@ -17,7 +17,7 @@ import (
 
 	"github.com/ory/hydra/v2/jwk"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 )
 
 type Context interface {

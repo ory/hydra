@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/go-faker/faker/v4"
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

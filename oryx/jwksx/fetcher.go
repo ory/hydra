@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/pkg/errors"
 )
 

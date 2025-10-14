@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	jjson "github.com/go-jose/go-jose/v3/json"
+	jjson "github.com/go-jose/go-jose/v4/json"
 	"github.com/mohae/deepcopy"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"

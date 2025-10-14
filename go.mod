@@ -3,6 +3,7 @@ module github.com/ory/hydra/v2
 go 1.25
 
 replace (
+	github.com/ory/fosite => github.com/mitar/fosite v0.31.1-0.20251014211448-cb0c65e6d93e
 	github.com/ory/hydra-client-go/v2 => ./internal/httpclient
 	github.com/ory/x => ./oryx
 )
@@ -107,6 +108,7 @@ require (
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/analysis v0.23.0 // indirect

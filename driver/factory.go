@@ -7,8 +7,9 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/ory/pop/v6"
 	"github.com/pkg/errors"
+
+	"github.com/ory/pop/v6"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"

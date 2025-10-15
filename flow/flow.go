@@ -177,11 +177,9 @@ type Flow struct {
 	// If specified, we will use this value to propagate the logout.
 	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id" json:"is,omitempty"`
 
-	LoginVerifier string `db:"login_verifier" json:"lv,omitempty"`
-	LoginCSRF     string `db:"login_csrf" json:"lc,omitempty"`
+	LoginCSRF string `db:"login_csrf" json:"lc,omitempty"`
 
-	LoginInitializedAt sqlxx.NullTime `db:"login_initialized_at" json:"li,omitempty"`
-	RequestedAt        time.Time      `db:"requested_at" json:"ia,omitempty"`
+	RequestedAt time.Time `db:"requested_at" json:"ia,omitempty"`
 
 	State State `db:"state" json:"q,omitempty"`
 
@@ -239,9 +237,7 @@ type Flow struct {
 	DeviceChallengeID sqlxx.NullString `db:"device_challenge_id" json:"di,omitempty"`
 	// DeviceCodeRequestID is the device request's ID
 	DeviceCodeRequestID sqlxx.NullString `db:"device_code_request_id" json:"dr,omitempty"`
-	// DeviceVerifier is the device request's verifier
-	DeviceVerifier sqlxx.NullString `db:"device_verifier" json:"dv,omitempty"`
-	// DeviceVerifier is the device request's CSRF
+	// DeviceCSRF is the device request's CSRF
 	DeviceCSRF sqlxx.NullString `db:"device_csrf" json:"dc,omitempty"`
 	// DeviceHandledAt contains the timestamp the device user_code verification request was handled
 	DeviceHandledAt sqlxx.NullTime `db:"device_handled_at" json:"dh,omitempty"`
@@ -252,9 +248,8 @@ type Flow struct {
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
-	ConsentSkip     bool             `db:"consent_skip" json:"cs,omitempty"`
-	ConsentVerifier sqlxx.NullString `db:"consent_verifier" json:"cv,omitempty"`
-	ConsentCSRF     sqlxx.NullString `db:"consent_csrf" json:"cr,omitempty"`
+	ConsentSkip bool             `db:"consent_skip" json:"cs,omitempty"`
+	ConsentCSRF sqlxx.NullString `db:"consent_csrf" json:"cr,omitempty"`
 
 	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `db:"granted_scope" json:"gs,omitempty"`
@@ -362,22 +357,15 @@ func (f *Flow) HandleLoginError(er *RequestDeniedError) error {
 
 func (f *Flow) GetLoginRequest() *LoginRequest {
 	return &LoginRequest{
-		ID:                     f.ID,
-		RequestedScope:         f.RequestedScope,
-		RequestedAudience:      f.RequestedAudience,
-		Skip:                   f.LoginSkip,
-		Subject:                f.Subject,
-		OpenIDConnectContext:   f.OpenIDConnectContext,
-		Client:                 f.Client,
-		ClientID:               f.ClientID,
-		RequestURL:             f.RequestURL,
-		SessionID:              f.SessionID,
-		WasHandled:             f.State.LoginWasUsed(),
-		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
-		Verifier:               f.LoginVerifier,
-		CSRF:                   f.LoginCSRF,
-		AuthenticatedAt:        f.LoginAuthenticatedAt,
-		RequestedAt:            f.RequestedAt,
+		ID:                   f.ID,
+		RequestedScope:       f.RequestedScope,
+		RequestedAudience:    f.RequestedAudience,
+		Skip:                 f.LoginSkip,
+		Subject:              f.Subject,
+		OpenIDConnectContext: f.OpenIDConnectContext,
+		Client:               f.Client,
+		RequestURL:           f.RequestURL,
+		SessionID:            f.SessionID,
 	}
 }
 

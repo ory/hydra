@@ -15,9 +15,7 @@
   "ci": "client-0014",
   "r": "http://request/0006",
   "si": "auth_session-0006",
-  "lv": "verifier-0006",
   "lc": "csrf-0006",
-  "li": "2022-02-15T22:20:21Z",
   "ia": "2022-02-15T22:20:21Z",
   "q": 128,
   "lr": true,
@@ -37,7 +35,6 @@
   "dh": null,
   "cc": "challenge-0006",
   "cs": true,
-  "cv": "verifier-0006",
   "cr": "csrf-0006",
   "gs": [
     "granted_scope-0006_1"

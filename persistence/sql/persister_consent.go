@@ -171,8 +171,10 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 type flowWithConsentUsed struct {
 	*flow.Flow
 	// we need to write these columns because of the check constraint, but we will soon switch to a new table anyway that will not have them at all
-	ConsentUsed bool `db:"consent_was_used"`
-	LoginUsed   bool `db:"login_was_used"`
+	ConsentUsed     bool   `db:"consent_was_used"`
+	LoginUsed       bool   `db:"login_was_used"`
+	ConsentVerifier string `db:"consent_verifier"`
+	LoginVerifier   string `db:"login_verifier"`
 }
 
 func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
@@ -184,9 +186,11 @@ func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err
 	}
 
 	return sqlcon.HandleError(p.Connection(ctx).Create(&flowWithConsentUsed{
-		Flow:        f,
-		ConsentUsed: true,
-		LoginUsed:   true,
+		Flow:            f,
+		ConsentUsed:     true,
+		LoginUsed:       true,
+		ConsentVerifier: "",
+		LoginVerifier:   "",
 	}))
 }
 

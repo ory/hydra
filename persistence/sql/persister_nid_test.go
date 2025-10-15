@@ -1227,18 +1227,12 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 
 			t1f1 := newFlow(s.t1NID, c1.ID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
 			t1f1.ConsentRequestID = "t1f1-consent-challenge"
-			t1f1.LoginVerifier = "t1f1-login-verifier"
-			t1f1.ConsentVerifier = "t1f1-consent-verifier"
 
 			t2f1 := newFlow(s.t2NID, c1.ID, "sub", t1f1.SessionID)
 			t2f1.ConsentRequestID = "t2f1-consent-challenge"
-			t2f1.LoginVerifier = "t2f1-login-verifier"
-			t2f1.ConsentVerifier = "t2f1-consent-verifier"
 
 			t2f2 := newFlow(s.t2NID, c2.ID, "sub", t1f1.SessionID)
 			t2f2.ConsentRequestID = "t2f2-consent-challenge"
-			t2f2.LoginVerifier = "t2f2-login-verifier"
-			t2f2.ConsentVerifier = "t2f2-consent-verifier"
 
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: t1f1.SessionID.String()})
 
@@ -1272,18 +1266,12 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 
 			t1f1 := newFlow(s.t1NID, c1.ID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
 			t1f1.ConsentRequestID = "t1f1-consent-challenge"
-			t1f1.LoginVerifier = "t1f1-login-verifier"
-			t1f1.ConsentVerifier = "t1f1-consent-verifier"
 
 			t2f1 := newFlow(s.t2NID, c1.ID, "sub", t1f1.SessionID)
 			t2f1.ConsentRequestID = "t2f1-consent-challenge"
-			t2f1.LoginVerifier = "t2f1-login-verifier"
-			t2f1.ConsentVerifier = "t2f1-consent-verifier"
 
 			t2f2 := newFlow(s.t2NID, c2.ID, "sub", t1f1.SessionID)
 			t2f2.ConsentRequestID = "t2f2-consent-challenge"
-			t2f2.LoginVerifier = "t2f2-login-verifier"
-			t2f2.ConsentVerifier = "t2f2-consent-verifier"
 
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: t1f1.SessionID.String()})
 
@@ -1808,7 +1796,6 @@ func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.Nul
 		Context:          sqlxx.JSONRawMessage{},
 		AMR:              sqlxx.StringSliceJSONFormat{},
 		ConsentRequestID: "not-null",
-		ConsentVerifier:  "not-null",
 		ConsentCSRF:      "not-null",
 		SessionID:        sessionID,
 		RequestedAt:      time.Now(),

@@ -18,9 +18,7 @@
   "r": "http://request/0017",
   "si": "auth_session-0017",
   "is": "identity_provider_session_id-0017",
-  "lv": "verifier-0017",
   "lc": "csrf-0017",
-  "li": "2022-02-15T22:20:21Z",
   "ia": "2022-02-15T22:20:21Z",
   "q": 128,
   "lr": true,
@@ -47,7 +45,6 @@
   "dh": null,
   "cc": "challenge-0017",
   "cs": true,
-  "cv": "verifier-0017",
   "cr": "csrf-0017",
   "gs": [
     "granted_scope-0016_1",

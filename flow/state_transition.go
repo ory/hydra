@@ -19,12 +19,6 @@ func WithConsentSkip(skip bool) StateTransitionOption {
 	}
 }
 
-func WithConsentVerifier(verifier string) StateTransitionOption {
-	return func(f *Flow) {
-		f.ConsentVerifier = sqlxx.NullString(verifier)
-	}
-}
-
 func WithConsentCSRF(csrf string) StateTransitionOption {
 	return func(f *Flow) {
 		f.ConsentCSRF = sqlxx.NullString(csrf)

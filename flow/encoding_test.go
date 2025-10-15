@@ -70,7 +70,6 @@ func TestEncoding(t *testing.T) {
 		RequestURL:         "https://auth.hydra.local/oauth2/auth?client_id=some-client-id&response_type=code&scope=scope1+scope2&redirect_uri=https%3A%2F%2Fredirect1.example.org%2Fcallback&state=some-state&nonce=some-nonce",
 		SessionID:          sqlxx.NullString("some-session-id"),
 		LoginCSRF:          "test-login-csrf",
-		LoginInitializedAt: sqlxx.NullTime(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)),
 		RequestedAt:        time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
 		State:              1,
 		LoginRemember:      true,

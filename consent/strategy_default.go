@@ -220,9 +220,8 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 	}
 
 	// Set up csrf/challenge/verifier values
-	verifier := strings.Replace(uuid.New(), "-", "", -1)
-	challenge := strings.Replace(uuid.New(), "-", "", -1)
-	csrf := strings.Replace(uuid.New(), "-", "", -1)
+	challenge := strings.ReplaceAll(uuid.New(), "-", "")
+	csrf := strings.ReplaceAll(uuid.New(), "-", "")
 
 	// Generate the request URL
 	var requestURL string
@@ -271,7 +270,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 			ClientID:             cl.ID,
 			RequestURL:           requestURL,
 			SessionID:            sqlxx.NullString(sessionID),
-			LoginVerifier:        verifier,
 			LoginCSRF:            csrf,
 			LoginAuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 			RequestedAt:          time.Now().Truncate(time.Second).UTC(),
@@ -284,7 +282,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 		f.LoginSkip = skip
 		f.Subject = subject
 		f.SessionID = sqlxx.NullString(sessionID)
-		f.LoginVerifier = verifier
 		f.LoginCSRF = csrf
 		f.LoginAuthenticatedAt = sqlxx.NullTime(authenticatedAt)
 		f.RequestedAt = time.Now().Truncate(time.Second).UTC()
@@ -598,7 +595,6 @@ func (s *DefaultStrategy) forwardConsentRequest(
 	f.ToStateConsentUnused(
 		flow.WithConsentRequestID(strings.ReplaceAll(uuid.New(), "-", "")),
 		flow.WithConsentSkip(canSkipConsent),
-		flow.WithConsentVerifier(strings.ReplaceAll(uuid.New(), "-", "")),
 		flow.WithConsentCSRF(strings.ReplaceAll(uuid.New(), "-", "")),
 	)
 
@@ -1220,7 +1216,6 @@ func (s *DefaultStrategy) requestDevice(ctx context.Context, w http.ResponseWrit
 
 func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	// Set up csrf/challenge/verifier values
-	verifier := strings.ReplaceAll(uuid.New(), "-", "")
 	challenge := strings.ReplaceAll(uuid.New(), "-", "")
 	csrf := strings.ReplaceAll(uuid.New(), "-", "")
 
@@ -1234,7 +1229,6 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 	f := &flow.Flow{
 		DeviceChallengeID: sqlxx.NullString(challenge),
 		RequestURL:        iu.String(),
-		DeviceVerifier:    sqlxx.NullString(verifier),
 		DeviceCSRF:        sqlxx.NullString(csrf),
 		RequestedAt:       time.Now().Truncate(time.Second).UTC(),
 		State:             flow.DeviceFlowStateUnused,

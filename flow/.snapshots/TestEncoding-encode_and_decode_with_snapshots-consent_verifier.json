@@ -86,7 +86,6 @@
   "r": "https://auth.hydra.local/oauth2/auth?client_id=some-client-id\u0026response_type=code\u0026scope=scope1+scope2\u0026redirect_uri=https%3A%2F%2Fredirect1.example.org%2Fcallback\u0026state=some-state\u0026nonce=some-nonce",
   "si": "some-session-id",
   "lc": "test-login-csrf",
-  "li": "2025-01-01T00:00:00Z",
   "q": 1,
   "lr": true,
   "lf": 3600,

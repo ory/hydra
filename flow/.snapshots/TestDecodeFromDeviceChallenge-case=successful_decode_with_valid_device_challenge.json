@@ -62,9 +62,7 @@
   "r": "https://example.org/oauth2/auth?client_id=test",
   "si": "session-123",
   "is": "session-id",
-  "lv": "login-verifier",
   "lc": "login-csrf",
-  "li": "2025-10-09T12:51:00Z",
   "q": 8,
   "lr": true,
   "lf": 3000,
@@ -80,12 +78,10 @@
   "la": "2025-10-09T12:52:00Z",
   "di": "device-challenge",
   "dr": "device-code-request",
-  "dv": "device-verifier",
   "dc": "device-csrf",
   "dh": null,
   "cc": "consent-request",
   "cs": true,
-  "cv": "consent-verifier",
   "cr": "consent-csrf",
   "gs": [
     "openid"

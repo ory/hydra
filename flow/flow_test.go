@@ -23,14 +23,8 @@ func (f *Flow) setLoginRequest(r *LoginRequest) {
 	f.Subject = r.Subject
 	f.OpenIDConnectContext = r.OpenIDConnectContext
 	f.Client = r.Client
-	f.ClientID = r.ClientID
 	f.RequestURL = r.RequestURL
 	f.SessionID = r.SessionID
-	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
-	f.LoginVerifier = r.Verifier
-	f.LoginCSRF = r.CSRF
-	f.LoginAuthenticatedAt = r.AuthenticatedAt
-	f.RequestedAt = r.RequestedAt
 }
 
 func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
@@ -47,26 +41,6 @@ func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Context = r.Context
-}
-
-func (f *Flow) setDeviceRequest(r *DeviceUserAuthRequest) {
-	f.DeviceChallengeID = sqlxx.NullString(r.ID)
-	f.DeviceCSRF = sqlxx.NullString(r.CSRF)
-	f.DeviceVerifier = sqlxx.NullString(r.Verifier)
-	f.Client = r.Client
-	f.RequestURL = r.RequestURL
-	f.RequestedAt = r.RequestedAt
-	f.RequestedScope = r.RequestedScope
-	f.RequestedAudience = r.RequestedAudience
-	f.DeviceHandledAt = r.HandledAt
-}
-
-func (f *Flow) setHandledDeviceRequest(r *HandledDeviceUserAuthRequest) {
-	f.Client = r.Client
-	f.RequestURL = r.RequestURL
-	f.RequestedScope = r.RequestedScope
-	f.RequestedAudience = r.RequestedAudience
-	f.DeviceCodeRequestID = sqlxx.NullString(r.DeviceCodeRequestID)
 }
 
 func TestFlow_HandleDeviceUserAuthRequest(t *testing.T) {
@@ -107,7 +81,6 @@ func TestFlow_GetLoginRequest(t *testing.T) {
 		assert.NoError(t, faker.FakeData(&expected))
 		f := Flow{State: FlowStateLoginUsed}
 		f.setLoginRequest(&expected)
-		expected.WasHandled = true // this depends on the flow state and is not copied from the request
 
 		actual := f.GetLoginRequest()
 		assert.Equal(t, expected, *actual)

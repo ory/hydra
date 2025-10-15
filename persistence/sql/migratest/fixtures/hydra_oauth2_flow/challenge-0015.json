@@ -17,9 +17,7 @@
   "ci": "client-21",
   "r": "http://request/0015",
   "si": "auth_session-0015",
-  "lv": "verifier-0015",
   "lc": "csrf-0015",
-  "li": "2022-02-15T22:20:21Z",
   "ia": "2022-02-15T22:20:21Z",
   "q": 128,
   "lr": true,
@@ -45,7 +43,6 @@
   "dh": null,
   "cc": "challenge-0015",
   "cs": true,
-  "cv": "verifier-0015",
   "cr": "csrf-0015",
   "gs": [
     "granted_scope-0015_1",

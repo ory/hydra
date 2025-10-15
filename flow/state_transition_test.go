@@ -26,7 +26,6 @@ func TestStateTransition(t *testing.T) {
 				opts: []StateTransitionOption{
 					WithConsentRequestID("consent-req-123"),
 					WithConsentSkip(true),
-					WithConsentVerifier("verifier-456"),
 					WithConsentCSRF("csrf-789"),
 					WithID("new-flow-id"),
 				},
@@ -35,7 +34,6 @@ func TestStateTransition(t *testing.T) {
 					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString("consent-req-123"),
 					ConsentSkip:      true,
-					ConsentVerifier:  sqlxx.NullString("verifier-456"),
 					ConsentCSRF:      sqlxx.NullString("csrf-789"),
 				},
 			},
@@ -44,14 +42,12 @@ func TestStateTransition(t *testing.T) {
 				flowID: "test-flow-2",
 				opts: []StateTransitionOption{
 					WithConsentRequestID("consent-req-456"),
-					WithConsentVerifier("verifier-789"),
 				},
 				expected: &Flow{
 					ID:               "test-flow-2",
 					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString("consent-req-456"),
 					ConsentSkip:      false,
-					ConsentVerifier:  sqlxx.NullString("verifier-789"),
 					ConsentCSRF:      sqlxx.NullString(""),
 				},
 			},
@@ -64,7 +60,6 @@ func TestStateTransition(t *testing.T) {
 					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString(""),
 					ConsentSkip:      false,
-					ConsentVerifier:  sqlxx.NullString(""),
 					ConsentCSRF:      sqlxx.NullString(""),
 				},
 			},
@@ -82,7 +77,6 @@ func TestStateTransition(t *testing.T) {
 				assert.Equal(t, tc.expected.State, f.State)
 				assert.Equal(t, tc.expected.ConsentRequestID, f.ConsentRequestID)
 				assert.Equal(t, tc.expected.ConsentSkip, f.ConsentSkip)
-				assert.Equal(t, tc.expected.ConsentVerifier, f.ConsentVerifier)
 				assert.Equal(t, tc.expected.ConsentCSRF, f.ConsentCSRF)
 			})
 		}
@@ -98,10 +92,6 @@ func TestStateTransition(t *testing.T) {
 		// Test WithConsentSkip
 		WithConsentSkip(true)(f)
 		assert.True(t, f.ConsentSkip)
-
-		// Test WithConsentVerifier
-		WithConsentVerifier("test-verifier")(f)
-		assert.Equal(t, sqlxx.NullString("test-verifier"), f.ConsentVerifier)
 
 		// Test WithConsentCSRF
 		WithConsentCSRF("test-csrf")(f)

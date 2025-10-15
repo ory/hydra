@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
@@ -494,9 +493,7 @@ type DeviceUserAuthRequest struct {
 	// identify the session.
 	//
 	// required: true
-	ID       string `json:"challenge"`
-	CSRF     string `json:"-"`
-	Verifier string `json:"-"`
+	ID string `json:"challenge"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	Client *client.Client `json:"client"`
@@ -508,8 +505,7 @@ type DeviceUserAuthRequest struct {
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
-	RequestedAt time.Time      `json:"-"`
-	HandledAt   sqlxx.NullTime `json:"handled_at"`
+	HandledAt sqlxx.NullTime `json:"handled_at"`
 }
 
 // HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.
@@ -568,8 +564,6 @@ type LoginRequest struct {
 	// required: true
 	Client *client.Client `json:"client"`
 
-	ClientID string `json:"-"`
-
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
@@ -582,19 +576,6 @@ type LoginRequest struct {
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `json:"session_id"`
-
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-"`
-
-	ForceSubjectIdentifier string `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
-	Verifier               string `json:"-"`
-	CSRF                   string `json:"-"`
-
-	AuthenticatedAt sqlxx.NullTime `json:"-"`
-	RequestedAt     time.Time      `json:"-"`
 }
 
 func (r *LoginRequest) MarshalJSON() ([]byte, error) {

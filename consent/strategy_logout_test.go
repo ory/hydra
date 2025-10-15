@@ -362,14 +362,14 @@ func TestLogoutFlows(t *testing.T) {
 			expectedErrMessage string
 		}{
 			{
-				d: "should fail rp-inititated flow because id token hint is missing issuer",
+				d: "should fail rp-initiated flow because id token hint is missing issuer",
 				claims: jwtgo.MapClaims{
 					"iat": time.Now().Add(-time.Hour * 2).Unix(),
 				},
 				expectedErrMessage: "Logout failed because issuer claim value &#39;&#39; from query parameter id_token_hint does not match with issuer value from configuration",
 			},
 			{
-				d: "should fail rp-inititated flow because id token hint is using wrong issuer",
+				d: "should fail rp-initiated flow because id token hint is using wrong issuer",
 				claims: jwtgo.MapClaims{
 					"iss": "some-issuer",
 					"iat": time.Now().Add(-time.Hour * 2).Unix(),
@@ -377,7 +377,7 @@ func TestLogoutFlows(t *testing.T) {
 				expectedErrMessage: "Logout failed because issuer claim value &#39;some-issuer&#39; from query parameter id_token_hint does not match with issuer value from configuration",
 			},
 			{
-				d: "should fail rp-inititated flow because iat is in the future",
+				d: "should fail rp-initiated flow because iat is in the future",
 				claims: jwtgo.MapClaims{
 					"iss": reg.Config().IssuerURL(ctx).String(),
 					"iat": time.Now().Add(time.Hour * 2).Unix(),
@@ -465,21 +465,21 @@ func TestLogoutFlows(t *testing.T) {
 		}
 
 		t.Run("case=should pass even if expiry is in the past", func(t *testing.T) {
-			// formerly: should pass rp-inititated even when expiry is in the past
+			// formerly: should pass rp-initiated even when expiry is in the past
 			claims := jwtgo.MapClaims{"exp": time.Now().Add(-time.Hour).Unix()}
 			t.Run("method=GET", run("GET", claims))
 			t.Run("method=POST", run("POST", claims))
 		})
 
 		t.Run("case=should pass even if audience is an array not a string", func(t *testing.T) {
-			// formerly: should pass rp-inititated flow"
+			// formerly: should pass rp-initiated flow"
 			claims := jwtgo.MapClaims{"aud": []string{c.GetID()}}
 			t.Run("method=GET", run("GET", claims))
 			t.Run("method=POST", run("POST", claims))
 		})
 	})
 
-	t.Run("case=should pass rp-inititated flow without any action because SID is unknown", func(t *testing.T) {
+	t.Run("case=should pass rp-initiated flow without any action because SID is unknown", func(t *testing.T) {
 		c := createSampleClient(t)
 		acceptLoginAs(t, subject)
 

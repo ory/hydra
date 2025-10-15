@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Active** | **bool** | Active is a boolean indicator of whether or not the presented token is currently active.  The specifics of a token&#39;s \&quot;active\&quot; state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a \&quot;true\&quot; value return for the \&quot;active\&quot; property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time). | 
 **Aud** | Pointer to **[]string** | Audience contains a list of the token&#39;s intended audiences. | [optional] 
-**ClientId** | Pointer to **string** | ID is aclient identifier for the OAuth 2.0 client that requested this token. | [optional] 
+**ClientId** | Pointer to **string** | ID is a client identifier for the OAuth 2.0 client that requested this token. | [optional] 
 **Exp** | Pointer to **int64** | Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire. | [optional] 
 **Ext** | Pointer to **map[string]interface{}** | Extra is arbitrary data set by the session. | [optional] 
 **Iat** | Pointer to **int64** | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued. | [optional] 

@@ -7,6 +7,7 @@ import (
 	"context"
 	"io/fs"
 
+	"github.com/ory/pop/v6"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -38,6 +39,7 @@ type (
 		hsmContext         hsm.Context
 		kratos             kratos.Client
 		fop                fosite.OAuth2Provider
+		dbOptsModifier     []func(details *pop.ConnectionDetails)
 	}
 	OptionsModifier func(*options)
 
@@ -55,6 +57,13 @@ func newOptions(opts []OptionsModifier) *options {
 func WithConfigOptions(opts ...configx.OptionModifier) OptionsModifier {
 	return func(o *options) {
 		o.configOpts = append(o.configOpts, opts...)
+	}
+}
+
+// WithDBOptionsModifier modifies the pop connection details before the connection is opened.
+func WithDBOptionsModifier(f ...func(details *pop.ConnectionDetails)) OptionsModifier {
+	return func(o *options) {
+		o.dbOptsModifier = append(o.dbOptsModifier, f...)
 	}
 }
 
@@ -176,6 +185,7 @@ func New(ctx context.Context, opts ...OptionsModifier) (*RegistrySQL, error) {
 	r.ctxer = sl.Contextualizer()
 	r.kratos = o.kratos
 	r.fop = o.fop
+	r.dbOptsModifier = o.dbOptsModifier
 
 	if err = r.Init(ctx, o.skipNetworkInit, o.autoMigrate, o.extraMigrations, o.goMigrations); err != nil {
 		l.WithError(err).Error("Unable to initialize service registry.")

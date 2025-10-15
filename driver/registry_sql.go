@@ -87,6 +87,7 @@ type RegistrySQL struct {
 	kratos          kratos.Client
 	fositeFactories []fositex.Factory
 	migrator        *sql.MigrationManager
+	dbOptsModifier  []func(details *pop.ConnectionDetails)
 
 	keyManager  jwk.Manager
 	initialPing func(ctx context.Context, l *logrusx.Logger, p *sql.BasePersister) error
@@ -126,17 +127,22 @@ func (m *RegistrySQL) Init(
 		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(
 			m.l, m.Config().DSN(),
 		)
-		c, err := pop.NewConnection(
-			&pop.ConnectionDetails{
-				URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
-				IdlePool:        idlePool,
-				ConnMaxLifetime: connMaxLifetime,
-				ConnMaxIdleTime: connMaxIdleTime,
-				Pool:            pool,
-				TracerProvider:  m.Tracer(ctx).Provider(),
-				Unsafe:          m.Config().DbIgnoreUnknownTableColumns(),
-			},
-		)
+
+		opts := &pop.ConnectionDetails{
+			URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
+			IdlePool:        idlePool,
+			ConnMaxLifetime: connMaxLifetime,
+			ConnMaxIdleTime: connMaxIdleTime,
+			Pool:            pool,
+			TracerProvider:  m.Tracer(ctx).Provider(),
+			Unsafe:          m.Config().DbIgnoreUnknownTableColumns(),
+		}
+
+		for _, f := range m.dbOptsModifier {
+			f(opts)
+		}
+
+		c, err := pop.NewConnection(opts)
 		if err != nil {
 			return errors.WithStack(err)
 		}

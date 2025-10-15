@@ -30,7 +30,6 @@ import (
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/snapshotx"
-	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -69,13 +68,11 @@ func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 		AMR:                        []string{"pwd"},
 		ForceSubjectIdentifier:     "forced-subject",
 		Context:                    sqlxx.JSONRawMessage(`{"foo":"bar"}`),
-		LoginWasUsed:               state == flow.FlowStateLoginUsed,
 		LoginAuthenticatedAt:       sqlxx.NullTime(time.Date(2025, 10, 9, 12, 52, 0, 0, time.UTC)),
 		DeviceChallengeID:          "device-challenge",
 		DeviceCodeRequestID:        "device-code-request",
 		DeviceVerifier:             "device-verifier",
 		DeviceCSRF:                 "device-csrf",
-		DeviceWasUsed:              sqlxx.NullBool{Bool: state == flow.DeviceFlowStateUsed, Valid: true},
 		DeviceHandledAt:            sqlxx.NullTime{},
 		ConsentRequestID:           "consent-request",
 		ConsentSkip:                true,
@@ -86,7 +83,6 @@ func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 		ConsentRemember:            true,
 		ConsentRememberFor:         pointerx.Ptr(3000),
 		ConsentHandledAt:           sqlxx.NullTime{},
-		ConsentWasHandled:          state == flow.FlowStateConsentUsed,
 		SessionIDToken:             map[string]interface{}{"sub": "test-subject", "foo": "bar"},
 		SessionAccessToken:         map[string]interface{}{"scp": []string{"openid", "profile"}, "aud": []string{"https://api.example.org"}},
 	}
@@ -99,7 +95,7 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 	))
 
 	nid := reg.Networker().NetworkID(ctx)
-	testFlow := createTestFlow(nid, flow.FlowStateLoginInitialized)
+	testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
 
 	t.Run("case=successful decode with valid login challenge", func(t *testing.T) {
 		loginChallenge, err := testFlow.ToLoginChallenge(ctx, reg)
@@ -130,7 +126,7 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
-		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateLoginInitialized)
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateLoginUnused)
 
 		loginChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsLoginChallenge)
 		require.NoError(t, err)
@@ -141,7 +137,7 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := createTestFlow(nid, flow.FlowStateLoginInitialized)
+		expiredFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
 		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
 
 		loginChallenge, err := expiredFlow.ToLoginChallenge(ctx, reg)
@@ -170,7 +166,7 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	))
 
 	nid := reg.Networker().NetworkID(ctx)
-	testFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+	testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
 
 	t.Run("case=successful decode with valid consent challenge", func(t *testing.T) {
 		consentChallenge, err := testFlow.ToConsentChallenge(ctx, reg)
@@ -201,7 +197,7 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
-		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateConsentInitialized)
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.FlowStateConsentUnused)
 
 		consentChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsConsentChallenge)
 		require.NoError(t, err)
@@ -212,7 +208,7 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+		expiredFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
 		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
 
 		consentChallenge, err := expiredFlow.ToConsentChallenge(ctx, reg)
@@ -244,7 +240,6 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 
 	t.Run("case=successful decode and invalidate with valid login verifier", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
-		testFlow.LoginWasUsed = false
 
 		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -254,7 +249,6 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		// Verify that InvalidateLoginRequest was called
-		assert.True(t, decoded.LoginWasUsed, "LoginWasUsed should be true after invalidation")
 		assert.Equal(t, flow.FlowStateLoginUsed, decoded.State, "State should be FlowStateLoginUsed after invalidation")
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
@@ -262,7 +256,6 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 
 	t.Run("case=fails when flow has already been used", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.FlowStateLoginUsed)
-		testFlow.LoginWasUsed = true
 
 		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -272,7 +265,7 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 	})
 
 	t.Run("case=fails with invalid flow state", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.FlowStateConsentInitialized)
+		testFlow := createTestFlow(nid, flow.FlowStateConsentUnused)
 
 		loginVerifier, err := testFlow.ToLoginVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -289,7 +282,7 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		require.NotEmpty(t, loginChallenge)
 
 		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginChallenge)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
@@ -301,17 +294,17 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		require.NotEmpty(t, loginVerifier)
 
 		_, err = flow.DecodeAndInvalidateLoginVerifier(ctx, reg, loginVerifier)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
 		_, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, "invalid-verifier")
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=fails with empty verifier", func(t *testing.T) {
 		_, err := flow.DecodeAndInvalidateLoginVerifier(ctx, reg, "")
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=works with FlowStateLoginError", func(t *testing.T) {
@@ -325,8 +318,7 @@ func TestDecodeAndInvalidateLoginVerifier(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, decoded)
 
-		assert.True(t, decoded.LoginWasUsed)
-		assert.Equal(t, flow.FlowStateLoginUsed, decoded.State)
+		assert.Equal(t, flow.FlowStateLoginError, decoded.State)
 	})
 }
 
@@ -337,7 +329,7 @@ func TestDecodeFromDeviceChallenge(t *testing.T) {
 	))
 
 	nid := reg.Networker().NetworkID(ctx)
-	testFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+	testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
 
 	t.Run("case=successful decode with valid device challenge", func(t *testing.T) {
 		deviceChallenge, err := testFlow.ToDeviceChallenge(ctx, reg)
@@ -368,7 +360,7 @@ func TestDecodeFromDeviceChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with different network ID", func(t *testing.T) {
-		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.DeviceFlowStateInitialized)
+		flowWithDifferentNID := createTestFlow(uuid.Must(uuid.NewV4()), flow.DeviceFlowStateUnused)
 
 		deviceChallenge, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsDeviceChallenge)
 		require.NoError(t, err)
@@ -379,7 +371,7 @@ func TestDecodeFromDeviceChallenge(t *testing.T) {
 	})
 
 	t.Run("case=fails with expired request", func(t *testing.T) {
-		expiredFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+		expiredFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
 		expiredFlow.RequestedAt = time.Now().Add(-2 * time.Hour)
 
 		deviceChallenge, err := expiredFlow.ToDeviceChallenge(ctx, reg)
@@ -411,7 +403,6 @@ func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
 
 	t.Run("case=successful decode and invalidate with valid device verifier", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
-		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
 
 		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -421,15 +412,13 @@ func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, decoded)
 
-		assert.True(t, decoded.DeviceWasUsed.Bool, "DeviceWasUsed should be true after invalidation")
 		assert.Equal(t, flow.DeviceFlowStateUsed, decoded.State, "State should be DeviceFlowStateUsed after invalidation")
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
 	})
 
 	t.Run("case=fails when flow has already been used", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.DeviceFlowStateUnused)
-		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: true, Valid: true}
+		testFlow := createTestFlow(nid, flow.DeviceFlowStateUsed)
 
 		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -439,7 +428,7 @@ func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
 	})
 
 	t.Run("case=fails with invalid flow state", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.DeviceFlowStateInitialized)
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
 
 		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -462,14 +451,13 @@ func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
 	t.Run("case=fails with different network ID", func(t *testing.T) {
 		differentNID := uuid.Must(uuid.NewV4())
 		flowWithDifferentNID := createTestFlow(differentNID, flow.DeviceFlowStateUnused)
-		flowWithDifferentNID.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
 
 		deviceVerifier, err := flow.Encode(ctx, reg.FlowCipher(), flowWithDifferentNID, flow.AsDeviceVerifier)
 		require.NoError(t, err)
 		require.NotEmpty(t, deviceVerifier)
 
 		_, err = flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
@@ -480,22 +468,6 @@ func TestDecodeAndInvalidateDeviceVerifier(t *testing.T) {
 	t.Run("case=fails with empty verifier", func(t *testing.T) {
 		_, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, "")
 		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
-	})
-
-	t.Run("case=works with DeviceFlowStateError", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.DeviceFlowStateError)
-		testFlow.DeviceWasUsed = sqlxx.NullBool{Bool: false, Valid: true}
-
-		deviceVerifier, err := testFlow.ToDeviceVerifier(ctx, reg)
-		require.NoError(t, err)
-		require.NotEmpty(t, deviceVerifier)
-
-		decoded, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, reg, deviceVerifier)
-		require.NoError(t, err)
-		require.NotNil(t, decoded)
-
-		assert.True(t, decoded.DeviceWasUsed.Bool)
-		assert.Equal(t, flow.DeviceFlowStateUsed, decoded.State)
 	})
 }
 
@@ -518,7 +490,6 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		// Verify that InvalidateConsentRequest was called
-		assert.True(t, decoded.ConsentWasHandled, "ConsentWasHandled should be true after invalidation")
 		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State, "State should be FlowStateConsentUsed after invalidation")
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
@@ -526,7 +497,6 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 
 	t.Run("case=fails when flow has already been used", func(t *testing.T) {
 		testFlow := createTestFlow(nid, flow.FlowStateConsentUsed)
-		testFlow.ConsentWasHandled = true
 
 		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -536,7 +506,7 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 	})
 
 	t.Run("case=fails with invalid flow state", func(t *testing.T) {
-		testFlow := createTestFlow(nid, flow.FlowStateLoginInitialized)
+		testFlow := createTestFlow(nid, flow.FlowStateLoginUnused)
 
 		consentVerifier, err := testFlow.ToConsentVerifier(ctx, reg)
 		require.NoError(t, err)
@@ -565,7 +535,7 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 		require.NotEmpty(t, consentVerifier)
 
 		_, err = flow.DecodeAndInvalidateConsentVerifier(ctx, reg, consentVerifier)
-		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+		assert.ErrorIs(t, err, fosite.ErrAccessDenied)
 	})
 
 	t.Run("case=fails with invalid verifier format", func(t *testing.T) {
@@ -589,8 +559,7 @@ func TestDecodeAndInvalidateConsentVerifier(t *testing.T) {
 		require.NoError(t, err)
 		require.NotNil(t, decoded)
 
-		assert.True(t, decoded.ConsentWasHandled)
-		assert.Equal(t, flow.FlowStateConsentUsed, decoded.State)
+		assert.Equal(t, flow.FlowStateConsentError, decoded.State)
 	})
 }
 
@@ -657,7 +626,6 @@ func TestUpdateLegacyChallenges(t *testing.T) {
 		"device_initialized":  flow.DeviceFlowStateInitialized,
 		"device_unused":       flow.DeviceFlowStateUnused,
 		"device_used":         flow.DeviceFlowStateUsed,
-		"device_error":        flow.DeviceFlowStateError,
 	} {
 		f := createTestFlow(legacyChallengesNID, flowState)
 		var challenge string
@@ -667,7 +635,7 @@ func TestUpdateLegacyChallenges(t *testing.T) {
 			challenge, err = f.ToLoginChallenge(t.Context(), reg)
 		case flow.FlowStateConsentInitialized, flow.FlowStateConsentUnused, flow.FlowStateConsentUsed, flow.FlowStateConsentError:
 			challenge, err = f.ToConsentChallenge(t.Context(), reg)
-		case flow.DeviceFlowStateInitialized, flow.DeviceFlowStateUnused, flow.DeviceFlowStateUsed, flow.DeviceFlowStateError:
+		case flow.DeviceFlowStateInitialized, flow.DeviceFlowStateUnused, flow.DeviceFlowStateUsed:
 			challenge, err = f.ToDeviceChallenge(t.Context(), reg)
 		default:
 			t.Fatalf("unknown flow state: %d", flowState)

@@ -27,7 +27,6 @@
   "ct": {
     "context": "0008"
   },
-  "lu": true,
   "le": {
     "error": "",
     "error_description": "",
@@ -37,7 +36,6 @@
     "valid": false
   },
   "la": "2022-02-15T22:20:21Z",
-  "du": null,
   "dh": null,
   "cc": "challenge-0008",
   "cs": true,
@@ -52,7 +50,6 @@
   "ce": true,
   "cf": 8,
   "ch": null,
-  "cw": true,
   "cx": {
     "error": "",
     "error_description": "",

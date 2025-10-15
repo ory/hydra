@@ -85,7 +85,7 @@ func (r *DeviceRequestSQL) toRequest(ctx context.Context, session fosite.Session
 	}
 
 	return &fosite.DeviceRequest{
-		UserCodeState: fosite.UserCodeState(r.UserCodeState),
+		UserCodeState: r.UserCodeState,
 		Request: fosite.Request{
 			ID:          r.Request,
 			RequestedAt: r.RequestedAt,

@@ -117,7 +117,7 @@ func TestGetLoginRequest(t *testing.T) {
 		Client:            cl,
 		RequestURL:        requestURL,
 		RequestedAt:       time.Now(),
-		State:             flow.FlowStateLoginInitialized,
+		State:             flow.FlowStateLoginUnused,
 		NID:               reg.Persister().NetworkID(t.Context()),
 		RequestedAudience: []string{"audience1", "audience2"},
 		RequestedScope:    []string{"scope1", "scope2"},
@@ -185,7 +185,7 @@ func TestGetConsentRequest(t *testing.T) {
 		Client:           cl,
 		RequestURL:       requestURL,
 		RequestedAt:      time.Now(),
-		State:            flow.FlowStateConsentInitialized,
+		State:            flow.FlowStateConsentUnused,
 		NID:              reg.Persister().NetworkID(t.Context()),
 		ConsentRequestID: sqlxx.NullString(consentRequestID),
 	}
@@ -239,7 +239,7 @@ func TestAcceptLoginRequestDouble(t *testing.T) {
 		RequestURL:  requestURL,
 		RequestedAt: time.Now(),
 		NID:         reg.Persister().NetworkID(t.Context()),
-		State:       flow.FlowStateLoginInitialized,
+		State:       flow.FlowStateLoginUnused,
 	}
 	challenge, err := f.ToLoginChallenge(t.Context(), reg)
 	require.NoError(t, err)
@@ -279,7 +279,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		Client:      cl,
 		RequestURL:  requestURL,
 		RequestedAt: time.Now(),
-		State:       flow.DeviceFlowStateInitialized,
+		State:       flow.DeviceFlowStateUnused,
 	}
 	f.NID = reg.Networker().NetworkID(t.Context())
 	challenge, err := f.ToDeviceChallenge(t.Context(), reg)

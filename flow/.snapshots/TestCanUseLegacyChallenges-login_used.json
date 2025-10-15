@@ -79,13 +79,11 @@
   "ct": {
     "foo": "bar"
   },
-  "lu": true,
   "la": "2025-10-09T12:52:00Z",
   "di": "device-challenge",
   "dr": "device-code-request",
   "dv": "device-verifier",
   "dc": "device-csrf",
-  "du": false,
   "dh": null,
   "cc": "consent-request",
   "cs": true,

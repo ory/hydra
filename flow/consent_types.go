@@ -167,8 +167,6 @@ type AcceptOAuth2ConsentRequest struct {
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context"`
-
-	Error *RequestDeniedError `json:"-"`
 }
 
 func (r *AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
@@ -188,10 +186,6 @@ func (r *AcceptOAuth2ConsentRequest) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(alias)
-}
-
-func (r *AcceptOAuth2ConsentRequest) HasError() bool {
-	return r.Error.IsError()
 }
 
 // List of OAuth 2.0 Consent Sessions
@@ -336,8 +330,6 @@ type HandledLoginRequest struct {
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context"`
-
-	Error *RequestDeniedError `json:"-"`
 }
 
 func (r *HandledLoginRequest) MarshalJSON() ([]byte, error) {
@@ -352,10 +344,6 @@ func (r *HandledLoginRequest) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(alias)
-}
-
-func (r *HandledLoginRequest) HasError() bool {
-	return r.Error.IsError()
 }
 
 // Contains optional information about the OpenID Connect request.
@@ -522,7 +510,6 @@ type DeviceUserAuthRequest struct {
 
 	RequestedAt time.Time      `json:"-"`
 	HandledAt   sqlxx.NullTime `json:"handled_at"`
-	WasHandled  bool           `json:"-"`
 }
 
 // HandledDeviceUserAuthRequest is the request payload used to accept a device user_code.
@@ -540,13 +527,6 @@ type HandledDeviceUserAuthRequest struct {
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	Client *client.Client `json:"client"`
-
-	Error *RequestDeniedError `json:"-"`
-}
-
-// HasError returns whether the request has errors.
-func (r *HandledDeviceUserAuthRequest) HasError() bool {
-	return r.Error.IsError()
 }
 
 // Contains information on an ongoing login request.

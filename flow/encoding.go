@@ -31,6 +31,19 @@ const (
 	consentVerifier
 )
 
+func (p purpose) RequestType() string {
+	switch p {
+	case loginChallenge, loginVerifier:
+		return "login"
+	case deviceChallenge, deviceVerifier:
+		return "device"
+	case consentChallenge, consentVerifier:
+		return "consent"
+	default:
+		return "unknown"
+	}
+}
+
 func withPurpose(purpose purpose) CodecOption { return func(ad *data) { ad.Purpose = purpose } }
 
 var (

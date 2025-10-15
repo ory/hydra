@@ -650,7 +650,7 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			}))
 
 			f.State = flow.FlowStateConsentUsed
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
 
 			actual, err := r.Persister().FindGrantedAndRememberedConsentRequest(s.t2, cl.ID, f.Subject)
 			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
@@ -671,7 +671,7 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
 
 			_, _, err := r.Persister().FindSubjectsGrantedConsentRequests(s.t2, f.Subject)
 			require.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
@@ -752,7 +752,7 @@ func (s *PersisterTestSuite) TestFlushInactiveLoginConsentRequests() {
 			f.RequestedAt = time.Now().Add(-24 * time.Hour)
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
 
 			actual := flow.Flow{}
 
@@ -1164,10 +1164,9 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 				Remember: true,
 			}))
 
-			f.ConsentWasHandled = true
 			f.State = flow.FlowStateConsentUsed
 
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
 			actual, err = r.Persister().FindGrantedAndRememberedConsentRequest(s.t1, c1.ID, f.Subject)
 			require.NoError(t, err)
 			assert.EqualValues(t, f.ConsentRequestID, actual.ConsentRequestID)
@@ -1243,9 +1242,9 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: t1f1.SessionID.String()})
 
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t1f1))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, t1f1))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t2, t2f1))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t2, t2f2))
 
 			t1f1.ConsentRequestID = sqlxx.NullString(t1f1.ID)
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
@@ -1288,9 +1287,9 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: t1f1.SessionID.String()})
 
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t1f1))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, t1f1))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t2, t2f1))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t2, t2f2))
 
 			t1f1.ConsentRequestID = sqlxx.NullString(t1f1.ID)
 			t2f1.ConsentRequestID = sqlxx.NullString(t2f1.ID)
@@ -1518,7 +1517,7 @@ func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
 			f.RequestedAt = time.Now().Add(-24 * time.Hour)
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
 
 			actual := flow.Flow{}
 

@@ -275,7 +275,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 			LoginCSRF:            csrf,
 			LoginAuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 			RequestedAt:          time.Now().Truncate(time.Second).UTC(),
-			State:                flow.FlowStateLoginInitialized,
+			State:                flow.FlowStateLoginUnused,
 			NID:                  s.r.ConsentManager().NetworkID(ctx),
 		}
 	} else {
@@ -288,7 +288,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 		f.LoginCSRF = csrf
 		f.LoginAuthenticatedAt = sqlxx.NullTime(authenticatedAt)
 		f.RequestedAt = time.Now().Truncate(time.Second).UTC()
-		f.State = flow.FlowStateLoginInitialized
+		f.State = flow.FlowStateLoginUnused
 		f.NID = s.r.ConsentManager().NetworkID(ctx)
 	}
 
@@ -376,19 +376,13 @@ func (s *DefaultStrategy) verifyAuthentication(
 	defer otelx.End(span, &err)
 
 	f, err := flow.DecodeAndInvalidateLoginVerifier(ctx, s.r, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 
 	if f.LoginError.IsError() {
 		f.LoginError.SetDefaults(flow.LoginRequestDeniedErrorName)
 		return nil, errors.WithStack(f.LoginError.ToRFCError())
-	}
-
-	if f.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -601,11 +595,11 @@ func (s *DefaultStrategy) forwardConsentRequest(
 		return errors.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 
-	f.ToStateConsentInitialized(
-		flow.WithConsentRequestID(strings.Replace(uuid.New(), "-", "", -1)),
+	f.ToStateConsentUnused(
+		flow.WithConsentRequestID(strings.ReplaceAll(uuid.New(), "-", "")),
 		flow.WithConsentSkip(canSkipConsent),
-		flow.WithConsentVerifier(strings.Replace(uuid.New(), "-", "", -1)),
-		flow.WithConsentCSRF(strings.Replace(uuid.New(), "-", "", -1)),
+		flow.WithConsentVerifier(strings.ReplaceAll(uuid.New(), "-", "")),
+		flow.WithConsentCSRF(strings.ReplaceAll(uuid.New(), "-", "")),
 	)
 
 	consentChallenge, err := f.ToConsentChallenge(ctx, s.r)
@@ -650,25 +644,17 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, _ http.ResponseWrit
 		return nil, errors.WithStack(fosite.ErrInvalidClient.WithHint("The flow client id does not match the authorize request client id."))
 	}
 
+	if f.ConsentError.IsError() {
+		f.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
+		return nil, errors.WithStack(f.ConsentError.ToRFCError())
+	}
+
 	if err := s.r.ConsentManager().CreateConsentSession(ctx, f); errors.Is(err, sqlcon.ErrUniqueViolation) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used."))
 	} else if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
-	}
-
-	if f.RequestedAt.Add(s.c.ConsentRequestMaxAge(ctx)).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
-	}
-
-	if f.ConsentError.IsError() {
-		f.ConsentError.SetDefaults(flow.ConsentRequestDeniedErrorName)
-		return nil, errors.WithStack(f.ConsentError.ToRFCError())
-	}
-
-	if time.Time(f.LoginAuthenticatedAt).IsZero() {
-		return nil, errors.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -1251,8 +1237,7 @@ func (s *DefaultStrategy) forwardDeviceRequest(ctx context.Context, w http.Respo
 		DeviceVerifier:    sqlxx.NullString(verifier),
 		DeviceCSRF:        sqlxx.NullString(csrf),
 		RequestedAt:       time.Now().Truncate(time.Second).UTC(),
-		DeviceWasUsed:     sqlxx.NullBool{Bool: false, Valid: true},
-		State:             flow.DeviceFlowStateInitialized,
+		State:             flow.DeviceFlowStateUnused,
 		NID:               s.r.Networker().NetworkID(ctx),
 	}
 
@@ -1292,15 +1277,8 @@ func (s *DefaultStrategy) verifyDevice(ctx context.Context, _ http.ResponseWrite
 	defer otelx.End(span, &err)
 
 	f, err := flow.DecodeAndInvalidateDeviceVerifier(ctx, s.r, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithHint("The device verifier has already been used, has not been granted, or is invalid."))
-	} else if err != nil {
+	if err != nil {
 		return nil, err
-	}
-
-	if f.DeviceError.IsError() {
-		f.DeviceError.SetDefaults(flow.DeviceRequestDeniedErrorName)
-		return nil, errors.WithStack(f.DeviceError.ToRFCError())
 	}
 
 	store, err := s.r.CookieStore(ctx)

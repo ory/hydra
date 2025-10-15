@@ -43,7 +43,7 @@ test:
 
 # Resets the test databases
 .PHONY: test-resetdb
-test-resetdb: node_modules
+test-resetdb:
 	docker rm --force --volumes hydra_test_database_mysql || true
 	docker rm --force --volumes hydra_test_database_postgres || true
 	docker rm --force --volumes hydra_test_database_cockroach || true

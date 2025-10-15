@@ -33,7 +33,6 @@
   "ct": {
     "context": "0018"
   },
-  "lu": true,
   "le": {
     "error": "",
     "error_description": "",
@@ -47,16 +46,7 @@
   "dr": "device-request-id-0018",
   "dv": "device-verifier-0018",
   "dc": "device-csrf-0018",
-  "du": true,
   "dh": "2025-05-16T12:24:00Z",
-  "de": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
   "cc": "challenge-0018",
   "cs": true,
   "cv": "verifier-0018",
@@ -72,7 +62,6 @@
   "ce": true,
   "cf": 15,
   "ch": "2025-05-16T12:24:00Z",
-  "cw": true,
   "cx": {
     "error": "",
     "error_description": "",

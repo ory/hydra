@@ -34,7 +34,6 @@
   "ct": {
     "context": "0016"
   },
-  "lu": true,
   "le": {
     "error": "",
     "error_description": "",
@@ -44,7 +43,6 @@
     "valid": false
   },
   "la": "2022-02-15T22:20:21Z",
-  "du": null,
   "dh": null,
   "cc": "challenge-0016",
   "cs": true,
@@ -61,7 +59,6 @@
   "ce": true,
   "cf": 15,
   "ch": "2022-02-15T22:20:21Z",
-  "cw": true,
   "cx": {
     "error": "",
     "error_description": "",

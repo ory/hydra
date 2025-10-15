@@ -37,8 +37,8 @@ func WithID(id string) StateTransitionOption {
 	}
 }
 
-func (f *Flow) ToStateConsentInitialized(opts ...StateTransitionOption) {
-	f.State = FlowStateConsentInitialized
+func (f *Flow) ToStateConsentUnused(opts ...StateTransitionOption) {
+	f.State = FlowStateConsentUnused
 
 	for _, opt := range opts {
 		opt(f)

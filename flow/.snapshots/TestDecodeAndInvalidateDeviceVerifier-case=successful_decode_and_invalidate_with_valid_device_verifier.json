@@ -82,7 +82,6 @@
   "dr": "device-code-request",
   "dv": "device-verifier",
   "dc": "device-csrf",
-  "du": true,
   "dh": null,
   "cc": "consent-request",
   "cs": true,

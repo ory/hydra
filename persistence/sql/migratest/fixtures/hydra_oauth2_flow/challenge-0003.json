@@ -22,7 +22,6 @@
   "a": "acr-0003",
   "fs": "force_subject_id-0003",
   "ct": {},
-  "lu": true,
   "le": {
     "error": "",
     "error_description": "",
@@ -32,7 +31,6 @@
     "valid": false
   },
   "la": "2022-02-15T22:20:21Z",
-  "du": null,
   "dh": null,
   "cc": "challenge-0003",
   "cs": true,
@@ -44,7 +42,6 @@
   "ce": true,
   "cf": 3,
   "ch": null,
-  "cw": true,
   "cx": {
     "error": "",
     "error_description": "",

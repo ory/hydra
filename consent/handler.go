@@ -357,7 +357,7 @@ func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if f.LoginWasUsed {
+	if f.State.LoginWasUsed() {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
 			RedirectTo: f.RequestURL,
 		})
@@ -465,7 +465,7 @@ func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 			Truncate(time.Second))
 	}
 
-	if err := f.UpdateFlowWithHandledLoginRequest(&payload); err != nil {
+	if err := f.HandleLoginRequest(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
@@ -557,9 +557,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := f.UpdateFlowWithHandledLoginRequest(&flow.HandledLoginRequest{
-		Error: &payload,
-	}); err != nil {
+	if err := f.HandleLoginError(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
@@ -641,7 +639,7 @@ func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if f.ConsentWasHandled {
+	if f.State.ConsentWasUsed() {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &flow.OAuth2RedirectTo{
 			RedirectTo: f.RequestURL,
 		})
@@ -820,9 +818,7 @@ func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if err := f.HandleConsentRequest(&flow.AcceptOAuth2ConsentRequest{
-		Error: &payload,
-	}); err != nil {
+	if err := f.HandleConsentError(&payload); err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}

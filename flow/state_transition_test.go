@@ -13,7 +13,7 @@ import (
 )
 
 func TestStateTransition(t *testing.T) {
-	t.Run("case=ToStateConsentInitialized", func(t *testing.T) {
+	t.Run("case=ToStateConsentUnused", func(t *testing.T) {
 		testCases := []struct {
 			name     string
 			flowID   string
@@ -32,7 +32,7 @@ func TestStateTransition(t *testing.T) {
 				},
 				expected: &Flow{
 					ID:               "new-flow-id",
-					State:            FlowStateConsentInitialized,
+					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString("consent-req-123"),
 					ConsentSkip:      true,
 					ConsentVerifier:  sqlxx.NullString("verifier-456"),
@@ -48,7 +48,7 @@ func TestStateTransition(t *testing.T) {
 				},
 				expected: &Flow{
 					ID:               "test-flow-2",
-					State:            FlowStateConsentInitialized,
+					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString("consent-req-456"),
 					ConsentSkip:      false,
 					ConsentVerifier:  sqlxx.NullString("verifier-789"),
@@ -61,7 +61,7 @@ func TestStateTransition(t *testing.T) {
 				opts:   []StateTransitionOption{},
 				expected: &Flow{
 					ID:               "test-flow-3",
-					State:            FlowStateConsentInitialized,
+					State:            FlowStateConsentUnused,
 					ConsentRequestID: sqlxx.NullString(""),
 					ConsentSkip:      false,
 					ConsentVerifier:  sqlxx.NullString(""),
@@ -76,7 +76,7 @@ func TestStateTransition(t *testing.T) {
 					ID: tc.flowID,
 				}
 
-				f.ToStateConsentInitialized(tc.opts...)
+				f.ToStateConsentUnused(tc.opts...)
 
 				assert.Equal(t, tc.expected.ID, f.ID)
 				assert.Equal(t, tc.expected.State, f.State)
@@ -119,12 +119,12 @@ func TestStateTransition(t *testing.T) {
 			Client:  &client.Client{ID: "test-client"},
 		}
 
-		f.ToStateConsentInitialized(
+		f.ToStateConsentUnused(
 			WithConsentRequestID("new-consent-id"),
 		)
 
 		// State should be updated
-		assert.Equal(t, FlowStateConsentInitialized, f.State)
+		assert.Equal(t, FlowStateConsentUnused, f.State)
 		assert.Equal(t, sqlxx.NullString("new-consent-id"), f.ConsentRequestID)
 
 		// Other fields should be preserved

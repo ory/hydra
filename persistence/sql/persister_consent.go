@@ -168,6 +168,13 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
+type flowWithConsentUsed struct {
+	*flow.Flow
+	// we need to write these columns because of the check constraint, but we will soon switch to a new table anyway that will not have them at all
+	ConsentUsed bool `db:"consent_was_used"`
+	LoginUsed   bool `db:"login_was_used"`
+}
+
 func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentSession")
 	defer otelx.End(span, &err)
@@ -176,7 +183,11 @@ func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err
 		return errors.WithStack(sqlcon.ErrNoRows)
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(f))
+	return sqlcon.HandleError(p.Connection(ctx).Create(&flowWithConsentUsed{
+		Flow:        f,
+		ConsentUsed: true,
+		LoginUsed:   true,
+	}))
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
@@ -364,6 +375,7 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 		return nil, nil, sqlcon.HandleError(err)
 	}
 
+	// TODO we have to move this filter into SQL for proper pagination support
 	fs = filterExpiredConsentRequests(fs)
 	if len(fs) == 0 {
 		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)

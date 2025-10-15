@@ -4,8 +4,9 @@
 package errorsx
 
 import (
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
+
+	"github.com/ory/herodot"
 )
 
 // Cause returns the underlying cause of the error, if possible.

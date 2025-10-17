@@ -453,7 +453,6 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		RequestURL:           f.RequestURL,
 		LoginChallenge:       sqlxx.NullString(f.ID),
 		LoginSessionID:       f.SessionID,
-		DeviceChallenge:      f.DeviceChallengeID,
 		ACR:                  f.ACR,
 		AMR:                  f.AMR,
 		Context:              f.Context,

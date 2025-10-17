@@ -989,5 +989,4 @@ func compareConsentRequestFlow(t *testing.T, a *flow.OAuth2ConsentRequest, b *fl
 	assert.EqualValues(t, a.Skip, b.ConsentSkip)
 	assert.EqualValues(t, a.LoginChallenge, b.ID)
 	assert.EqualValues(t, a.LoginSessionID, b.SessionID)
-	assert.EqualValues(t, a.DeviceChallenge, b.DeviceChallengeID.String())
 }

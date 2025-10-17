@@ -837,7 +837,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 
 		loginFlowResp2, err := hc.Get(acceptResp.RedirectTo)
 		require.NoError(t, err)
-		require.Equal(t, http.StatusForbidden, loginFlowResp2.StatusCode)
+		require.Equalf(t, http.StatusForbidden, loginFlowResp2.StatusCode, "requested %q", acceptResp.RedirectTo)
 	})
 }
 

@@ -3112,10 +3112,6 @@
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
         },
-        "device_challenge_id": {
-          "description": "DeviceChallenge is the device challenge this consent challenge belongs to, if this flow was initiated by a device.",
-          "type": "string"
-        },
         "login_challenge": {
           "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
           "type": "string"

@@ -21,7 +21,6 @@ import (
 )
 
 const (
-	DeviceRequestDeniedErrorName  = "device request denied"
 	ConsentRequestDeniedErrorName = "consent request denied"
 	LoginRequestDeniedErrorName   = "login request denied"
 )
@@ -647,9 +646,6 @@ type OAuth2ConsentRequest struct {
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	LoginSessionID sqlxx.NullString `json:"login_session_id"`
-
-	// DeviceChallenge is the device challenge this consent challenge belongs to, if this flow was initiated by a device.
-	DeviceChallenge sqlxx.NullString `json:"device_challenge_id" faker:"-"`
 
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.

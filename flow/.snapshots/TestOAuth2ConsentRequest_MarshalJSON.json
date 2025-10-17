@@ -10,7 +10,6 @@
   "request_url": "",
   "login_challenge": "",
   "login_session_id": "",
-  "device_challenge_id": "",
   "acr": "",
   "amr": []
 }

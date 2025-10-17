@@ -41,7 +41,6 @@
     "subject_type": "",
     "tos_uri": ""
   },
-  "device_challenge_id": "",
   "oidc_context": {},
   "requested_access_token_audience": [],
   "requested_scope": [

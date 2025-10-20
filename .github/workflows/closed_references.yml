@@ -20,7 +20,7 @@ jobs:
     name: Find closed references
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
       - uses: ory/closed-reference-notifier@v1

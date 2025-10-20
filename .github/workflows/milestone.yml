@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           outputFile: docs/docs/milestones.md
       - name: Commit Milestone Documentation
-        uses: EndBug/add-and-commit@v4.4.0
+        uses: EndBug/add-and-commit@v9.1.4
         with:
           message: "autogen(docs): update milestone document"
           author_name: aeneasr

@@ -53,8 +53,8 @@ func testRegistry(t *testing.T, k string, t1, t2 *driver.RegistrySQL) {
 		parallel = true
 	}
 
-	t.Run("package=consent/manager="+k, test.ManagerTests(t1, t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-	t.Run("package=consent/manager="+k, test.ManagerTests(t2, t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+	t.Run("package=consent/manager="+k, test.ManagerTests(t1, t1.Persister(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
+	t.Run("package=consent/manager="+k, test.ManagerTests(t2, t2.Persister(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
 
 	t.Run("package=jwk/manager="+k, func(t *testing.T) {
 		for _, tc := range []struct {
@@ -212,7 +212,7 @@ func TestManagers(t *testing.T) {
 			)
 		}
 		t.Run("package=consent/manager="+k+"/case=nid",
-			test.TestHelperNID(r1.ConsentManager(), rInv.ConsentManager()),
+			test.TestHelperNID(r1.Persister(), rInv.Persister()),
 		)
 	}
 }

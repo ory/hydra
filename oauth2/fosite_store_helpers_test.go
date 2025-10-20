@@ -22,6 +22,7 @@ import (
 	"github.com/ory/fosite/handler/rfc7523"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
@@ -102,14 +103,14 @@ var flushRequests = []*fosite.Request{
 	},
 }
 
-func mockRequestForeignKey(t *testing.T, id string, x oauth2.InternalRegistry) {
+func mockRequestForeignKey(t *testing.T, _ string, x *driver.RegistrySQL) {
 	cl := &client.Client{ID: "foobar"}
 	if _, err := x.ClientManager().GetClient(t.Context(), cl.ID); errors.Is(err, sqlcon.ErrNoRows) {
 		require.NoError(t, x.ClientManager().CreateClient(t.Context(), cl))
 	}
 }
 
-func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *testing.T) {
+func testHelperRequestIDMultiples(m *driver.RegistrySQL, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 		requestID := uuid.Must(uuid.NewV4()).String()
@@ -140,7 +141,7 @@ func testHelperRequestIDMultiples(m oauth2.InternalRegistry, _ string) func(t *t
 	}
 }
 
-func testHelperCreateGetDeleteOpenIDConnectSession(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperCreateGetDeleteOpenIDConnectSession(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -164,7 +165,7 @@ func testHelperCreateGetDeleteOpenIDConnectSession(x oauth2.InternalRegistry) fu
 	}
 }
 
-func testHelperCreateGetDeleteRefreshTokenSession(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperCreateGetDeleteRefreshTokenSession(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -188,7 +189,7 @@ func testHelperCreateGetDeleteRefreshTokenSession(x oauth2.InternalRegistry) fun
 	}
 }
 
-func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperRevokeRefreshToken(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -237,7 +238,7 @@ func testHelperRevokeRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 	}
 }
 
-func testHelperCreateGetDeleteAuthorizeCodes(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperCreateGetDeleteAuthorizeCodes(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -276,7 +277,7 @@ func (r testHelperExpiryFieldsResult) TableName() string {
 	return "hydra_oauth2_" + r.name
 }
 
-func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperExpiryFields(reg *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := reg.OAuth2Storage()
 		t.Parallel()
@@ -357,7 +358,7 @@ func testHelperExpiryFields(reg oauth2.InternalRegistry) func(t *testing.T) {
 	}
 }
 
-func testHelperNilAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperNilAccessToken(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 		c := &client.Client{ID: uuid.Must(uuid.NewV4()).String()}
@@ -377,7 +378,7 @@ func testHelperNilAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 	}
 }
 
-func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperCreateGetDeleteAccessTokenSession(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -401,7 +402,7 @@ func testHelperCreateGetDeleteAccessTokenSession(x oauth2.InternalRegistry) func
 	}
 }
 
-func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperDeleteAccessTokens(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 		ctx := t.Context()
@@ -422,7 +423,7 @@ func testHelperDeleteAccessTokens(x oauth2.InternalRegistry) func(t *testing.T) 
 	}
 }
 
-func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperRevokeAccessToken(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 		ctx := t.Context()
@@ -443,7 +444,7 @@ func testHelperRevokeAccessToken(x oauth2.InternalRegistry) func(t *testing.T) {
 	}
 }
 
-func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperRotateRefreshToken(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 
@@ -667,7 +668,7 @@ func testHelperRotateRefreshToken(x oauth2.InternalRegistry) func(t *testing.T) 
 	}
 }
 
-func testHelperCreateGetDeletePKCERequestSession(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperCreateGetDeletePKCERequestSession(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
 
@@ -691,7 +692,7 @@ func testHelperCreateGetDeletePKCERequestSession(x oauth2.InternalRegistry) func
 	}
 }
 
-func testHelperFlushTokens(x oauth2.InternalRegistry, lifespan time.Duration) func(t *testing.T) {
+func testHelperFlushTokens(x *driver.RegistrySQL, lifespan time.Duration) func(t *testing.T) {
 	m := x.OAuth2Storage()
 	ds := &oauth2.Session{}
 
@@ -731,7 +732,7 @@ func testHelperFlushTokens(x oauth2.InternalRegistry, lifespan time.Duration) fu
 	}
 }
 
-func testHelperFlushTokensWithLimitAndBatchSize(x oauth2.InternalRegistry, limit int, batchSize int) func(t *testing.T) {
+func testHelperFlushTokensWithLimitAndBatchSize(x *driver.RegistrySQL, limit int, batchSize int) func(t *testing.T) {
 	m := x.OAuth2Storage()
 	ds := &oauth2.Session{}
 
@@ -767,7 +768,7 @@ func testHelperFlushTokensWithLimitAndBatchSize(x oauth2.InternalRegistry, limit
 	}
 }
 
-func testFositeSqlStoreTransactionCommitAccessToken(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitAccessToken(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		{
 			doTestCommit(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().RevokeAccessToken)
@@ -776,7 +777,7 @@ func testFositeSqlStoreTransactionCommitAccessToken(m oauth2.InternalRegistry) f
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackAccessToken(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackAccessToken(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		{
 			doTestRollback(m, t, m.OAuth2Storage().CreateAccessTokenSession, m.OAuth2Storage().GetAccessTokenSession, m.OAuth2Storage().RevokeAccessToken)
@@ -785,41 +786,41 @@ func testFositeSqlStoreTransactionRollbackAccessToken(m oauth2.InternalRegistry)
 	}
 }
 
-func testFositeSqlStoreTransactionCommitRefreshToken(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitRefreshToken(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		doTestCommitRefresh(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().RevokeRefreshToken)
 		doTestCommitRefresh(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().DeleteRefreshTokenSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackRefreshToken(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackRefreshToken(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		doTestRollbackRefresh(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().RevokeRefreshToken)
 		doTestRollbackRefresh(m, t, m.OAuth2Storage().CreateRefreshTokenSession, m.OAuth2Storage().GetRefreshTokenSession, m.OAuth2Storage().DeleteRefreshTokenSession)
 	}
 }
 
-func testFositeSqlStoreTransactionCommitAuthorizeCode(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
 
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackAuthorizeCode(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		doTestRollback(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
 }
 
-func testFositeSqlStoreTransactionCommitPKCERequest(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
 
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackPKCERequest(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		doTestRollback(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
@@ -827,7 +828,7 @@ func testFositeSqlStoreTransactionRollbackPKCERequest(m oauth2.InternalRegistry)
 
 // OpenIdConnect tests can't use the helper functions, due to the signature of GetOpenIdConnectSession being
 // different from the other getter methods
-func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
@@ -862,7 +863,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m oauth2.InternalRe
 	}
 }
 
-func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
 		require.True(t, ok)
@@ -903,7 +904,7 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m oauth2.Internal
 	}
 }
 
-func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testing.T) {
+func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=basic setting works", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
@@ -961,7 +962,7 @@ func testFositeStoreSetClientAssertionJWT(m oauth2.InternalRegistry) func(*testi
 	}
 }
 
-func testFositeStoreClientAssertionJWTValid(m oauth2.InternalRegistry) func(*testing.T) {
+func testFositeStoreClientAssertionJWTValid(m *driver.RegistrySQL) func(*testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=returns valid on unknown JTI", func(t *testing.T) {
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
@@ -992,7 +993,7 @@ func testFositeStoreClientAssertionJWTValid(m oauth2.InternalRegistry) func(*tes
 	}
 }
 
-func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.T) {
+func testFositeJWTBearerGrantStorage(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 		grantManager := x.GrantManager()
@@ -1278,7 +1279,7 @@ func testFositeJWTBearerGrantStorage(x oauth2.InternalRegistry) func(t *testing.
 	}
 }
 
-func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
+func doTestCommit(m *driver.RegistrySQL, t *testing.T,
 	createFn func(context.Context, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
@@ -1315,7 +1316,7 @@ func doTestCommit(m oauth2.InternalRegistry, t *testing.T,
 	require.Error(t, err)
 }
 
-func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
+func doTestCommitRefresh(m *driver.RegistrySQL, t *testing.T,
 	createFn func(context.Context, string, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
@@ -1352,7 +1353,7 @@ func doTestCommitRefresh(m oauth2.InternalRegistry, t *testing.T,
 	require.Error(t, err)
 }
 
-func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
+func doTestRollback(m *driver.RegistrySQL, t *testing.T,
 	createFn func(context.Context, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
@@ -1393,7 +1394,7 @@ func doTestRollback(m oauth2.InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 }
 
-func doTestRollbackRefresh(m oauth2.InternalRegistry, t *testing.T,
+func doTestRollbackRefresh(m *driver.RegistrySQL, t *testing.T,
 	createFn func(context.Context, string, string, fosite.Requester) error,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
@@ -1448,7 +1449,7 @@ func createTestRequest(id string) *fosite.Request {
 	}
 }
 
-func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperRefreshTokenExpiryUpdate(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 
@@ -1558,7 +1559,7 @@ func testHelperRefreshTokenExpiryUpdate(x oauth2.InternalRegistry) func(t *testi
 	}
 }
 
-func testHelperAuthorizeCodeInvalidation(x oauth2.InternalRegistry) func(t *testing.T) {
+func testHelperAuthorizeCodeInvalidation(x *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := t.Context()
 

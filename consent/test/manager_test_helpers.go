@@ -172,7 +172,7 @@ func makeID(base, network, key string) string {
 	return fmt.Sprintf("%s-%s-%s", base, network, key)
 }
 
-func TestHelperNID(t1ValidNID, t2InvalidNID consent.Manager) func(t *testing.T) {
+func TestHelperNID(t1ValidNID, t2InvalidNID consent.LoginManager) func(t *testing.T) {
 	testLS := flow.LoginSession{
 		ID:      "2022-03-11-ls-nid-test-1",
 		Subject: "2022-03-11-test-1-sub",
@@ -198,8 +198,14 @@ type Deps interface {
 	x.NetworkProvider
 	config.Provider
 }
+type manager interface {
+	consent.Manager
+	consent.LoginManager
+	consent.LogoutManager
+	consent.ObfuscatedSubjectManager
+}
 
-func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
+func ManagerTests(deps Deps, m manager, clientManager client.Manager, fositeManager x.FositeStorer, network string, parallel bool) func(t *testing.T) {
 	lr := make(map[string]*flow.Flow)
 
 	return func(t *testing.T) {
@@ -213,7 +219,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 				loginSession := &flow.LoginSession{
 					ID:              makeID("fk-login-session", network, k),
-					NID:             m.NetworkID(ctx),
+					NID:             deps.Networker().NetworkID(ctx),
 					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}
@@ -235,13 +241,13 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			for _, s := range []flow.LoginSession{
 				{
 					ID:              makeID("session", network, "1"),
-					NID:             m.NetworkID(ctx),
+					NID:             deps.Networker().NetworkID(ctx),
 					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-time.Minute).UTC()),
 					Subject:         "subject1",
 				},
 				{
 					ID:              makeID("session", network, "2"),
-					NID:             m.NetworkID(ctx),
+					NID:             deps.Networker().NetworkID(ctx),
 					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
 					Subject:         "subject2",
 				},
@@ -312,7 +318,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 			require.ErrorIs(t, err, x.ErrNotFound)
 
-			f.NID = m.NetworkID(ctx)
+			f.NID = deps.Networker().NetworkID(ctx)
 			deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 
 			got1, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
@@ -329,7 +335,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				_, err := flow.DecodeFromDeviceChallenge(ctx, deps, deviceChallenge)
 				require.ErrorIs(t, err, x.ErrNotFound)
 
-				f.NID = m.NetworkID(ctx)
+				f.NID = deps.Networker().NetworkID(ctx)
 				deviceChallenge = x.Must(f.ToDeviceChallenge(ctx, deps))
 				challenges = append(challenges, deviceChallenge)
 
@@ -379,7 +385,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					_, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
 					require.Error(t, err)
 
-					f.NID = m.NetworkID(ctx)
+					f.NID = deps.Networker().NetworkID(ctx)
 					loginChallenge = x.Must(f.ToLoginChallenge(ctx, deps))
 
 					got1, err := flow.DecodeFromLoginChallenge(ctx, deps, loginChallenge)
@@ -419,7 +425,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 				t.Run("key="+tc.key, func(t *testing.T) {
 					consentRequest, h, f := mockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.skip, "challenge", network)
 					_ = clientManager.CreateClient(ctx, consentRequest.Client) // Ignore errors that are caused by duplication
-					f.NID = m.NetworkID(ctx)
+					f.NID = deps.Networker().NetworkID(ctx)
 
 					require.NoError(t, f.HandleConsentRequest(h))
 					assert.WithinDuration(t, time.Now(), time.Time(f.ConsentHandledAt), 5*time.Second)
@@ -445,7 +451,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 			t.Run("case=consent-error", func(t *testing.T) {
 				err := mockConsentError("2")
 				_, _, f := mockConsentRequest("2", true, 0, false, "challenge", network)
-				f.NID = m.NetworkID(ctx)
+				f.NID = deps.Networker().NetworkID(ctx)
 
 				_ = clientManager.CreateClient(ctx, f.Client) // Ignore errors that are caused by duplication
 				require.NoError(t, f.HandleConsentError(err))
@@ -531,8 +537,8 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 			cr1, hcr1, f1 := mockConsentRequest("rv1", false, 0, false, "fk-login-challenge", network)
 			cr2, hcr2, f2 := mockConsentRequest("rv2", false, 0, false, "fk-login-challenge", network)
-			f1.NID = m.NetworkID(ctx)
-			f2.NID = m.NetworkID(ctx)
+			f1.NID = deps.Networker().NetworkID(ctx)
+			f2.NID = deps.Networker().NetworkID(ctx)
 
 			// Ignore duplication errors
 			_ = clientManager.CreateClient(ctx, cr1.Client)
@@ -617,9 +623,9 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
 			_, hcr1, f1 := mockConsentRequest("rv1", true, 0, false, "fk-login-challenge", network)
-			f1.NID = m.NetworkID(ctx)
+			f1.NID = deps.Networker().NetworkID(ctx)
 			_, hcr2, f2 := mockConsentRequest("rv2", false, 0, false, "fk-login-challenge", network)
-			f2.NID = m.NetworkID(ctx)
+			f2.NID = deps.Networker().NetworkID(ctx)
 
 			// Ignore duplicate errors
 			_ = clientManager.CreateClient(ctx, f1.Client)
@@ -672,11 +678,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 							assert.Contains(t, tc.clients, cs.Client.GetID())
 						}
 					}
-
-					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
-					require.NoError(t, err)
-					assert.EqualValues(t, n, len(tc.consentIDs))
-
 				})
 			}
 
@@ -714,11 +715,6 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 							assert.Contains(t, tc.clients, cs.Client.GetID())
 						}
 					}
-
-					n, err := m.CountSubjectsGrantedConsentRequests(ctx, tc.subject)
-					require.NoError(t, err)
-					assert.EqualValues(t, n, len(tc.consentRequestIDs))
-
 				})
 			}
 
@@ -774,7 +770,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 					t.Run(fmt.Sprintf("create/session=%s/subject=%s", id, subject), func(t *testing.T) {
 						ls := &flow.LoginSession{
 							ID:              id,
-							NID:             m.NetworkID(ctx),
+							NID:             deps.Networker().NetworkID(ctx),
 							AuthenticatedAt: sqlxx.NullTime(time.Now()),
 							Subject:         subject,
 							Remember:        true,
@@ -798,7 +794,7 @@ func ManagerTests(deps Deps, m consent.Manager, clientManager client.Manager, fo
 						require.NoError(t, clientManager.CreateClient(ctx, cl))
 
 						f := &flow.Flow{
-							NID: m.NetworkID(ctx),
+							NID: deps.Networker().NetworkID(ctx),
 							OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 								ACRValues: []string{"1", "2"},
 								UILocales: []string{"fr", "de"},

@@ -10,10 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/servicelocatorx"
-	"github.com/ory/x/sqlcon"
-
 	"github.com/go-jose/go-jose/v3"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -36,6 +32,9 @@ import (
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/servicelocatorx"
+	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/uuidx"
 )
@@ -80,17 +79,17 @@ func (s *PersisterTestSuite) TestAcceptLogoutRequest() {
 
 	for k, r := range s.registries {
 		s.T().Run("dialect="+k, func(t *testing.T) {
-			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+			require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
 
-			expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			expected, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
 			require.NoError(t, err)
 			require.Equal(t, false, expected.Accepted)
 
-			lrAccepted, err := r.ConsentManager().AcceptLogoutRequest(s.t2, lr.ID)
+			lrAccepted, err := r.LogoutManager().AcceptLogoutRequest(s.t2, lr.ID)
 			require.Error(t, err)
 			require.Equal(t, &flow.LogoutRequest{}, lrAccepted)
 
-			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
 			require.NoError(t, err)
 			require.Equal(t, expected, actual)
 		})
@@ -1337,15 +1336,15 @@ func (s *PersisterTestSuite) TestRejectLogoutRequest() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			lr := newLogoutRequest()
-			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+			require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
 
-			require.Error(t, r.ConsentManager().RejectLogoutRequest(s.t2, lr.ID))
-			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.Error(t, r.LogoutManager().RejectLogoutRequest(s.t2, lr.ID))
+			actual, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
 			require.NoError(t, err)
 			require.Equal(t, lr, actual)
 
-			require.NoError(t, r.ConsentManager().RejectLogoutRequest(s.t1, lr.ID))
-			actual, err = r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.NoError(t, r.LogoutManager().RejectLogoutRequest(s.t1, lr.ID))
+			actual, err = r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
 			require.Error(t, err)
 			require.Equal(t, &flow.LogoutRequest{}, actual)
 		})
@@ -1709,19 +1708,19 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 				lr.Verifier = uuid.Must(uuid.NewV4()).String()
 				lr.Accepted = true
 				lr.Rejected = false
-				require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+				require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
 
-				expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+				expected, err := r.LogoutManager().GetLogoutRequest(s.t1, lr.ID)
 				require.NoError(t, err)
 
-				lrInvalidated, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
+				lrInvalidated, err := r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
 				require.Error(t, err)
 				require.Nil(t, lrInvalidated)
 				actual := &flow.LogoutRequest{}
 				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
 				require.Equal(t, expected, actual)
 
-				lrInvalidated, err = r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
+				lrInvalidated, err = r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
 				require.NoError(t, err)
 				require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
 				require.Equal(t, lrInvalidated, actual)
@@ -1745,12 +1744,12 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 				lr.Verifier = uuid.Must(uuid.NewV4()).String()
 				lr.Accepted = true
 				lr.Rejected = false
-				require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+				require.NoError(t, r.LogoutManager().CreateLogoutRequest(s.t1, lr))
 
-				_, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
+				_, err := r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
 				require.ErrorIs(t, err, x.ErrNotFound)
 
-				_, err = r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
+				_, err = r.LogoutManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
 				require.ErrorIs(t, err, flow.ErrorLogoutFlowExpired)
 			})
 		})

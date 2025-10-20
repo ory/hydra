@@ -7,7 +7,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -419,27 +418,6 @@ func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Contex
 
 	fs, nextPage := keysetpagination.Result(fs, paginator)
 	return fs, nextPage, nil
-}
-
-func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (n int, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountSubjectsGrantedConsentRequests")
-	defer otelx.End(span, &err)
-	defer func() {
-		span.SetAttributes(attribute.Int("count", n))
-	}()
-
-	n, err = p.Connection(ctx).
-		Where(
-			strings.TrimSpace(fmt.Sprintf(`
-(state = %d OR state = %d) AND
-subject = ? AND
-consent_skip=FALSE AND
-consent_error='{}' AND
-nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
-			)),
-			subject, p.NetworkID(ctx)).
-		Count(&flow.Flow{})
-	return n, sqlcon.HandleError(err)
 }
 
 func filterExpiredConsentRequests(requests []flow.Flow) []flow.Flow {

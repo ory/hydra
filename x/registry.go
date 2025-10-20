@@ -44,3 +44,7 @@ type Networker interface {
 type NetworkProvider interface {
 	Networker() Networker
 }
+
+type Transactor interface {
+	Transaction(ctx context.Context, f func(ctx context.Context) error) error
+}

@@ -30,7 +30,11 @@ type InternalRegistry interface {
 }
 
 type Registry interface {
-	ConsentManager() Manager
+	ManagerProvider
+	ObfuscatedSubjectManagerProvider
+	LoginManagerProvider
+	LogoutManagerProvider
+
 	ConsentStrategy() Strategy
 	SubjectIdentifierAlgorithm(ctx context.Context) map[string]SubjectIdentifierAlgorithm
 }

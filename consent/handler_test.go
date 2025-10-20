@@ -50,7 +50,7 @@ func TestGetLogoutRequest(t *testing.T) {
 
 	t.Run("unhandled logout request", func(t *testing.T) {
 		challenge := "test-challenge-unhandled"
-		require.NoError(t, reg.ConsentManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
+		require.NoError(t, reg.LogoutManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
 			Client:     cl,
 			ID:         challenge,
 			RequestURL: requestURL,
@@ -71,7 +71,7 @@ func TestGetLogoutRequest(t *testing.T) {
 
 	t.Run("handled logout request", func(t *testing.T) {
 		challenge := "test-challenge-handled"
-		require.NoError(t, reg.ConsentManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
+		require.NoError(t, reg.LogoutManager().CreateLogoutRequest(t.Context(), &flow.LogoutRequest{
 			Client:     cl,
 			ID:         challenge,
 			RequestURL: requestURL,

@@ -30,7 +30,6 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
-	"github.com/ory/pop/v6"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/josex"
 	"github.com/ory/x/otelx"
@@ -779,7 +778,7 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	}
 
 	req.SetSession(session)
-	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+	if err := h.r.Transaction(ctx, func(ctx context.Context) error {
 		// Update the device code session with
 		//   - the claims for which the user gave consent
 		//   - the granted scopes
@@ -929,7 +928,7 @@ type _ struct {
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error {
+	err := h.r.Transaction(ctx, func(ctx context.Context) error {
 		return h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
 	})
 	if err != nil {
@@ -1227,7 +1226,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accessResponse fosite.AccessResponder
-	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) (err error) {
+	if err := h.r.Transaction(ctx, func(ctx context.Context) (err error) {
 		accessResponse, err = h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 		return err
 	}); err != nil {
@@ -1291,7 +1290,7 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response fosite.AuthorizeResponder
-	if err := h.r.Persister().Transaction(ctx, func(ctx context.Context, _ *pop.Connection) (err error) {
+	if err := h.r.Transaction(ctx, func(ctx context.Context) (err error) {
 		response, err = h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, session)
 		return err
 	}); err != nil {

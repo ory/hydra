@@ -291,7 +291,7 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
+	if err := h.r.LoginManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -875,7 +875,7 @@ func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		r.URL.Query().Get("challenge"),
 	)
 
-	c, err := h.r.ConsentManager().AcceptLogoutRequest(r.Context(), challenge)
+	c, err := h.r.LogoutManager().AcceptLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -918,7 +918,7 @@ func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Reque
 		r.URL.Query().Get("challenge"),
 	)
 
-	if err := h.r.ConsentManager().RejectLogoutRequest(r.Context(), challenge); err != nil {
+	if err := h.r.LogoutManager().RejectLogoutRequest(r.Context(), challenge); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -956,7 +956,7 @@ func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request)
 		r.URL.Query().Get("challenge"),
 	)
 
-	request, err := h.r.ConsentManager().GetLogoutRequest(r.Context(), challenge)
+	request, err := h.r.LogoutManager().GetLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

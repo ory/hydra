@@ -207,6 +207,12 @@ func (m *RegistrySQL) ConsentManager() consent.Manager {
 	return m.Persister()
 }
 
+func (m *RegistrySQL) ObfuscatedSubjectManager() consent.ObfuscatedSubjectManager {
+	return m.Persister()
+}
+func (m *RegistrySQL) LoginManager() consent.LoginManager   { return m.Persister() }
+func (m *RegistrySQL) LogoutManager() consent.LogoutManager { return m.Persister() }
+
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 	return m.Persister()
 }
@@ -508,9 +514,7 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 	return m.forv
 }
 
-func (m *RegistrySQL) Networker() x.Networker {
-	return m.basePersister
-}
+func (m *RegistrySQL) Networker() x.Networker { return m.basePersister }
 
 func (m *RegistrySQL) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
@@ -592,4 +596,8 @@ func (m *RegistrySQL) HTTPMiddlewares() []negroni.Handler {
 
 func (m *RegistrySQL) Migrator() *sql.MigrationManager {
 	return m.migrator
+}
+
+func (m *RegistrySQL) Transaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	return m.basePersister.Transaction(ctx, func(ctx context.Context, _ *pop.Connection) error { return fn(ctx) })
 }

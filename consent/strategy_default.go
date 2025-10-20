@@ -66,7 +66,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	}
 
 	var forcedObfuscatedUserID string
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Is(err, x.ErrNotFound) {
+	if s, err := s.r.ObfuscatedSubjectManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Is(err, x.ErrNotFound) {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (s *DefaultStrategy) authenticationSession(ctx context.Context, _ http.Resp
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, sessionID)
+	session, err := s.r.LoginManager().GetRememberedLoginSession(ctx, sessionID)
 	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().WithRequest(r).WithError(err).
 			Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
@@ -274,7 +274,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 			LoginAuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 			RequestedAt:          time.Now().Truncate(time.Second).UTC(),
 			State:                flow.FlowStateLoginUnused,
-			NID:                  s.r.ConsentManager().NetworkID(ctx),
+			NID:                  s.r.Networker().NetworkID(ctx),
 		}
 	} else {
 		// Device auth grant
@@ -286,7 +286,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(
 		f.LoginAuthenticatedAt = sqlxx.NullTime(authenticatedAt)
 		f.RequestedAt = time.Now().Truncate(time.Second).UTC()
 		f.State = flow.FlowStateLoginUnused
-		f.NID = s.r.ConsentManager().NetworkID(ctx)
+		f.NID = s.r.Networker().NetworkID(ctx)
 	}
 
 	store, err := s.r.CookieStore(ctx)
@@ -339,7 +339,7 @@ func (s *DefaultStrategy) revokeAuthenticationSession(ctx context.Context, w htt
 		return nil
 	}
 
-	_, err = s.r.ConsentManager().DeleteLoginSession(ctx, sid)
+	_, err = s.r.LoginManager().DeleteLoginSession(ctx, sid)
 	return err
 }
 
@@ -440,7 +440,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 	}
 
 	if f.ForceSubjectIdentifier != "" {
-		if err := s.r.ConsentManager().CreateForcedObfuscatedLoginSession(ctx, &ForcedObfuscatedLoginSession{
+		if err := s.r.ObfuscatedSubjectManager().CreateForcedObfuscatedLoginSession(ctx, &ForcedObfuscatedLoginSession{
 			Subject:           f.Subject,
 			ClientID:          req.GetClient().GetID(),
 			SubjectObfuscated: f.ForceSubjectIdentifier,
@@ -461,7 +461,7 @@ func (s *DefaultStrategy) verifyAuthentication(
 					"This is a bug which should be reported to https://github.com/ory/hydra."))
 		}
 
-		if err := s.r.ConsentManager().ConfirmLoginSession(ctx, &flow.LoginSession{
+		if err := s.r.LoginManager().ConfirmLoginSession(ctx, &flow.LoginSession{
 			ID:                        sessionID,
 			AuthenticatedAt:           f.LoginAuthenticatedAt,
 			Subject:                   f.Subject,
@@ -824,7 +824,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		}
 
 		challenge := uuid.New()
-		if err := s.r.ConsentManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
+		if err := s.r.LogoutManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
 			RequestURL:  r.URL.String(),
 			ID:          challenge,
 			Subject:     session.Subject,
@@ -936,7 +936,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	session, err := s.r.ConsentManager().GetRememberedLoginSession(ctx, hintSid)
+	session, err := s.r.LoginManager().GetRememberedLoginSession(ctx, hintSid)
 	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
@@ -947,7 +947,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 	}
 
 	challenge := uuid.New()
-	if err := s.r.ConsentManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
+	if err := s.r.LogoutManager().CreateLogoutRequest(ctx, &flow.LogoutRequest{
 		RequestURL:  r.URL.String(),
 		ID:          challenge,
 		SessionID:   hintSid,
@@ -976,7 +976,7 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.C
 	//
 	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
 	// even if an upstream URL fails!
-	if session, err := s.r.ConsentManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows) {
+	if session, err := s.r.LoginManager().DeleteLoginSession(ctx, sid); errors.Is(err, sqlcon.ErrNoRows) {
 		// This is ok (session probably already revoked), do nothing!
 	} else if err != nil {
 		return err
@@ -994,7 +994,7 @@ func (s *DefaultStrategy) performBackChannelLogoutAndDeleteSession(ctx context.C
 }
 
 func (s *DefaultStrategy) completeLogout(ctx context.Context, w http.ResponseWriter, r *http.Request, verifier string) (*flow.LogoutResult, error) {
-	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(ctx, verifier)
+	lr, err := s.r.LogoutManager().VerifyAndInvalidateLogoutRequest(ctx, verifier)
 	if err != nil {
 		return nil, err
 	}
@@ -1064,7 +1064,7 @@ func (s *DefaultStrategy) HandleOpenIDConnectLogout(ctx context.Context, w http.
 }
 
 func (s *DefaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.ResponseWriter, r *http.Request, sid string) error {
-	loginSession, lsErr := s.r.ConsentManager().GetRememberedLoginSession(ctx, sid)
+	loginSession, lsErr := s.r.LoginManager().GetRememberedLoginSession(ctx, sid)
 
 	if errors.Is(lsErr, x.ErrNotFound) {
 		// This is ok (session probably already revoked), do nothing!

@@ -68,7 +68,7 @@ jobs:
           go-version: "1.25"
       - run: go list -json > go.list
       - name: Run nancy
-        uses: sonatype-nexus-community/nancy-github-action@v1.0.2
+        uses: sonatype-nexus-community/nancy-github-action@v1.0.3
         with:
           nancyVersion: v1.0.42
       - name: Run golangci-lint

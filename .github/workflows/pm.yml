@@ -23,7 +23,8 @@ jobs:
           token: ${{ secrets.ORY_BOT_PAT }}
           todoLabel: "Needs Triage"
           statusName: Status
-          statusValue: "Needs Triage"
+          prStatusValue: "Needs Triage"
+          issueStatusValue: "Needs Triage"
           includeEffort: "false"
           monthlyMilestoneName: Roadmap Monthly
           quarterlyMilestoneName: Roadmap

@@ -137,7 +137,12 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 		tableName += "@hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx"
 	}
 
-	sql := fmt.Sprintf(`SELECT key_set FROM %s WHERE key_id = ? AND nid = ? AND issuer = ? AND (subject = ? OR allow_any_subject IS TRUE) LIMIT 1`, tableName)
+	expiresAt := "expires_at > NOW()"
+	if p.Connection(ctx).Dialect.Name() == "sqlite3" {
+		expiresAt = "expires_at > datetime('now')"
+	}
+
+	sql := fmt.Sprintf(`SELECT key_set FROM %s WHERE key_id = ? AND nid = ? AND issuer = ? AND (subject = ? OR allow_any_subject IS TRUE) AND %s LIMIT 1`, tableName, expiresAt)
 	query := p.Connection(ctx).RawQuery(sql,
 		keyId, p.NetworkID(ctx), issuer, subject,
 	)

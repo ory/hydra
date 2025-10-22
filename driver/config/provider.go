@@ -7,11 +7,9 @@ import (
 	"context"
 	"crypto/sha512"
 	"fmt"
-	"maps"
 	"math"
 	"net/http"
 	"net/url"
-	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -102,7 +100,9 @@ const (
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyDeviceAuthTokenPollingInterval            = "oauth2.device_authorization.token_polling_interval" // #nosec G101
-	KeyDeviceAuthUserCodeEntropy                 = "oauth2.device_authorization.user_code_entropy"
+	KeyDeviceAuthUserCodeEntropyPreset           = "oauth2.device_authorization.user_code.entropy_preset"
+	KeyDeviceAuthUserCodeLength                  = "oauth2.device_authorization.user_code.length"
+	KeyDeviceAuthUserCodeCharacterSet            = "oauth2.device_authorization.user_code.character_set"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
@@ -123,15 +123,6 @@ const (
 )
 
 const DSNMemory = "memory"
-
-var userCodeEtropy = map[string]struct {
-	Length  int
-	Symbols []rune
-}{
-	"high":   {Length: 8, Symbols: randx.AlphaNumNoAmbiguous},
-	"medium": {Length: 8, Symbols: randx.AlphaUpper},
-	"low":    {Length: 9, Symbols: randx.Numeric},
-}
 
 var (
 	_ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
@@ -437,31 +428,38 @@ func (p *DefaultProvider) GetDeviceAuthTokenPollingInterval(ctx context.Context)
 	return p.p.DurationF(KeyDeviceAuthTokenPollingInterval, time.Second*5)
 }
 
-// GetUserCodeLength returns configured user_code length
-func (p *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
-	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
-	profile, ok := userCodeEtropy[k]
-	if !ok {
-		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, strings.Join(slices.Collect(maps.Keys(userCodeEtropy)), ", ")))
-		return 0
+func (p *DefaultProvider) userCodeEntropyPreset(t string) (int, []rune) {
+	switch t {
+	default:
+		p.l.Errorf(`invalid user code entropy preset %q, allowed values are "high", "medium", or "low"`, t)
+		fallthrough
+	case "high":
+		return 8, randx.AlphaNumNoAmbiguous
+	case "medium":
+		return 8, randx.AlphaUpper
+	case "low":
+		return 9, randx.Numeric
 	}
-	return profile.Length
 }
 
-// GetDeviceAuthTokenPollingInterval returns configured user_code allowed symbols
-func (p *DefaultProvider) GetUserCodeSymbols(ctx context.Context) []rune {
-	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropy, "medium")
-	profile, ok := userCodeEtropy[k]
-	if !ok {
-		keys := []string{}
-		for k := range userCodeEtropy {
-			keys = append(keys, k)
-		}
-
-		p.l.WithError(errors.Errorf("Invalid user_code entropy: %s, allowed entropy values are: %s", k, keys))
-		return nil
+// GetUserCodeLength returns configured user_code length
+func (p *DefaultProvider) GetUserCodeLength(ctx context.Context) int {
+	if l := p.getProvider(ctx).Int(KeyDeviceAuthUserCodeLength); l > 0 {
+		return l
 	}
-	return profile.Symbols
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropyPreset, "high")
+	l, _ := p.userCodeEntropyPreset(k)
+	return l
+}
+
+// GetUserCodeSymbols returns configured user_code allowed symbols
+func (p *DefaultProvider) GetUserCodeSymbols(ctx context.Context) []rune {
+	if s := p.getProvider(ctx).String(KeyDeviceAuthUserCodeCharacterSet); s != "" {
+		return []rune(s)
+	}
+	k := p.getProvider(ctx).StringF(KeyDeviceAuthUserCodeEntropyPreset, "high")
+	_, s := p.userCodeEntropyPreset(k)
+	return s
 }
 
 func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {

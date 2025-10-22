@@ -926,11 +926,39 @@
               "description": "Configures how often a non-interactive device should poll the device token endpoint, this is a purely informational configuration and does not enforce rate-limiting.",
               "examples": ["5s", "15s", "1m"]
             },
-            "user_code_entropy": {
-              "type": "string",
-              "description": "Sets the entropy for the user codes.",
-              "default": "medium",
-              "enum": ["high", "medium", "low"]
+            "user_code": {
+              "type": "object",
+              "description": "Configures the user code settings.",
+              "oneOf": [
+                {
+                  "properties": {
+                    "entropy_preset": {
+                      "type": "string",
+                      "description": "Presets for the user-code length and character set.",
+                      "enum": ["high", "medium", "low"]
+                    }
+                  },
+                  "required": ["entropy_preset"],
+                  "additionalProperties": false
+                },
+                {
+                  "properties": {
+                    "length": {
+                      "type": "integer",
+                      "description": "The length of the user code.",
+                      "minimum": 6
+                    },
+                    "character_set": {
+                      "type": "string",
+                      "description": "The character set to use for the user code. Provide the raw characters that should be used.",
+                      "examples": ["ABCDEFGHJKLMNPQRSTUVWXYZ23456789"],
+                      "minLength": 8
+                    }
+                  },
+                  "required": ["length", "character_set"],
+                  "additionalProperties": false
+                }
+              ]
             }
           }
         },

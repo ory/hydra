@@ -326,7 +326,7 @@ func TestProviderValidates(t *testing.T) {
 	assert.Equal(t, true, c.GetEnforcePKCEForPublicClients(ctx))
 	assert.Equal(t, 2*time.Hour, c.GetDeviceAuthTokenPollingInterval(ctx))
 	assert.Equal(t, 8, c.GetUserCodeLength(ctx))
-	assert.Equal(t, randx.AlphaUpper, c.GetUserCodeSymbols(ctx))
+	assert.Equal(t, string(randx.AlphaUpper), string(c.GetUserCodeSymbols(ctx)))
 
 	// secrets
 	secret, err := c.GetGlobalSecret(ctx)
@@ -530,4 +530,24 @@ func TestJWTScopeClaimStrategy(t *testing.T) {
 	assert.Equal(t, jwt.JWTScopeFieldString, p.GetJWTScopeField(ctx))
 	p.MustSet(ctx, KeyJWTScopeClaimStrategy, "both")
 	assert.Equal(t, jwt.JWTScopeFieldBoth, p.GetJWTScopeField(ctx))
+}
+
+func TestDeviceUserCode(t *testing.T) {
+	l := logrusx.New("", "")
+
+	t.Run("preset", func(t *testing.T) {
+		p := MustNew(t, l, configx.WithValue(KeyDeviceAuthUserCodeEntropyPreset, "low"))
+		assert.Equal(t, 9, p.GetUserCodeLength(t.Context()))
+		assert.Equal(t, string(randx.Numeric), string(p.GetUserCodeSymbols(t.Context())))
+	})
+
+	t.Run("explicit values", func(t *testing.T) {
+		length, charSet := 15, "foobarbaz1234"
+		p := MustNew(t, l, configx.WithValues(map[string]any{
+			KeyDeviceAuthUserCodeLength:       length,
+			KeyDeviceAuthUserCodeCharacterSet: charSet,
+		}))
+		assert.Equal(t, length, p.GetUserCodeLength(t.Context()))
+		assert.Equal(t, charSet, string(p.GetUserCodeSymbols(t.Context())))
+	})
 }

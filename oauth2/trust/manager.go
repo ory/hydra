@@ -18,6 +18,5 @@ type GrantManager interface {
 	GetConcreteGrant(ctx context.Context, id uuid.UUID) (Grant, error)
 	DeleteGrant(ctx context.Context, id uuid.UUID) error
 	GetGrants(ctx context.Context, optionalIssuer string, pageOpts ...keysetpagination.Option) ([]Grant, *keysetpagination.Paginator, error)
-	CountGrants(ctx context.Context) (int, error)
 	FlushInactiveGrants(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 }

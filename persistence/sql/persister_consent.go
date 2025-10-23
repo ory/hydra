@@ -463,7 +463,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 SELECT DISTINCT %s FROM hydra_client as c
 JOIN hydra_oauth2_flow as f ON (c.id = f.client_id AND c.nid = f.nid)
 WHERE
-	f.subject=? AND
+	f.subject = ? AND
 	c.%schannel_logout_uri != '' AND
 	c.%schannel_logout_uri IS NOT NULL AND
 	f.login_session_id = ? AND
@@ -622,24 +622,26 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 }
 
 func (p *Persister) mySQLConfirmLoginSession(ctx context.Context, session *flow.LoginSession) error {
-	err := sqlcon.HandleError(p.Connection(ctx).Create(session))
-	if err == nil {
+	return p.Transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := sqlcon.HandleError(c.Create(session))
+		if err == nil {
+			return nil
+		}
+
+		if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+			return err
+		}
+
+		n, err := c.
+			Where("id = ? and nid = ?", session.ID, session.NID).
+			UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember", "expires_at")
+		if err != nil {
+			return errors.WithStack(sqlcon.HandleError(err))
+		}
+		if n == 0 {
+			return errors.WithStack(x.ErrNotFound)
+		}
+
 		return nil
-	}
-
-	if !errors.Is(err, sqlcon.ErrUniqueViolation) {
-		return err
-	}
-
-	n, err := p.Connection(ctx).
-		Where("id = ? and nid = ?", session.ID, session.NID).
-		UpdateQuery(session, "authenticated_at", "subject", "identity_provider_session_id", "remember", "expires_at")
-	if err != nil {
-		return errors.WithStack(sqlcon.HandleError(err))
-	}
-	if n == 0 {
-		return errors.WithStack(x.ErrNotFound)
-	}
-
-	return nil
+	})
 }

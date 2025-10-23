@@ -45,10 +45,6 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		assert.Len(t, storedGrants, 0)
 		assert.True(t, nextPage.IsLast())
 
-		count, err := t1.CountGrants(t.Context())
-		require.NoError(t, err)
-		assert.Equal(t, 0, count)
-
 		createdAt := time.Now().UTC().Round(time.Second)
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
@@ -105,10 +101,6 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 
 		require.NoError(t, t1.CreateGrant(t.Context(), grant3, mikePubKey))
 
-		count, err = t1.CountGrants(t.Context())
-		require.NoError(t, err)
-		assert.Equal(t, 3, count)
-
 		storedGrants, nextPage, err = t1.GetGrants(t.Context(), "")
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
@@ -133,20 +125,15 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 		require.NoError(t, t1.DeleteGrant(t.Context(), grant.ID))
 
 		_, err = t1.GetConcreteGrant(t.Context(), grant.ID)
-		require.Error(t, err)
-
-		count, err = t1.CountGrants(t.Context())
-		require.NoError(t, err)
-		assert.Equal(t, 2, count)
+		require.ErrorIs(t, err, sqlcon.ErrNoRows)
 
 		require.NoError(t, t1.FlushInactiveGrants(t.Context(), grant2.ExpiresAt, 1000, 100))
 
-		count, err = t1.CountGrants(t.Context())
-		require.NoError(t, err)
-		assert.Equal(t, 1, count)
-
 		_, err = t1.GetConcreteGrant(t.Context(), grant2.ID)
 		assert.NoError(t, err)
+
+		_, err = t1.GetConcreteGrant(t.Context(), grant3.ID)
+		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	}
 }
 

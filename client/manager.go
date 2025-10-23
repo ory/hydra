@@ -34,8 +34,6 @@ type Storage interface {
 
 	GetClients(ctx context.Context, filters Filter) ([]Client, *keysetpagination.Paginator, error)
 
-	CountClients(ctx context.Context) (int, error)
-
 	GetConcreteClient(ctx context.Context, id string) (*Client, error)
 }
 

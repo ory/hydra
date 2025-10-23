@@ -35,9 +35,10 @@ func BenchmarkClientCredentials(b *testing.B) {
 	tracer := trace.NewTracerProvider(trace.WithSpanProcessor(spans)).Tracer("")
 
 	dsn := "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable"
-	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true,
+	reg, err := testhelpers.NewRegistrySQLFromURL(b.Context(), dsn, true,
 		driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }),
 		driver.WithConfigOptions(configx.WithValue(config.KeyAccessTokenStrategy, "opaque")))
+	require.NoError(b, err)
 	public, admin := testhelpers.NewOAuth2Server(ctx, b, reg)
 
 	newCustomClient := func(b *testing.B, c *hc.Client) (*hc.Client, clientcredentials.Config) {

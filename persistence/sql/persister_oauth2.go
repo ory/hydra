@@ -477,7 +477,7 @@ func (p *Persister) GetRefreshTokenSession(ctx context.Context, signature string
 		row.FirstUsedAt.Valid &&
 		row.FirstUsedAt.Time.Add(graceful.Period).After(time.Now()) &&
 		(graceful.Count == 0 || // no limit
-			(row.UsedTimes.Valid && row.UsedTimes.Int32 < graceful.Count)) {
+			(row.UsedTimes.Int32 < graceful.Count)) {
 		// We return the request as is, which indicates that the token is active (because we are in the grace period still).
 		return row.toRequest(ctx, session, p)
 	}

@@ -118,15 +118,6 @@ func (p *Persister) GetGrants(ctx context.Context, optionalIssuer string, pageOp
 	return grants, nextPage, nil
 }
 
-func (p *Persister) CountGrants(ctx context.Context) (n int, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountGrants")
-	defer otelx.End(span, &err)
-
-	n, err = p.QueryWithNetwork(ctx).
-		Count(&SQLGrant{})
-	return n, sqlcon.HandleError(err)
-}
-
 func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKey")
 	defer otelx.End(span, &err)

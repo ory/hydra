@@ -213,57 +213,6 @@ func (s *PersisterTestSuite) TestCreateSession() {
 	}
 }
 
-func (s *PersisterTestSuite) TestCountClients() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			count, err := r.Persister().CountClients(s.t1)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			count, err = r.Persister().CountClients(s.t2)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			require.NoError(t, r.Persister().CreateClient(s.t1, newClient()))
-
-			count, err = r.Persister().CountClients(s.t1)
-			require.NoError(t, err)
-			require.Equal(t, 1, count)
-
-			count, err = r.Persister().CountClients(s.t2)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-		})
-	}
-}
-
-func (s *PersisterTestSuite) TestCountGrants() {
-	for k, r := range s.registries {
-		s.T().Run(k, func(t *testing.T) {
-			count, err := r.Persister().CountGrants(s.t1)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			count, err = r.Persister().CountGrants(s.t2)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-
-			keySet := uuid.Must(uuid.NewV4()).String()
-			publicKey := newKey(keySet, "use")
-			grant := newGrant(keySet, publicKey.KeyID)
-			require.NoError(t, r.Persister().CreateGrant(s.t1, grant, publicKey))
-
-			count, err = r.Persister().CountGrants(s.t1)
-			require.NoError(t, err)
-			require.Equal(t, 1, count)
-
-			count, err = r.Persister().CountGrants(s.t2)
-			require.NoError(t, err)
-			require.Equal(t, 0, count)
-		})
-	}
-}
-
 func (s *PersisterTestSuite) TestCreateAccessTokenSession() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {

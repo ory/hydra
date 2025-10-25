@@ -108,6 +108,12 @@ func TestDecodeFromLoginChallenge(t *testing.T) {
 		assert.Equal(t, testFlow.Subject, decoded.Subject)
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+
+		t.Run("decodes deterministically", func(t *testing.T) {
+			second, err := flow.DecodeFromLoginChallenge(ctx, reg, loginChallenge)
+			require.NoError(t, err)
+			assert.Equal(t, decoded, second)
+		})
 	})
 
 	t.Run("case=fails with wrong purpose (consent challenge instead of login)", func(t *testing.T) {
@@ -179,6 +185,12 @@ func TestDecodeFromConsentChallenge(t *testing.T) {
 		assert.Equal(t, testFlow.Subject, decoded.Subject)
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+
+		t.Run("decodes deterministically", func(t *testing.T) {
+			second, err := flow.DecodeFromConsentChallenge(ctx, reg, consentChallenge)
+			require.NoError(t, err)
+			assert.Equal(t, decoded, second)
+		})
 	})
 
 	t.Run("case=fails with wrong purpose (login challenge instead of consent)", func(t *testing.T) {
@@ -342,6 +354,12 @@ func TestDecodeFromDeviceChallenge(t *testing.T) {
 		assert.Equal(t, testFlow.Subject, decoded.Subject)
 
 		snapshotx.SnapshotT(t, decoded, snapshotx.ExceptPaths("n", "ia"))
+
+		t.Run("decodes deterministically", func(t *testing.T) {
+			second, err := flow.DecodeFromDeviceChallenge(ctx, reg, deviceChallenge)
+			require.NoError(t, err)
+			assert.Equal(t, decoded, second)
+		})
 	})
 
 	t.Run("case=fails with wrong purpose (login challenge instead of device)", func(t *testing.T) {

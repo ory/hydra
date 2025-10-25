@@ -4,6 +4,7 @@
 package testhelpers
 
 import (
+	"context"
 	"regexp"
 	"strings"
 	"sync"
@@ -14,6 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
@@ -50,10 +52,12 @@ func NewConfigurationWithDefaults(t testing.TB, opts ...configx.OptionModifier) 
 }
 
 func NewRegistryMemory(t testing.TB, opts ...driver.OptionsModifier) *driver.RegistrySQL {
-	return NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, opts...)
+	reg, err := NewRegistrySQLFromURL(t.Context(), dbal.NewSQLiteTestDatabase(t), true, opts...)
+	require.NoError(t, err)
+	return reg
 }
 
-func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate bool, opts ...driver.OptionsModifier) *driver.RegistrySQL {
+func NewRegistrySQLFromURL(ctx context.Context, dsn string, migrate bool, opts ...driver.OptionsModifier) (*driver.RegistrySQL, error) {
 	sql.SilenceMigrations = true
 
 	configOpts := append(ConfigDefaults, configx.WithValue(config.KeyDSN, dsn))
@@ -65,10 +69,7 @@ func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate bool, opts ...drive
 		regOpts = append(regOpts, driver.WithAutoMigrate())
 	}
 
-	r, err := driver.New(t.Context(), regOpts...)
-	require.NoError(t, err)
-
-	return r
+	return driver.New(ctx, regOpts...)
 }
 
 func ConnectToMySQL(t testing.TB) string { return dockertest.RunTestMySQLWithVersion(t, "8.0") }
@@ -138,9 +139,20 @@ func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier
 	regs["memory"] = NewRegistryMemory(t, opts...)
 	if !testing.Short() {
 		pg, mysql, crdb := ConnectDatabasesURLs(t)
-		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, opts...)
-		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, opts...)
-		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, opts...)
+		eg, ctx := errgroup.WithContext(t.Context())
+		eg.Go(func() (err error) {
+			regs["postgres"], err = NewRegistrySQLFromURL(ctx, pg, migrate, opts...)
+			return
+		})
+		eg.Go(func() (err error) {
+			regs["mysql"], err = NewRegistrySQLFromURL(ctx, mysql, migrate, opts...)
+			return
+		})
+		eg.Go(func() (err error) {
+			regs["cockroach"], err = NewRegistrySQLFromURL(ctx, crdb, migrate, opts...)
+			return
+		})
+		require.NoError(t, eg.Wait())
 	}
 	return regs
 }

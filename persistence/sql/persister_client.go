@@ -167,11 +167,3 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (cs [
 	cs, nextPage := keysetpagination.Result(cs, paginator)
 	return cs, nextPage, nil
 }
-
-func (p *Persister) CountClients(ctx context.Context) (n int, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CountClients")
-	defer otelx.End(span, &err)
-
-	n, err = p.QueryWithNetwork(ctx).Count(&client.Client{})
-	return n, sqlcon.HandleError(err)
-}

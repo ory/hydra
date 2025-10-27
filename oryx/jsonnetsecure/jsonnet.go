@@ -65,6 +65,12 @@ func newVMOptions() *vmOptions {
 	}
 }
 
+func WithContext(ctx context.Context) Option {
+	return func(o *vmOptions) {
+		o.ctx = ctx
+	}
+}
+
 func WithProcessPool(p Pool) Option {
 	return func(o *vmOptions) {
 		pool, _ := p.(*pool)

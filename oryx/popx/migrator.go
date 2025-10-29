@@ -5,7 +5,6 @@ package popx
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"math"
 	"os"
@@ -30,6 +29,10 @@ const (
 	Applied          = "Applied"
 	tracingComponent = "github.com/ory/x/popx"
 )
+
+func (mb *MigrationBox) shouldNotUseTransaction(m Migration) bool {
+	return m.Autocommit || mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql"
+}
 
 // Up runs pending "up" migrations and applies them to the database.
 func (mb *MigrationBox) Up(ctx context.Context) error {
@@ -91,9 +94,19 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 				return err
 			}
 
-			if mi.Runner != nil {
-				err := mb.isolatedTransaction(ctx, "up", func(conn *pop.Connection) error {
-					if err := mi.Runner(mi, conn, conn.TX); err != nil {
+			noTx := mb.shouldNotUseTransaction(mi)
+			if noTx {
+				if err := mi.Runner(mi, c); err != nil {
+					return err
+				}
+
+				// #nosec G201 - mtn is a system-wide const
+				if err := c.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec(); err != nil {
+					return errors.Wrapf(err, "problem inserting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}
+			} else {
+				if err := mb.isolatedTransaction(ctx, "up", func(conn *pop.Connection) error {
+					if err := mi.Runner(mi, conn); err != nil {
 						return err
 					}
 
@@ -102,23 +115,12 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 						return errors.Wrapf(err, "problem inserting migration version %s", mi.Version)
 					}
 					return nil
-				})
-				if err != nil {
+				}); err != nil {
 					return err
-				}
-			} else {
-				l.Warn("Migration has requested running outside a transaction. Proceed with caution.")
-				if err := mi.RunnerNoTx(mi, c); err != nil {
-					return err
-				}
-
-				// #nosec G201 - mtn is a system-wide const
-				if err := c.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec(); err != nil {
-					return errors.Wrapf(err, "problem inserting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
 				}
 			}
 
-			l.Infof("> %s applied successfully", mi.Name)
+			l.WithField("autocommit", noTx).Infof("> %s applied successfully", mi.Name)
 			applied++
 			if step > 0 && applied >= step {
 				break
@@ -195,9 +197,19 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 				return err
 			}
 
-			if mi.Runner != nil {
-				err := mb.isolatedTransaction(ctx, "down", func(conn *pop.Connection) error {
-					err := mi.Runner(mi, conn, conn.TX)
+			if mb.shouldNotUseTransaction(mi) {
+				err := mi.Runner(mi, c)
+				if err != nil {
+					return err
+				}
+
+				// #nosec G201 - mtn is a system-wide const
+				if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE version = ?", mtn), mi.Version).Exec(); err != nil {
+					return errors.Wrapf(err, "problem deleting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}
+			} else {
+				if err := mb.isolatedTransaction(ctx, "down", func(conn *pop.Connection) error {
+					err := mi.Runner(mi, conn)
 					if err != nil {
 						return err
 					}
@@ -208,19 +220,8 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 					}
 
 					return nil
-				})
-				if err != nil {
+				}); err != nil {
 					return err
-				}
-			} else {
-				err := mi.RunnerNoTx(mi, c)
-				if err != nil {
-					return err
-				}
-
-				// #nosec G201 - mtn is a system-wide const
-				if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE version = ?", mtn), mi.Version).Exec(); err != nil {
-					return errors.Wrapf(err, "problem deleting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
 				}
 			}
 
@@ -234,7 +235,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 func (mb *MigrationBox) createTransactionalMigrationTable(ctx context.Context, c *pop.Connection, l *logrusx.Logger) error {
 	mtn := sanitizedMigrationTableName(c)
 
-	if err := mb.execMigrationTransaction(ctx, []string{
+	if err := mb.createMigrationStatusTableTransaction(ctx, []string{
 		fmt.Sprintf(`CREATE TABLE %s (version VARCHAR (48) NOT NULL, version_self INT NOT NULL DEFAULT 0)`, mtn),
 		fmt.Sprintf(`CREATE UNIQUE INDEX %s_version_idx ON %s (version)`, mtn, mtn),
 		fmt.Sprintf(`CREATE INDEX %s_version_self_idx ON %s (version_self)`, mtn, mtn),
@@ -272,7 +273,7 @@ func (mb *MigrationBox) migrateToTransactionalMigrationTable(ctx context.Context
 		},
 	}
 
-	if err := mb.execMigrationTransaction(ctx, workload...); err != nil {
+	if err := mb.createMigrationStatusTableTransaction(ctx, workload...); err != nil {
 		return err
 	}
 
@@ -291,39 +292,32 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 		defer cancel()
 	}
 
-	conn, dberr := mb.c.NewTransactionContextOptions(ctx, &sql.TxOptions{
-		Isolation: sql.LevelSerializable,
-		ReadOnly:  false,
+	return Transaction(ctx, mb.c.WithContext(ctx), func(ctx context.Context, connection *pop.Connection) error {
+		return fn(connection)
 	})
-	if dberr != nil {
-		return dberr
-	}
-
-	err = fn(conn)
-	if err != nil {
-		dberr = conn.TX.Rollback()
-	} else {
-		dberr = conn.TX.Commit()
-	}
-
-	if dberr != nil {
-		return errors.Wrapf(dberr, "error committing or rolling back transaction; original error: %v", err)
-	}
-
-	return err
 }
 
-func (mb *MigrationBox) execMigrationTransaction(ctx context.Context, transactions ...[]string) error {
+func (mb *MigrationBox) createMigrationStatusTableTransaction(ctx context.Context, transactions ...[]string) error {
 	for _, statements := range transactions {
-		if err := mb.isolatedTransaction(ctx, "init", func(conn *pop.Connection) error {
+		// CockroachDB does not support transactional schema changes, so we have to run
+		// the statements outside of a transaction.
+		if mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql" {
 			for _, statement := range statements {
-				if _, err := conn.TX.ExecContext(ctx, statement); err != nil {
+				if err := mb.c.WithContext(ctx).RawQuery(statement).Exec(); err != nil {
 					return errors.Wrapf(err, "unable to execute statement: %s", statement)
 				}
 			}
-			return nil
-		}); err != nil {
-			return err
+		} else {
+			if err := mb.isolatedTransaction(ctx, "init", func(conn *pop.Connection) error {
+				for _, statement := range statements {
+					if err := conn.WithContext(ctx).RawQuery(statement).Exec(); err != nil {
+						return errors.Wrapf(err, "unable to execute statement: %s", statement)
+					}
+				}
+				return nil
+			}); err != nil {
+				return err
+			}
 		}
 	}
 

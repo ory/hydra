@@ -28,21 +28,18 @@ type Migration struct {
 	DBType string
 	// Runner function to run/execute the migration. Will be wrapped in a
 	// database transaction. Mutually exclusive with RunnerNoTx
-	Runner func(Migration, *pop.Connection, *pop.Tx) error
-	// RunnerNoTx function to run/execute the migration. NOT wrapped in a
-	// database transaction. Mutually exclusive with Runner.
-	RunnerNoTx func(Migration, *pop.Connection) error
+	Runner func(Migration, *pop.Connection) error
 	// Content is the raw content of the migration file
 	Content string
+	// Autocommit indicates whether the migration should be run in autocommit mode
+	Autocommit bool
 }
 
 func (m Migration) Valid() error {
-	if m.Runner == nil && m.RunnerNoTx == nil {
+	if m.Runner == nil {
 		return errors.Errorf("no runner defined for %s", m.Path)
 	}
-	if m.Runner != nil && m.RunnerNoTx != nil {
-		return errors.Errorf("incompatible transaction and non-transaction runners defined for %s", m.Path)
-	}
+
 	return nil
 }
 

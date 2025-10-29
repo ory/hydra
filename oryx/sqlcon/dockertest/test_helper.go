@@ -312,7 +312,7 @@ func ConnectToTestMySQLPop(t testing.TB) *pop.Connection {
 func startCockroachDB(version string) (*dockertest.Resource, error) {
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "cockroachdb/cockroach",
-		Tag:        stringsx.Coalesce(version, "latest-v24.2"),
+		Tag:        stringsx.Coalesce(version, "latest-v25.3"),
 		Cmd:        []string{"start-single-node", "--insecure"},
 	})
 	if err == nil {

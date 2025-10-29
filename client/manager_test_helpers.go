@@ -313,6 +313,31 @@ func TestHelperCreateGetUpdateDeleteClient(t1, t2 Storage) func(t *testing.T) {
 			assert.True(t, nextPage.IsLast())
 		})
 
+		t.Run("list by ids", func(t *testing.T) {
+			cs, nextPage, err := t1.GetClients(ctx, Filter{IDs: []string{t1c1.ID, c2Template.ID}})
+			require.NoError(t, err)
+			require.Len(t, cs, 2)
+			assert.ElementsMatch(t, []string{t1c1.ID, c2Template.ID}, []string{cs[0].GetID(), cs[1].GetID()})
+			assert.True(t, nextPage.IsLast())
+
+			cs, nextPage, err = t1.GetClients(ctx, Filter{IDs: []string{t1c1.ID}})
+			require.NoError(t, err)
+			require.Len(t, cs, 1)
+			assert.Equal(t, t1c1.ID, cs[0].GetID())
+			assert.True(t, nextPage.IsLast())
+
+			cs, nextPage, err = t1.GetClients(ctx, Filter{IDs: []string{c2Template.ID}})
+			require.NoError(t, err)
+			require.Len(t, cs, 1)
+			assert.Equal(t, c2Template.ID, cs[0].GetID())
+			assert.True(t, nextPage.IsLast())
+
+			cs, nextPage, err = t1.GetClients(ctx, Filter{IDs: []string{uuidx.NewV4().String()}})
+			require.NoError(t, err)
+			require.Len(t, cs, 0)
+			assert.True(t, nextPage.IsLast())
+		})
+
 		testHelperUpdateClient(t, ctx, t1, t1c1)
 		testHelperUpdateClient(t, ctx, t2, &t2c1)
 

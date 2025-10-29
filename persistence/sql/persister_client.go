@@ -160,6 +160,9 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) (cs [
 	if filters.Owner != "" {
 		query.Where("owner = ?", filters.Owner)
 	}
+	if len(filters.IDs) > 0 {
+		query.Where("id IN (?)", filters.IDs)
+	}
 
 	if err := query.All(&cs); err != nil {
 		return nil, nil, sqlcon.HandleError(err)

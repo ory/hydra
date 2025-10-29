@@ -15,6 +15,7 @@ type Filter struct {
 	PageOpts []keysetpagination.Option
 	Name     string
 	Owner    string
+	IDs      []string
 }
 
 type Manager interface {

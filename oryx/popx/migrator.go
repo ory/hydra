@@ -164,7 +164,8 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 
 		reverted := 0
 		defer func() {
-			mb.l.Debugf("Successfully reverted %d migrations.", reverted)
+			migrationsToRevertCount := min(steps, len(mfs))
+			mb.l.Debugf("Successfully reverted %d/%d migrations.", reverted, migrationsToRevertCount)
 			if err != nil {
 				mb.l.WithError(err).Error("Problem reverting migrations.")
 			}
@@ -174,6 +175,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 				break
 			}
 			l := mb.l.WithField("version", mi.Version).WithField("migration_name", mi.Name).WithField("migration_file", mi.Path)
+			l.Debugf("handling migration %s", mi.Name)
 			exists, err := c.Where("version = ?", mi.Version).Exists(mtn)
 			if err != nil {
 				return errors.Wrapf(err, "problem checking for migration version %s", mi.Version)
@@ -194,7 +196,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 			}
 
 			if err := mi.Valid(); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
 			if mb.shouldNotUseTransaction(mi) {
@@ -211,7 +213,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 				if err := mb.isolatedTransaction(ctx, "down", func(conn *pop.Connection) error {
 					err := mi.Runner(mi, conn)
 					if err != nil {
-						return err
+						return errors.WithStack(err)
 					}
 
 					// #nosec G201 - mtn is a system-wide const
@@ -221,11 +223,11 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 
 					return nil
 				}); err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 			}
 
-			l.Infof("< %s applied successfully", mi.Name)
+			l.Infof("%s applied successfully", mi.Name)
 			reverted++
 		}
 		return nil

@@ -67,7 +67,7 @@ func init() {
 		ssrf.WithAnyPort(),
 		ssrf.WithNetworks("tcp4", "tcp6"),
 	).Safe
-	prohibitInternalAllowIPv6 = otelTransport(t)
+	prohibitInternalAllowIPv6 = OTELTraceTransport(t)
 }
 
 func init() {
@@ -79,7 +79,7 @@ func init() {
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return d.DialContext(ctx, "tcp4", addr)
 	}
-	prohibitInternalProhibitIPv6 = otelTransport(t)
+	prohibitInternalProhibitIPv6 = OTELTraceTransport(t)
 }
 
 func init() {
@@ -99,7 +99,7 @@ func init() {
 			netip.MustParsePrefix("fc00::/7"), // Unique Local (RFC 4193)
 		),
 	).Safe
-	allowInternalAllowIPv6 = otelTransport(t)
+	allowInternalAllowIPv6 = OTELTraceTransport(t)
 }
 
 func init() {
@@ -122,7 +122,7 @@ func init() {
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return d.DialContext(ctx, "tcp4", addr)
 	}
-	allowInternalProhibitIPv6 = otelTransport(t)
+	allowInternalProhibitIPv6 = OTELTraceTransport(t)
 }
 
 func newDefaultTransport() (*http.Transport, *net.Dialer) {
@@ -141,7 +141,8 @@ func newDefaultTransport() (*http.Transport, *net.Dialer) {
 	}, &dialer
 }
 
-func otelTransport(t *http.Transport) http.RoundTripper {
+// OTELTraceTransport wraps the given http.Transport with OpenTelemetry instrumentation.
+func OTELTraceTransport(t *http.Transport) http.RoundTripper {
 	return otelhttp.NewTransport(t, otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
 		return otelhttptrace.NewClientTrace(ctx, otelhttptrace.WithoutHeaders(), otelhttptrace.WithoutSubSpans())
 	}))

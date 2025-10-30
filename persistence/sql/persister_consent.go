@@ -315,6 +315,7 @@ AND client_id = ?
 AND consent_skip = FALSE
 AND consent_error = '{}'
 AND consent_remember = TRUE
+AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
 ORDER BY requested_at DESC
 LIMIT 1`,
 		cols,
@@ -336,11 +337,7 @@ LIMIT 1`,
 		return nil, sqlcon.HandleError(err)
 	}
 
-	fs := filterExpiredConsentRequests([]flow.Flow{f})
-	if len(fs) == 0 {
-		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
-	}
-	return &fs[0], nil
+	return &f, nil
 }
 
 func applyTableNameWithIndexHint(conn *pop.Connection, table string, index string) string {
@@ -370,16 +367,12 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 		Where("subject = ?", subject).
 		Where("consent_skip = FALSE").
 		Where("consent_error = '{}'").
+		Where("(expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)").
 		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
 		All(&fs)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
-	} else if err != nil {
+	if err != nil {
 		return nil, nil, sqlcon.HandleError(err)
 	}
-
-	// TODO we have to move this filter into SQL for proper pagination support
-	fs = filterExpiredConsentRequests(fs)
 	if len(fs) == 0 {
 		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
@@ -403,36 +396,18 @@ func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Contex
 		Where("login_session_id = ?", sid).
 		Where("consent_skip = FALSE").
 		Where("consent_error = '{}'").
+		Where("(expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)").
 		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
 		All(&fs)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
-	} else if err != nil {
+	if err != nil {
 		return nil, nil, sqlcon.HandleError(err)
 	}
-
-	fs = filterExpiredConsentRequests(fs)
 	if len(fs) == 0 {
 		return nil, nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 	}
 
 	fs, nextPage := keysetpagination.Result(fs, paginator)
 	return fs, nextPage, nil
-}
-
-func filterExpiredConsentRequests(requests []flow.Flow) []flow.Flow {
-	result := make([]flow.Flow, 0, len(requests))
-	for _, v := range requests {
-		rememberFor := 0
-		if v.ConsentRememberFor != nil {
-			rememberFor = *v.ConsentRememberFor
-		}
-		if rememberFor > 0 && v.RequestedAt.Add(time.Duration(rememberFor)*time.Second).Before(time.Now().UTC()) {
-			continue
-		}
-		result = append(result, v)
-	}
-	return result
 }
 
 func (p *Persister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
@@ -552,7 +527,7 @@ WHERE nid = ?
 	if expiry := time.Time(lr.ExpiresAt);
 	// If the expiry is unset, we are in a legacy use case (allow logout).
 	// TODO: Remove this in the future.
-	!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
+		!expiry.IsZero() && expiry.Before(time.Now().UTC()) {
 		return nil, errors.WithStack(flow.ErrorLogoutFlowExpired)
 	}
 

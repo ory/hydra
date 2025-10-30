@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
       - uses: ory/closed-reference-notifier@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

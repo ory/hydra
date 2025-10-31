@@ -27,7 +27,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.1.0
 	github.com/ory/analytics-go/v5 v5.0.1
-	github.com/ory/fosite v0.49.1-0.20250203124447-75b904ddbee4
+	github.com/ory/fosite v0.49.1-0.20250703093431-a5f0b09bf31c
 	github.com/ory/graceful v0.1.3
 	github.com/ory/herodot v0.10.5
 	github.com/ory/hydra-client-go/v2 v2.2.1

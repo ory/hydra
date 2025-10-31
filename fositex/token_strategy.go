@@ -7,10 +7,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/ory/fosite"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
+	foauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
 )
 
 var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)

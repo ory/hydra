@@ -4,7 +4,7 @@
 package driver
 
 import (
-	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/jwk"
 )
 

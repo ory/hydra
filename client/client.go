@@ -14,8 +14,8 @@ import (
 
 	"github.com/ory/pop/v6"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/sqlxx"
 )

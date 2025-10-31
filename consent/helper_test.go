@@ -20,8 +20,8 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 func TestSanitizeClient(t *testing.T) {

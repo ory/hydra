@@ -3,6 +3,6 @@
 
 package flow
 
-import "github.com/ory/fosite"
+import "github.com/ory/hydra/v2/fosite"
 
 var ErrorLogoutFlowExpired = fosite.ErrRequestUnauthorized.WithHint("The logout request has expired, please try the flow again.")

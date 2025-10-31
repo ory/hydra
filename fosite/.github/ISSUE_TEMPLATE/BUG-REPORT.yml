@@ -1,0 +1,122 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/ISSUE_TEMPLATE/BUG-REPORT.yml
+
+description: "Create a bug report"
+labels:
+  - bug
+name: "Bug Report"
+body:
+  - attributes:
+      value: "Thank you for taking the time to fill out this bug report!\n"
+    type: markdown
+  - attributes:
+      label: "Preflight checklist"
+      options:
+        - label:
+            "I could not find a solution in the existing issues, docs, nor
+            discussions."
+          required: true
+        - label:
+            "I agree to follow this project's [Code of
+            Conduct](https://github.com/ory/fosite/blob/master/CODE_OF_CONDUCT.md)."
+          required: true
+        - label:
+            "I have read and am following this repository's [Contribution
+            Guidelines](https://github.com/ory/fosite/blob/master/CONTRIBUTING.md)."
+          required: true
+        - label:
+            "I have joined the [Ory Community Slack](https://slack.ory.sh)."
+        - label:
+            "I am signed up to the [Ory Security Patch
+            Newsletter](https://www.ory.sh/l/sign-up-newsletter)."
+    id: checklist
+    type: checkboxes
+  - attributes:
+      description:
+        "Enter the slug or API URL of the affected Ory Network project. Leave
+        empty when you are self-hosting."
+      label: "Ory Network Project"
+      placeholder: "https://<your-project-slug>.projects.oryapis.com"
+    id: ory-network-project
+    type: input
+  - attributes:
+      description: "A clear and concise description of what the bug is."
+      label: "Describe the bug"
+      placeholder: "Tell us what you see!"
+    id: describe-bug
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description: |
+        Clear, formatted, and easy to follow steps to reproduce the behavior:
+      placeholder: |
+        Steps to reproduce the behavior:
+
+        1. Run `docker run ....`
+        2. Make API Request to with `curl ...`
+        3. Request fails with response: `{"some": "error"}`
+      label: "Reproducing the bug"
+    id: reproduce-bug
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        "Please copy and paste any relevant log output. This will be
+        automatically formatted into code, so no need for backticks. Please
+        redact any sensitive information"
+      label: "Relevant log output"
+      render: shell
+      placeholder: |
+        log=error ....
+    id: logs
+    type: textarea
+  - attributes:
+      description:
+        "Please copy and paste any relevant configuration. This will be
+        automatically formatted into code, so no need for backticks. Please
+        redact any sensitive information!"
+      label: "Relevant configuration"
+      render: yml
+      placeholder: |
+        server:
+          admin:
+            port: 1234
+    id: config
+    type: textarea
+  - attributes:
+      description: "What version of our software are you running?"
+      label: Version
+    id: version
+    type: input
+    validations:
+      required: true
+  - attributes:
+      label: "On which operating system are you observing this issue?"
+      options:
+        - Ory Network
+        - macOS
+        - Linux
+        - Windows
+        - FreeBSD
+        - Other
+    id: operating-system
+    type: dropdown
+  - attributes:
+      label: "In which environment are you deploying?"
+      options:
+        - Ory Network
+        - Docker
+        - "Docker Compose"
+        - "Kubernetes with Helm"
+        - Kubernetes
+        - Binary
+        - Other
+    id: deployment
+    type: dropdown
+  - attributes:
+      description: "Add any other context about the problem here."
+      label: Additional Context
+    id: additional
+    type: textarea

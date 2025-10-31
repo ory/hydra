@@ -4,12 +4,12 @@
 package oauth2
 
 import (
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"

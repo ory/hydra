@@ -8,7 +8,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/x/hasherx"
 	"github.com/ory/x/otelx"
 )

@@ -6,9 +6,9 @@ package consent
 import (
 	"context"
 
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/x"
 )

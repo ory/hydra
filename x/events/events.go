@@ -10,8 +10,8 @@ import (
 	otelattr "go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/x/otelx/semconv"
 )
 

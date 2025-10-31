@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/v2/client"

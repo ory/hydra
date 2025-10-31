@@ -1,0 +1,35 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/workflows/licenses.yml
+
+name: Licenses
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - v3
+      - master
+
+jobs:
+  licenses:
+    name: License compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install script
+        uses: ory/ci/licenses/setup@master
+        with:
+          token: ${{ secrets.ORY_BOT_PAT || secrets.GITHUB_TOKEN }}
+      - name: Check licenses
+        uses: ory/ci/licenses/check@master
+      - name: Write, commit, push licenses
+        uses: ory/ci/licenses/write@master
+        if:
+          ${{ github.ref == 'refs/heads/main' || github.ref ==
+          'refs/heads/master' || github.ref == 'refs/heads/v3' }}
+        with:
+          author-email:
+            ${{ secrets.ORY_BOT_PAT &&
+            '60093411+ory-bot@users.noreply.github.com' ||
+            format('{0}@users.noreply.github.com', github.actor) }}
+          author-name: ${{ secrets.ORY_BOT_PAT && 'ory-bot' || github.actor }}

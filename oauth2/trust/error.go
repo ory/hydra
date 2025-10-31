@@ -6,7 +6,7 @@ package trust
 import (
 	"net/http"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 var ErrMissingRequiredParameter = &fosite.RFC6749Error{

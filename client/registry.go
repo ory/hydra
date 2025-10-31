@@ -6,10 +6,10 @@ package client
 import (
 	"github.com/ory/hydra/v2/driver/config"
 
-	"github.com/ory/fosite"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/rfc8628"
-	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/v2/fosite"
+	foauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	enigma "github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 )

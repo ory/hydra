@@ -13,8 +13,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"

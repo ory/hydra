@@ -4,7 +4,7 @@
 package x
 
 import (
-	"github.com/ory/fosite/storage"
+	"github.com/ory/hydra/v2/fosite/storage"
 )
 
 func FositeStore() *storage.MemoryStore {

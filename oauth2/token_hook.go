@@ -17,8 +17,8 @@ import (
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 // AccessRequestHook is called when an access token request is performed.

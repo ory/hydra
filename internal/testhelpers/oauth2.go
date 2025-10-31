@@ -23,10 +23,10 @@ import (
 	"github.com/urfave/negroni"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"

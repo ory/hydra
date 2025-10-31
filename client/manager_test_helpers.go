@@ -18,7 +18,7 @@ import (
 
 	"github.com/ory/x/uuidx"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	testhelpersuuid "github.com/ory/hydra/v2/internal/testhelpers/uuid"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"

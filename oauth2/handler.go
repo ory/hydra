@@ -21,13 +21,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
 	"github.com/ory/x/httprouterx"
@@ -63,7 +63,7 @@ const (
 	DeviceVerificationPath = "/oauth2/device/verify"
 )
 
-// Taken from https://github.com/ory/fosite/blob/049ed1924cd0b41f12357b0fe617530c264421ac/handler/openid/flow_explicit_auth.go#L29
+// Taken from https://github.com/ory/hydra/v2/fosite/blob/049ed1924cd0b41f12357b0fe617530c264421ac/handler/openid/flow_explicit_auth.go#L29
 var oidcParameters = []string{"grant_type",
 	"max_age",
 	"prompt",
@@ -1412,7 +1412,7 @@ func (h *Handler) updateSessionWithRequest(
 		AuthenticationContextClassReference: flow.ACR,
 		AuthenticationMethodsReferences:     flow.AMR,
 
-		// These are required for work around https://github.com/ory/fosite/issues/530
+		// These are required for work around https://github.com/ory/hydra/v2/fosite/issues/530
 		Nonce:    request.GetRequestForm().Get("nonce"),
 		Audience: []string{request.GetClient().GetID()},
 		IssuedAt: time.Now().Truncate(time.Second).UTC(),

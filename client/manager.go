@@ -6,7 +6,7 @@ package client
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 )
 

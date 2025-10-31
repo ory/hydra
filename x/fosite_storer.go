@@ -7,13 +7,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/pkce"
-	"github.com/ory/fosite/handler/rfc7523"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/handler/verifiable"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
+	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	"github.com/ory/hydra/v2/fosite/handler/verifiable"
 )
 
 type FositeStorer interface {

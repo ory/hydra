@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"

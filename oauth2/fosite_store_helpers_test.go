@@ -1253,6 +1253,31 @@ func testFositeJWTBearerGrantStorage(x *driver.RegistrySQL) func(t *testing.T) {
 			require.NotEmpty(t, jwks.Keys)
 		})
 
+		t.Run("case=does not found expired grant", func(t *testing.T) {
+			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[0].Public()
+			issuer := uuid.Must(uuid.NewV4()).String()
+			subject := uuid.Must(uuid.NewV4()).String()
+			grant := trust.Grant{
+				ID:              uuid.Must(uuid.NewV4()),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: true,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(-1, 0, 0),
+			}
+
+			require.NoError(t, grantManager.CreateGrant(ctx, grant, publicKey))
+
+			key, err := grantStorage.GetPublicKey(ctx, issuer, subject, publicKey.KeyID)
+			require.Error(t, err)
+			assert.Nil(t, key)
+		})
+
 		t.Run("case=does not return expired values", func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(jose.RS256, uuid.Must(uuid.NewV4()).String(), "sig")
 			require.NoError(t, err)

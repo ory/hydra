@@ -356,7 +356,7 @@ func RunTestCockroachDB(t testing.TB) string {
 	return RunTestCockroachDBWithVersion(t, "")
 }
 
-// RunTestCockroachDB runs a CockroachDB database and returns the URL to it.
+// RunTestCockroachDBWithVersion runs a CockroachDB database and returns the URL to it.
 // If a docker container is started for the database, the container be removed
 // at the end of the test.
 func RunTestCockroachDBWithVersion(t testing.TB, version string) string {

@@ -245,20 +245,8 @@ func NewT(t testing.TB, opts ...Option) *Logger {
 		t.Fatalf("Logger exited with code %d", code)
 	}))
 	l := New(t.Name(), "test", opts...)
-	l.Logger.Out = &testOutput{t}
+	l.Logger.Out = t.Output()
 	return l
-}
-
-type testOutput struct {
-	t testing.TB
-}
-
-func (t *testOutput) Write(p []byte) (n int, err error) {
-	if t.t == nil {
-		return os.Stdout.Write(p)
-	}
-	t.t.Log(t.t.Name() + " " + string(p))
-	return len(p), nil
 }
 
 func NewAudit(name string, version string, opts ...Option) *Logger {

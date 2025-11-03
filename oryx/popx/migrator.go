@@ -138,6 +138,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 
 // Down runs pending "down" migrations and rolls back the
 // database by the specified number of steps.
+// If step <= 0, all down migrations are run.
 func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 	ctx, span := startSpan(ctx, MigrationDownOpName, trace.WithAttributes(attribute.Int("steps", steps)))
 	defer otelx.End(span, &err)

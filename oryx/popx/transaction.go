@@ -22,6 +22,10 @@ func WithTransaction(ctx context.Context, tx *pop.Connection) context.Context {
 	return context.WithValue(ctx, transactionKey, tx)
 }
 
+func InTransaction(ctx context.Context) bool {
+	return ctx.Value(transactionKey) != nil
+}
+
 func Transaction(ctx context.Context, connection *pop.Connection, callback func(context.Context, *pop.Connection) error) error {
 	c := ctx.Value(transactionKey)
 	if c != nil {

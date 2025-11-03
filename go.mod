@@ -36,7 +36,7 @@ require (
 	github.com/ory/go-acc v0.2.9-0.20230103102148-6b1c9a70dbbe
 	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.3
-	github.com/ory/herodot v0.10.5
+	github.com/ory/herodot v0.10.7
 	github.com/ory/hydra-client-go/v2 v2.2.1
 	github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e
 	github.com/ory/kratos-client-go v1.3.8

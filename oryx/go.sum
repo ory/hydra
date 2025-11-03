@@ -427,8 +427,8 @@ github.com/ory/analytics-go/v5 v5.0.1 h1:LX8T5B9FN8KZXOtxgN+R3I4THRRVB6+28IKgKBp
 github.com/ory/analytics-go/v5 v5.0.1/go.mod h1:lWCiCjAaJkKfgR/BN5DCLMol8BjKS1x+4jxBxff/FF0=
 github.com/ory/dockertest/v3 v3.12.0 h1:3oV9d0sDzlSQfHtIaB5k6ghUCVMVLpAY8hwrqoCyRCw=
 github.com/ory/dockertest/v3 v3.12.0/go.mod h1:aKNDTva3cp8dwOWwb9cWuX84aH5akkxXRvO7KCwWVjE=
-github.com/ory/herodot v0.10.5 h1:pJv+Y4qQqZgqtQQeb/B+e9MgQe5YVGfNZ2O8DEJ1w3U=
-github.com/ory/herodot v0.10.5/go.mod h1:j6i246U6iX8TStYNKIVQxb2waweQvtOLi+b/9q+OULg=
+github.com/ory/herodot v0.10.7 h1:CETBRP4LboLlQCSVTkyQix/a2bVh1rmNhhfxd45khCI=
+github.com/ory/herodot v0.10.7/go.mod h1:j6i246U6iX8TStYNKIVQxb2waweQvtOLi+b/9q+OULg=
 github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e h1:4tUrC7x4YWRVMFp+c64KACNSGchW1zXo4l6Pa9/1hA8=
 github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e/go.mod h1:XWLxVK4un/iuIcrw+6lCeanbF3NZwO5k6RdLeu/loQk=
 github.com/ory/pop/v6 v6.3.1 h1:d73i7e2kqxMMCgyHBkQk3TqfPBnOMS8EJd+EP5bIP6A=

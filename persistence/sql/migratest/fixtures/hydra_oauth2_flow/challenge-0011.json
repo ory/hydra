@@ -7,7 +7,6 @@
   "ra": [
     "requested_audience-0011_1"
   ],
-  "ls": true,
   "s": "subject-0011",
   "oc": {
     "display": "display-0011"
@@ -15,29 +14,16 @@
   "ci": "client-0014",
   "r": "http://request/0011",
   "si": "auth_session-0011",
-  "lc": "csrf-0011",
   "ia": "2022-02-15T22:20:21Z",
-  "q": 128,
-  "lr": true,
-  "lf": 11,
   "a": "acr-0011",
   "fs": "force_subject_id-0011",
   "ct": {
     "context": "0011"
   },
-  "le": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
-  "la": "2022-02-15T22:20:21Z",
+  "la": null,
   "dh": null,
   "cc": "challenge-0011",
   "cs": true,
-  "cr": "csrf-0011",
   "gs": [
     "granted_scope-0011_1"
   ],
@@ -47,14 +33,7 @@
   "ce": true,
   "cf": 11,
   "ch": null,
-  "cx": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
+  "cx": null,
   "st": {
     "session_id_token-0011": "0011"
   },

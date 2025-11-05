@@ -21,6 +21,7 @@ import (
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
+	"github.com/ory/x/pointerx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -167,13 +168,25 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-type flowWithConsentUsed struct {
+type FlowWithConstantColumns struct {
 	*flow.Flow
+
+	State flow.State `db:"state"`
+
 	// we need to write these columns because of the check constraint, but we will soon switch to a new table anyway that will not have them at all
-	ConsentUsed     bool   `db:"consent_was_used"`
-	LoginUsed       bool   `db:"login_was_used"`
-	ConsentVerifier string `db:"consent_verifier"`
-	LoginVerifier   string `db:"login_verifier"`
+	LoginRemember    bool   `db:"login_remember"`
+	LoginRememberFor int    `db:"login_remember_for"`
+	LoginError       string `db:"login_error"`
+	LoginUsed        bool   `db:"login_was_used"`
+	ConsentVerifier  string `db:"consent_verifier"`
+	ConsentCSRF      string `db:"consent_csrf"`
+	ConsentError     string `db:"consent_error"`
+	ConsentUsed      bool   `db:"consent_was_used"`
+
+	// these columns have NOT NULL constraints, but are not required to be stored
+	LoginVerifier string `db:"login_verifier"`
+	LoginCSRF     string `db:"login_csrf"`
+	LoginSkip     bool   `db:"login_skip"`
 }
 
 func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
@@ -183,14 +196,21 @@ func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err
 	if f.NID != p.NetworkID(ctx) {
 		return errors.WithStack(sqlcon.ErrNoRows)
 	}
+	if f.ConsentRememberFor == nil {
+		// This is really stupid: we treat 0 the same as NULL, which means the flow does not expire.
+		// However, for some reason it is part of the check constraint and required to be NOT NULL.
+		f.ConsentRememberFor = pointerx.Ptr(0)
+	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(&flowWithConsentUsed{
-		Flow:            f,
-		ConsentUsed:     true,
-		LoginUsed:       true,
-		ConsentVerifier: "",
-		LoginVerifier:   "",
-	}))
+	fx := &FlowWithConstantColumns{
+		Flow:         f,
+		State:        flow.FlowStateConsentUsed, // if this was another state, we'd not store it in the DB
+		ConsentUsed:  true,
+		LoginUsed:    true,
+		LoginError:   "{}",
+		ConsentError: "{}",
+	}
+	return sqlcon.HandleError(p.Connection(ctx).Create(fx))
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
@@ -257,11 +277,9 @@ func (p *Persister) DeleteLoginSession(ctx context.Context, id string) (_ *flow.
 	}
 
 	var session flow.LoginSession
-	columns := pop.NewModel(&session, ctx).Columns().Readable()
+	columns := popx.DBColumns[flow.LoginSession](c.Dialect)
 	if err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf(
-			`DELETE FROM hydra_oauth2_authentication_session WHERE id = ? AND nid = ? RETURNING %s`,
-			columns.QuotedString(c.Dialect)),
+		fmt.Sprintf(`DELETE FROM hydra_oauth2_authentication_session WHERE id = ? AND nid = ? RETURNING %s`, columns),
 		id,
 		p.NetworkID(ctx),
 	).First(&session); err != nil {
@@ -534,12 +552,9 @@ WHERE nid = ?
 	return &lr, nil
 }
 
-func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) (err error) {
+func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit, batchSize int) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveLoginConsentRequests")
 	defer otelx.End(span, &err)
-
-	/* #nosec G201 table is static */
-	var f flow.Flow
 
 	// The value of notAfter should be the minimum between input parameter and request max expire based on its configured age
 	requestMaxExpire := time.Now().Add(-p.r.Config().ConsentRequestMaxAge(ctx))
@@ -547,21 +562,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		notAfter = requestMaxExpire
 	}
 
-	challenges := []string{}
-	queryFormat := `
-	SELECT login_challenge
-	FROM hydra_oauth2_flow
-	WHERE (
-		(state != ?)
-		OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')
-		OR (consent_error IS NOT NULL AND consent_error <> '{}' AND consent_error <> '')
-	)
-	AND requested_at < ?
-	AND nid = ?
-	ORDER BY login_challenge
-	LIMIT %[1]d
-	`
-
+	challenges := make([]string, 0, limit)
 	// Select up to [limit] flows that can be safely deleted, i.e. flows that meet
 	// the following criteria:
 	// - flow.state is anything between FlowStateLoginInitialized and FlowStateConsentUnused (unhandled)
@@ -569,21 +570,30 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - flow.consent_error has valid error (consent rejected)
 	// AND timed-out
 	// - flow.requested_at < minimum of ttl.login_consent_request and notAfter
-	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, limit), flow.FlowStateConsentUsed, notAfter, p.NetworkID(ctx))
+	q := p.Connection(ctx).RawQuery(`
+		SELECT login_challenge
+		FROM hydra_oauth2_flow
+		WHERE (
+			(state != ?)
+			OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')
+			OR (consent_error IS NOT NULL AND consent_error <> '{}' AND consent_error <> '')
+		)
+		AND requested_at < ?
+		AND nid = ?
+		ORDER BY login_challenge
+		LIMIT ?`,
+		flow.FlowStateConsentUsed, notAfter, p.NetworkID(ctx), limit)
 
-	if err := q.All(&challenges); err == sql.ErrNoRows {
-		return errors.Wrap(fosite.ErrNotFound, "")
+	if err := q.All(&challenges); err != nil {
+		return errors.WithStack(err)
 	}
 
 	// Delete in batch consent requests and their references in cascade
 	for i := 0; i < len(challenges); i += batchSize {
-		j := i + batchSize
-		if j > len(challenges) {
-			j = len(challenges)
-		}
+		j := min(i+batchSize, len(challenges))
 
 		q := p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE login_challenge in (?) AND nid = ?", (&f).TableName()),
+			"DELETE FROM hydra_oauth2_flow WHERE login_challenge in (?) AND nid = ?",
 			challenges[i:j],
 			p.NetworkID(ctx),
 		)

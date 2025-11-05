@@ -16,7 +16,6 @@
   "si": "auth_session-0011",
   "ia": "2022-02-15T22:20:21Z",
   "a": "acr-0011",
-  "fs": "force_subject_id-0011",
   "ct": {
     "context": "0011"
   },

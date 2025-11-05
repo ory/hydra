@@ -175,7 +175,7 @@ type Flow struct {
 
 	// IdentityProviderSessionID is the session ID of the end-user that authenticated.
 	// If specified, we will use this value to propagate the logout.
-	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id" json:"is,omitempty"`
+	IdentityProviderSessionID sqlxx.NullString `db:"-" json:"is,omitempty"`
 
 	LoginCSRF string `db:"-" json:"lc,omitempty"`
 
@@ -223,7 +223,7 @@ type Flow struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `db:"forced_subject_identifier" json:"fs,omitempty"`
+	ForceSubjectIdentifier string `db:"-" json:"fs,omitempty"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share

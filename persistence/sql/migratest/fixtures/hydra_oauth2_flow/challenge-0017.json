@@ -16,14 +16,12 @@
   "ci": "client-21",
   "r": "http://request/0017",
   "si": "auth_session-0017",
-  "is": "identity_provider_session_id-0017",
   "ia": "2022-02-15T22:20:21Z",
   "a": "acr-0017",
   "am": [
     "amr-0017-1",
     "amr-0017-2"
   ],
-  "fs": "force_subject_id-0017",
   "ct": {
     "context": "0017"
   },

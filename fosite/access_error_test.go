@@ -24,7 +24,7 @@ func TestWriteAccessError(t *testing.T) {
 	header := http.Header{}
 	ctrl := gomock.NewController(t)
 	rw := NewMockResponseWriter(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	rw.EXPECT().Header().AnyTimes().Return(header)
 	rw.EXPECT().WriteHeader(http.StatusBadRequest)

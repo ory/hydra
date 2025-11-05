@@ -45,7 +45,7 @@ func TestAccessTokenFromRequestQuery(t *testing.T) {
 func TestIntrospect(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	validator := internal.NewMockTokenIntrospector(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	config := new(Config)
 	f := compose.ComposeAllEnabled(config, storage.NewMemoryStore(), nil).(*Fosite)

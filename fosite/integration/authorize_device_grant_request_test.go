@@ -8,13 +8,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	goauth "golang.org/x/oauth2"
+
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
 	"github.com/ory/hydra/v2/fosite/internal/gen"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	goauth "golang.org/x/oauth2"
 )
 
 func TestDeviceFlow(t *testing.T) {

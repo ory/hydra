@@ -1,35 +1,38 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
 	"fmt"
 	"net/url"
-	"testing" //"time"
-
+	"testing"
 	"time"
+
+	//"time"
 
 	gomock "go.uber.org/mock/gomock"
 
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/internal"
 
-	"github.com/ory/hydra/v2/fosite" //"github.com/ory/hydra/v2/fosite/internal"
-	"github.com/ory/hydra/v2/fosite/storage"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/v2/fosite" //"github.com/ory/hydra/v2/fosite/internal"
+	"github.com/ory/hydra/v2/fosite/storage"
 )
 
 func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
-	for k, strategy := range map[string]CoreStrategy{
+	for k, strategy := range map[string]oauth2.CoreStrategy{
 		"hmac": hmacshaStrategy,
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
 
-			var h AuthorizeExplicitGrantHandler
+			var h oauth2.AuthorizeExplicitGrantHandler
 			for _, c := range []struct {
 				areq        *fosite.AccessRequest
 				description string
@@ -58,7 +61,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					description: "should fail because authcode not found",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, _, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, _, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Set("code", code)
 					},
@@ -96,7 +99,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 						},
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -126,7 +129,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
 						config.RefreshTokenScopes = []string{}
-						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -156,7 +159,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
 						config.RefreshTokenScopes = []string{}
-						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -185,7 +188,7 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 						},
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, config *fosite.Config) {
-						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -208,12 +211,10 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 						AccessTokenLifespan:      time.Minute,
 						RefreshTokenScopes:       []string{"offline"},
 					}
-					h = AuthorizeExplicitGrantHandler{
-						CoreStorage:           store,
-						AuthorizeCodeStrategy: strategy,
-						AccessTokenStrategy:   strategy,
-						RefreshTokenStrategy:  strategy,
-						Config:                config,
+					h = oauth2.AuthorizeExplicitGrantHandler{
+						Storage:  store,
+						Strategy: strategy,
+						Config:   config,
 					}
 
 					if c.setup != nil {
@@ -239,16 +240,15 @@ func TestAuthorizeCode_PopulateTokenEndpointResponse(t *testing.T) {
 }
 
 func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
-	for k, strategy := range map[string]CoreStrategy{
+	for k, strategy := range map[string]oauth2.CoreStrategy{
 		"hmac": hmacshaStrategy,
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
 
-			h := AuthorizeExplicitGrantHandler{
-				CoreStorage:            store,
-				AuthorizeCodeStrategy:  hmacshaStrategy,
-				TokenRevocationStorage: store,
+			h := oauth2.AuthorizeExplicitGrantHandler{
+				Storage:  store,
+				Strategy: hmacshaStrategy,
 				Config: &fosite.Config{
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
@@ -293,7 +293,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because authcode could not be retrieved (1)",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, _, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						token, _, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 					},
@@ -329,7 +329,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because client mismatch",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 
@@ -355,7 +355,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should fail because redirect uri was set during /authorize call, but not in /token call",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form = url.Values{"code": {token}}
 
@@ -383,7 +383,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 					},
 					description: "should pass",
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						token, signature, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						token, signature, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 
 						areq.Form = url.Values{"code": {token}}
@@ -408,7 +408,7 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 						assert.Equal(t, time.Now().Add(time.Minute).UTC().Round(time.Second), areq.GetSession().GetExpiresAt(fosite.RefreshToken))
 					},
 					setup: func(t *testing.T, areq *fosite.AccessRequest, authreq *fosite.AuthorizeRequest) {
-						code, sig, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
+						code, sig, err := strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(context.Background(), nil)
 						require.NoError(t, err)
 						areq.Form.Add("code", code)
 
@@ -442,9 +442,9 @@ func TestAuthorizeCode_HandleTokenEndpointRequest(t *testing.T) {
 }
 
 func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
-	var mockTransactional *internal.MockTransactional
-	var mockCoreStore *internal.MockCoreStorage
-	strategy := hmacshaStrategy
+	token, _, err := hmacshaStrategy.GenerateAuthorizeCode(context.Background(), nil)
+	require.NoError(t, err)
+
 	request := &fosite.AccessRequest{
 		GrantTypes: fosite.Arguments{"authorization_code"},
 		Request: fosite.Request{
@@ -456,50 +456,112 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			RequestedAt:  time.Now().UTC(),
 		},
 	}
-	token, _, err := strategy.GenerateAuthorizeCode(context.Background(), nil)
-	require.NoError(t, err)
 	request.Form = url.Values{"code": {token}}
 	response := fosite.NewAccessResponse()
 	propagatedContext := context.Background()
 
-	// some storage implementation that has support for transactions, notice the embedded type `storage.Transactional`
-	type transactionalStore struct {
-		storage.Transactional
-		CoreStorage
-	}
-
-	for _, testCase := range []struct {
+	for k, c := range []struct {
 		description string
-		setup       func()
+		setup       func(
+			mockTransactional *internal.MockTransactional,
+			tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+			tokenRevocationStorage *internal.MockTokenRevocationStorage,
+			authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+			authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+			accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+			accessTokenStorage *internal.MockAccessTokenStorage,
+			refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+			refreshTokenStorage *internal.MockRefreshTokenStorage,
+			authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+			authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+			accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+			accessTokenStrategy *internal.MockAccessTokenStrategy,
+			refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+			refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+		)
 		expectError error
 	}{
 		{
 			description: "transaction should be committed successfully if no errors occur",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+				authorizeCodeStorage.
 					EXPECT().
 					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the access token storage mock
+				accessTokenStorageProvider.
+					EXPECT().
+					AccessTokenStorage().
+					Return(accessTokenStorage).
+					Times(1)
+
+				// Set up access token storage expectations
+				accessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the refresh token storage mock
+				refreshTokenStorageProvider.
+					EXPECT().
+					RefreshTokenStorage().
+					Return(refreshTokenStorage).
+					Times(0)
+
+				// Set up refresh token storage expectations
+				refreshTokenStorage.
 					EXPECT().
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
-					Times(1)
+					Times(0)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					BeginTX(propagatedContext).
+					Return(propagatedContext, nil)
 				mockTransactional.
 					EXPECT().
 					Commit(propagatedContext).
@@ -509,21 +571,57 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 		{
 			description: "transaction should be rolled back if `InvalidateAuthorizeCodeSession` returns an error",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+				authorizeCodeStorage.
 					EXPECT().
 					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					BeginTX(propagatedContext).
+					Return(propagatedContext, nil)
 				mockTransactional.
 					EXPECT().
 					Rollback(propagatedContext).
@@ -534,25 +632,71 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 		{
 			description: "transaction should be rolled back if `CreateAccessTokenSession` returns an error",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+				authorizeCodeStorage.
 					EXPECT().
 					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+
+				// Set up CoreStorage to return the access token storage mock
+				accessTokenStorageProvider.
+					EXPECT().
+					AccessTokenStorage().
+					Return(accessTokenStorage).
+					Times(1)
+
+				// Set up access token storage expectations
+				accessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
+					Times(1)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					BeginTX(propagatedContext).
+					Return(propagatedContext, nil).
 					Times(1)
 				mockTransactional.
 					EXPECT().
@@ -564,12 +708,48 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 		{
 			description: "should result in a server error if transaction cannot be created",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(1)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
+
+				// Set up transaction expectations
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
@@ -579,21 +759,57 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 		{
 			description: "should result in a server error if transaction cannot be rolled back",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+				authorizeCodeStorage.
 					EXPECT().
 					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					BeginTX(propagatedContext).
+					Return(propagatedContext, nil)
 				mockTransactional.
 					EXPECT().
 					Rollback(propagatedContext).
@@ -604,31 +820,85 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 		{
 			description: "should result in a server error if transaction cannot be committed",
-			setup: func() {
-				mockCoreStore.
+			setup: func(
+				mockTransactional *internal.MockTransactional,
+				tokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider,
+				tokenRevocationStorage *internal.MockTokenRevocationStorage,
+				authorizeCodeStorageProvider *internal.MockAuthorizeCodeStorageProvider,
+				authorizeCodeStorage *internal.MockAuthorizeCodeStorage,
+				accessTokenStorageProvider *internal.MockAccessTokenStorageProvider,
+				accessTokenStorage *internal.MockAccessTokenStorage,
+				refreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider,
+				refreshTokenStorage *internal.MockRefreshTokenStorage,
+				authorizeCodeStrategyProvider *internal.MockAuthorizeCodeStrategyProvider,
+				authorizeCodeStrategy *internal.MockAuthorizeCodeStrategy,
+				accessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider,
+				accessTokenStrategy *internal.MockAccessTokenStrategy,
+				refreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider,
+				refreshTokenStrategy *internal.MockRefreshTokenStrategy,
+			) {
+				authorizeCodeStrategyProvider.EXPECT().AuthorizeCodeStrategy().Return(authorizeCodeStrategy).Times(2)
+				authorizeCodeStrategy.EXPECT().AuthorizeCodeSignature(gomock.Any(), gomock.Any())
+				authorizeCodeStrategy.EXPECT().ValidateAuthorizeCode(gomock.Any(), gomock.Any(), gomock.Any())
+
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), gomock.Any())
+
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any())
+
+				// Set up CoreStorage to return the authorize code storage mock
+				authorizeCodeStorageProvider.
+					EXPECT().
+					AuthorizeCodeStorage().
+					Return(authorizeCodeStorage).
+					Times(2)
+
+				// Set up authorize code storage expectations
+				authorizeCodeStorage.
 					EXPECT().
 					GetAuthorizeCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(request, nil).
 					Times(1)
-				mockTransactional.
-					EXPECT().
-					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+				authorizeCodeStorage.
 					EXPECT().
 					InvalidateAuthorizeCodeSession(gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+
+				// Set up CoreStorage to return the access token storage mock
+				accessTokenStorageProvider.
+					EXPECT().
+					AccessTokenStorage().
+					Return(accessTokenStorage).
+					Times(1)
+
+				// Set up access token storage expectations
+				accessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+
+				// Set up CoreStorage to return the refresh token storage mock
+				refreshTokenStorageProvider.
+					EXPECT().
+					RefreshTokenStorage().
+					Return(refreshTokenStorage).
+					Times(0)
+
+				// Set up refresh token storage expectations
+				refreshTokenStorage.
 					EXPECT().
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
-					Times(1)
+					Times(0)
+
+				// Set up transaction expectations
+				mockTransactional.
+					EXPECT().
+					BeginTX(propagatedContext).
+					Return(propagatedContext, nil)
 				mockTransactional.
 					EXPECT().
 					Commit(propagatedContext).
@@ -643,22 +913,64 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 			expectError: fosite.ErrServerError,
 		},
 	} {
-		t.Run(fmt.Sprintf("scenario=%s", testCase.description), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
+			t.Parallel()
+
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			t.Cleanup(ctrl.Finish)
 
-			mockTransactional = internal.NewMockTransactional(ctrl)
-			mockCoreStore = internal.NewMockCoreStorage(ctrl)
-			testCase.setup()
+			// Initialize all mocks
+			mockTransactional := internal.NewMockTransactional(ctrl)
 
-			handler := AuthorizeExplicitGrantHandler{
-				CoreStorage: transactionalStore{
-					mockTransactional,
-					mockCoreStore,
-				},
-				AccessTokenStrategy:   strategy,
-				RefreshTokenStrategy:  strategy,
-				AuthorizeCodeStrategy: strategy,
+			tokenRevocationStorageProvider := internal.NewMockTokenRevocationStorageProvider(ctrl)
+			tokenRevocationStorage := internal.NewMockTokenRevocationStorage(ctrl)
+
+			authorizeCodeStorageProvider := internal.NewMockAuthorizeCodeStorageProvider(ctrl)
+			authorizeCodeStorage := internal.NewMockAuthorizeCodeStorage(ctrl)
+
+			accessTokenStorageProvider := internal.NewMockAccessTokenStorageProvider(ctrl)
+			accessTokenStorage := internal.NewMockAccessTokenStorage(ctrl)
+
+			refreshTokenStorageProvider := internal.NewMockRefreshTokenStorageProvider(ctrl)
+			refreshTokenStorage := internal.NewMockRefreshTokenStorage(ctrl)
+
+			authorizeCodeStrategyProvider := internal.NewMockAuthorizeCodeStrategyProvider(ctrl)
+			authorizeCodeStrategy := internal.NewMockAuthorizeCodeStrategy(ctrl)
+
+			accessTokenStrategyProvider := internal.NewMockAccessTokenStrategyProvider(ctrl)
+			accessTokenStrategy := internal.NewMockAccessTokenStrategy(ctrl)
+
+			refreshTokenStrategyProvider := internal.NewMockRefreshTokenStrategyProvider(ctrl)
+			refreshTokenStrategy := internal.NewMockRefreshTokenStrategy(ctrl)
+
+			// define concrete types
+			mockStorage := struct {
+				*internal.MockAuthorizeCodeStorageProvider
+				*internal.MockAccessTokenStorageProvider
+				*internal.MockRefreshTokenStorageProvider
+				*internal.MockTokenRevocationStorageProvider
+				*internal.MockTransactional
+			}{
+				MockAuthorizeCodeStorageProvider:   authorizeCodeStorageProvider,
+				MockAccessTokenStorageProvider:     accessTokenStorageProvider,
+				MockRefreshTokenStorageProvider:    refreshTokenStorageProvider,
+				MockTokenRevocationStorageProvider: tokenRevocationStorageProvider,
+				MockTransactional:                  mockTransactional,
+			}
+
+			mockStrategy := struct {
+				*internal.MockAuthorizeCodeStrategyProvider
+				*internal.MockAccessTokenStrategyProvider
+				*internal.MockRefreshTokenStrategyProvider
+			}{
+				MockAuthorizeCodeStrategyProvider: authorizeCodeStrategyProvider,
+				MockAccessTokenStrategyProvider:   accessTokenStrategyProvider,
+				MockRefreshTokenStrategyProvider:  refreshTokenStrategyProvider,
+			}
+
+			handler := oauth2.AuthorizeExplicitGrantHandler{
+				Storage:  mockStorage,
+				Strategy: mockStrategy,
 				Config: &fosite.Config{
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
@@ -666,8 +978,28 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 				},
 			}
 
-			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, response); testCase.expectError != nil {
-				assert.EqualError(t, err, testCase.expectError.Error())
+			// set up mock expectations
+			c.setup(
+				mockTransactional,
+				tokenRevocationStorageProvider,
+				tokenRevocationStorage,
+				authorizeCodeStorageProvider,
+				authorizeCodeStorage,
+				accessTokenStorageProvider,
+				accessTokenStorage,
+				refreshTokenStorageProvider,
+				refreshTokenStorage,
+				authorizeCodeStrategyProvider,
+				authorizeCodeStrategy,
+				accessTokenStrategyProvider,
+				accessTokenStrategy,
+				refreshTokenStrategyProvider,
+				refreshTokenStrategy,
+			)
+
+			// invoke function under test
+			if err := handler.PopulateTokenEndpointResponse(propagatedContext, request, response); c.expectError != nil {
+				assert.EqualError(t, err, c.expectError.Error())
 			}
 		})
 	}

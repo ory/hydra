@@ -12,6 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/pop/v6"
@@ -38,6 +39,10 @@ type SQLGrant struct {
 
 func (SQLGrant) TableName() string {
 	return "hydra_oauth2_trusted_jwt_bearer_issuer"
+}
+
+func (p *Persister) RFC7523KeyStorage() rfc7523.RFC7523KeyStorage {
+	return p
 }
 
 func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) (err error) {

@@ -16,7 +16,7 @@ import (
 )
 
 type IDTokenHandleHelper struct {
-	IDTokenStrategy OpenIDConnectTokenStrategy
+	IDTokenStrategy OpenIDConnectTokenStrategyProvider
 }
 
 func (i *IDTokenHandleHelper) GetAccessTokenHash(ctx context.Context, requester fosite.AccessRequester, responder fosite.AccessResponder) string {
@@ -45,7 +45,7 @@ func (i *IDTokenHandleHelper) GetAccessTokenHash(ctx context.Context, requester 
 }
 
 func (i *IDTokenHandleHelper) generateIDToken(ctx context.Context, lifespan time.Duration, fosr fosite.Requester) (token string, err error) {
-	token, err = i.IDTokenStrategy.GenerateIDToken(ctx, lifespan, fosr)
+	token, err = i.IDTokenStrategy.OpenIDConnectTokenStrategy().GenerateIDToken(ctx, lifespan, fosr)
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,6 @@ func (i *IDTokenHandleHelper) generateIDToken(ctx context.Context, lifespan time
 }
 
 func (i *IDTokenHandleHelper) IssueImplicitIDToken(ctx context.Context, lifespan time.Duration, ar fosite.Requester, resp fosite.AuthorizeResponder) error {
-
 	token, err := i.generateIDToken(ctx, lifespan, ar)
 	if err != nil {
 		return err

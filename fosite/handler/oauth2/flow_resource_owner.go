@@ -20,11 +20,12 @@ var _ fosite.TokenEndpointHandler = (*ResourceOwnerPasswordCredentialsGrantHandl
 // is at the time of this writing going to be omitted in the OAuth 2.1 spec. For more information on why this grant type
 // is discouraged see: https://www.scottbrady91.com/oauth/why-the-resource-owner-password-credentials-grant-type-is-not-authentication-nor-suitable-for-modern-applications
 type ResourceOwnerPasswordCredentialsGrantHandler struct {
-	*HandleHelper
-	// ResourceOwnerPasswordCredentialsGrantStorage is used to persist session data across requests.
-	ResourceOwnerPasswordCredentialsGrantStorage ResourceOwnerPasswordCredentialsGrantStorage
-	RefreshTokenStrategy                         RefreshTokenStrategy
-	Config                                       interface {
+	Storage  ResourceOwnerPasswordCredentialsGrantStorage
+	Strategy interface {
+		AccessTokenStrategyProvider
+		RefreshTokenStrategyProvider
+	}
+	Config interface {
 		fosite.ScopeStrategyProvider
 		fosite.AudienceStrategyProvider
 		fosite.RefreshTokenScopesProvider
@@ -63,7 +64,7 @@ func (c *ResourceOwnerPasswordCredentialsGrantHandler) HandleTokenEndpointReques
 	password := request.GetRequestForm().Get("password")
 	if username == "" || password == "" {
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Username or password are missing from the POST body."))
-	} else if sub, err := c.ResourceOwnerPasswordCredentialsGrantStorage.Authenticate(ctx, username, password); errors.Is(err, fosite.ErrNotFound) {
+	} else if sub, err := c.Storage.Authenticate(ctx, username, password); errors.Is(err, fosite.ErrNotFound) {
 		return errorsx.WithStack(fosite.ErrInvalidGrant.WithHint("Unable to authenticate the provided username and password credentials.").WithWrap(err).WithDebug(err.Error()))
 	} else if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
@@ -102,10 +103,10 @@ func (c *ResourceOwnerPasswordCredentialsGrantHandler) PopulateTokenEndpointResp
 	var refresh, refreshSignature string
 	if len(c.Config.GetRefreshTokenScopes(ctx)) == 0 || requester.GetGrantedScopes().HasOneOf(c.Config.GetRefreshTokenScopes(ctx)...) {
 		var err error
-		refresh, refreshSignature, err = c.RefreshTokenStrategy.GenerateRefreshToken(ctx, requester)
+		refresh, refreshSignature, err = c.Strategy.RefreshTokenStrategy().GenerateRefreshToken(ctx, requester)
 		if err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-		} else if err := c.ResourceOwnerPasswordCredentialsGrantStorage.CreateRefreshTokenSession(ctx, refreshSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
+		} else if err := c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 	}
@@ -115,6 +116,26 @@ func (c *ResourceOwnerPasswordCredentialsGrantHandler) PopulateTokenEndpointResp
 	}
 
 	return nil
+}
+
+func (c *ResourceOwnerPasswordCredentialsGrantHandler) IssueAccessToken(ctx context.Context, atLifespan time.Duration, requester fosite.AccessRequester, responder fosite.AccessResponder) (signature string, err error) {
+	token, signature, err := c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
+	if err != nil {
+		return "", err
+	} else if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, signature, requester.Sanitize([]string{})); err != nil {
+		return "", err
+	}
+
+	if !requester.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		atLifespan = time.Duration(requester.GetSession().GetExpiresAt(fosite.AccessToken).UnixNano() - time.Now().UTC().UnixNano())
+	}
+
+	responder.SetAccessToken(token)
+	responder.SetTokenType("bearer")
+	responder.SetExpiresIn(atLifespan)
+	responder.SetScopes(requester.GetGrantedScopes())
+
+	return signature, nil
 }
 
 func (c *ResourceOwnerPasswordCredentialsGrantHandler) CanSkipClientAuth(ctx context.Context, _ fosite.AccessRequester) bool {

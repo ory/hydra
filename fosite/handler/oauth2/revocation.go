@@ -13,10 +13,18 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
+var _ fosite.RevocationHandler = (*TokenRevocationHandler)(nil)
+
 type TokenRevocationHandler struct {
-	TokenRevocationStorage TokenRevocationStorage
-	RefreshTokenStrategy   RefreshTokenStrategy
-	AccessTokenStrategy    AccessTokenStrategy
+	Storage interface {
+		TokenRevocationStorageProvider
+		AccessTokenStorageProvider
+		RefreshTokenStorageProvider
+	}
+	Strategy interface {
+		AccessTokenStrategyProvider
+		RefreshTokenStrategyProvider
+	}
 }
 
 // RevokeToken implements https://tools.ietf.org/html/rfc7009#section-2.1
@@ -25,13 +33,13 @@ func (r *TokenRevocationHandler) RevokeToken(ctx context.Context, token string, 
 	discoveryFuncs := []func() (request fosite.Requester, err error){
 		func() (request fosite.Requester, err error) {
 			// Refresh token
-			signature := r.RefreshTokenStrategy.RefreshTokenSignature(ctx, token)
-			return r.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature, nil)
+			signature := r.Strategy.RefreshTokenStrategy().RefreshTokenSignature(ctx, token)
+			return r.Storage.RefreshTokenStorage().GetRefreshTokenSession(ctx, signature, nil)
 		},
 		func() (request fosite.Requester, err error) {
 			// Access token
-			signature := r.AccessTokenStrategy.AccessTokenSignature(ctx, token)
-			return r.TokenRevocationStorage.GetAccessTokenSession(ctx, signature, nil)
+			signature := r.Strategy.AccessTokenStrategy().AccessTokenSignature(ctx, token)
+			return r.Storage.AccessTokenStorage().GetAccessTokenSession(ctx, signature, nil)
 		},
 	}
 
@@ -55,8 +63,8 @@ func (r *TokenRevocationHandler) RevokeToken(ctx context.Context, token string, 
 	}
 
 	requestID := ar.GetID()
-	err1 = r.TokenRevocationStorage.RevokeRefreshToken(ctx, requestID)
-	err2 = r.TokenRevocationStorage.RevokeAccessToken(ctx, requestID)
+	err1 = r.Storage.TokenRevocationStorage().RevokeRefreshToken(ctx, requestID)
+	err2 = r.Storage.TokenRevocationStorage().RevokeAccessToken(ctx, requestID)
 
 	return storeErrorsToRevocationError(err1, err2)
 }

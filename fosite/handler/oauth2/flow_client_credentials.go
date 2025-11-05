@@ -7,19 +7,20 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/x/errorsx"
 )
 
 var _ fosite.TokenEndpointHandler = (*ClientCredentialsGrantHandler)(nil)
 
 type ClientCredentialsGrantHandler struct {
-	*HandleHelper
-	Config interface {
+	Storage  AccessTokenStorageProvider
+	Strategy AccessTokenStrategyProvider
+	Config   interface {
 		fosite.ScopeStrategyProvider
 		fosite.AudienceStrategyProvider
 		fosite.AccessTokenLifespanProvider
+		fosite.RefreshTokenLifespanProvider
 	}
 }
 
@@ -66,6 +67,26 @@ func (c *ClientCredentialsGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	atLifespan := fosite.GetEffectiveLifespan(request.GetClient(), fosite.GrantTypeClientCredentials, fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
 	_, err := c.IssueAccessToken(ctx, atLifespan, request, response)
 	return err
+}
+
+func (c *ClientCredentialsGrantHandler) IssueAccessToken(ctx context.Context, atLifespan time.Duration, requester fosite.AccessRequester, responder fosite.AccessResponder) (signature string, err error) {
+	token, signature, err := c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
+	if err != nil {
+		return "", err
+	} else if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, signature, requester.Sanitize([]string{})); err != nil {
+		return "", err
+	}
+
+	if !requester.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		atLifespan = time.Duration(requester.GetSession().GetExpiresAt(fosite.AccessToken).UnixNano() - time.Now().UTC().UnixNano())
+	}
+
+	responder.SetAccessToken(token)
+	responder.SetTokenType("bearer")
+	responder.SetExpiresIn(atLifespan)
+	responder.SetScopes(requester.GetGrantedScopes())
+
+	return signature, nil
 }
 
 func (c *ClientCredentialsGrantHandler) CanSkipClientAuth(ctx context.Context, requester fosite.AccessRequester) bool {

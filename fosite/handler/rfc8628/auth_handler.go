@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/x/errorsx"
+
 	"github.com/pkg/errors"
 )
 
@@ -19,9 +21,17 @@ const MaxAttempts = 3
 // DeviceAuthHandler is a response handler for the Device Authorisation Grant as
 // defined in https://tools.ietf.org/html/rfc8628#section-3.1
 type DeviceAuthHandler struct {
-	Storage  RFC8628CoreStorage
-	Strategy RFC8628CodeStrategy
-	Config   interface {
+	Storage interface {
+		DeviceAuthStorageProvider
+		oauth2.AccessTokenStorageProvider
+		oauth2.RefreshTokenStorageProvider
+	}
+	Strategy interface {
+		DeviceRateLimitStrategyProvider
+		DeviceCodeStrategyProvider
+		UserCodeStrategyProvider
+	}
+	Config interface {
 		fosite.DeviceProvider
 		fosite.DeviceAndUserCodeLifespanProvider
 	}
@@ -49,7 +59,7 @@ func (d *DeviceAuthHandler) HandleDeviceEndpointRequest(ctx context.Context, dar
 func (d *DeviceAuthHandler) handleDeviceAuthSession(ctx context.Context, dar fosite.DeviceRequester) (string, string, error) {
 	var userCode, userCodeSignature string
 
-	deviceCode, deviceCodeSignature, err := d.Strategy.GenerateDeviceCode(ctx)
+	deviceCode, deviceCodeSignature, err := d.Strategy.DeviceCodeStrategy().GenerateDeviceCode(ctx)
 	if err != nil {
 		return "", "", errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
@@ -63,12 +73,12 @@ func (d *DeviceAuthHandler) handleDeviceAuthSession(ctx context.Context, dar fos
 	// the chances of hitting a duplicate here can be higher.
 	// Three retries should be plenty, as otherwise the entropy is definitely off.
 	for i := 0; i < MaxAttempts; i++ {
-		userCode, userCodeSignature, err = d.Strategy.GenerateUserCode(ctx)
+		userCode, userCodeSignature, err = d.Strategy.UserCodeStrategy().GenerateUserCode(ctx)
 		if err != nil {
 			return "", "", errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 
-		err = d.Storage.CreateDeviceAuthSession(ctx, deviceCodeSignature, userCodeSignature, dar.Sanitize(nil).(fosite.DeviceRequester))
+		err = d.Storage.DeviceAuthStorage().CreateDeviceAuthSession(ctx, deviceCodeSignature, userCodeSignature, dar.Sanitize(nil).(fosite.DeviceRequester))
 		if err == nil {
 			break
 		}

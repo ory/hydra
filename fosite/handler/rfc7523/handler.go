@@ -8,23 +8,28 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/x/errorsx"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/jwt"
-
-	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/x/errorsx"
 )
 
 // #nosec:gosec G101 - False Positive
 const grantTypeJWTBearer = "urn:ietf:params:oauth:grant-type:jwt-bearer"
 
-type Handler struct {
-	Storage RFC7523KeyStorage
+var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
-	Config interface {
+type Handler struct {
+	Storage interface {
+		oauth2.AccessTokenStorageProvider
+		RFC7523KeyStorageProvider
+	}
+	Strategy oauth2.AccessTokenStrategyProvider
+	Config   interface {
 		fosite.AccessTokenLifespanProvider
+		fosite.RefreshTokenLifespanProvider
 		fosite.TokenURLProvider
 		fosite.GrantTypeJWTBearerCanSkipClientAuthProvider
 		fosite.GrantTypeJWTBearerIDOptionalProvider
@@ -33,11 +38,7 @@ type Handler struct {
 		fosite.AudienceStrategyProvider
 		fosite.ScopeStrategyProvider
 	}
-
-	*oauth2.HandleHelper
 }
-
-var _ fosite.TokenEndpointHandler = (*Handler)(nil)
 
 // HandleTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-4.1.3 (everything) and
 // https://tools.ietf.org/html/rfc7523#section-2.1 (everything)
@@ -81,7 +82,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		return err
 	}
 
-	scopes, err := c.Storage.GetPublicKeyScopes(ctx, claims.Issuer, claims.Subject, key.KeyID)
+	scopes, err := c.Storage.RFC7523KeyStorage().GetPublicKeyScopes(ctx, claims.Issuer, claims.Subject, key.KeyID)
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
@@ -93,7 +94,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 	}
 
 	if claims.ID != "" {
-		if err := c.Storage.MarkJWTUsedForTime(ctx, claims.ID, claims.Expiry.Time()); err != nil {
+		if err := c.Storage.RFC7523KeyStorage().MarkJWTUsedForTime(ctx, claims.ID, claims.Expiry.Time()); err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 	}
@@ -111,7 +112,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		return err
 	}
 
-	atLifespan := fosite.GetEffectiveLifespan(request.GetClient(), fosite.GrantTypeJWTBearer, fosite.AccessToken, c.HandleHelper.Config.GetAccessTokenLifespan(ctx))
+	atLifespan := fosite.GetEffectiveLifespan(request.GetClient(), fosite.GrantTypeJWTBearer, fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
 	session.SetExpiresAt(fosite.AccessToken, time.Now().UTC().Add(atLifespan).Round(time.Second))
 	session.SetSubject(claims.Subject)
 
@@ -126,6 +127,26 @@ func (c *Handler) PopulateTokenEndpointResponse(ctx context.Context, request fos
 	atLifespan := fosite.GetEffectiveLifespan(request.GetClient(), fosite.GrantTypeJWTBearer, fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
 	_, err := c.IssueAccessToken(ctx, atLifespan, request, response)
 	return err
+}
+
+func (c *Handler) IssueAccessToken(ctx context.Context, atLifespan time.Duration, requester fosite.AccessRequester, responder fosite.AccessResponder) (signature string, err error) {
+	token, signature, err := c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
+	if err != nil {
+		return "", err
+	} else if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, signature, requester.Sanitize([]string{})); err != nil {
+		return "", err
+	}
+
+	if !requester.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
+		atLifespan = time.Duration(requester.GetSession().GetExpiresAt(fosite.AccessToken).UnixNano() - time.Now().UTC().UnixNano())
+	}
+
+	responder.SetAccessToken(token)
+	responder.SetTokenType("bearer")
+	responder.SetExpiresIn(atLifespan)
+	responder.SetScopes(requester.GetGrantedScopes())
+
+	return signature, nil
 }
 
 func (c *Handler) CanSkipClientAuth(ctx context.Context, requester fosite.AccessRequester) bool {
@@ -200,14 +221,14 @@ func (c *Handler) findPublicKeyForToken(ctx context.Context, token *jwt.JSONWebT
 		unverifiedClaims.Subject,
 	)
 	if keyID != "" {
-		key, err := c.Storage.GetPublicKey(ctx, unverifiedClaims.Issuer, unverifiedClaims.Subject, keyID)
+		key, err := c.Storage.RFC7523KeyStorage().GetPublicKey(ctx, unverifiedClaims.Issuer, unverifiedClaims.Subject, keyID)
 		if err != nil {
 			return nil, errorsx.WithStack(keyNotFoundErr.WithWrap(err).WithDebug(err.Error()))
 		}
 		return key, nil
 	}
 
-	keys, err := c.Storage.GetPublicKeys(ctx, unverifiedClaims.Issuer, unverifiedClaims.Subject)
+	keys, err := c.Storage.RFC7523KeyStorage().GetPublicKeys(ctx, unverifiedClaims.Issuer, unverifiedClaims.Subject)
 	if err != nil {
 		return nil, errorsx.WithStack(keyNotFoundErr.WithWrap(err).WithDebug(err.Error()))
 	}
@@ -287,7 +308,7 @@ func (c *Handler) validateTokenClaims(ctx context.Context, claims jwt.Claims, ke
 	}
 
 	if claims.ID != "" {
-		used, err := c.Storage.IsJWTUsed(ctx, claims.ID)
+		used, err := c.Storage.RFC7523KeyStorage().IsJWTUsed(ctx, claims.ID)
 		if err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}

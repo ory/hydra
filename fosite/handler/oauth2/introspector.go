@@ -6,22 +6,25 @@ package oauth2
 import (
 	"context"
 
-	"github.com/ory/x/errorsx"
-
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/x/errorsx"
 )
-
-type coreValidatorConfigProvider interface {
-	fosite.ScopeStrategyProvider
-	fosite.DisableRefreshTokenValidationProvider
-}
 
 var _ fosite.TokenIntrospector = (*CoreValidator)(nil)
 
 type CoreValidator struct {
-	CoreStrategy
-	CoreStorage
-	Config coreValidatorConfigProvider
+	Storage interface {
+		AccessTokenStorageProvider
+		RefreshTokenStorageProvider
+	}
+	Strategy interface {
+		AccessTokenStrategyProvider
+		RefreshTokenStrategyProvider
+	}
+	Config interface {
+		fosite.ScopeStrategyProvider
+		fosite.DisableRefreshTokenValidationProvider
+	}
 }
 
 func (c *CoreValidator) IntrospectToken(ctx context.Context, token string, tokenUse fosite.TokenUse, accessRequest fosite.AccessRequester, scopes []string) (fosite.TokenUse, error) {
@@ -67,11 +70,11 @@ func matchScopes(ss fosite.ScopeStrategy, granted, scopes []string) error {
 }
 
 func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
-	sig := c.CoreStrategy.AccessTokenSignature(ctx, token)
-	or, err := c.CoreStorage.GetAccessTokenSession(ctx, sig, accessRequest.GetSession())
+	sig := c.Strategy.AccessTokenStrategy().AccessTokenSignature(ctx, token)
+	or, err := c.Storage.AccessTokenStorage().GetAccessTokenSession(ctx, sig, accessRequest.GetSession())
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrRequestUnauthorized.WithWrap(err).WithDebug(err.Error()))
-	} else if err := c.CoreStrategy.ValidateAccessToken(ctx, or, token); err != nil {
+	} else if err := c.Strategy.AccessTokenStrategy().ValidateAccessToken(ctx, or, token); err != nil {
 		return err
 	}
 
@@ -84,12 +87,12 @@ func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string,
 }
 
 func (c *CoreValidator) introspectRefreshToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
-	sig := c.CoreStrategy.RefreshTokenSignature(ctx, token)
-	or, err := c.CoreStorage.GetRefreshTokenSession(ctx, sig, accessRequest.GetSession())
+	sig := c.Strategy.RefreshTokenStrategy().RefreshTokenSignature(ctx, token)
+	or, err := c.Storage.RefreshTokenStorage().GetRefreshTokenSession(ctx, sig, accessRequest.GetSession())
 
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrRequestUnauthorized.WithWrap(err).WithDebug(err.Error()))
-	} else if err := c.CoreStrategy.ValidateRefreshToken(ctx, or, token); err != nil {
+	} else if err := c.Strategy.RefreshTokenStrategy().ValidateRefreshToken(ctx, or, token); err != nil {
 		return err
 	}
 

@@ -13,12 +13,11 @@
 package internal
 
 import (
-	context "context"
 	reflect "reflect"
-	time "time"
+
+	gomock "go.uber.org/mock/gomock"
 
 	fosite "github.com/ory/hydra/v2/fosite"
-	gomock "go.uber.org/mock/gomock"
 )
 
 // MockStorage is a mock of Storage interface.
@@ -45,45 +44,16 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
-// ClientAssertionJWTValid mocks base method.
-func (m *MockStorage) ClientAssertionJWTValid(ctx context.Context, jti string) error {
+// ClientManager mocks base method.
+func (m *MockStorage) ClientManager() fosite.ClientManager {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ClientAssertionJWTValid", ctx, jti)
-	ret0, _ := ret[0].(error)
+	ret := m.ctrl.Call(m, "ClientManager")
+	ret0, _ := ret[0].(fosite.ClientManager)
 	return ret0
 }
 
-// ClientAssertionJWTValid indicates an expected call of ClientAssertionJWTValid.
-func (mr *MockStorageMockRecorder) ClientAssertionJWTValid(ctx, jti any) *gomock.Call {
+// ClientManager indicates an expected call of ClientManager.
+func (mr *MockStorageMockRecorder) ClientManager() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClientAssertionJWTValid", reflect.TypeOf((*MockStorage)(nil).ClientAssertionJWTValid), ctx, jti)
-}
-
-// GetClient mocks base method.
-func (m *MockStorage) GetClient(ctx context.Context, id string) (fosite.Client, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetClient", ctx, id)
-	ret0, _ := ret[0].(fosite.Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetClient indicates an expected call of GetClient.
-func (mr *MockStorageMockRecorder) GetClient(ctx, id any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClient", reflect.TypeOf((*MockStorage)(nil).GetClient), ctx, id)
-}
-
-// SetClientAssertionJWT mocks base method.
-func (m *MockStorage) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetClientAssertionJWT", ctx, jti, exp)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetClientAssertionJWT indicates an expected call of SetClientAssertionJWT.
-func (mr *MockStorageMockRecorder) SetClientAssertionJWT(ctx, jti, exp any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetClientAssertionJWT", reflect.TypeOf((*MockStorage)(nil).SetClientAssertionJWT), ctx, jti, exp)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClientManager", reflect.TypeOf((*MockStorage)(nil).ClientManager))
 }

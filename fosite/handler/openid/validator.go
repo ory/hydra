@@ -27,7 +27,10 @@ type openIDConnectRequestValidatorConfigProvider interface {
 
 type OpenIDConnectRequestValidator struct {
 	Strategy jwt.Signer
-	Config   openIDConnectRequestValidatorConfigProvider
+	Config   interface {
+		fosite.RedirectSecureCheckerProvider
+		fosite.AllowedPromptsProvider
+	}
 }
 
 func NewOpenIDConnectRequestValidator(strategy jwt.Signer, config openIDConnectRequestValidatorConfigProvider) *OpenIDConnectRequestValidator {

@@ -19,7 +19,7 @@ import (
 func TestNewAccessResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	handler := internal.NewMockTokenEndpointHandler(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	config := &Config{}
 	f := &Fosite{Config: config}

@@ -21,7 +21,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/hydra/v2/fosite/storage"
+	foauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/events"
@@ -32,8 +34,10 @@ import (
 	"github.com/ory/x/stringsx"
 )
 
-var _ oauth2.AssertionJWTReader = &Persister{}
-var _ storage.Transactional = &Persister{}
+var (
+	_ oauth2.AssertionJWTReader = &Persister{}
+	_ fosite.Transactional      = &Persister{}
+)
 
 type (
 	tableName        string
@@ -173,6 +177,34 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 		Form:              val,
 		Session:           session,
 	}, nil
+}
+
+func (p *Persister) ClientManager() fosite.ClientManager {
+	return p
+}
+
+func (p *Persister) AccessTokenStorage() foauth2.AccessTokenStorage {
+	return p
+}
+
+func (p *Persister) RefreshTokenStorage() foauth2.RefreshTokenStorage {
+	return p
+}
+
+func (p *Persister) AuthorizeCodeStorage() foauth2.AuthorizeCodeStorage {
+	return p
+}
+
+func (p *Persister) TokenRevocationStorage() foauth2.TokenRevocationStorage {
+	return p
+}
+
+func (p *Persister) OpenIDConnectRequestStorage() openid.OpenIDConnectRequestStorage {
+	return p
+}
+
+func (p *Persister) PKCERequestStorage() pkce.PKCERequestStorage {
+	return p
 }
 
 func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) (err error) {

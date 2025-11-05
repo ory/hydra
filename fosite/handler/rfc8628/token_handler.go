@@ -12,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
-	"github.com/ory/hydra/v2/fosite/storage"
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/hydra/v2/fosite"
@@ -24,15 +23,20 @@ var _ fosite.TokenEndpointHandler = (*DeviceCodeTokenEndpointHandler)(nil)
 // - the Authorize code grant using the explicit grant type as defined in https://tools.ietf.org/html/rfc6749#section-4.1
 // - the Device Authorization Grant as defined in https://www.rfc-editor.org/rfc/rfc8628
 type DeviceCodeTokenEndpointHandler struct {
-	DeviceRateLimitStrategy DeviceRateLimitStrategy
-	DeviceCodeStrategy      DeviceCodeStrategy
-	UserCodeStrategy        UserCodeStrategy
-	CoreStorage             RFC8628CoreStorage
-
-	AccessTokenStrategy    oauth2.AccessTokenStrategy
-	RefreshTokenStrategy   oauth2.RefreshTokenStrategy
-	TokenRevocationStorage oauth2.TokenRevocationStorage
-	Config                 interface {
+	Storage interface {
+		DeviceAuthStorageProvider
+		oauth2.AccessTokenStorageProvider
+		oauth2.RefreshTokenStorageProvider
+		oauth2.TokenRevocationStorageProvider
+	}
+	Strategy interface {
+		DeviceRateLimitStrategyProvider
+		DeviceCodeStrategyProvider
+		UserCodeStrategyProvider
+		oauth2.AccessTokenStrategyProvider
+		oauth2.RefreshTokenStrategyProvider
+	}
+	Config interface {
 		fosite.AccessTokenLifespanProvider
 		fosite.RefreshTokenLifespanProvider
 		fosite.RefreshTokenScopesProvider
@@ -67,7 +71,7 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err = c.DeviceCodeStrategy.ValidateDeviceCode(ctx, ar, code); err != nil {
+	if err = c.Strategy.DeviceCodeStrategy().ValidateDeviceCode(ctx, ar, code); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -80,41 +84,41 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 	}
 
 	var accessToken, accessTokenSignature string
-	accessToken, accessTokenSignature, err = c.AccessTokenStrategy.GenerateAccessToken(ctx, requester)
+	accessToken, accessTokenSignature, err = c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, requester)
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	var refreshToken, refreshTokenSignature string
 	if c.canIssueRefreshToken(ctx, requester) {
-		refreshToken, refreshTokenSignature, err = c.RefreshTokenStrategy.GenerateRefreshToken(ctx, requester)
+		refreshToken, refreshTokenSignature, err = c.Strategy.RefreshTokenStrategy().GenerateRefreshToken(ctx, requester)
 		if err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 	}
 
-	ctx, err = storage.MaybeBeginTx(ctx, c.CoreStorage)
+	ctx, err = fosite.MaybeBeginTx(ctx, c.Storage)
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 	defer func() {
 		if err != nil {
-			if rollBackTxnErr := storage.MaybeRollbackTx(ctx, c.CoreStorage); rollBackTxnErr != nil {
+			if rollBackTxnErr := fosite.MaybeRollbackTx(ctx, c.Storage); rollBackTxnErr != nil {
 				err = errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebugf("error: %s; rollback error: %s", err, rollBackTxnErr))
 			}
 		}
 	}()
 
-	if err = c.CoreStorage.InvalidateDeviceCodeSession(ctx, signature); err != nil {
+	if err = c.Storage.DeviceAuthStorage().InvalidateDeviceCodeSession(ctx, signature); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err = c.CoreStorage.CreateAccessTokenSession(ctx, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
+	if err = c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	if refreshTokenSignature != "" {
-		if err = c.CoreStorage.CreateRefreshTokenSession(ctx, refreshTokenSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
+		if err = c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshTokenSignature, accessTokenSignature, requester.Sanitize([]string{})); err != nil {
 			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 		}
 	}
@@ -128,7 +132,7 @@ func (c *DeviceCodeTokenEndpointHandler) PopulateTokenEndpointResponse(ctx conte
 		responder.SetExtra("refresh_token", refreshToken)
 	}
 
-	if err = storage.MaybeCommitTx(ctx, c.CoreStorage); err != nil {
+	if err = fosite.MaybeCommitTx(ctx, c.Storage); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
@@ -163,7 +167,7 @@ func (c *DeviceCodeTokenEndpointHandler) HandleTokenEndpointRequest(ctx context.
 		return err
 	}
 
-	if err = c.DeviceCodeStrategy.ValidateDeviceCode(ctx, ar, code); err != nil {
+	if err = c.Strategy.DeviceCodeStrategy().ValidateDeviceCode(ctx, ar, code); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -224,8 +228,8 @@ func (c *DeviceCodeTokenEndpointHandler) revokeTokens(ctx context.Context, reqId
 		}
 	}
 
-	revokeAndAppendErr("access", c.TokenRevocationStorage.RevokeAccessToken)
-	revokeAndAppendErr("refresh", c.TokenRevocationStorage.RevokeRefreshToken)
+	revokeAndAppendErr("access", c.Storage.TokenRevocationStorage().RevokeAccessToken)
+	revokeAndAppendErr("refresh", c.Storage.TokenRevocationStorage().RevokeRefreshToken)
 
 	return errorsx.WithStack(fosite.ErrInvalidGrant.WithHint(hint).WithDebug(debug.String()))
 }
@@ -233,7 +237,7 @@ func (c *DeviceCodeTokenEndpointHandler) revokeTokens(ctx context.Context, reqId
 func (c DeviceCodeTokenEndpointHandler) deviceCode(ctx context.Context, requester fosite.AccessRequester) (code string, signature string, err error) {
 	code = requester.GetRequestForm().Get("device_code")
 
-	signature, err = c.DeviceCodeStrategy.DeviceCodeSignature(ctx, code)
+	signature, err = c.Strategy.DeviceCodeStrategy().DeviceCodeSignature(ctx, code)
 	if err != nil {
 		return "", "", errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
@@ -242,7 +246,7 @@ func (c DeviceCodeTokenEndpointHandler) deviceCode(ctx context.Context, requeste
 }
 
 func (c DeviceCodeTokenEndpointHandler) validateCode(ctx context.Context, requester fosite.Requester, code string) error {
-	shouldRateLimit, err := c.DeviceRateLimitStrategy.ShouldRateLimit(ctx, code)
+	shouldRateLimit, err := c.Strategy.DeviceRateLimitStrategy().ShouldRateLimit(ctx, code)
 	if err != nil {
 		return err
 	}
@@ -253,7 +257,7 @@ func (c DeviceCodeTokenEndpointHandler) validateCode(ctx context.Context, reques
 }
 
 func (s DeviceCodeTokenEndpointHandler) session(ctx context.Context, requester fosite.AccessRequester, codeSignature string) (fosite.DeviceRequester, error) {
-	req, err := s.CoreStorage.GetDeviceCodeSession(ctx, codeSignature, requester.GetSession())
+	req, err := s.Storage.DeviceAuthStorage().GetDeviceCodeSession(ctx, codeSignature, requester.GetSession())
 
 	if err != nil && errors.Is(err, fosite.ErrInvalidatedDeviceCode) {
 		if req != nil {

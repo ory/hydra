@@ -36,40 +36,52 @@ func (t TokenStrategy) gs(ctx context.Context, additionalSources ...config.Acces
 	return t.hmac
 }
 
+func (t TokenStrategy) AuthorizeCodeStrategy() foauth2.AuthorizeCodeStrategy {
+	return t
+}
+
+func (t TokenStrategy) AccessTokenStrategy() foauth2.AccessTokenStrategy {
+	return t
+}
+
+func (t TokenStrategy) RefreshTokenStrategy() foauth2.RefreshTokenStrategy {
+	return t
+}
+
 func (t TokenStrategy) AccessTokenSignature(_ context.Context, token string) string {
 	return genericSignature(token)
 }
 
 func (t TokenStrategy) GenerateAccessToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).GenerateAccessToken(ctx, requester)
+	return t.gs(ctx, withRequester(requester)).AccessTokenStrategy().GenerateAccessToken(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateAccessToken(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).ValidateAccessToken(ctx, requester, token)
+	return t.gs(ctx, withRequester(requester)).AccessTokenStrategy().ValidateAccessToken(ctx, requester, token)
 }
 
 func (t TokenStrategy) RefreshTokenSignature(ctx context.Context, token string) string {
-	return t.gs(ctx).RefreshTokenSignature(ctx, token)
+	return t.gs(ctx).RefreshTokenStrategy().RefreshTokenSignature(ctx, token)
 }
 
 func (t TokenStrategy) GenerateRefreshToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).GenerateRefreshToken(ctx, requester)
+	return t.gs(ctx, withRequester(requester)).RefreshTokenStrategy().GenerateRefreshToken(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateRefreshToken(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).ValidateRefreshToken(ctx, requester, token)
+	return t.gs(ctx, withRequester(requester)).RefreshTokenStrategy().ValidateRefreshToken(ctx, requester, token)
 }
 
 func (t TokenStrategy) AuthorizeCodeSignature(ctx context.Context, token string) string {
-	return t.gs(ctx).AuthorizeCodeSignature(ctx, token)
+	return t.gs(ctx).AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, token)
 }
 
 func (t TokenStrategy) GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).GenerateAuthorizeCode(ctx, requester)
+	return t.gs(ctx, withRequester(requester)).AuthorizeCodeStrategy().GenerateAuthorizeCode(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).ValidateAuthorizeCode(ctx, requester, token)
+	return t.gs(ctx, withRequester(requester)).AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, requester, token)
 }
 
 func withRequester(requester fosite.Requester) config.AccessTokenStrategySource {

@@ -16,8 +16,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	fosite "github.com/ory/hydra/v2/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/hydra/v2/fosite"
 )
 
 // MockClientCredentialsGrantStorage is a mock of ClientCredentialsGrantStorage interface.

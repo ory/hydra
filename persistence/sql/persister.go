@@ -14,7 +14,6 @@ import (
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/hydra/v2/fosite/storage"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/persistence"
@@ -27,12 +26,12 @@ import (
 	"github.com/ory/x/popx"
 )
 
-var _ persistence.Persister = (*Persister)(nil)
-var _ storage.Transactional = (*Persister)(nil)
-
 var (
-	ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
+	_ persistence.Persister = (*Persister)(nil)
+	_ fosite.Transactional  = (*Persister)(nil)
 )
+
+var ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
 
 type skipCommitContextKey int
 

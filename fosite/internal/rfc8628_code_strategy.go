@@ -16,8 +16,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	fosite "github.com/ory/hydra/v2/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/hydra/v2/fosite"
 )
 
 // MockRFC8628CodeStrategy is a mock of RFC8628CodeStrategy interface.

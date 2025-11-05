@@ -23,7 +23,7 @@ func TestWriteAuthorizeResponse(t *testing.T) {
 	rw := NewMockResponseWriter(ctrl)
 	ar := NewMockAuthorizeRequester(ctrl)
 	resp := NewMockAuthorizeResponder(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	for k, c := range []struct {
 		setup  func()

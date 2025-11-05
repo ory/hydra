@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -13,10 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 )
 
-var hmacshaStrategy = NewHMACSHAStrategy(
+var hmacshaStrategy = oauth2.NewHMACSHAStrategy(
 	&hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar")}},
 	&fosite.Config{
 		AccessTokenLifespan:   time.Hour * 24,
@@ -24,7 +25,7 @@ var hmacshaStrategy = NewHMACSHAStrategy(
 	},
 )
 
-var hmacshaStrategyUnprefixed = NewHMACSHAStrategyUnPrefixed(
+var hmacshaStrategyUnprefixed = oauth2.NewHMACSHAStrategyUnPrefixed(
 	&hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar")}},
 	&fosite.Config{
 		AccessTokenLifespan:   time.Hour * 24,
@@ -62,7 +63,7 @@ func TestHMACAccessToken(t *testing.T) {
 	for k, c := range []struct {
 		r      fosite.Request
 		pass   bool
-		strat  CoreStrategy
+		strat  any
 		prefix string
 	}{
 		{

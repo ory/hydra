@@ -9,9 +9,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // NewPushedAuthorizeResponse executes the handlers and builds the response

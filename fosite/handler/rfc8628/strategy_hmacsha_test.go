@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/fosite"
-	. "github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 )
 
-var hmacshaStrategy = DefaultDeviceStrategy{
+var hmacshaStrategyDefault = rfc8628.DefaultDeviceStrategy{
 	Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar")}},
 	Config: &fosite.Config{
 		AccessTokenLifespan:            time.Minute * 24,
@@ -53,17 +53,17 @@ func TestHMACUserCode(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			userCode, signature, err := hmacshaStrategy.GenerateUserCode(context.TODO())
+			userCode, signature, err := hmacshaStrategyDefault.GenerateUserCode(context.TODO())
 			assert.NoError(t, err)
 			regex := regexp.MustCompile("[ABCDEFGHIJKLMNOPQRSTUVWXYZ]{8}")
 			assert.Equal(t, len(regex.FindString(userCode)), len(userCode))
 
-			err = hmacshaStrategy.ValidateUserCode(context.TODO(), c.r, userCode)
+			err = hmacshaStrategyDefault.ValidateUserCode(context.TODO(), c.r, userCode)
 			if c.pass {
 				assert.NoError(t, err)
-				validate, _ := hmacshaStrategy.Enigma.GenerateHMACForString(context.TODO(), userCode)
+				validate, _ := hmacshaStrategyDefault.Enigma.GenerateHMACForString(context.TODO(), userCode)
 				assert.Equal(t, signature, validate)
-				testSign, err := hmacshaStrategy.UserCodeSignature(context.TODO(), userCode)
+				testSign, err := hmacshaStrategyDefault.UserCodeSignature(context.TODO(), userCode)
 				assert.NoError(t, err)
 				assert.Equal(t, testSign, signature)
 			} else {
@@ -84,7 +84,7 @@ func TestHMACDeviceCode(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-			token, signature, err := hmacshaStrategy.GenerateDeviceCode(context.TODO())
+			token, signature, err := hmacshaStrategyDefault.GenerateDeviceCode(context.TODO())
 			assert.NoError(t, err)
 			assert.Equal(t, strings.Split(token, ".")[1], signature)
 			assert.Contains(t, token, "ory_dc_")
@@ -94,12 +94,12 @@ func TestHMACDeviceCode(t *testing.T) {
 				strings.TrimPrefix(token, "ory_dc_"),
 			} {
 				t.Run(fmt.Sprintf("prefix=%v", k == 0), func(t *testing.T) {
-					err = hmacshaStrategy.ValidateDeviceCode(context.TODO(), c.r, token)
+					err = hmacshaStrategyDefault.ValidateDeviceCode(context.TODO(), c.r, token)
 					if c.pass {
 						assert.NoError(t, err)
-						validate := hmacshaStrategy.Enigma.Signature(token)
+						validate := hmacshaStrategyDefault.Enigma.Signature(token)
 						assert.Equal(t, signature, validate)
-						testSign, err := hmacshaStrategy.DeviceCodeSignature(context.TODO(), token)
+						testSign, err := hmacshaStrategyDefault.DeviceCodeSignature(context.TODO(), token)
 						assert.NoError(t, err)
 						assert.Equal(t, testSign, signature)
 					} else {

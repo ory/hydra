@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"net/url"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func (f *Fosite) NewAuthorizeResponse(ctx context.Context, ar AuthorizeRequester, session Session) (_ AuthorizeResponder, err error) {

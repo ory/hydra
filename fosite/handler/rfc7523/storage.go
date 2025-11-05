@@ -31,3 +31,7 @@ type RFC7523KeyStorage interface {
 	// considered valid based on the applicable "exp" instant. (https://tools.ietf.org/html/rfc7523#section-3)
 	MarkJWTUsedForTime(ctx context.Context, jti string, exp time.Time) error
 }
+
+type RFC7523KeyStorageProvider interface {
+	RFC7523KeyStorage() RFC7523KeyStorage
+}

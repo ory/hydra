@@ -17,6 +17,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
@@ -99,6 +100,10 @@ func (r *DeviceRequestSQL) toRequest(ctx context.Context, session fosite.Session
 			Session:           session,
 		},
 	}, nil
+}
+
+func (p *Persister) DeviceAuthStorage() rfc8628.DeviceAuthStorage {
+	return p
 }
 
 func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSignature, userCodeSignature string, r fosite.DeviceRequester, expiresAt time.Time) (*DeviceRequestSQL, error) {

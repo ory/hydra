@@ -32,11 +32,11 @@ import (
 //     additional query parameters.  The endpoint URI MUST NOT include a
 //     fragment component.
 func TestWriteAuthorizeError(t *testing.T) {
-	var urls = []string{
+	urls := []string{
 		"https://foobar.com/",
 		"https://foobar.com/?foo=bar",
 	}
-	var purls = []*url.URL{}
+	purls := []*url.URL{}
 	for _, u := range urls {
 		purl, _ := url.Parse(u)
 		purls = append(purls, purl)
@@ -431,7 +431,7 @@ func TestWriteAuthorizeError(t *testing.T) {
 			}
 
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			t.Cleanup(ctrl.Finish)
 			rw := NewMockResponseWriter(ctrl)
 			req := NewMockAuthorizeRequester(ctrl)
 

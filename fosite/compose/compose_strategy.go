@@ -15,10 +15,41 @@ import (
 )
 
 type CommonStrategy struct {
-	oauth2.CoreStrategy
-	rfc8628.RFC8628CodeStrategy
-	openid.OpenIDConnectTokenStrategy
+	CoreStrategy        oauth2.CoreStrategy
+	RFC8628CodeStrategy rfc8628.RFC8628CodeStrategy
+	OIDCTokenStrategy   openid.OpenIDConnectTokenStrategy
 	jwt.Signer
+}
+
+// OAuth2 Strategy Providers
+func (s *CommonStrategy) AuthorizeCodeStrategy() oauth2.AuthorizeCodeStrategy {
+	return s.CoreStrategy.AuthorizeCodeStrategy()
+}
+
+func (s *CommonStrategy) AccessTokenStrategy() oauth2.AccessTokenStrategy {
+	return s.CoreStrategy.AccessTokenStrategy()
+}
+
+func (s *CommonStrategy) RefreshTokenStrategy() oauth2.RefreshTokenStrategy {
+	return s.CoreStrategy.RefreshTokenStrategy()
+}
+
+// OpenID Connect Strategy Provider
+func (s *CommonStrategy) OpenIDConnectTokenStrategy() openid.OpenIDConnectTokenStrategy {
+	return s.OIDCTokenStrategy
+}
+
+// RFC8628 Device Strategy Providers
+func (s *CommonStrategy) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
+	return s.RFC8628CodeStrategy
+}
+
+func (s *CommonStrategy) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
+	return s.RFC8628CodeStrategy
+}
+
+func (s *CommonStrategy) UserCodeStrategy() rfc8628.UserCodeStrategy {
+	return s.RFC8628CodeStrategy
 }
 
 type HMACSHAStrategyConfigurator interface {
@@ -36,11 +67,15 @@ func NewOAuth2HMACStrategy(config HMACSHAStrategyConfigurator) *oauth2.HMACSHASt
 	return oauth2.NewHMACSHAStrategy(&hmac.HMACStrategy{Config: config}, config)
 }
 
-func NewOAuth2JWTStrategy(keyGetter func(context.Context) (interface{}, error), strategy oauth2.CoreStrategy, config fosite.Configurator) *oauth2.DefaultJWTStrategy {
+func NewOAuth2JWTStrategy(keyGetter func(context.Context) (interface{}, error), strategy interface{}, config fosite.Configurator) *oauth2.DefaultJWTStrategy {
 	return &oauth2.DefaultJWTStrategy{
-		Signer:          &jwt.DefaultSigner{GetPrivateKey: keyGetter},
-		HMACSHAStrategy: strategy,
-		Config:          config,
+		Signer: &jwt.DefaultSigner{GetPrivateKey: keyGetter},
+		Strategy: strategy.(interface {
+			oauth2.AuthorizeCodeStrategyProvider
+			oauth2.AccessTokenStrategyProvider
+			oauth2.RefreshTokenStrategyProvider
+		}),
+		Config: config,
 	}
 }
 

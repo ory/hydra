@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package pkce
+package pkce_test
 
 import (
 	"context"
@@ -16,6 +16,7 @@ import (
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
 	"github.com/ory/hydra/v2/fosite/storage"
 )
 
@@ -35,12 +36,20 @@ func (m *mockCodeStrategy) ValidateAuthorizeCode(ctx context.Context, requester 
 	return nil
 }
 
+type mockStrategyProvider struct {
+	strategy oauth2.AuthorizeCodeStrategy
+}
+
+func (p *mockStrategyProvider) AuthorizeCodeStrategy() oauth2.AuthorizeCodeStrategy {
+	return p.strategy
+}
+
 func TestPKCEHandleAuthorizeEndpointRequest(t *testing.T) {
 	var config fosite.Config
-	h := &Handler{
-		Storage:               storage.NewMemoryStore(),
-		AuthorizeCodeStrategy: oauth2.NewHMACSHAStrategy(nil, nil),
-		Config:                &config,
+	h := &pkce.Handler{
+		Storage:  storage.NewMemoryStore(),
+		Strategy: oauth2.NewHMACSHAStrategy(nil, nil),
+		Config:   &config,
 	}
 	w := fosite.NewAuthorizeResponse()
 	r := fosite.NewAuthorizeRequest()
@@ -84,8 +93,9 @@ func TestPKCEHandleAuthorizeEndpointRequest(t *testing.T) {
 func TestPKCEHandlerValidate(t *testing.T) {
 	s := storage.NewMemoryStore()
 	ms := &mockCodeStrategy{}
+	msp := &mockStrategyProvider{strategy: ms}
 	config := &fosite.Config{}
-	h := &Handler{Storage: s, AuthorizeCodeStrategy: ms, Config: config}
+	h := &pkce.Handler{Storage: s, Strategy: msp, Config: config}
 	pc := &fosite.DefaultClient{Public: true}
 
 	s256verifier := "KGCt4m8AmjUvIR5ArTByrmehjtbxn1A49YpTZhsH8N7fhDr7LQayn9xx6mck"
@@ -374,7 +384,7 @@ func TestPKCEHandleTokenEndpointRequest(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-			h := &Handler{
+			h := &pkce.Handler{
 				Config: &fosite.Config{
 					EnforcePKCE:                    tc.force,
 					EnforcePKCEForPublicClients:    tc.forcePublic,
@@ -383,9 +393,9 @@ func TestPKCEHandleTokenEndpointRequest(t *testing.T) {
 			}
 
 			if tc.expectErr {
-				assert.Error(t, h.validate(context.Background(), tc.challenge, tc.method, tc.client))
+				assert.Error(t, pkce.CallValidate(context.Background(), tc.challenge, tc.method, tc.client, h))
 			} else {
-				assert.NoError(t, h.validate(context.Background(), tc.challenge, tc.method, tc.client))
+				assert.NoError(t, pkce.CallValidate(context.Background(), tc.challenge, tc.method, tc.client, h))
 			}
 		})
 	}

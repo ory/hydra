@@ -22,6 +22,7 @@ import (
 func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	deviceClient := &DefaultClient{ID: "client_id"}
 	deviceClient.Public = true
 	deviceClient.Scopes = []string{"17", "42"}
@@ -33,7 +34,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 	authCodeClient.Scopes = []string{"17", "42"}
 	authCodeClient.GrantTypes = []string{"authorization_code"}
 
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 	config := &Config{ScopeStrategy: ExactScopeStrategy, AudienceMatchingStrategy: DefaultAudienceMatchingStrategy}
 	fosite := &Fosite{Store: store, Config: config}
 	for k, c := range []struct {
@@ -63,7 +64,8 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		expectedError: ErrInvalidClient,
 		method:        "POST",
 		mock: func() {
-			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(nil, errors.New(""))
+			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(nil, errors.New(""))
 		},
 	}, {
 		description: "fails because scope not allowed",
@@ -73,7 +75,8 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
+			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 		expectedError: ErrInvalidScope,
 	}, {
@@ -85,7 +88,8 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
+			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 		expectedError: ErrInvalidRequest,
 	}, {
@@ -96,7 +100,8 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id_2")).Return(authCodeClient, nil)
+			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id_2")).Return(authCodeClient, nil)
 		},
 		expectedError: ErrInvalidGrant,
 	}, {
@@ -107,7 +112,8 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
+			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 	}} {
 		t.Run(fmt.Sprintf("case=%d description=%s", k, c.description), func(t *testing.T) {
@@ -131,9 +137,10 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	hasher := internal.NewMockHasher(ctrl)
 	client := &DefaultClient{ID: "client_id"}
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 	config := &Config{ClientSecretsHasher: hasher, ScopeStrategy: ExactScopeStrategy, AudienceMatchingStrategy: DefaultAudienceMatchingStrategy}
 	fosite := &Fosite{Store: store, Config: config}
 
@@ -159,7 +166,8 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			expectedError: ErrInvalidClient,
 			method:        "POST",
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New(""))
 			},
 			description: "Should failed becaue no client authn provided.",
@@ -175,7 +183,8 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			expectedError: ErrInvalidRequest,
 			method:        "POST",
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("client_secret")), gomock.Eq([]byte("client_secret"))).Return(nil)
 			},
 			description: "should fail because different client is used in authn than in form",
@@ -190,7 +199,8 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			},
 			method: "POST",
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("client_secret")), gomock.Eq([]byte("client_secret"))).Return(nil)
 			},
 			description: "should succeed",

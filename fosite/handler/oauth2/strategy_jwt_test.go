@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/internal/gen"
 
 	"github.com/stretchr/testify/assert"
@@ -21,15 +22,17 @@ import (
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 )
 
-var rsaKey = gen.MustRSAKey()
-var j = &DefaultJWTStrategy{
-	Signer: &jwt.DefaultSigner{
-		GetPrivateKey: func(_ context.Context) (interface{}, error) {
-			return rsaKey, nil
+var (
+	rsaKey = gen.MustRSAKey()
+	j      = &oauth2.DefaultJWTStrategy{
+		Signer: &jwt.DefaultSigner{
+			GetPrivateKey: func(_ context.Context) (interface{}, error) {
+				return rsaKey, nil
+			},
 		},
-	},
-	Config: &fosite.Config{},
-}
+		Config: &fosite.Config{},
+	}
+)
 
 // returns a valid JWT type. The JWTClaims.ExpiresAt time is intentionally
 // left empty to ensure it is pulled from the session's ExpiresAt map for
@@ -39,7 +42,7 @@ var jwtValidCase = func(tokenType fosite.TokenType) *fosite.Request {
 		Client: &fosite.DefaultClient{
 			Secret: []byte("foobarfoobarfoobarfoobar"),
 		},
-		Session: &JWTSession{
+		Session: &oauth2.JWTSession{
 			JWTClaims: &jwt.JWTClaims{
 				Issuer:    "fosite",
 				Subject:   "peter",
@@ -68,7 +71,7 @@ var jwtValidCaseWithZeroRefreshExpiry = func(tokenType fosite.TokenType) *fosite
 		Client: &fosite.DefaultClient{
 			Secret: []byte("foobarfoobarfoobarfoobar"),
 		},
-		Session: &JWTSession{
+		Session: &oauth2.JWTSession{
 			JWTClaims: &jwt.JWTClaims{
 				Issuer:    "fosite",
 				Subject:   "peter",
@@ -98,7 +101,7 @@ var jwtValidCaseWithRefreshExpiry = func(tokenType fosite.TokenType) *fosite.Req
 		Client: &fosite.DefaultClient{
 			Secret: []byte("foobarfoobarfoobarfoobar"),
 		},
-		Session: &JWTSession{
+		Session: &oauth2.JWTSession{
 			JWTClaims: &jwt.JWTClaims{
 				Issuer:    "fosite",
 				Subject:   "peter",
@@ -131,7 +134,7 @@ var jwtExpiredCase = func(tokenType fosite.TokenType) *fosite.Request {
 		Client: &fosite.DefaultClient{
 			Secret: []byte("foobarfoobarfoobarfoobar"),
 		},
-		Session: &JWTSession{
+		Session: &oauth2.JWTSession{
 			JWTClaims: &jwt.JWTClaims{
 				Issuer:    "fosite",
 				Subject:   "peter",
@@ -220,7 +223,7 @@ func TestAccessToken(t *testing.T) {
 				// Scope field is always a string.
 				assert.Equal(t, "email offline", claims["scope"])
 
-				validate := j.signature(token)
+				validate := oauth2.CallSignature(token, j)
 				err = j.ValidateAccessToken(context.Background(), c.r, token)
 				if c.pass {
 					assert.NoError(t, err)

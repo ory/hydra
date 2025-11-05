@@ -13,7 +13,11 @@ import (
 	enigma "github.com/ory/hydra/v2/fosite/token/hmac"
 )
 
-var _ CoreStrategy = (*HMACSHAStrategyUnPrefixed)(nil)
+var (
+	_ AuthorizeCodeStrategy = (*HMACSHAStrategyUnPrefixed)(nil)
+	_ AccessTokenStrategy   = (*HMACSHAStrategyUnPrefixed)(nil)
+	_ RefreshTokenStrategy  = (*HMACSHAStrategyUnPrefixed)(nil)
+)
 
 type HMACSHAStrategyUnPrefixed struct {
 	Enigma *enigma.HMACStrategy
@@ -33,9 +37,11 @@ func NewHMACSHAStrategyUnPrefixed(
 func (h *HMACSHAStrategyUnPrefixed) AccessTokenSignature(ctx context.Context, token string) string {
 	return h.Enigma.Signature(token)
 }
+
 func (h *HMACSHAStrategyUnPrefixed) RefreshTokenSignature(ctx context.Context, token string) string {
 	return h.Enigma.Signature(token)
 }
+
 func (h *HMACSHAStrategyUnPrefixed) AuthorizeCodeSignature(ctx context.Context, token string) string {
 	return h.Enigma.Signature(token)
 }
@@ -50,7 +56,7 @@ func (h *HMACSHAStrategyUnPrefixed) GenerateAccessToken(ctx context.Context, _ f
 }
 
 func (h *HMACSHAStrategyUnPrefixed) ValidateAccessToken(ctx context.Context, r fosite.Requester, token string) (err error) {
-	var exp = r.GetSession().GetExpiresAt(fosite.AccessToken)
+	exp := r.GetSession().GetExpiresAt(fosite.AccessToken)
 	if exp.IsZero() && r.GetRequestedAt().Add(h.Config.GetAccessTokenLifespan(ctx)).Before(time.Now().UTC()) {
 		return errorsx.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at '%s'.", r.GetRequestedAt().Add(h.Config.GetAccessTokenLifespan(ctx))))
 	}
@@ -72,7 +78,7 @@ func (h *HMACSHAStrategyUnPrefixed) GenerateRefreshToken(ctx context.Context, _ 
 }
 
 func (h *HMACSHAStrategyUnPrefixed) ValidateRefreshToken(ctx context.Context, r fosite.Requester, token string) (err error) {
-	var exp = r.GetSession().GetExpiresAt(fosite.RefreshToken)
+	exp := r.GetSession().GetExpiresAt(fosite.RefreshToken)
 	if exp.IsZero() {
 		// Unlimited lifetime
 		return h.Enigma.Validate(ctx, token)
@@ -95,7 +101,7 @@ func (h *HMACSHAStrategyUnPrefixed) GenerateAuthorizeCode(ctx context.Context, _
 }
 
 func (h *HMACSHAStrategyUnPrefixed) ValidateAuthorizeCode(ctx context.Context, r fosite.Requester, token string) (err error) {
-	var exp = r.GetSession().GetExpiresAt(fosite.AuthorizeCode)
+	exp := r.GetSession().GetExpiresAt(fosite.AuthorizeCode)
 	if exp.IsZero() && r.GetRequestedAt().Add(h.Config.GetAuthorizeCodeLifespan(ctx)).Before(time.Now().UTC()) {
 		return errorsx.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at '%s'.", r.GetRequestedAt().Add(h.Config.GetAuthorizeCodeLifespan(ctx))))
 	}

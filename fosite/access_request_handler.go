@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"strings"
 
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/ory/hydra/v2/fosite/i18n"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/pkg/errors"
 )

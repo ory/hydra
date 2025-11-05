@@ -34,14 +34,20 @@ Put an `x` in the boxes that apply. You can also fill these out after creating t
 them, don't hesitate to ask. We're here to help! This is simply a reminder of what we are going to look for before merging your code.
 -->
 
-- [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md) and signed the CLA.
-- [ ] I have referenced an issue containing the design document if my change introduces a new feature.
+- [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md)
+      and signed the CLA.
+- [ ] I have referenced an issue containing the design document if my change
+      introduces a new feature.
 - [ ] I have read the [security policy](../security/policy).
-- [ ] I confirm that this pull request does not address a security vulnerability. 
-      If this pull request addresses a security vulnerability, 
-      I confirm that I got approval (please contact [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push the changes.
-- [ ] I have added tests that prove my fix is effective or that my feature works.
-- [ ] I have added the necessary documentation within the code base (if appropriate).
+- [ ] I confirm that this pull request does not address a security
+      vulnerability. If this pull request addresses a security vulnerability, I
+      confirm that I got approval (please contact
+      [security@ory.sh](mailto:security@ory.sh)) from the maintainers to push
+      the changes.
+- [ ] I have added tests that prove my fix is effective or that my feature
+      works.
+- [ ] I have added the necessary documentation within the code base (if
+      appropriate).
 
 ## Further comments
 

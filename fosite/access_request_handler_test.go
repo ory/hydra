@@ -22,11 +22,12 @@ import (
 func TestNewAccessRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	handler := internal.NewMockTokenEndpointHandler(ctrl)
 	handler.EXPECT().CanHandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(true).AnyTimes()
 	handler.EXPECT().CanSkipClientAuth(gomock.Any(), gomock.Any()).Return(false).AnyTimes()
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	client := &DefaultClient{}
 	config := &Config{ClientSecretsHasher: hasher, AudienceMatchingStrategy: DefaultAudienceMatchingStrategy}
@@ -76,7 +77,8 @@ func TestNewAccessRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
 			},
 			handlers: TokenEndpointHandlers{handler},
 		},
@@ -101,7 +103,8 @@ func TestNewAccessRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(nil, errors.New(""))
 			},
 			handlers: TokenEndpointHandlers{handler},
 		},
@@ -115,7 +118,8 @@ func TestNewAccessRequest(t *testing.T) {
 			},
 			expectErr: ErrInvalidClient,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = false
 				client.Secret = []byte("foo")
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(errors.New(""))
@@ -132,7 +136,8 @@ func TestNewAccessRequest(t *testing.T) {
 			},
 			expectErr: ErrServerError,
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = false
 				client.Secret = []byte("foo")
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -149,7 +154,8 @@ func TestNewAccessRequest(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = false
 				client.Secret = []byte("foo")
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -172,7 +178,8 @@ func TestNewAccessRequest(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = true
 				handler.EXPECT().HandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(nil)
 			},
@@ -211,11 +218,12 @@ func TestNewAccessRequest(t *testing.T) {
 func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 	handler := internal.NewMockTokenEndpointHandler(ctrl)
 	handler.EXPECT().CanHandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(true).AnyTimes()
 	handler.EXPECT().CanSkipClientAuth(gomock.Any(), gomock.Any()).Return(true).AnyTimes()
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	client := &DefaultClient{}
 	anotherClient := &DefaultClient{ID: "another"}
@@ -234,7 +242,7 @@ func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 		{
 			form: url.Values{},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
 			},
 			method:    "POST",
 			expectErr: ErrInvalidRequest,
@@ -245,7 +253,7 @@ func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
 			},
 			method:    "POST",
 			expectErr: ErrInvalidRequest,
@@ -261,7 +269,8 @@ func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 			},
 			mock: func() {
 				// despite error from storage, we should success, because client auth is not required
-				store.EXPECT().GetClient(gomock.Any(), "foo").Return(nil, errors.New("no client")).Times(1)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), "foo").Return(nil, errors.New("no client")).Times(1)
 				handler.EXPECT().HandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(nil)
 			},
 			method: "POST",
@@ -299,7 +308,8 @@ func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), "foo").Return(anotherClient, nil).Times(1)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), "foo").Return(anotherClient, nil).Times(1)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).Times(1)
 				handler.EXPECT().HandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(nil)
 			},
@@ -340,6 +350,7 @@ func TestNewAccessRequestWithoutClientAuth(t *testing.T) {
 func TestNewAccessRequestWithMixedClientAuth(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockStorage(ctrl)
+	clientManager := internal.NewMockClientManager(ctrl)
 
 	handlerWithClientAuth := internal.NewMockTokenEndpointHandler(ctrl)
 	handlerWithClientAuth.EXPECT().CanHandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(true).AnyTimes()
@@ -350,7 +361,7 @@ func TestNewAccessRequestWithMixedClientAuth(t *testing.T) {
 	handlerWithoutClientAuth.EXPECT().CanSkipClientAuth(gomock.Any(), gomock.Any()).Return(true).AnyTimes()
 
 	hasher := internal.NewMockHasher(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	client := &DefaultClient{}
 	config := &Config{ClientSecretsHasher: hasher, AudienceMatchingStrategy: DefaultAudienceMatchingStrategy}
@@ -372,7 +383,8 @@ func TestNewAccessRequestWithMixedClientAuth(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = false
 				client.Secret = []byte("foo")
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(errors.New("hash err"))
@@ -390,7 +402,8 @@ func TestNewAccessRequestWithMixedClientAuth(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
+				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("foo")).Return(client, nil)
 				client.Public = false
 				client.Secret = []byte("foo")
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("foo")), gomock.Eq([]byte("bar"))).Return(nil)
@@ -412,7 +425,7 @@ func TestNewAccessRequestWithMixedClientAuth(t *testing.T) {
 				"grant_type": {"foo"},
 			},
 			mock: func() {
-				store.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
+				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Any()).Times(0)
 				handlerWithoutClientAuth.EXPECT().HandleTokenEndpointRequest(gomock.Any(), gomock.Any()).Return(nil)
 			},
 			method:    "POST",

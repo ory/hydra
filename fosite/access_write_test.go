@@ -22,7 +22,7 @@ func TestWriteAccessResponse(t *testing.T) {
 	rw := NewMockResponseWriter(ctrl)
 	ar := NewMockAccessRequester(ctrl)
 	resp := NewMockAccessResponder(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	rw.EXPECT().Header().AnyTimes().Return(header)
 	rw.EXPECT().WriteHeader(http.StatusOK)

@@ -25,3 +25,6 @@ type OpenIDConnectRequestStorage interface {
 	// DeleteOpenIDConnectSession removes an open id connect session from the store.
 	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
 }
+type OpenIDConnectRequestStorageProvider interface {
+	OpenIDConnectRequestStorage() OpenIDConnectRequestStorage
+}

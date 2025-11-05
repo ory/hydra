@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package openid
+package openid_test
 
 import (
 	"context"
@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 )
 
@@ -21,19 +22,20 @@ func TestValidatePrompt(t *testing.T) {
 	config := &fosite.Config{
 		MinParameterEntropy: fosite.MinParameterEntropy,
 	}
-	var j = &DefaultStrategy{
+	j := &openid.DefaultStrategy{
 		Signer: &jwt.DefaultSigner{
 			GetPrivateKey: func(_ context.Context) (interface{}, error) {
 				return key, nil
-			}},
+			},
+		},
 		Config: &fosite.Config{
 			MinParameterEntropy: fosite.MinParameterEntropy,
 		},
 	}
 
-	v := NewOpenIDConnectRequestValidator(j, config)
+	v := openid.NewOpenIDConnectRequestValidator(j, config)
 
-	var genIDToken = func(c jwt.IDTokenClaims) string {
+	genIDToken := func(c jwt.IDTokenClaims) string {
 		s, _, err := j.Generate(context.TODO(), c.ToMapClaims(), jwt.NewHeaders())
 		require.NoError(t, err)
 		return s
@@ -46,7 +48,7 @@ func TestValidatePrompt(t *testing.T) {
 		isPublic    bool
 		expectErr   bool
 		idTokenHint string
-		s           *DefaultSession
+		s           *openid.DefaultSession
 	}{
 		{
 			d:           "should fail because prompt=none should not work together with public clients and http non-localhost",
@@ -54,7 +56,7 @@ func TestValidatePrompt(t *testing.T) {
 			isPublic:    true,
 			expectErr:   true,
 			redirectURL: "http://foo-bar/",
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -69,7 +71,7 @@ func TestValidatePrompt(t *testing.T) {
 			isPublic:    true,
 			expectErr:   false,
 			redirectURL: "http://localhost/",
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -84,7 +86,7 @@ func TestValidatePrompt(t *testing.T) {
 			isPublic:    true,
 			expectErr:   false,
 			redirectURL: "https://foo-bar/",
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -98,7 +100,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "none",
 			isPublic:  false,
 			expectErr: true,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -111,7 +113,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "none",
 			isPublic:  false,
 			expectErr: true,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -125,7 +127,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "none",
 			isPublic:  false,
 			expectErr: false,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -139,7 +141,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "none login",
 			isPublic:  false,
 			expectErr: true,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -153,7 +155,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "foo",
 			isPublic:  false,
 			expectErr: true,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -167,7 +169,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "login consent",
 			isPublic:  true,
 			expectErr: false,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -181,7 +183,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "login consent",
 			isPublic:  false,
 			expectErr: false,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -195,7 +197,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "login",
 			isPublic:  false,
 			expectErr: true,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -214,7 +216,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "",
 			isPublic:  false,
 			expectErr: false,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",
@@ -233,7 +235,7 @@ func TestValidatePrompt(t *testing.T) {
 			prompt:    "",
 			isPublic:  false,
 			expectErr: false,
-			s: &DefaultSession{
+			s: &openid.DefaultSession{
 				Subject: "foo",
 				Claims: &jwt.IDTokenClaims{
 					Subject:     "foo",

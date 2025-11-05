@@ -13,7 +13,11 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-var _ CoreStrategy = (*HMACSHAStrategy)(nil)
+var (
+	_ AuthorizeCodeStrategy = (*HMACSHAStrategy)(nil)
+	_ AccessTokenStrategy   = (*HMACSHAStrategy)(nil)
+	_ RefreshTokenStrategy  = (*HMACSHAStrategy)(nil)
+)
 
 type HMACSHAStrategy struct {
 	*HMACSHAStrategyUnPrefixed
@@ -68,4 +72,17 @@ func (h *HMACSHAStrategy) GenerateAuthorizeCode(ctx context.Context, r fosite.Re
 
 func (h *HMACSHAStrategy) ValidateAuthorizeCode(ctx context.Context, r fosite.Requester, token string) (err error) {
 	return h.HMACSHAStrategyUnPrefixed.ValidateAuthorizeCode(ctx, r, h.trimPrefix(token, "ac"))
+}
+
+// Implements providers interface
+func (h *HMACSHAStrategy) AuthorizeCodeStrategy() AuthorizeCodeStrategy {
+	return h
+}
+
+func (h *HMACSHAStrategy) AccessTokenStrategy() AccessTokenStrategy {
+	return h
+}
+
+func (h *HMACSHAStrategy) RefreshTokenStrategy() RefreshTokenStrategy {
+	return h
 }

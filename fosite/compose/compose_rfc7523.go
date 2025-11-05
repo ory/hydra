@@ -11,14 +11,13 @@ import (
 
 // RFC7523AssertionGrantFactory creates an OAuth2 Authorize JWT Grant (using JWTs as Authorization Grants) handler
 // and registers an access token, refresh token and authorize code validator.
-func RFC7523AssertionGrantFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func RFC7523AssertionGrantFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &rfc7523.Handler{
-		Storage: storage.(rfc7523.RFC7523KeyStorage),
-		HandleHelper: &oauth2.HandleHelper{
-			AccessTokenStrategy: strategy.(oauth2.AccessTokenStrategy),
-			AccessTokenStorage:  storage.(oauth2.AccessTokenStorage),
-			Config:              config,
-		},
+		Strategy: strategy.(oauth2.AccessTokenStrategyProvider),
+		Storage: storage.(interface {
+			oauth2.AccessTokenStorageProvider
+			rfc7523.RFC7523KeyStorageProvider
+		}),
 		Config: config,
 	}
 }

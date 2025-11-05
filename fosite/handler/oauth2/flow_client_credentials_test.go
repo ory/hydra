@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -14,27 +14,24 @@ import (
 	gomock "go.uber.org/mock/gomock"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/internal"
 )
 
 func TestClientCredentials_HandleTokenEndpointRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	store := internal.NewMockClientCredentialsGrantStorage(ctrl)
-	chgen := internal.NewMockAccessTokenStrategy(ctrl)
+	provider := internal.NewMockAccessTokenStorageProvider(ctrl)
+	chgenp := internal.NewMockAccessTokenStrategyProvider(ctrl)
 	areq := internal.NewMockAccessRequester(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	h := ClientCredentialsGrantHandler{
-		HandleHelper: &HandleHelper{
-			AccessTokenStorage:  store,
-			AccessTokenStrategy: chgen,
-			Config: &fosite.Config{
-				AccessTokenLifespan: time.Hour,
-			},
-		},
+	h := oauth2.ClientCredentialsGrantHandler{
+		Storage:  provider,
+		Strategy: chgenp,
 		Config: &fosite.Config{
 			ScopeStrategy:            fosite.HierarchicScopeStrategy,
 			AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
+			AccessTokenLifespan:      time.Hour,
 		},
 	}
 	for k, c := range []struct {
@@ -104,21 +101,19 @@ func TestClientCredentials_HandleTokenEndpointRequest(t *testing.T) {
 func TestClientCredentials_PopulateTokenEndpointResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	store := internal.NewMockClientCredentialsGrantStorage(ctrl)
+	provider := internal.NewMockAccessTokenStorageProvider(ctrl)
 	chgen := internal.NewMockAccessTokenStrategy(ctrl)
+	chgenp := internal.NewMockAccessTokenStrategyProvider(ctrl)
 	areq := fosite.NewAccessRequest(new(fosite.DefaultSession))
 	aresp := fosite.NewAccessResponse()
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
-	h := ClientCredentialsGrantHandler{
-		HandleHelper: &HandleHelper{
-			AccessTokenStorage:  store,
-			AccessTokenStrategy: chgen,
-			Config: &fosite.Config{
-				AccessTokenLifespan: time.Hour,
-			},
-		},
+	h := oauth2.ClientCredentialsGrantHandler{
+		Storage:  provider,
+		Strategy: chgenp,
 		Config: &fosite.Config{
-			ScopeStrategy: fosite.HierarchicScopeStrategy,
+			ScopeStrategy:       fosite.HierarchicScopeStrategy,
+			AccessTokenLifespan: time.Hour,
 		},
 	}
 	for k, c := range []struct {
@@ -148,7 +143,9 @@ func TestClientCredentials_PopulateTokenEndpointResponse(t *testing.T) {
 				areq.GrantTypes = fosite.Arguments{"client_credentials"}
 				areq.Session = &fosite.DefaultSession{}
 				areq.Client = &fosite.DefaultClient{GrantTypes: fosite.Arguments{"client_credentials"}}
+				chgenp.EXPECT().AccessTokenStrategy().Return(chgen).Times(1)
 				chgen.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return("tokenfoo.bar", "bar", nil)
+				provider.EXPECT().AccessTokenStorage().Return(store).Times(1)
 				store.EXPECT().CreateAccessTokenSession(gomock.Any(), "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 			},
 		},

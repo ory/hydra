@@ -13,25 +13,39 @@ import (
 
 // RFC8628DeviceFactory creates an OAuth2 device code grant ("Device Authorization Grant") handler and registers
 // a user code, device code, access token and a refresh token validator.
-func RFC8628DeviceFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func RFC8628DeviceFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &rfc8628.DeviceAuthHandler{
-		Strategy: strategy.(rfc8628.RFC8628CodeStrategy),
-		Storage:  storage.(rfc8628.RFC8628CoreStorage),
-		Config:   config,
+		Strategy: strategy.(interface {
+			rfc8628.DeviceRateLimitStrategyProvider
+			rfc8628.DeviceCodeStrategyProvider
+			rfc8628.UserCodeStrategyProvider
+		}),
+		Storage: storage.(interface {
+			rfc8628.DeviceAuthStorageProvider
+			oauth2.AccessTokenStorageProvider
+			oauth2.RefreshTokenStorageProvider
+		}),
+		Config: config,
 	}
 }
 
 // RFC8628DeviceAuthorizationTokenFactory creates an OAuth2 device authorization grant ("Device Authorization Grant") handler and registers
 // an access token, refresh token and authorize code validator.
-func RFC8628DeviceAuthorizationTokenFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func RFC8628DeviceAuthorizationTokenFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &rfc8628.DeviceCodeTokenEndpointHandler{
-		DeviceRateLimitStrategy: strategy.(rfc8628.DeviceRateLimitStrategy),
-		DeviceCodeStrategy:      strategy.(rfc8628.DeviceCodeStrategy),
-		UserCodeStrategy:        strategy.(rfc8628.UserCodeStrategy),
-		AccessTokenStrategy:     strategy.(oauth2.AccessTokenStrategy),
-		RefreshTokenStrategy:    strategy.(oauth2.RefreshTokenStrategy),
-		CoreStorage:             storage.(rfc8628.RFC8628CoreStorage),
-		TokenRevocationStorage:  storage.(oauth2.TokenRevocationStorage),
-		Config:                  config,
+		Strategy: strategy.(interface {
+			rfc8628.DeviceRateLimitStrategyProvider
+			rfc8628.DeviceCodeStrategyProvider
+			rfc8628.UserCodeStrategyProvider
+			oauth2.AccessTokenStrategyProvider
+			oauth2.RefreshTokenStrategyProvider
+		}),
+		Storage: storage.(interface {
+			rfc8628.DeviceAuthStorageProvider
+			oauth2.AccessTokenStorageProvider
+			oauth2.RefreshTokenStorageProvider
+			oauth2.TokenRevocationStorageProvider
+		}),
+		Config: config,
 	}
 }

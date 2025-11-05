@@ -11,9 +11,13 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-type OpenIDConnectExplicitHandler struct {
-	// OpenIDConnectRequestStorage is the storage for open id connect sessions.
-	OpenIDConnectRequestStorage   OpenIDConnectRequestStorage
+var (
+	_ fosite.AuthorizeEndpointHandler = (*ExplicitHandler)(nil)
+	_ fosite.TokenEndpointHandler     = (*ExplicitHandler)(nil)
+)
+
+type ExplicitHandler struct {
+	Storage                       OpenIDConnectRequestStorageProvider
 	OpenIDConnectRequestValidator *OpenIDConnectRequestValidator
 
 	Config interface {
@@ -23,10 +27,8 @@ type OpenIDConnectExplicitHandler struct {
 	*IDTokenHandleHelper
 }
 
-var _ fosite.AuthorizeEndpointHandler = (*OpenIDConnectExplicitHandler)(nil)
-var _ fosite.TokenEndpointHandler = (*OpenIDConnectExplicitHandler)(nil)
-
-var oidcParameters = []string{"grant_type",
+var oidcParameters = []string{
+	"grant_type",
 	"max_age",
 	"prompt",
 	"acr_values",
@@ -34,7 +36,7 @@ var oidcParameters = []string{"grant_type",
 	"nonce",
 }
 
-func (c *OpenIDConnectExplicitHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+func (c *ExplicitHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
 	if !(ar.GetGrantedScopes().Has("openid") && ar.GetResponseTypes().ExactOne("code")) {
 		return nil
 	}
@@ -63,7 +65,7 @@ func (c *OpenIDConnectExplicitHandler) HandleAuthorizeEndpointRequest(ctx contex
 		return err
 	}
 
-	if err := c.OpenIDConnectRequestStorage.CreateOpenIDConnectSession(ctx, resp.GetCode(), ar.Sanitize(oidcParameters)); err != nil {
+	if err := c.Storage.OpenIDConnectRequestStorage().CreateOpenIDConnectSession(ctx, resp.GetCode(), ar.Sanitize(oidcParameters)); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 

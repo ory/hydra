@@ -32,7 +32,7 @@ type configDependencies interface {
 	ExtraFositeFactories() []Factory
 }
 
-type Factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
+type Factory func(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{}
 
 type Config struct {
 	deps configDependencies
@@ -47,25 +47,27 @@ type Config struct {
 	*config.DefaultProvider
 }
 
-var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
-var defaultFactories = []Factory{
-	compose.OAuth2AuthorizeExplicitFactory,
-	compose.OAuth2AuthorizeImplicitFactory,
-	compose.OAuth2ClientCredentialsGrantFactory,
-	compose.OAuth2RefreshTokenGrantFactory,
-	compose.OpenIDConnectExplicitFactory,
-	compose.OpenIDConnectHybridFactory,
-	compose.OpenIDConnectImplicitFactory,
-	compose.OpenIDConnectRefreshFactory,
-	compose.OAuth2TokenRevocationFactory,
-	compose.OAuth2TokenIntrospectionFactory,
-	compose.OAuth2PKCEFactory,
-	compose.RFC7523AssertionGrantFactory,
-	compose.OIDCUserinfoVerifiableCredentialFactory,
-	compose.RFC8628DeviceFactory,
-	compose.RFC8628DeviceAuthorizationTokenFactory,
-	compose.OpenIDConnectDeviceFactory,
-}
+var (
+	defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
+	defaultFactories           = []Factory{
+		compose.OAuth2AuthorizeExplicitFactory,
+		compose.OAuth2AuthorizeImplicitFactory,
+		compose.OAuth2ClientCredentialsGrantFactory,
+		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OpenIDConnectExplicitFactory,
+		compose.OpenIDConnectHybridFactory,
+		compose.OpenIDConnectImplicitFactory,
+		compose.OpenIDConnectRefreshFactory,
+		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2TokenIntrospectionFactory,
+		compose.OAuth2PKCEFactory,
+		compose.RFC7523AssertionGrantFactory,
+		compose.OIDCUserinfoVerifiableCredentialFactory,
+		compose.RFC8628DeviceFactory,
+		compose.RFC8628DeviceAuthorizationTokenFactory,
+		compose.OpenIDConnectDeviceFactory,
+	}
+)
 
 func NewConfig(deps configDependencies) *Config {
 	return &Config{

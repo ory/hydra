@@ -15,8 +15,9 @@ package internal
 import (
 	reflect "reflect"
 
-	fosite "github.com/ory/hydra/v2/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/hydra/v2/fosite"
 )
 
 // MockClient is a mock of Client interface.

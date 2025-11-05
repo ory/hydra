@@ -32,7 +32,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	ctx := context.Background()
 	dsn := dbal.NewSQLiteInMemoryDatabase(t.Name())
 	r := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue("dsn", dsn)))
-	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(ctx, nil)
+	token, signature, _ := r.OAuth2HMACStrategy().AccessTokenStrategy().GenerateAccessToken(ctx, nil)
 
 	for k, tc := range []struct {
 		prep         func(*testing.T, *driver.RegistrySQL)

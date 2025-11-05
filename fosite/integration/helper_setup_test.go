@@ -205,8 +205,8 @@ var (
 				return defaultRSAKey, nil
 			},
 		},
-		Config:          &fosite.Config{},
-		HMACSHAStrategy: hmacStrategy,
+		Config:   &fosite.Config{},
+		Strategy: hmacStrategy,
 	}
 )
 

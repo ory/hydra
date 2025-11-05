@@ -14,23 +14,21 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-var _ fosite.AuthorizeEndpointHandler = (*AuthorizeImplicitGrantTypeHandler)(nil)
+var _ fosite.AuthorizeEndpointHandler = (*AuthorizeImplicitGrantHandler)(nil)
 
-// AuthorizeImplicitGrantTypeHandler is a response handler for the Authorize Code grant using the implicit grant type
+// AuthorizeImplicitGrantHandler is a response handler for the Authorize Code grant using the implicit grant type
 // as defined in https://tools.ietf.org/html/rfc6749#section-4.2
-type AuthorizeImplicitGrantTypeHandler struct {
-	AccessTokenStrategy AccessTokenStrategy
-	// AccessTokenStorage is used to persist session data across requests.
-	AccessTokenStorage AccessTokenStorage
-
-	Config interface {
+type AuthorizeImplicitGrantHandler struct {
+	Strategy AccessTokenStrategyProvider
+	Storage  AccessTokenStorageProvider
+	Config   interface {
 		fosite.AccessTokenLifespanProvider
 		fosite.ScopeStrategyProvider
 		fosite.AudienceStrategyProvider
 	}
 }
 
-func (c *AuthorizeImplicitGrantTypeHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+func (c *AuthorizeImplicitGrantHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
 	// This let's us define multiple response types, for example open id connect's id_token
 	if !ar.GetResponseTypes().ExactOne("token") {
 		return nil
@@ -64,22 +62,23 @@ func (c *AuthorizeImplicitGrantTypeHandler) HandleAuthorizeEndpointRequest(ctx c
 	return c.IssueImplicitAccessToken(ctx, ar, resp)
 }
 
-func (c *AuthorizeImplicitGrantTypeHandler) IssueImplicitAccessToken(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
+func (c *AuthorizeImplicitGrantHandler) IssueImplicitAccessToken(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
 	// Only override expiry if none is set.
 	atLifespan := fosite.GetEffectiveLifespan(ar.GetClient(), fosite.GrantTypeImplicit, fosite.AccessToken, c.Config.GetAccessTokenLifespan(ctx))
 	if ar.GetSession().GetExpiresAt(fosite.AccessToken).IsZero() {
 		ar.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().UTC().Add(atLifespan).Round(time.Second))
 	}
 
-	// Generate the code
-	token, signature, err := c.AccessTokenStrategy.GenerateAccessToken(ctx, ar)
+	// Generate the access token
+	token, signature, err := c.Strategy.AccessTokenStrategy().GenerateAccessToken(ctx, ar)
 	if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
-	if err := c.AccessTokenStorage.CreateAccessTokenSession(ctx, signature, ar.Sanitize([]string{})); err != nil {
+	if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, signature, ar.Sanitize([]string{})); err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
+
 	resp.AddParameter("access_token", token)
 	resp.AddParameter("expires_in", strconv.FormatInt(int64(getExpiresIn(ar, fosite.AccessToken, atLifespan, time.Now().UTC())/time.Second), 10))
 	resp.AddParameter("token_type", "bearer")

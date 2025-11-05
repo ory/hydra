@@ -16,8 +16,9 @@ import (
 	reflect "reflect"
 	time "time"
 
-	fosite "github.com/ory/hydra/v2/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/hydra/v2/fosite"
 )
 
 // MockAccessResponder is a mock of AccessResponder interface.

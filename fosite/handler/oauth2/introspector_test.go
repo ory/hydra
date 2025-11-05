@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -17,21 +17,43 @@ import (
 	gomock "go.uber.org/mock/gomock"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/internal"
 )
 
 func TestIntrospectToken(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	store := internal.NewMockCoreStorage(ctrl)
-	chgen := internal.NewMockCoreStrategy(ctrl)
+	accessTokenStorageProvider := internal.NewMockAccessTokenStorageProvider(ctrl)
+	accessTokenStorage := internal.NewMockAccessTokenStorage(ctrl)
+	refreshTokenStorageProvider := internal.NewMockRefreshTokenStorageProvider(ctrl)
+	refreshTokenStorage := internal.NewMockRefreshTokenStorage(ctrl)
+	accessTokenStrategyProvider := internal.NewMockAccessTokenStrategyProvider(ctrl)
+	accessTokenStrategy := internal.NewMockAccessTokenStrategy(ctrl)
+	refreshTokenStrategyProvider := internal.NewMockRefreshTokenStrategyProvider(ctrl)
+	refreshTokenStrategy := internal.NewMockRefreshTokenStrategy(ctrl)
 	areq := fosite.NewAccessRequest(nil)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
+
+	mockStorage := struct {
+		*internal.MockAccessTokenStorageProvider
+		*internal.MockRefreshTokenStorageProvider
+	}{
+		MockAccessTokenStorageProvider:  accessTokenStorageProvider,
+		MockRefreshTokenStorageProvider: refreshTokenStorageProvider,
+	}
+	mockStrategy := struct {
+		*internal.MockAccessTokenStrategyProvider
+		*internal.MockRefreshTokenStrategyProvider
+	}{
+		MockAccessTokenStrategyProvider:  accessTokenStrategyProvider,
+		MockRefreshTokenStrategyProvider: refreshTokenStrategyProvider,
+	}
 
 	config := &fosite.Config{}
-	v := &CoreValidator{
-		CoreStrategy: chgen,
-		CoreStorage:  store,
-		Config:       config,
+	v := &oauth2.CoreValidator{
+		Strategy: mockStrategy,
+		Storage:  mockStorage,
+		Config:   config,
 	}
 	httpreq := &http.Request{Header: http.Header{}}
 
@@ -45,10 +67,14 @@ func TestIntrospectToken(t *testing.T) {
 			description: "should fail because no bearer token set",
 			setup: func() {
 				httpreq.Header.Set("Authorization", "bearer")
-				chgen.EXPECT().AccessTokenSignature(gomock.Any(), "").Return("")
-				store.EXPECT().GetAccessTokenSession(gomock.Any(), "", nil).Return(nil, errors.New(""))
-				chgen.EXPECT().RefreshTokenSignature(gomock.Any(), "").Return("")
-				store.EXPECT().GetRefreshTokenSession(gomock.Any(), "", nil).Return(nil, errors.New(""))
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().AccessTokenSignature(gomock.Any(), "").Return("")
+				accessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(accessTokenStorage).Times(1)
+				accessTokenStorage.EXPECT().GetAccessTokenSession(gomock.Any(), "", nil).Return(nil, errors.New(""))
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().RefreshTokenSignature(gomock.Any(), "").Return("")
+				refreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(refreshTokenStorage).Times(1)
+				refreshTokenStorage.EXPECT().GetRefreshTokenSession(gomock.Any(), "", nil).Return(nil, errors.New(""))
 			},
 			expectErr: fosite.ErrRequestUnauthorized,
 		},
@@ -56,20 +82,28 @@ func TestIntrospectToken(t *testing.T) {
 			description: "should fail because retrieval fails",
 			setup: func() {
 				httpreq.Header.Set("Authorization", "bearer 1234")
-				chgen.EXPECT().AccessTokenSignature(gomock.Any(), "1234").AnyTimes().Return("asdf")
-				store.EXPECT().GetAccessTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
-				chgen.EXPECT().RefreshTokenSignature(gomock.Any(), "1234").Return("asdf")
-				store.EXPECT().GetRefreshTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(1)
+				accessTokenStrategy.EXPECT().AccessTokenSignature(gomock.Any(), "1234").AnyTimes().Return("asdf")
+				accessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(accessTokenStorage).Times(1)
+				accessTokenStorage.EXPECT().GetAccessTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().RefreshTokenSignature(gomock.Any(), "1234").Return("asdf")
+				refreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(refreshTokenStorage).Times(1)
+				refreshTokenStorage.EXPECT().GetRefreshTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
 			},
 			expectErr: fosite.ErrRequestUnauthorized,
 		},
 		{
 			description: "should fail because validation fails",
 			setup: func() {
-				store.EXPECT().GetAccessTokenSession(gomock.Any(), "asdf", nil).AnyTimes().Return(areq, nil)
-				chgen.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(errorsx.WithStack(fosite.ErrTokenExpired))
-				chgen.EXPECT().RefreshTokenSignature(gomock.Any(), "1234").Return("asdf")
-				store.EXPECT().GetRefreshTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
+				accessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(accessTokenStorage).AnyTimes()
+				accessTokenStorage.EXPECT().GetAccessTokenSession(gomock.Any(), "asdf", nil).AnyTimes().Return(areq, nil)
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(2)
+				accessTokenStrategy.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(errorsx.WithStack(fosite.ErrTokenExpired))
+				refreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(refreshTokenStrategy).Times(1)
+				refreshTokenStrategy.EXPECT().RefreshTokenSignature(gomock.Any(), "1234").Return("asdf")
+				refreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(refreshTokenStorage).Times(1)
+				refreshTokenStorage.EXPECT().GetRefreshTokenSession(gomock.Any(), "asdf", nil).Return(nil, errors.New(""))
 			},
 			expectErr: fosite.ErrTokenExpired,
 		},
@@ -77,14 +111,16 @@ func TestIntrospectToken(t *testing.T) {
 			description: "should fail because access token invalid",
 			setup: func() {
 				config.DisableRefreshTokenValidation = true
-				chgen.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(errorsx.WithStack(fosite.ErrInvalidTokenFormat))
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(2)
+				accessTokenStrategy.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(errorsx.WithStack(fosite.ErrInvalidTokenFormat))
 			},
 			expectErr: fosite.ErrInvalidTokenFormat,
 		},
 		{
 			description: "should pass",
 			setup: func() {
-				chgen.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(nil)
+				accessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(accessTokenStrategy).Times(2)
+				accessTokenStrategy.EXPECT().ValidateAccessToken(gomock.Any(), areq, "1234").Return(nil)
 			},
 			expectTU: fosite.AccessToken,
 		},

@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package openid
+package openid_test
 
 import (
 	"context"
@@ -12,15 +12,17 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 )
 
 func TestJWTStrategy_GenerateIDToken(t *testing.T) {
-	var j = &DefaultStrategy{
+	j := &openid.DefaultStrategy{
 		Signer: &jwt.DefaultSigner{
 			GetPrivateKey: func(_ context.Context) (interface{}, error) {
 				return key, nil
-			}},
+			},
+		},
 		Config: &fosite.Config{
 			MinParameterEntropy: fosite.MinParameterEntropy,
 		},
@@ -34,7 +36,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 	}{
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject: "peter",
 					},
@@ -46,7 +48,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		},
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().UTC(),
@@ -61,7 +63,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		},
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:   "peter",
 						ExpiresAt: time.Now().UTC().Add(-time.Hour),
@@ -74,7 +76,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		},
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject: "peter",
 					},
@@ -87,7 +89,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		},
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims:  &jwt.IDTokenClaims{},
 					Headers: &jwt.Headers{},
 				})
@@ -97,7 +99,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		},
 		{
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject: "peter",
 					},
@@ -109,7 +111,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass because max_age was requested and auth_time happened after initial request time",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().UTC(),
@@ -124,7 +126,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should fail because max_age was requested and auth_time has expired",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:  "peter",
 						AuthTime: time.Now().Add(-time.Hour).UTC(),
@@ -138,7 +140,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should fail because prompt=none was requested and auth_time indicates fresh login",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().UTC(),
@@ -153,7 +155,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass because prompt=none was requested and auth_time indicates fresh login but grant type is refresh_token",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().UTC(),
@@ -169,7 +171,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass because prompt=none was requested and auth_time indicates old login",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().Add(-time.Hour).UTC(),
@@ -184,7 +186,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass because prompt=login was requested and auth_time indicates fresh login",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().UTC(),
@@ -199,7 +201,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should fail because prompt=login was requested and auth_time indicates old login",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().Add(-time.Hour).UTC(),
@@ -214,7 +216,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass because id_token_hint subject matches subject from claims",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().Add(-time.Hour).UTC(),
@@ -222,7 +224,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 					},
 					Headers: &jwt.Headers{},
 				})
-				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&DefaultSession{
+				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject: "peter",
 					},
@@ -235,7 +237,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should pass even though token is expired",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().Add(-time.Hour).UTC(),
@@ -243,7 +245,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 					},
 					Headers: &jwt.Headers{},
 				})
-				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&DefaultSession{
+				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:   "peter",
 						ExpiresAt: time.Now().Add(-time.Hour).UTC(),
@@ -257,7 +259,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 		{
 			description: "should fail because id_token_hint subject does not match subject from claims",
 			setup: func() {
-				req = fosite.NewAccessRequest(&DefaultSession{
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{
 						Subject:     "peter",
 						AuthTime:    time.Now().Add(-time.Hour).UTC(),
@@ -265,7 +267,7 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 					},
 					Headers: &jwt.Headers{},
 				})
-				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&DefaultSession{
+				token, _ := j.GenerateIDToken(context.TODO(), time.Duration(0), fosite.NewAccessRequest(&openid.DefaultSession{
 					Claims: &jwt.IDTokenClaims{Subject: "alice"}, Headers: &jwt.Headers{},
 				}))
 				req.Form.Set("id_token_hint", token)

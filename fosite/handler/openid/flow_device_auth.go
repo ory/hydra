@@ -6,20 +6,17 @@ package openid
 import (
 	"context"
 
-	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
-
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 )
 
 // OpenIDConnectDeviceHandler a response handler for the Device Authorization Grant with OpenID Connect identity layer
 type OpenIDConnectDeviceHandler struct {
-	OpenIDConnectRequestStorage OpenIDConnectRequestStorage
-	DeviceCodeStrategy          rfc8628.DeviceCodeStrategy
-
-	Config interface {
+	Storage  OpenIDConnectRequestStorageProvider
+	Strategy rfc8628.DeviceCodeStrategyProvider
+	Config   interface {
 		fosite.IDTokenLifespanProvider
 	}
-
 	*IDTokenHandleHelper
 }
 

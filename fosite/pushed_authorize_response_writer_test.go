@@ -19,7 +19,7 @@ func TestNewPushedAuthorizeResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	handlers := []*MockPushedAuthorizeEndpointHandler{NewMockPushedAuthorizeEndpointHandler(ctrl)}
 	ar := NewMockAuthorizeRequester(ctrl)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
 
 	ctx := context.Background()
 	oauth2 := &Fosite{

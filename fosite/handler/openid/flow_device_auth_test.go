@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package openid
+package openid_test
 
 import (
 	"context"
@@ -9,12 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/fosite/internal"
 	gomock "go.uber.org/mock/gomock"
+
+	"github.com/ory/hydra/v2/fosite/internal"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
@@ -22,13 +24,21 @@ import (
 
 func TestDeviceAuth_HandleDeviceEndpointRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	store := internal.NewMockOpenIDConnectRequestStorage(ctrl)
+	t.Cleanup(ctrl.Finish)
+	store := internal.NewMockOpenIDConnectRequestStorageProvider(ctrl)
+	strategyProvider := internal.NewMockDeviceCodeStrategyProvider(ctrl)
+	openIDTokenStrategyProvider := internal.NewMockOpenIDConnectTokenStrategyProvider(ctrl)
 
 	config := &fosite.Config{
 		MinParameterEntropy:       fosite.MinParameterEntropy,
 		DeviceAndUserCodeLifespan: time.Hour * 24,
 	}
+
+	strategy := &rfc8628.DefaultDeviceStrategy{
+		Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobar")}},
+		Config: config,
+	}
+	strategyProvider.EXPECT().DeviceCodeStrategy().Return(strategy).Times(0)
 
 	signer := &jwt.DefaultSigner{
 		GetPrivateKey: func(ctx context.Context) (interface{}, error) {
@@ -36,22 +46,22 @@ func TestDeviceAuth_HandleDeviceEndpointRequest(t *testing.T) {
 		},
 	}
 
-	h := OpenIDConnectDeviceHandler{
-		OpenIDConnectRequestStorage: store,
-		DeviceCodeStrategy: &rfc8628.DefaultDeviceStrategy{
-			Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobar")}},
-			Config: config,
-		},
+	defaultStrategy := &openid.DefaultStrategy{
+		Signer: signer,
 		Config: config,
-		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: &DefaultStrategy{
-				Signer: signer,
-				Config: config,
-			},
+	}
+	openIDTokenStrategyProvider.EXPECT().OpenIDConnectTokenStrategy().Return(defaultStrategy).Times(0)
+
+	h := openid.OpenIDConnectDeviceHandler{
+		Storage:  store,
+		Strategy: strategyProvider,
+		Config:   config,
+		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
+			IDTokenStrategy: openIDTokenStrategyProvider,
 		},
 	}
 
-	session := &DefaultSession{
+	session := &openid.DefaultSession{
 		Claims: &jwt.IDTokenClaims{
 			Subject: "foo",
 		},

@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package oauth2
+package oauth2_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/internal/gen"
 
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,7 @@ import (
 
 func TestIntrospectJWT(t *testing.T) {
 	rsaKey := gen.MustRSAKey()
-	strat := &DefaultJWTStrategy{
+	strat := &oauth2.DefaultJWTStrategy{
 		Signer: &jwt.DefaultSigner{
 			GetPrivateKey: func(_ context.Context) (interface{}, error) {
 				return rsaKey, nil
@@ -30,7 +31,7 @@ func TestIntrospectJWT(t *testing.T) {
 		Config: &fosite.Config{},
 	}
 
-	var v = &StatelessJWTValidator{
+	v := &oauth2.StatelessJWTValidator{
 		Signer: strat,
 		Config: &fosite.Config{
 			ScopeStrategy: fosite.HierarchicScopeStrategy,
@@ -119,15 +120,16 @@ func TestIntrospectJWT(t *testing.T) {
 }
 
 func BenchmarkIntrospectJWT(b *testing.B) {
-	strat := &DefaultJWTStrategy{
-		Signer: &jwt.DefaultSigner{GetPrivateKey: func(_ context.Context) (interface{}, error) {
-			return gen.MustRSAKey(), nil
-		},
+	strat := &oauth2.DefaultJWTStrategy{
+		Signer: &jwt.DefaultSigner{
+			GetPrivateKey: func(_ context.Context) (interface{}, error) {
+				return gen.MustRSAKey(), nil
+			},
 		},
 		Config: &fosite.Config{},
 	}
 
-	v := &StatelessJWTValidator{
+	v := &oauth2.StatelessJWTValidator{
 		Signer: strat,
 	}
 

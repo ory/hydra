@@ -23,7 +23,6 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
-	"github.com/ory/hydra/v2/fosite/storage"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -801,7 +800,6 @@ func testFositeSqlStoreTransactionRollbackRefreshToken(m *driver.RegistrySQL) fu
 }
 
 func testFositeSqlStoreTransactionCommitAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
-
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
@@ -814,7 +812,6 @@ func testFositeSqlStoreTransactionRollbackAuthorizeCode(m *driver.RegistrySQL) f
 }
 
 func testFositeSqlStoreTransactionCommitPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
-
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
@@ -830,7 +827,7 @@ func testFositeSqlStoreTransactionRollbackPKCERequest(m *driver.RegistrySQL) fun
 // different from the other getter methods
 func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 		require.True(t, ok)
 		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
@@ -865,7 +862,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistryS
 
 func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 		require.True(t, ok)
 		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
@@ -911,7 +908,7 @@ func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T
 			require.True(t, ok)
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 
-			require.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
+			require.NoError(t, store.ClientManager().SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 
 			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
 			require.NotEqual(t, cmp.NID, uuid.Nil)
@@ -926,7 +923,7 @@ func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.ErrorIs(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
+			assert.ErrorIs(t, store.ClientManager().SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
 		})
 
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {
@@ -936,7 +933,7 @@ func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), expiredJTI))
 			newJTI := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(time.Minute))
 
-			require.NoError(t, store.SetClientAssertionJWT(context.Background(), newJTI.JTI, newJTI.Expiry))
+			require.NoError(t, store.ClientManager().SetClientAssertionJWT(context.Background(), newJTI.JTI, newJTI.Expiry))
 
 			_, err := store.GetClientAssertionJWT(context.Background(), expiredJTI.JTI)
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
@@ -954,7 +951,7 @@ func testFositeStoreSetClientAssertionJWT(m *driver.RegistrySQL) func(*testing.T
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			jti.Expiry = jti.Expiry.Add(2 * time.Minute)
-			assert.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
+			assert.NoError(t, store.ClientManager().SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
 			assert.NoError(t, err)
 			assert.Equal(t, jti, cmp)
@@ -968,7 +965,7 @@ func testFositeStoreClientAssertionJWTValid(m *driver.RegistrySQL) func(*testing
 			store, ok := m.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
 
-			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), uuid.Must(uuid.NewV4()).String()))
+			assert.NoError(t, store.ClientManager().ClientAssertionJWTValid(context.Background(), uuid.Must(uuid.NewV4()).String()))
 		})
 
 		t.Run("case=returns invalid on known JTI", func(t *testing.T) {
@@ -978,7 +975,7 @@ func testFositeStoreClientAssertionJWTValid(m *driver.RegistrySQL) func(*testing
 
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.True(t, errors.Is(store.ClientAssertionJWTValid(context.Background(), jti.JTI), fosite.ErrJTIKnown))
+			assert.True(t, errors.Is(store.ClientManager().ClientAssertionJWTValid(context.Background(), jti.JTI), fosite.ErrJTIKnown))
 		})
 
 		t.Run("case=returns valid on expired JTI", func(t *testing.T) {
@@ -988,7 +985,7 @@ func testFositeStoreClientAssertionJWTValid(m *driver.RegistrySQL) func(*testing
 
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), jti.JTI))
+			assert.NoError(t, store.ClientManager().ClientAssertionJWTValid(context.Background(), jti.JTI))
 		})
 	}
 }
@@ -1284,7 +1281,7 @@ func doTestCommit(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
@@ -1321,7 +1318,7 @@ func doTestCommitRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
@@ -1358,7 +1355,7 @@ func doTestRollback(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 
 	ctx := t.Context()
@@ -1399,7 +1396,7 @@ func doTestRollbackRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 
 	ctx := t.Context()

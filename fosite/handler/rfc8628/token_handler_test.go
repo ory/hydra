@@ -1,30 +1,32 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package rfc8628
+package rfc8628_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/ory/hydra/v2/fosite/internal"
 	gomock "go.uber.org/mock/gomock"
 
+	"github.com/ory/hydra/v2/fosite/internal"
+
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/storage"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-var hmacshaStrategy = oauth2.NewHMACSHAStrategy(
+var hmacshaStrategyOAuth = oauth2.NewHMACSHAStrategy(
 	&hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar")}},
 	&fosite.Config{
 		AccessTokenLifespan:   time.Hour * 24,
@@ -32,30 +34,58 @@ var hmacshaStrategy = oauth2.NewHMACSHAStrategy(
 	},
 )
 
-var RFC8628HMACSHAStrategy = DefaultDeviceStrategy{
+var RFC8628HMACSHAStrategy = rfc8628.DefaultDeviceStrategy{
 	Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar")}},
 	Config: &fosite.Config{
 		DeviceAndUserCodeLifespan: time.Minute * 30,
 	},
 }
 
+type mockDeviceCodeStrategyProvider struct {
+	deviceRateLimitStrategy rfc8628.DeviceRateLimitStrategy
+	deviceCodeStrategy      rfc8628.DeviceCodeStrategy
+	userCodeStrategy        rfc8628.UserCodeStrategy
+	coreStrategy            oauth2.CoreStrategy
+}
+
+func (t *mockDeviceCodeStrategyProvider) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
+	return t.deviceRateLimitStrategy
+}
+
+func (t *mockDeviceCodeStrategyProvider) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
+	return t.deviceCodeStrategy
+}
+
+func (t *mockDeviceCodeStrategyProvider) UserCodeStrategy() rfc8628.UserCodeStrategy {
+	return t.userCodeStrategy
+}
+
+func (t *mockDeviceCodeStrategyProvider) AccessTokenStrategy() oauth2.AccessTokenStrategy {
+	return t.coreStrategy.AccessTokenStrategy()
+}
+
+func (t *mockDeviceCodeStrategyProvider) RefreshTokenStrategy() oauth2.RefreshTokenStrategy {
+	return t.coreStrategy.RefreshTokenStrategy()
+}
+
 func TestDeviceUserCode_HandleTokenEndpointRequest(t *testing.T) {
 	for k, strategy := range map[string]struct {
 		oauth2.CoreStrategy
-		RFC8628CodeStrategy
+		rfc8628.DefaultDeviceStrategy
 	}{
-		"hmac": {hmacshaStrategy, &RFC8628HMACSHAStrategy},
+		"hmac": {hmacshaStrategyOAuth, RFC8628HMACSHAStrategy},
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
 
-			h := DeviceCodeTokenEndpointHandler{
-				DeviceRateLimitStrategy: strategy,
-				DeviceCodeStrategy:      strategy,
-				UserCodeStrategy:        strategy,
-				CoreStorage:             store,
-				AccessTokenStrategy:     strategy.CoreStrategy,
-				RefreshTokenStrategy:    strategy.CoreStrategy,
+			h := rfc8628.DeviceCodeTokenEndpointHandler{
+				Strategy: &mockDeviceCodeStrategyProvider{
+					deviceRateLimitStrategy: &strategy.DefaultDeviceStrategy,
+					deviceCodeStrategy:      &strategy.DefaultDeviceStrategy,
+					userCodeStrategy:        &strategy.DefaultDeviceStrategy,
+					coreStrategy:            strategy.CoreStrategy,
+				},
+				Storage: store,
 				Config: &fosite.Config{
 					ScopeStrategy:             fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy:  fosite.DefaultAudienceMatchingStrategy,
@@ -303,20 +333,21 @@ func TestDeviceUserCode_HandleTokenEndpointRequest(t *testing.T) {
 func TestDeviceUserCode_HandleTokenEndpointRequest_RateLimiting(t *testing.T) {
 	for k, strategy := range map[string]struct {
 		oauth2.CoreStrategy
-		RFC8628CodeStrategy
+		rfc8628.DefaultDeviceStrategy
 	}{
-		"hmac": {hmacshaStrategy, &RFC8628HMACSHAStrategy},
+		"hmac": {hmacshaStrategyOAuth, RFC8628HMACSHAStrategy},
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
 
-			h := DeviceCodeTokenEndpointHandler{
-				DeviceRateLimitStrategy: strategy,
-				DeviceCodeStrategy:      strategy,
-				UserCodeStrategy:        strategy,
-				CoreStorage:             store,
-				AccessTokenStrategy:     strategy.CoreStrategy,
-				RefreshTokenStrategy:    strategy.CoreStrategy,
+			h := rfc8628.DeviceCodeTokenEndpointHandler{
+				Strategy: &mockDeviceCodeStrategyProvider{
+					deviceRateLimitStrategy: &strategy.DefaultDeviceStrategy,
+					deviceCodeStrategy:      &strategy.DefaultDeviceStrategy,
+					userCodeStrategy:        &strategy.DefaultDeviceStrategy,
+					coreStrategy:            strategy.CoreStrategy,
+				},
+				Storage: store,
 				Config: &fosite.Config{
 					ScopeStrategy:             fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy:  fosite.DefaultAudienceMatchingStrategy,
@@ -367,9 +398,9 @@ func TestDeviceUserCode_HandleTokenEndpointRequest_RateLimiting(t *testing.T) {
 func TestDeviceUserCode_PopulateTokenEndpointResponse(t *testing.T) {
 	for k, strategy := range map[string]struct {
 		oauth2.CoreStrategy
-		RFC8628CodeStrategy
+		rfc8628.DefaultDeviceStrategy
 	}{
-		"hmac": {hmacshaStrategy, &RFC8628HMACSHAStrategy},
+		"hmac": {hmacshaStrategyOAuth, RFC8628HMACSHAStrategy},
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
@@ -547,15 +578,16 @@ func TestDeviceUserCode_PopulateTokenEndpointResponse(t *testing.T) {
 						AccessTokenLifespan:      time.Minute,
 						RefreshTokenScopes:       []string{"offline"},
 					}
-					h := DeviceCodeTokenEndpointHandler{
-						DeviceRateLimitStrategy: strategy,
-						DeviceCodeStrategy:      strategy,
-						UserCodeStrategy:        strategy,
-						AccessTokenStrategy:     strategy.CoreStrategy,
-						RefreshTokenStrategy:    strategy.CoreStrategy,
-						Config:                  config,
-						CoreStorage:             store,
-						TokenRevocationStorage:  store,
+
+					h := rfc8628.DeviceCodeTokenEndpointHandler{
+						Strategy: &mockDeviceCodeStrategyProvider{
+							deviceRateLimitStrategy: &strategy.DefaultDeviceStrategy,
+							deviceCodeStrategy:      &strategy.DefaultDeviceStrategy,
+							userCodeStrategy:        &strategy.DefaultDeviceStrategy,
+							coreStrategy:            strategy.CoreStrategy,
+						},
+						Storage: store,
+						Config:  config,
 					}
 
 					if testCase.setup != nil {
@@ -582,9 +614,24 @@ func TestDeviceUserCode_PopulateTokenEndpointResponse(t *testing.T) {
 
 func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 	var mockTransactional *internal.MockTransactional
-	var mockCoreStore *internal.MockRFC8628CoreStorage
-	var mockDeviceRateLimitStrategy *internal.MockDeviceRateLimitStrategy
-	strategy := hmacshaStrategy
+
+	var mockDeviceAuthStorage *internal.MockDeviceAuthStorage
+	var mockDeviceAuthStorageProvider *internal.MockDeviceAuthStorageProvider
+	var mockAccessTokenStorage *internal.MockAccessTokenStorage
+	var mockAccessTokenStorageProvider *internal.MockAccessTokenStorageProvider
+	var mockRefreshTokenStorage *internal.MockRefreshTokenStorage
+	var mockRefreshTokenStorageProvider *internal.MockRefreshTokenStorageProvider
+	var mockTokenRevocationStorageProvider *internal.MockTokenRevocationStorageProvider
+
+	var mockDeviceRateLimitStrategyProvider *internal.MockDeviceRateLimitStrategyProvider
+	var mockDeviceCodeStrategy *internal.MockDeviceCodeStrategy
+	var mockDeviceCodeStrategyProvider *internal.MockDeviceCodeStrategyProvider
+	var mockUserCodeStrategyProvider *internal.MockUserCodeStrategyProvider
+	var mockAccessTokenStrategy *internal.MockAccessTokenStrategy
+	var mockAccessTokenStrategyProvider *internal.MockAccessTokenStrategyProvider
+	var mockRefreshTokenStrategy *internal.MockRefreshTokenStrategy
+	var mockRefreshTokenStrategyProvider *internal.MockRefreshTokenStrategyProvider
+
 	deviceStrategy := RFC8628HMACSHAStrategy
 
 	authreq := &fosite.DeviceRequest{
@@ -615,13 +662,6 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 	require.NoError(t, err)
 	areq.Form = url.Values{"device_code": {code}}
 
-	// some storage implementation that has support for transactions, notice the embedded type `storage.Transactional`
-
-	type deviceTransactionalStore struct {
-		storage.Transactional
-		RFC8628CoreStorage
-	}
-
 	testCases := []struct {
 		description string
 		setup       func()
@@ -630,26 +670,50 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "transaction should be committed successfully if no errors occur",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+				mockRefreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+					Return(propagatedContext, nil).
+					Times(1)
+				mockDeviceAuthStorage.
 					EXPECT().
-					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateDeviceCodeSession(propagatedContext, gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+				mockAccessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+				mockRefreshTokenStorage.
 					EXPECT().
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
@@ -664,16 +728,38 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "transaction should be rolled back if `InvalidateDeviceCodeSession` returns an error",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+					Return(propagatedContext, nil).
+					Times(1)
+				mockDeviceAuthStorage.
 					EXPECT().
 					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
@@ -689,21 +775,44 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "transaction should be rolled back if `CreateAccessTokenSession` returns an error",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+					Return(propagatedContext, nil).
+					Times(1)
+				mockDeviceAuthStorage.
 					EXPECT().
-					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateDeviceCodeSession(propagatedContext, gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+				mockAccessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
@@ -719,11 +828,32 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should result in a server error if transaction cannot be created",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(1)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
@@ -734,16 +864,38 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should result in a server error if transaction cannot be rolled back",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+					Return(propagatedContext, nil).
+					Times(1)
+				mockDeviceAuthStorage.
 					EXPECT().
 					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
 					Return(errors.New("Whoops, a nasty database error occurred!")).
@@ -759,26 +911,50 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		{
 			description: "should result in a server error if transaction cannot be committed",
 			setup: func() {
-				mockCoreStore.
+				mockDeviceCodeStrategyProvider.EXPECT().DeviceCodeStrategy().Return(mockDeviceCodeStrategy).Times(2)
+				mockDeviceAuthStorageProvider.EXPECT().DeviceAuthStorage().Return(mockDeviceAuthStorage).Times(2)
+				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
+				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+				mockRefreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
+
+				mockDeviceCodeStrategy.
+					EXPECT().
+					DeviceCodeSignature(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), nil)
+				mockDeviceAuthStorage.
 					EXPECT().
 					GetDeviceCodeSession(gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(authreq, nil).
 					Times(1)
+				mockDeviceCodeStrategy.
+					EXPECT().
+					ValidateDeviceCode(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+				mockAccessTokenStrategy.
+					EXPECT().
+					GenerateAccessToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
+				mockRefreshTokenStrategy.
+					EXPECT().
+					GenerateRefreshToken(gomock.Any(), gomock.Any()).
+					Return(gomock.Any().String(), gomock.Any().String(), nil)
 				mockTransactional.
 					EXPECT().
 					BeginTX(propagatedContext).
-					Return(propagatedContext, nil)
-				mockCoreStore.
+					Return(propagatedContext, nil).
+					Times(1)
+				mockDeviceAuthStorage.
 					EXPECT().
-					InvalidateDeviceCodeSession(gomock.Any(), gomock.Any()).
+					InvalidateDeviceCodeSession(propagatedContext, gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+				mockAccessTokenStorage.
 					EXPECT().
 					CreateAccessTokenSession(propagatedContext, gomock.Any(), gomock.Any()).
 					Return(nil).
 					Times(1)
-				mockCoreStore.
+				mockRefreshTokenStorage.
 					EXPECT().
 					CreateRefreshTokenSession(propagatedContext, gomock.Any(), gomock.Any(), gomock.Any()).
 					Return(nil).
@@ -801,23 +977,60 @@ func TestDeviceUserCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("scenario=%s", testCase.description), func(t *testing.T) {
 			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			t.Cleanup(ctrl.Finish)
 
 			mockTransactional = internal.NewMockTransactional(ctrl)
-			mockCoreStore = internal.NewMockRFC8628CoreStorage(ctrl)
-			mockDeviceRateLimitStrategy = internal.NewMockDeviceRateLimitStrategy(ctrl)
+
+			mockDeviceAuthStorage = internal.NewMockDeviceAuthStorage(ctrl)
+			mockDeviceAuthStorageProvider = internal.NewMockDeviceAuthStorageProvider(ctrl)
+			mockAccessTokenStorage = internal.NewMockAccessTokenStorage(ctrl)
+			mockAccessTokenStorageProvider = internal.NewMockAccessTokenStorageProvider(ctrl)
+			mockRefreshTokenStorage = internal.NewMockRefreshTokenStorage(ctrl)
+			mockRefreshTokenStorageProvider = internal.NewMockRefreshTokenStorageProvider(ctrl)
+			mockTokenRevocationStorageProvider = internal.NewMockTokenRevocationStorageProvider(ctrl)
+
+			mockDeviceRateLimitStrategyProvider = internal.NewMockDeviceRateLimitStrategyProvider(ctrl)
+			mockDeviceCodeStrategy = internal.NewMockDeviceCodeStrategy(ctrl)
+			mockDeviceCodeStrategyProvider = internal.NewMockDeviceCodeStrategyProvider(ctrl)
+			mockUserCodeStrategyProvider = internal.NewMockUserCodeStrategyProvider(ctrl)
+			mockAccessTokenStrategy = internal.NewMockAccessTokenStrategy(ctrl)
+			mockAccessTokenStrategyProvider = internal.NewMockAccessTokenStrategyProvider(ctrl)
+			mockRefreshTokenStrategy = internal.NewMockRefreshTokenStrategy(ctrl)
+			mockRefreshTokenStrategyProvider = internal.NewMockRefreshTokenStrategyProvider(ctrl)
+
+			mockStorage := struct {
+				*internal.MockDeviceAuthStorageProvider
+				*internal.MockAccessTokenStorageProvider
+				*internal.MockRefreshTokenStorageProvider
+				*internal.MockTokenRevocationStorageProvider
+				*internal.MockTransactional
+			}{
+				MockDeviceAuthStorageProvider:      mockDeviceAuthStorageProvider,
+				MockAccessTokenStorageProvider:     mockAccessTokenStorageProvider,
+				MockRefreshTokenStorageProvider:    mockRefreshTokenStorageProvider,
+				MockTokenRevocationStorageProvider: mockTokenRevocationStorageProvider,
+				MockTransactional:                  mockTransactional,
+			}
+
+			mockStrategy := struct {
+				*internal.MockDeviceRateLimitStrategyProvider
+				*internal.MockDeviceCodeStrategyProvider
+				*internal.MockUserCodeStrategyProvider
+				*internal.MockAccessTokenStrategyProvider
+				*internal.MockRefreshTokenStrategyProvider
+			}{
+				MockDeviceRateLimitStrategyProvider: mockDeviceRateLimitStrategyProvider,
+				MockDeviceCodeStrategyProvider:      mockDeviceCodeStrategyProvider,
+				MockUserCodeStrategyProvider:        mockUserCodeStrategyProvider,
+				MockAccessTokenStrategyProvider:     mockAccessTokenStrategyProvider,
+				MockRefreshTokenStrategyProvider:    mockRefreshTokenStrategyProvider,
+			}
+
 			testCase.setup()
 
-			h := DeviceCodeTokenEndpointHandler{
-				DeviceCodeStrategy:      &deviceStrategy,
-				UserCodeStrategy:        &deviceStrategy,
-				DeviceRateLimitStrategy: mockDeviceRateLimitStrategy,
-				CoreStorage: deviceTransactionalStore{
-					mockTransactional,
-					mockCoreStore,
-				},
-				AccessTokenStrategy:  strategy,
-				RefreshTokenStrategy: strategy,
+			h := rfc8628.DeviceCodeTokenEndpointHandler{
+				Strategy: mockStrategy,
+				Storage:  mockStorage,
 				Config: &fosite.Config{
 					ScopeStrategy:             fosite.HierarchicScopeStrategy,
 					AudienceMatchingStrategy:  fosite.DefaultAudienceMatchingStrategy,

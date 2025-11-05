@@ -1,7 +1,7 @@
 // Copyright © 2025 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-package openid
+package openid_test
 
 import (
 	"context"
@@ -11,14 +11,15 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-
 	"github.com/stretchr/testify/require"
 
+	gomock "go.uber.org/mock/gomock"
+
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/fosite/internal"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
-	gomock "go.uber.org/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
 
@@ -26,7 +27,7 @@ import (
 )
 
 func TestDeviceToken_HandleTokenEndpointRequest(t *testing.T) {
-	h := OpenIDConnectDeviceHandler{
+	h := openid.OpenIDConnectDeviceHandler{
 		Config: &fosite.Config{},
 	}
 	areq := fosite.NewAccessRequest(nil)
@@ -40,14 +41,23 @@ func TestDeviceToken_HandleTokenEndpointRequest(t *testing.T) {
 
 func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	t.Cleanup(ctrl.Finish)
+
 	store := internal.NewMockOpenIDConnectRequestStorage(ctrl)
+	provider := internal.NewMockOpenIDConnectRequestStorageProvider(ctrl)
+	strategyProvider := internal.NewMockDeviceCodeStrategyProvider(ctrl)
+	openIDTokenStrategyProvider := internal.NewMockOpenIDConnectTokenStrategyProvider(ctrl)
 
 	config := &fosite.Config{
 		MinParameterEntropy:       fosite.MinParameterEntropy,
 		DeviceAndUserCodeLifespan: time.Hour * 24,
 		IDTokenLifespan:           time.Hour * 24,
 	}
+	strategy := &rfc8628.DefaultDeviceStrategy{
+		Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobar")}},
+		Config: config,
+	}
+	strategyProvider.EXPECT().DeviceCodeStrategy().Return(strategy).AnyTimes()
 
 	signer := &jwt.DefaultSigner{
 		GetPrivateKey: func(ctx context.Context) (interface{}, error) {
@@ -55,22 +65,22 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 		},
 	}
 
-	h := OpenIDConnectDeviceHandler{
-		OpenIDConnectRequestStorage: store,
-		DeviceCodeStrategy: &rfc8628.DefaultDeviceStrategy{
-			Enigma: &hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("foobar")}},
-			Config: config,
-		},
+	defaultStrategy := &openid.DefaultStrategy{
+		Signer: signer,
 		Config: config,
-		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: &DefaultStrategy{
-				Signer: signer,
-				Config: config,
-			},
+	}
+	openIDTokenStrategyProvider.EXPECT().OpenIDConnectTokenStrategy().Return(defaultStrategy).AnyTimes()
+
+	h := openid.OpenIDConnectDeviceHandler{
+		Storage:  provider,
+		Strategy: strategyProvider,
+		Config:   config,
+		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
+			IDTokenStrategy: openIDTokenStrategyProvider,
 		},
 	}
 
-	session := &DefaultSession{
+	session := &openid.DefaultSession{
 		Claims: &jwt.IDTokenClaims{
 			Subject: "foo",
 		},
@@ -115,7 +125,8 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 			},
 			aresp: fosite.NewAccessResponse(),
 			setup: func(areq *fosite.AccessRequest) {
-				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(nil, ErrNoSessionFound)
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
+				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(nil, openid.ErrNoSessionFound)
 			},
 			expectErr: fosite.ErrUnknownRequest,
 		},
@@ -130,6 +141,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 				},
 			},
 			setup: func(areq *fosite.AccessRequest) {
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
 				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(nil, errors.New(""))
 			},
 			expectErr: fosite.ErrServerError,
@@ -152,6 +164,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 						Session:      session,
 					},
 				}
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
 				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrMisconfiguration,
@@ -173,6 +186,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 						GrantedScope: fosite.Arguments{"openid", "email"},
 					},
 				}
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
 				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrServerError,
@@ -192,9 +206,10 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 					Request: fosite.Request{
 						Client:       client,
 						GrantedScope: fosite.Arguments{"openid", "email"},
-						Session:      NewDefaultSession(),
+						Session:      openid.NewDefaultSession(),
 					},
 				}
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(1)
 				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
 			},
 			expectErr: fosite.ErrServerError,
@@ -217,6 +232,7 @@ func TestDeviceToken_PopulateTokenEndpointResponse(t *testing.T) {
 						Session:      session,
 					},
 				}
+				provider.EXPECT().OpenIDConnectRequestStorage().Return(store).Times(2)
 				store.EXPECT().GetOpenIDConnectSession(gomock.Any(), gomock.Any(), areq).Return(authreq, nil)
 				store.EXPECT().DeleteOpenIDConnectSession(gomock.Any(), gomock.Any()).Return(nil)
 			},

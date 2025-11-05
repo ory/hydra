@@ -17,8 +17,9 @@ import (
 	reflect "reflect"
 	time "time"
 
-	fosite "github.com/ory/hydra/v2/fosite"
 	gomock "go.uber.org/mock/gomock"
+
+	fosite "github.com/ory/hydra/v2/fosite"
 )
 
 // MockAuthorizeRequester is a mock of AuthorizeRequester interface.

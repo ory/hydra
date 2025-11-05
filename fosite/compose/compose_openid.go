@@ -14,11 +14,11 @@ import (
 // OpenIDConnectExplicitFactory creates an OpenID Connect explicit ("authorize code flow") grant handler.
 //
 // **Important note:** You must add this handler *after* you have added an OAuth2 authorize code handler!
-func OpenIDConnectExplicitFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
-	return &openid.OpenIDConnectExplicitHandler{
-		OpenIDConnectRequestStorage: storage.(openid.OpenIDConnectRequestStorage),
+func OpenIDConnectExplicitFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
+	return &openid.ExplicitHandler{
+		Storage: storage.(openid.OpenIDConnectRequestStorageProvider),
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
-			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategyProvider),
 		},
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(strategy.(jwt.Signer), config),
 		Config:                        config,
@@ -28,10 +28,10 @@ func OpenIDConnectExplicitFactory(config fosite.Configurator, storage interface{
 // OpenIDConnectRefreshFactory creates a handler for refreshing openid connect tokens.
 //
 // **Important note:** You must add this handler *after* you have added an OAuth2 authorize code handler!
-func OpenIDConnectRefreshFactory(config fosite.Configurator, _ interface{}, strategy interface{}) interface{} {
+func OpenIDConnectRefreshFactory(config fosite.Configurator, _ fosite.Storage, strategy interface{}) interface{} {
 	return &openid.OpenIDConnectRefreshHandler{
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
-			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategyProvider),
 		},
 		Config: config,
 	}
@@ -40,16 +40,16 @@ func OpenIDConnectRefreshFactory(config fosite.Configurator, _ interface{}, stra
 // OpenIDConnectImplicitFactory creates an OpenID Connect implicit ("implicit flow") grant handler.
 //
 // **Important note:** You must add this handler *after* you have added an OAuth2 authorize code handler!
-func OpenIDConnectImplicitFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func OpenIDConnectImplicitFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &openid.OpenIDConnectImplicitHandler{
-		AuthorizeImplicitGrantTypeHandler: &oauth2.AuthorizeImplicitGrantTypeHandler{
-			AccessTokenStrategy: strategy.(oauth2.AccessTokenStrategy),
-			AccessTokenStorage:  storage.(oauth2.AccessTokenStorage),
-			Config:              config,
+		AuthorizeImplicitGrantTypeHandler: &oauth2.AuthorizeImplicitGrantHandler{
+			Strategy: strategy.(oauth2.AccessTokenStrategyProvider),
+			Storage:  storage.(oauth2.AccessTokenStorageProvider),
+			Config:   config,
 		},
 		Config: config,
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
-			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategyProvider),
 		},
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(strategy.(jwt.Signer), config),
 	}
@@ -58,25 +58,32 @@ func OpenIDConnectImplicitFactory(config fosite.Configurator, storage interface{
 // OpenIDConnectHybridFactory creates an OpenID Connect hybrid grant handler.
 //
 // **Important note:** You must add this handler *after* you have added an OAuth2 authorize code handler!
-func OpenIDConnectHybridFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func OpenIDConnectHybridFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &openid.OpenIDConnectHybridHandler{
 		AuthorizeExplicitGrantHandler: &oauth2.AuthorizeExplicitGrantHandler{
-			AccessTokenStrategy:   strategy.(oauth2.AccessTokenStrategy),
-			RefreshTokenStrategy:  strategy.(oauth2.RefreshTokenStrategy),
-			AuthorizeCodeStrategy: strategy.(oauth2.AuthorizeCodeStrategy),
-			CoreStorage:           storage.(oauth2.CoreStorage),
-			Config:                config,
+			Strategy: strategy.(interface {
+				oauth2.AuthorizeCodeStrategyProvider
+				oauth2.AccessTokenStrategyProvider
+				oauth2.RefreshTokenStrategyProvider
+			}),
+			Storage: storage.(interface {
+				oauth2.AuthorizeCodeStorageProvider
+				oauth2.AccessTokenStorageProvider
+				oauth2.RefreshTokenStorageProvider
+				oauth2.TokenRevocationStorageProvider
+			}),
+			Config: config,
 		},
 		Config: config,
-		AuthorizeImplicitGrantTypeHandler: &oauth2.AuthorizeImplicitGrantTypeHandler{
-			AccessTokenStrategy: strategy.(oauth2.AccessTokenStrategy),
-			AccessTokenStorage:  storage.(oauth2.AccessTokenStorage),
-			Config:              config,
+		AuthorizeImplicitGrantHandler: &oauth2.AuthorizeImplicitGrantHandler{
+			Strategy: strategy.(oauth2.AccessTokenStrategyProvider),
+			Storage:  storage.(oauth2.AccessTokenStorageProvider),
+			Config:   config,
 		},
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
-			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategyProvider),
 		},
-		OpenIDConnectRequestStorage:   storage.(openid.OpenIDConnectRequestStorage),
+		OpenIDConnectRequestStorage:   storage.(openid.OpenIDConnectRequestStorageProvider),
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(strategy.(jwt.Signer), config),
 	}
 }
@@ -84,13 +91,13 @@ func OpenIDConnectHybridFactory(config fosite.Configurator, storage interface{},
 // OpenIDConnectDeviceFactory creates an OpenID Connect device ("device code flow") grant handler.
 //
 // **Important note:** You must add this handler *after* you have added an OAuth2 device authorization handler!
-func OpenIDConnectDeviceFactory(config fosite.Configurator, storage interface{}, strategy interface{}) interface{} {
+func OpenIDConnectDeviceFactory(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{} {
 	return &openid.OpenIDConnectDeviceHandler{
-		OpenIDConnectRequestStorage: storage.(openid.OpenIDConnectRequestStorage),
+		Storage: storage.(openid.OpenIDConnectRequestStorageProvider),
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
-			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategyProvider),
 		},
-		DeviceCodeStrategy: strategy.(rfc8628.DeviceCodeStrategy),
-		Config:             config,
+		Strategy: strategy.(rfc8628.DeviceCodeStrategyProvider),
+		Config:   config,
 	}
 }

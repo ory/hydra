@@ -16,7 +16,7 @@ import (
 type OpenIDConnectImplicitHandler struct {
 	*IDTokenHandleHelper
 
-	AuthorizeImplicitGrantTypeHandler *oauth2.AuthorizeImplicitGrantTypeHandler
+	AuthorizeImplicitGrantTypeHandler *oauth2.AuthorizeImplicitGrantHandler
 	OpenIDConnectRequestValidator     *OpenIDConnectRequestValidator
 	RS256JWTStrategy                  *jwt.DefaultSigner
 

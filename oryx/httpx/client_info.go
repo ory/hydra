@@ -6,13 +6,16 @@ package httpx
 import (
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 type GeoLocation struct {
-	City    string
-	Region  string
-	Country string
+	City      string
+	Region    string
+	Country   string
+	Latitude  *float64
+	Longitude *float64
 }
 
 func GetClientIPAddressesWithoutInternalIPs(ipAddresses []string) (string, error) {
@@ -45,10 +48,25 @@ func ClientIP(r *http.Request) string {
 	}
 }
 
+func parseFloatHeaderValue(headerValue string) *float64 {
+	if headerValue == "" {
+		return nil
+	}
+
+	val, err := strconv.ParseFloat(headerValue, 64)
+	if err != nil {
+		return nil
+	}
+
+	return &val
+}
+
 func ClientGeoLocation(r *http.Request) *GeoLocation {
 	return &GeoLocation{
-		City:    r.Header.Get("Cf-Ipcity"),
-		Region:  r.Header.Get("Cf-Region-Code"),
-		Country: r.Header.Get("Cf-Ipcountry"),
+		City:      r.Header.Get("Cf-Ipcity"),
+		Region:    r.Header.Get("Cf-Region-Code"),
+		Country:   r.Header.Get("Cf-Ipcountry"),
+		Longitude: parseFloatHeaderValue(r.Header.Get("Cf-Iplongitude")),
+		Latitude:  parseFloatHeaderValue(r.Header.Get("Cf-Iplatitude")),
 	}
 }

@@ -73,7 +73,7 @@ jobs:
           nancyVersion: v1.0.42
       - name: Run golangci-lint
         if: ${{ github.ref_type != 'tag' }}
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         env:
           GOGC: 100
         with:

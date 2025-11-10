@@ -401,11 +401,6 @@ func (m *RegistrySQL) HTTPClient(ctx context.Context, opts ...httpx.ResilientOpt
 		httpx.ResilientClientWithMaxRetry(2),
 		httpx.ResilientClientWithConnectionTimeout(30*time.Second))
 
-	tracer := m.Tracer(ctx)
-	if tracer.IsLoaded() {
-		opts = append(opts, httpx.ResilientClientWithTracer(tracer.Tracer()))
-	}
-
 	if m.Config().ClientHTTPNoPrivateIPRanges() {
 		opts = append(
 			opts,

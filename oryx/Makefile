@@ -13,7 +13,7 @@ format: .bin/ory node_modules
 	npm exec -- prettier --write .
 
 .bin/golangci-lint: Makefile
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v1.64.8
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v2.4.0
 
 .bin/licenses: Makefile
 	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh

@@ -55,10 +55,8 @@ func (n noInternalIPRoundTripper) RoundTrip(request *http.Request) (*http.Respon
 }
 
 var (
-	prohibitInternalAllowIPv6    http.RoundTripper
-	prohibitInternalProhibitIPv6 http.RoundTripper
-	allowInternalAllowIPv6       http.RoundTripper
-	allowInternalProhibitIPv6    http.RoundTripper
+	prohibitInternalAllowIPv6 http.RoundTripper
+	allowInternalAllowIPv6    http.RoundTripper
 )
 
 func init() {
@@ -79,7 +77,6 @@ func init() {
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return d.DialContext(ctx, "tcp4", addr)
 	}
-	prohibitInternalProhibitIPv6 = OTELTraceTransport(t)
 }
 
 func init() {
@@ -122,7 +119,6 @@ func init() {
 	t.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return d.DialContext(ctx, "tcp4", addr)
 	}
-	allowInternalProhibitIPv6 = OTELTraceTransport(t)
 }
 
 func newDefaultTransport() (*http.Transport, *net.Dialer) {

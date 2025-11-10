@@ -47,7 +47,7 @@ func NewSharedUniqueInMemorySQLiteDatabase() (string, error) {
 	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&mode=memory&cache=shared", dir), nil
 }
 
-// NewSQLiteTestDatabase creates a new unique SQLite database
+// NewSQLiteTestDatabase creates a new in-memory, unique SQLite database
 // which is shared amongst all callers and identified by an individual file name.
 func NewSQLiteTestDatabase(t interface {
 	TempDir() string
@@ -55,8 +55,27 @@ func NewSQLiteTestDatabase(t interface {
 	return NewSQLiteInMemoryDatabase(t.TempDir())
 }
 
-// NewSQLiteInMemoryDatabase creates a new unique SQLite database
+// NewSQLiteInMemoryDatabase creates a new in-memory, unique SQLite database
 // which is shared amongst all callers and identified by an individual file name.
 func NewSQLiteInMemoryDatabase(name string) string {
 	return fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared", name)
+}
+
+// NewSQLiteDatabase creates a new on-disk, unique SQLite database
+// which is shared amongst all callers and identified by an individual file name.
+// This is sometimes necessary over a in-memory database, for example when multiple tests/goroutines run in parallel
+// and access the same table.
+// This would result in a locking error from SQLite when running in-memory.
+// Additionally, shared cache mode is deprecated and discouraged, and the problem is better solved with the WAL,
+// according to official docs.
+func NewSQLiteDatabase(name string) string {
+	return fmt.Sprintf("sqlite://file:%s/test.db?_fk=true&_journal=WAL", name)
+}
+
+// NewSQLiteTestDatabaseOnDisk creates a new on-disk, unique SQLite database
+// which is shared amongst all callers and identified by an individual file name.
+func NewSQLiteTestDatabaseOnDisk(t interface {
+	TempDir() string
+}) string {
+	return NewSQLiteDatabase(t.TempDir())
 }

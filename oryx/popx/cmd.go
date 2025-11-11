@@ -31,7 +31,7 @@ func RegisterMigrateSQLUpFlags(cmd *cobra.Command) *cobra.Command {
 }
 
 func NewMigrateSQLUpCmd(runE func(cmd *cobra.Command, args []string) error) *cobra.Command {
-	return RegisterMigrateSQLDownFlags(&cobra.Command{
+	return RegisterMigrateSQLUpFlags(&cobra.Command{
 		Use:   "up [database_url]",
 		Args:  cobra.RangeArgs(0, 1),
 		Short: "Apply all pending SQL migrations",

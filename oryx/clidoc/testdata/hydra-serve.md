@@ -1,7 +1,7 @@
 ---
-id: root-child2
-title: root child2
-description: root child2 
+id: hydra-serve
+title: hydra serve
+description: hydra serve
 ---
 
 <!--
@@ -9,29 +9,28 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-## root child2
+## hydra serve
 
 
 
 ### Synopsis
 
-A sample text
-child2
+Manage the server
 
 <[some argument]>
 
 
 ```
-root child2 [flags]
+hydra serve [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for child2
+  -h, --help   help for serve
 ```
 
-### SEE ALSO
+### See also
 
-* [root](root)	 - 
+* [hydra](hydra)
 

@@ -52,7 +52,7 @@ func generate(cmd *cobra.Command, dir string) error {
 	if _, err := io.WriteString(f, fmt.Sprintf(`---
 id: %s
 title: %s
-description: %s %s
+description: %s
 ---
 
 <!--
@@ -64,7 +64,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 		basename,
 		cmd.CommandPath(),
 		cmd.CommandPath(),
-		cmd.Short,
 	)); err != nil {
 		return err
 	}

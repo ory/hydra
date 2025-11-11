@@ -1,7 +1,7 @@
 ---
-id: root
-title: root
-description: root 
+id: hydra
+title: hydra
+description: hydra
 ---
 
 <!--
@@ -9,7 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-## root
+## hydra
 
 
 
@@ -22,17 +22,17 @@ root
 
 
 ```
-root [flags]
+hydra [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for root
+  -h, --help   help for hydra
 ```
 
-### SEE ALSO
+### See also
 
-* [root child1](root-child1)	 - 
-* [root child2](root-child2)	 - 
+* [hydra client](hydra-client)	 - Run client commands
+* [hydra serve](hydra-serve)	
 

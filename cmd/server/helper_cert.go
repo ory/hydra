@@ -13,7 +13,6 @@ import (
 	"sync"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/jwk"
@@ -44,13 +43,14 @@ func GetOrCreateTLSCertificate(ctx context.Context, d *driver.RegistrySQL, tlsCo
 	defer lock.Unlock()
 
 	// check if certificates are configured
-	certFunc, err := tlsConfig.GetCertFunc(ctx, d.Logger(), ifaceName)
-	if err == nil {
-		return certFunc
-	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {
+	if certFunc, err := tlsConfig.GetCertFunc(ctx, d.Logger(), ifaceName); err != nil {
 		d.Logger().WithError(err).Fatal("Unable to load HTTPS TLS Certificate")
 		return nil // in case Fatal is hooked
+	} else if certFunc != nil {
+		return certFunc
 	}
+
+	d.Logger().Infof("No certificate found for %s, generating a self-signed certificate.", ifaceName)
 
 	// no certificates configured: self-sign a new cert
 	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.KeyManager(), TlsKeyName, "RS256")

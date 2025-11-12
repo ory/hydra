@@ -12,19 +12,18 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/mapx"
 )
 
-func createCSRFSession(ctx context.Context, w http.ResponseWriter, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name string, csrfValue string, maxAge time.Duration) error {
+func setCSRFCookie(ctx context.Context, w http.ResponseWriter, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, csrfValue string, maxAge time.Duration) error {
 	// Errors can be ignored here, because we always get a session back. Error typically means that the
 	// session doesn't exist yet.
 	session, _ := store.Get(r, name)
 
 	sameSite := conf.CookieSameSiteMode(ctx)
-	if isLegacyCSRFSessionName(name) {
+	if isLegacyCSRFCookieName(name) {
 		sameSite = 0
 	}
 
@@ -39,14 +38,14 @@ func createCSRFSession(ctx context.Context, w http.ResponseWriter, r *http.Reque
 	}
 
 	if sameSite == http.SameSiteNoneMode && conf.CookieSameSiteLegacyWorkaround(ctx) {
-		return createCSRFSession(ctx, w, r, conf, store, legacyCSRFSessionName(name), csrfValue, maxAge)
+		return setCSRFCookie(ctx, w, r, conf, store, legacyCSRFCookieName(name), csrfValue, maxAge)
 	}
 
 	return nil
 }
 
-func ValidateCSRFSession(ctx context.Context, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string, f *flow.Flow) error {
-	if cookie, err := getCSRFSession(ctx, r, store, conf, name); err != nil {
+func validateCSRFCookie(ctx context.Context, r *http.Request, conf x.CookieConfigProvider, store sessions.Store, name, expectedCSRF string) error {
+	if cookie, err := getCSRFCookie(ctx, r, store, conf, name); err != nil {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithHint("CSRF session cookie could not be decoded."))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithHint("No CSRF value available in the session cookie."))
@@ -57,16 +56,16 @@ func ValidateCSRFSession(ctx context.Context, r *http.Request, conf x.CookieConf
 	return nil
 }
 
-func getCSRFSession(ctx context.Context, r *http.Request, store sessions.Store, conf x.CookieConfigProvider, name string) (*sessions.Session, error) {
+func getCSRFCookie(ctx context.Context, r *http.Request, store sessions.Store, conf x.CookieConfigProvider, name string) (*sessions.Session, error) {
 	cookie, err := store.Get(r, name)
-	if !isLegacyCSRFSessionName(name) &&
+	if !isLegacyCSRFCookieName(name) &&
 		conf.CookieSameSiteMode(ctx) == http.SameSiteNoneMode &&
 		conf.CookieSameSiteLegacyWorkaround(ctx) &&
 		(err != nil || len(cookie.Values) == 0) {
-		return store.Get(r, legacyCSRFSessionName(name))
+		return store.Get(r, legacyCSRFCookieName(name))
 	}
 	return cookie, err
 }
 
-func legacyCSRFSessionName(name string) string { return name + "_legacy" }
-func isLegacyCSRFSessionName(name string) bool { return strings.HasSuffix(name, "_legacy") }
+func legacyCSRFCookieName(name string) string { return name + "_legacy" }
+func isLegacyCSRFCookieName(name string) bool { return strings.HasSuffix(name, "_legacy") }

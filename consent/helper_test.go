@@ -13,7 +13,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/internal/mock"
 
 	"github.com/gorilla/securecookie"
@@ -143,7 +142,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCSRFSessionName(name),
+					name:      legacyCSRFCookieName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -155,7 +154,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCSRFSessionName(name),
+					name:      legacyCSRFCookieName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -168,7 +167,7 @@ func TestValidateCsrfSession(t *testing.T) {
 		{
 			cookies: []cookie{
 				{
-					name:      legacyCSRFSessionName(name),
+					name:      legacyCSRFCookieName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -186,7 +185,7 @@ func TestValidateCsrfSession(t *testing.T) {
 					sameSite:  http.SameSiteNoneMode,
 				},
 				{
-					name:      legacyCSRFSessionName(name),
+					name:      legacyCSRFCookieName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -203,7 +202,7 @@ func TestValidateCsrfSession(t *testing.T) {
 					sameSite:  http.SameSiteNoneMode,
 				},
 				{
-					name:      legacyCSRFSessionName(name),
+					name:      legacyCSRFCookieName(name),
 					csrfValue: "CSRF-VALUE",
 					sameSite:  http.SameSiteDefaultMode,
 				},
@@ -243,7 +242,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				assert.NoError(t, err, "failed to save cookie %s", c.name)
 			}
 
-			err := ValidateCSRFSession(t.Context(), r, config, store, name, tc.csrfValue, new(flow.Flow))
+			err := validateCSRFCookie(t.Context(), r, config, store, name, tc.csrfValue)
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {
@@ -380,7 +379,7 @@ func TestCreateCsrfSession(t *testing.T) {
 			config.EXPECT().CookieSecure(gomock.Any()).Return(tc.secure).AnyTimes()
 			config.EXPECT().CookieDomain(gomock.Any()).Return(tc.domain).AnyTimes()
 
-			err := createCSRFSession(t.Context(), rr, req, config, store, tc.name, "value", tc.maxAge)
+			err := setCSRFCookie(t.Context(), rr, req, config, store, tc.name, "value", tc.maxAge)
 			assert.NoError(t, err)
 
 			cookies := make(map[string]cookie)

@@ -68,7 +68,6 @@ func callRegistry(ctx context.Context, r *RegistrySQL) {
 	r.ClientHasher()
 	r.ConsentManager()
 	r.ConsentStrategy()
-	r.SubjectIdentifierAlgorithm(ctx)
 	r.KeyManager()
 	r.KeyCipher()
 	r.FlowCipher()

@@ -4,8 +4,6 @@
 package consent
 
 import (
-	"context"
-
 	"github.com/ory/hydra/v2/aead"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/fosite/handler/openid"
@@ -36,5 +34,4 @@ type Registry interface {
 	LogoutManagerProvider
 
 	ConsentStrategy() Strategy
-	SubjectIdentifierAlgorithm(ctx context.Context) map[string]SubjectIdentifierAlgorithm
 }

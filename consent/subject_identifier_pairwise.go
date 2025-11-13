@@ -14,15 +14,7 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-type SubjectIdentifierAlgorithmPairwise struct {
-	Salt []byte
-}
-
-func NewSubjectIdentifierAlgorithmPairwise(salt []byte) *SubjectIdentifierAlgorithmPairwise {
-	return &SubjectIdentifierAlgorithmPairwise{Salt: salt}
-}
-
-func (g *SubjectIdentifierAlgorithmPairwise) Obfuscate(subject string, client *client.Client) (string, error) {
+func pairwiseObfuscate(salt, subject string, client *client.Client) (string, error) {
 	// sub = SHA-256 ( sector_identifier || local_account_id || salt ).
 	var id string
 	if len(client.SectorIdentifierURI) == 0 && len(client.RedirectURIs) > 1 {
@@ -38,6 +30,9 @@ func (g *SubjectIdentifierAlgorithmPairwise) Obfuscate(subject string, client *c
 		}
 		id = redirectURL.Host
 	}
-
-	return fmt.Sprintf("%x", sha256.Sum256(append(append([]byte{}, []byte(id+subject)...), g.Salt...))), nil
+	h := sha256.New()
+	h.Write([]byte(id))
+	h.Write([]byte(subject))
+	h.Write([]byte(salt))
+	return fmt.Sprintf("%x", h.Sum(make([]byte, 0, sha256.Size))), nil
 }

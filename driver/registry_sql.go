@@ -71,7 +71,6 @@ type RegistrySQL struct {
 	hsm             hsm.Context
 	forv            *openid.OpenIDConnectRequestValidator
 	fop             fosite.OAuth2Provider
-	sia             map[string]consent.SubjectIdentifierAlgorithm
 	trc             *otelx.Tracer
 	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
 	arhs            []oauth2.AccessRequestHook
@@ -510,21 +509,6 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 }
 
 func (m *RegistrySQL) Networker() x.Networker { return m.basePersister }
-
-func (m *RegistrySQL) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
-	if m.sia == nil {
-		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.Config().SubjectTypesSupported(ctx) {
-			switch t {
-			case "public":
-				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
-			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.Config().SubjectIdentifierAlgorithmSalt(ctx)))
-			}
-		}
-	}
-	return m.sia
-}
 
 func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 	if m.trc == nil {

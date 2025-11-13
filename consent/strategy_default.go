@@ -1183,8 +1183,7 @@ func (s *defaultStrategy) HandleOAuth2DeviceAuthorizationRequest(
 
 func (s *defaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
-		algorithm, ok := s.r.SubjectIdentifierAlgorithm(ctx)[c.SubjectType]
-		if !ok {
+		if !slices.Contains(s.r.Config().SubjectTypesSupported(ctx), "pairwise") {
 			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.GetID()))
 		}
 
@@ -1192,7 +1191,8 @@ func (s *defaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 			return forcedIdentifier, nil
 		}
 
-		return algorithm.Obfuscate(subject, c)
+		salt := s.r.Config().SubjectIdentifierAlgorithmSalt(ctx)
+		return pairwiseObfuscate(salt, subject, c)
 	} else if !ok {
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
 	}

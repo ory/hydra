@@ -100,3 +100,11 @@ func NamedUpdateArguments(t any, exclude ...string) string {
 
 	return strings.Join(statements, ", ")
 }
+
+func OnConflictDoNothing(dialect string, columnNoop string) string {
+	if dialect == "mysql" {
+		return fmt.Sprintf(" ON DUPLICATE KEY UPDATE `%s` = `%s` ", columnNoop, columnNoop)
+	} else {
+		return ` ON CONFLICT DO NOTHING `
+	}
+}

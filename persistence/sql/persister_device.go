@@ -17,7 +17,6 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/sqlcon"
@@ -102,10 +101,6 @@ func (r *DeviceRequestSQL) toRequest(ctx context.Context, session fosite.Session
 	}, nil
 }
 
-func (p *Persister) DeviceAuthStorage() rfc8628.DeviceAuthStorage {
-	return p
-}
-
 func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSignature, userCodeSignature string, r fosite.DeviceRequester, expiresAt time.Time) (*DeviceRequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
@@ -157,7 +152,7 @@ func (p *Persister) sqlDeviceSchemaFromRequest(ctx context.Context, deviceCodeSi
 	}, nil
 }
 
-// CreateDeviceCodeSession creates a new device code session and stores it in the database
+// CreateDeviceCodeSession creates a new device code session and stores it in the database. Implements DeviceAuthStorage.
 func (p *Persister) CreateDeviceAuthSession(ctx context.Context, deviceCodeSignature, userCodeSignature string, requester fosite.DeviceRequester) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateDeviceCodeSession")
 	defer otelx.End(span, &err)
@@ -178,33 +173,7 @@ func (p *Persister) CreateDeviceAuthSession(ctx context.Context, deviceCodeSigna
 	return nil
 }
 
-// UpdateDeviceCodeSessionBySignature updates a device code session by the device_code signature
-func (p *Persister) UpdateDeviceCodeSessionBySignature(ctx context.Context, signature string, requester fosite.DeviceRequester) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionBySignature")
-	defer otelx.End(span, &err)
-
-	req, err := p.sqlDeviceSchemaFromRequest(ctx, signature, "", requester, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
-	if err != nil {
-		return err
-	}
-
-	stmt := fmt.Sprintf(
-		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=?, user_code_state=?, subject=?, challenge_id=? WHERE device_code_signature=? AND nid = ?",
-		sqlTableDeviceAuthCodes,
-	)
-
-	/* #nosec G201 table is static */
-	return sqlcon.HandleError(
-		p.Connection(ctx).RawQuery(stmt,
-			req.GrantedScope, req.GrantedAudience,
-			req.Session, req.UserCodeState,
-			req.Subject, req.ConsentChallenge,
-			signature, p.NetworkID(ctx),
-		).Exec(),
-	)
-}
-
-// GetDeviceCodeSession returns a device code session from the database
+// GetDeviceCodeSession returns a device code session from the database. Implements DeviceAuthStorage.
 func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.DeviceRequester, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSession")
 	defer otelx.End(span, &err)
@@ -227,7 +196,47 @@ func (p *Persister) GetDeviceCodeSession(ctx context.Context, signature string, 
 	return r.toRequest(ctx, session, p)
 }
 
-// GetDeviceCodeSessionByRequestID returns a device code session from the database
+// InvalidateDeviceCodeSession invalidates a device code session. Implements DeviceAuthStorage.
+func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateDeviceCodeSession")
+	defer otelx.End(span, &err)
+
+	/* #nosec G201 table is static */
+	return sqlcon.HandleError(
+		p.QueryWithNetwork(ctx).
+			Where("device_code_signature = ?", signature).
+			Delete(DeviceRequestSQL{}))
+}
+
+// GetUserCodeSession returns a user code session from the database. Implements FositeStorer.
+func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.DeviceRequester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
+	defer otelx.End(span, &err)
+
+	r := DeviceRequestSQL{}
+	if session == nil {
+		session = oauth2.NewSessionWithCustomClaims(ctx, p.r.Config(), "")
+	}
+
+	if err = p.QueryWithNetwork(ctx).Where("user_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	fr, err := r.toRequest(ctx, session, p)
+	if err != nil {
+		return nil, err
+	}
+
+	if r.UserCodeState != fosite.UserCodeUnused {
+		return fr, errors.WithStack(fosite.ErrInactiveToken)
+	}
+
+	return fr, err
+}
+
+// GetDeviceCodeSessionByRequestID returns a device code session from the database. Implements FositeStorer.
 func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, requestID string, session fosite.Session) (_ fosite.DeviceRequester, deviceCodeSignature string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetDeviceCodeSessionByRequestID")
 	defer otelx.End(span, &err)
@@ -254,42 +263,28 @@ func (p *Persister) GetDeviceCodeSessionByRequestID(ctx context.Context, request
 	return fr, r.ID, nil
 }
 
-// InvalidateDeviceCodeSession invalidates a device code session
-func (p *Persister) InvalidateDeviceCodeSession(ctx context.Context, signature string) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateDeviceCodeSession")
+// UpdateDeviceCodeSessionBySignature updates a device code session by the device_code signature. Implements FositeStorer.
+func (p *Persister) UpdateDeviceCodeSessionBySignature(ctx context.Context, signature string, requester fosite.DeviceRequester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateDeviceCodeSessionBySignature")
 	defer otelx.End(span, &err)
+
+	req, err := p.sqlDeviceSchemaFromRequest(ctx, signature, "", requester, requester.GetSession().GetExpiresAt(fosite.DeviceCode).UTC())
+	if err != nil {
+		return err
+	}
+
+	stmt := fmt.Sprintf(
+		"UPDATE %s SET granted_scope=?, granted_audience=?, session_data=?, user_code_state=?, subject=?, challenge_id=? WHERE device_code_signature=? AND nid = ?",
+		sqlTableDeviceAuthCodes,
+	)
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
-		p.QueryWithNetwork(ctx).
-			Where("device_code_signature = ?", signature).
-			Delete(DeviceRequestSQL{}))
-}
-
-// GetUserCodeSession returns a user code session from the database
-func (p *Persister) GetUserCodeSession(ctx context.Context, signature string, session fosite.Session) (_ fosite.DeviceRequester, err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetUserCodeSession")
-	defer otelx.End(span, &err)
-
-	r := DeviceRequestSQL{}
-	if session == nil {
-		session = oauth2.NewSessionWithCustomClaims(ctx, p.r.Config(), "")
-	}
-
-	if err = p.QueryWithNetwork(ctx).Where("user_code_signature = ?", signature).First(&r); errors.Is(err, sql.ErrNoRows) {
-		return nil, errors.WithStack(fosite.ErrNotFound)
-	} else if err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
-
-	fr, err := r.toRequest(ctx, session, p)
-	if err != nil {
-		return nil, err
-	}
-
-	if r.UserCodeState != fosite.UserCodeUnused {
-		return fr, errors.WithStack(fosite.ErrInactiveToken)
-	}
-
-	return fr, err
+		p.Connection(ctx).RawQuery(stmt,
+			req.GrantedScope, req.GrantedAudience,
+			req.Session, req.UserCodeState,
+			req.Subject, req.ConsentChallenge,
+			signature, p.NetworkID(ctx),
+		).Exec(),
+	)
 }

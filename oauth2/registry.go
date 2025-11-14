@@ -35,5 +35,7 @@ type Registry interface {
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 	AccessRequestHooks() []AccessRequestHook
 	OAuth2ProviderConfig() fosite.Configurator
-	RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy
+	rfc8628.DeviceRateLimitStrategyProvider
+	rfc8628.DeviceCodeStrategyProvider
+	rfc8628.UserCodeStrategyProvider
 }

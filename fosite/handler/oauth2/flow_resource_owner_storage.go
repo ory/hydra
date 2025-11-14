@@ -7,8 +7,12 @@ import (
 	"context"
 )
 
+// ResourceOwnerPasswordCredentialsGrantStorage provides storage for the resource owner password credentials grant.
 type ResourceOwnerPasswordCredentialsGrantStorage interface {
 	Authenticate(ctx context.Context, name string, secret string) (subject string, err error)
-	AccessTokenStorageProvider
-	RefreshTokenStorageProvider
+}
+
+// ResourceOwnerPasswordCredentialsGrantStorageProvider provides the resource owner password credentials grant storage.
+type ResourceOwnerPasswordCredentialsGrantStorageProvider interface {
+	ResourceOwnerPasswordCredentialsGrantStorage() ResourceOwnerPasswordCredentialsGrantStorage
 }

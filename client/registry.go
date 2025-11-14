@@ -26,6 +26,8 @@ type Registry interface {
 	OpenIDJWTStrategy() jwk.JWTSigner
 	OAuth2HMACStrategy() foauth2.CoreStrategy
 	OAuth2EnigmaStrategy() *enigma.HMACStrategy
-	RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy
+	rfc8628.DeviceRateLimitStrategyProvider
+	rfc8628.DeviceCodeStrategyProvider
+	rfc8628.UserCodeStrategyProvider
 	config.Provider
 }

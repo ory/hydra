@@ -17,8 +17,6 @@ import (
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
-
-	oauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
 )
 
 // MockResourceOwnerPasswordCredentialsGrantStorage is a mock of ResourceOwnerPasswordCredentialsGrantStorage interface.
@@ -45,20 +43,6 @@ func (m *MockResourceOwnerPasswordCredentialsGrantStorage) EXPECT() *MockResourc
 	return m.recorder
 }
 
-// AccessTokenStorage mocks base method.
-func (m *MockResourceOwnerPasswordCredentialsGrantStorage) AccessTokenStorage() oauth2.AccessTokenStorage {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AccessTokenStorage")
-	ret0, _ := ret[0].(oauth2.AccessTokenStorage)
-	return ret0
-}
-
-// AccessTokenStorage indicates an expected call of AccessTokenStorage.
-func (mr *MockResourceOwnerPasswordCredentialsGrantStorageMockRecorder) AccessTokenStorage() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AccessTokenStorage", reflect.TypeOf((*MockResourceOwnerPasswordCredentialsGrantStorage)(nil).AccessTokenStorage))
-}
-
 // Authenticate mocks base method.
 func (m *MockResourceOwnerPasswordCredentialsGrantStorage) Authenticate(ctx context.Context, name, secret string) (string, error) {
 	m.ctrl.T.Helper()
@@ -72,18 +56,4 @@ func (m *MockResourceOwnerPasswordCredentialsGrantStorage) Authenticate(ctx cont
 func (mr *MockResourceOwnerPasswordCredentialsGrantStorageMockRecorder) Authenticate(ctx, name, secret any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Authenticate", reflect.TypeOf((*MockResourceOwnerPasswordCredentialsGrantStorage)(nil).Authenticate), ctx, name, secret)
-}
-
-// RefreshTokenStorage mocks base method.
-func (m *MockResourceOwnerPasswordCredentialsGrantStorage) RefreshTokenStorage() oauth2.RefreshTokenStorage {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RefreshTokenStorage")
-	ret0, _ := ret[0].(oauth2.RefreshTokenStorage)
-	return ret0
-}
-
-// RefreshTokenStorage indicates an expected call of RefreshTokenStorage.
-func (mr *MockResourceOwnerPasswordCredentialsGrantStorageMockRecorder) RefreshTokenStorage() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshTokenStorage", reflect.TypeOf((*MockResourceOwnerPasswordCredentialsGrantStorage)(nil).RefreshTokenStorage))
 }

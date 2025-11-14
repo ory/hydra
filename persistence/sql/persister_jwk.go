@@ -26,6 +26,7 @@ type JWKPersister struct {
 	*BasePersister
 }
 
+// GenerateAndPersistKeySet implements jwk.Manager.
 func (p *JWKPersister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GenerateAndPersistKeySet",
 		trace.WithAttributes(
@@ -51,6 +52,7 @@ func (p *JWKPersister) GenerateAndPersistKeySet(ctx context.Context, set, kid, a
 	return keys, nil
 }
 
+// AddKey implements jwk.Manager.
 func (p *JWKPersister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKey",
 		trace.WithAttributes(
@@ -76,6 +78,7 @@ func (p *JWKPersister) AddKey(ctx context.Context, set string, key *jose.JSONWeb
 	}))
 }
 
+// AddKeySet implements jwk.Manager.
 func (p *JWKPersister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.AddKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)
@@ -105,7 +108,7 @@ func (p *JWKPersister) AddKeySet(ctx context.Context, set string, keys *jose.JSO
 	})
 }
 
-// UpdateKey updates or creates the key.
+// UpdateKey updates or creates the key. Implements jwk.Manager.
 func (p *JWKPersister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKey",
 		trace.WithAttributes(
@@ -124,7 +127,7 @@ func (p *JWKPersister) UpdateKey(ctx context.Context, set string, key *jose.JSON
 	})
 }
 
-// UpdateKeySet updates or creates the key set.
+// UpdateKeySet updates or creates the key set. Implements jwk.Manager.
 func (p *JWKPersister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.UpdateKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)
@@ -140,6 +143,7 @@ func (p *JWKPersister) UpdateKeySet(ctx context.Context, set string, keySet *jos
 	})
 }
 
+// GetKey implements jwk.Manager.
 func (p *JWKPersister) GetKey(ctx context.Context, set, kid string) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKey",
 		trace.WithAttributes(
@@ -170,6 +174,7 @@ func (p *JWKPersister) GetKey(ctx context.Context, set, kid string) (_ *jose.JSO
 	}, nil
 }
 
+// GetKeySet implements jwk.Manager.
 func (p *JWKPersister) GetKeySet(ctx context.Context, set string) (keys *jose.JSONWebKeySet, err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)
@@ -185,6 +190,7 @@ func (p *JWKPersister) GetKeySet(ctx context.Context, set string) (keys *jose.JS
 	return js.ToJWK(ctx, aead.NewAESGCM(p.d.Config()))
 }
 
+// DeleteKey implements jwk.Manager.
 func (p *JWKPersister) DeleteKey(ctx context.Context, set, kid string) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKey",
 		trace.WithAttributes(
@@ -196,6 +202,7 @@ func (p *JWKPersister) DeleteKey(ctx context.Context, set, kid string) (err erro
 	return sqlcon.HandleError(err)
 }
 
+// DeleteKeySet implements jwk.Manager.
 func (p *JWKPersister) DeleteKeySet(ctx context.Context, set string) (err error) {
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteKeySet", trace.WithAttributes(attribute.String("set", set)))
 	defer otelx.End(span, &err)

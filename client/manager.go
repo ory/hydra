@@ -25,7 +25,7 @@ type Manager interface {
 }
 
 type Storage interface {
-	GetClient(ctx context.Context, id string) (fosite.Client, error)
+	fosite.ClientManager
 
 	CreateClient(ctx context.Context, c *Client) error
 

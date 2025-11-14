@@ -12,7 +12,7 @@ import (
 // handler.
 func OIDCUserinfoVerifiableCredentialFactory(config fosite.Configurator, storage fosite.Storage, strategy any) any {
 	return &verifiable.Handler{
-		NonceManager: storage.(verifiable.NonceManager),
-		Config:       config,
+		NonceManagerProvider: storage.(verifiable.NonceManagerProvider),
+		Config:               config,
 	}
 }

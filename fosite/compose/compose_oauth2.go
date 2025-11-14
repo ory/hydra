@@ -77,8 +77,12 @@ func OAuth2ResourceOwnerPasswordCredentialsFactory(config fosite.Configurator, s
 			oauth2.AccessTokenStrategyProvider
 			oauth2.RefreshTokenStrategyProvider
 		}),
-		Storage: storage.(oauth2.ResourceOwnerPasswordCredentialsGrantStorage),
-		Config:  config,
+		Storage: storage.(interface {
+			oauth2.ResourceOwnerPasswordCredentialsGrantStorageProvider
+			oauth2.AccessTokenStorageProvider
+			oauth2.RefreshTokenStorageProvider
+		}),
+		Config: config,
 	}
 }
 

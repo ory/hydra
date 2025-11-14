@@ -1032,7 +1032,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	userCodeSignature, err := h.r.RFC8628HMACStrategy().UserCodeSignature(r.Context(), reqBody.UserCode)
+	userCodeSignature, err := h.r.UserCodeStrategy().UserCodeSignature(r.Context(), reqBody.UserCode)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, fosite.ErrServerError.WithWrap(err).WithHint(`The 'user_code' signature could not be computed.`))
 		return
@@ -1044,7 +1044,7 @@ func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if err := h.r.RFC8628HMACStrategy().ValidateUserCode(ctx, userCodeRequest, reqBody.UserCode); err != nil {
+	if err := h.r.UserCodeStrategy().ValidateUserCode(ctx, userCodeRequest, reqBody.UserCode); err != nil {
 		h.r.Writer().WriteError(w, r, fosite.ErrInvalidRequest.WithWrap(err).WithHint(`The 'user_code' session could not be found or has expired or is otherwise malformed.`))
 		return
 	}

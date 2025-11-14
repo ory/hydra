@@ -76,10 +76,10 @@ func NewConfig(deps configDependencies) *Config {
 	}
 }
 
-func (c *Config) LoadDefaultHandlers(strategy interface{}) {
+func (c *Config) LoadDefaultHandlers(storage fosite.Storage, strategy interface{}) {
 	factories := append(defaultFactories, c.deps.ExtraFositeFactories()...)
 	for _, factory := range factories {
-		res := factory(c, c.deps.Persister(), strategy)
+		res := factory(c, storage, strategy)
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)
 		}

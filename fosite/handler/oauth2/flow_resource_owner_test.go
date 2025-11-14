@@ -22,7 +22,10 @@ import (
 
 func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	store := internal.NewMockResourceOwnerPasswordCredentialsGrantStorage(ctrl)
+	mockRopcgStorageProvider := internal.NewMockResourceOwnerPasswordCredentialsGrantStorageProvider(ctrl)
+	mockRopcgStorage := internal.NewMockResourceOwnerPasswordCredentialsGrantStorage(ctrl)
+	mockAccessTokenStorageProvider := internal.NewMockAccessTokenStorageProvider(ctrl)
+	mockRefreshTokenStorageProvider := internal.NewMockRefreshTokenStorageProvider(ctrl)
 	t.Cleanup(ctrl.Finish)
 
 	areq := fosite.NewAccessRequest(new(fosite.DefaultSession))
@@ -72,21 +75,24 @@ func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 				areq.Form.Set("password", "pan")
 				areq.Client = &fosite.DefaultClient{GrantTypes: fosite.Arguments{"password"}, Scopes: []string{"foo-scope"}, Audience: []string{"https://www.ory.sh/api"}}
 
-				store.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", fosite.ErrNotFound)
+				mockRopcgStorageProvider.EXPECT().ResourceOwnerPasswordCredentialsGrantStorage().Return(mockRopcgStorage).Times(1)
+				mockRopcgStorage.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", fosite.ErrNotFound)
 			},
 			expectErr: fosite.ErrInvalidGrant,
 		},
 		{
 			description: "should fail because error on lookup",
 			setup: func(config *fosite.Config) {
-				store.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", errors.New(""))
+				mockRopcgStorageProvider.EXPECT().ResourceOwnerPasswordCredentialsGrantStorage().Return(mockRopcgStorage).Times(1)
+				mockRopcgStorage.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", errors.New(""))
 			},
 			expectErr: fosite.ErrServerError,
 		},
 		{
 			description: "should pass",
 			setup: func(config *fosite.Config) {
-				store.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", nil)
+				mockRopcgStorageProvider.EXPECT().ResourceOwnerPasswordCredentialsGrantStorage().Return(mockRopcgStorage).Times(1)
+				mockRopcgStorage.EXPECT().Authenticate(gomock.Any(), "peter", "pan").Return("", nil)
 			},
 			check: func(areq *fosite.AccessRequest) {
 				// assert.NotEmpty(t, areq.GetSession().GetExpiresAt(fosite.AccessToken))
@@ -102,8 +108,17 @@ func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 				ScopeStrategy:            fosite.HierarchicScopeStrategy,
 				AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
 			}
+			mockStorage := struct {
+				*internal.MockResourceOwnerPasswordCredentialsGrantStorageProvider
+				*internal.MockAccessTokenStorageProvider
+				*internal.MockRefreshTokenStorageProvider
+			}{
+				MockResourceOwnerPasswordCredentialsGrantStorageProvider: mockRopcgStorageProvider,
+				MockAccessTokenStorageProvider:                           mockAccessTokenStorageProvider,
+				MockRefreshTokenStorageProvider:                          mockRefreshTokenStorageProvider,
+			}
 			h := oauth2.ResourceOwnerPasswordCredentialsGrantHandler{
-				Storage: store,
+				Storage: mockStorage,
 				Config:  config,
 			}
 			c.setup(config)
@@ -123,8 +138,10 @@ func TestResourceOwnerFlow_HandleTokenEndpointRequest(t *testing.T) {
 
 func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 	var (
-		mockRopcgStorage                 *internal.MockResourceOwnerPasswordCredentialsGrantStorage
+		mockRopcgStorageProvider         *internal.MockResourceOwnerPasswordCredentialsGrantStorageProvider
+		mockAccessTokenStorageProvider   *internal.MockAccessTokenStorageProvider
 		mockAccessTokenStorage           *internal.MockAccessTokenStorage
+		mockRefreshTokenStorageProvider  *internal.MockRefreshTokenStorageProvider
 		mockRefreshTokenStorage          *internal.MockRefreshTokenStorage
 		mockAccessTokenStrategyProvider  *internal.MockAccessTokenStrategyProvider
 		mockAccessTokenStrategy          *internal.MockAccessTokenStrategy
@@ -161,7 +178,7 @@ func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 				areq.GrantTypes = fosite.Arguments{"password"}
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
 				mockAccessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return(mockAT, "bar", nil)
-				mockRopcgStorage.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
 				mockAccessTokenStorage.EXPECT().CreateAccessTokenSession(gomock.Any(), "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 			},
 			expect: func() {
@@ -175,11 +192,11 @@ func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 				areq.GrantScope("offline")
 				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
 				mockRefreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), areq).Return(mockRT, "bar", nil)
-				mockRopcgStorage.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
+				mockRefreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
 				mockRefreshTokenStorage.EXPECT().CreateRefreshTokenSession(gomock.Any(), "bar", "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
 				mockAccessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return(mockAT, "bar", nil)
-				mockRopcgStorage.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
 				mockAccessTokenStorage.EXPECT().CreateAccessTokenSession(gomock.Any(), "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 			},
 			expect: func() {
@@ -193,11 +210,11 @@ func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 				areq.GrantTypes = fosite.Arguments{"password"}
 				mockAccessTokenStrategyProvider.EXPECT().AccessTokenStrategy().Return(mockAccessTokenStrategy).Times(1)
 				mockAccessTokenStrategy.EXPECT().GenerateAccessToken(gomock.Any(), areq).Return(mockAT, "bar", nil)
-				mockRopcgStorage.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
+				mockAccessTokenStorageProvider.EXPECT().AccessTokenStorage().Return(mockAccessTokenStorage).Times(1)
 				mockAccessTokenStorage.EXPECT().CreateAccessTokenSession(gomock.Any(), "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 				mockRefreshTokenStrategyProvider.EXPECT().RefreshTokenStrategy().Return(mockRefreshTokenStrategy).Times(1)
 				mockRefreshTokenStrategy.EXPECT().GenerateRefreshToken(gomock.Any(), areq).Return(mockRT, "bar", nil)
-				mockRopcgStorage.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
+				mockRefreshTokenStorageProvider.EXPECT().RefreshTokenStorage().Return(mockRefreshTokenStorage).Times(1)
 				mockRefreshTokenStorage.EXPECT().CreateRefreshTokenSession(gomock.Any(), "bar", "bar", gomock.Eq(areq.Sanitize([]string{}))).Return(nil)
 			},
 			expect: func() {
@@ -218,13 +235,25 @@ func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 				AccessTokenLifespan: time.Hour,
 			}
 
-			mockRopcgStorage = internal.NewMockResourceOwnerPasswordCredentialsGrantStorage(ctrl)
+			mockRopcgStorageProvider = internal.NewMockResourceOwnerPasswordCredentialsGrantStorageProvider(ctrl)
+			mockAccessTokenStorageProvider = internal.NewMockAccessTokenStorageProvider(ctrl)
 			mockAccessTokenStorage = internal.NewMockAccessTokenStorage(ctrl)
+			mockRefreshTokenStorageProvider = internal.NewMockRefreshTokenStorageProvider(ctrl)
 			mockRefreshTokenStorage = internal.NewMockRefreshTokenStorage(ctrl)
 			mockAccessTokenStrategyProvider = internal.NewMockAccessTokenStrategyProvider(ctrl)
 			mockAccessTokenStrategy = internal.NewMockAccessTokenStrategy(ctrl)
 			mockRefreshTokenStrategyProvider = internal.NewMockRefreshTokenStrategyProvider(ctrl)
 			mockRefreshTokenStrategy = internal.NewMockRefreshTokenStrategy(ctrl)
+
+			mockStorage := struct {
+				*internal.MockResourceOwnerPasswordCredentialsGrantStorageProvider
+				*internal.MockAccessTokenStorageProvider
+				*internal.MockRefreshTokenStorageProvider
+			}{
+				MockResourceOwnerPasswordCredentialsGrantStorageProvider: mockRopcgStorageProvider,
+				MockAccessTokenStorageProvider:                           mockAccessTokenStorageProvider,
+				MockRefreshTokenStorageProvider:                          mockRefreshTokenStorageProvider,
+			}
 
 			mockStrategy := struct {
 				*internal.MockAccessTokenStrategyProvider
@@ -235,7 +264,7 @@ func TestResourceOwnerFlow_PopulateTokenEndpointResponse(t *testing.T) {
 			}
 
 			h = oauth2.ResourceOwnerPasswordCredentialsGrantHandler{
-				Storage:  mockRopcgStorage,
+				Storage:  mockStorage,
 				Strategy: mockStrategy,
 				Config:   config,
 			}

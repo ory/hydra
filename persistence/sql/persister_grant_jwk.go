@@ -12,7 +12,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/pop/v6"
@@ -22,7 +21,7 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-var _ trust.GrantManager = &Persister{}
+var _ trust.GrantManager = (*Persister)(nil)
 
 type SQLGrant struct {
 	ID              uuid.UUID                      `db:"id"`
@@ -41,10 +40,37 @@ func (SQLGrant) TableName() string {
 	return "hydra_oauth2_trusted_jwt_bearer_issuer"
 }
 
-func (p *Persister) RFC7523KeyStorage() rfc7523.RFC7523KeyStorage {
-	return p
+func (SQLGrant) fromGrant(g trust.Grant) SQLGrant {
+	return SQLGrant{
+		ID:              g.ID,
+		Issuer:          g.Issuer,
+		Subject:         g.Subject,
+		AllowAnySubject: g.AllowAnySubject,
+		Scope:           g.Scope,
+		KeySet:          g.PublicKey.Set,
+		KeyID:           g.PublicKey.KeyID,
+		CreatedAt:       g.CreatedAt,
+		ExpiresAt:       g.ExpiresAt,
+	}
 }
 
+func (d SQLGrant) toGrant() trust.Grant {
+	return trust.Grant{
+		ID:              d.ID,
+		Issuer:          d.Issuer,
+		Subject:         d.Subject,
+		AllowAnySubject: d.AllowAnySubject,
+		Scope:           d.Scope,
+		PublicKey: trust.PublicKey{
+			Set:   d.KeySet,
+			KeyID: d.KeyID,
+		},
+		CreatedAt: d.CreatedAt,
+		ExpiresAt: d.ExpiresAt,
+	}
+}
+
+// CreateGrant implements GrantManager
 func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateGrant")
 	defer otelx.End(span, &err)
@@ -66,6 +92,7 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 	})
 }
 
+// GetConcreteGrant implements GrantManager
 func (p *Persister) GetConcreteGrant(ctx context.Context, id uuid.UUID) (_ trust.Grant, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetConcreteGrant")
 	defer otelx.End(span, &err)
@@ -78,6 +105,7 @@ func (p *Persister) GetConcreteGrant(ctx context.Context, id uuid.UUID) (_ trust
 	return data.toGrant(), nil
 }
 
+// DeleteGrant implements GrantManager
 func (p *Persister) DeleteGrant(ctx context.Context, id uuid.UUID) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteGrant")
 	defer otelx.End(span, &err)
@@ -96,6 +124,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id uuid.UUID) (err error) {
 	})
 }
 
+// GetGrants implements GrantManager
 func (p *Persister) GetGrants(ctx context.Context, optionalIssuer string, pageOpts ...keysetpagination.Option) (_ []trust.Grant, _ *keysetpagination.Paginator, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetGrants")
 	defer otelx.End(span, &err)
@@ -123,6 +152,19 @@ func (p *Persister) GetGrants(ctx context.Context, optionalIssuer string, pageOp
 	return grants, nextPage, nil
 }
 
+// FlushInactiveGrants implements GrantManager
+func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, _ int, _ int) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveGrants")
+	defer otelx.End(span, &err)
+
+	deleteUntil := time.Now().UTC()
+	if deleteUntil.After(notAfter) {
+		deleteUntil = notAfter
+	}
+	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("expires_at < ?", deleteUntil).Delete(&SQLGrant{}))
+}
+
+// GetPublicKey implements RFC7523KeyStorage
 func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKey")
 	defer otelx.End(span, &err)
@@ -151,6 +193,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	return &keySet.Keys[0], nil
 }
 
+// GetPublicKeys implements RFC7523KeyStorage
 func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeys")
 	defer otelx.End(span, &err)
@@ -212,6 +255,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	return js.ToJWK(ctx, p.r.KeyCipher())
 }
 
+// GetPublicKeyScopes implements RFC7523KeyStorage
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) (_ []string, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetPublicKeyScopes")
 	defer otelx.End(span, &err)
@@ -234,6 +278,7 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	return scopes, nil
 }
 
+// IsJWTUsed implements RFC7523KeyStorage
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (ok bool, err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.IsJWTUsed")
 	defer otelx.End(span, &err)
@@ -246,50 +291,10 @@ func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (ok bool, err err
 	return false, nil
 }
 
+// MarkJWTUsedForTime implements RFC7523KeyStorage
 func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time.Time) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.MarkJWTUsedForTime")
 	defer otelx.End(span, &err)
 
 	return p.SetClientAssertionJWT(ctx, jti, exp)
-}
-
-func (SQLGrant) fromGrant(g trust.Grant) SQLGrant {
-	return SQLGrant{
-		ID:              g.ID,
-		Issuer:          g.Issuer,
-		Subject:         g.Subject,
-		AllowAnySubject: g.AllowAnySubject,
-		Scope:           g.Scope,
-		KeySet:          g.PublicKey.Set,
-		KeyID:           g.PublicKey.KeyID,
-		CreatedAt:       g.CreatedAt,
-		ExpiresAt:       g.ExpiresAt,
-	}
-}
-
-func (d SQLGrant) toGrant() trust.Grant {
-	return trust.Grant{
-		ID:              d.ID,
-		Issuer:          d.Issuer,
-		Subject:         d.Subject,
-		AllowAnySubject: d.AllowAnySubject,
-		Scope:           d.Scope,
-		PublicKey: trust.PublicKey{
-			Set:   d.KeySet,
-			KeyID: d.KeyID,
-		},
-		CreatedAt: d.CreatedAt,
-		ExpiresAt: d.ExpiresAt,
-	}
-}
-
-func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, _ int, _ int) (err error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FlushInactiveGrants")
-	defer otelx.End(span, &err)
-
-	deleteUntil := time.Now().UTC()
-	if deleteUntil.After(notAfter) {
-		deleteUntil = notAfter
-	}
-	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("expires_at < ?", deleteUntil).Delete(&SQLGrant{}))
 }

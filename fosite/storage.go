@@ -9,7 +9,7 @@ import (
 
 // Storage defines fosite's minimal storage interface.
 type Storage interface {
-	ClientManager() ClientManager
+	FositeClientManager() ClientManager
 }
 
 type PARStorageProvider interface {

@@ -91,7 +91,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 				}
 			}
 
-			client, err = f.Store.ClientManager().GetClient(ctx, clientID)
+			client, err = f.Store.FositeClientManager().GetClient(ctx, clientID)
 			if err != nil {
 				return nil, errorsx.WithStack(ErrInvalidClient.WithWrap(err).WithDebug(err.Error()))
 			}
@@ -156,7 +156,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 			return nil, errorsx.WithStack(ErrInvalidClient.WithHint("Claim 'sub' from 'client_assertion' must match the 'client_id' of the OAuth 2.0 Client."))
 		} else if jti, ok = claims["jti"].(string); !ok || len(jti) == 0 {
 			return nil, errorsx.WithStack(ErrInvalidClient.WithHint("Claim 'jti' from 'client_assertion' must be set but is not."))
-		} else if f.Store.ClientManager().ClientAssertionJWTValid(ctx, jti) != nil {
+		} else if f.Store.FositeClientManager().ClientAssertionJWTValid(ctx, jti) != nil {
 			return nil, errorsx.WithStack(ErrJTIKnown.WithHint("Claim 'jti' from 'client_assertion' MUST only be used once."))
 		}
 
@@ -177,7 +177,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
-		if err := f.Store.ClientManager().SetClientAssertionJWT(ctx, jti, time.Unix(expiry, 0)); err != nil {
+		if err := f.Store.FositeClientManager().SetClientAssertionJWT(ctx, jti, time.Unix(expiry, 0)); err != nil {
 			return nil, err
 		}
 
@@ -197,7 +197,7 @@ func (f *Fosite) DefaultClientAuthenticationStrategy(ctx context.Context, r *htt
 		return nil, err
 	}
 
-	client, err := f.Store.ClientManager().GetClient(ctx, clientID)
+	client, err := f.Store.FositeClientManager().GetClient(ctx, clientID)
 	if err != nil {
 		return nil, errorsx.WithStack(ErrInvalidClient.WithWrap(err).WithDebug(err.Error()))
 	}

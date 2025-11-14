@@ -9,13 +9,6 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-// RFC8628CodeStrategy is the code strategy needed for the DeviceAuthHandler
-type RFC8628CodeStrategy interface {
-	DeviceRateLimitStrategy
-	DeviceCodeStrategy
-	UserCodeStrategy
-}
-
 // DeviceRateLimitStrategy handles the rate limiting strategy
 type DeviceRateLimitStrategy interface {
 	// ShouldRateLimit checks whether the token request should be rate-limited

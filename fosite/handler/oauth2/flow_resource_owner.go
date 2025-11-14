@@ -20,7 +20,11 @@ var _ fosite.TokenEndpointHandler = (*ResourceOwnerPasswordCredentialsGrantHandl
 // is at the time of this writing going to be omitted in the OAuth 2.1 spec. For more information on why this grant type
 // is discouraged see: https://www.scottbrady91.com/oauth/why-the-resource-owner-password-credentials-grant-type-is-not-authentication-nor-suitable-for-modern-applications
 type ResourceOwnerPasswordCredentialsGrantHandler struct {
-	Storage  ResourceOwnerPasswordCredentialsGrantStorage
+	Storage interface {
+		ResourceOwnerPasswordCredentialsGrantStorageProvider
+		AccessTokenStorageProvider
+		RefreshTokenStorageProvider
+	}
 	Strategy interface {
 		AccessTokenStrategyProvider
 		RefreshTokenStrategyProvider
@@ -64,7 +68,7 @@ func (c *ResourceOwnerPasswordCredentialsGrantHandler) HandleTokenEndpointReques
 	password := request.GetRequestForm().Get("password")
 	if username == "" || password == "" {
 		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Username or password are missing from the POST body."))
-	} else if sub, err := c.Storage.Authenticate(ctx, username, password); errors.Is(err, fosite.ErrNotFound) {
+	} else if sub, err := c.Storage.ResourceOwnerPasswordCredentialsGrantStorage().Authenticate(ctx, username, password); errors.Is(err, fosite.ErrNotFound) {
 		return errorsx.WithStack(fosite.ErrInvalidGrant.WithHint("Unable to authenticate the provided username and password credentials.").WithWrap(err).WithDebug(err.Error()))
 	} else if err != nil {
 		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))

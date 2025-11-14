@@ -42,6 +42,7 @@ package fosite
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/refresh_token_strategy_provider.go github.com/ory/hydra/v2/fosite/handler/oauth2 RefreshTokenStrategyProvider
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/request.go github.com/ory/hydra/v2/fosite Requester
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/resource_owner_password_credentials_grant_storage.go github.com/ory/hydra/v2/fosite/handler/oauth2 ResourceOwnerPasswordCredentialsGrantStorage
+//go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/resource_owner_password_credentials_grant_storage_provider.go github.com/ory/hydra/v2/fosite/handler/oauth2 ResourceOwnerPasswordCredentialsGrantStorageProvider
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/revocation_handler.go github.com/ory/hydra/v2/fosite RevocationHandler
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/revocation_handlers_provider.go github.com/ory/hydra/v2/fosite RevocationHandlersProvider
 //go:generate go run go.uber.org/mock/mockgen -package internal -destination internal/rfc7523_key_storage.go github.com/ory/hydra/v2/fosite/handler/rfc7523 RFC7523KeyStorage

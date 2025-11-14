@@ -17,7 +17,7 @@ import (
 )
 
 type FositeStorer interface {
-	fosite.Storage
+	fosite.ClientManager
 	oauth2.AuthorizeCodeStorage
 	oauth2.AccessTokenStorage
 	oauth2.RefreshTokenStorage
@@ -29,6 +29,7 @@ type FositeStorer interface {
 	verifiable.NonceManager
 	oauth2.ResourceOwnerPasswordCredentialsGrantStorage
 
+	// Hydra-specific storage utilities
 	// flush the access token requests from the database.
 	// no data will be deleted after the 'notAfter' timeframe.
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
@@ -44,8 +45,9 @@ type FositeStorer interface {
 
 	// DeleteOpenIDConnectSession deletes an OpenID Connect session.
 	// This is duplicated from Ory Fosite to help against deprecation linting errors.
-	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
+	// DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
 
+	// Hydra-specific RFC8628 Device Auth capabilities
 	GetUserCodeSession(context.Context, string, fosite.Session) (fosite.DeviceRequester, error)
 	GetDeviceCodeSessionByRequestID(ctx context.Context, requestID string, requester fosite.Session) (fosite.DeviceRequester, string, error)
 	UpdateDeviceCodeSessionBySignature(ctx context.Context, requestID string, requester fosite.DeviceRequester) error

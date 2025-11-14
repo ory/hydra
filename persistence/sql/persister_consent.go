@@ -27,7 +27,7 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-var _ consent.Manager = &Persister{}
+var _ consent.Manager = (*Persister)(nil)
 
 func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string) (err error) {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectConsentSession")

@@ -12,14 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/urfave/negroni"
-
 	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-retryablehttp"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
+	"github.com/urfave/negroni"
 	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/herodot"
@@ -31,7 +30,10 @@ import (
 	"github.com/ory/hydra/v2/fosite/compose"
 	foauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
+	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
 	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	"github.com/ory/hydra/v2/fosite/handler/verifiable"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/fositex"
 	"github.com/ory/hydra/v2/hsm"
@@ -58,35 +60,37 @@ import (
 )
 
 type RegistrySQL struct {
-	l, al           *logrusx.Logger
-	conf            *config.DefaultProvider
-	fh              fosite.Hasher
-	cv              *client.Validator
-	ctxer           contextx.Contextualizer
-	hh              *healthx.Handler
-	kc              *aead.AESGCM
-	flowc           *aead.XChaCha20Poly1305
-	cos             consent.Strategy
-	writer          herodot.Writer
-	hsm             hsm.Context
-	forv            *openid.OpenIDConnectRequestValidator
-	fop             fosite.OAuth2Provider
-	trc             *otelx.Tracer
-	tracerWrapper   func(*otelx.Tracer) *otelx.Tracer
-	arhs            []oauth2.AccessRequestHook
-	basePersister   *sql.BasePersister
-	oc              fosite.Configurator
-	oidcs           jwk.JWTSigner
-	ats             jwk.JWTSigner
-	hmacs           foauth2.CoreStrategy
-	enigmaHMAC      *hmac.HMACStrategy
-	deviceHmac      rfc8628.RFC8628CodeStrategy
-	fc              *fositex.Config
-	publicCORS      *cors.Cors
-	kratos          kratos.Client
-	fositeFactories []fositex.Factory
-	migrator        *sql.MigrationManager
-	dbOptsModifier  []func(details *pop.ConnectionDetails)
+	l, al                *logrusx.Logger
+	conf                 *config.DefaultProvider
+	fh                   fosite.Hasher
+	cv                   *client.Validator
+	ctxer                contextx.Contextualizer
+	hh                   *healthx.Handler
+	kc                   *aead.AESGCM
+	flowc                *aead.XChaCha20Poly1305
+	cos                  consent.Strategy
+	writer               herodot.Writer
+	hsm                  hsm.Context
+	forv                 *openid.OpenIDConnectRequestValidator
+	fop                  fosite.OAuth2Provider
+	trc                  *otelx.Tracer
+	tracerWrapper        func(*otelx.Tracer) *otelx.Tracer
+	arhs                 []oauth2.AccessRequestHook
+	basePersister        *sql.BasePersister
+	accessTokenStorage   foauth2.AccessTokenStorage
+	authorizeCodeStorage foauth2.AuthorizeCodeStorage
+	oc                   fosite.Configurator
+	oidcs                jwk.JWTSigner
+	ats                  jwk.JWTSigner
+	hmacs                foauth2.CoreStrategy
+	enigmaHMAC           *hmac.HMACStrategy
+	deviceHmac           *rfc8628.DefaultDeviceStrategy
+	fc                   *fositex.Config
+	publicCORS           *cors.Cors
+	kratos               kratos.Client
+	fositeFactories      []fositex.Factory
+	migrator             *sql.MigrationManager
+	dbOptsModifier       []func(details *pop.ConnectionDetails)
 
 	keyManager  jwk.Manager
 	initialPing func(ctx context.Context, l *logrusx.Logger, p *sql.BasePersister) error
@@ -97,6 +101,66 @@ var (
 	_ contextx.Provider = (*RegistrySQL)(nil)
 	_ registry          = (*RegistrySQL)(nil)
 )
+
+func (m *RegistrySQL) FositeClientManager() fosite.ClientManager {
+	return m.OAuth2Storage()
+}
+
+// AuthorizeCodeStorage implements foauth2.AuthorizeCodeStorageProvider
+func (m *RegistrySQL) AuthorizeCodeStorage() foauth2.AuthorizeCodeStorage {
+	if m.authorizeCodeStorage != nil {
+		return m.authorizeCodeStorage
+	}
+	return m.OAuth2Storage()
+}
+
+// AccessTokenStorage implements foauth2.AccessTokenStorageProvider
+func (m *RegistrySQL) AccessTokenStorage() foauth2.AccessTokenStorage {
+	if m.accessTokenStorage != nil {
+		return m.accessTokenStorage
+	}
+	return m.OAuth2Storage()
+}
+
+// RefreshTokenStorage implements foauth2.RefreshTokenStorageProvider
+func (m *RegistrySQL) RefreshTokenStorage() foauth2.RefreshTokenStorage {
+	return m.OAuth2Storage()
+}
+
+// TokenRevocationStorage implements foauth2.TokenRevocationStorageProvider
+func (m *RegistrySQL) TokenRevocationStorage() foauth2.TokenRevocationStorage {
+	return m.OAuth2Storage()
+}
+
+// ResourceOwnerPasswordCredentialsGrantStorage implements foauth2.ResourceOwnerPasswordCredentialsGrantStorage
+func (m *RegistrySQL) ResourceOwnerPasswordCredentialsGrantStorage() foauth2.ResourceOwnerPasswordCredentialsGrantStorage {
+	return m.OAuth2Storage()
+}
+
+// OpenIDConnectRequestStorage implements openid.OIDCRequestStorageProvider
+func (m *RegistrySQL) OpenIDConnectRequestStorage() openid.OpenIDConnectRequestStorage {
+	return m.OAuth2Storage()
+}
+
+// PKCERequestStorage implements pkce.PKCERequestStorageProvider
+func (m *RegistrySQL) PKCERequestStorage() pkce.PKCERequestStorage {
+	return m.OAuth2Storage()
+}
+
+// DeviceAuthStorage implements rfc8628.DeviceAuthStorageProvider
+func (m *RegistrySQL) DeviceAuthStorage() rfc8628.DeviceAuthStorage {
+	return m.OAuth2Storage()
+}
+
+// RFC7523KeyStorage implements rfc7523.RFC7523KeyStorageProvider
+func (m *RegistrySQL) RFC7523KeyStorage() rfc7523.RFC7523KeyStorage {
+	return m.OAuth2Storage()
+}
+
+// NonceManager implements verifiable.NonceManager
+func (m *RegistrySQL) NonceManager() verifiable.NonceManager {
+	return m.OAuth2Storage()
+}
 
 // defaultInitialPing is the default function that will be called within RegistrySQL.Init to make sure
 // the database is reachable. It can be injected for test purposes by changing the value
@@ -209,7 +273,9 @@ func (m *RegistrySQL) ConsentManager() consent.Manager {
 func (m *RegistrySQL) ObfuscatedSubjectManager() consent.ObfuscatedSubjectManager {
 	return m.Persister()
 }
-func (m *RegistrySQL) LoginManager() consent.LoginManager   { return m.Persister() }
+
+func (m *RegistrySQL) LoginManager() consent.LoginManager { return m.Persister() }
+
 func (m *RegistrySQL) LogoutManager() consent.LogoutManager { return m.Persister() }
 
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
@@ -412,7 +478,7 @@ func (m *RegistrySQL) HTTPClient(ctx context.Context, opts ...httpx.ResilientOpt
 
 func (m *RegistrySQL) OAuth2Provider() fosite.OAuth2Provider {
 	if m.fop == nil {
-		m.fop = fosite.NewOAuth2Provider(m.OAuth2Storage(), m.OAuth2ProviderConfig())
+		m.fop = fosite.NewOAuth2Provider(m, m.OAuth2ProviderConfig())
 	}
 	return m.fop
 }
@@ -445,12 +511,27 @@ func (m *RegistrySQL) OAuth2HMACStrategy() foauth2.CoreStrategy {
 	return m.hmacs
 }
 
-// RFC8628HMACStrategy returns the rfc8628 strategy
-func (m *RegistrySQL) RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy {
+// rfc8628HMACStrategy returns the rfc8628 strategy
+func (m *RegistrySQL) rfc8628HMACStrategy() *rfc8628.DefaultDeviceStrategy {
 	if m.deviceHmac == nil {
 		m.deviceHmac = compose.NewDeviceStrategy(m.OAuth2Config())
 	}
 	return m.deviceHmac
+}
+
+// DeviceRateLimitStrategy implements rfc8628.DeviceRateLimitStrategyProvider
+func (m *RegistrySQL) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
+	return m.rfc8628HMACStrategy()
+}
+
+// DeviceCodeStrategy implements rfc8628.DeviceCodeStrategyProvider
+func (m *RegistrySQL) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
+	return m.rfc8628HMACStrategy()
+}
+
+// UserCodeStrategy implements rfc8628.UserCodeStrategyProvider
+func (m *RegistrySQL) UserCodeStrategy() rfc8628.UserCodeStrategy {
+	return m.rfc8628HMACStrategy()
 }
 
 func (m *RegistrySQL) OAuth2Config() *fositex.Config {
@@ -471,7 +552,7 @@ func (m *RegistrySQL) OAuth2ProviderConfig() fosite.Configurator {
 
 	conf := m.OAuth2Config()
 	hmacAtStrategy := m.OAuth2HMACStrategy()
-	deviceHmacAtStrategy := m.RFC8628HMACStrategy()
+	deviceHmacAtStrategy := m.rfc8628HMACStrategy()
 	oidcSigner := m.OpenIDJWTStrategy()
 	atSigner := m.AccessTokenJWTStrategy()
 	jwtAtStrategy := &foauth2.DefaultJWTStrategy{
@@ -480,13 +561,13 @@ func (m *RegistrySQL) OAuth2ProviderConfig() fosite.Configurator {
 		Config:   conf,
 	}
 
-	conf.LoadDefaultHandlers(&compose.CommonStrategy{
+	conf.LoadDefaultHandlers(m, &compose.CommonStrategy{
 		CoreStrategy: fositex.NewTokenStrategy(m.Config(), hmacAtStrategy, &foauth2.DefaultJWTStrategy{
 			Signer:   jwtAtStrategy,
 			Strategy: hmacAtStrategy,
 			Config:   conf,
 		}),
-		RFC8628CodeStrategy: deviceHmacAtStrategy,
+		DeviceStrategy: deviceHmacAtStrategy,
 		OIDCTokenStrategy: &openid.DefaultStrategy{
 			Config: conf,
 			Signer: oidcSigner,

@@ -15,3 +15,7 @@ type NonceManager interface {
 	// IsNonceValid checks if the given nonce is valid for the given access token and not expired.
 	IsNonceValid(ctx context.Context, accessToken string, nonce string) error
 }
+
+type NonceManagerProvider interface {
+	NonceManager() NonceManager
+}

@@ -15,9 +15,8 @@ package internal
 import (
 	reflect "reflect"
 
-	gomock "go.uber.org/mock/gomock"
-
 	fosite "github.com/ory/hydra/v2/fosite"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockStorage is a mock of Storage interface.
@@ -44,16 +43,16 @@ func (m *MockStorage) EXPECT() *MockStorageMockRecorder {
 	return m.recorder
 }
 
-// ClientManager mocks base method.
-func (m *MockStorage) ClientManager() fosite.ClientManager {
+// FositeClientManager mocks base method.
+func (m *MockStorage) FositeClientManager() fosite.ClientManager {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ClientManager")
+	ret := m.ctrl.Call(m, "FositeClientManager")
 	ret0, _ := ret[0].(fosite.ClientManager)
 	return ret0
 }
 
-// ClientManager indicates an expected call of ClientManager.
-func (mr *MockStorageMockRecorder) ClientManager() *gomock.Call {
+// FositeClientManager indicates an expected call of FositeClientManager.
+func (mr *MockStorageMockRecorder) FositeClientManager() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClientManager", reflect.TypeOf((*MockStorage)(nil).ClientManager))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FositeClientManager", reflect.TypeOf((*MockStorage)(nil).FositeClientManager))
 }

@@ -64,7 +64,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		expectedError: ErrInvalidClient,
 		method:        "POST",
 		mock: func() {
-			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(nil, errors.New(""))
 		},
 	}, {
@@ -75,7 +75,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 		expectedError: ErrInvalidScope,
@@ -88,7 +88,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 		expectedError: ErrInvalidRequest,
@@ -100,7 +100,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id_2")).Return(authCodeClient, nil)
 		},
 		expectedError: ErrInvalidGrant,
@@ -112,7 +112,7 @@ func TestNewDeviceRequestWithPublicClient(t *testing.T) {
 		},
 		method: "POST",
 		mock: func() {
-			store.EXPECT().ClientManager().Return(clientManager).Times(1)
+			store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 			clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(deviceClient, nil)
 		},
 	}} {
@@ -166,7 +166,7 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			expectedError: ErrInvalidClient,
 			method:        "POST",
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New(""))
 			},
@@ -183,7 +183,7 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			expectedError: ErrInvalidRequest,
 			method:        "POST",
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("client_secret")), gomock.Eq([]byte("client_secret"))).Return(nil)
 			},
@@ -199,7 +199,7 @@ func TestNewDeviceRequestWithClientAuthn(t *testing.T) {
 			},
 			method: "POST",
 			mock: func() {
-				store.EXPECT().ClientManager().Return(clientManager).Times(1)
+				store.EXPECT().FositeClientManager().Return(clientManager).Times(1)
 				clientManager.EXPECT().GetClient(gomock.Any(), gomock.Eq("client_id")).Return(client, nil)
 				hasher.EXPECT().Compare(gomock.Any(), gomock.Eq([]byte("client_secret")), gomock.Eq([]byte("client_secret"))).Return(nil)
 			},

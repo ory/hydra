@@ -163,10 +163,10 @@ func (s *PersisterTestSuite) TestClientAssertionJWTValid() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
-			require.NoError(t, r.Persister().ClientManager().ClientAssertionJWTValid(s.t2, jti.JTI))
-			require.Error(t, r.Persister().ClientManager().ClientAssertionJWTValid(s.t1, jti.JTI))
+			require.NoError(t, r.Persister().ClientAssertionJWTValid(s.t2, jti.JTI))
+			require.Error(t, r.Persister().ClientAssertionJWTValid(s.t1, jti.JTI))
 		})
 	}
 }
@@ -799,7 +799,7 @@ func (s *PersisterTestSuite) TestGetClientAssertionJWT() {
 			store, ok := r.OAuth2Storage().(oauth2.AssertionJWTReader)
 			require.True(t, ok)
 			expected := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t1, expected.JTI, expected.Expiry))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, expected.JTI, expected.Expiry))
 
 			_, err := store.GetClientAssertionJWT(s.t2, expected.JTI)
 			require.Error(t, err)
@@ -1151,7 +1151,7 @@ func (s *PersisterTestSuite) TestIsJWTUsed() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
 			actual, err := r.Persister().IsJWTUsed(s.t2, jti.JTI)
 			require.NoError(t, err)
@@ -1245,9 +1245,9 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 func (s *PersisterTestSuite) TestMarkJWTUsedForTime() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t1, "a", time.Now().Add(-24*time.Hour)))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t2, "a", time.Now().Add(-24*time.Hour)))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t2, "b", time.Now().Add(-24*time.Hour)))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, "a", time.Now().Add(-24*time.Hour)))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t2, "a", time.Now().Add(-24*time.Hour)))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t2, "b", time.Now().Add(-24*time.Hour)))
 
 			require.NoError(t, r.Persister().MarkJWTUsedForTime(s.t2, "a", time.Now().Add(48*time.Hour)))
 
@@ -1469,7 +1469,7 @@ func (s *PersisterTestSuite) TestSetClientAssertionJWT() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
-			require.NoError(t, r.Persister().ClientManager().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
 			actual := &oauth2.BlacklistedJTI{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, jti.ID))

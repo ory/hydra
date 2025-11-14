@@ -9,12 +9,6 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 )
 
-type CoreStorage interface {
-	AuthorizeCodeStorageProvider
-	AccessTokenStorageProvider
-	RefreshTokenStorageProvider
-}
-
 // AuthorizeCodeStorage handles storage requests related to authorization codes.
 type AuthorizeCodeStorage interface {
 	// CreateAuthorizeCodeSession stores the authorization request for a given authorization code.

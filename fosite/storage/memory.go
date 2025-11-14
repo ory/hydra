@@ -101,7 +101,7 @@ func NewMemoryStore() *MemoryStore {
 	}
 }
 
-func (s *MemoryStore) ClientManager() fosite.ClientManager {
+func (s *MemoryStore) FositeClientManager() fosite.ClientManager {
 	return s
 }
 
@@ -118,6 +118,10 @@ func (s *MemoryStore) RefreshTokenStorage() oauth2.RefreshTokenStorage {
 }
 
 func (s *MemoryStore) TokenRevocationStorage() oauth2.TokenRevocationStorage {
+	return s
+}
+
+func (s *MemoryStore) ResourceOwnerPasswordCredentialsGrantStorage() oauth2.ResourceOwnerPasswordCredentialsGrantStorage {
 	return s
 }
 

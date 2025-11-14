@@ -16,6 +16,7 @@ import (
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
+	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
@@ -27,8 +28,11 @@ import (
 )
 
 var (
-	_ persistence.Persister = (*Persister)(nil)
-	_ fosite.Transactional  = (*Persister)(nil)
+	_ persistence.Persister     = (*Persister)(nil)
+	_ fosite.Transactional      = (*Persister)(nil)
+	_ fosite.ClientManager      = (*Persister)(nil)
+	_ oauth2.AssertionJWTReader = (*Persister)(nil)
+	_ x.FositeStorer            = (*Persister)(nil)
 )
 
 var ErrNoTransactionOpen = errors.New("There is no Transaction in this context.")
@@ -66,62 +70,6 @@ type (
 		jwk.ManagerProvider
 	}
 )
-
-func (p *BasePersister) BeginTX(ctx context.Context) (_ context.Context, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
-	defer otelx.End(span, &err)
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
-		return context.WithValue(ctx, skipCommitKey, true), nil // no-op
-	}
-
-	tx, err := p.c.Store.TransactionContextOptions(ctx, &sql.TxOptions{
-		Isolation: sql.LevelRepeatableRead,
-		ReadOnly:  false,
-	})
-	c := &pop.Connection{
-		TX:      tx,
-		Store:   tx,
-		ID:      uuid.Must(uuid.NewV4()).String(),
-		Dialect: p.c.Dialect,
-	}
-	return popx.WithTransaction(ctx, c), err
-}
-
-func (p *BasePersister) Commit(ctx context.Context) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
-	defer otelx.End(span, &err)
-
-	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
-		return nil // we skipped BeginTX, so we also skip Commit
-	}
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	tx := popx.GetConnection(ctx, fallback)
-	if tx.TX == fallback.TX || tx.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
-	}
-
-	return errors.WithStack(tx.TX.Commit())
-}
-
-func (p *BasePersister) Rollback(ctx context.Context) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
-	defer otelx.End(span, &err)
-
-	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
-		return nil // we skipped BeginTX, so we also skip Rollback
-	}
-
-	fallback := &pop.Connection{TX: &pop.Tx{}}
-	tx := popx.GetConnection(ctx, fallback)
-	if tx.TX == fallback.TX || tx.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
-	}
-
-	return errors.WithStack(tx.TX.Rollback())
-}
 
 func NewPersister(base *BasePersister, r Dependencies) *Persister {
 	return &Persister{
@@ -191,4 +139,63 @@ func (p *BasePersister) mustSetNetwork(ctx context.Context, v interface{}) {
 
 func (p *BasePersister) Transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	return popx.Transaction(ctx, p.c, f)
+}
+
+// BeginTX implements Transactional.
+func (p *BasePersister) BeginTX(ctx context.Context) (_ context.Context, err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
+	defer otelx.End(span, &err)
+
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
+		return context.WithValue(ctx, skipCommitKey, true), nil // no-op
+	}
+
+	tx, err := p.c.Store.TransactionContextOptions(ctx, &sql.TxOptions{
+		Isolation: sql.LevelRepeatableRead,
+		ReadOnly:  false,
+	})
+	c := &pop.Connection{
+		TX:      tx,
+		Store:   tx,
+		ID:      uuid.Must(uuid.NewV4()).String(),
+		Dialect: p.c.Dialect,
+	}
+	return popx.WithTransaction(ctx, c), err
+}
+
+// Commit implements Transactional.
+func (p *BasePersister) Commit(ctx context.Context) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
+	defer otelx.End(span, &err)
+
+	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
+		return nil // we skipped BeginTX, so we also skip Commit
+	}
+
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	tx := popx.GetConnection(ctx, fallback)
+	if tx.TX == fallback.TX || tx.TX == nil {
+		return errors.WithStack(ErrNoTransactionOpen)
+	}
+
+	return errors.WithStack(tx.TX.Commit())
+}
+
+// Rollback implements Transactional.
+func (p *BasePersister) Rollback(ctx context.Context) (err error) {
+	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
+	defer otelx.End(span, &err)
+
+	if skip, ok := ctx.Value(skipCommitKey).(bool); ok && skip {
+		return nil // we skipped BeginTX, so we also skip Rollback
+	}
+
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	tx := popx.GetConnection(ctx, fallback)
+	if tx.TX == fallback.TX || tx.TX == nil {
+		return errors.WithStack(ErrNoTransactionOpen)
+	}
+
+	return errors.WithStack(tx.TX.Rollback())
 }

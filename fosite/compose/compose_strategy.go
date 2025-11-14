@@ -15,9 +15,9 @@ import (
 )
 
 type CommonStrategy struct {
-	CoreStrategy        oauth2.CoreStrategy
-	RFC8628CodeStrategy rfc8628.RFC8628CodeStrategy
-	OIDCTokenStrategy   openid.OpenIDConnectTokenStrategy
+	CoreStrategy      oauth2.CoreStrategy
+	DeviceStrategy    *rfc8628.DefaultDeviceStrategy
+	OIDCTokenStrategy openid.OpenIDConnectTokenStrategy
 	jwt.Signer
 }
 
@@ -41,15 +41,15 @@ func (s *CommonStrategy) OpenIDConnectTokenStrategy() openid.OpenIDConnectTokenS
 
 // RFC8628 Device Strategy Providers
 func (s *CommonStrategy) DeviceRateLimitStrategy() rfc8628.DeviceRateLimitStrategy {
-	return s.RFC8628CodeStrategy
+	return s.DeviceStrategy
 }
 
 func (s *CommonStrategy) DeviceCodeStrategy() rfc8628.DeviceCodeStrategy {
-	return s.RFC8628CodeStrategy
+	return s.DeviceStrategy
 }
 
 func (s *CommonStrategy) UserCodeStrategy() rfc8628.UserCodeStrategy {
-	return s.RFC8628CodeStrategy
+	return s.DeviceStrategy
 }
 
 type HMACSHAStrategyConfigurator interface {

@@ -15,6 +15,10 @@ import (
 	"github.com/ory/hydra/v2/fosite/internal"
 )
 
+type mockNonceManagerProvider struct{ n NonceManager }
+
+func (m mockNonceManagerProvider) NonceManager() NonceManager { return m.n }
+
 type mockNonceManager struct{ t *testing.T }
 
 func (m *mockNonceManager) NewNonce(ctx context.Context, accessToken string, expiresAt time.Time) (string, error) {
@@ -67,7 +71,7 @@ func TestHandler(t *testing.T) {
 
 func newHandler(t *testing.T) *Handler {
 	return &Handler{
-		Config:       new(fosite.Config),
-		NonceManager: &mockNonceManager{t: t},
+		Config:               new(fosite.Config),
+		NonceManagerProvider: mockNonceManagerProvider{n: &mockNonceManager{t: t}},
 	}
 }

@@ -310,9 +310,9 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		deviceRequest.Client = cl
 		deviceRequest.SetSession(oauth2.NewTestSession(t, "test-subject"))
 
-		_, deviceCodeSig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(t.Context())
+		_, deviceCodeSig, err := reg.DeviceCodeStrategy().GenerateDeviceCode(t.Context())
 		require.NoError(t, err)
-		userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, sig, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(t.Context(), deviceCodeSig, sig, deviceRequest))
 
@@ -337,7 +337,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	})
 
 	t.Run("case=random user_code, not persisted in the database", func(t *testing.T) {
-		userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, _, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 
 		resp := submitCode(t, &flow.AcceptDeviceUserCodeRequest{UserCode: userCode}, challenge)
@@ -360,7 +360,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	})
 
 	t.Run("case=empty challenge", func(t *testing.T) {
-		userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, _, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		resp := submitCode(t, &flow.AcceptDeviceUserCodeRequest{UserCode: userCode}, "")
 		require.EqualValues(t, http.StatusBadRequest, resp.StatusCode)
@@ -372,7 +372,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	})
 
 	t.Run("case=invalid challenge", func(t *testing.T) {
-		userCode, _, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, _, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		resp := submitCode(t, &hydra.AcceptDeviceUserCodeRequest{UserCode: &userCode}, "invalid-challenge")
 		require.EqualValues(t, http.StatusNotFound, resp.StatusCode)
@@ -388,9 +388,9 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		deviceRequest.SetSession(oauth2.NewTestSession(t, "test-subject"))
 		deviceRequest.Session.SetExpiresAt(fosite.UserCode, time.Now().Add(-time.Hour).UTC())
 
-		_, deviceCodeSig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(t.Context())
+		_, deviceCodeSig, err := reg.DeviceCodeStrategy().GenerateDeviceCode(t.Context())
 		require.NoError(t, err)
-		userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, sig, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(t.Context(), deviceCodeSig, sig, deviceRequest))
 
@@ -409,9 +409,9 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		deviceRequest.SetSession(oauth2.NewTestSession(t, "test-subject"))
 		deviceRequest.UserCodeState = fosite.UserCodeAccepted
 
-		_, deviceCodeSig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(t.Context())
+		_, deviceCodeSig, err := reg.DeviceCodeStrategy().GenerateDeviceCode(t.Context())
 		require.NoError(t, err)
-		userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, sig, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(t.Context(), deviceCodeSig, sig, deviceRequest))
 
@@ -430,9 +430,9 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		deviceRequest.SetSession(oauth2.NewTestSession(t, "test-subject"))
 		deviceRequest.UserCodeState = fosite.UserCodeRejected
 
-		_, deviceCodesig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(t.Context())
+		_, deviceCodesig, err := reg.DeviceCodeStrategy().GenerateDeviceCode(t.Context())
 		require.NoError(t, err)
-		userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, sig, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(t.Context(), deviceCodesig, sig, deviceRequest))
 
@@ -450,9 +450,9 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 		deviceRequest.Client = cl
 		deviceRequest.SetSession(oauth2.NewTestSession(t, "test-subject"))
 
-		_, deviceCodeSig, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(t.Context())
+		_, deviceCodeSig, err := reg.DeviceCodeStrategy().GenerateDeviceCode(t.Context())
 		require.NoError(t, err)
-		userCode, sig, err := reg.RFC8628HMACStrategy().GenerateUserCode(t.Context())
+		userCode, sig, err := reg.UserCodeStrategy().GenerateUserCode(t.Context())
 		require.NoError(t, err)
 		require.NoError(t, reg.OAuth2Storage().CreateDeviceAuthSession(t.Context(), deviceCodeSig, sig, deviceRequest))
 

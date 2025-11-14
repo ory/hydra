@@ -205,9 +205,9 @@ func TestDeviceTokenRequest(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run("case="+testCase.description, func(t *testing.T) {
-			code, signature, err := reg.RFC8628HMACStrategy().GenerateDeviceCode(context.TODO())
+			code, signature, err := reg.DeviceCodeStrategy().GenerateDeviceCode(context.TODO())
 			require.NoError(t, err)
-			_, userCodeSignature, err := reg.RFC8628HMACStrategy().GenerateUserCode(context.TODO())
+			_, userCodeSignature, err := reg.UserCodeStrategy().GenerateUserCode(context.TODO())
 			require.NoError(t, err)
 
 			if testCase.setUp != nil {
@@ -428,7 +428,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 	subject := "aeneas-rekkas"
 	nonce := uuid.New()
 	t.Run("case=perform device flow without ID and refresh tokens", func(t *testing.T) {
-
 		c, conf := newDeviceClient(t, reg)
 		conf.Scopes = []string{"hydra"}
 		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
@@ -453,7 +452,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.Empty(t, token.RefreshToken)
 	})
 	t.Run("case=perform device flow with ID token", func(t *testing.T) {
-
 		c, conf := newDeviceClient(t, reg)
 		conf.Scopes = []string{"openid", "hydra"}
 		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),
@@ -479,7 +477,6 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 		assert.Empty(t, token.RefreshToken)
 	})
 	t.Run("case=perform device flow with refresh token", func(t *testing.T) {
-
 		c, conf := newDeviceClient(t, reg)
 		conf.Scopes = []string{"hydra", "offline"}
 		testhelpers.NewDeviceLoginConsentUI(t, reg.Config(),

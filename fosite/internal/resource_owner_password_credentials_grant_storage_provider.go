@@ -15,8 +15,9 @@ package internal
 import (
 	reflect "reflect"
 
-	oauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
 	gomock "go.uber.org/mock/gomock"
+
+	oauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
 )
 
 // MockResourceOwnerPasswordCredentialsGrantStorageProvider is a mock of ResourceOwnerPasswordCredentialsGrantStorageProvider interface.

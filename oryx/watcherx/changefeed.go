@@ -218,9 +218,9 @@ func WatchChangeFeed(ctx context.Context, cx *sqlx.DB, tableName string, out Eve
 	return d, nil
 }
 
-// InternalDeduplicate sents events from `events` to the `deduplicated` channel, but
+// InternalDeduplicate sends events from `events` to the `deduplicated` channel, but
 // deduplicates events that are sent multiple times. This is necessary, because
-// the CochroachDB changefeed has a atleast-once guarantee for change events,
+// the CockroachDB changefeed has an at-least-once guarantee for change events,
 // meaning that events could be sent multiple times.
 //
 // For deduplication, the last x `pastEvents` are considered.

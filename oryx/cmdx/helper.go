@@ -190,7 +190,7 @@ func ExecCtx(ctx context.Context, cmd *cobra.Command, stdIn io.Reader, args ...s
 
 	prepareCmd(cmd, stdIn, stdOut, stdErr, args)
 
-	// needs to be on a separate line to ensure that the ouput buffers are read AFTER the command ran
+	// needs to be on a separate line to ensure that the output buffers are read AFTER the command ran
 	err := cmd.ExecuteContext(ctx)
 
 	return stdOut.String(), stdErr.String(), err

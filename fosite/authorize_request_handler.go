@@ -11,16 +11,15 @@ import (
 	"strings"
 
 	"github.com/go-jose/go-jose/v3"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/hydra/v2/fosite/i18n"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/otelx"
-
-	"github.com/pkg/errors"
-
-	"github.com/ory/go-convenience/stringslice"
 )
 
 func wrapSigningKeyFailure(outer *RFC6749Error, inner error) *RFC6749Error {
@@ -66,11 +65,16 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 		}
 
 		hc := f.Config.GetHTTPClient(ctx)
-		response, err := hc.Get(location)
+		req, err := retryablehttp.NewRequestWithContext(ctx, "GET", location, nil)
+		if err != nil {
+			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Unable to fetch OpenID Connect request parameters from 'request_uri' because: %s.", err.Error()).WithWrap(err).WithDebug(err.Error()))
+		}
+		response, err := hc.Do(req)
 		if err != nil {
 			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Unable to fetch OpenID Connect request parameters from 'request_uri' because: %s.", err.Error()).WithWrap(err).WithDebug(err.Error()))
 		}
 		defer response.Body.Close()
+		response.Body = io.NopCloser(io.LimitReader(response.Body, 10*1024*1024)) // limit to 10MiB
 
 		if response.StatusCode != http.StatusOK {
 			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Unable to fetch OpenID Connect request parameters from 'request_uri' because status code '%d' was expected, but got '%d'.", http.StatusOK, response.StatusCode))

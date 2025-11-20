@@ -12,12 +12,13 @@ docker start kong
 
 dockerize -wait http://localhost:8001/ -timeout 30s
 
-ip=$(curl ifconfig.co)
+ip=$(curl --retry 7 --retry-connrefused ifconfig.co)
 
-curl -i -X DELETE --url http://localhost:8001/apis/hydra-oauth
-curl -i -X DELETE --url http://localhost:8001/apis/login-consent
+curl --retry 7 --retry-connrefused -i -X DELETE --url http://localhost:8001/apis/hydra-oauth
+curl --retry 7 --retry-connrefused -i -X DELETE --url http://localhost:8001/apis/login-consent
 
 curl -i -X POST \
+  --retry 7 --retry-connrefused \
   --url http://localhost:8001/apis/ \
   --data 'name=hydra-oauth' \
   --data upstream_url=http://"${ip}":9000/ \
@@ -26,6 +27,7 @@ curl -i -X POST \
   --data 'preserve_host=true'
 
 curl -i -X POST \
+  --retry 7 --retry-connrefused \
   --url http://localhost:8001/apis/ \
   --data 'name=login-consent' \
   --data upstream_url=http://"$ip":9001/ \

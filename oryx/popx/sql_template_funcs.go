@@ -4,8 +4,9 @@
 package popx
 
 import (
-	"fmt"
 	"regexp"
+
+	"github.com/pkg/errors"
 )
 
 var SQLTemplateFuncs = map[string]interface{}{
@@ -16,7 +17,7 @@ var identifierPattern = regexp.MustCompile("^[a-zA-Z][a-zA-Z0-9_]*$")
 
 func Identifier(i string) (string, error) {
 	if !identifierPattern.MatchString(i) {
-		return "", fmt.Errorf("invalid SQL identifier '%s'", i)
+		return "", errors.Errorf("invalid SQL identifier '%s'", i)
 	}
 	return i, nil
 }

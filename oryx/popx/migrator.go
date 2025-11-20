@@ -22,6 +22,7 @@ import (
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/sqlcon"
 )
 
 const (
@@ -37,7 +38,7 @@ func (mb *MigrationBox) shouldNotUseTransaction(m Migration) bool {
 // Up runs pending "up" migrations and applies them to the database.
 func (mb *MigrationBox) Up(ctx context.Context) error {
 	_, err := mb.UpTo(ctx, 0)
-	return err
+	return errors.WithStack(err)
 }
 
 // UpTo runs up to step "up" migrations and applies them to the database.
@@ -83,7 +84,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 					err := conn.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec()
 					return errors.Wrapf(err, "problem inserting migration version %s", mi.Version)
 				}); err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 				continue
 			}
@@ -91,13 +92,14 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 			l.Info("Migration has not yet been applied, running migration.")
 
 			if err := mi.Valid(); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
 			noTx := mb.shouldNotUseTransaction(mi)
 			if noTx {
+				l.Info("NOT running migrations inside a transaction")
 				if err := mi.Runner(mi, c); err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 
 				// #nosec G201 - mtn is a system-wide const
@@ -107,7 +109,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 			} else {
 				if err := mb.isolatedTransaction(ctx, "up", func(conn *pop.Connection) error {
 					if err := mi.Runner(mi, conn); err != nil {
-						return err
+						return errors.WithStack(err)
 					}
 
 					// #nosec G201 - mtn is a system-wide const
@@ -116,7 +118,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 					}
 					return nil
 				}); err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 			}
 
@@ -133,7 +135,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 		}
 		return nil
 	})
-	return
+	return applied, errors.WithStack(err)
 }
 
 // Down runs pending "down" migrations and rolls back the
@@ -148,7 +150,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 	}
 
 	c := mb.c.WithContext(ctx)
-	return mb.exec(ctx, func() (err error) {
+	return errors.WithStack(mb.exec(ctx, func() (err error) {
 		mtn := sanitizedMigrationTableName(c)
 		count, err := c.Count(mtn)
 		if err != nil {
@@ -203,7 +205,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 			if mb.shouldNotUseTransaction(mi) {
 				err := mi.Runner(mi, c)
 				if err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 
 				// #nosec G201 - mtn is a system-wide const
@@ -232,7 +234,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 			reverted++
 		}
 		return nil
-	})
+	}))
 }
 
 func (mb *MigrationBox) createTransactionalMigrationTable(ctx context.Context, c *pop.Connection, l *logrusx.Logger) error {
@@ -243,7 +245,7 @@ func (mb *MigrationBox) createTransactionalMigrationTable(ctx context.Context, c
 		fmt.Sprintf(`CREATE UNIQUE INDEX %s_version_idx ON %s (version)`, mtn, mtn),
 		fmt.Sprintf(`CREATE INDEX %s_version_self_idx ON %s (version_self)`, mtn, mtn),
 	}); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	l.WithField("migration_table", mtn).Debug("Transactional migration table created successfully.")
@@ -277,7 +279,7 @@ func (mb *MigrationBox) migrateToTransactionalMigrationTable(ctx context.Context
 	}
 
 	if err := mb.createMigrationStatusTableTransaction(ctx, workload...); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	l.WithField("migration_table", mtn).Debug("Successfully migrated legacy schema_migration to new transactional schema_migration table.")
@@ -296,7 +298,7 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 	}
 
 	return Transaction(ctx, mb.c.WithContext(ctx), func(ctx context.Context, connection *pop.Connection) error {
-		return fn(connection)
+		return errors.WithStack(fn(connection))
 	})
 }
 
@@ -319,7 +321,7 @@ func (mb *MigrationBox) createMigrationStatusTableTransaction(ctx context.Contex
 				}
 				return nil
 			}); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 	}
@@ -341,14 +343,14 @@ func (mb *MigrationBox) CreateSchemaMigrations(ctx context.Context) error {
 	if err != nil {
 		mb.l.WithError(err).WithField("migration_table", mtn).Debug("An error occurred while checking for the legacy migration table, maybe it does not exist yet? Trying to create.")
 		// This means that the legacy pop migrator has not yet been applied
-		return mb.createTransactionalMigrationTable(ctx, c, mb.l)
+		return errors.WithStack(mb.createTransactionalMigrationTable(ctx, c, mb.l))
 	}
 
 	mb.l.WithField("migration_table", mtn).Debug("A migration table exists, checking if it is a transactional migration table.")
 	_, err = c.Store.Exec(fmt.Sprintf("select version, version_self from %s", mtn))
 	if err != nil {
 		mb.l.WithError(err).WithField("migration_table", mtn).Debug("An error occurred while checking for the transactional migration table, maybe it does not exist yet? Trying to create.")
-		return mb.migrateToTransactionalMigrationTable(ctx, c, mb.l)
+		return errors.WithStack(mb.migrateToTransactionalMigrationTable(ctx, c, mb.l))
 	}
 
 	mb.l.WithField("migration_table", mtn).Debug("Migration tables exist and are up to date.")
@@ -436,7 +438,7 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 			// It also means that we can ignore this state and act as if no migrations have been applied yet.
 		} else {
 			// On any other error, we fail.
-			return nil, errors.Wrapf(err, "problem with migration")
+			return nil, errors.Wrap(err, "problem with migration")
 		}
 	}
 
@@ -471,12 +473,12 @@ func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 	schema := "schema.sql"
 	f, err := os.Create(schema) //#nosec:G304) //#nosec:G304
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	err = c.Dialect.DumpSchema(f)
 	if err != nil {
 		_ = os.RemoveAll(schema)
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -501,24 +503,24 @@ func (mb *MigrationBox) exec(ctx context.Context, fn func() error) error {
 
 	if mb.c.Dialect.Name() == "sqlite3" {
 		if err := mb.c.RawQuery("PRAGMA foreign_keys=OFF").Exec(); err != nil {
-			return err
+			return sqlcon.HandleError(err)
 		}
 	}
 
 	if mb.c.Dialect.Name() == "cockroach" {
 		outer := fn
 		fn = func() error {
-			return crdb.Execute(outer)
+			return errors.WithStack(crdb.Execute(outer))
 		}
 	}
 
 	if err := fn(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if mb.c.Dialect.Name() == "sqlite3" {
 		if err := mb.c.RawQuery("PRAGMA foreign_keys=ON").Exec(); err != nil {
-			return err
+			return sqlcon.HandleError(err)
 		}
 	}
 

@@ -89,7 +89,7 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 	return func(m *MigrationBox) {
 		require.NoError(t, fs.WalkDir(testdata, ".", func(path string, info fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 			if !info.Type().IsRegular() {
 				t.Logf("skipping testdata entry that is not a file: %s", path)
@@ -120,13 +120,13 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 				Runner: func(m Migration, c *pop.Connection) error {
 					b, err := fs.ReadFile(testdata, m.Path)
 					if err != nil {
-						return err
+						return errors.WithStack(err)
 					}
 					if isMigrationEmpty(string(b)) {
 						return nil
 					}
 					_, err = c.Store.SQLDB().Exec(string(b))
-					return err
+					return errors.WithStack(err)
 				},
 			})
 
@@ -230,7 +230,7 @@ func (mb *MigrationBox) findMigrations(
 		}
 
 		if details == nil {
-			return errors.WithStack(fmt.Errorf("Found a migration file that does not match the file pattern: filename=%s pattern=%s", info.Name(), MigrationFileRegexp))
+			return errors.Errorf("Found a migration file that does not match the file pattern: filename=%s pattern=%s", info.Name(), MigrationFileRegexp)
 		}
 
 		content, err := fs.ReadFile(dir, p)
@@ -269,7 +269,7 @@ func (mb *MigrationBox) findMigrations(
 	// Sort ascending.
 	sort.Sort(mb.migrationsUp)
 
-	return err
+	return errors.WithStack(err)
 }
 
 // hasDownMigrationWithVersion checks if there is a migration with the given
@@ -293,12 +293,12 @@ func (mb *MigrationBox) check() error {
 
 	for _, n := range mb.migrationsUp {
 		if err := n.Valid(); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	for _, n := range mb.migrationsDown {
 		if err := n.Valid(); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	return nil

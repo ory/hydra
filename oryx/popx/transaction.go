@@ -9,6 +9,7 @@ import (
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/pop/v6"
@@ -30,7 +31,7 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 	c := ctx.Value(transactionKey)
 	if c != nil {
 		if conn, ok := c.(*pop.Connection); ok {
-			return callback(ctx, conn.WithContext(ctx))
+			return errors.WithStack(callback(ctx, conn.WithContext(ctx)))
 		}
 	}
 
@@ -38,24 +39,24 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 		return connection.WithContext(ctx).Dialect.Lock(func() error {
 			transaction, err := connection.NewTransaction()
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
 			attempt := 0
-			return crdb.ExecuteInTx(ctx, sqlxTxAdapter{transaction.TX.Tx}, func() error {
+			return errors.WithStack(crdb.ExecuteInTx(ctx, sqlxTxAdapter{transaction.TX.Tx}, func() error {
 				attempt++
 				if attempt > 1 {
 					caller := caller()
 					transactionRetries.WithLabelValues(caller).Inc()
 				}
-				return callback(WithTransaction(ctx, transaction), transaction)
-			})
+				return errors.WithStack(callback(WithTransaction(ctx, transaction), transaction))
+			}))
 		})
 	}
 
-	return connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {
-		return callback(WithTransaction(ctx, tx), tx)
-	})
+	return errors.WithStack(connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {
+		return errors.WithStack(callback(WithTransaction(ctx, tx), tx))
+	}))
 }
 
 func GetConnection(ctx context.Context, connection *pop.Connection) *pop.Connection {
@@ -76,15 +77,15 @@ var _ crdb.Tx = sqlxTxAdapter{}
 
 func (s sqlxTxAdapter) Exec(ctx context.Context, query string, args ...interface{}) error {
 	_, err := s.Tx.ExecContext(ctx, query, args...)
-	return err
+	return errors.WithStack(err)
 }
 
 func (s sqlxTxAdapter) Commit(ctx context.Context) error {
-	return s.Tx.Commit()
+	return errors.WithStack(s.Tx.Commit())
 }
 
 func (s sqlxTxAdapter) Rollback(ctx context.Context) error {
-	return s.Tx.Rollback()
+	return errors.WithStack(s.Tx.Rollback())
 }
 
 var (

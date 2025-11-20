@@ -4,8 +4,9 @@
 package popx
 
 import (
-	"fmt"
 	"regexp"
+
+	"github.com/pkg/errors"
 
 	"github.com/ory/pop/v6"
 )
@@ -43,18 +44,18 @@ func parseMigrationFilename(filename string) (*match, error) {
 	} else {
 		dbType = pop.CanonicalDialect(m[3][1:])
 		if !pop.DialectSupported(dbType) {
-			return nil, fmt.Errorf("unsupported dialect %s", dbType)
+			return nil, errors.Errorf("unsupported dialect %s", dbType)
 		}
 	}
 
 	if m[6] == "fizz" && dbType != "all" {
-		return nil, fmt.Errorf("invalid database type %q, expected \"all\" because fizz is database type independent", dbType)
+		return nil, errors.Errorf("invalid database type %q, expected \"all\" because fizz is database type independent", dbType)
 	}
 
 	if m[4] == ".autocommit" {
 		autocommit = true
 	} else if m[4] != "" {
-		return nil, fmt.Errorf("invalid autocommit flag %q", m[4])
+		return nil, errors.Errorf("invalid autocommit flag %q", m[4])
 	}
 
 	return &match{

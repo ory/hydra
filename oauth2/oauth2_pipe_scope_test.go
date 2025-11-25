@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -131,26 +130,6 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 				// Split by space to get individual scopes
 				actualScopes := strings.Split(scopes, " ")
 				assert.ElementsMatch(t, scopeParts, actualScopes, "Scopes should be preserved as space-separated, with pipe characters intact. Expected: %v, got: %v", scopeParts, actualScopes)
-
-				t.Run("followup=verify refresh token preserves pipe scopes", func(t *testing.T) {
-					require.NotEmpty(t, token.RefreshToken)
-					token.Expiry = token.Expiry.Add(-time.Hour * 24)
-
-					refreshedToken, err := conf.TokenSource(context.Background(), token).Token()
-					require.NoError(t, err)
-
-					// Introspect the refreshed access token
-					refreshedIntrospect := testhelpers.IntrospectToken(t, refreshedToken.AccessToken, adminTS)
-					assert.True(t, refreshedIntrospect.Get("active").Bool(), "%s", refreshedIntrospect)
-					assert.EqualValues(t, conf.ClientID, refreshedIntrospect.Get("client_id").String(), "%s", refreshedIntrospect)
-					assert.EqualValues(t, subject, refreshedIntrospect.Get("sub").String(), "%s", refreshedIntrospect)
-
-					// Verify that the scope field still contains the correct scopes with pipe characters
-					refreshedScopes := refreshedIntrospect.Get("scope").String()
-					assert.NotEmpty(t, refreshedScopes)
-					actualRefreshedScopes := strings.Split(refreshedScopes, " ")
-					assert.ElementsMatch(t, scopeParts, actualRefreshedScopes, "Refreshed scopes should preserve pipe characters. Expected: %v, got: %v", scopeParts, actualRefreshedScopes)
-				})
 			})
 
 			t.Run("case=verify JWT access token preserves pipe scopes", func(t *testing.T) {

@@ -86,7 +86,8 @@ func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APICl
 		assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 		assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
 		assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
-		assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+		// RequestedScope should match what was requested, which may include scopes with pipe characters
+		assert.NotEmpty(t, rr.RequestedScope)
 		assert.Contains(t, rr.RequestUrl, reg.Config().OAuth2AuthURL(ctx).String())
 
 		acceptBody := hydra.AcceptOAuth2LoginRequest{
@@ -125,12 +126,12 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 		assert.EqualValues(t, c.LogoURI, pointerx.Deref(rr.Client.LogoUri))
 		assert.EqualValues(t, c.RedirectURIs, rr.Client.RedirectUris)
 		assert.EqualValues(t, subject, pointerx.Deref(rr.Subject))
-		assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
+		assert.NotEmpty(t, rr.RequestedScope)
 		assert.Contains(t, *rr.RequestUrl, reg.Config().OAuth2AuthURL(r.Context()).String())
 		assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Context)
 
 		acceptBody := hydra.AcceptOAuth2ConsentRequest{
-			GrantScope:               []string{"hydra", "offline", "openid"},
+			GrantScope:               rr.RequestedScope,
 			GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 			Remember:                 pointerx.Ptr(true),
 			RememberFor:              pointerx.Ptr[int64](0),

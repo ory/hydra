@@ -5,17 +5,14 @@ package oauth2_test
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
-	"golang.org/x/oauth2"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/driver"
@@ -49,7 +46,7 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OpenIDConnectKeyName)
 			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OAuth2JWTKeyName)
 
-			publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
+			_, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 			adminClient := hydra.NewAPIClient(hydra.NewConfiguration())
 			adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
@@ -59,7 +56,7 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 			scopeParts := []string{"openid", "profile", "patient|read", "patient|write"}
 
 			t.Run("case=perform authorize code flow with scopes containing pipe characters", func(t *testing.T) {
-				c, conf := newOAuth2Client(
+				_, conf := newOAuth2Client(
 					t,
 					reg,
 					testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
@@ -68,11 +65,11 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					func(w http.ResponseWriter, r *http.Request) {
-						rr, res, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+						loginRequest, res, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 						require.NoErrorf(t, err, "%s\n%s", res.Request.URL, ioutilx.MustReadAll(res.Body))
 
 						// Verify the login request contains the correct scopes
-						assert.ElementsMatch(t, scopeParts, rr.RequestedScope)
+						assert.ElementsMatch(t, scopeParts, loginRequest.RequestedScope)
 
 						acceptBody := hydra.AcceptOAuth2LoginRequest{
 							Subject:  subject,
@@ -91,15 +88,15 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 					},
 					func(w http.ResponseWriter, r *http.Request) {
 						challenge := r.URL.Query().Get("consent_challenge")
-						rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
+						consentRequest, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
 						require.NoError(t, err)
 
 						// Verify the consent request contains the correct scopes
-						assert.ElementsMatch(t, scopeParts, rr.RequestedScope)
+						assert.ElementsMatch(t, scopeParts, consentRequest.RequestedScope)
 
 						acceptBody := hydra.AcceptOAuth2ConsentRequest{
 							GrantScope:               scopeParts,
-							GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+							GrantAccessTokenAudience: consentRequest.RequestedAccessTokenAudience,
 							Remember:                 pointerx.Ptr(true),
 							RememberFor:              pointerx.Ptr[int64](0),
 						}
@@ -162,7 +159,7 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 					reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 				})
 
-				c, conf := newOAuth2Client(
+				_, conf := newOAuth2Client(
 					t,
 					reg,
 					testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
@@ -171,8 +168,11 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 
 				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					func(w http.ResponseWriter, r *http.Request) {
-						rr, res, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
+						loginRequest, res, err := adminClient.OAuth2API.GetOAuth2LoginRequest(context.Background()).LoginChallenge(r.URL.Query().Get("login_challenge")).Execute()
 						require.NoErrorf(t, err, "%s\n%s", res.Request.URL, ioutilx.MustReadAll(res.Body))
+
+						// Verify the login request contains the correct scopes
+						assert.ElementsMatch(t, scopeParts, loginRequest.RequestedScope)
 
 						acceptBody := hydra.AcceptOAuth2LoginRequest{
 							Subject:  subject,
@@ -190,12 +190,12 @@ func TestOAuth2AuthCodeWithPipeCharactersInScopes(t *testing.T) {
 					},
 					func(w http.ResponseWriter, r *http.Request) {
 						challenge := r.URL.Query().Get("consent_challenge")
-						rr, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
+						consentRequest, _, err := adminClient.OAuth2API.GetOAuth2ConsentRequest(context.Background()).ConsentChallenge(challenge).Execute()
 						require.NoError(t, err)
 
 						acceptBody := hydra.AcceptOAuth2ConsentRequest{
 							GrantScope:               scopeParts,
-							GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+							GrantAccessTokenAudience: consentRequest.RequestedAccessTokenAudience,
 							Remember:                 pointerx.Ptr(true),
 							RememberFor:              pointerx.Ptr[int64](0),
 						}

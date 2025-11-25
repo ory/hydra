@@ -750,6 +750,41 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				assertIDToken(t, token, conf, subject, nonce, time.Now().Add(reg.Config().GetIDTokenLifespan(ctx)))
 			})
 
+			t.Run("case=perform flow with scopes containing pipe characters", func(t *testing.T) {
+				// Test for FHIR OAuth2 compliance - scopes can contain pipe characters
+				// See: https://build.fhir.org/ig/HL7/smart-app-launch/scopes-and-launch-context.html
+				scopeWithPipe := "openid profile patient|read patient|write"
+				scopeParts := []string{"openid", "profile", "patient|read", "patient|write"}
+
+				c, conf := newOAuth2Client(
+					t,
+					reg,
+					testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
+					withScope(scopeWithPipe),
+				)
+
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
+					acceptLoginHandler(t, c, adminClient, reg, subject, nil),
+					acceptConsentHandler(t, c, adminClient, reg, subject, nil),
+				)
+
+				code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("nonce", nonce))
+				require.NotEmpty(t, code)
+
+				token, err := conf.Exchange(context.Background(), code)
+				require.NoError(t, err)
+
+				// Verify scopes are preserved in token introspection
+				introspect := testhelpers.IntrospectToken(t, token.AccessToken, adminTS)
+				assert.True(t, introspect.Get("active").Bool(), "%s", introspect)
+
+				// Verify that the scope field contains the correct space-separated scopes with pipe characters preserved
+				scopes := introspect.Get("scope").String()
+				assert.NotEmpty(t, scopes)
+				actualScopes := strings.Split(scopes, " ")
+				assert.ElementsMatch(t, scopeParts, actualScopes, "Scopes should be preserved as space-separated with pipe characters intact. Expected: %v, got: %v", scopeParts, actualScopes)
+			})
+
 			t.Run("case=respects client token lifespan configuration", func(t *testing.T) {
 				run := func(t *testing.T, strategy string, c *client.Client, conf *oauth2.Config, expectedLifespans client.Lifespans) {
 					testhelpers.NewLoginConsentUI(t, reg.Config(),

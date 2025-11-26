@@ -5,7 +5,6 @@ package internal
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -71,46 +70,33 @@ func ExtractJwtExpClaim(t *testing.T, token string) *time.Time {
 	return &claims.ExpiresAt.Time
 }
 
-func ParseFormPostResponse(redirectURL string, resp io.ReadCloser) (authorizationCode, stateFromServer, iDToken string, token goauth.Token, customParameters url.Values, rFC6749Error map[string]string, err error) {
+func ParseFormPostResponse(t *testing.T, redirectURL string, resp io.Reader) (authorizationCode, stateFromServer, iDToken string, token goauth.Token, customParameters url.Values, rFC6749Error map[string]string) {
 	token = goauth.Token{}
 	rFC6749Error = map[string]string{}
 	customParameters = url.Values{}
 
 	doc, err := html.Parse(resp)
-	if err != nil {
-		return "", "", "", token, customParameters, rFC6749Error, err
-	}
+	require.NoError(t, err)
 
 	//doc>html>body
 	body := findBody(doc.FirstChild.FirstChild)
-	if body.Data != "body" {
-		return "", "", "", token, customParameters, rFC6749Error, errors.New("Malformed html")
-	}
+	require.Equal(t, "body", body.Data)
 
 	htmlEvent := body.Attr[0].Key
-	if htmlEvent != "onload" {
-		return "", "", "", token, customParameters, rFC6749Error, errors.New("onload event is missing")
-	}
+	require.Equal(t, "onload", htmlEvent)
 
 	onLoadFunc := body.Attr[0].Val
-	if onLoadFunc != "javascript:document.forms[0].submit()" {
-		return "", "", "", token, customParameters, rFC6749Error, errors.New("onload function is missing")
-	}
+	require.Equal(t, "javascript:document.forms[0].submit()", onLoadFunc)
 
 	form := getNextNoneTextNode(body.FirstChild)
-	if form.Data != "form" {
-		return "", "", "", token, customParameters, rFC6749Error, errors.New("html form is missing")
-	}
+	require.NotNil(t, form)
+	require.Equal(t, "form", form.Data)
 
 	for _, attr := range form.Attr {
 		if attr.Key == "method" {
-			if attr.Val != "post" {
-				return "", "", "", token, customParameters, rFC6749Error, errors.New("html form post method is missing")
-			}
+			require.Equal(t, "post", attr.Val)
 		} else {
-			if attr.Val != redirectURL {
-				return "", "", "", token, customParameters, rFC6749Error, errors.New("html form post url is wrong")
-			}
+			require.Equal(t, redirectURL, attr.Val)
 		}
 	}
 
@@ -122,7 +108,6 @@ func ParseFormPostResponse(redirectURL string, resp io.ReadCloser) (authorizatio
 			} else if attr.Key == "value" {
 				v = attr.Val
 			}
-
 		}
 
 		switch k {
@@ -132,9 +117,7 @@ func ParseFormPostResponse(redirectURL string, resp io.ReadCloser) (authorizatio
 			authorizationCode = v
 		case "expires_in":
 			expires, err := strconv.Atoi(v)
-			if err != nil {
-				return "", "", "", token, customParameters, rFC6749Error, err
-			}
+			require.NoError(t, err)
 			token.Expiry = time.Now().UTC().Add(time.Duration(expires) * time.Second)
 		case "access_token":
 			token.AccessToken = v

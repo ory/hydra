@@ -24,6 +24,13 @@ func RegistryWithHMACSHAStrategy(s func(r *RegistrySQL) oauth2.CoreStrategy) Reg
 	}
 }
 
+func RegistryWithJWTStrategy(s func(r *RegistrySQL) oauth2.AccessTokenStrategy) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.jwtStrategy = s(r)
+		return nil
+	}
+}
+
 func RegistryWithKeyManager(km func(r *RegistrySQL) (jwk.Manager, error)) RegistryModifier {
 	return func(r *RegistrySQL) (err error) {
 		r.keyManager, err = km(r)

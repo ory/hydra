@@ -83,6 +83,7 @@ type RegistrySQL struct {
 	oidcs                jwk.JWTSigner
 	ats                  jwk.JWTSigner
 	hmacs                foauth2.CoreStrategy
+	jwtStrategy          foauth2.AccessTokenStrategy
 	enigmaHMAC           *hmac.HMACStrategy
 	deviceHmac           *rfc8628.DefaultDeviceStrategy
 	fc                   *fositex.Config
@@ -460,7 +461,7 @@ func (m *RegistrySQL) CookieStore(ctx context.Context) (sessions.Store, error) {
 	return cs, nil
 }
 
-func (m *RegistrySQL) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
+func (m *RegistrySQL) HTTPClient(_ context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
 	opts = append(opts,
 		httpx.ResilientClientWithLogger(m.Logger()),
 		httpx.ResilientClientWithMaxRetry(2),
@@ -483,14 +484,14 @@ func (m *RegistrySQL) OAuth2Provider() fosite.OAuth2Provider {
 	return m.fop
 }
 
-func (m *RegistrySQL) OpenIDJWTStrategy() jwk.JWTSigner {
+func (m *RegistrySQL) OpenIDJWTSigner() jwk.JWTSigner {
 	if m.oidcs == nil {
 		m.oidcs = jwk.NewDefaultJWTSigner(m, x.OpenIDConnectKeyName)
 	}
 	return m.oidcs
 }
 
-func (m *RegistrySQL) AccessTokenJWTStrategy() jwk.JWTSigner {
+func (m *RegistrySQL) AccessTokenJWTSigner() jwk.JWTSigner {
 	if m.ats == nil {
 		m.ats = jwk.NewDefaultJWTSigner(m, x.OAuth2JWTKeyName)
 	}
@@ -509,6 +510,16 @@ func (m *RegistrySQL) OAuth2HMACStrategy() foauth2.CoreStrategy {
 		m.hmacs = foauth2.NewHMACSHAStrategy(m.OAuth2EnigmaStrategy(), m.OAuth2Config())
 	}
 	return m.hmacs
+}
+
+func (m *RegistrySQL) OAuth2JWTStrategy() foauth2.AccessTokenStrategy {
+	if m.jwtStrategy == nil {
+		m.jwtStrategy = &foauth2.DefaultJWTStrategy{
+			Signer: m.AccessTokenJWTSigner(),
+			Config: m.OAuth2Config(),
+		}
+	}
+	return m.jwtStrategy
 }
 
 // rfc8628HMACStrategy returns the rfc8628 strategy
@@ -551,22 +562,11 @@ func (m *RegistrySQL) OAuth2ProviderConfig() fosite.Configurator {
 	}
 
 	conf := m.OAuth2Config()
-	hmacAtStrategy := m.OAuth2HMACStrategy()
 	deviceHmacAtStrategy := m.rfc8628HMACStrategy()
-	oidcSigner := m.OpenIDJWTStrategy()
-	atSigner := m.AccessTokenJWTStrategy()
-	jwtAtStrategy := &foauth2.DefaultJWTStrategy{
-		Signer:   atSigner,
-		Strategy: hmacAtStrategy,
-		Config:   conf,
-	}
+	oidcSigner := m.OpenIDJWTSigner()
 
-	conf.LoadDefaultHandlers(m, &compose.CommonStrategy{
-		CoreStrategy: fositex.NewTokenStrategy(m.Config(), hmacAtStrategy, &foauth2.DefaultJWTStrategy{
-			Signer:   jwtAtStrategy,
-			Strategy: hmacAtStrategy,
-			Config:   conf,
-		}),
+	conf.LoadDefaultHandlers(m, &compose.CommonStrategyProvider{
+		CoreStrategy:   fositex.NewTokenStrategy(m),
 		DeviceStrategy: deviceHmacAtStrategy,
 		OIDCTokenStrategy: &openid.DefaultStrategy{
 			Config: conf,
@@ -583,7 +583,7 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 	if m.forv == nil {
 		m.forv = openid.NewOpenIDConnectRequestValidator(&openid.DefaultStrategy{
 			Config: m.OAuth2ProviderConfig(),
-			Signer: m.OpenIDJWTStrategy(),
+			Signer: m.OpenIDJWTSigner(),
 		}, m.OAuth2ProviderConfig())
 	}
 	return m.forv

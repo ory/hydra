@@ -112,7 +112,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 		// Access token should have hook and identity_id claims
 		jwtAT, err := jwt.Parse(token.AccessToken, func(token *jwt.Token) (interface{}, error) {
-			return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
+			return reg.AccessTokenJWTSigner().GetPublicKey(ctx)
 		})
 		require.NoError(t, err)
 		assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["ext"].(map[string]any)["username"])
@@ -142,7 +142,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 			require.NotEqual(t, token.RefreshToken, refreshedToken.RefreshToken)
 
 			jwtAT, err := jwt.Parse(refreshedToken.AccessToken, func(token *jwt.Token) (interface{}, error) {
-				return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
+				return reg.AccessTokenJWTSigner().GetPublicKey(ctx)
 			})
 			require.NoError(t, err)
 			assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])

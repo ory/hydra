@@ -69,7 +69,7 @@ func ComposeAllEnabled(config *fosite.Config, storage fosite.Storage, key interf
 	return Compose(
 		config,
 		storage,
-		&CommonStrategy{
+		&CommonStrategyProvider{
 			CoreStrategy:      NewOAuth2HMACStrategy(config),
 			DeviceStrategy:    NewDeviceStrategy(config),
 			OIDCTokenStrategy: NewOpenIDConnectStrategy(keyGetter, config),

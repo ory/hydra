@@ -24,28 +24,31 @@ import (
 	"github.com/ory/x/urlx"
 )
 
-type configDependencies interface {
-	config.Provider
-	persistence.Provider
-	x.HTTPClientProvider
-	ClientHasher() fosite.Hasher
-	ExtraFositeFactories() []Factory
-}
+type (
+	configDependencies interface {
+		config.Provider
+		persistence.Provider
+		x.HTTPClientProvider
+		ClientHasher() fosite.Hasher
+		ExtraFositeFactories() []Factory
+	}
+	Factory func(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{}
+	Config  struct {
+		deps configDependencies
 
-type Factory func(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{}
+		authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
+		tokenEndpointHandlers      fosite.TokenEndpointHandlers
+		tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
+		revocationHandlers         fosite.RevocationHandlers
+		deviceEndpointHandlers     fosite.DeviceEndpointHandlers
+		jwksFetcherStrategy        fosite.JWKSFetcherStrategy
 
-type Config struct {
-	deps configDependencies
-
-	authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
-	tokenEndpointHandlers      fosite.TokenEndpointHandlers
-	tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
-	revocationHandlers         fosite.RevocationHandlers
-	deviceEndpointHandlers     fosite.DeviceEndpointHandlers
-	jwksFetcherStrategy        fosite.JWKSFetcherStrategy
-
-	*config.DefaultProvider
-}
+		*config.DefaultProvider
+	}
+	ConfigProvider interface {
+		OAuth2Config() *Config
+	}
+)
 
 var (
 	defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
@@ -74,6 +77,10 @@ func NewConfig(deps configDependencies) *Config {
 		deps:            deps,
 		DefaultProvider: deps.Config(),
 	}
+}
+
+func (c *Config) Config() *config.DefaultProvider {
+	return c.deps.Config()
 }
 
 func (c *Config) LoadDefaultHandlers(storage fosite.Storage, strategy interface{}) {
@@ -220,7 +227,7 @@ func (c *Config) GetFormPostHTMLTemplate(context.Context) *template.Template {
 
 func (c *Config) GetTokenURLs(ctx context.Context) []string {
 	return stringslice.Unique([]string{
-		c.OAuth2TokenURL(ctx).String(),
+		c.deps.Config().OAuth2TokenURL(ctx).String(),
 		urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String(),
 	})
 }

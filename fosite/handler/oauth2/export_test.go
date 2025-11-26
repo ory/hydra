@@ -13,6 +13,6 @@ func CallGetExpiresIn(r fosite.Requester, key fosite.TokenType, defaultLifespan 
 	return getExpiresIn(r, key, defaultLifespan, now)
 }
 
-func CallSignature(token string, s *DefaultJWTStrategy) string {
-	return s.signature(token)
+func CallSignature(token string) string {
+	return signature(token)
 }

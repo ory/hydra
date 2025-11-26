@@ -40,7 +40,7 @@ func NewIDToken(t *testing.T, reg *driver.RegistrySQL, subject string) string {
 }
 
 func NewIDTokenWithExpiry(t *testing.T, reg *driver.RegistrySQL, subject string, exp time.Duration) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), jwt.IDTokenClaims{
+	token, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), jwt.IDTokenClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(exp),
 		IssuedAt:  time.Now(),
@@ -50,7 +50,7 @@ func NewIDTokenWithExpiry(t *testing.T, reg *driver.RegistrySQL, subject string,
 }
 
 func NewIDTokenWithClaims(t *testing.T, reg *driver.RegistrySQL, claims jwt.MapClaims) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
+	token, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
 }

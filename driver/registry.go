@@ -73,8 +73,8 @@ func callRegistry(ctx context.Context, r *RegistrySQL) {
 	r.FlowCipher()
 	r.OAuth2Storage()
 	r.OAuth2Provider()
-	r.AccessTokenJWTStrategy()
-	r.OpenIDJWTStrategy()
+	r.AccessTokenJWTSigner()
+	r.OpenIDJWTSigner()
 	r.OpenIDConnectRequestValidator()
 	r.Tracer(ctx)
 }

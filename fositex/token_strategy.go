@@ -15,73 +15,64 @@ import (
 
 var _ foauth2.CoreStrategy = (*TokenStrategy)(nil)
 
-// TokenStrategy uses the correct token strategy (jwt, opaque) depending on the configuration.
-type TokenStrategy struct {
-	c    *config.DefaultProvider
-	hmac foauth2.CoreStrategy
-	jwt  foauth2.CoreStrategy
-}
+type (
+	// TokenStrategy uses the correct token strategy (jwt, opaque) depending on the configuration.
+	TokenStrategy struct {
+		d tokenStrategyDependencies
+	}
+	tokenStrategyDependencies interface {
+		OAuth2HMACStrategy() foauth2.CoreStrategy
+		OAuth2JWTStrategy() foauth2.AccessTokenStrategy
+		config.Provider
+	}
+)
 
 // NewTokenStrategy returns a new TokenStrategy.
-func NewTokenStrategy(c *config.DefaultProvider, hmac foauth2.CoreStrategy, jwt *foauth2.DefaultJWTStrategy) *TokenStrategy {
-	return &TokenStrategy{c: c, hmac: hmac, jwt: jwt}
-}
+func NewTokenStrategy(d tokenStrategyDependencies) *TokenStrategy { return &TokenStrategy{d: d} }
 
 // gs returns the configured strategy.
-func (t TokenStrategy) gs(ctx context.Context, additionalSources ...config.AccessTokenStrategySource) foauth2.CoreStrategy {
-	switch ats := t.c.AccessTokenStrategy(ctx, additionalSources...); ats {
+func (t TokenStrategy) gs(ctx context.Context, additionalSources ...config.AccessTokenStrategySource) foauth2.AccessTokenStrategy {
+	switch ats := t.d.Config().AccessTokenStrategy(ctx, additionalSources...); ats {
 	case config.AccessTokenJWTStrategy:
-		return t.jwt
+		return t.d.OAuth2JWTStrategy()
 	}
-	return t.hmac
-}
-
-func (t TokenStrategy) AuthorizeCodeStrategy() foauth2.AuthorizeCodeStrategy {
-	return t
-}
-
-func (t TokenStrategy) AccessTokenStrategy() foauth2.AccessTokenStrategy {
-	return t
-}
-
-func (t TokenStrategy) RefreshTokenStrategy() foauth2.RefreshTokenStrategy {
-	return t
+	return t.d.OAuth2HMACStrategy()
 }
 
 func (t TokenStrategy) AccessTokenSignature(_ context.Context, token string) string {
 	return genericSignature(token)
 }
 
-func (t TokenStrategy) GenerateAccessToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).AccessTokenStrategy().GenerateAccessToken(ctx, requester)
+func (t TokenStrategy) GenerateAccessToken(ctx context.Context, requester fosite.Requester) (token, signature string, err error) {
+	return t.gs(ctx, withRequester(requester)).GenerateAccessToken(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateAccessToken(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).AccessTokenStrategy().ValidateAccessToken(ctx, requester, token)
+	return t.gs(ctx, withRequester(requester)).ValidateAccessToken(ctx, requester, token)
 }
 
 func (t TokenStrategy) RefreshTokenSignature(ctx context.Context, token string) string {
-	return t.gs(ctx).RefreshTokenStrategy().RefreshTokenSignature(ctx, token)
+	return t.d.OAuth2HMACStrategy().RefreshTokenSignature(ctx, token)
 }
 
-func (t TokenStrategy) GenerateRefreshToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).RefreshTokenStrategy().GenerateRefreshToken(ctx, requester)
+func (t TokenStrategy) GenerateRefreshToken(ctx context.Context, requester fosite.Requester) (token, signature string, err error) {
+	return t.d.OAuth2HMACStrategy().GenerateRefreshToken(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateRefreshToken(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).RefreshTokenStrategy().ValidateRefreshToken(ctx, requester, token)
+	return t.d.OAuth2HMACStrategy().ValidateRefreshToken(ctx, requester, token)
 }
 
 func (t TokenStrategy) AuthorizeCodeSignature(ctx context.Context, token string) string {
-	return t.gs(ctx).AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, token)
+	return t.d.OAuth2HMACStrategy().AuthorizeCodeSignature(ctx, token)
 }
 
-func (t TokenStrategy) GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
-	return t.gs(ctx, withRequester(requester)).AuthorizeCodeStrategy().GenerateAuthorizeCode(ctx, requester)
+func (t TokenStrategy) GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token, signature string, err error) {
+	return t.d.OAuth2HMACStrategy().GenerateAuthorizeCode(ctx, requester)
 }
 
 func (t TokenStrategy) ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error) {
-	return t.gs(ctx, withRequester(requester)).AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, requester, token)
+	return t.d.OAuth2HMACStrategy().ValidateAuthorizeCode(ctx, requester, token)
 }
 
 func withRequester(requester fosite.Requester) config.AccessTokenStrategySource {

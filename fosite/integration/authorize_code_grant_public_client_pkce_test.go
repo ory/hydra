@@ -21,14 +21,14 @@ import (
 )
 
 func TestAuthorizeCodeFlowWithPublicClientAndPKCE(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runAuthorizeCodeGrantWithPublicClientAndPKCETest(t, strategy)
 	}
 }
 
-func runAuthorizeCodeGrantWithPublicClientAndPKCETest(t *testing.T, strategy interface{}) {
+func runAuthorizeCodeGrantWithPublicClientAndPKCETest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	c := new(fosite.Config)
 	c.EnforcePKCE = true
 	c.EnablePKCEPlainChallengeMethod = true

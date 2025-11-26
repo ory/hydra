@@ -37,18 +37,18 @@ func getLock(set string) *sync.RWMutex {
 }
 
 func EnsureAsymmetricKeypairExists(t testing.TB, r InternalRegistry, alg, set string) {
-	_, err := GetOrGenerateKeys(t.Context(), r, r.KeyManager(), set, alg)
+	_, err := GetOrGenerateKeys(t.Context(), r, set, alg)
 	require.NoError(t, err)
 }
 
-func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, alg string) (private *jose.JSONWebKey, err error) {
+func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, set, alg string) (private *jose.JSONWebKey, err error) {
 	getLock(set).Lock()
 	defer getLock(set).Unlock()
 
-	keys, err := m.GetKeySet(ctx, set)
+	keys, err := r.KeyManager().GetKeySet(ctx, set)
 	if errors.Is(err, x.ErrNotFound) || err == nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set %q does not exist yet, generating new key pair...", set)
-		keys, err = m.GenerateAndPersistKeySet(ctx, set, "", alg, "sig")
+		keys, err = r.KeyManager().GenerateAndPersistKeySet(ctx, set, "", alg, "sig")
 		if err != nil {
 			return nil, err
 		}
@@ -62,7 +62,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 	}
 	r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
 
-	keys, err = m.GenerateAndPersistKeySet(ctx, set, "", alg, "sig")
+	keys, err = r.KeyManager().GenerateAndPersistKeySet(ctx, set, "", alg, "sig")
 	if err != nil {
 		return nil, err
 	}

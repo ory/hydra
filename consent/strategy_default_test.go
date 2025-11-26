@@ -163,7 +163,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistrySQL, u, sessionID string
 }
 
 func genIDToken(t *testing.T, reg *driver.RegistrySQL, c jwt.MapClaims) string {
-	r, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), c, jwt.NewHeaders())
+	r, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r
 }

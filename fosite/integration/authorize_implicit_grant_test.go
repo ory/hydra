@@ -24,14 +24,14 @@ import (
 )
 
 func TestAuthorizeImplicitFlow(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runTestAuthorizeImplicitGrant(t, strategy)
 	}
 }
 
-func runTestAuthorizeImplicitGrant(t *testing.T, strategy interface{}) {
+func runTestAuthorizeImplicitGrant(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2AuthorizeImplicitFactory, compose.OAuth2TokenIntrospectionFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()

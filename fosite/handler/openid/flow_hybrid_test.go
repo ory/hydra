@@ -11,26 +11,26 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/v2/fosite/internal"
-	"github.com/ory/hydra/v2/fosite/internal/gen"
-
 	cristaljwt "github.com/cristalhq/jwt/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	gomock "go.uber.org/mock/gomock"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/compose"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/internal"
+	"github.com/ory/hydra/v2/fosite/internal/gen"
 	"github.com/ory/hydra/v2/fosite/storage"
 	"github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 )
 
-var hmacStrategy = oauth2.NewHMACSHAStrategy(
+var hmacStrategy = &compose.CommonStrategyProvider{CoreStrategy: oauth2.NewHMACSHAStrategy(
 	&hmac.HMACStrategy{Config: &fosite.Config{GlobalSecret: []byte("some-super-cool-secret-that-nobody-knows-nobody-knows")}},
 	nil,
-)
+)}
 
 type mockOpenIDConnectTokenStrategyProvider struct {
 	strategy openid.DefaultStrategy

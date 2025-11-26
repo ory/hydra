@@ -22,14 +22,14 @@ import (
 )
 
 func TestPushedAuthorizeCodeFlow(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runPushedAuthorizeCodeGrantTest(t, strategy)
 	}
 }
 
-func runPushedAuthorizeCodeGrantTest(t *testing.T, strategy interface{}) {
+func runPushedAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2AuthorizeExplicitFactory, compose.OAuth2TokenIntrospectionFactory, compose.PushedAuthorizeHandlerFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{Subject: "foo-sub"})
 	defer ts.Close()

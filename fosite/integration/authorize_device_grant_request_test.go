@@ -4,13 +4,14 @@
 package integration_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	goauth "golang.org/x/oauth2"
+
+	"github.com/ory/x/uuidx"
 
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
@@ -19,11 +20,11 @@ import (
 )
 
 func TestDeviceFlow(t *testing.T) {
-	runDeviceFlowTest(t)
-	runDeviceFlowAccessTokenTest(t)
+	t.Run("device auth", deviceAuth)
+	t.Run("exchange for access token", exchangeForAccessToken)
 }
 
-func runDeviceFlowTest(t *testing.T) {
+func deviceAuth(t *testing.T) {
 	session := &fosite.DefaultSession{}
 
 	fc := &fosite.Config{
@@ -43,7 +44,7 @@ func runDeviceFlowTest(t *testing.T) {
 			DeviceAuthURL: ts.URL + deviceAuthRelativePath,
 		},
 	}
-	for k, c := range []struct {
+	for _, c := range []struct {
 		description string
 		setup       func()
 		err         bool
@@ -97,11 +98,11 @@ func runDeviceFlowTest(t *testing.T) {
 			err:         false,
 		},
 	} {
-		t.Run(fmt.Sprintf("case=%d description=%s", k, c.description), func(t *testing.T) {
+		t.Run(fmt.Sprintf("description=%s", c.description), func(t *testing.T) {
 			c.setup()
 
-			resp, err := oauthClient.DeviceAuth(context.Background())
-			require.Equal(t, c.err, err != nil, "(%d) %s\n%s\n%s", k, c.description, c.err, err)
+			resp, err := oauthClient.DeviceAuth(t.Context())
+			require.Equalf(t, c.err, err != nil, "got %+v", err)
 			if !c.err {
 				assert.NotEmpty(t, resp.DeviceCode)
 				assert.NotEmpty(t, resp.UserCode)
@@ -117,13 +118,11 @@ func runDeviceFlowTest(t *testing.T) {
 			if c.cleanUp != nil {
 				c.cleanUp()
 			}
-
-			t.Logf("Passed test case %d", k)
 		})
 	}
 }
 
-func runDeviceFlowAccessTokenTest(t *testing.T) {
+func exchangeForAccessToken(t *testing.T) {
 	session := newIDSession(&jwt.IDTokenClaims{Subject: "peter"})
 
 	fc := &fosite.Config{
@@ -134,87 +133,55 @@ func runDeviceFlowAccessTokenTest(t *testing.T) {
 	}
 	f := compose.ComposeAllEnabled(fc, fositeStore, gen.MustRSAKey())
 	ts := mockServer(t, f, session)
-	defer ts.Close()
 
-	oauthClient := &goauth.Config{
-		ClientID:     "device-client",
-		ClientSecret: "foobar",
-		Endpoint: goauth.Endpoint{
-			TokenURL:      ts.URL + tokenRelativePath,
-			DeviceAuthURL: ts.URL + deviceAuthRelativePath,
-		},
-		Scopes: []string{"openid", "fosite", "offline"},
-	}
-	resp, _ := oauthClient.DeviceAuth(context.Background())
-	deviceCodeSignature, err := compose.NewDeviceStrategy(fc).DeviceCodeSignature(context.Background(), resp.DeviceCode)
-	require.NoError(t, err)
-
-	req, err := fositeStore.GetDeviceCodeSession(context.TODO(), deviceCodeSignature, nil)
-	require.NoError(t, err)
-	fositeStore.CreateOpenIDConnectSession(context.TODO(), deviceCodeSignature, req)
-
-	d := fositeStore.DeviceAuths[deviceCodeSignature]
-	d.SetUserCodeState(fosite.UserCodeAccepted)
-	fositeStore.DeviceAuths[deviceCodeSignature] = d
-
-	for k, c := range []struct {
-		description string
-		setup       func()
-		params      []goauth.AuthCodeOption
-		check       func(t *testing.T, token *goauth.Token, err error)
-		cleanUp     func()
+	for _, c := range []struct {
+		description   string
+		updateClients func(*fosite.DefaultClient, *goauth.Config)
+		params        []goauth.AuthCodeOption
+		check         func(t *testing.T, token *goauth.Token, cl *goauth.Config, err error)
 	}{
 		{
 			description: "should fail with invalid grant type",
-			setup: func() {
-			},
-			params: []goauth.AuthCodeOption{goauth.SetAuthURLParam("grant_type", "invalid_grant_type")},
-			check: func(t *testing.T, token *goauth.Token, err error) {
+			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("grant_type", "invalid_grant_type")},
+			check: func(t *testing.T, _ *goauth.Token, _ *goauth.Config, err error) {
 				assert.ErrorContains(t, err, "invalid_request")
 			},
 		},
 		{
-			description: "should fail with unauthorized client",
-			setup: func() {
-				fositeStore.Clients["device-client"].(*fosite.DefaultClient).GrantTypes = []string{"authorization_code"}
+			description: "should fail with wrong grant type",
+			updateClients: func(cl *fosite.DefaultClient, _ *goauth.Config) {
+				cl.GrantTypes = []string{"authorization_code"}
 			},
 			params: []goauth.AuthCodeOption{},
-			check: func(t *testing.T, token *goauth.Token, err error) {
+			check: func(t *testing.T, _ *goauth.Token, _ *goauth.Config, err error) {
 				assert.ErrorContains(t, err, "unauthorized_client")
-			},
-			cleanUp: func() {
-				fositeStore.Clients["device-client"].(*fosite.DefaultClient).GrantTypes = []string{"urn:ietf:params:oauth:grant-type:device_code", "refresh_token"}
 			},
 		},
 		{
 			description: "should fail with invalid device code",
-			setup:       func() {},
 			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("device_code", "invalid_device_code")},
-			check: func(t *testing.T, token *goauth.Token, err error) {
+			check: func(t *testing.T, _ *goauth.Token, _ *goauth.Config, err error) {
 				assert.ErrorContains(t, err, "invalid_grant")
 			},
 		},
 		{
 			description: "should fail with invalid client id",
-			setup: func() {
-				oauthClient.ClientID = "invalid_client_id"
+			updateClients: func(_ *fosite.DefaultClient, cl *goauth.Config) {
+				cl.ClientID = uuidx.NewV4().String()
 			},
-			check: func(t *testing.T, token *goauth.Token, err error) {
+			check: func(t *testing.T, _ *goauth.Token, _ *goauth.Config, err error) {
 				assert.ErrorContains(t, err, "invalid_client")
-			},
-			cleanUp: func() {
-				oauthClient.ClientID = "device-client"
 			},
 		},
 		{
 			description: "should pass",
-			check: func(t *testing.T, token *goauth.Token, err error) {
+			check: func(t *testing.T, token *goauth.Token, cl *goauth.Config, err error) {
 				assert.Equal(t, "bearer", token.TokenType)
 				assert.NotEmpty(t, token.AccessToken)
 				assert.NotEmpty(t, token.RefreshToken)
 				assert.NotEmpty(t, token.Extra("id_token"))
 
-				tokenSource := oauthClient.TokenSource(context.Background(), token)
+				tokenSource := cl.TokenSource(t.Context(), token)
 				refreshed, err := tokenSource.Token()
 
 				assert.NotEmpty(t, refreshed.AccessToken)
@@ -223,22 +190,53 @@ func runDeviceFlowAccessTokenTest(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(fmt.Sprintf("case=%d description=%s", k, c.description), func(t *testing.T) {
-			if c.setup != nil {
-				c.setup()
+		t.Run(fmt.Sprintf("description=%s", c.description), func(t *testing.T) {
+			clientID := uuidx.NewV4().String()
+			fCl := &fosite.DefaultClient{
+				ID:         clientID,
+				Secret:     []byte(`$2a$10$IxMdI6d.LIRZPpSfEwNoeu4rY3FhDREsxFJXikcgdRRAStxUlsuEO`), // = "foobar"
+				GrantTypes: []string{"urn:ietf:params:oauth:grant-type:device_code", "refresh_token"},
+				Scopes:     []string{"fosite", "offline", "openid"},
+				Audience:   []string{tokenURL},
+				Public:     true,
+			}
+			cl := &goauth.Config{
+				ClientID:     clientID,
+				ClientSecret: "foobar",
+				Endpoint: goauth.Endpoint{
+					TokenURL:      ts.URL + tokenRelativePath,
+					DeviceAuthURL: ts.URL + deviceAuthRelativePath,
+				},
+				Scopes: []string{"openid", "fosite", "offline"},
 			}
 
-			token, err := oauthClient.DeviceAccessToken(context.Background(), resp, c.params...)
+			fositeStore.Clients[fCl.ID] = fCl
 
-			if c.check != nil {
-				c.check(t, token, err)
+			resp, err := cl.DeviceAuth(t.Context())
+			require.NoError(t, err)
+
+			if c.updateClients != nil {
+				c.updateClients(fCl, cl)
+				fositeStore.Clients[fCl.ID] = fCl
 			}
 
-			if c.cleanUp != nil {
-				c.cleanUp()
-			}
+			resp.Interval = 1 // speed up tests
+			deviceCodeSignature, err := compose.NewDeviceStrategy(fc).DeviceCodeSignature(t.Context(), resp.DeviceCode)
+			require.NoError(t, err)
 
-			t.Logf("Passed test case %d", k)
+			req, err := fositeStore.GetDeviceCodeSession(t.Context(), deviceCodeSignature, nil)
+			require.NoError(t, err)
+			require.NoError(t, fositeStore.CreateOpenIDConnectSession(t.Context(), deviceCodeSignature, req))
+
+			d := fositeStore.DeviceAuths[deviceCodeSignature]
+			d.SetUserCodeState(fosite.UserCodeAccepted)
+			fositeStore.DeviceAuths[deviceCodeSignature] = d
+
+			t.Parallel()
+
+			token, err := cl.DeviceAccessToken(t.Context(), resp, c.params...)
+
+			c.check(t, token, cl, err)
 		})
 	}
 }

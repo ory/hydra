@@ -6,27 +6,26 @@ package cmd_test
 import (
 	"bytes"
 	"cmp"
+	_ "embed"
 	"encoding/json"
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/stretchr/testify/require"
-
-	"github.com/ory/x/snapshotx"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
-
-	_ "embed"
 
 	"github.com/ory/hydra/v2/cmd"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/snapshotx"
 )
 
 //go:embed stub/jwk.json
 var stubJsonWebKeySet []byte
 
 func TestImportJWKS(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewKeysImportCmd()
 	_ = setup(t, c)
 

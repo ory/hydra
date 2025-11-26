@@ -15,6 +15,8 @@ import (
 )
 
 func TestDeleteAccessTokensCmd(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewDeleteAccessTokensCmd()
 
 	reg := setup(t, c)

@@ -69,6 +69,9 @@ type (
 		config.Provider
 		jwk.ManagerProvider
 	}
+	BasePersisterProvider interface {
+		BasePersister() *BasePersister
+	}
 )
 
 func NewPersister(base *BasePersister, r Dependencies) *Persister {

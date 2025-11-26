@@ -4,7 +4,7 @@
 package dockertest
 
 import (
-	"context"
+	"cmp"
 	"fmt"
 	"io"
 	"log"
@@ -18,8 +18,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/pop/v6"
@@ -73,53 +71,6 @@ func Register() *OnExit {
 	return onexit
 }
 
-// Parallel runs tasks in parallel.
-func Parallel(fs []func()) {
-	wg := sync.WaitGroup{}
-
-	wg.Add(len(fs))
-	for _, f := range fs {
-		go func(ff func()) {
-			defer wg.Done()
-			ff()
-		}(f)
-	}
-
-	wg.Wait()
-}
-
-func connect(dialect, driver, dsn string) (db *sqlx.DB, err error) {
-	if scheme := strings.Split(dsn, "://")[0]; scheme == "mysql" {
-		dsn = strings.Replace(dsn, "mysql://", "", -1)
-	} else if scheme == "cockroach" {
-		dsn = strings.Replace(dsn, "cockroach://", "postgres://", 1)
-	}
-	err = resilience.Retry(
-		logrusx.New("", ""),
-		time.Second*5,
-		time.Minute*5,
-		func() (err error) {
-			db, err = sqlx.Open(dialect, dsn)
-			if err != nil {
-				log.Printf("Connecting to database %s failed: %s", driver, err)
-				return err
-			}
-
-			if err := db.Ping(); err != nil {
-				log.Printf("Pinging database %s failed: %s", driver, err)
-				return err
-			}
-
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, errors.Errorf("Unable to connect to %s (%s): %s", driver, dsn, err)
-	}
-	log.Printf("Connected to database %s", driver)
-	return db, nil
-}
-
 func ConnectPop(t require.TestingT, url string) (c *pop.Connection) {
 	require.NoError(t, resilience.Retry(logrusx.New("", ""), time.Second*5, time.Minute*5, func() error {
 		var err error
@@ -143,7 +94,7 @@ func ConnectPop(t require.TestingT, url string) (c *pop.Connection) {
 // ## PostgreSQL ##
 
 func startPostgreSQL(version string) (*dockertest.Resource, error) {
-	resource, err := pool.Run("postgres", stringsx.Coalesce(version, "16"), []string{"PGUSER=postgres", "POSTGRES_PASSWORD=secret", "POSTGRES_DB=postgres"})
+	resource, err := pool.Run("postgres", cmp.Or(version, "16"), []string{"PGUSER=postgres", "POSTGRES_PASSWORD=secret", "POSTGRES_DB=postgres"})
 	if err == nil {
 		mux.Lock()
 		resources = append(resources, resource)
@@ -168,12 +119,6 @@ func RunTestPostgreSQL(t testing.TB) string {
 	return u
 }
 
-// RunPostgreSQL runs a PostgreSQL database and returns the URL to it.
-func RunPostgreSQL() (string, error) {
-	dsn, _, err := runPosgreSQLCleanup("")
-	return dsn, err
-}
-
 func runPosgreSQLCleanup(version string) (string, func(), error) {
 	resource, err := startPostgreSQL(version)
 	if err != nil {
@@ -182,21 +127,6 @@ func runPosgreSQLCleanup(version string) (string, func(), error) {
 
 	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", resource.GetPort("5432/tcp")),
 		func() { _ = pool.Purge(resource) }, nil
-}
-
-// ConnectToTestPostgreSQL connects to a PostgreSQL database.
-func ConnectToTestPostgreSQL() (*sqlx.DB, error) {
-	if dsn := os.Getenv("TEST_DATABASE_POSTGRESQL"); dsn != "" {
-		return connect("pgx", "postgres", dsn)
-	}
-
-	resource, err := startPostgreSQL("")
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not start resource")
-	}
-
-	db := bootstrap("postgres://postgres:secret@localhost:%s/postgres?sslmode=disable", "5432/tcp", "pgx", pool, resource)
-	return db, nil
 }
 
 // RunTestPostgreSQLWithVersion connects to a PostgreSQL database .
@@ -210,20 +140,12 @@ func RunTestPostgreSQLWithVersion(t testing.TB, version string) string {
 	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", resource.GetPort("5432/tcp"))
 }
 
-// ConnectToTestPostgreSQLPop connects to a test PostgreSQL database.
-// If a docker container is started for the database, the container be removed
-// at the end of the test.
-func ConnectToTestPostgreSQLPop(t testing.TB) *pop.Connection {
-	url := RunTestPostgreSQL(t)
-	return ConnectPop(t, url)
-}
-
 // ## MySQL ##
 
 func startMySQL(version string) (*dockertest.Resource, error) {
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "mysql",
-		Tag:        stringsx.Coalesce(version, "8.0"),
+		Tag:        cmp.Or(version, "8.0"),
 		Env: []string{
 			"MYSQL_ROOT_PASSWORD=secret",
 			"MYSQL_ROOT_HOST=%",
@@ -236,12 +158,6 @@ func startMySQL(version string) (*dockertest.Resource, error) {
 	resources = append(resources, resource)
 	mux.Unlock()
 	return resource, nil
-}
-
-// RunMySQL runs a RunMySQL database and returns the URL to it.
-func RunMySQL() (string, error) {
-	dsn, _, err := runMySQLCleanup("")
-	return dsn, err
 }
 
 func runMySQLCleanup(version string) (string, func(), error) {
@@ -286,33 +202,12 @@ func RunTestMySQLWithVersion(t testing.TB, version string) string {
 	return u
 }
 
-// ConnectToTestMySQL connects to a MySQL database.
-func ConnectToTestMySQL() (*sqlx.DB, error) {
-	if dsn := os.Getenv("TEST_DATABASE_MYSQL"); dsn != "" {
-		log.Println("Found mysql test database config, skipping dockertest...")
-		return connect("mysql", "mysql", dsn)
-	}
-
-	resource, err := startMySQL("")
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not start resource")
-	}
-
-	db := bootstrap("root:secret@(localhost:%s)/mysql?parseTime=true", "3306/tcp", "mysql", pool, resource)
-	return db, nil
-}
-
-func ConnectToTestMySQLPop(t testing.TB) *pop.Connection {
-	url := RunTestMySQL(t)
-	return ConnectPop(t, url)
-}
-
 // ## CockroachDB
 
 func startCockroachDB(version string) (*dockertest.Resource, error) {
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "cockroachdb/cockroach",
-		Tag:        stringsx.Coalesce(version, "latest-v25.3"),
+		Tag:        cmp.Or(version, "latest-v25.3"),
 		Cmd:        []string{"start-single-node", "--insecure"},
 	})
 	if err == nil {
@@ -321,21 +216,6 @@ func startCockroachDB(version string) (*dockertest.Resource, error) {
 		mux.Unlock()
 	}
 	return resource, err
-}
-
-// RunCockroachDB runs a CockroachDB database and returns the URL to it.
-func RunCockroachDB() (string, error) {
-	return RunCockroachDBWithVersion("")
-}
-
-// RunCockroachDBWithVersion runs a CockroachDB database with the specified version and returns the URL to it.
-func RunCockroachDBWithVersion(version string) (string, error) {
-	resource, err := startCockroachDB(version)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("cockroach://root@localhost:%s/defaultdb?sslmode=disable", resource.GetPort("26257/tcp")), nil
 }
 
 func runCockroachDBWithVersionCleanup(version string) (string, func(), error) {
@@ -372,104 +252,60 @@ func RunTestCockroachDBWithVersion(t testing.TB, version string) string {
 	return u
 }
 
-// ConnectToTestCockroachDB connects to a CockroachDB database.
-func ConnectToTestCockroachDB() (*sqlx.DB, error) {
-	if dsn := os.Getenv("TEST_DATABASE_COCKROACHDB"); dsn != "" {
-		log.Println("Found cockroachdb test database config, skipping dockertest...")
-		return connect("pgx", "cockroach", dsn)
-	}
+func DumpSchema(t testing.TB, c *pop.Connection) string {
+	name, database, port := c.Dialect.Name(), c.Dialect.Details().Database, c.Dialect.Details().Port
+	t.Logf("Dumping schema for dialect %s, database %s on port %s", name, database, port)
 
-	resource, err := startCockroachDB("")
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not start resource")
-	}
-
-	db := bootstrap("postgres://root@localhost:%s/defaultdb?sslmode=disable", "26257/tcp", "pgx", pool, resource)
-	return db, nil
-}
-
-// ConnectToTestCockroachDBPop connects to a test CockroachDB database.
-// If a docker container is started for the database, the container be removed
-// at the end of the test.
-func ConnectToTestCockroachDBPop(t testing.TB) *pop.Connection {
-	url := RunTestCockroachDB(t)
-	return ConnectPop(t, url)
-}
-
-func bootstrap(u, port, d string, pool dockerPool, resource *dockertest.Resource) (db *sqlx.DB) {
-	if err := resilience.Retry(logrusx.New("", ""), time.Second*5, time.Minute*5, func() error {
-		var err error
-		db, err = sqlx.Open(d, fmt.Sprintf(u, resource.GetPort(port)))
-		if err != nil {
-			return err
-		}
-
-		return db.Ping()
-	}); err != nil {
-		if pErr := pool.Purge(resource); pErr != nil {
-			log.Fatalf("Could not connect to docker and unable to remove image: %s - %s", err, pErr)
-		}
-		log.Fatalf("Could not connect to docker: %s", err)
-	}
-	return
-}
-
-var comments = regexp.MustCompile("(--[^\n]*\n)|(?s:/\\*.+\\*/)")
-
-func StripDump(d string) string {
-	d = comments.ReplaceAllLiteralString(d, "")
-	d = strings.TrimPrefix(d, "Command \"dump\" is deprecated, cockroach dump will be removed in a subsequent release.\r\nFor details, see: https://github.com/cockroachdb/cockroach/issues/54040\r\n")
-	d = strings.ReplaceAll(d, "\r\n", "")
-	d = strings.ReplaceAll(d, "\t", " ")
-	d = strings.ReplaceAll(d, "\n", " ")
-	return d
-}
-
-func DumpSchema(ctx context.Context, t *testing.T, db string) string {
-	var containerPort string
 	var cmd []string
-
-	switch c := stringsx.SwitchExact(db); {
-	case c.AddCase("postgres"):
-		containerPort = "5432"
-		cmd = []string{"pg_dump", "-U", "postgres", "-s", "-T", "hydra_*_migration", "-T", "schema_migration"}
-	case c.AddCase("mysql"):
-		containerPort = "3306"
-		cmd = []string{"/usr/bin/mysqldump", "-u", "root", "--password=secret", "mysql"}
-	case c.AddCase("cockroach"):
-		containerPort = "26257"
-		cmd = []string{"./cockroach", "dump", "defaultdb", "--insecure", "--dump-mode=schema"}
+	var appendToDump string
+	switch dialects := stringsx.SwitchExact(name); {
+	case dialects.AddCase("sqlite3"):
+		return dumpSQLiteSchema(t, c)
+	case dialects.AddCase("postgres"):
+		cmd = []string{"pg_dump", "--username", "postgres", "--schema-only", "--dbname", database}
+		// we need to set the search path because the postgres dump always unsets it
+		appendToDump = "SET search_path TO public;\n"
+	case dialects.AddCase("mysql"):
+		cmd = []string{"mysqldump", "--user", "root", "--password=secret", "--no-data", database}
+	case dialects.AddCase("cockroach"):
+		cmd = []string{"cockroach", "sql", "--insecure", "--database", database, "--execute", "SHOW CREATE ALL TABLES; SHOW CREATE ALL TYPES;", "--format", "raw"}
 	default:
-		t.Log(c.ToUnknownCaseErr())
+		t.Log(dialects.ToUnknownCaseErr())
 		t.FailNow()
 		return ""
 	}
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	require.NoError(t, err)
-	containers, err := cli.ContainerList(ctx, container.ListOptions{
-		Filters: filters.NewArgs(filters.Arg("expose", containerPort)),
+	containers, err := cli.ContainerList(t.Context(), container.ListOptions{
+		Filters: filters.NewArgs(filters.Arg("publish", port)),
 	})
 	require.NoError(t, err)
+	require.Lenf(t, containers, 1, "expected exactly one %s container with port %s", name, port)
 
-	if len(containers) != 1 {
-		t.Logf("Ambiguous amount of %s containers: %d", db, len(containers))
-		t.FailNow()
-	}
-
-	process, err := cli.ContainerExecCreate(ctx, containers[0].ID, container.ExecOptions{
+	process, err := cli.ContainerExecCreate(t.Context(), containers[0].ID, container.ExecOptions{
 		Tty:          true,
 		AttachStdout: true,
 		Cmd:          cmd,
 	})
 	require.NoError(t, err)
 
-	resp, err := cli.ContainerExecAttach(ctx, process.ID, container.ExecAttachOptions{
+	resp, err := cli.ContainerExecAttach(t.Context(), process.ID, container.ExecAttachOptions{
 		Tty: true,
 	})
 	require.NoError(t, err)
 	dump, err := io.ReadAll(resp.Reader)
-	require.NoError(t, err, "%s", dump)
+	require.NoErrorf(t, err, "%s", dump)
 
-	return StripDump(string(dump))
+	d := string(dump) + appendToDump
+	d = regexp.MustCompile(`(--|#|\\|mysqldump|SHOW CREATE)[^\n]*\n`).ReplaceAllLiteralString(d, "") // comments and other non-schema lines
+	d = strings.ReplaceAll(d, "\r\n", "\n")
+	d = regexp.MustCompile(`\n\n+`).ReplaceAllLiteralString(d, "\n\n")
+	return d
+}
+
+func dumpSQLiteSchema(t testing.TB, c *pop.Connection) string {
+	var sqls []string
+	require.NoError(t, c.RawQuery("SELECT sql FROM sqlite_master WHERE type IN ('table', 'index', 'trigger', 'view') AND name NOT LIKE 'sqlite_%' ORDER BY name").All(&sqls))
+	return strings.Join(sqls, ";\n") + ";\n"
 }

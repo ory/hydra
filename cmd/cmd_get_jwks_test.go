@@ -4,7 +4,6 @@
 package cmd_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -18,7 +17,8 @@ import (
 )
 
 func TestGetJWKS(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewGetJWKSCmd()
 	reg := setup(t, c)
 
@@ -29,7 +29,7 @@ func TestGetJWKS(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set))
 		assert.NotEmpty(t, actual.Get("kid").String(), actual.Raw)
 
-		expected, err := reg.KeyManager().GetKeySet(ctx, set)
+		expected, err := reg.KeyManager().GetKeySet(t.Context(), set)
 		require.NoError(t, err)
 
 		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("kid").String())
@@ -38,7 +38,7 @@ func TestGetJWKS(t *testing.T) {
 	t.Run("case=gets jwks public", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, set, "--public"))
 
-		expected, err := reg.KeyManager().GetKeySet(ctx, set)
+		expected, err := reg.KeyManager().GetKeySet(t.Context(), set)
 		require.NoError(t, err)
 
 		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("kid").String())

@@ -4,7 +4,6 @@
 package migratest
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -101,7 +100,6 @@ func TestMigrations(t *testing.T) {
 	for db, c := range connections {
 		t.Run("database="+db, func(t *testing.T) {
 			t.Parallel()
-			ctx := context.Background()
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
@@ -110,7 +108,7 @@ func TestMigrations(t *testing.T) {
 				c, l,
 				popx.WithTestdata(t, os.DirFS("./testdata")))
 			require.NoError(t, err)
-			require.NoError(t, tm.Up(ctx))
+			require.NoError(t, tm.Up(t.Context()))
 
 			t.Run("suite=fixtures", func(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {

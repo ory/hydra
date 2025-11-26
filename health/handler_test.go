@@ -4,11 +4,11 @@
 package health
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/x/dbal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -21,8 +21,6 @@ import (
 )
 
 func TestPublicHealthHandler(t *testing.T) {
-	ctx := context.Background()
-
 	doCORSRequest := func(t *testing.T, endpoint string) *http.Response {
 		req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 		require.NoError(t, err)
@@ -70,10 +68,13 @@ func TestPublicHealthHandler(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValues(tc.config)))
+			// we explicitly don't restore from the backup because that has the wrong migration status
+			reg := testhelpers.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), false, false, driver.WithConfigOptions(configx.WithValues(tc.config)))
+			require.NoError(t, reg.Migrator().MigrateUp(t.Context()))
+			require.NoError(t, reg.InitNetwork(t.Context()))
 
 			public := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
-			reg.RegisterPublicRoutes(ctx, public)
+			reg.RegisterPublicRoutes(t.Context(), public)
 
 			ts := httptest.NewServer(public)
 

@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent/test"
@@ -35,10 +34,10 @@ func init() {
 }
 
 func testRegistry(t *testing.T, db string, t1, t2 *driver.RegistrySQL) {
-	// TODO enable parallel tests for cockroach once we configure the cockroach integration test server to support retry
+	// TODO enable parallel tests for mysql once we support automatic transaction retries
 	var parallel bool
 	switch db {
-	case "memory", "mysql", "cockroach":
+	case "mysql":
 		parallel = false
 	default:
 		parallel = true
@@ -172,85 +171,23 @@ func TestManagersNextGen(t *testing.T) {
 func TestManagers(t *testing.T) {
 	t.Parallel()
 
-	regs1, regs2, regsInvalid := make(map[string]*driver.RegistrySQL), make(map[string]*driver.RegistrySQL), make(map[string]*driver.RegistrySQL)
+	dsns := map[string]string{
+		"sqlite": dbal.NewSQLiteTestDatabase(t),
+	}
+	if !testing.Short() {
+		dsns["postgres"], dsns["mysql"], dsns["cockroach"] = testhelpers.ConnectDatabasesURLs(t)
+	}
 	network1NID, network2NID, invalidNID := uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
 
-	sqlite := dbal.NewSQLiteTestDatabase(t)
-	var err error
-	regs1["memory"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), sqlite, true,
-		driver.DisableValidation(),
-		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network1NID})))
-	require.NoError(t, err)
-	regs2["memory"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), sqlite, false,
-		driver.DisableValidation(),
-		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network2NID})))
-	require.NoError(t, err)
-	regsInvalid["memory"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), sqlite, false,
-		driver.DisableValidation(),
-		driver.SkipNetworkInit(),
-		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: invalidNID})))
-	require.NoError(t, err)
-
-	if !testing.Short() {
-		pg, mysql, crdb := testhelpers.ConnectDatabasesURLs(t)
-		eg, ctx := errgroup.WithContext(t.Context())
-		eg.Go(func() (err error) {
-			regs1["postgres"], err = testhelpers.NewRegistrySQLFromURL(ctx, pg, true,
-				driver.DisableValidation(),
-				driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network1NID})))
-			return
-		})
-		eg.Go(func() (err error) {
-			regs1["mysql"], err = testhelpers.NewRegistrySQLFromURL(ctx, mysql, true,
-				driver.DisableValidation(),
-				driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network1NID})))
-			return
-		})
-		eg.Go(func() (err error) {
-			regs1["cockroach"], err = testhelpers.NewRegistrySQLFromURL(ctx, crdb, true,
-				driver.DisableValidation(),
-				driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network1NID})))
-			return
-		})
-		require.NoError(t, eg.Wait())
-
-		regs2["postgres"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), pg, false,
-			driver.DisableValidation(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network2NID})))
-		require.NoError(t, err)
-		regsInvalid["postgres"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), pg, false,
-			driver.DisableValidation(),
-			driver.SkipNetworkInit(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: invalidNID})))
-		require.NoError(t, err)
-		regs2["mysql"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), mysql, false,
-			driver.DisableValidation(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network2NID})))
-		require.NoError(t, err)
-		regsInvalid["mysql"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), mysql, false,
-			driver.DisableValidation(),
-			driver.SkipNetworkInit(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: invalidNID})))
-		require.NoError(t, err)
-		regs2["cockroach"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), crdb, false,
-			driver.DisableValidation(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network2NID})))
-		require.NoError(t, err)
-		regsInvalid["cockroach"], err = testhelpers.NewRegistrySQLFromURL(t.Context(), crdb, false,
-			driver.DisableValidation(),
-			driver.SkipNetworkInit(),
-			driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: invalidNID})))
-		require.NoError(t, err)
-	}
-
-	for db, r1 := range regs1 {
+	for db, dsn := range dsns {
 		t.Run(db, func(t *testing.T) {
 			t.Parallel()
+			t.Logf("Testing database %s: %q", db, dsn)
 
-			r2 := regs2[db]
-			rInv := regsInvalid[db]
+			r1 := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.DisableValidation(), driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network1NID})))
+			r2 := testhelpers.NewRegistrySQLFromURL(t, dsn, false, true, driver.DisableValidation(), driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: network2NID})))
+			rInv := testhelpers.NewRegistrySQLFromURL(t, dsn, false, true, driver.DisableValidation(), driver.SkipNetworkInit(), driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(&contextx.Static{NID: invalidNID})))
 
-			r1.Persister()
 			require.NoError(t, r1.Persister().Connection(t.Context()).Create(&networkx.Network{ID: network1NID}))
 			require.NoError(t, r1.Persister().Connection(t.Context()).Create(&networkx.Network{ID: network2NID}))
 
@@ -260,7 +197,7 @@ func TestManagers(t *testing.T) {
 
 			t.Run("parallel boundary", func(t *testing.T) { testRegistry(t, db, r1, r2) })
 
-			if db == "memory" {
+			if db == "sqlite" {
 				// The following tests rely on foreign key constraints, which some of them are not correctly created in the SQLite schema.
 				return
 			}

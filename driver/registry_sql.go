@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -240,52 +239,41 @@ func (m *RegistrySQL) Init(
 		}
 
 		if !skipNetworkInit {
-			net, err := m.basePersister.DetermineNetwork(ctx)
-			if err != nil {
-				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
+			if err := m.InitNetwork(ctx); err != nil {
 				return err
 			}
-
-			m.basePersister = m.basePersister.WithFallbackNetworkID(net.ID)
 		}
 	}
 
 	return nil
 }
 
-func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
-	scheme := strings.Split(dsn, "://")[0]
-	s := dbal.Canonicalize(scheme)
-	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
+func (m *RegistrySQL) InitNetwork(ctx context.Context) error {
+	net, err := m.basePersister.DetermineNetwork(ctx)
+	if err != nil {
+		m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
+		return err
+	}
+
+	m.basePersister = m.basePersister.WithFallbackNetworkID(net.ID)
+	return nil
 }
 
-func (m *RegistrySQL) PingContext(ctx context.Context) error {
-	return m.basePersister.Ping(ctx)
-}
+func (m *RegistrySQL) PingContext(ctx context.Context) error { return m.basePersister.Ping(ctx) }
 
-func (m *RegistrySQL) ClientManager() client.Manager {
-	return m.Persister()
-}
-
-func (m *RegistrySQL) ConsentManager() consent.Manager {
-	return m.Persister()
-}
-
+func (m *RegistrySQL) BasePersister() *sql.BasePersister { return m.basePersister }
+func (m *RegistrySQL) ClientManager() client.Manager     { return m.Persister() }
+func (m *RegistrySQL) ConsentManager() consent.Manager   { return m.Persister() }
 func (m *RegistrySQL) ObfuscatedSubjectManager() consent.ObfuscatedSubjectManager {
 	return m.Persister()
 }
-
-func (m *RegistrySQL) LoginManager() consent.LoginManager { return m.Persister() }
-
+func (m *RegistrySQL) LoginManager() consent.LoginManager   { return m.Persister() }
 func (m *RegistrySQL) LogoutManager() consent.LogoutManager { return m.Persister() }
-
-func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
-	return m.Persister()
-}
+func (m *RegistrySQL) OAuth2Storage() x.FositeStorer        { return m.Persister() }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
 	if m.keyManager == nil {
-		softwareKeyManager := &sql.JWKPersister{BasePersister: m.basePersister}
+		softwareKeyManager := &sql.JWKPersister{D: m}
 		if m.Config().HSMEnabled() {
 			hardwareKeyManager := hsm.NewKeyManager(m.HSMContext(), m.Config())
 			m.keyManager = jwk.NewManagerStrategy(hardwareKeyManager, softwareKeyManager)
@@ -296,9 +284,7 @@ func (m *RegistrySQL) KeyManager() jwk.Manager {
 	return m.keyManager
 }
 
-func (m *RegistrySQL) GrantManager() trust.GrantManager {
-	return m.Persister()
-}
+func (m *RegistrySQL) GrantManager() trust.GrantManager { return m.Persister() }
 
 func (m *RegistrySQL) Contextualizer() contextx.Contextualizer {
 	if m.ctxer == nil {
@@ -612,19 +598,11 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 	return m.trc
 }
 
-func (m *RegistrySQL) Persister() persistence.Persister {
-	return sql.NewPersister(m.basePersister, m)
-}
-
-// Config returns the configuration for the given context. It may or may not be the same as the global configuration.
-func (m *RegistrySQL) Config() *config.DefaultProvider {
-	return m.conf
-}
+func (m *RegistrySQL) Persister() persistence.Persister { return sql.NewPersister(m.basePersister, m) }
+func (m *RegistrySQL) Config() *config.DefaultProvider  { return m.conf }
 
 // WithConsentStrategy forces a consent strategy which is only used for testing.
-func (m *RegistrySQL) WithConsentStrategy(c consent.Strategy) {
-	m.cos = c
-}
+func (m *RegistrySQL) WithConsentStrategy(c consent.Strategy) { m.cos = c }
 
 func (m *RegistrySQL) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {

@@ -50,12 +50,12 @@ type Middleware struct {
 	sync.RWMutex
 }
 
-// NewMiddleware returns a new *Middleware, yay!
+// NewMiddleware returns a reqlog middleware with default settings
 func NewMiddleware() *Middleware {
 	return NewCustomMiddleware(logrus.InfoLevel, &logrus.TextFormatter{}, "web")
 }
 
-// NewCustomMiddleware builds a *Middleware with the given level and formatter
+// NewCustomMiddleware returns a reqlog middleware with the given level and formatter
 func NewCustomMiddleware(level logrus.Level, formatter logrus.Formatter, name string) *Middleware {
 	log := logrusx.New(name, "", logrusx.ForceFormatter(formatter), logrusx.ForceLevel(level))
 	return &Middleware{
@@ -71,7 +71,7 @@ func NewCustomMiddleware(level logrus.Level, formatter logrus.Formatter, name st
 	}
 }
 
-// NewMiddlewareFromLogger returns a new *Middleware which writes to a given logrus logger.
+// NewMiddlewareFromLogger returns a reqlog middleware which writes to a given logrus logger.
 func NewMiddlewareFromLogger(logger *logrusx.Logger, name string) *Middleware {
 	return &Middleware{
 		Logger: logger,
@@ -151,7 +151,7 @@ func (m *Middleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next htt
 		nrw = negroni.NewResponseWriter(rw)
 	}
 
-	r = r.WithContext(WithEnableExternalLatencyMeasurement(r.Context()))
+	r = r.WithContext(withEnableExternalLatencyMeasurement(r.Context()))
 	next(nrw, r)
 
 	latency := m.clock.Since(start)
@@ -181,7 +181,7 @@ func DefaultAfter(entry *logrusx.Logger, req *http.Request, res negroni.Response
 		"took":        latency,
 		"headers":     entry.HTTPHeadersRedacted(res.Header()),
 	})
-	if el := totalExternalLatency(req.Context()); el > 0 {
+	if el := getExternalLatency(req.Context()); el > 0 {
 		e = e.WithFields(map[string]any{
 			"took_internal": latency - el,
 			"took_external": el,

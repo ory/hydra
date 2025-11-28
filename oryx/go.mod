@@ -33,7 +33,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/jackc/puddle/v2 v2.2.2
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/julienschmidt/httprouter v1.3.0
+	github.com/julienschmidt/httprouter v1.3.1-0.20240130105656-484018016424
 	github.com/knadh/koanf/maps v0.1.2
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/parsers/toml v0.1.0

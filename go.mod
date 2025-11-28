@@ -26,7 +26,6 @@ require (
 	github.com/gorilla/sessions v1.4.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jackc/pgx/v5 v5.7.5
-	github.com/julienschmidt/httprouter v1.3.0
 	github.com/magiconair/properties v1.8.9
 	github.com/mattn/goveralls v0.0.12
 	github.com/miekg/pkcs11 v1.1.1
@@ -171,6 +170,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/julienschmidt/httprouter v1.3.1-0.20240130105656-484018016424 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/parsers/json v0.1.0 // indirect

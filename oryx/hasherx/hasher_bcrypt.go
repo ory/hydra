@@ -3,11 +3,11 @@ package hasherx
 import (
 	"context"
 
+	"github.com/ory/x/otelx"
 	"github.com/pkg/errors"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,22 +35,18 @@ func NewHasherBcrypt(c BCryptConfigurator) *Bcrypt {
 }
 
 // Generate generates a hash for the given password.
-func (h *Bcrypt) Generate(ctx context.Context, password []byte) ([]byte, error) {
+func (h *Bcrypt) Generate(ctx context.Context, password []byte) (hash []byte, err error) {
 	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hash.Bcrypt.Generate")
-	defer span.End()
+	defer otelx.End(span, &err)
 
 	if err := validateBcryptPasswordLength(password); err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
 	cost := int(h.c.HasherBcryptConfig(ctx).Cost)
 	span.SetAttributes(attribute.Int("bcrypt.cost", cost))
-	hash, err := bcrypt.GenerateFromPassword(password, cost)
+	hash, err = bcrypt.GenerateFromPassword(password, cost)
 	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 

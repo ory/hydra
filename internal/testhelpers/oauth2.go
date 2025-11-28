@@ -16,7 +16,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -217,8 +216,8 @@ func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 		h = HTTPServerNotImplementedHandler
 	}
 
-	r := httprouter.New()
-	r.GET("/"+prefix, func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	r := http.NewServeMux()
+	r.HandleFunc("/"+prefix, func(w http.ResponseWriter, r *http.Request) {
 		h(w, r)
 	})
 	ts := httptest.NewServer(r)

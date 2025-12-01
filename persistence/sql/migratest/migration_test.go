@@ -264,6 +264,22 @@ func TestMigrations(t *testing.T) {
 					}
 				})
 			})
+
+			t.Run("down", func(t *testing.T) {
+				status, err := tm.Status(t.Context())
+				require.NoError(t, err)
+
+				// there are no proper down migrations from v2 to v1
+				var stepsDown int
+				for i := range status {
+					if status[len(status)-1-i].Version == "20220210000001000000" {
+						stepsDown = i
+						break
+					}
+				}
+
+				assert.NoError(t, tm.Down(t.Context(), stepsDown))
+			})
 		})
 	}
 }

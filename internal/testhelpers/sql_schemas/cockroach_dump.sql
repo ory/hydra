@@ -1,4 +1,4 @@
--- migrations hash: dafe7028cc42e8a804b6ca0417a404daace09184350797a13e1d2806ea4fca6f396db0df017f7485191dbb9c9e922cc4e11a9c10c7b79bc5b150776e0e9a0f30
+-- migrations hash: f5af1bbf8624fd09cf094c1a5745a255e6ea8d56bc7177e0db9eb73d72f1b3dae0fdf3312458a84550c1f2374b0a1ea6fdd026e22267fbf1808b8e8611fb39c0
 
 CREATE TABLE public.schema_migration (
 	version VARCHAR(48) NOT NULL,

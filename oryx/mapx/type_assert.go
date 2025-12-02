@@ -81,15 +81,6 @@ func GetTime[K comparable](values map[K]any, key K) (time.Time, error) {
 	return time.Time{}, ErrKeyCanNotBeTypeAsserted
 }
 
-// GetInt64Default returns a int64 or the default value for a given key in values.
-func GetInt64Default[K comparable](values map[K]any, key K, defaultValue int64) int64 {
-	f, err := GetInt64(values, key)
-	if err != nil {
-		return defaultValue
-	}
-	return f
-}
-
 // GetInt64 returns an int64 for a given key in values.
 func GetInt64[K comparable](values map[K]any, key K) (int64, error) {
 	v, ok := values[key]
@@ -122,15 +113,6 @@ func GetInt64[K comparable](values map[K]any, key K) (int64, error) {
 	return 0, ErrKeyCanNotBeTypeAsserted
 }
 
-// GetInt32Default returns a int32 or the default value for a given key in values.
-func GetInt32Default[K comparable](values map[K]any, key K, defaultValue int32) int32 {
-	f, err := GetInt32(values, key)
-	if err != nil {
-		return defaultValue
-	}
-	return f
-}
-
 // GetInt32 returns an int32 for a given key in values.
 func GetInt32[K comparable](values map[K]any, key K) (int32, error) {
 	v, err := GetInt64(values, key)
@@ -143,15 +125,6 @@ func GetInt32[K comparable](values map[K]any, key K) (int32, error) {
 	return int32(v), nil
 }
 
-// GetIntDefault returns a int or the default value for a given key in values.
-func GetIntDefault[K comparable](values map[K]any, key K, defaultValue int) int {
-	f, err := GetInt(values, key)
-	if err != nil {
-		return defaultValue
-	}
-	return f
-}
-
 // GetInt returns an int for a given key in values.
 func GetInt[K comparable](values map[K]any, key K) (int, error) {
 	v, err := GetInt64(values, key)
@@ -162,33 +135,6 @@ func GetInt[K comparable](values map[K]any, key K) (int, error) {
 		return 0, errors.New("value is out of range")
 	}
 	return int(v), nil
-}
-
-// GetFloat32Default returns a float32 or the default value for a given key in values.
-func GetFloat32Default[K comparable](values map[K]any, key K, defaultValue float32) float32 {
-	f, err := GetFloat32(values, key)
-	if err != nil {
-		return defaultValue
-	}
-	return f
-}
-
-// GetFloat32 returns a float32 for a given key in values.
-func GetFloat32[K comparable](values map[K]any, key K) (float32, error) {
-	v, ok := values[key]
-	if !ok {
-		return 0, ErrKeyDoesNotExist
-	}
-	switch v := v.(type) {
-	case json.Number:
-		f, err := v.Float64()
-		return float32(f), err
-	case float32:
-		return v, nil
-	case float64:
-		return float32(v), nil
-	}
-	return 0, ErrKeyCanNotBeTypeAsserted
 }
 
 // GetFloat64Default returns a float64 or the default value for a given key in values.

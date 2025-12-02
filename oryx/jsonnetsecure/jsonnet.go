@@ -32,13 +32,6 @@ type (
 		TLACodes, TLAVars, ExtCodes, ExtVars []kv
 	}
 
-	ProcessVM struct {
-		ctx    context.Context
-		path   string
-		args   []string
-		params processParameters
-	}
-
 	vmOptions struct {
 		jsonnetBinaryPath string
 		args              []string

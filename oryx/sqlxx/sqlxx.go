@@ -10,42 +10,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/jmoiron/sqlx/reflectx"
 	"github.com/pkg/errors"
 )
-
-// GetDBFieldNames extracts all database field names from a struct based on the `db` tags using sqlx.
-// Fields without a `db` tag, with a `db:"-"` tag, or listed in the `exclude` parameter are omitted.
-// Returns a slice of field names as strings.
-//
-//	type Simple struct {
-//		Foo  string `db:"foo"`
-//		Bar  string `db:"bar"`
-//		Baz  string `db:"baz"`
-//		Baz  string `db:"-"`    // Excluded due to "-" tag
-//		Qux  string             // Excluded due to missing db tag
-//	}
-//
-//	fields := GetDBFieldNames[Simple](true, []string{"baz"})
-//	// Returns: ["foo", "bar"]
-func GetDBFieldNames[M any](strict bool, excludeColumns []string) []string {
-	// Create a mapper that uses the "db" tag
-	mapper := reflectx.NewMapper("db")
-
-	// Get field names from the structs
-	fields := mapper.TypeMap(reflectx.Deref(reflect.TypeOf((*M)(nil)))).Names
-
-	// Extract just the field names
-	fieldNames := make([]string, 0, len(fields))
-	for _, f := range fields {
-		if (strict && f.Field.Tag == "") || f.Path == "" || f.Name == "" || slices.Contains(excludeColumns, f.Name) {
-			continue
-		}
-		fieldNames = append(fieldNames, f.Name)
-	}
-
-	return fieldNames
-}
 
 func keys(t any, exclude []string) []string {
 	tt := reflect.TypeOf(t)

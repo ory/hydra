@@ -28,7 +28,6 @@ type Middleware struct {
 	o   *middlewareOptions
 	wku string
 	jm  *jwtmiddleware.JWTMiddleware
-	w   herodot.Writer
 }
 
 type middlewareOptions struct {

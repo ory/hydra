@@ -22,14 +22,6 @@ func IndexHint(conn *pop.Connection, table string, index string) string {
 	return table
 }
 
-func WritableDBColumnNames[T any]() []string {
-	var names []string
-	for _, c := range (&pop.Model{Value: new(T)}).Columns().Writeable().Cols {
-		names = append(names, c.Name)
-	}
-	return names
-}
-
 func DBColumnsExcluding[T any](quoter Quoter, exclude ...string) string {
 	cols := (&pop.Model{Value: new(T)}).Columns()
 	for _, e := range exclude {

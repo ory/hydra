@@ -1,4 +1,4 @@
--- migrations hash: f5af1bbf8624fd09cf094c1a5745a255e6ea8d56bc7177e0db9eb73d72f1b3dae0fdf3312458a84550c1f2374b0a1ea6fdd026e22267fbf1808b8e8611fb39c0
+-- migrations hash: 50fee568f492d7cbf7edabd240b0b534f15a23da153bdfd04f55cd470a41a9650b3561b8a943d6c35e867fb444b35cf21ae3b242e256fbcbb6b4fe59f10775a7
 
 CREATE TABLE "hydra_client"
 (
@@ -148,131 +148,137 @@ CREATE INDEX hydra_oauth2_device_auth_codes_client_id_idx ON hydra_oauth2_device
 CREATE INDEX hydra_oauth2_device_auth_codes_request_id_idx ON hydra_oauth2_device_auth_codes (request_id, nid);
 CREATE UNIQUE INDEX hydra_oauth2_device_auth_codes_user_code_signature_idx ON hydra_oauth2_device_auth_codes (nid, user_code_signature);
 CREATE TABLE "hydra_oauth2_flow" (
-    login_challenge           VARCHAR(40)  NOT NULL PRIMARY KEY,
-    nid                       CHAR(36)     NOT NULL,
-    requested_scope           TEXT         NOT NULL,
-    login_verifier            VARCHAR(40)  NOT NULL,
-    login_csrf                VARCHAR(40)  NOT NULL,
-    subject                   VARCHAR(255) NOT NULL,
-    request_url               TEXT         NOT NULL,
-    login_skip                INTEGER      NOT NULL,
-    client_id                 VARCHAR(255) NOT NULL,
-    requested_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    oidc_context              TEXT         NOT NULL,
-    login_session_id          VARCHAR(40)  NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE SET NULL,
-    requested_at_audience     TEXT         NULL DEFAULT '',
-    login_initialized_at      TIMESTAMP    NULL,
+    login_challenge               VARCHAR(40)   NOT NULL PRIMARY KEY,
+    nid                           CHAR(36)      NOT NULL,
+    requested_scope               TEXT          NOT NULL,
+    login_verifier                VARCHAR(40)   NOT NULL,
+    login_csrf                    VARCHAR(40)   NOT NULL,
+    subject                       VARCHAR(255)  NOT NULL,
+    request_url                   TEXT          NOT NULL,
+    login_skip                    INTEGER       NOT NULL,
+    client_id                     VARCHAR(255)  NOT NULL,
+    requested_at                  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    oidc_context                  TEXT          NOT NULL,
+    login_session_id              VARCHAR(40)   NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE SET NULL,
+    requested_at_audience         TEXT          NULL,
+    login_initialized_at          TIMESTAMP     NULL,
 
-    state                     INTEGER      NOT NULL,
+    state                         INTEGER       NOT NULL,
 
-    login_remember            INTEGER      NULL,
-    login_remember_for        INTEGER      NULL,
-    login_error               TEXT         NULL,
-    acr                       TEXT         NULL,
-    login_authenticated_at    TIMESTAMP    NULL,
-    login_was_used            INTEGER      NULL,
-    forced_subject_identifier VARCHAR(255) NULL DEFAULT '',
-    context                   TEXT         NULL DEFAULT '{}',
-    amr                       TEXT         NULL DEFAULT '',
+    login_remember                INTEGER       NULL,
+    login_remember_for            INTEGER       NULL,
+    login_error                   TEXT          NULL,
+    acr                           TEXT          NULL,
+    login_authenticated_at        TIMESTAMP     NULL,
+    login_was_used                INTEGER       NULL,
+    forced_subject_identifier     VARCHAR(255)  NULL,
+    context                       TEXT          NULL,
+    amr                           TEXT          NULL,
 
-    consent_challenge_id      VARCHAR(40)  NULL,
-    consent_skip              INTEGER      NULL DEFAULT false,
-    consent_verifier          VARCHAR(40)  NULL,
-    consent_csrf              VARCHAR(40)  NULL,
+    consent_challenge_id          VARCHAR(40)   NULL,
+    consent_skip                  INTEGER       NULL,
+    consent_verifier              VARCHAR(40)   NULL,
+    consent_csrf                  VARCHAR(40)   NULL,
 
-    granted_scope             TEXT        NULL,
-    granted_at_audience       TEXT        NULL DEFAULT '',
-    consent_remember          INTEGER     NULL DEFAULT 0,
-    consent_remember_for      INTEGER     NULL,
-    consent_handled_at        TIMESTAMP   NULL,
-    consent_was_used          INTEGER     NOT NULL DEFAULT false,
-    consent_error             TEXT        NULL,
-    session_id_token          TEXT        NULL DEFAULT '{}',
-    session_access_token      TEXT        NULL DEFAULT '{}', login_extend_session_lifespan BOOLEAN NOT NULL DEFAULT FALSE, identity_provider_session_id VARCHAR(40), device_challenge_id VARCHAR(255) NULL, device_code_request_id VARCHAR(255) NULL, device_verifier VARCHAR(40) NULL, device_csrf VARCHAR(40) NULL, device_was_used BOOLEAN NULL, device_handled_at TIMESTAMP NULL, device_error VARCHAR(2048) NULL, expires_at TIMESTAMP
-    GENERATED ALWAYS AS (if(consent_remember_for > 0, datetime(requested_at, '+' || consent_remember_for || ' seconds'), NULL)) VIRTUAL,
+    granted_scope                 TEXT          NULL,
+    granted_at_audience           TEXT          NULL,
+    consent_remember              INTEGER       NULL,
+    consent_remember_for          INTEGER       NULL,
+    consent_handled_at            TIMESTAMP     NULL,
+    consent_was_used              INTEGER       NOT NULL,
+    consent_error                 TEXT          NULL,
+    session_id_token              TEXT          NULL,
+    session_access_token          TEXT          NULL,
+    login_extend_session_lifespan BOOLEAN       NULL,
+    identity_provider_session_id  VARCHAR(40)   NULL,
+    device_challenge_id           VARCHAR(255)  NULL,
+    device_code_request_id        VARCHAR(255)  NULL,
+    device_verifier               VARCHAR(40)   NULL,
+    device_csrf                   VARCHAR(40)   NULL,
+    device_was_used               BOOLEAN       NULL,
+    device_handled_at             TIMESTAMP     NULL,
+    device_error                  VARCHAR(2048) NULL,
+    expires_at                    TIMESTAMP GENERATED ALWAYS AS (if(consent_remember_for > 0,
+                                                                  datetime(requested_at, '+' || consent_remember_for || ' seconds'),
+                                                                  NULL)) VIRTUAL,
 
-    FOREIGN KEY (client_id, nid) REFERENCES hydra_client (id, nid) ON DELETE CASCADE,
-
-    CHECK (
-        state = 128 OR
-        state = 129 OR
-        state = 1 OR
-        (state = 2 AND (
-            login_remember IS NOT NULL AND
-            login_remember_for IS NOT NULL AND
-            login_error IS NOT NULL AND
-            acr IS NOT NULL AND
-            login_was_used IS NOT NULL AND
-            context IS NOT NULL AND
-            amr IS NOT NULL
-        )) OR
-        (state = 3 AND (
-            login_remember IS NOT NULL AND
-            login_remember_for IS NOT NULL AND
-            login_error IS NOT NULL AND
-            acr IS NOT NULL AND
-            login_was_used IS NOT NULL AND
-            context IS NOT NULL AND
-            amr IS NOT NULL
-        )) OR
-        (state = 4 AND (
-            login_remember IS NOT NULL AND
-            login_remember_for IS NOT NULL AND
-            login_error IS NOT NULL AND
-            acr IS NOT NULL AND
-            login_was_used IS NOT NULL AND
-            context IS NOT NULL AND
-            amr IS NOT NULL AND
-
-            consent_challenge_id IS NOT NULL AND
-            consent_verifier IS NOT NULL AND
-            consent_skip IS NOT NULL AND
-            consent_csrf IS NOT NULL
-        )) OR
-        (state = 5 AND (
-            login_remember IS NOT NULL AND
-            login_remember_for IS NOT NULL AND
-            login_error IS NOT NULL AND
-            acr IS NOT NULL AND
-            login_was_used IS NOT NULL AND
-            context IS NOT NULL AND
-            amr IS NOT NULL AND
-
-            consent_challenge_id IS NOT NULL AND
-            consent_verifier IS NOT NULL AND
-            consent_skip IS NOT NULL AND
-            consent_csrf IS NOT NULL
-        )) OR
-        (state = 6 AND (
-            login_remember IS NOT NULL AND
-            login_remember_for IS NOT NULL AND
-            login_error IS NOT NULL AND
-            acr IS NOT NULL AND
-            login_was_used IS NOT NULL AND
-            context IS NOT NULL AND
-            amr IS NOT NULL AND
-
-            consent_challenge_id IS NOT NULL AND
-            consent_verifier IS NOT NULL AND
-            consent_skip IS NOT NULL AND
-            consent_csrf IS NOT NULL AND
-
-            granted_scope IS NOT NULL AND
-            consent_remember IS NOT NULL AND
-            consent_remember_for IS NOT NULL AND
-            consent_error IS NOT NULL AND
-            session_access_token IS NOT NULL AND
-            session_id_token IS NOT NULL AND
-            consent_was_used IS NOT NULL
-        ))
+  FOREIGN KEY (client_id, nid) REFERENCES hydra_client (id, nid) ON DELETE CASCADE,
+  CHECK (
+    state = 128 OR
+    state = 129 OR
+    state = 1 OR
+    (state = 2 AND (
+      login_remember IS NOT NULL AND
+      login_remember_for IS NOT NULL AND
+      login_error IS NOT NULL AND
+      acr IS NOT NULL AND
+      login_was_used IS NOT NULL AND
+      context IS NOT NULL AND
+      amr IS NOT NULL
+      )) OR
+    (state = 3 AND (
+      login_remember IS NOT NULL AND
+      login_remember_for IS NOT NULL AND
+      login_error IS NOT NULL AND
+      acr IS NOT NULL AND
+      login_was_used IS NOT NULL AND
+      context IS NOT NULL AND
+      amr IS NOT NULL
+      )) OR
+    (state = 4 AND (
+      login_remember IS NOT NULL AND
+      login_remember_for IS NOT NULL AND
+      login_error IS NOT NULL AND
+      acr IS NOT NULL AND
+      login_was_used IS NOT NULL AND
+      context IS NOT NULL AND
+      amr IS NOT NULL AND
+      consent_challenge_id IS NOT NULL AND
+      consent_verifier IS NOT NULL AND
+      consent_skip IS NOT NULL AND
+      consent_csrf IS NOT NULL
+      )) OR
+    (state = 5 AND (
+      login_remember IS NOT NULL AND
+      login_remember_for IS NOT NULL AND
+      login_error IS NOT NULL AND
+      acr IS NOT NULL AND
+      login_was_used IS NOT NULL AND
+      context IS NOT NULL AND
+      amr IS NOT NULL AND
+      consent_challenge_id IS NOT NULL AND
+      consent_verifier IS NOT NULL AND
+      consent_skip IS NOT NULL AND
+      consent_csrf IS NOT NULL
+      )) OR
+    (state = 6 AND (
+      login_remember IS NOT NULL AND
+      login_remember_for IS NOT NULL AND
+      login_error IS NOT NULL AND
+      acr IS NOT NULL AND
+      login_was_used IS NOT NULL AND
+      context IS NOT NULL AND
+      amr IS NOT NULL AND
+      consent_challenge_id IS NOT NULL AND
+      consent_verifier IS NOT NULL AND
+      consent_skip IS NOT NULL AND
+      consent_csrf IS NOT NULL AND
+      granted_scope IS NOT NULL AND
+      consent_remember IS NOT NULL AND
+      consent_remember_for IS NOT NULL AND
+      consent_error IS NOT NULL AND
+      session_access_token IS NOT NULL AND
+      session_id_token IS NOT NULL AND
+      consent_was_used IS NOT NULL
+      ))
     )
 );
 CREATE INDEX hydra_oauth2_flow_client_id_idx ON hydra_oauth2_flow (client_id, nid);
 CREATE UNIQUE INDEX hydra_oauth2_flow_consent_challenge_id_idx ON hydra_oauth2_flow (consent_challenge_id);
 CREATE UNIQUE INDEX hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
 CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON hydra_oauth2_flow (login_session_id);
-CREATE INDEX hydra_oauth2_flow_previous_consents_idx
-  ON hydra_oauth2_flow (subject, client_id, nid, consent_skip, consent_error, consent_remember);
+CREATE INDEX hydra_oauth2_flow_previous_consents_idx ON hydra_oauth2_flow (subject, client_id, nid, consent_skip,
+                                                                           consent_error, consent_remember);
 CREATE INDEX hydra_oauth2_flow_subject_idx ON hydra_oauth2_flow (subject, nid);
 CREATE TABLE "hydra_oauth2_jti_blacklist" (
     signature  VARCHAR(64) NOT NULL,

@@ -142,7 +142,7 @@ func TestMigrations(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				require.Len(t, flows, 18)
+				require.Len(t, flows, 19)
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {

@@ -4,11 +4,11 @@
 package sqlxx
 
 import (
-	"bytes"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -47,7 +47,18 @@ type StringSliceJSONFormat []string
 
 // Scan implements the Scanner interface.
 func (m *StringSliceJSONFormat) Scan(value interface{}) error {
-	val := fmt.Sprintf("%s", value)
+	var val string
+	switch v := value.(type) {
+	case nil:
+		*m = StringSliceJSONFormat{}
+		return nil
+	case string:
+		val = v
+	case []byte:
+		val = string(v)
+	default:
+		return errors.Errorf("cannot scan %#v into StringSliceJSONFormat", value)
+	}
 	if len(val) == 0 {
 		val = "[]"
 	}
@@ -358,7 +369,16 @@ type JSONRawMessage json.RawMessage
 
 // Scan implements the Scanner interface.
 func (m *JSONRawMessage) Scan(value interface{}) error {
-	*m = []byte(fmt.Sprintf("%s", value))
+	switch v := value.(type) {
+	case []byte:
+		*m = slices.Clone(v)
+	case string:
+		*m = JSONRawMessage(v)
+	case nil:
+		*m = JSONRawMessage("null")
+	default:
+		return errors.Errorf("cannot scan %T into JSONRawMessage", value)
+	}
 	return nil
 }
 
@@ -393,17 +413,13 @@ func (m *JSONRawMessage) UnmarshalJSON(data []byte) error {
 type NullJSONRawMessage json.RawMessage
 
 // Scan implements the Scanner interface.
-func (m *NullJSONRawMessage) Scan(value interface{}) error {
-	if value == nil {
-		value = "null"
-	}
-	*m = []byte(fmt.Sprintf("%s", value))
-	return nil
+func (m *NullJSONRawMessage) Scan(value any) error {
+	return (*JSONRawMessage)(m).Scan(value)
 }
 
 // Value implements the driver Valuer interface.
 func (m NullJSONRawMessage) Value() (driver.Value, error) {
-	if len(m) == 0 {
+	if len(m) == 0 || string(m) == "null" {
 		return nil, nil
 	}
 	return string(m), nil
@@ -426,27 +442,25 @@ func (m *NullJSONRawMessage) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// JSONScan is a generic helper for storing a value as a JSON blob in SQL.
-func JSONScan(dst interface{}, value interface{}) error {
-	if value == nil {
-		value = "null"
+// JSONScan is a generic helper for retrieving a SQL JSON-encoded value.
+func JSONScan(dst, value any) error {
+	// Note: raw is a string (not []byte) because the MySQL driver reuses byte slices across scans.
+	// Using strings avoids the need to manually copy the byte slice.
+	var raw string
+	switch v := value.(type) {
+	case nil:
+		raw = "null"
+	case string:
+		raw = v
+	case []byte:
+		raw = string(v)
+	default:
+		return fmt.Errorf("unable to scan type %T as JSON into %T", value, dst)
 	}
-	if err := json.Unmarshal([]byte(fmt.Sprintf("%s", value)), &dst); err != nil {
-		return fmt.Errorf("unable to decode payload to: %s", err)
+	if err := json.Unmarshal([]byte(raw), dst); err != nil {
+		return fmt.Errorf("unable to decode JSON payload into %T: %w", dst, err)
 	}
 	return nil
-}
-
-// JSONValue is a generic helper for retrieving a SQL JSON-encoded value.
-func JSONValue(src interface{}) (driver.Value, error) {
-	if src == nil {
-		return nil, nil
-	}
-	var b bytes.Buffer
-	if err := json.NewEncoder(&b).Encode(&src); err != nil {
-		return nil, err
-	}
-	return b.String(), nil
 }
 
 // NullInt64 represents an int64 that may be null.

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -83,6 +82,7 @@ type RegistrySQL struct {
 	oidcs                jwk.JWTSigner
 	ats                  jwk.JWTSigner
 	hmacs                foauth2.CoreStrategy
+	jwtStrategy          foauth2.AccessTokenStrategy
 	enigmaHMAC           *hmac.HMACStrategy
 	deviceHmac           *rfc8628.DefaultDeviceStrategy
 	fc                   *fositex.Config
@@ -239,52 +239,41 @@ func (m *RegistrySQL) Init(
 		}
 
 		if !skipNetworkInit {
-			net, err := m.basePersister.DetermineNetwork(ctx)
-			if err != nil {
-				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
+			if err := m.InitNetwork(ctx); err != nil {
 				return err
 			}
-
-			m.basePersister = m.basePersister.WithFallbackNetworkID(net.ID)
 		}
 	}
 
 	return nil
 }
 
-func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
-	scheme := strings.Split(dsn, "://")[0]
-	s := dbal.Canonicalize(scheme)
-	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
+func (m *RegistrySQL) InitNetwork(ctx context.Context) error {
+	net, err := m.basePersister.DetermineNetwork(ctx)
+	if err != nil {
+		m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
+		return err
+	}
+
+	m.basePersister = m.basePersister.WithFallbackNetworkID(net.ID)
+	return nil
 }
 
-func (m *RegistrySQL) PingContext(ctx context.Context) error {
-	return m.basePersister.Ping(ctx)
-}
+func (m *RegistrySQL) PingContext(ctx context.Context) error { return m.basePersister.Ping(ctx) }
 
-func (m *RegistrySQL) ClientManager() client.Manager {
-	return m.Persister()
-}
-
-func (m *RegistrySQL) ConsentManager() consent.Manager {
-	return m.Persister()
-}
-
+func (m *RegistrySQL) BasePersister() *sql.BasePersister { return m.basePersister }
+func (m *RegistrySQL) ClientManager() client.Manager     { return m.Persister() }
+func (m *RegistrySQL) ConsentManager() consent.Manager   { return m.Persister() }
 func (m *RegistrySQL) ObfuscatedSubjectManager() consent.ObfuscatedSubjectManager {
 	return m.Persister()
 }
-
-func (m *RegistrySQL) LoginManager() consent.LoginManager { return m.Persister() }
-
+func (m *RegistrySQL) LoginManager() consent.LoginManager   { return m.Persister() }
 func (m *RegistrySQL) LogoutManager() consent.LogoutManager { return m.Persister() }
-
-func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
-	return m.Persister()
-}
+func (m *RegistrySQL) OAuth2Storage() x.FositeStorer        { return m.Persister() }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
 	if m.keyManager == nil {
-		softwareKeyManager := &sql.JWKPersister{BasePersister: m.basePersister}
+		softwareKeyManager := &sql.JWKPersister{D: m}
 		if m.Config().HSMEnabled() {
 			hardwareKeyManager := hsm.NewKeyManager(m.HSMContext(), m.Config())
 			m.keyManager = jwk.NewManagerStrategy(hardwareKeyManager, softwareKeyManager)
@@ -295,9 +284,7 @@ func (m *RegistrySQL) KeyManager() jwk.Manager {
 	return m.keyManager
 }
 
-func (m *RegistrySQL) GrantManager() trust.GrantManager {
-	return m.Persister()
-}
+func (m *RegistrySQL) GrantManager() trust.GrantManager { return m.Persister() }
 
 func (m *RegistrySQL) Contextualizer() contextx.Contextualizer {
 	if m.ctxer == nil {
@@ -460,7 +447,7 @@ func (m *RegistrySQL) CookieStore(ctx context.Context) (sessions.Store, error) {
 	return cs, nil
 }
 
-func (m *RegistrySQL) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
+func (m *RegistrySQL) HTTPClient(_ context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
 	opts = append(opts,
 		httpx.ResilientClientWithLogger(m.Logger()),
 		httpx.ResilientClientWithMaxRetry(2),
@@ -483,14 +470,14 @@ func (m *RegistrySQL) OAuth2Provider() fosite.OAuth2Provider {
 	return m.fop
 }
 
-func (m *RegistrySQL) OpenIDJWTStrategy() jwk.JWTSigner {
+func (m *RegistrySQL) OpenIDJWTSigner() jwk.JWTSigner {
 	if m.oidcs == nil {
 		m.oidcs = jwk.NewDefaultJWTSigner(m, x.OpenIDConnectKeyName)
 	}
 	return m.oidcs
 }
 
-func (m *RegistrySQL) AccessTokenJWTStrategy() jwk.JWTSigner {
+func (m *RegistrySQL) AccessTokenJWTSigner() jwk.JWTSigner {
 	if m.ats == nil {
 		m.ats = jwk.NewDefaultJWTSigner(m, x.OAuth2JWTKeyName)
 	}
@@ -509,6 +496,16 @@ func (m *RegistrySQL) OAuth2HMACStrategy() foauth2.CoreStrategy {
 		m.hmacs = foauth2.NewHMACSHAStrategy(m.OAuth2EnigmaStrategy(), m.OAuth2Config())
 	}
 	return m.hmacs
+}
+
+func (m *RegistrySQL) OAuth2JWTStrategy() foauth2.AccessTokenStrategy {
+	if m.jwtStrategy == nil {
+		m.jwtStrategy = &foauth2.DefaultJWTStrategy{
+			Signer: m.AccessTokenJWTSigner(),
+			Config: m.OAuth2Config(),
+		}
+	}
+	return m.jwtStrategy
 }
 
 // rfc8628HMACStrategy returns the rfc8628 strategy
@@ -551,22 +548,11 @@ func (m *RegistrySQL) OAuth2ProviderConfig() fosite.Configurator {
 	}
 
 	conf := m.OAuth2Config()
-	hmacAtStrategy := m.OAuth2HMACStrategy()
 	deviceHmacAtStrategy := m.rfc8628HMACStrategy()
-	oidcSigner := m.OpenIDJWTStrategy()
-	atSigner := m.AccessTokenJWTStrategy()
-	jwtAtStrategy := &foauth2.DefaultJWTStrategy{
-		Signer:   atSigner,
-		Strategy: hmacAtStrategy,
-		Config:   conf,
-	}
+	oidcSigner := m.OpenIDJWTSigner()
 
-	conf.LoadDefaultHandlers(m, &compose.CommonStrategy{
-		CoreStrategy: fositex.NewTokenStrategy(m.Config(), hmacAtStrategy, &foauth2.DefaultJWTStrategy{
-			Signer:   jwtAtStrategy,
-			Strategy: hmacAtStrategy,
-			Config:   conf,
-		}),
+	conf.LoadDefaultHandlers(m, &compose.CommonStrategyProvider{
+		CoreStrategy:   fositex.NewTokenStrategy(m),
 		DeviceStrategy: deviceHmacAtStrategy,
 		OIDCTokenStrategy: &openid.DefaultStrategy{
 			Config: conf,
@@ -583,7 +569,7 @@ func (m *RegistrySQL) OpenIDConnectRequestValidator() *openid.OpenIDConnectReque
 	if m.forv == nil {
 		m.forv = openid.NewOpenIDConnectRequestValidator(&openid.DefaultStrategy{
 			Config: m.OAuth2ProviderConfig(),
-			Signer: m.OpenIDJWTStrategy(),
+			Signer: m.OpenIDJWTSigner(),
 		}, m.OAuth2ProviderConfig())
 	}
 	return m.forv
@@ -612,19 +598,11 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 	return m.trc
 }
 
-func (m *RegistrySQL) Persister() persistence.Persister {
-	return sql.NewPersister(m.basePersister, m)
-}
-
-// Config returns the configuration for the given context. It may or may not be the same as the global configuration.
-func (m *RegistrySQL) Config() *config.DefaultProvider {
-	return m.conf
-}
+func (m *RegistrySQL) Persister() persistence.Persister { return sql.NewPersister(m.basePersister, m) }
+func (m *RegistrySQL) Config() *config.DefaultProvider  { return m.conf }
 
 // WithConsentStrategy forces a consent strategy which is only used for testing.
-func (m *RegistrySQL) WithConsentStrategy(c consent.Strategy) {
-	m.cos = c
-}
+func (m *RegistrySQL) WithConsentStrategy(c consent.Strategy) { m.cos = c }
 
 func (m *RegistrySQL) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {

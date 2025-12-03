@@ -10,6 +10,11 @@ import (
 )
 
 type CoreStrategy interface {
+	AuthorizeCodeStrategy
+	AccessTokenStrategy
+	RefreshTokenStrategy
+}
+type CoreStrategyProvider interface {
 	AuthorizeCodeStrategyProvider
 	AccessTokenStrategyProvider
 	RefreshTokenStrategyProvider

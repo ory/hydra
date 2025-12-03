@@ -4,7 +4,6 @@
 package cmd_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -21,7 +20,8 @@ import (
 )
 
 func TestDeleteClient(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewDeleteClientCmd()
 	reg := setup(t, c)
 
@@ -30,7 +30,7 @@ func TestDeleteClient(t *testing.T) {
 		stdout := cmdx.ExecNoErr(t, c, expected.GetID())
 		assert.Equal(t, fmt.Sprintf(`"%s"`, expected.GetID()), strings.TrimSpace(stdout))
 
-		_, err := reg.ClientManager().GetClient(ctx, expected.GetID())
+		_, err := reg.ClientManager().GetClient(t.Context(), expected.GetID())
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	})
 
@@ -39,10 +39,10 @@ func TestDeleteClient(t *testing.T) {
 		expected2 := createClient(t, reg, nil)
 		assertx.EqualAsJSON(t, []string{expected1.GetID(), expected2.GetID()}, json.RawMessage(cmdx.ExecNoErr(t, c, expected1.GetID(), expected2.GetID())))
 
-		_, err := reg.ClientManager().GetClient(ctx, expected1.GetID())
+		_, err := reg.ClientManager().GetClient(t.Context(), expected1.GetID())
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 
-		_, err = reg.ClientManager().GetClient(ctx, expected2.GetID())
+		_, err = reg.ClientManager().GetClient(t.Context(), expected2.GetID())
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	})
 
@@ -53,7 +53,7 @@ func TestDeleteClient(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf(`"%s"`, expected.GetID()), strings.TrimSpace(stdout))
 		snapshotx.SnapshotT(t, stderr)
 
-		_, err = reg.ClientManager().GetClient(ctx, expected.GetID())
+		_, err = reg.ClientManager().GetClient(t.Context(), expected.GetID())
 		assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 	})
 }

@@ -27,12 +27,8 @@ type AuthorizeExplicitGrantHandler struct {
 		RefreshTokenStorageProvider
 		TokenRevocationStorageProvider
 	}
-	Strategy interface {
-		AuthorizeCodeStrategyProvider
-		AccessTokenStrategyProvider
-		RefreshTokenStrategyProvider
-	}
-	Config interface {
+	Strategy CoreStrategyProvider
+	Config   interface {
 		fosite.AuthorizeCodeLifespanProvider
 		fosite.AccessTokenLifespanProvider
 		fosite.RefreshTokenLifespanProvider

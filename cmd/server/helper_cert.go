@@ -53,7 +53,7 @@ func GetOrCreateTLSCertificate(ctx context.Context, d *driver.RegistrySQL, tlsCo
 	d.Logger().Infof("No certificate found for %s, generating a self-signed certificate.", ifaceName)
 
 	// no certificates configured: self-sign a new cert
-	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.KeyManager(), TlsKeyName, "RS256")
+	priv, err := jwk.GetOrGenerateKeys(ctx, d, TlsKeyName, "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 		return nil // in case Fatal is hooked

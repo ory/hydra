@@ -5,7 +5,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -33,7 +32,8 @@ func writeTempFile(t *testing.T, contents interface{}) string {
 }
 
 func TestImportClient(t *testing.T) {
-	ctx := context.Background()
+	t.Context()
+
 	c := cmd.NewImportClientCmd()
 	reg := setup(t, c)
 
@@ -47,10 +47,10 @@ func TestImportClient(t *testing.T) {
 		assert.NotEmpty(t, actual.Get("0.client_secret").String())
 		assert.Equal(t, "some-secret", actual.Get("1.client_secret").String())
 
-		_, err := reg.ClientManager().GetClient(ctx, actual.Get("0.client_id").String())
+		_, err := reg.ClientManager().GetClient(t.Context(), actual.Get("0.client_id").String())
 		require.NoError(t, err)
 
-		_, err = reg.ClientManager().GetClient(ctx, actual.Get("1.client_id").String())
+		_, err = reg.ClientManager().GetClient(t.Context(), actual.Get("1.client_id").String())
 		require.NoError(t, err)
 
 		snapshotx.SnapshotT(t, json.RawMessage(actual.Raw), snapshotExcludedClientFields...)

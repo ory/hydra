@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/compose"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/fosite/storage"
 )
@@ -24,18 +25,14 @@ func parseUrl(uu string) *url.URL {
 }
 
 func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
-	for k, strategy := range map[string]any{
+	for k, strategy := range map[string]oauth2.CoreStrategy{
 		"hmac": hmacshaStrategy,
 	} {
 		t.Run("strategy="+k, func(t *testing.T) {
 			store := storage.NewMemoryStore()
 			handler := oauth2.AuthorizeExplicitGrantHandler{
-				Storage: store,
-				Strategy: strategy.(interface {
-					oauth2.AccessTokenStrategyProvider
-					oauth2.RefreshTokenStrategyProvider
-					oauth2.AuthorizeCodeStrategyProvider
-				}),
+				Storage:  store,
+				Strategy: &compose.CommonStrategyProvider{CoreStrategy: strategy},
 				Config: &fosite.Config{
 					AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,
 					ScopeStrategy:            fosite.HierarchicScopeStrategy,
@@ -128,12 +125,8 @@ func TestAuthorizeCode_HandleAuthorizeEndpointRequest(t *testing.T) {
 				},
 				{
 					handler: oauth2.AuthorizeExplicitGrantHandler{
-						Storage: store,
-						Strategy: strategy.(interface {
-							oauth2.AccessTokenStrategyProvider
-							oauth2.RefreshTokenStrategyProvider
-							oauth2.AuthorizeCodeStrategyProvider
-						}),
+						Storage:  store,
+						Strategy: &compose.CommonStrategyProvider{CoreStrategy: strategy},
 						Config: &fosite.Config{
 							ScopeStrategy:            fosite.HierarchicScopeStrategy,
 							AudienceMatchingStrategy: fosite.DefaultAudienceMatchingStrategy,

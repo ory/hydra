@@ -61,11 +61,11 @@ func (t *mockDeviceCodeStrategyProvider) UserCodeStrategy() rfc8628.UserCodeStra
 }
 
 func (t *mockDeviceCodeStrategyProvider) AccessTokenStrategy() oauth2.AccessTokenStrategy {
-	return t.coreStrategy.AccessTokenStrategy()
+	return t.coreStrategy
 }
 
 func (t *mockDeviceCodeStrategyProvider) RefreshTokenStrategy() oauth2.RefreshTokenStrategy {
-	return t.coreStrategy.RefreshTokenStrategy()
+	return t.coreStrategy
 }
 
 func TestDeviceUserCode_HandleTokenEndpointRequest(t *testing.T) {

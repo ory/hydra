@@ -18,14 +18,14 @@ import (
 )
 
 func TestRevokeToken(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runRevokeTokenTest(t, strategy)
 	}
 }
 
-func runRevokeTokenTest(t *testing.T, strategy oauth2.AccessTokenStrategy) {
+func runRevokeTokenTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2ClientCredentialsGrantFactory, compose.OAuth2TokenIntrospectionFactory, compose.OAuth2TokenRevocationFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()

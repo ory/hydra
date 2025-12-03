@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 type (
@@ -54,8 +52,6 @@ const (
 	serialTypeRemove serialEventType = "remove"
 	serialTypeError  serialEventType = "error"
 )
-
-var errUnknownEvent = errors.New("unknown event type")
 
 func (e *ErrorEvent) Reader() io.Reader {
 	return bytes.NewBufferString(e.Error())
@@ -110,28 +106,4 @@ func (e *RemoveEvent) MarshalJSON() ([]byte, error) {
 
 func (e *RemoveEvent) String() string {
 	return fmt.Sprintf("removed source: %s", e.source)
-}
-
-func unmarshalEvent(data []byte) (Event, error) {
-	var serialEvent serialEvent
-	if err := json.Unmarshal(data, &serialEvent); err != nil {
-		return nil, errors.WithStack(err)
-	}
-	switch serialEvent.Type {
-	case serialTypeRemove:
-		return &RemoveEvent{
-			source: serialEvent.Source,
-		}, nil
-	case serialTypeChange:
-		return &ChangeEvent{
-			data:   serialEvent.Data,
-			source: serialEvent.Source,
-		}, nil
-	case serialTypeError:
-		return &ErrorEvent{
-			error:  errors.New(string(serialEvent.Data)),
-			source: serialEvent.Source,
-		}, nil
-	}
-	return nil, errUnknownEvent
 }

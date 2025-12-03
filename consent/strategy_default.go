@@ -164,7 +164,7 @@ func (s *defaultStrategy) requestAuthentication(
 }
 
 func (s *defaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwt.MapClaims, error) {
-	token, err := s.r.OpenIDJWTStrategy().Decode(ctx, idTokenHint)
+	token, err := s.r.OpenIDJWTSigner().Decode(ctx, idTokenHint)
 	if ve := new(jwt.ValidationError); errors.As(err, &ve) && ve.Errors == jwt.ValidationErrorExpired {
 		// Expired is ok
 	} else if err != nil {
@@ -691,7 +691,7 @@ func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		return err
 	}
 
-	openIDKeyID, err := s.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	openIDKeyID, err := s.r.OpenIDJWTSigner().GetPublicKeyID(ctx)
 	if err != nil {
 		return err
 	}
@@ -711,7 +711,7 @@ func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
 		// sub := s.obfuscateSubjectIdentifier(c, subject, )
 
-		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwt.MapClaims{
+		t, _, err := s.r.OpenIDJWTSigner().Generate(ctx, jwt.MapClaims{
 			"iss":    s.r.Config().IssuerURL(ctx).String(),
 			"aud":    []string{c.ID},
 			"iat":    time.Now().UTC().Unix(),

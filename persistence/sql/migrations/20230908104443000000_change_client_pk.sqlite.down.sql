@@ -50,8 +50,7 @@ CREATE TABLE "_hydra_client_tmp"
   refresh_token_grant_access_token_lifespan       BIGINT NULL DEFAULT NULL,
   refresh_token_grant_refresh_token_lifespan      BIGINT NULL DEFAULT NULL,
   skip_consent                                    BOOLEAN          NOT NULL DEFAULT false,
-  nid                                             CHAR(36)         NOT NULL,
-  PRIMARY KEY (id, nid)
+  nid                                             CHAR(36)         NOT NULL
 );
 INSERT INTO "_hydra_client_tmp" (id,
                                  client_name,
@@ -127,7 +126,6 @@ SELECT id,
        userinfo_signed_response_alg,
        subject_type,
        allowed_cors_origins,
-       id,
        pk,
        pk_deprecated,
        audience,

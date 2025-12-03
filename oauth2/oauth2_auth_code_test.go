@@ -1788,7 +1788,7 @@ func claimsFromVCResponse(t *testing.T, reg *driver.RegistrySQL, vc *hydraoauth2
 		if !found {
 			return nil, errors.New("missing kid header")
 		}
-		openIDKey, err := reg.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+		openIDKey, err := reg.OpenIDJWTSigner().GetPublicKeyID(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1796,7 +1796,7 @@ func claimsFromVCResponse(t *testing.T, reg *driver.RegistrySQL, vc *hydraoauth2
 			return nil, errors.New("invalid kid header")
 		}
 
-		return x.Must(reg.OpenIDJWTStrategy().GetPublicKey(ctx)).Key, nil
+		return x.Must(reg.OpenIDJWTSigner().GetPublicKey(ctx)).Key, nil
 	})
 	require.NoError(t, err)
 

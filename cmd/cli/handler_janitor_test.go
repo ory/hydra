@@ -30,8 +30,7 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 	for k, v := range testhelpers.NotAfterTestCycles {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, k)
-			require.NoError(t, err)
+			reg := jt.GetRegistry(t)
 
 			// setup test
 			t.Run("step=setup-access", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
@@ -136,8 +135,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 	for k, v := range testhelpers.NotAfterTestCycles {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, k)
-			require.NoError(t, err)
+			reg := jt.GetRegistry(t)
 
 			// setup test
 			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.GrantManager()))

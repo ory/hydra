@@ -4,7 +4,6 @@
 package cmd_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -18,7 +17,8 @@ import (
 )
 
 func TestCreateJWKS(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewCreateJWKSCmd()
 	reg := setup(t, c)
 
@@ -29,7 +29,7 @@ func TestCreateJWKS(t *testing.T) {
 		assert.NotEmpty(t, actual.Get("keys.0.kid").Array(), "%s", actual.Raw)
 		assert.Equal(t, "ES256", actual.Get("keys.0.alg").String(), "%s", actual.Raw)
 
-		expected, err := reg.KeyManager().GetKeySet(ctx, set)
+		expected, err := reg.KeyManager().GetKeySet(t.Context(), set)
 		require.NoError(t, err)
 		assert.Equal(t, expected.Keys[0].KeyID, actual.Get("keys.0.kid").String())
 	})

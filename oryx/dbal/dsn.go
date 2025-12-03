@@ -7,22 +7,12 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-const (
-	// SQLiteInMemory is a DNS string for SQLite in-memory database.
-	//
-	// DEPRECATED: Do not use this DSN string as it can cause flaky tests
-	// due to the way SQL connection pooling works. Please use NewSQLiteTestDatabase instead.
-	SQLiteInMemory = "sqlite://file::memory:?_fk=true"
-	// SQLiteSharedInMemory is a DNS string for SQLite in-memory database in shared mode.
-	//
-	// DEPRECATED: Do not use this DSN string as it can cause flaky tests
-	// due to the way SQL connection pooling works. Please use NewSQLiteTestDatabase instead.
-	SQLiteSharedInMemory = "sqlite://file::memory:?_fk=true&cache=shared"
-)
-
-var dsnRegex = regexp.MustCompile(`^(sqlite://file:(?:.+)\?((\w+=\w+)(&\w+=\w+)*)?(&?mode=memory)(&\w+=\w+)*)$|(?:sqlite://(file:)?:memory:(?:\?\w+=\w+)?(?:&\w+=\w+)*)|^(?:(?::memory:)|(?:memory))$`)
+var sqliteMemoryRegexp = regexp.MustCompile(`^sqlite://file:.+\?.*&?mode=memory($|&.*)|sqlite://(file:)?:memory:\?.*$|^(:memory:|memory)$`)
 
 // IsMemorySQLite returns true if a given DSN string is pointing to a SQLite database.
 //
@@ -31,28 +21,16 @@ var dsnRegex = regexp.MustCompile(`^(sqlite://file:(?:.+)\?((\w+=\w+)(&\w+=\w+)*
 // - shared connection
 // - shared but unique in the same process
 // see: https://sqlite.org/inmemorydb.html
-func IsMemorySQLite(dsn string) bool {
-	return dsnRegex.MatchString(dsn)
-}
+func IsMemorySQLite(dsn string) bool { return sqliteMemoryRegexp.MatchString(dsn) }
 
-// NewSharedUniqueInMemorySQLiteDatabase creates a new unique SQLite database
+// NewSQLiteTestDatabase creates a new, unique SQLite database
 // which is shared amongst all callers and identified by an individual file name.
-//
-// DEPRECATED: Please use NewSQLiteTestDatabase instead.
-func NewSharedUniqueInMemorySQLiteDatabase() (string, error) {
-	dir, err := os.MkdirTemp(os.TempDir(), "unique-sqlite-db-*")
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&mode=memory&cache=shared", dir), nil
-}
-
-// NewSQLiteTestDatabase creates a new in-memory, unique SQLite database
-// which is shared amongst all callers and identified by an individual file name.
-func NewSQLiteTestDatabase(t interface {
-	TempDir() string
-}) string {
-	return NewSQLiteInMemoryDatabase(t.TempDir())
+// The database file is created in the system's temporary directory, and not actively
+// removed to allow debugging in case of test failures.
+func NewSQLiteTestDatabase(t testing.TB) string {
+	fn, err := os.MkdirTemp("", "sqlite-test-db-*")
+	require.NoError(t, err)
+	return NewSQLiteDatabase(fn)
 }
 
 // NewSQLiteInMemoryDatabase creates a new in-memory, unique SQLite database
@@ -70,12 +48,4 @@ func NewSQLiteInMemoryDatabase(name string) string {
 // according to official docs.
 func NewSQLiteDatabase(name string) string {
 	return fmt.Sprintf("sqlite://file:%s/test.db?_fk=true&_journal=WAL", name)
-}
-
-// NewSQLiteTestDatabaseOnDisk creates a new on-disk, unique SQLite database
-// which is shared amongst all callers and identified by an individual file name.
-func NewSQLiteTestDatabaseOnDisk(t interface {
-	TempDir() string
-}) string {
-	return NewSQLiteDatabase(t.TempDir())
 }

@@ -22,22 +22,22 @@ import (
 )
 
 func TestAuthorizeCodeFlow(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runAuthorizeCodeGrantTest(t, strategy)
 	}
 }
 
 func TestAuthorizeCodeFlowDupeCode(t *testing.T) {
-	for _, strategy := range []oauth2.AccessTokenStrategy{
-		hmacStrategy,
+	for _, strategy := range []oauth2.CoreStrategyProvider{
+		hmacStrategyProvider,
 	} {
 		runAuthorizeCodeGrantDupeCodeTest(t, strategy)
 	}
 }
 
-func runAuthorizeCodeGrantTest(t *testing.T, strategy interface{}) {
+func runAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2AuthorizeExplicitFactory, compose.OAuth2TokenIntrospectionFactory)
 	ts := mockServer(t, f, &openid.DefaultSession{Subject: "foo-sub"})
 	defer ts.Close()
@@ -147,7 +147,7 @@ func runAuthorizeCodeGrantTest(t *testing.T, strategy interface{}) {
 	}
 }
 
-func runAuthorizeCodeGrantDupeCodeTest(t *testing.T, strategy interface{}) {
+func runAuthorizeCodeGrantDupeCodeTest(t *testing.T, strategy oauth2.CoreStrategyProvider) {
 	f := compose.Compose(new(fosite.Config), fositeStore, strategy, compose.OAuth2AuthorizeExplicitFactory, compose.OAuth2TokenIntrospectionFactory)
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()

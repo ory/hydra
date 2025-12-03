@@ -177,8 +177,7 @@ func testFormPost(state *string, customResponse bool, c formPostTestCase, oauthC
 		resp, err := client.Get(authURL)
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, resp.StatusCode)
-		code, state, token, iDToken, cparam, errResp, err := internal.ParseFormPostResponse(fositeStore.Clients["response-mode-client"].GetRedirectURIs()[0], resp.Body)
-		require.NoError(t, err)
+		code, state, token, iDToken, cparam, errResp := internal.ParseFormPostResponse(t, fositeStore.Clients["response-mode-client"].GetRedirectURIs()[0], resp.Body)
 		c.check(t, state, code, iDToken, token, cparam, errResp)
 	}
 }

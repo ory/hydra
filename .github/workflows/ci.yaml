@@ -40,19 +40,19 @@ jobs:
         image: postgres:18
         env:
           POSTGRES_DB: postgres
-          POSTGRES_PASSWORD: test
-          POSTGRES_USER: test
+          POSTGRES_PASSWORD: secret
+          POSTGRES_USER: postgres
         ports:
           - 5432:5432
       mysql:
         image: mysql:9.4
         env:
-          MYSQL_ROOT_PASSWORD: test
+          MYSQL_ROOT_PASSWORD: secret
         ports:
           - 3306:3306
     env:
-      TEST_DATABASE_POSTGRESQL: "postgres://test:test@localhost:5432/postgres?sslmode=disable"
-      TEST_DATABASE_MYSQL: "mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true"
+      TEST_DATABASE_POSTGRESQL: "postgres://postgres:secret@localhost:5432/postgres?sslmode=disable"
+      TEST_DATABASE_MYSQL: "mysql://root:secret@(localhost:3306)/mysql?multiStatements=true&parseTime=true"
       TEST_DATABASE_COCKROACHDB: "cockroach://root@localhost:26257/defaultdb?sslmode=disable"
     steps:
       - run: |

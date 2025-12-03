@@ -18,6 +18,8 @@ import (
 )
 
 func TestRevokeToken(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewRevokeTokenCmd()
 	public, _, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, public.URL))

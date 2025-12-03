@@ -52,7 +52,3 @@ func NullStringer(k string, v fmt.Stringer) attribute.KeyValue {
 	}
 	return attribute.String(k, v.String())
 }
-
-func NullInt[I int | int32 | int64, V *I | sql.Null[I]](k string, v V) attribute.KeyValue {
-	return Nullable[I](AutoInt, k, v)
-}

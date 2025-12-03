@@ -80,17 +80,13 @@ func BenchmarkAuthCode(b *testing.B) {
 	dsn := cmp.Or(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
 	// dsn := "cockroach://root@localhost:3446/defaultdb?sslmode=disable&max_conns=16&max_idle_conns=16"
-	reg, err := testhelpers.NewRegistrySQLFromURL(b.Context(), dsn, true,
-		driver.WithConfigOptions(configx.WithValues(map[string]any{
-			config.KeyLogLevel:                  "error",
-			config.KeyAccessTokenStrategy:       "opaque",
-			config.KeyRefreshTokenHook:          "",
-			"tracing.providers.otlp.server_url": "http://localhost:4318",
-			"tracing.providers.otlp.insecure":   true,
-		})),
-		driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }),
-	)
-	require.NoError(b, err)
+	reg := testhelpers.NewRegistrySQLFromURL(b, dsn, true, true, driver.WithConfigOptions(configx.WithValues(map[string]any{
+		config.KeyLogLevel:                  "error",
+		config.KeyAccessTokenStrategy:       "opaque",
+		config.KeyRefreshTokenHook:          "",
+		"tracing.providers.otlp.server_url": "http://localhost:4318",
+		"tracing.providers.otlp.insecure":   true,
+	})), driver.WithTracerWrapper(func(t *otelx.Tracer) *otelx.Tracer { return new(otelx.Tracer).WithOTLP(tracer) }))
 	oauth2Keys, err := jwk.GenerateJWK(jose.ES256, x.OAuth2JWTKeyName, "sig")
 	require.NoError(b, err)
 	oidcKeys, err := jwk.GenerateJWK(jose.ES256, x.OpenIDConnectKeyName, "sig")

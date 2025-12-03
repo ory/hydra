@@ -223,7 +223,7 @@ func TestAccessToken(t *testing.T) {
 				// Scope field is always a string.
 				assert.Equal(t, "email offline", claims["scope"])
 
-				validate := oauth2.CallSignature(token, j)
+				validate := oauth2.CallSignature(token)
 				err = j.ValidateAccessToken(context.Background(), c.r, token)
 				if c.pass {
 					assert.NoError(t, err)

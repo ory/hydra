@@ -101,8 +101,6 @@ type tracerProvider struct {
 	t trace.Tracer
 }
 
-func (tp tracerProvider) tracerProvider() {}
-
 var _ trace.TracerProvider = tracerProvider{}
 
 // Tracer implements trace.TracerProvider.

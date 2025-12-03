@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/reqlog"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
@@ -104,6 +106,7 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 	}
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
+	t0 := time.Now()
 	resp, err := reg.HTTPClient(ctx).Do(req)
 	if err != nil {
 		return errors.WithStack(
@@ -146,6 +149,8 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 		)
 	}
 
+	reqlog.AccumulateExternalLatency(ctx, time.Since(t0)) // body read
+
 	// Overwrite existing session data (extra claims).
 	session.Extra = respBody.Session.AccessToken
 	idTokenClaims := session.IDTokenClaims()
@@ -157,7 +162,8 @@ func executeHookAndUpdateSession(ctx context.Context, reg x.HTTPClientProvider, 
 func TokenHook(reg interface {
 	config.Provider
 	x.HTTPClientProvider
-}) AccessRequestHook {
+},
+) AccessRequestHook {
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
 		hookConfig := reg.Config().TokenHookConfig(ctx)
 		if hookConfig == nil {

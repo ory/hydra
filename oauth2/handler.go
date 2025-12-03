@@ -504,7 +504,7 @@ type CredentialSupportedDraft00 struct {
 //	  default: errorOAuth2
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(ctx)
+	key, err := h.r.OpenIDJWTSigner().GetPublicKey(ctx)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -693,13 +693,13 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 		interim["jti"] = uuid.New()
 		interim["iat"] = time.Now().Unix()
 
-		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+		keyID, err := h.r.OpenIDJWTSigner().GetPublicKeyID(ctx)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 
-		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, interim, &jwt.Headers{
+		token, _, err := h.r.OpenIDJWTSigner().Generate(ctx, interim, &jwt.Headers{
 			Extra: map[string]interface{}{"kid": keyID},
 		})
 		if err != nil {
@@ -1164,7 +1164,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
-			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+			accessTokenKeyID, err = h.r.AccessTokenJWTSigner().GetPublicKeyID(ctx)
 			if err != nil {
 				h.logOrAudit(err, r)
 				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
@@ -1378,7 +1378,7 @@ func (h *Handler) updateSessionWithRequest(
 		request.GrantAudience(audience)
 	}
 
-	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	openIDKeyID, err := h.r.OpenIDJWTSigner().GetPublicKeyID(ctx)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		return nil, err
@@ -1386,7 +1386,7 @@ func (h *Handler) updateSessionWithRequest(
 
 	var accessTokenKeyID string
 	if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(request.GetClient())) == "jwt" {
-		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
+		accessTokenKeyID, err = h.r.AccessTokenJWTSigner().GetPublicKeyID(ctx)
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())
 			return nil, err
@@ -1596,7 +1596,7 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	signingKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	signingKeyID, err := h.r.OpenIDJWTSigner().GetPublicKeyID(ctx)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -1608,7 +1608,7 @@ func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Requ
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
 	}
-	rawToken, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, mapClaims, headers)
+	rawToken, _, err := h.r.OpenIDJWTSigner().Generate(ctx, mapClaims, headers)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return

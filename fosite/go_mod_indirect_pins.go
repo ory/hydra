@@ -7,7 +7,6 @@
 package fosite
 
 import (
-	_ "github.com/gorilla/websocket"
 	_ "github.com/mattn/goveralls"
 
 	_ "github.com/ory/go-acc"

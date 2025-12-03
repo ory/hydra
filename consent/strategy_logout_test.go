@@ -76,7 +76,7 @@ func TestLogoutFlows(t *testing.T) {
 			require.NoError(t, r.ParseForm())
 			lt := r.PostFormValue("logout_token")
 			assert.NotEmpty(t, lt)
-			token, err := reg.OpenIDJWTStrategy().Decode(r.Context(), lt)
+			token, err := reg.OpenIDJWTSigner().Decode(r.Context(), lt)
 			require.NoError(t, err)
 
 			var b bytes.Buffer

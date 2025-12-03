@@ -457,6 +457,10 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		AMR:                  f.AMR,
 		Context:              f.Context,
 	}
+	// set some defaults for the API
+	if cs.RequestedAudience == nil {
+		cs.RequestedAudience = []string{}
+	}
 	if cs.AMR == nil {
 		cs.AMR = []string{}
 	}
@@ -553,5 +557,9 @@ func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {
 		ConsentRequest:   f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
 	}
 	s.ConsentRequest.Client.Secret = "" // do not leak client secret in response
+	// set some defaults for the API
+	if s.GrantedAudience == nil {
+		s.GrantedAudience = []string{}
+	}
 	return s
 }

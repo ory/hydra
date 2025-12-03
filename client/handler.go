@@ -183,7 +183,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 	c.CreatedAt = time.Now().UTC().Round(time.Second)
 	c.UpdatedAt = c.CreatedAt
 
-	token, signature, err := h.r.OAuth2HMACStrategy().AccessTokenStrategy().GenerateAccessToken(r.Context(), nil)
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(r.Context(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +358,7 @@ func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Regenerate the registration access token
-	token, signature, err := h.r.OAuth2HMACStrategy().AccessTokenStrategy().GenerateAccessToken(r.Context(), nil)
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(r.Context(), nil)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -816,7 +816,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, id string) (fosite.Client, e
 	}
 
 	token := strings.TrimPrefix(fosite.AccessTokenFromRequest(r), "ory_at_")
-	if err := h.r.OAuth2HMACStrategy().AccessTokenStrategy().ValidateAccessToken(
+	if err := h.r.OAuth2HMACStrategy().ValidateAccessToken(
 		r.Context(),
 		// The strategy checks the expiry time of the token. Registration tokens don't expire (we don't have a way of
 		// rotating them) so we set the expiry time to a time in the future.

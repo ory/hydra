@@ -23,7 +23,7 @@ type Registry interface {
 	ClientValidator() *Validator
 	ClientManager() Manager
 	ClientHasher() fosite.Hasher
-	OpenIDJWTStrategy() jwk.JWTSigner
+	OpenIDJWTSigner() jwk.JWTSigner
 	OAuth2HMACStrategy() foauth2.CoreStrategy
 	OAuth2EnigmaStrategy() *enigma.HMACStrategy
 	rfc8628.DeviceRateLimitStrategyProvider

@@ -17,19 +17,16 @@ import (
 
 // DefaultJWTStrategy is a JWT RS256 strategy.
 type DefaultJWTStrategy struct {
-	jwt.Signer
-	Strategy interface {
-		AuthorizeCodeStrategyProvider
-		AccessTokenStrategyProvider
-		RefreshTokenStrategyProvider
-	}
+	Signer jwt.Signer
 	Config interface {
 		fosite.AccessTokenIssuerProvider
 		fosite.JWTScopeFieldProvider
 	}
 }
 
-func (h DefaultJWTStrategy) signature(token string) string {
+var _ AccessTokenStrategy = (*DefaultJWTStrategy)(nil)
+
+func signature(token string) string {
 	split := strings.Split(token, ".")
 	if len(split) != 3 {
 		return ""
@@ -38,20 +35,8 @@ func (h DefaultJWTStrategy) signature(token string) string {
 	return split[2]
 }
 
-func (h *DefaultJWTStrategy) AuthorizeCodeStrategy() AuthorizeCodeStrategy {
-	return h
-}
-
-func (h *DefaultJWTStrategy) AccessTokenStrategy() AccessTokenStrategy {
-	return h
-}
-
-func (h *DefaultJWTStrategy) RefreshTokenStrategy() RefreshTokenStrategy {
-	return h
-}
-
-func (h DefaultJWTStrategy) AccessTokenSignature(ctx context.Context, token string) string {
-	return h.signature(token)
+func (h *DefaultJWTStrategy) AccessTokenSignature(_ context.Context, token string) string {
+	return signature(token)
 }
 
 func (h *DefaultJWTStrategy) GenerateAccessToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
@@ -61,30 +46,6 @@ func (h *DefaultJWTStrategy) GenerateAccessToken(ctx context.Context, requester 
 func (h *DefaultJWTStrategy) ValidateAccessToken(ctx context.Context, _ fosite.Requester, token string) error {
 	_, err := validate(ctx, h.Signer, token)
 	return err
-}
-
-func (h DefaultJWTStrategy) RefreshTokenSignature(ctx context.Context, token string) string {
-	return h.Strategy.RefreshTokenStrategy().RefreshTokenSignature(ctx, token)
-}
-
-func (h DefaultJWTStrategy) AuthorizeCodeSignature(ctx context.Context, token string) string {
-	return h.Strategy.AuthorizeCodeStrategy().AuthorizeCodeSignature(ctx, token)
-}
-
-func (h *DefaultJWTStrategy) GenerateRefreshToken(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
-	return h.Strategy.RefreshTokenStrategy().GenerateRefreshToken(ctx, req)
-}
-
-func (h *DefaultJWTStrategy) ValidateRefreshToken(ctx context.Context, req fosite.Requester, token string) error {
-	return h.Strategy.RefreshTokenStrategy().ValidateRefreshToken(ctx, req, token)
-}
-
-func (h *DefaultJWTStrategy) GenerateAuthorizeCode(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
-	return h.Strategy.AuthorizeCodeStrategy().GenerateAuthorizeCode(ctx, req)
-}
-
-func (h *DefaultJWTStrategy) ValidateAuthorizeCode(ctx context.Context, req fosite.Requester, token string) error {
-	return h.Strategy.AuthorizeCodeStrategy().ValidateAuthorizeCode(ctx, req, token)
 }
 
 func validate(ctx context.Context, jwtStrategy jwt.Signer, token string) (t *jwt.Token, err error) {

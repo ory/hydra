@@ -1,0 +1,37 @@
+{
+  "i": "challenge-0019",
+  "n": "24704dcb-0ab9-4bfa-a84c-405932ae53fe",
+  "rs": [
+    "requested_scope-0019_1",
+    "requested_scope-0019_2"
+  ],
+  "s": "subject-0019",
+  "oc": {
+    "display": "display-0019"
+  },
+  "ci": "client-21",
+  "r": "http://request/0019",
+  "ia": "2022-02-15T22:20:21Z",
+  "a": "acr-0019",
+  "ct": {},
+  "la": null,
+  "di": "device-challenge-0019",
+  "dr": "device-request-id-0019",
+  "dh": null,
+  "cc": "challenge-0019",
+  "cs": true,
+  "gs": [
+    "granted_scope-0019_1",
+    "granted_scope-0019_2"
+  ],
+  "ce": true,
+  "cf": 15,
+  "ch": "2025-05-16T12:24:00Z",
+  "cx": null,
+  "st": {
+    "session_id_token-0019": "0019"
+  },
+  "sa": {
+    "session_access_token-0019": "0019"
+  }
+}

@@ -62,8 +62,6 @@ func Watch(ctx context.Context, u *url.URL, c EventChannel) (Watcher, error) {
 	// see urlx.Parse for why the empty string is also file
 	case "file", "":
 		return WatchFile(ctx, u.Path, c)
-	case "ws":
-		return WatchWebsocket(ctx, u, c)
 	}
 	return nil, &errSchemeUnknown{u.Scheme}
 }

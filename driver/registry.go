@@ -7,8 +7,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/ory/x/contextx"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"

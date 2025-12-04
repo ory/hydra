@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
+
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/pop/v6"

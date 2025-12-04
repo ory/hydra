@@ -181,7 +181,9 @@ func TestOpenIDConnectExplicitFlow(t *testing.T) {
 
 			resp, err := http.Get(c.setup(oauthClient))
 			require.NoError(t, err)
-			defer resp.Body.Close()
+			defer func(body io.ReadCloser) {
+				require.NoError(t, body.Close())
+			}(resp.Body)
 
 			body, _ := io.ReadAll(resp.Body)
 			require.Equal(t, c.authStatusCode, resp.StatusCode, "Got response: %s", body)

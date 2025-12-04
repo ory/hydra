@@ -183,6 +183,7 @@ func exchangeForAccessToken(t *testing.T) {
 
 				tokenSource := cl.TokenSource(t.Context(), token)
 				refreshed, err := tokenSource.Token()
+				require.NoError(t, err)
 
 				assert.NotEmpty(t, refreshed.AccessToken)
 				assert.NotEmpty(t, refreshed.RefreshToken)

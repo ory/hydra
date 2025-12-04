@@ -98,7 +98,7 @@ func runAuthorizeCodeGrantWithPublicClientAndPKCETest(t *testing.T, strategy oau
 					"code_verifier": {verifier},
 				})
 				require.NoError(t, err)
-				defer resp.Body.Close()
+				defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 
 				body, err := io.ReadAll(resp.Body)
 				require.NoError(t, err)

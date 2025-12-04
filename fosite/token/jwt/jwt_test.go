@@ -141,15 +141,15 @@ func TestGenerateJWT(t *testing.T) {
 				require.Equal(t, k.KeyID, decoded.Header["kid"])
 			}
 
-			sig, err = tc.strategy.Validate(context.TODO(), token)
+			_, err = tc.strategy.Validate(context.TODO(), token)
 			require.NoError(t, err)
 
-			sig, err = tc.strategy.Validate(context.TODO(), token+"."+"0123456789")
+			_, err = tc.strategy.Validate(context.TODO(), token+"."+"0123456789")
 			require.Error(t, err)
 
 			partToken := strings.Split(token, ".")[2]
 
-			sig, err = tc.strategy.Validate(context.TODO(), partToken)
+			_, err = tc.strategy.Validate(context.TODO(), partToken)
 			require.Error(t, err)
 
 			// Reset private key
@@ -159,21 +159,21 @@ func TestGenerateJWT(t *testing.T) {
 			claims = &JWTClaims{
 				ExpiresAt: time.Now().UTC().Add(-time.Hour),
 			}
-			token, sig, err = tc.strategy.Generate(context.TODO(), claims.ToMapClaims(), header)
+			token, _, err = tc.strategy.Generate(context.TODO(), claims.ToMapClaims(), header)
 			require.NoError(t, err)
 			require.NotNil(t, token)
 
-			sig, err = tc.strategy.Validate(context.TODO(), token)
+			_, err = tc.strategy.Validate(context.TODO(), token)
 			require.Error(t, err)
 
 			// Lets validate the nbf claim
 			claims = &JWTClaims{
 				NotBefore: time.Now().UTC().Add(time.Hour),
 			}
-			token, sig, err = tc.strategy.Generate(context.TODO(), claims.ToMapClaims(), header)
+			token, _, err = tc.strategy.Generate(context.TODO(), claims.ToMapClaims(), header)
 			require.NoError(t, err)
 			require.NotNil(t, token)
-			//t.Logf("%s.%s", token, sig)
+			// t.Logf("%s.%s", token, sig)
 			sig, err = tc.strategy.Validate(context.TODO(), token)
 			require.Error(t, err)
 			require.Empty(t, sig, "%s", err)

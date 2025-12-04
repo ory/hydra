@@ -73,7 +73,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 		if err != nil {
 			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Unable to fetch OpenID Connect request parameters from 'request_uri' because: %s.", err.Error()).WithWrap(err).WithDebug(err.Error()))
 		}
-		defer response.Body.Close()
+		defer func(Body io.ReadCloser) { _ = Body.Close() }(response.Body)
 		response.Body = io.NopCloser(io.LimitReader(response.Body, 10*1024*1024)) // limit to 10MiB
 
 		if response.StatusCode != http.StatusOK {

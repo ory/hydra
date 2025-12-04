@@ -12,13 +12,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	goauth "golang.org/x/oauth2"
-
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPushedAuthorizeCodeFlow(t *testing.T) {
@@ -159,11 +157,11 @@ func runPushedAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyP
 
 			require.NotEmpty(t, resp.Request.URL.Query().Get("code"), "Auth code is empty")
 
-			token, err := oauthClient.Exchange(goauth.NoContext, resp.Request.URL.Query().Get("code"))
+			token, err := oauthClient.Exchange(t.Context(), resp.Request.URL.Query().Get("code"))
 			require.NoError(t, err)
 			require.NotEmpty(t, token.AccessToken)
 
-			httpClient := oauthClient.Client(goauth.NoContext, token)
+			httpClient := oauthClient.Client(t.Context(), token)
 			resp, err = httpClient.Get(ts.URL + "/info")
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -176,7 +174,7 @@ func runPushedAuthorizeCodeGrantTest(t *testing.T, strategy oauth2.CoreStrategyP
 }
 
 func checkStatusAndGetBody(t *testing.T, resp *http.Response, expectedStatusCode int) ([]byte, error) {
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(resp.Body)
 
 	require.Equal(t, expectedStatusCode, resp.StatusCode)
 	b, err := io.ReadAll(resp.Body)
@@ -184,7 +182,7 @@ func checkStatusAndGetBody(t *testing.T, resp *http.Response, expectedStatusCode
 		fmt.Printf("PAR response: body=%s\n", string(b))
 	}
 	if expectedStatusCode != resp.StatusCode {
-		return nil, fmt.Errorf("Invalid status code %d", resp.StatusCode)
+		return nil, fmt.Errorf("invalid status code %d", resp.StatusCode)
 	}
 
 	return b, err

@@ -112,7 +112,9 @@ func (s *DefaultJWKSFetcherStrategy) Resolve(ctx context.Context, location strin
 		if err != nil {
 			return nil, errorsx.WithStack(ErrServerError.WithHintf("Unable to fetch JSON Web Keys from location '%s'. Check for typos or other network issues.", location).WithWrap(err).WithDebug(err.Error()))
 		}
-		defer response.Body.Close()
+		defer func() {
+			_ = response.Body.Close()
+		}()
 
 		if response.StatusCode < 200 || response.StatusCode >= 400 {
 			return nil, errorsx.WithStack(ErrServerError.WithHintf("Expected successful status code in range of 200 - 399 from location '%s' but received code %d.", location, response.StatusCode))

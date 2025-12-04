@@ -40,7 +40,7 @@ func introspect(t *testing.T, ts *httptest.Server, token string, p interface{}, 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	r, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
-	defer r.Body.Close()
+	defer func(Body io.ReadCloser) { _ = Body.Close() }(r.Body)
 	body, err := io.ReadAll(r.Body)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, r.StatusCode, "%s", body)
@@ -134,7 +134,7 @@ func runClientCredentialsGrantTest(t *testing.T, strategy oauth2.CoreStrategyPro
 			c.setup()
 
 			oauthClient.EndpointParams = c.params
-			token, err := oauthClient.Token(goauth.NoContext)
+			token, err := oauthClient.Token(t.Context())
 			require.Equal(t, c.err, err != nil, "(%d) %s\n%s\n%s", k, c.description, c.err, err)
 			if !c.err {
 				assert.NotEmpty(t, token.AccessToken, "(%d) %s\n%s", k, c.description, token)

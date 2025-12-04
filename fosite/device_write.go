@@ -32,7 +32,7 @@ func (f *Fosite) WriteDeviceResponse(ctx context.Context, rw http.ResponseWriter
 	}
 
 	r, err := json.Marshal(deviceResponse)
-	rw.Write(r)
+	_, _ = rw.Write(r)
 	if err != nil {
 		http.Error(rw, ErrServerError.WithWrap(err).WithDebug(err.Error()).Error(), http.StatusInternalServerError)
 		return

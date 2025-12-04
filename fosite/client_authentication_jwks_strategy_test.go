@@ -167,7 +167,7 @@ func TestDefaultJWKSFetcherStrategy(t *testing.T) {
 	t.Run("case=error_encoding", func(t *testing.T) {
 		s := NewDefaultJWKSFetcherStrategy()
 		h = func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("[]"))
+			_, _ = w.Write([]byte("[]"))
 		}
 		ts := httptest.NewServer(h)
 		defer ts.Close()

@@ -152,10 +152,10 @@ func runAuthorizeCodeGrantDupeCodeTest(t *testing.T, strategy oauth2.CoreStrateg
 	ts := mockServer(t, f, &fosite.DefaultSession{})
 	defer ts.Close()
 
-	oauthClient := newOAuth2Client(ts)
+	newOAuth2Client(ts)
 	fositeStore.Clients["my-client"].(*fosite.DefaultClient).RedirectURIs[0] = ts.URL + "/callback"
 
-	oauthClient = newOAuth2Client(ts)
+	oauthClient := newOAuth2Client(ts)
 	state := "12345678901234567890"
 
 	resp, err := http.Get(oauthClient.AuthCodeURL(state))

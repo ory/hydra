@@ -50,7 +50,7 @@ require (
 	github.com/ory/dockertest/v3 v3.12.0
 	github.com/ory/herodot v0.10.7
 	github.com/ory/jsonschema/v3 v3.0.9-0.20250317235931-280c5fc7bf0e
-	github.com/ory/pop/v6 v6.3.1
+	github.com/ory/pop/v6 v6.3.2-0.20251203152233-a32233875f7e
 	github.com/pelletier/go-toml v1.9.5
 	github.com/peterhellberg/link v1.2.0
 	github.com/pkg/errors v0.9.1

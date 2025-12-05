@@ -211,10 +211,6 @@ func WatchChangeFeed(ctx context.Context, cx *sqlx.DB, tableName string, out Eve
 		}
 	}()
 
-	if err := rows.Err(); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
 	return d, nil
 }
 

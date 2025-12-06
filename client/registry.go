@@ -6,10 +6,10 @@ package client
 import (
 	"github.com/ory/hydra/v2/driver/config"
 
-	"github.com/ory/fosite"
-	foauth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/rfc8628"
-	enigma "github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/v2/fosite"
+	foauth2 "github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	enigma "github.com/ory/hydra/v2/fosite/token/hmac"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 )
@@ -23,9 +23,11 @@ type Registry interface {
 	ClientValidator() *Validator
 	ClientManager() Manager
 	ClientHasher() fosite.Hasher
-	OpenIDJWTStrategy() jwk.JWTSigner
+	OpenIDJWTSigner() jwk.JWTSigner
 	OAuth2HMACStrategy() foauth2.CoreStrategy
 	OAuth2EnigmaStrategy() *enigma.HMACStrategy
-	RFC8628HMACStrategy() rfc8628.RFC8628CodeStrategy
+	rfc8628.DeviceRateLimitStrategyProvider
+	rfc8628.DeviceCodeStrategyProvider
+	rfc8628.UserCodeStrategyProvider
 	config.Provider
 }

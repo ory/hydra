@@ -18,12 +18,10 @@ import (
 func ParseConnectionOptions(l *logrusx.Logger, dsn string) (maxConns int, maxIdleConns int, maxConnLifetime, maxIdleConnTime time.Duration, cleanedDSN string) {
 	maxConns = maxParallelism() * 2
 	maxIdleConns = maxParallelism()
-	maxConnLifetime = time.Duration(0)
-	maxIdleConnTime = time.Duration(0)
 	cleanedDSN = dsn
 
-	parts := strings.Split(dsn, "?")
-	if len(parts) != 2 {
+	hostPath, rawQuery, ok := strings.Cut(dsn, "?")
+	if !ok {
 		l.
 			WithField("sql_max_connections", maxConns).
 			WithField("sql_max_idle_connections", maxIdleConns).
@@ -33,7 +31,7 @@ func ParseConnectionOptions(l *logrusx.Logger, dsn string) (maxConns int, maxIdl
 		return
 	}
 
-	query, err := url.ParseQuery(parts[1])
+	query, err := url.ParseQuery(rawQuery)
 	if err != nil {
 		l.
 			WithField("sql_max_connections", maxConns).
@@ -84,37 +82,37 @@ func ParseConnectionOptions(l *logrusx.Logger, dsn string) (maxConns int, maxIdl
 		}
 		query.Del("max_conn_idle_time")
 	}
-	cleanedDSN = fmt.Sprintf("%s?%s", parts[0], query.Encode())
+	cleanedDSN = fmt.Sprintf("%s?%s", hostPath, query.Encode())
 
 	return
 }
 
 // FinalizeDSN will return a finalized DSN URI.
 func FinalizeDSN(l *logrusx.Logger, dsn string) string {
-	if strings.HasPrefix(dsn, "mysql://") {
-		var q url.Values
-		parts := strings.SplitN(dsn, "?", 2)
-
-		if len(parts) == 1 {
-			q = make(url.Values)
-		} else {
-			var err error
-			q, err = url.ParseQuery(parts[1])
-			if err != nil {
-				l.WithError(err).Warnf("Unable to parse SQL DSN query, could not finalize the DSN URI.")
-				return dsn
-			}
-		}
-
-		q.Set("multiStatements", "true")
-		q.Set("parseTime", "true")
-
-		// Thius causes an UPDATE to return the number of matching rows instead of
-		// the number of rows changed. This ensures compatibility with PostgreSQL and SQLite behavior.
-		q.Set("clientFoundRows", "true")
-
-		return fmt.Sprintf("%s?%s", parts[0], q.Encode())
+	if !strings.HasPrefix(dsn, "mysql://") {
+		return dsn
 	}
 
-	return dsn
+	var q url.Values
+	hostPath, query, ok := strings.Cut(dsn, "?")
+
+	if !ok {
+		q = make(url.Values)
+	} else {
+		var err error
+		q, err = url.ParseQuery(query)
+		if err != nil {
+			l.WithError(err).Warnf("Unable to parse SQL DSN query, could not finalize the DSN URI.")
+			return dsn
+		}
+	}
+
+	q.Set("multiStatements", "true")
+	q.Set("parseTime", "true")
+
+	// This causes an UPDATE to return the number of matching rows instead of
+	// the number of rows changed. This ensures compatibility with PostgreSQL and SQLite behavior.
+	q.Set("clientFoundRows", "true")
+
+	return fmt.Sprintf("%s?%s", hostPath, q.Encode())
 }

@@ -7,11 +7,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
 )
 
-var _ Strategy = new(DefaultStrategy)
+var _ Strategy = (*defaultStrategy)(nil)
 
 type Strategy interface {
 	HandleOAuth2AuthorizationRequest(

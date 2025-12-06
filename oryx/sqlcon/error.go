@@ -74,11 +74,11 @@ func HandleError(err error) error {
 	if errors.Is(err, sql.ErrNoRows) {
 		return errors.WithStack(ErrNoRows)
 	} else if errors.As(err, &st) {
-		return handlePostgres(err, st.SQLState())
+		return errors.WithStack(handlePostgres(err, st.SQLState()))
 	} else if e := new(pq.Error); errors.As(err, &e) {
-		return handlePostgres(err, string(e.Code))
+		return errors.WithStack(handlePostgres(err, string(e.Code)))
 	} else if e := new(pgconn.PgError); errors.As(err, &e) {
-		return handlePostgres(err, e.Code)
+		return errors.WithStack(handlePostgres(err, e.Code))
 	} else if e := new(mysql.MySQLError); errors.As(err, &e) {
 		switch e.Number {
 		case 1062:
@@ -89,7 +89,7 @@ func HandleError(err error) error {
 	}
 
 	if err := handleSqlite(err); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return errors.WithStack(err)

@@ -32,13 +32,6 @@ type (
 		TLACodes, TLAVars, ExtCodes, ExtVars []kv
 	}
 
-	ProcessVM struct {
-		ctx    context.Context
-		path   string
-		args   []string
-		params processParameters
-	}
-
 	vmOptions struct {
 		jsonnetBinaryPath string
 		args              []string
@@ -62,6 +55,12 @@ func newVMOptions() *vmOptions {
 	return &vmOptions{
 		jsonnetBinaryPath: jsonnetBinaryPath,
 		ctx:               context.Background(),
+	}
+}
+
+func WithContext(ctx context.Context) Option {
+	return func(o *vmOptions) {
+		o.ctx = ctx
 	}
 }
 

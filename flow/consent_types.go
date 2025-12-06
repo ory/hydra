@@ -7,14 +7,12 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/client"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -111,33 +109,6 @@ func (e *RequestDeniedError) ToRFCError() *fosite.RFC6749Error {
 		CodeField:        e.Code,
 		DebugField:       e.Debug,
 	}
-}
-
-func (e *RequestDeniedError) Scan(value any) error {
-	v := fmt.Sprintf("%s", value)
-	if len(v) == 0 || v == "{}" {
-		return nil
-	}
-
-	if err := json.Unmarshal([]byte(v), e); err != nil {
-		return errors.WithStack(err)
-	}
-
-	e.Valid = true
-	return nil
-}
-
-func (e *RequestDeniedError) Value() (driver.Value, error) {
-	if !e.IsError() {
-		return "{}", nil
-	}
-
-	value, err := json.Marshal(e)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return string(value), nil
 }
 
 // The request payload used to accept a consent request.
@@ -406,16 +377,11 @@ func (n *OAuth2ConsentRequestOpenIDConnectContext) MarshalJSON() ([]byte, error)
 }
 
 func (n *OAuth2ConsentRequestOpenIDConnectContext) Scan(value interface{}) error {
-	v := fmt.Sprintf("%s", value)
-	if len(v) == 0 {
-		return nil
-	}
-	return errors.WithStack(json.Unmarshal([]byte(v), n))
+	return sqlxx.JSONScan(n, value)
 }
 
 func (n *OAuth2ConsentRequestOpenIDConnectContext) Value() (driver.Value, error) {
-	value, err := json.Marshal(n)
-	return value, errors.WithStack(err)
+	return json.Marshal(n)
 }
 
 // Contains information about an ongoing logout request.

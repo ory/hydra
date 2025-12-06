@@ -5,7 +5,6 @@ package popx
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"math"
 	"os"
@@ -23,6 +22,7 @@ import (
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
+	"github.com/ory/x/sqlcon"
 )
 
 const (
@@ -31,10 +31,14 @@ const (
 	tracingComponent = "github.com/ory/x/popx"
 )
 
+func (mb *MigrationBox) shouldNotUseTransaction(m Migration) bool {
+	return m.Autocommit || mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql"
+}
+
 // Up runs pending "up" migrations and applies them to the database.
 func (mb *MigrationBox) Up(ctx context.Context) error {
 	_, err := mb.UpTo(ctx, 0)
-	return err
+	return errors.WithStack(err)
 }
 
 // UpTo runs up to step "up" migrations and applies them to the database.
@@ -80,7 +84,7 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 					err := conn.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec()
 					return errors.Wrapf(err, "problem inserting migration version %s", mi.Version)
 				}); err != nil {
-					return err
+					return errors.WithStack(err)
 				}
 				continue
 			}
@@ -88,13 +92,24 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 			l.Info("Migration has not yet been applied, running migration.")
 
 			if err := mi.Valid(); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
-			if mi.Runner != nil {
-				err := mb.isolatedTransaction(ctx, "up", func(conn *pop.Connection) error {
-					if err := mi.Runner(mi, conn, conn.TX); err != nil {
-						return err
+			noTx := mb.shouldNotUseTransaction(mi)
+			if noTx {
+				l.Info("NOT running migrations inside a transaction")
+				if err := mi.Runner(mi, c); err != nil {
+					return errors.WithStack(err)
+				}
+
+				// #nosec G201 - mtn is a system-wide const
+				if err := c.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec(); err != nil {
+					return errors.Wrapf(err, "problem inserting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}
+			} else {
+				if err := mb.isolatedTransaction(ctx, "up", func(conn *pop.Connection) error {
+					if err := mi.Runner(mi, conn); err != nil {
+						return errors.WithStack(err)
 					}
 
 					// #nosec G201 - mtn is a system-wide const
@@ -102,23 +117,12 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 						return errors.Wrapf(err, "problem inserting migration version %s", mi.Version)
 					}
 					return nil
-				})
-				if err != nil {
-					return err
-				}
-			} else {
-				l.Warn("Migration has requested running outside a transaction. Proceed with caution.")
-				if err := mi.RunnerNoTx(mi, c); err != nil {
-					return err
-				}
-
-				// #nosec G201 - mtn is a system-wide const
-				if err := c.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (?)", mtn), mi.Version).Exec(); err != nil {
-					return errors.Wrapf(err, "problem inserting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}); err != nil {
+					return errors.WithStack(err)
 				}
 			}
 
-			l.Infof("> %s applied successfully", mi.Name)
+			l.WithField("autocommit", noTx).Infof("> %s applied successfully", mi.Name)
 			applied++
 			if step > 0 && applied >= step {
 				break
@@ -131,11 +135,12 @@ func (mb *MigrationBox) UpTo(ctx context.Context, step int) (applied int, err er
 		}
 		return nil
 	})
-	return
+	return applied, errors.WithStack(err)
 }
 
 // Down runs pending "down" migrations and rolls back the
 // database by the specified number of steps.
+// If step <= 0, all down migrations are run.
 func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 	ctx, span := startSpan(ctx, MigrationDownOpName, trace.WithAttributes(attribute.Int("steps", steps)))
 	defer otelx.End(span, &err)
@@ -145,7 +150,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 	}
 
 	c := mb.c.WithContext(ctx)
-	return mb.exec(ctx, func() (err error) {
+	return errors.WithStack(mb.exec(ctx, func() (err error) {
 		mtn := sanitizedMigrationTableName(c)
 		count, err := c.Count(mtn)
 		if err != nil {
@@ -162,7 +167,8 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 
 		reverted := 0
 		defer func() {
-			mb.l.Debugf("Successfully reverted %d migrations.", reverted)
+			migrationsToRevertCount := min(steps, len(mfs))
+			mb.l.Debugf("Successfully reverted %d/%d migrations.", reverted, migrationsToRevertCount)
 			if err != nil {
 				mb.l.WithError(err).Error("Problem reverting migrations.")
 			}
@@ -172,6 +178,7 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 				break
 			}
 			l := mb.l.WithField("version", mi.Version).WithField("migration_name", mi.Name).WithField("migration_file", mi.Path)
+			l.Debugf("handling migration %s", mi.Name)
 			exists, err := c.Where("version = ?", mi.Version).Exists(mtn)
 			if err != nil {
 				return errors.Wrapf(err, "problem checking for migration version %s", mi.Version)
@@ -192,14 +199,24 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 			}
 
 			if err := mi.Valid(); err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 
-			if mi.Runner != nil {
-				err := mb.isolatedTransaction(ctx, "down", func(conn *pop.Connection) error {
-					err := mi.Runner(mi, conn, conn.TX)
+			if mb.shouldNotUseTransaction(mi) {
+				err := mi.Runner(mi, c)
+				if err != nil {
+					return errors.WithStack(err)
+				}
+
+				// #nosec G201 - mtn is a system-wide const
+				if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE version = ?", mtn), mi.Version).Exec(); err != nil {
+					return errors.Wrapf(err, "problem deleting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}
+			} else {
+				if err := mb.isolatedTransaction(ctx, "down", func(conn *pop.Connection) error {
+					err := mi.Runner(mi, conn)
 					if err != nil {
-						return err
+						return errors.WithStack(err)
 					}
 
 					// #nosec G201 - mtn is a system-wide const
@@ -208,38 +225,27 @@ func (mb *MigrationBox) Down(ctx context.Context, steps int) (err error) {
 					}
 
 					return nil
-				})
-				if err != nil {
-					return err
-				}
-			} else {
-				err := mi.RunnerNoTx(mi, c)
-				if err != nil {
-					return err
-				}
-
-				// #nosec G201 - mtn is a system-wide const
-				if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE version = ?", mtn), mi.Version).Exec(); err != nil {
-					return errors.Wrapf(err, "problem deleting migration version %s. YOUR DATABASE MAY BE IN AN INCONSISTENT STATE! MANUAL INTERVENTION REQUIRED!", mi.Version)
+				}); err != nil {
+					return errors.WithStack(err)
 				}
 			}
 
-			l.Infof("< %s applied successfully", mi.Name)
+			l.Infof("%s applied successfully", mi.Name)
 			reverted++
 		}
 		return nil
-	})
+	}))
 }
 
 func (mb *MigrationBox) createTransactionalMigrationTable(ctx context.Context, c *pop.Connection, l *logrusx.Logger) error {
 	mtn := sanitizedMigrationTableName(c)
 
-	if err := mb.execMigrationTransaction(ctx, []string{
+	if err := mb.createMigrationStatusTableTransaction(ctx, []string{
 		fmt.Sprintf(`CREATE TABLE %s (version VARCHAR (48) NOT NULL, version_self INT NOT NULL DEFAULT 0)`, mtn),
 		fmt.Sprintf(`CREATE UNIQUE INDEX %s_version_idx ON %s (version)`, mtn, mtn),
 		fmt.Sprintf(`CREATE INDEX %s_version_self_idx ON %s (version_self)`, mtn, mtn),
 	}); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	l.WithField("migration_table", mtn).Debug("Transactional migration table created successfully.")
@@ -272,8 +278,8 @@ func (mb *MigrationBox) migrateToTransactionalMigrationTable(ctx context.Context
 		},
 	}
 
-	if err := mb.execMigrationTransaction(ctx, workload...); err != nil {
-		return err
+	if err := mb.createMigrationStatusTableTransaction(ctx, workload...); err != nil {
+		return errors.WithStack(err)
 	}
 
 	l.WithField("migration_table", mtn).Debug("Successfully migrated legacy schema_migration to new transactional schema_migration table.")
@@ -291,39 +297,32 @@ func (mb *MigrationBox) isolatedTransaction(ctx context.Context, direction strin
 		defer cancel()
 	}
 
-	conn, dberr := mb.c.NewTransactionContextOptions(ctx, &sql.TxOptions{
-		Isolation: sql.LevelSerializable,
-		ReadOnly:  false,
+	return Transaction(ctx, mb.c.WithContext(ctx), func(ctx context.Context, connection *pop.Connection) error {
+		return errors.WithStack(fn(connection))
 	})
-	if dberr != nil {
-		return dberr
-	}
-
-	err = fn(conn)
-	if err != nil {
-		dberr = conn.TX.Rollback()
-	} else {
-		dberr = conn.TX.Commit()
-	}
-
-	if dberr != nil {
-		return errors.Wrapf(dberr, "error committing or rolling back transaction; original error: %v", err)
-	}
-
-	return err
 }
 
-func (mb *MigrationBox) execMigrationTransaction(ctx context.Context, transactions ...[]string) error {
+func (mb *MigrationBox) createMigrationStatusTableTransaction(ctx context.Context, transactions ...[]string) error {
 	for _, statements := range transactions {
-		if err := mb.isolatedTransaction(ctx, "init", func(conn *pop.Connection) error {
+		// CockroachDB does not support transactional schema changes, so we have to run
+		// the statements outside of a transaction.
+		if mb.c.Dialect.Name() == "cockroach" || mb.c.Dialect.Name() == "mysql" {
 			for _, statement := range statements {
-				if _, err := conn.TX.ExecContext(ctx, statement); err != nil {
+				if err := mb.c.WithContext(ctx).RawQuery(statement).Exec(); err != nil {
 					return errors.Wrapf(err, "unable to execute statement: %s", statement)
 				}
 			}
-			return nil
-		}); err != nil {
-			return err
+		} else {
+			if err := mb.isolatedTransaction(ctx, "init", func(conn *pop.Connection) error {
+				for _, statement := range statements {
+					if err := conn.WithContext(ctx).RawQuery(statement).Exec(); err != nil {
+						return errors.Wrapf(err, "unable to execute statement: %s", statement)
+					}
+				}
+				return nil
+			}); err != nil {
+				return errors.WithStack(err)
+			}
 		}
 	}
 
@@ -344,14 +343,14 @@ func (mb *MigrationBox) CreateSchemaMigrations(ctx context.Context) error {
 	if err != nil {
 		mb.l.WithError(err).WithField("migration_table", mtn).Debug("An error occurred while checking for the legacy migration table, maybe it does not exist yet? Trying to create.")
 		// This means that the legacy pop migrator has not yet been applied
-		return mb.createTransactionalMigrationTable(ctx, c, mb.l)
+		return errors.WithStack(mb.createTransactionalMigrationTable(ctx, c, mb.l))
 	}
 
 	mb.l.WithField("migration_table", mtn).Debug("A migration table exists, checking if it is a transactional migration table.")
 	_, err = c.Store.Exec(fmt.Sprintf("select version, version_self from %s", mtn))
 	if err != nil {
 		mb.l.WithError(err).WithField("migration_table", mtn).Debug("An error occurred while checking for the transactional migration table, maybe it does not exist yet? Trying to create.")
-		return mb.migrateToTransactionalMigrationTable(ctx, c, mb.l)
+		return errors.WithStack(mb.migrateToTransactionalMigrationTable(ctx, c, mb.l))
 	}
 
 	mb.l.WithField("migration_table", mtn).Debug("Migration tables exist and are up to date.")
@@ -439,7 +438,7 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 			// It also means that we can ignore this state and act as if no migrations have been applied yet.
 		} else {
 			// On any other error, we fail.
-			return nil, errors.Wrapf(err, "problem with migration")
+			return nil, errors.Wrap(err, "problem with migration")
 		}
 	}
 
@@ -474,12 +473,12 @@ func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 	schema := "schema.sql"
 	f, err := os.Create(schema) //#nosec:G304) //#nosec:G304
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	err = c.Dialect.DumpSchema(f)
 	if err != nil {
 		_ = os.RemoveAll(schema)
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }
@@ -504,24 +503,24 @@ func (mb *MigrationBox) exec(ctx context.Context, fn func() error) error {
 
 	if mb.c.Dialect.Name() == "sqlite3" {
 		if err := mb.c.RawQuery("PRAGMA foreign_keys=OFF").Exec(); err != nil {
-			return err
+			return sqlcon.HandleError(err)
 		}
 	}
 
 	if mb.c.Dialect.Name() == "cockroach" {
 		outer := fn
 		fn = func() error {
-			return crdb.Execute(outer)
+			return errors.WithStack(crdb.Execute(outer))
 		}
 	}
 
 	if err := fn(); err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	if mb.c.Dialect.Name() == "sqlite3" {
 		if err := mb.c.RawQuery("PRAGMA foreign_keys=ON").Exec(); err != nil {
-			return err
+			return sqlcon.HandleError(err)
 		}
 	}
 

@@ -207,8 +207,11 @@ func ExecNoErr(t testing.TB, cmd *cobra.Command, args ...string) string {
 
 func ExecNoErrCtx(ctx context.Context, t require.TestingT, cmd *cobra.Command, args ...string) string {
 	stdOut, stdErr, err := ExecCtx(ctx, cmd, nil, args...)
-	require.NoError(t, err, "std_out: %s\nstd_err: %s", stdOut, stdErr)
-	require.Len(t, stdErr, 0, stdOut)
+	if err == nil {
+		require.Len(t, stdErr, 0, "std_out: %s\nstd_err: %s", stdOut, stdErr)
+	} else {
+		require.ErrorIsf(t, err, context.Canceled, "std_out: %s\nstd_err: %s", stdOut, stdErr)
+	}
 	return stdOut
 }
 

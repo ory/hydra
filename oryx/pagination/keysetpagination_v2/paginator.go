@@ -24,6 +24,8 @@ const (
 	DefaultMaxSize = 500
 )
 
+var dbStructTagMapper = reflectx.NewMapper("db")
+
 func (p *Paginator) DefaultToken() PageToken { return p.defaultToken }
 func (p *Paginator) IsLast() bool            { return p.isLast }
 
@@ -74,6 +76,15 @@ func (p *Paginator) ToOptions() []Option {
 
 // Result removes the last item (if applicable) and returns the paginator for the next page.
 func Result[I any](items []I, p *Paginator) ([]I, *Paginator) {
+	return ResultFunc(items, p, func(last I, colName string) any {
+		lastItemVal := reflect.ValueOf(last)
+		return dbStructTagMapper.FieldByName(lastItemVal, colName).Interface()
+	})
+}
+
+// ResultFunc removes the last item (if applicable) and returns the paginator for the next page.
+// The extractor function is used to extract the column values from the last item.
+func ResultFunc[I any](items []I, p *Paginator, extractor func(last I, colName string) any) ([]I, *Paginator) {
 	if len(items) <= p.Size() {
 		return items, &Paginator{
 			isLast: true,
@@ -88,15 +99,13 @@ func Result[I any](items []I, p *Paginator) ([]I, *Paginator) {
 	items = items[:p.Size()]
 	lastItem := items[len(items)-1]
 
-	mapper := reflectx.NewMapper("db")
-	lastItemVal := reflect.ValueOf(lastItem)
 	currentCols := p.PageToken().Columns()
 	newCols := make([]Column, len(currentCols))
 	for i, col := range currentCols {
 		newCols[i] = Column{
 			Name:  col.Name,
 			Order: col.Order,
-			Value: mapper.FieldByName(lastItemVal, col.Name).Interface(),
+			Value: extractor(lastItem, col.Name),
 		}
 	}
 

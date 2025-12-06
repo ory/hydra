@@ -7,11 +7,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/v2/fosite/token/hmac"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 )
 
 // Test that the generic signature function implements the same signature as the

@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
@@ -694,20 +694,20 @@ func (s *PersisterTestSuite) TestFlushInactiveGrants() {
 func (s *PersisterTestSuite) TestFlushInactiveLoginConsentRequests() {
 	for k, r := range s.registries {
 		s.T().Run(k, func(t *testing.T) {
-			sessionID := uuid.Must(uuid.NewV4()).String()
-			cl := &client.Client{ID: "client-id"}
+			sessionID := uuidx.NewV4().String()
+			cl := &client.Client{ID: uuidx.NewV4().String()}
 			f := newFlow(s.t1NID, cl.ID, "sub", sqlxx.NullString(sessionID))
 			f.RequestedAt = time.Now().Add(-24 * time.Hour)
 			persistLoginSession(s.t1, t, r.Persister(), &flow.LoginSession{ID: sessionID})
 			require.NoError(t, r.Persister().CreateClient(s.t1, cl))
-			require.NoError(t, r.Persister().CreateConsentSession(s.t1, f))
+			require.NoError(t, r.Persister().Connection(s.t1).Create(&persistencesql.FlowWithConstantColumns{Flow: f, State: f.State}))
 
 			actual := flow.Flow{}
 
 			require.NoError(t, r.Persister().FlushInactiveLoginConsentRequests(s.t2, time.Now(), 100, 100))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
 			require.NoError(t, r.Persister().FlushInactiveLoginConsentRequests(s.t1, time.Now(), 100, 100))
-			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
+			require.ErrorIs(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID), sql.ErrNoRows)
 		})
 	}
 }
@@ -1726,38 +1726,17 @@ func TestPersisterTestSuite(t *testing.T) {
 	suite.Run(t, new(PersisterTestSuite))
 }
 
-func newClient() *client.Client {
-	return &client.Client{
-		ID: uuid.Must(uuid.NewV4()).String(),
-	}
-}
-
 func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.NullString) *flow.Flow {
 	return &flow.Flow{
 		NID:              nid,
 		ID:               uuid.Must(uuid.NewV4()).String(),
 		ClientID:         clientID,
 		Subject:          subject,
-		ConsentError:     &flow.RequestDeniedError{},
 		State:            flow.FlowStateConsentUnused,
-		LoginError:       &flow.RequestDeniedError{},
-		Context:          sqlxx.JSONRawMessage{},
-		AMR:              sqlxx.StringSliceJSONFormat{},
 		ConsentRequestID: "not-null",
 		ConsentCSRF:      "not-null",
 		SessionID:        sessionID,
 		RequestedAt:      time.Now(),
-	}
-}
-
-func newGrant(keySet string, keyID string) trust.Grant {
-	return trust.Grant{
-		ID:        uuid.Must(uuid.NewV4()),
-		ExpiresAt: time.Now().Add(time.Hour),
-		PublicKey: trust.PublicKey{
-			Set:   keySet,
-			KeyID: keyID,
-		},
 	}
 }
 

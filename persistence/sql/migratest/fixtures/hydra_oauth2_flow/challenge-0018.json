@@ -9,44 +9,27 @@
     "requested_audience-0018_1",
     "requested_audience-0018_2"
   ],
-  "ls": true,
   "s": "subject-0018",
   "oc": {
     "display": "display-0018"
   },
   "ci": "client-21",
   "r": "http://request/0018",
-  "lc": "csrf-0018",
   "ia": "2022-02-15T22:20:21Z",
-  "q": 128,
-  "lr": true,
-  "lf": 15,
-  "ll": true,
   "a": "acr-0018",
   "am": [
     "amr-0018-1",
     "amr-0018-2"
   ],
-  "fs": "force_subject_id-0018",
   "ct": {
     "context": "0018"
   },
-  "le": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
-  "la": "2022-02-15T22:20:21Z",
+  "la": null,
   "di": "device-challenge-0018",
   "dr": "device-request-id-0018",
-  "dc": "device-csrf-0018",
-  "dh": "2025-05-16T12:24:00Z",
+  "dh": null,
   "cc": "challenge-0018",
   "cs": true,
-  "cr": "csrf-0018",
   "gs": [
     "granted_scope-0018_1",
     "granted_scope-0018_2"
@@ -58,14 +41,7 @@
   "ce": true,
   "cf": 15,
   "ch": "2025-05-16T12:24:00Z",
-  "cx": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
+  "cx": null,
   "st": {
     "session_id_token-0018": "0018"
   },

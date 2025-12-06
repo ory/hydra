@@ -6,7 +6,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 var ErrInvalidClientMetadata = &fosite.RFC6749Error{

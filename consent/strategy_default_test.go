@@ -16,11 +16,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
-	"github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/x/ioutilx"
@@ -163,7 +163,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistrySQL, u, sessionID string
 }
 
 func genIDToken(t *testing.T, reg *driver.RegistrySQL, c jwt.MapClaims) string {
-	r, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), c, jwt.NewHeaders())
+	r, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r
 }

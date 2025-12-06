@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"time"
 
-	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/oauth2"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -20,16 +19,12 @@ import (
 
 type resilientOptions struct {
 	c                    *http.Client
-	oauthConfig          *oauth2.Config
-	oauthToken           *oauth2.Token
 	l                    interface{}
 	retryWaitMin         time.Duration
 	retryWaitMax         time.Duration
 	retryMax             int
 	noInternalIPs        bool
 	internalIPExceptions []string
-	ipV6                 bool
-	tracer               trace.Tracer
 }
 
 func newResilientOptions() *resilientOptions {
@@ -40,19 +35,11 @@ func newResilientOptions() *resilientOptions {
 		retryWaitMax: 30 * time.Second,
 		retryMax:     4,
 		l:            log.New(io.Discard, "", log.LstdFlags),
-		ipV6:         true,
 	}
 }
 
 // ResilientOptions is a set of options for the ResilientClient.
 type ResilientOptions func(o *resilientOptions)
-
-// ResilientClientWithTracer wraps the http clients transport with a tracing instrumentation
-func ResilientClientWithTracer(tracer trace.Tracer) ResilientOptions {
-	return func(o *resilientOptions) {
-		o.tracer = tracer
-	}
-}
 
 // ResilientClientWithMaxRetry sets the maximum number of retries.
 func ResilientClientWithMaxRetry(retryMax int) ResilientOptions {
@@ -104,12 +91,6 @@ func ResilientClientAllowInternalIPRequestsTo(urlGlobs ...string) ResilientOptio
 	}
 }
 
-func ResilientClientNoIPv6() ResilientOptions {
-	return func(o *resilientOptions) {
-		o.ipV6 = false
-	}
-}
-
 // NewResilientClient creates a new ResilientClient.
 func NewResilientClient(opts ...ResilientOptions) *retryablehttp.Client {
 	o := newResilientOptions()
@@ -119,12 +100,12 @@ func NewResilientClient(opts ...ResilientOptions) *retryablehttp.Client {
 
 	if o.noInternalIPs {
 		o.c.Transport = &noInternalIPRoundTripper{
-			onWhitelist:          ifelse(o.ipV6, allowInternalAllowIPv6, allowInternalProhibitIPv6),
-			notOnWhitelist:       ifelse(o.ipV6, prohibitInternalAllowIPv6, prohibitInternalProhibitIPv6),
+			onWhitelist:          allowInternalAllowIPv6,
+			notOnWhitelist:       prohibitInternalAllowIPv6,
 			internalIPExceptions: o.internalIPExceptions,
 		}
 	} else {
-		o.c.Transport = ifelse(o.ipV6, allowInternalAllowIPv6, allowInternalProhibitIPv6)
+		o.c.Transport = allowInternalAllowIPv6
 	}
 
 	cl := retryablehttp.NewClient()
@@ -154,11 +135,4 @@ func SetOAuth2(ctx context.Context, cl *retryablehttp.Client, c OAuth2Config, t 
 
 type OAuth2Config interface {
 	Client(context.Context, *oauth2.Token) *http.Client
-}
-
-func ifelse[A any](b bool, x, y A) A {
-	if b {
-		return x
-	}
-	return y
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 func Middleware(

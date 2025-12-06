@@ -6,7 +6,7 @@ package x
 import (
 	"net/http"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/x/logrusx"
 )
 

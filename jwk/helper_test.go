@@ -4,7 +4,6 @@
 package jwk_test
 
 import (
-	"context"
 	"crypto"
 	"crypto/dsa" //lint:ignore SA1019 used for testing invalid key types
 	"crypto/ecdsa"
@@ -26,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
+	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
@@ -206,6 +206,13 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 	assert.True(t, isPublic)
 }
 
+type regWithManager struct {
+	*driver.RegistrySQL
+	km *MockManager
+}
+
+func (r regWithManager) KeyManager() jwk.Manager { return r.km }
+
 func TestGetOrGenerateKeys(t *testing.T) {
 	t.Parallel()
 	reg := testhelpers.NewRegistryMemory(t)
@@ -229,7 +236,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 	t.Run("Test_Helper/Run_GetOrGenerateKeys_With_GetKeySetError", func(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setID)).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(t.Context(), reg, keyManager, setID, "RS256")
+		privKey, err := jwk.GetOrGenerateKeys(t.Context(), regWithManager{RegistrySQL: reg, km: keyManager}, setID, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
@@ -238,7 +245,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setID)).Return(nil, errors.Wrap(x.ErrNotFound, ""))
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setID), gomock.Eq(""), gomock.Eq("RS256"), gomock.Eq("sig")).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setID, "RS256")
+		privKey, err := jwk.GetOrGenerateKeys(t.Context(), regWithManager{RegistrySQL: reg, km: keyManager}, setID, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
@@ -247,7 +254,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setID)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setID), gomock.Eq(""), gomock.Eq("RS256"), gomock.Eq("sig")).Return(nil, errors.New("GetKeySetError"))
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setID, "RS256")
+		privKey, err := jwk.GetOrGenerateKeys(t.Context(), regWithManager{RegistrySQL: reg, km: keyManager}, setID, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "GetKeySetError")
 	})
@@ -256,7 +263,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setID)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setID), gomock.Eq(""), gomock.Eq("RS256"), gomock.Eq("sig")).Return(keySet, nil)
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setID, "RS256")
+		privKey, err := jwk.GetOrGenerateKeys(t.Context(), regWithManager{RegistrySQL: reg, km: keyManager}, setID, "RS256")
 		assert.NoError(t, err)
 		assert.Equal(t, privKey, &keySet.Keys[0])
 	})
@@ -265,7 +272,7 @@ func TestGetOrGenerateKeys(t *testing.T) {
 		keyManager := km(t)
 		keyManager.EXPECT().GetKeySet(gomock.Any(), gomock.Eq(setID)).Return(keySetWithoutPrivateKey, nil)
 		keyManager.EXPECT().GenerateAndPersistKeySet(gomock.Any(), gomock.Eq(setID), gomock.Eq(""), gomock.Eq("RS256"), gomock.Eq("sig")).Return(keySetWithoutPrivateKey, nil).Times(1)
-		privKey, err := jwk.GetOrGenerateKeys(context.TODO(), reg, keyManager, setID, "RS256")
+		privKey, err := jwk.GetOrGenerateKeys(t.Context(), regWithManager{RegistrySQL: reg, km: keyManager}, setID, "RS256")
 		assert.Nil(t, privKey)
 		assert.EqualError(t, err, "key not found")
 	})

@@ -3,7 +3,7 @@ SHELL=/bin/bash -o pipefail
 export PATH := .bin:${PATH}
 
 .bin/ory: Makefile
-	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.2.2
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.2.2
 	touch .bin/ory
 
 .PHONY: format
@@ -13,10 +13,10 @@ format: .bin/ory node_modules
 	npm exec -- prettier --write .
 
 .bin/golangci-lint: Makefile
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v1.64.8
+	curl --retry 7 --retry-connrefused -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v2.4.0
 
 .bin/licenses: Makefile
-	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 licenses: .bin/licenses node_modules  # checks open-source licenses
 	.bin/licenses
@@ -36,7 +36,7 @@ resetdb:
 	docker rm -f hydra_test_database_cockroach || true
 	docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0
 	docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:11.8
-	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.2 start-single-node --insecure
+	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.3 start-single-node --insecure
 
 .PHONY: lint
 lint: .bin/golangci-lint

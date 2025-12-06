@@ -4,7 +4,6 @@
 package migratest
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -101,17 +100,15 @@ func TestMigrations(t *testing.T) {
 	for db, c := range connections {
 		t.Run("database="+db, func(t *testing.T) {
 			t.Parallel()
-			ctx := context.Background()
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
 
 			tm, err := popx.NewMigrationBox(
 				sql.Migrations,
 				c, l,
-				popx.WithPerMigrationTimeout(time.Minute),
 				popx.WithTestdata(t, os.DirFS("./testdata")))
 			require.NoError(t, err)
-			require.NoError(t, tm.Up(ctx))
+			require.NoError(t, tm.Up(t.Context()))
 
 			t.Run("suite=fixtures", func(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
@@ -145,7 +142,7 @@ func TestMigrations(t *testing.T) {
 
 				flows := []flow.Flow{}
 				require.NoError(t, c.All(&flows))
-				require.Len(t, flows, 18)
+				require.Len(t, flows, 19)
 
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
 					for _, f := range flows {
@@ -266,6 +263,22 @@ func TestMigrations(t *testing.T) {
 						require.NotZero(t, n.UpdatedAt)
 					}
 				})
+			})
+
+			t.Run("down", func(t *testing.T) {
+				status, err := tm.Status(t.Context())
+				require.NoError(t, err)
+
+				// there are no proper down migrations from v2 to v1
+				var stepsDown int
+				for i := range status {
+					if status[len(status)-1-i].Version == "20220210000001000000" {
+						stepsDown = i
+						break
+					}
+				}
+
+				assert.NoError(t, tm.Down(t.Context(), stepsDown))
 			})
 		})
 	}

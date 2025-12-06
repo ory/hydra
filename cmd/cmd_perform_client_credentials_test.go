@@ -16,6 +16,8 @@ import (
 )
 
 func TestPerformClientCredentialsGrant(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewPerformClientCredentialsCmd()
 	public, _, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, public.URL))

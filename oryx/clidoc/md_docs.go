@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -61,7 +62,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	name := cmd.CommandPath()
 
 	buf.WriteString("## " + html.EscapeString(name) + "\n\n")
-	buf.WriteString(cmd.Short + "\n\n")
+	buf.WriteString(fenceIndentedBlocks(cmd.Short) + "\n\n")
 	if len(cmd.Long) > 0 {
 		buf.WriteString("### Synopsis\n\n")
 		long, err := cmdx.TemplateCommandField(cmd, cmd.Long)
@@ -69,7 +70,7 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			buf.WriteString(fmt.Sprintf("<!-- Error rendering cmd.Long: %s -->\n\n", err.Error()))
 			long = cmd.Long
 		}
-		buf.WriteString(long + "\n\n")
+		buf.WriteString(fenceIndentedBlocks(long) + "\n\n")
 	}
 
 	if cmd.Runnable() {
@@ -90,13 +91,17 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 		return err
 	}
 	if hasSeeAlso(cmd) {
-		buf.WriteString("### SEE ALSO\n\n")
+		buf.WriteString("### See also\n\n")
 		if cmd.HasParent() {
 			parent := cmd.Parent()
 			pname := parent.CommandPath()
 			link := pname + ".md"
 			link = strings.Replace(link, " ", "_", -1)
-			buf.WriteString(fmt.Sprintf("* [%s](%s)\t - %s\n", pname, linkHandler(link), parent.Short))
+			short := parent.Short
+			if short != "" {
+				short = fmt.Sprintf(" %s", short)
+			}
+			buf.WriteString(fmt.Sprintf("* [%s](%s)%s\n", pname, linkHandler(link), short))
 			cmd.VisitParents(func(c *cobra.Command) {
 				if c.DisableAutoGenTag {
 					cmd.DisableAutoGenTag = c.DisableAutoGenTag
@@ -114,7 +119,11 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			cname := name + " " + child.Name()
 			link := cname + ".md"
 			link = strings.Replace(link, " ", "_", -1)
-			buf.WriteString(fmt.Sprintf("* [%s](%s)\t - %s\n", cname, linkHandler(link), child.Short))
+			short := child.Short
+			if short != "" {
+				short = fmt.Sprintf(" - %s", short)
+			}
+			buf.WriteString(fmt.Sprintf("* [%s](%s)\t%s\n", cname, linkHandler(link), short))
 		}
 		buf.WriteString("\n")
 	}
@@ -162,4 +171,31 @@ func GenMarkdownTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHa
 		return err
 	}
 	return nil
+}
+
+var indentedBlock = regexp.MustCompile(`(?m)^(?: {4}|\t).*(?:\n(?: {4}|\t).*)*`)
+
+func fenceIndentedBlocks(s string) string {
+	return indentedBlock.ReplaceAllStringFunc(s, func(block string) string {
+		// trim trailing newline to keep fence tidy
+		block = strings.TrimRight(block, "\n")
+
+		// de-indent exactly one level for nicer fenced output
+		lines := strings.Split(block, "\n")
+		for i, ln := range lines {
+			switch {
+			case strings.HasPrefix(ln, "    "):
+				lines[i] = ln[4:]
+			case strings.HasPrefix(ln, "\t"):
+				lines[i] = ln[1:]
+			}
+		}
+		b := strings.Join(lines, "\n")
+
+		// guard against already fenced content
+		if strings.HasPrefix(strings.TrimSpace(b), "```") {
+			return block
+		}
+		return "```\n" + b + "\n```"
+	})
 }

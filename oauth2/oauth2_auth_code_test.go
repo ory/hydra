@@ -32,12 +32,12 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
@@ -1752,7 +1752,7 @@ func claimsFromVCResponse(t *testing.T, reg *driver.RegistrySQL, vc *hydraoauth2
 		if !found {
 			return nil, errors.New("missing kid header")
 		}
-		openIDKey, err := reg.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+		openIDKey, err := reg.OpenIDJWTSigner().GetPublicKeyID(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1760,7 +1760,7 @@ func claimsFromVCResponse(t *testing.T, reg *driver.RegistrySQL, vc *hydraoauth2
 			return nil, errors.New("invalid kid header")
 		}
 
-		return x.Must(reg.OpenIDJWTStrategy().GetPublicKey(ctx)).Key, nil
+		return x.Must(reg.OpenIDJWTSigner().GetPublicKey(ctx)).Key, nil
 	})
 	require.NoError(t, err)
 

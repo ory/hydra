@@ -12,11 +12,11 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/i18n"
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/compose"
+	"github.com/ory/hydra/v2/fosite/i18n"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/persistence"
 	"github.com/ory/hydra/v2/x"
@@ -24,48 +24,53 @@ import (
 	"github.com/ory/x/urlx"
 )
 
-type configDependencies interface {
-	config.Provider
-	persistence.Provider
-	x.HTTPClientProvider
-	ClientHasher() fosite.Hasher
-	ExtraFositeFactories() []Factory
-}
+type (
+	configDependencies interface {
+		config.Provider
+		persistence.Provider
+		x.HTTPClientProvider
+		ClientHasher() fosite.Hasher
+		ExtraFositeFactories() []Factory
+	}
+	Factory func(config fosite.Configurator, storage fosite.Storage, strategy interface{}) interface{}
+	Config  struct {
+		deps configDependencies
 
-type Factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
+		authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
+		tokenEndpointHandlers      fosite.TokenEndpointHandlers
+		tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
+		revocationHandlers         fosite.RevocationHandlers
+		deviceEndpointHandlers     fosite.DeviceEndpointHandlers
+		jwksFetcherStrategy        fosite.JWKSFetcherStrategy
 
-type Config struct {
-	deps configDependencies
+		*config.DefaultProvider
+	}
+	ConfigProvider interface {
+		OAuth2Config() *Config
+	}
+)
 
-	authorizeEndpointHandlers  fosite.AuthorizeEndpointHandlers
-	tokenEndpointHandlers      fosite.TokenEndpointHandlers
-	tokenIntrospectionHandlers fosite.TokenIntrospectionHandlers
-	revocationHandlers         fosite.RevocationHandlers
-	deviceEndpointHandlers     fosite.DeviceEndpointHandlers
-	jwksFetcherStrategy        fosite.JWKSFetcherStrategy
-
-	*config.DefaultProvider
-}
-
-var defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
-var defaultFactories = []Factory{
-	compose.OAuth2AuthorizeExplicitFactory,
-	compose.OAuth2AuthorizeImplicitFactory,
-	compose.OAuth2ClientCredentialsGrantFactory,
-	compose.OAuth2RefreshTokenGrantFactory,
-	compose.OpenIDConnectExplicitFactory,
-	compose.OpenIDConnectHybridFactory,
-	compose.OpenIDConnectImplicitFactory,
-	compose.OpenIDConnectRefreshFactory,
-	compose.OAuth2TokenRevocationFactory,
-	compose.OAuth2TokenIntrospectionFactory,
-	compose.OAuth2PKCEFactory,
-	compose.RFC7523AssertionGrantFactory,
-	compose.OIDCUserinfoVerifiableCredentialFactory,
-	compose.RFC8628DeviceFactory,
-	compose.RFC8628DeviceAuthorizationTokenFactory,
-	compose.OpenIDConnectDeviceFactory,
-}
+var (
+	defaultResponseModeHandler = fosite.NewDefaultResponseModeHandler()
+	defaultFactories           = []Factory{
+		compose.OAuth2AuthorizeExplicitFactory,
+		compose.OAuth2AuthorizeImplicitFactory,
+		compose.OAuth2ClientCredentialsGrantFactory,
+		compose.OAuth2RefreshTokenGrantFactory,
+		compose.OpenIDConnectExplicitFactory,
+		compose.OpenIDConnectHybridFactory,
+		compose.OpenIDConnectImplicitFactory,
+		compose.OpenIDConnectRefreshFactory,
+		compose.OAuth2TokenRevocationFactory,
+		compose.OAuth2TokenIntrospectionFactory,
+		compose.OAuth2PKCEFactory,
+		compose.RFC7523AssertionGrantFactory,
+		compose.OIDCUserinfoVerifiableCredentialFactory,
+		compose.RFC8628DeviceFactory,
+		compose.RFC8628DeviceAuthorizationTokenFactory,
+		compose.OpenIDConnectDeviceFactory,
+	}
+)
 
 func NewConfig(deps configDependencies) *Config {
 	return &Config{
@@ -74,10 +79,14 @@ func NewConfig(deps configDependencies) *Config {
 	}
 }
 
-func (c *Config) LoadDefaultHandlers(strategy interface{}) {
+func (c *Config) Config() *config.DefaultProvider {
+	return c.deps.Config()
+}
+
+func (c *Config) LoadDefaultHandlers(storage fosite.Storage, strategy interface{}) {
 	factories := append(defaultFactories, c.deps.ExtraFositeFactories()...)
 	for _, factory := range factories {
-		res := factory(c, c.deps.Persister(), strategy)
+		res := factory(c, storage, strategy)
 		if ah, ok := res.(fosite.AuthorizeEndpointHandler); ok {
 			c.authorizeEndpointHandlers.Append(ah)
 		}
@@ -218,7 +227,7 @@ func (c *Config) GetFormPostHTMLTemplate(context.Context) *template.Template {
 
 func (c *Config) GetTokenURLs(ctx context.Context) []string {
 	return stringslice.Unique([]string{
-		c.OAuth2TokenURL(ctx).String(),
+		c.deps.Config().OAuth2TokenURL(ctx).String(),
 		urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String(),
 	})
 }

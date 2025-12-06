@@ -18,6 +18,8 @@ import (
 )
 
 func TestIntrospectToken(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewIntrospectTokenCmd()
 	public, admin, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, admin.URL))

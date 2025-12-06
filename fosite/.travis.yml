@@ -1,0 +1,18 @@
+language: go
+
+go_import_path: github.com/ory/fosite
+
+go:
+  - "1.14"
+
+install:
+  - go install github.com/mattn/goveralls
+  - go install github.com/ory/go-acc
+  - curl -sSfL
+    https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh |
+    sh -s -- -b $(go env GOPATH)/bin v1.24.0
+
+script:
+  - golangci-lint run
+  - go-acc -o coverage.txt ./... -- -failfast -timeout=20m
+  - goveralls -coverprofile="coverage.txt"

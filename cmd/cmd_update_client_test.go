@@ -5,7 +5,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"testing"
 
@@ -21,14 +20,15 @@ import (
 )
 
 func TestUpdateClient(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewUpdateClientCmd()
 	reg := setup(t, c)
 
 	original := createClient(t, reg, nil)
 	t.Run("case=creates successfully", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, "--grant-type", "implicit", original.GetID()))
-		expected, err := reg.ClientManager().GetClient(ctx, actual.Get("client_id").Str)
+		expected, err := reg.ClientManager().GetClient(t.Context(), actual.Get("client_id").Str)
 		require.NoError(t, err)
 
 		assert.Equal(t, expected.GetID(), actual.Get("client_id").Str)
@@ -50,7 +50,7 @@ func TestUpdateClient(t *testing.T) {
 	})
 
 	t.Run("case=updates from file", func(t *testing.T) {
-		original, err := reg.ClientManager().GetConcreteClient(ctx, original.GetID())
+		original, err := reg.ClientManager().GetConcreteClient(t.Context(), original.GetID())
 		require.NoError(t, err)
 
 		raw, err := json.Marshal(original)

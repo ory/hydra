@@ -4,7 +4,7 @@
 package testhelpers
 
 import (
-	"context"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -15,7 +15,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/errgroup"
 
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
@@ -29,6 +28,7 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/testingx"
 )
 
 var ConfigDefaults = []configx.OptionModifier{
@@ -52,24 +52,33 @@ func NewConfigurationWithDefaults(t testing.TB, opts ...configx.OptionModifier) 
 }
 
 func NewRegistryMemory(t testing.TB, opts ...driver.OptionsModifier) *driver.RegistrySQL {
-	reg, err := NewRegistrySQLFromURL(t.Context(), dbal.NewSQLiteTestDatabase(t), true, opts...)
-	require.NoError(t, err)
-	return reg
+	return NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, true, opts...)
 }
 
-func NewRegistrySQLFromURL(ctx context.Context, dsn string, migrate bool, opts ...driver.OptionsModifier) (*driver.RegistrySQL, error) {
-	sql.SilenceMigrations = true
-
+func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate, initNetwork bool, opts ...driver.OptionsModifier) *driver.RegistrySQL {
 	configOpts := append(ConfigDefaults, configx.WithValue(config.KeyDSN, dsn))
 	regOpts := append([]driver.OptionsModifier{
+		driver.SkipNetworkInit(),
 		driver.WithConfigOptions(configOpts...),
 		driver.WithServiceLocatorOptions(servicelocatorx.WithContextualizer(contextx.NewTestConfigProvider(spec.ConfigValidationSchema, configOpts...))),
 	}, opts...)
-	if migrate {
-		regOpts = append(regOpts, driver.WithAutoMigrate())
-	}
 
-	return driver.New(ctx, regOpts...)
+	reg, err := driver.New(t.Context(), regOpts...)
+	require.NoError(t, err)
+	if migrate {
+		if updateDump := dbal.RestoreFromSchemaDump(t,
+			reg.Persister().Connection(t.Context()),
+			sql.Migrations,
+			filepath.Join(testingx.RepoRootPath(t), "internal", "testhelpers", "sql_schemas"),
+		); updateDump != nil {
+			require.NoError(t, reg.Migrator().MigrateUp(t.Context()))
+			updateDump(t)
+		}
+	}
+	if initNetwork {
+		require.NoError(t, reg.InitNetwork(t.Context()))
+	}
+	return reg
 }
 
 func ConnectToMySQL(t testing.TB) string { return dockertest.RunTestMySQLWithVersion(t, "8.0") }
@@ -139,20 +148,9 @@ func ConnectDatabases(t *testing.T, migrate bool, opts ...driver.OptionsModifier
 	regs["memory"] = NewRegistryMemory(t, opts...)
 	if !testing.Short() {
 		pg, mysql, crdb := ConnectDatabasesURLs(t)
-		eg, ctx := errgroup.WithContext(t.Context())
-		eg.Go(func() (err error) {
-			regs["postgres"], err = NewRegistrySQLFromURL(ctx, pg, migrate, opts...)
-			return
-		})
-		eg.Go(func() (err error) {
-			regs["mysql"], err = NewRegistrySQLFromURL(ctx, mysql, migrate, opts...)
-			return
-		})
-		eg.Go(func() (err error) {
-			regs["cockroach"], err = NewRegistrySQLFromURL(ctx, crdb, migrate, opts...)
-			return
-		})
-		require.NoError(t, eg.Wait())
+		regs["postgres"] = NewRegistrySQLFromURL(t, pg, migrate, true, opts...)
+		regs["mysql"] = NewRegistrySQLFromURL(t, mysql, migrate, true, opts...)
+		regs["cockroach"] = NewRegistrySQLFromURL(t, crdb, migrate, true, opts...)
 	}
 	return regs
 }

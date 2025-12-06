@@ -7,26 +7,29 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/pkce"
-	"github.com/ory/fosite/handler/rfc7523"
-	"github.com/ory/fosite/handler/rfc8628"
-	"github.com/ory/fosite/handler/verifiable"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/pkce"
+	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
+	"github.com/ory/hydra/v2/fosite/handler/rfc8628"
+	"github.com/ory/hydra/v2/fosite/handler/verifiable"
 )
 
 type FositeStorer interface {
-	fosite.Storage
-	oauth2.CoreStorage
+	fosite.ClientManager
+	oauth2.AuthorizeCodeStorage
+	oauth2.AccessTokenStorage
+	oauth2.RefreshTokenStorage
 	oauth2.TokenRevocationStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
 	rfc7523.RFC7523KeyStorage
-	rfc8628.RFC8628CoreStorage
+	rfc8628.DeviceAuthStorage
 	verifiable.NonceManager
 	oauth2.ResourceOwnerPasswordCredentialsGrantStorage
 
+	// Hydra-specific storage utilities
 	// flush the access token requests from the database.
 	// no data will be deleted after the 'notAfter' timeframe.
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
@@ -42,8 +45,9 @@ type FositeStorer interface {
 
 	// DeleteOpenIDConnectSession deletes an OpenID Connect session.
 	// This is duplicated from Ory Fosite to help against deprecation linting errors.
-	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
+	// DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
 
+	// Hydra-specific RFC8628 Device Auth capabilities
 	GetUserCodeSession(context.Context, string, fosite.Session) (fosite.DeviceRequester, error)
 	GetDeviceCodeSessionByRequestID(ctx context.Context, requestID string, requester fosite.Session) (fosite.DeviceRequester, string, error)
 	UpdateDeviceCodeSessionBySignature(ctx context.Context, requestID string, requester fosite.DeviceRequester) error

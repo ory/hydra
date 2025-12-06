@@ -10,9 +10,9 @@ import (
 	"github.com/oleiade/reflections"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite/token/hmac"
 )
 
 func Tokens(c fosite.Configurator, length int) []struct{ sig, tok string } {

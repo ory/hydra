@@ -4,7 +4,6 @@
 package cmd_test
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
 
@@ -18,7 +17,8 @@ import (
 )
 
 func TestCreateClient(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewCreateClientsCommand()
 	reg := setup(t, c)
 
@@ -27,7 +27,7 @@ func TestCreateClient(t *testing.T) {
 		assert.NotEmpty(t, actual.Get("client_id").String())
 		assert.NotEmpty(t, actual.Get("client_secret").String())
 
-		expected, err := reg.ClientManager().GetClient(ctx, actual.Get("client_id").String())
+		expected, err := reg.ClientManager().GetClient(t.Context(), actual.Get("client_id").String())
 		require.NoError(t, err)
 
 		assert.Equal(t, expected.GetID(), actual.Get("client_id").String())

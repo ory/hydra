@@ -1,0 +1,86 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/ISSUE_TEMPLATE/FEATURE-REQUEST.yml
+
+description:
+  "Suggest an idea for this project without a plan for implementation"
+labels:
+  - feat
+name: "Feature Request"
+body:
+  - attributes:
+      value: |
+        Thank you for suggesting an idea for this project!
+
+        If you already have a plan to implement a feature or a change, please create a [design document](https://github.com/aeneasr/gh-template-test/issues/new?assignees=&labels=rfc&template=DESIGN-DOC.yml) instead if the change is non-trivial!
+    type: markdown
+  - attributes:
+      label: "Preflight checklist"
+      options:
+        - label:
+            "I could not find a solution in the existing issues, docs, nor
+            discussions."
+          required: true
+        - label:
+            "I agree to follow this project's [Code of
+            Conduct](https://github.com/ory/fosite/blob/master/CODE_OF_CONDUCT.md)."
+          required: true
+        - label:
+            "I have read and am following this repository's [Contribution
+            Guidelines](https://github.com/ory/fosite/blob/master/CONTRIBUTING.md)."
+          required: true
+        - label:
+            "I have joined the [Ory Community Slack](https://slack.ory.sh)."
+        - label:
+            "I am signed up to the [Ory Security Patch
+            Newsletter](https://www.ory.sh/l/sign-up-newsletter)."
+    id: checklist
+    type: checkboxes
+  - attributes:
+      description:
+        "Enter the slug or API URL of the affected Ory Network project. Leave
+        empty when you are self-hosting."
+      label: "Ory Network Project"
+      placeholder: "https://<your-project-slug>.projects.oryapis.com"
+    id: ory-network-project
+    type: input
+  - attributes:
+      description:
+        "Is your feature request related to a problem? Please describe."
+      label: "Describe your problem"
+      placeholder:
+        "A clear and concise description of what the problem is. Ex. I'm always
+        frustrated when [...]"
+    id: problem
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description: |
+        Describe the solution you'd like
+      placeholder: |
+        A clear and concise description of what you want to happen.
+      label: "Describe your ideal solution"
+    id: solution
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description: "Describe alternatives you've considered"
+      label: "Workarounds or alternatives"
+    id: alternatives
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description: "What version of our software are you running?"
+      label: Version
+    id: version
+    type: input
+    validations:
+      required: true
+  - attributes:
+      description:
+        "Add any other context or screenshots about the feature request here."
+      label: Additional Context
+    id: additional
+    type: textarea

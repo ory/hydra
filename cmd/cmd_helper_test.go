@@ -74,13 +74,13 @@ func createClient(t *testing.T, reg *driver.RegistrySQL, c *client.Client) *clie
 		c = &client.Client{TokenEndpointAuthMethod: "client_secret_post", Secret: uuid.Must(uuid.NewV4()).String()}
 	}
 	secret := c.Secret
-	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+	require.NoError(t, reg.ClientManager().CreateClient(t.Context(), c))
 	c.Secret = secret
 	return c
 }
 
 func createJWK(t *testing.T, reg *driver.RegistrySQL, set string, alg string) jose.JSONWebKey {
-	c, err := reg.KeyManager().GenerateAndPersistKeySet(context.Background(), set, "", alg, "sig")
+	c, err := reg.KeyManager().GenerateAndPersistKeySet(t.Context(), set, "", alg, "sig")
 	require.NoError(t, err)
 	return c.Keys[0]
 }

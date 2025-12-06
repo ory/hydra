@@ -17,21 +17,22 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
+	"github.com/ory/x/configx"
+
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/hydra/v2/x/oauth2cors"
-	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
 )
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	ctx := context.Background()
-	dsn := dbal.NewSQLiteInMemoryDatabase(t.Name())
-	r := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue("dsn", dsn)))
+	dsn := dbal.NewSQLiteTestDatabase(t)
+	r := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true)
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(ctx, nil)
 
 	for k, tc := range []struct {
@@ -291,7 +292,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-			r := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue("dsn", dsn), configx.WithValues(tc.configs)))
+			r := testhelpers.NewRegistrySQLFromURL(t, dsn, false, true, driver.WithConfigOptions(configx.WithValues(tc.configs)))
 
 			if tc.prep != nil {
 				tc.prep(t, r)

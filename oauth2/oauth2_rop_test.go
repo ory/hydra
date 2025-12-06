@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite/compose"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	hydraoauth2 "github.com/ory/hydra/v2/oauth2"
@@ -112,7 +112,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 
 		// Access token should have hook and identity_id claims
 		jwtAT, err := jwt.Parse(token.AccessToken, func(token *jwt.Token) (interface{}, error) {
-			return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
+			return reg.AccessTokenJWTSigner().GetPublicKey(ctx)
 		})
 		require.NoError(t, err)
 		assert.Equal(t, kratos.FakeUsername, jwtAT.Claims["ext"].(map[string]any)["username"])
@@ -142,7 +142,7 @@ func TestResourceOwnerPasswordGrant(t *testing.T) {
 			require.NotEqual(t, token.RefreshToken, refreshedToken.RefreshToken)
 
 			jwtAT, err := jwt.Parse(refreshedToken.AccessToken, func(token *jwt.Token) (interface{}, error) {
-				return reg.AccessTokenJWTStrategy().GetPublicKey(ctx)
+				return reg.AccessTokenJWTSigner().GetPublicKey(ctx)
 			})
 			require.NoError(t, err)
 			assert.Equal(t, kratos.FakeIdentityID, jwtAT.Claims["sub"])

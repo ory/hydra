@@ -6,7 +6,7 @@ package kratos
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	client "github.com/ory/kratos-client-go"
 )
 

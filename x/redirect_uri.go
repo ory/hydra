@@ -7,7 +7,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 type redirectConfiguration interface {

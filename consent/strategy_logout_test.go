@@ -22,10 +22,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
-	jwtgo "github.com/ory/fosite/token/jwt"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	jwtgo "github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
@@ -76,7 +76,7 @@ func TestLogoutFlows(t *testing.T) {
 			require.NoError(t, r.ParseForm())
 			lt := r.PostFormValue("logout_token")
 			assert.NotEmpty(t, lt)
-			token, err := reg.OpenIDJWTStrategy().Decode(r.Context(), lt)
+			token, err := reg.OpenIDJWTSigner().Decode(r.Context(), lt)
 			require.NoError(t, err)
 
 			var b bytes.Buffer

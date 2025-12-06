@@ -4,6 +4,7 @@
 package popx
 
 import (
+	"database/sql"
 	"fmt"
 	"io/fs"
 	"path"
@@ -88,9 +89,10 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 	return func(m *MigrationBox) {
 		require.NoError(t, fs.WalkDir(testdata, ".", func(path string, info fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
-			if info.IsDir() {
+			if !info.Type().IsRegular() {
+				t.Logf("skipping testdata entry that is not a file: %s", path)
 				return nil
 			}
 
@@ -115,18 +117,16 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 				DBType:    flavor,
 				Direction: "up",
 				Type:      "sql",
-				Runner: func(m Migration, _ *pop.Connection, tx *pop.Tx) error {
+				Runner: func(m Migration, c *pop.Connection) error {
 					b, err := fs.ReadFile(testdata, m.Path)
 					if err != nil {
-						return err
+						return errors.WithStack(err)
 					}
 					if isMigrationEmpty(string(b)) {
 						return nil
 					}
-					_, err = tx.Exec(string(b))
-					//match := match
-					//t.Logf("Ran test migration \"%s\" (%s, %+v) with error \"%v\" and content:\n %s", m.Path, m.DBType, match, err, string(b))
-					return err
+					_, err = c.Store.SQLDB().Exec(string(b))
+					return errors.WithStack(err)
 				},
 			})
 
@@ -137,7 +137,7 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 				DBType:    flavor,
 				Direction: "down",
 				Type:      "sql",
-				Runner:    func(m Migration, _ *pop.Connection, tx *pop.Tx) error { return nil },
+				Runner:    func(m Migration, _ *pop.Connection) error { return nil },
 			})
 
 			return nil
@@ -149,6 +149,10 @@ var emptySQLReplace = regexp.MustCompile(`(?m)^(\s*--.*|\s*)$`)
 
 func isMigrationEmpty(content string) bool {
 	return len(strings.ReplaceAll(emptySQLReplace.ReplaceAllString(content, ""), "\n", "")) == 0
+}
+
+type queryExecutor interface {
+	Exec(query string, args ...any) (sql.Result, error)
 }
 
 // NewMigrationBox creates a new migration box.
@@ -163,24 +167,7 @@ func NewMigrationBox(dir fs.FS, c *pop.Connection, l *logrusx.Logger, opts ...Mi
 		o(mb)
 	}
 
-	txRunner := func(b []byte) func(Migration, *pop.Connection, *pop.Tx) error {
-		return func(mf Migration, c *pop.Connection, tx *pop.Tx) error {
-			content, err := mb.migrationContent(mf, c, b, true)
-			if err != nil {
-				return errors.Wrapf(err, "error processing %s", mf.Path)
-			}
-			if isMigrationEmpty(content) {
-				l.WithField("migration", mf.Path).Trace("This is usually ok - ignoring migration because content is empty. This is ok!")
-				return nil
-			}
-			if _, err = tx.Exec(content); err != nil {
-				return errors.Wrapf(err, "error executing %s, sql: %s", mf.Path, content)
-			}
-			return nil
-		}
-	}
-
-	autoCommitRunner := func(b []byte) func(Migration, *pop.Connection) error {
+	txRunner := func(b []byte) func(Migration, *pop.Connection) error {
 		return func(mf Migration, c *pop.Connection) error {
 			content, err := mb.migrationContent(mf, c, b, true)
 			if err != nil {
@@ -190,14 +177,20 @@ func NewMigrationBox(dir fs.FS, c *pop.Connection, l *logrusx.Logger, opts ...Mi
 				l.WithField("migration", mf.Path).Trace("This is usually ok - ignoring migration because content is empty. This is ok!")
 				return nil
 			}
-			if _, err = c.RawQuery(content).ExecWithCount(); err != nil {
+
+			var q queryExecutor = c.Store.SQLDB()
+			if c.TX != nil {
+				q = c.TX
+			}
+
+			if _, err = q.Exec(content); err != nil {
 				return errors.Wrapf(err, "error executing %s, sql: %s", mf.Path, content)
 			}
 			return nil
 		}
 	}
 
-	err := mb.findMigrations(dir, txRunner, autoCommitRunner)
+	err := mb.findMigrations(dir, txRunner)
 	if err != nil {
 		return mb, err
 	}
@@ -210,8 +203,7 @@ func NewMigrationBox(dir fs.FS, c *pop.Connection, l *logrusx.Logger, opts ...Mi
 
 func (mb *MigrationBox) findMigrations(
 	dir fs.FS,
-	runner func([]byte) func(m Migration, c *pop.Connection, tx *pop.Tx) error,
-	runnerNoTx func([]byte) func(m Migration, c *pop.Connection) error,
+	runner func([]byte) func(m Migration, c *pop.Connection) error,
 ) error {
 	err := fs.WalkDir(dir, ".", func(p string, info fs.DirEntry, err error) error {
 		if err != nil {
@@ -238,7 +230,7 @@ func (mb *MigrationBox) findMigrations(
 		}
 
 		if details == nil {
-			return errors.WithStack(fmt.Errorf("Found a migration file that does not match the file pattern: filename=%s pattern=%s", info.Name(), MigrationFileRegexp))
+			return errors.Errorf("Found a migration file that does not match the file pattern: filename=%s pattern=%s", info.Name(), MigrationFileRegexp)
 		}
 
 		content, err := fs.ReadFile(dir, p)
@@ -247,20 +239,17 @@ func (mb *MigrationBox) findMigrations(
 		}
 
 		mf := Migration{
-			Path:      p,
-			Version:   details.Version,
-			Name:      details.Name,
-			DBType:    details.DBType,
-			Direction: details.Direction,
-			Type:      details.Type,
-			Content:   string(content),
+			Path:       p,
+			Version:    details.Version,
+			Name:       details.Name,
+			DBType:     details.DBType,
+			Direction:  details.Direction,
+			Type:       details.Type,
+			Content:    string(content),
+			Autocommit: details.Autocommit,
 		}
 
-		if details.Autocommit {
-			mf.RunnerNoTx = runnerNoTx(content)
-		} else {
-			mf.Runner = runner(content)
-		}
+		mf.Runner = runner(content)
 
 		switch details.Direction {
 		case "up":
@@ -280,7 +269,7 @@ func (mb *MigrationBox) findMigrations(
 	// Sort ascending.
 	sort.Sort(mb.migrationsUp)
 
-	return err
+	return errors.WithStack(err)
 }
 
 // hasDownMigrationWithVersion checks if there is a migration with the given
@@ -304,12 +293,12 @@ func (mb *MigrationBox) check() error {
 
 	for _, n := range mb.migrationsUp {
 		if err := n.Valid(); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	for _, n := range mb.migrationsDown {
 		if err := n.Valid(); err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 	return nil

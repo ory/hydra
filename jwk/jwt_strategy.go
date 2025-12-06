@@ -10,22 +10,29 @@ import (
 	"github.com/go-jose/go-jose/v3"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/x/josex"
 )
 
-type JWTSigner interface {
-	GetPublicKeyID(ctx context.Context) (string, error)
-	GetPublicKey(ctx context.Context) (jose.JSONWebKey, error)
-	jwt.Signer
-}
-
-type DefaultJWTSigner struct {
-	*jwt.DefaultSigner
-	r     InternalRegistry
-	setID string
-}
+type (
+	JWTSigner interface {
+		GetPublicKeyID(ctx context.Context) (string, error)
+		GetPublicKey(ctx context.Context) (jose.JSONWebKey, error)
+		jwt.Signer
+	}
+	DefaultJWTSigner struct {
+		*jwt.DefaultSigner
+		r     InternalRegistry
+		setID string
+	}
+	AccessTokenSignerProvider interface {
+		AccessTokenJWTSigner() JWTSigner
+	}
+	OpenIDSignerProvider interface {
+		OpenIDJWTSigner() JWTSigner
+	}
+)
 
 func NewDefaultJWTSigner(r InternalRegistry, setID string) *DefaultJWTSigner {
 	j := &DefaultJWTSigner{r: r, setID: setID, DefaultSigner: &jwt.DefaultSigner{}}
@@ -34,7 +41,7 @@ func NewDefaultJWTSigner(r InternalRegistry, setID string) *DefaultJWTSigner {
 }
 
 func (j *DefaultJWTSigner) getKeys(ctx context.Context) (private *jose.JSONWebKey, err error) {
-	private, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, string(jose.RS256))
+	private, err = GetOrGenerateKeys(ctx, j.r, j.setID, string(jose.RS256))
 	if err == nil {
 		return private, nil
 	}
@@ -66,11 +73,6 @@ func (j *DefaultJWTSigner) GetPublicKey(ctx context.Context) (jose.JSONWebKey, e
 	return josex.ToPublicKey(private), nil
 }
 
-func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, error) {
-	private, err := j.getKeys(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return private, nil
+func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (any, error) {
+	return j.getKeys(ctx)
 }

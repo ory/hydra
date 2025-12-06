@@ -6,7 +6,7 @@ package client
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
 )
 
@@ -15,6 +15,7 @@ type Filter struct {
 	PageOpts []keysetpagination.Option
 	Name     string
 	Owner    string
+	IDs      []string
 }
 
 type Manager interface {
@@ -24,7 +25,7 @@ type Manager interface {
 }
 
 type Storage interface {
-	GetClient(ctx context.Context, id string) (fosite.Client, error)
+	fosite.ClientManager
 
 	CreateClient(ctx context.Context, c *Client) error
 

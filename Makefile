@@ -22,10 +22,10 @@ docs/cli: .bin/clidoc
 	clidoc .
 
 .bin/licenses: Makefile
-	curl https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
 
 .bin/ory: Makefile
-	curl https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.2.2
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/meta/master/install.sh | bash -s -- -b .bin ory v0.2.2
 	touch .bin/ory
 
 .PHONY: lint
@@ -49,7 +49,7 @@ test-resetdb:
 	docker rm --force --volumes hydra_test_database_cockroach || true
 	docker run --rm --name hydra_test_database_mysql  -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0
 	docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:16
-	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.2 start-single-node --insecure
+	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.3 start-single-node --insecure
 
 # Build local docker images
 .PHONY: docker
@@ -80,7 +80,7 @@ test-refresh:
 	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm  --target test-refresh-hsm -t oryd/hydra:${IMAGE_TAG} --target test-refresh-hsm .
 
 authors:  # updates the AUTHORS file
-	curl https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
+	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 
 # Formats the code
 .PHONY: format

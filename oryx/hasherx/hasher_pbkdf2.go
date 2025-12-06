@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"hash"
 
+	"github.com/ory/x/otelx"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -48,9 +49,9 @@ func NewHasherPBKDF2(c PBKDF2Configurator) *PBKDF2 {
 }
 
 // Generate generates a hash for the given password.
-func (h *PBKDF2) Generate(ctx context.Context, password []byte) ([]byte, error) {
-	_, span := otel.GetTracerProvider().Tracer("").Start(ctx, "hash.PBKDF2.Generate")
-	defer span.End()
+func (h *PBKDF2) Generate(ctx context.Context, password []byte) (hash []byte, err error) {
+	ctx, span := otel.GetTracerProvider().Tracer("").Start(ctx, "hash.PBKDF2.Generate")
+	defer otelx.End(span, &err)
 
 	conf := h.c.HasherPBKDF2Config(ctx)
 	salt := make([]byte, conf.SaltLength)

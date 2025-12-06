@@ -12,12 +12,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
@@ -409,25 +409,24 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 					require.NoError(t, clientManager.CreateClient(t.Context(), cl))
 
 					f := &flow.Flow{
+						ID:  uuidx.NewV4().String(),
 						NID: deps.Networker().NetworkID(t.Context()),
 						OpenIDConnectContext: &flow.OAuth2ConsentRequestOpenIDConnectContext{
 							ACRValues: []string{"1", "2"},
 							UILocales: []string{"fr", "de"},
 							Display:   "popup",
 						},
-						RequestedAt:      time.Now().UTC().Add(-time.Hour),
-						Client:           cl,
-						Subject:          ls.Subject,
-						RequestURL:       "https://request-url/path",
-						LoginSkip:        true,
-						RequestedScope:   []string{"scopea", "scopeb"},
-						SessionID:        sqlxx.NullString(ls.ID),
-						ConsentRequestID: sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
-						ConsentCSRF:      sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
-
-						LoginCSRF: uuid.Must(uuid.NewV4()).String(),
-						ID:        uuid.Must(uuid.NewV4()).String(),
-						State:     flow.FlowStateLoginUsed,
+						ACR:                "1",
+						AMR:                sqlxx.StringSliceJSONFormat{"passwd"},
+						RequestedAt:        time.Now().UTC().Add(-time.Hour),
+						Client:             cl,
+						Subject:            ls.Subject,
+						RequestURL:         "https://request-url/path",
+						RequestedScope:     []string{"scopea", "scopeb"},
+						SessionID:          sqlxx.NullString(ls.ID),
+						ConsentRequestID:   sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
+						GrantedScope:       sqlxx.StringSliceJSONFormat{"scopea", "scopeb"},
+						ConsentRememberFor: pointerx.Ptr(0),
 					}
 
 					require.NoError(t, m.CreateConsentSession(t.Context(), f))

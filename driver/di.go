@@ -4,7 +4,8 @@
 package driver
 
 import (
-	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/jwk"
 )
 
@@ -23,9 +24,37 @@ func RegistryWithHMACSHAStrategy(s func(r *RegistrySQL) oauth2.CoreStrategy) Reg
 	}
 }
 
+func RegistryWithJWTStrategy(s func(r *RegistrySQL) oauth2.AccessTokenStrategy) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.jwtStrategy = s(r)
+		return nil
+	}
+}
+
 func RegistryWithKeyManager(km func(r *RegistrySQL) (jwk.Manager, error)) RegistryModifier {
 	return func(r *RegistrySQL) (err error) {
 		r.keyManager, err = km(r)
 		return err
+	}
+}
+
+func RegistryWithOAuth2Provider(pr func(r *RegistrySQL) fosite.OAuth2Provider) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.fop = pr(r)
+		return nil
+	}
+}
+
+func RegistryWithAccessTokenStorage(s func(r *RegistrySQL) oauth2.AccessTokenStorage) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.accessTokenStorage = s(r)
+		return nil
+	}
+}
+
+func RegistryWithAuthorizeCodeStorage(s func(r *RegistrySQL) oauth2.AuthorizeCodeStorage) RegistryModifier {
+	return func(r *RegistrySQL) error {
+		r.authorizeCodeStorage = s(r)
+		return nil
 	}
 }

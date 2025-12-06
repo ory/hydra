@@ -4,7 +4,6 @@
 package cmd_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -22,7 +21,8 @@ import (
 )
 
 func TestDeleteJwks(t *testing.T) {
-	ctx := context.Background()
+	t.Parallel()
+
 	c := cmd.NewDeleteJWKSCommand()
 	reg := setup(t, c)
 
@@ -32,7 +32,7 @@ func TestDeleteJwks(t *testing.T) {
 		stdout := cmdx.ExecNoErr(t, c, set)
 		assert.Equal(t, fmt.Sprintf(`"%s"`, set), strings.TrimSpace(stdout))
 
-		_, err := reg.KeyManager().GetKeySet(ctx, set)
+		_, err := reg.KeyManager().GetKeySet(t.Context(), set)
 		assert.ErrorIs(t, err, x.ErrNotFound)
 	})
 
@@ -43,10 +43,10 @@ func TestDeleteJwks(t *testing.T) {
 		_ = createJWK(t, reg, set2, "RS256")
 		assertx.EqualAsJSON(t, []string{set1, set2}, json.RawMessage(cmdx.ExecNoErr(t, c, set1, set2)))
 
-		_, err := reg.KeyManager().GetKeySet(ctx, set1)
+		_, err := reg.KeyManager().GetKeySet(t.Context(), set1)
 		assert.ErrorIs(t, err, x.ErrNotFound)
 
-		_, err = reg.KeyManager().GetKeySet(ctx, set2)
+		_, err = reg.KeyManager().GetKeySet(t.Context(), set2)
 		assert.ErrorIs(t, err, x.ErrNotFound)
 	})
 }

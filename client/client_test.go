@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 var _ fosite.OpenIDConnectClient = new(Client)

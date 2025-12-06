@@ -24,17 +24,19 @@ func (a AttributeKey) String() string {
 }
 
 const (
-	AttributeKeyIdentityID         AttributeKey = "IdentityID"
-	AttributeKeyNID                AttributeKey = "ProjectID"
-	AttributeKeyClientIP           AttributeKey = "ClientIP"
-	AttributeKeyGeoLocationCity    AttributeKey = "GeoLocationCity"
-	AttributeKeyGeoLocationRegion  AttributeKey = "GeoLocationRegion"
-	AttributeKeyGeoLocationCountry AttributeKey = "GeoLocationCountry"
-	AttributeKeyWorkspace          AttributeKey = "WorkspaceID"
-	AttributeKeySubscriptionID     AttributeKey = "SubscriptionID"
-	AttributeKeyProjectEnvironment AttributeKey = "ProjectEnvironment"
-	AttributeKeyWorkspaceAPIKeyID  AttributeKey = "WorkspaceAPIKeyID"
-	AttributeKeyProjectAPIKeyID    AttributeKey = "ProjectAPIKeyID"
+	AttributeKeyIdentityID           AttributeKey = "IdentityID"
+	AttributeKeyNID                  AttributeKey = "ProjectID"
+	AttributeKeyClientIP             AttributeKey = "ClientIP"
+	AttributeKeyGeoLocationCity      AttributeKey = "GeoLocationCity"
+	AttributeKeyGeoLocationRegion    AttributeKey = "GeoLocationRegion"
+	AttributeKeyGeoLocationCountry   AttributeKey = "GeoLocationCountry"
+	AttributeKeyGeoLocationLatitude  AttributeKey = "GeoLocationLatitude"
+	AttributeKeyGeoLocationLongitude AttributeKey = "GeoLocationLongitude"
+	AttributeKeyWorkspace            AttributeKey = "WorkspaceID"
+	AttributeKeySubscriptionID       AttributeKey = "SubscriptionID"
+	AttributeKeyProjectEnvironment   AttributeKey = "ProjectEnvironment"
+	AttributeKeyWorkspaceAPIKeyID    AttributeKey = "WorkspaceAPIKeyID"
+	AttributeKeyProjectAPIKeyID      AttributeKey = "ProjectAPIKeyID"
 )
 
 func AttrIdentityID[V string | uuid.UUID](val V) otelattr.KeyValue {
@@ -72,6 +74,12 @@ func AttrGeoLocation(val httpx.GeoLocation) []otelattr.KeyValue {
 	}
 	if val.Region != "" {
 		geoLocationAttributes = append(geoLocationAttributes, otelattr.String(AttributeKeyGeoLocationRegion.String(), val.Region))
+	}
+	if val.Latitude != nil {
+		geoLocationAttributes = append(geoLocationAttributes, otelattr.Float64(AttributeKeyGeoLocationLatitude.String(), *val.Latitude))
+	}
+	if val.Longitude != nil {
+		geoLocationAttributes = append(geoLocationAttributes, otelattr.Float64(AttributeKeyGeoLocationLongitude.String(), *val.Longitude))
 	}
 
 	return geoLocationAttributes

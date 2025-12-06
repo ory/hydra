@@ -17,13 +17,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/handler/rfc7523"
-	"github.com/ory/fosite/storage"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
+	"github.com/ory/hydra/v2/fosite/handler/rfc7523"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
@@ -801,7 +800,6 @@ func testFositeSqlStoreTransactionRollbackRefreshToken(m *driver.RegistrySQL) fu
 }
 
 func testFositeSqlStoreTransactionCommitAuthorizeCode(m *driver.RegistrySQL) func(t *testing.T) {
-
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreateAuthorizeCodeSession, m.OAuth2Storage().GetAuthorizeCodeSession, m.OAuth2Storage().InvalidateAuthorizeCodeSession)
 	}
@@ -814,7 +812,6 @@ func testFositeSqlStoreTransactionRollbackAuthorizeCode(m *driver.RegistrySQL) f
 }
 
 func testFositeSqlStoreTransactionCommitPKCERequest(m *driver.RegistrySQL) func(t *testing.T) {
-
 	return func(t *testing.T) {
 		doTestCommit(m, t, m.OAuth2Storage().CreatePKCERequestSession, m.OAuth2Storage().GetPKCERequestSession, m.OAuth2Storage().DeletePKCERequestSession)
 	}
@@ -830,7 +827,7 @@ func testFositeSqlStoreTransactionRollbackPKCERequest(m *driver.RegistrySQL) fun
 // different from the other getter methods
 func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 		require.True(t, ok)
 		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
@@ -865,7 +862,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistryS
 
 func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 		require.True(t, ok)
 		ctx := t.Context()
 		ctx, err := txnStore.BeginTX(ctx)
@@ -1309,7 +1306,7 @@ func doTestCommit(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
@@ -1346,7 +1343,7 @@ func doTestCommitRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 	ctx := t.Context()
 	ctx, err := txnStore.BeginTX(ctx)
@@ -1383,7 +1380,7 @@ func doTestRollback(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 
 	ctx := t.Context()
@@ -1424,7 +1421,7 @@ func doTestRollbackRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(storage.Transactional)
+	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
 	require.True(t, ok)
 
 	ctx := t.Context()

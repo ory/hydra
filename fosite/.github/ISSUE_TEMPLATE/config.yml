@@ -1,0 +1,14 @@
+# AUTO-GENERATED, DO NOT EDIT!
+# Please edit the original at https://github.com/ory/meta/blob/master/templates/repository/common/.github/ISSUE_TEMPLATE/config.yml
+
+blank_issues_enabled: false
+contact_links:
+  - name: Ory Fosite Forum
+    url: https://github.com/orgs/ory/discussions
+    about:
+      Please ask and answer questions here, show your implementations and
+      discuss ideas.
+  - name: Ory Chat
+    url: https://www.ory.sh/chat
+    about:
+      Hang out with other Ory community members to ask and answer questions.

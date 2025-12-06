@@ -4,48 +4,26 @@
   "rs": [
     "requested_scope-0002_1"
   ],
-  "ls": true,
   "s": "subject-0002",
   "oc": {
     "display": "display-0002"
   },
   "ci": "client-0014",
   "r": "http://request/0002",
-  "lc": "csrf-0002",
   "ia": "2022-02-15T22:20:21Z",
-  "q": 128,
-  "lr": true,
-  "lf": 2,
   "a": "acr-0002",
-  "fs": "force_subject_id-0002",
   "ct": {},
-  "le": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
-  "la": "2022-02-15T22:20:21Z",
+  "la": null,
   "dh": null,
   "cc": "challenge-0002",
   "cs": true,
-  "cr": "csrf-0002",
   "gs": [
     "granted_scope-0002_1"
   ],
   "ce": true,
   "cf": 2,
   "ch": null,
-  "cx": {
-    "error": "",
-    "error_description": "",
-    "error_hint": "",
-    "status_code": 0,
-    "error_debug": "",
-    "valid": false
-  },
+  "cx": null,
   "st": {
     "session_id_token-0002": "0002"
   },

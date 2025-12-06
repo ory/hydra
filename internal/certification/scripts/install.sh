@@ -20,7 +20,7 @@ mkdir -p go/bin
 source "$HOME"/.profile
 
 # go/dep
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 # Docker
 sudo apt-get update
@@ -30,7 +30,7 @@ sudo apt-get -y install \
      curl \
      gnupg2 \
      software-properties-common
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+curl --retry 7 --retry-connrefused -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \

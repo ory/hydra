@@ -1,0 +1,32 @@
+# etcd issues - can be ignored because etcd is not used.
+CVE-2020-15114
+CVE-2020-15136
+CVE-2020-15115
+# end
+
+# dockertest issues - can be ignored because only used for testing
+CVE-2020-8911
+sonatype-2020-1759
+CVE-2020-8912
+CVE-2021-41103
+CVE-2022-23648
+CVE-2021-21334
+CVE-2021-32760
+CVE-2021-41190
+sonatype-2021-0853
+sonatype-2021-0853
+CVE-2021-41190
+CVE-2021-30465
+CVE-2021-43784
+sonatype-2020-0569
+CVE-2022-29162
+sonatype-2019-0890
+CVE-2022-21698
+sonatype-2021-148
+CVE-2021-20329
+CVE-2021-22133
+sonatype-2021-1485
+sonatype-2021-4899
+sonatype-2020-1759
+CVE-2021-221333
+CVE-2022-31030

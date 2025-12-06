@@ -162,6 +162,7 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 
 	n.UseHandler(router)
 
+	n.UseFunc(otelx.SpanNameRecorderNegroniFunc)
 	return func() error {
 		return serve(ctx, d, cfg, n, "admin")
 	}, nil
@@ -209,6 +210,7 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 	d.RegisterPublicRoutes(ctx, router)
 
 	n.UseHandler(router)
+	n.UseFunc(otelx.SpanNameRecorderNegroniFunc)
 	return func() error {
 		return serve(ctx, d, cfg, n, "public")
 	}, nil
@@ -312,12 +314,8 @@ func serve(
 	ifaceName string,
 ) error {
 	if tracer := d.Tracer(ctx); tracer.IsLoaded() {
-		handler = otelx.TraceHandler(
-			handler,
+		handler = otelx.NewMiddleware(handler, ifaceName,
 			otelhttp.WithTracerProvider(tracer.Provider()),
-			otelhttp.WithFilter(func(r *http.Request) bool {
-				return !strings.HasPrefix(r.URL.Path, "/admin/metrics/")
-			}),
 		)
 	}
 

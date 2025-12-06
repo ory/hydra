@@ -14,16 +14,15 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/dbal"
 )
 
 type JanitorConsentTestHelper struct {
@@ -57,8 +56,8 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 	return map[string]time.Duration{}
 }
 
-func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (*driver.RegistrySQL, error) {
-	return driver.New(ctx, driver.WithConfigOptions(
+func (j *JanitorConsentTestHelper) GetRegistry(t *testing.T) *driver.RegistrySQL {
+	return NewRegistryMemory(t, driver.WithConfigOptions(
 		configx.WithValues(map[string]any{
 			config.KeyScopeStrategy:        "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY",
 			config.KeyIssuerURL:            "https://hydra.localhost",
@@ -66,11 +65,8 @@ func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname strin
 			config.KeyRefreshTokenLifespan: lifespan,
 			config.KeyConsentRequestMaxAge: lifespan,
 			config.KeyLogLevel:             "trace",
-			config.KeyDSN:                  dbal.NewSQLiteInMemoryDatabase(dbname),
 			config.KeyGetSystemSecret:      []string{"0000000000000000"},
-		}),
-		configx.SkipValidation(),
-	))
+		})))
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {

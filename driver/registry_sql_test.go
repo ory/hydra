@@ -97,7 +97,7 @@ func TestRegistrySQL_CookieStore_MaxAgeZero(t *testing.T) {
 
 	r, err := New(t.Context(), SkipNetworkInit(), DisableValidation(), WithConfigOptions(
 		configx.WithValues(map[string]any{
-			config.KeyDSN:             dbal.NewSQLiteInMemoryDatabase(t.Name()),
+			config.KeyDSN:             dbal.NewSQLiteTestDatabase(t),
 			config.KeyGetSystemSecret: []string{randx.MustString(32, randx.AlphaNum)},
 		}),
 	))
@@ -119,7 +119,7 @@ func TestRegistrySQL_HTTPClient(t *testing.T) {
 	defer ts.Close()
 
 	r, err := New(t.Context(), SkipNetworkInit(), DisableValidation(), WithConfigOptions(configx.WithValues(map[string]interface{}{
-		config.KeyDSN:                              dbal.NewSQLiteInMemoryDatabase(t.Name()),
+		config.KeyDSN:                              dbal.NewSQLiteTestDatabase(t),
 		config.KeyClientHTTPNoPrivateIPRanges:      true,
 		config.KeyClientHTTPPrivateIPExceptionURLs: []string{ts.URL + "/exception/*"},
 	})))

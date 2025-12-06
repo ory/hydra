@@ -141,7 +141,7 @@ type Flow struct {
 	// This feature allows you to update / set session information.
 	//
 	// required: true
-	LoginSkip bool `db:"login_skip" json:"ls,omitempty"`
+	LoginSkip bool `db:"-" json:"ls,omitempty"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
@@ -175,26 +175,26 @@ type Flow struct {
 
 	// IdentityProviderSessionID is the session ID of the end-user that authenticated.
 	// If specified, we will use this value to propagate the logout.
-	IdentityProviderSessionID sqlxx.NullString `db:"identity_provider_session_id" json:"is,omitempty"`
+	IdentityProviderSessionID sqlxx.NullString `db:"-" json:"is,omitempty"`
 
-	LoginCSRF string `db:"login_csrf" json:"lc,omitempty"`
+	LoginCSRF string `db:"-" json:"lc,omitempty"`
 
 	RequestedAt time.Time `db:"requested_at" json:"ia,omitempty"`
 
-	State State `db:"state" json:"q,omitempty"`
+	State State `db:"-" json:"q,omitempty"`
 
 	// LoginRemember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
-	LoginRemember bool `db:"login_remember" json:"lr,omitempty"`
+	LoginRemember bool `db:"-" json:"lr,omitempty"`
 
 	// LoginRememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
-	LoginRememberFor int `db:"login_remember_for" json:"lf,omitempty"`
+	LoginRememberFor int `db:"-" json:"lf,omitempty"`
 
 	// LoginExtendSessionLifespan, if set to true, session cookie expiry time will be updated when session is
 	// refreshed (login skip=true).
-	LoginExtendSessionLifespan bool `db:"login_extend_session_lifespan" json:"ll,omitempty"`
+	LoginExtendSessionLifespan bool `db:"-" json:"ll,omitempty"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
@@ -223,24 +223,24 @@ type Flow struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `db:"forced_subject_identifier" json:"fs,omitempty"`
+	ForceSubjectIdentifier string `db:"-" json:"fs,omitempty"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
 	Context sqlxx.JSONRawMessage `db:"context" json:"ct"`
 
-	LoginError           *RequestDeniedError `db:"login_error" json:"le,omitempty"`
-	LoginAuthenticatedAt sqlxx.NullTime      `db:"login_authenticated_at" json:"la,omitempty"`
+	LoginError           *RequestDeniedError `db:"-" json:"le,omitempty"`
+	LoginAuthenticatedAt sqlxx.NullTime      `db:"-" json:"la,omitempty"`
 
 	// DeviceChallengeID is the device request's challenge ID
 	DeviceChallengeID sqlxx.NullString `db:"device_challenge_id" json:"di,omitempty"`
 	// DeviceCodeRequestID is the device request's ID
 	DeviceCodeRequestID sqlxx.NullString `db:"device_code_request_id" json:"dr,omitempty"`
 	// DeviceCSRF is the device request's CSRF
-	DeviceCSRF sqlxx.NullString `db:"device_csrf" json:"dc,omitempty"`
+	DeviceCSRF sqlxx.NullString `db:"-" json:"dc,omitempty"`
 	// DeviceHandledAt contains the timestamp the device user_code verification request was handled
-	DeviceHandledAt sqlxx.NullTime `db:"device_handled_at" json:"dh,omitempty"`
+	DeviceHandledAt sqlxx.NullTime `db:"-" json:"dh,omitempty"`
 
 	// ConsentRequestID is the identifier of the consent request.
 	// The database column should be named `consent_request_id`, but is not for historical reasons.
@@ -249,7 +249,7 @@ type Flow struct {
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
 	ConsentSkip bool             `db:"consent_skip" json:"cs,omitempty"`
-	ConsentCSRF sqlxx.NullString `db:"consent_csrf" json:"cr,omitempty"`
+	ConsentCSRF sqlxx.NullString `db:"-" json:"cr,omitempty"`
 
 	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSliceJSONFormat `db:"granted_scope" json:"gs,omitempty"`
@@ -268,7 +268,7 @@ type Flow struct {
 	// ConsentHandledAt contains the timestamp the consent request was handled.
 	ConsentHandledAt sqlxx.NullTime `db:"consent_handled_at" json:"ch,omitempty"`
 
-	ConsentError       *RequestDeniedError      `db:"consent_error" json:"cx"`
+	ConsentError       *RequestDeniedError      `db:"-" json:"cx"`
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" faker:"-" json:"st"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" faker:"-" json:"sa"`
 }
@@ -457,6 +457,10 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		AMR:                  f.AMR,
 		Context:              f.Context,
 	}
+	// set some defaults for the API
+	if cs.RequestedAudience == nil {
+		cs.RequestedAudience = []string{}
+	}
 	if cs.AMR == nil {
 		cs.AMR = []string{}
 	}
@@ -553,5 +557,9 @@ func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {
 		ConsentRequest:   f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
 	}
 	s.ConsentRequest.Client.Secret = "" // do not leak client secret in response
+	// set some defaults for the API
+	if s.GrantedAudience == nil {
+		s.GrantedAudience = []string{}
+	}
 	return s
 }

@@ -1,2 +1,2 @@
-DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx;
-
+-- can't drop this because it replaces the auto-generated index for the foreign key constraint (yes, mysql is weird like that)
+-- DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_nid_uq_idx ON hydra_oauth2_trusted_jwt_bearer_issuer;

@@ -18,6 +18,8 @@ import (
 )
 
 func TestListClient(t *testing.T) {
+	t.Parallel()
+
 	c := cmd.NewListClientsCmd()
 	reg := setup(t, c)
 

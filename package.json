@@ -11,7 +11,7 @@
   },
   "prettier": "ory-prettier-styles",
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^2.24.0"
+    "@openapitools/openapi-generator-cli": "2.25.2"
   },
   "devDependencies": {
     "cypress": "9.7.0",
@@ -27,6 +27,7 @@
     "wait-on": "9.0.1"
   },
   "overrides": {
-    "axios": ">=1.12.0"
+    "axios": ">=1.12.0",
+    "glob": ">=11.1.0"
   }
 }

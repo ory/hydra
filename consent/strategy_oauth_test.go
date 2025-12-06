@@ -23,11 +23,11 @@ import (
 	"golang.org/x/exp/slices"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/fosite"
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/pointerx"

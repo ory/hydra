@@ -4,48 +4,68 @@
 package otelx
 
 import (
+	"cmp"
+	"context"
 	"net/http"
 	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-func isHealthFilter(r *http.Request) bool {
-	path := r.URL.Path
-	return !strings.HasPrefix(path, "/health/")
+var WithDefaultFilters otelhttp.Option = otelhttp.WithFilter(func(r *http.Request) bool {
+	return !(strings.HasPrefix(r.URL.Path, "/health") ||
+		strings.HasPrefix(r.URL.Path, "/admin/health") ||
+		strings.HasPrefix(r.URL.Path, "/metrics") ||
+		strings.HasPrefix(r.URL.Path, "/admin/metrics"))
+})
+
+type contextKey int
+
+const callbackContextKey contextKey = iota
+
+func SpanNameRecorderMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			cb, _ := r.Context().Value(callbackContextKey).(func(string))
+			if cb == nil {
+				return
+			}
+			if r.Pattern != "" {
+				cb(r.Pattern)
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
 
-func isAdminHealthFilter(r *http.Request) bool {
-	path := r.URL.Path
-	return !strings.HasPrefix(path, "/admin/health/")
+func SpanNameRecorderNegroniFunc(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	defer func() {
+		cb, _ := r.Context().Value(callbackContextKey).(func(string))
+		if cb == nil {
+			return
+		}
+		if r.Pattern != "" {
+			cb(r.Pattern)
+		}
+	}()
+	next(w, r)
 }
 
-func filterOpts() []otelhttp.Option {
-	filters := []otelhttp.Filter{
-		isHealthFilter,
-		isAdminHealthFilter,
-	}
-	opts := []otelhttp.Option{}
-	for _, f := range filters {
-		opts = append(opts, otelhttp.WithFilter(f))
-	}
-	return opts
-}
-
-// NewHandler returns a wrapped otelhttp.NewHandler with our request filters.
-func NewHandler(handler http.Handler, operation string, opts ...otelhttp.Option) http.Handler {
-	opts = append(filterOpts(), opts...)
-	return otelhttp.NewHandler(handler, operation, opts...)
-}
-
-// TraceHandler wraps otelx.NewHandler, passing the URL path as the span name.
-func TraceHandler(h http.Handler, opts ...otelhttp.Option) http.Handler {
-	// Use a span formatter to set the span name to the URL path, rather than passing in the operation to NewHandler.
-	// This allows us to use the same handler for multiple routes.
-	middlewareOpts := []otelhttp.Option{
+func NewMiddleware(next http.Handler, operation string, opts ...otelhttp.Option) http.Handler {
+	myOpts := []otelhttp.Option{
+		WithDefaultFilters,
 		otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-			return r.URL.Path
+			return cmp.Or(r.Pattern, operation, r.Method+" "+r.URL.Path)
 		}),
 	}
-	return NewHandler(h, "", append(middlewareOpts, opts...)...)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		callback := func(s string) {
+			r.Pattern = cmp.Or(r.Pattern, s)
+		}
+		ctx := context.WithValue(r.Context(), callbackContextKey, callback)
+		r2 := r.WithContext(ctx)
+		next.ServeHTTP(w, r2)
+		r.Pattern = cmp.Or(r2.Pattern, r.Pattern) // best-effort in case callback never is called
+	})
+	return otelhttp.NewHandler(handler, operation, append(myOpts, opts...)...)
 }

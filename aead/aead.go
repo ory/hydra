@@ -6,7 +6,7 @@ package aead
 import (
 	"context"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 // Cipher provides AEAD (authenticated encryption with associated data). The

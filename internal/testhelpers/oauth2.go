@@ -16,17 +16,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/negroni"
 	"golang.org/x/oauth2"
 
-	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
@@ -40,7 +39,7 @@ func NewIDToken(t *testing.T, reg *driver.RegistrySQL, subject string) string {
 }
 
 func NewIDTokenWithExpiry(t *testing.T, reg *driver.RegistrySQL, subject string, exp time.Duration) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), jwt.IDTokenClaims{
+	token, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), jwt.IDTokenClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(exp),
 		IssuedAt:  time.Now(),
@@ -50,7 +49,7 @@ func NewIDTokenWithExpiry(t *testing.T, reg *driver.RegistrySQL, subject string,
 }
 
 func NewIDTokenWithClaims(t *testing.T, reg *driver.RegistrySQL, claims jwt.MapClaims) string {
-	token, _, err := reg.OpenIDJWTStrategy().Generate(context.Background(), claims, jwt.NewHeaders())
+	token, _, err := reg.OpenIDJWTSigner().Generate(context.Background(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
 }
@@ -217,8 +216,8 @@ func NewCallbackURL(t testing.TB, prefix string, h http.HandlerFunc) string {
 		h = HTTPServerNotImplementedHandler
 	}
 
-	r := httprouter.New()
-	r.GET("/"+prefix, func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	r := http.NewServeMux()
+	r.HandleFunc("/"+prefix, func(w http.ResponseWriter, r *http.Request) {
 		h(w, r)
 	})
 	ts := httptest.NewServer(r)

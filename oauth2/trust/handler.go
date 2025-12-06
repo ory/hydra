@@ -12,8 +12,8 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"

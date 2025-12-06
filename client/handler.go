@@ -15,8 +15,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
 	"github.com/ory/herodot"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/jsonx"

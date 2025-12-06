@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //go:build hsm
-// +build hsm
 
 package hsm_test
 

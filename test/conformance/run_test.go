@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //go:build conformity
-// +build conformity
 
 package main
 
@@ -198,8 +197,8 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 	}
 
 	// https://localhost:8443/api/plan?planName=oidcc-formpost-basic-certification-test-plan&variant={"server_metadata":"discovery","client_registration":"dynamic_client"}&variant={"server_metadata":"discovery","client_registration":"dynamic_client"}
-	//planConfig, err := sjson.SetBytes(config, "alias", uuid.New())
-	//require.NoError(t, err)
+	// planConfig, err := sjson.SetBytes(config, "alias", uuid.New())
+	// require.NoError(t, err)
 	body := makePost(t, urlx.CopyWithQuery(urlx.AppendPaths(server, "/api/plan"), extra).String(),
 		bytes.NewReader(config),
 		201)

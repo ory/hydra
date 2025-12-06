@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/ory/fosite"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/x"
 	client "github.com/ory/kratos-client-go"
 	"github.com/ory/x/httpx"

@@ -9,10 +9,9 @@ import (
 
 	"github.com/ory/x/snapshotx"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
+	"github.com/ory/hydra/v2/fosite"
 )
 
 func TestToRFCError(t *testing.T) {
@@ -60,13 +59,6 @@ func TestToRFCError(t *testing.T) {
 			require.EqualValues(t, tc.input.ToRFCError(), tc.expect)
 		})
 	}
-}
-
-func TestRequestDeniedError(t *testing.T) {
-	var e *RequestDeniedError
-	v, err := e.Value()
-	require.NoError(t, err)
-	assert.JSONEq(t, "{}", fmt.Sprintf("%v", v))
 }
 
 func TestAcceptOAuth2ConsentRequest_MarshalJSON(t *testing.T) {

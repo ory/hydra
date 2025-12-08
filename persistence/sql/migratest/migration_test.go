@@ -48,7 +48,7 @@ func snapshotFor(paths ...string) *cupaloy.Config {
 func compareWithFixture(t *testing.T, actual interface{}, prefix string, id string) {
 	s := snapshotFor("fixtures", prefix)
 	actualJSON, err := json.MarshalIndent(actual, "", "  ")
-	require.NoError(t, err)
+	require.NoErrorf(t, err, "%+v", actual)
 	assert.NoError(t, s.SnapshotWithName(id, actualJSON))
 }
 
@@ -140,14 +140,24 @@ func TestMigrations(t *testing.T) {
 					}
 				})
 
-				flows := []flow.Flow{}
-				require.NoError(t, c.All(&flows))
-				require.Len(t, flows, 19)
-
 				t.Run("case=hydra_oauth2_flow", func(t *testing.T) {
-					for _, f := range flows {
+					// we first load the "full" flows
+					fullFlows := []flow.Flow{}
+					require.NoError(t, c.Where("client_id IS NOT NULL").All(&fullFlows))
+					require.Len(t, fullFlows, 19)
+
+					for _, f := range fullFlows {
 						assert.NotNil(t, f.Client)
 						f.Client = nil // clients are loaded eagerly, nil them for snapshot comparison
+						compareWithFixture(t, f, "hydra_oauth2_flow", f.ID)
+					}
+
+					// then the "reduced" flows
+					reducedFlows := []flow.Flow{}
+					require.NoError(t, c.Select("login_challenge", "nid", "requested_at").Where("client_id IS NULL").All(&reducedFlows))
+					require.Len(t, reducedFlows, 1)
+
+					for _, f := range reducedFlows {
 						compareWithFixture(t, f, "hydra_oauth2_flow", f.ID)
 					}
 				})

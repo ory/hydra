@@ -37,7 +37,7 @@ func testRegistry(t *testing.T, db string, t1, t2 *driver.RegistrySQL) {
 	// TODO enable parallel tests for mysql once we support automatic transaction retries
 	var parallel bool
 	switch db {
-	case "mysql":
+	case "mysql", "sqlite":
 		parallel = false
 	default:
 		parallel = true

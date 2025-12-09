@@ -40,7 +40,7 @@ func (f *Flow) setConsentRequest(r OAuth2ConsentRequest) {
 	f.SessionID = r.LoginSessionID
 	f.ACR = r.ACR
 	f.AMR = r.AMR
-	f.Context = r.Context
+	f.Context = sqlxx.NullJSONRawMessage(r.Context)
 }
 
 func TestFlow_HandleDeviceUserAuthRequest(t *testing.T) {
@@ -110,7 +110,7 @@ func TestFlow_UpdateFlowWithHandledLoginRequest(t *testing.T) {
 			assert.Equal(t, r.ACR, f.ACR)
 			assert.Equal(t, r.AMR, f.AMR)
 			assert.Equal(t, r.IdentityProviderSessionID, f.IdentityProviderSessionID.String())
-			assert.Equal(t, r.Context, f.Context)
+			assert.EqualValues(t, r.Context, f.Context)
 		},
 	)
 }

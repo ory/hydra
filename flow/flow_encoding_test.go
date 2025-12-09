@@ -65,7 +65,7 @@ func createTestFlow(nid uuid.UUID, state flow.State) *flow.Flow {
 		ACR:                        "http://acrvalues.example.org",
 		AMR:                        []string{"pwd"},
 		ForceSubjectIdentifier:     "forced-subject",
-		Context:                    sqlxx.JSONRawMessage(`{"foo":"bar"}`),
+		Context:                    sqlxx.NullJSONRawMessage(`{"foo":"bar"}`),
 		LoginAuthenticatedAt:       sqlxx.NullTime(time.Date(2025, 10, 9, 12, 52, 0, 0, time.UTC)),
 		DeviceChallengeID:          "device-challenge",
 		DeviceCodeRequestID:        "device-code-request",

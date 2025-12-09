@@ -74,7 +74,7 @@ func TestEncoding(t *testing.T) {
 		State:              1,
 		LoginRemember:      true,
 		LoginRememberFor:   3600,
-		Context:            sqlxx.JSONRawMessage(`{"context-key1": "val1"}`),
+		Context:            sqlxx.NullJSONRawMessage(`{"context-key1": "val1"}`),
 		GrantedScope:       []string{"scope1", "scope2"},
 		GrantedAudience:    []string{"https://api.example.org/v1", "https://api.example.org/v2"},
 		ConsentRemember:    true,

@@ -21,45 +21,37 @@ import (
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/otelx"
 	keysetpagination "github.com/ory/x/pagination/keysetpagination_v2"
+	"github.com/ory/x/pointerx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
 
-var (
-	_ consent.Manager                  = (*ConsentPersister)(nil)
-	_ consent.LoginManager             = (*Persister)(nil)
-	_ consent.LogoutManager            = (*Persister)(nil)
-	_ consent.ObfuscatedSubjectManager = (*Persister)(nil)
-)
+var _ consent.Manager = (*Persister)(nil)
 
-type ConsentPersister struct {
-	*BasePersister
-}
-
-func (p *ConsentPersister) RevokeSubjectConsentSession(ctx context.Context, user string) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectConsentSession")
+func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectConsentSession")
 	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
 }
 
-func (p *ConsentPersister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client", client)))
+func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeSubjectClientConsentSession", trace.WithAttributes(attribute.String("client", client)))
 	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
 }
 
-func (p *ConsentPersister) RevokeConsentSessionByID(ctx context.Context, consentRequestID string) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeConsentSessionByID",
+func (p *Persister) RevokeConsentSessionByID(ctx context.Context, consentRequestID string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.RevokeConsentSessionByID",
 		trace.WithAttributes(attribute.String("consent_challenge_id", consentRequestID)))
 	defer otelx.End(span, &err)
 
 	return p.Transaction(ctx, p.revokeConsentSession("consent_challenge_id = ?", consentRequestID))
 }
 
-func (p *ConsentPersister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
+func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
 	return func(ctx context.Context, c *pop.Connection) error {
 		fs := make([]*flow.Flow, 0)
 		if err := p.QueryWithNetwork(ctx).
@@ -176,14 +168,49 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 	return &s, nil
 }
 
-func (p *ConsentPersister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentSession")
+type FlowWithConstantColumns struct {
+	*flow.Flow
+
+	State flow.State `db:"state"`
+
+	// we need to write these columns because of the check constraint, but we will soon switch to a new table anyway that will not have them at all
+	LoginRemember    bool   `db:"login_remember"`
+	LoginRememberFor int    `db:"login_remember_for"`
+	LoginError       string `db:"login_error"`
+	LoginUsed        bool   `db:"login_was_used"`
+	ConsentVerifier  string `db:"consent_verifier"`
+	ConsentCSRF      string `db:"consent_csrf"`
+	ConsentError     string `db:"consent_error"`
+	ConsentUsed      bool   `db:"consent_was_used"`
+
+	// these columns have NOT NULL constraints, but are not required to be stored
+	LoginVerifier string `db:"login_verifier"`
+	LoginCSRF     string `db:"login_csrf"`
+	LoginSkip     bool   `db:"login_skip"`
+}
+
+func (p *Persister) CreateConsentSession(ctx context.Context, f *flow.Flow) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateConsentSession")
 	defer otelx.End(span, &err)
 
 	if f.NID != p.NetworkID(ctx) {
 		return errors.WithStack(sqlcon.ErrNoRows)
 	}
-	return sqlcon.HandleError(p.Connection(ctx).Create(f))
+	if f.ConsentRememberFor == nil {
+		// This is really stupid: we treat 0 the same as NULL, which means the flow does not expire.
+		// However, for some reason it is part of the check constraint and required to be NOT NULL.
+		f.ConsentRememberFor = pointerx.Ptr(0)
+	}
+
+	fx := &FlowWithConstantColumns{
+		Flow:         f,
+		State:        flow.FlowStateConsentUsed, // if this was another state, we'd not store it in the DB
+		ConsentUsed:  true,
+		LoginUsed:    true,
+		LoginError:   "{}",
+		ConsentError: "{}",
+	}
+	return sqlcon.HandleError(p.Connection(ctx).Create(fx))
 }
 
 func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (_ *flow.LoginSession, err error) {
@@ -283,8 +310,8 @@ func (p *Persister) mySQLDeleteLoginSession(ctx context.Context, id string) (_ *
 	return &session, nil
 }
 
-func (p *ConsentPersister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.Flow, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequest")
+func (p *Persister) FindGrantedAndRememberedConsentRequest(ctx context.Context, client, subject string) (_ *flow.Flow, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindGrantedAndRememberedConsentRequest")
 	defer otelx.End(span, &err)
 
 	f := flow.Flow{}
@@ -300,10 +327,11 @@ func (p *ConsentPersister) FindGrantedAndRememberedConsentRequest(ctx context.Co
 	q := fmt.Sprintf(`
 SELECT %s FROM %s
 WHERE nid = ?
-AND (state = ? OR state IS NULL)
+AND state = ?
 AND subject = ?
 AND client_id = ?
 AND consent_skip = FALSE
+AND consent_error = '{}'
 AND consent_remember = TRUE
 AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
 ORDER BY requested_at DESC
@@ -343,8 +371,8 @@ func applyTableNameWithIndexHint(conn *pop.Connection, table string, index strin
 	}
 }
 
-func (p *ConsentPersister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
+func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer otelx.End(span, &err)
 
 	paginator := keysetpagination.NewPaginator(append(pageOpts,
@@ -353,9 +381,10 @@ func (p *ConsentPersister) FindSubjectsGrantedConsentRequests(ctx context.Contex
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).
-		Where("(state IN (?, ?) OR state IS NULL)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
+		Where("state IN (?, ?)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
 		Where("subject = ?", subject).
 		Where("consent_skip = FALSE").
+		Where("consent_error = '{}'").
 		Where("(expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)").
 		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
 		All(&fs)
@@ -370,8 +399,8 @@ func (p *ConsentPersister) FindSubjectsGrantedConsentRequests(ctx context.Contex
 	return fs, nextPage, nil
 }
 
-func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
+func (p *Persister) FindSubjectsSessionGrantedConsentRequests(ctx context.Context, subject, sid string, pageOpts ...keysetpagination.Option) (_ []flow.Flow, _ *keysetpagination.Paginator, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
 	paginator := keysetpagination.NewPaginator(append(pageOpts,
@@ -380,10 +409,11 @@ func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).
-		Where("(state IN (?, ?) OR state IS NULL)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
+		Where("state IN (?, ?)", flow.FlowStateConsentUsed, flow.FlowStateConsentUnused).
 		Where("subject = ?", subject).
 		Where("login_session_id = ?", sid).
 		Where("consent_skip = FALSE").
+		Where("consent_error = '{}'").
 		Where("(expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)").
 		Scope(keysetpagination.Paginate[flow.Flow](paginator)).
 		All(&fs)
@@ -398,22 +428,22 @@ func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context
 	return fs, nextPage, nil
 }
 
-func (p *ConsentPersister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithFrontChannelLogout")
+func (p *Persister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithFrontChannelLogout")
 	defer otelx.End(span, &err)
 
 	return p.listUserAuthenticatedClients(ctx, subject, sid, "front")
 }
 
-func (p *ConsentPersister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithBackChannelLogout")
+func (p *Persister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) (_ []client.Client, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ListUserAuthenticatedClientsWithBackChannelLogout")
 	defer otelx.End(span, &err)
 
 	return p.listUserAuthenticatedClients(ctx, subject, sid, "back")
 }
 
-func (p *ConsentPersister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) (cs []client.Client, err error) {
-	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.listUserAuthenticatedClients",
+func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) (cs []client.Client, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.listUserAuthenticatedClients",
 		trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
@@ -544,7 +574,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		SELECT login_challenge
 		FROM hydra_oauth2_flow
 		WHERE (
-			(state != ? AND state IS NOT NULL)
+			(state != ?)
 			OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')
 			OR (consent_error IS NOT NULL AND consent_error <> '{}' AND consent_error <> '')
 		)

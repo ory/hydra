@@ -92,9 +92,7 @@ type RegistrySQL struct {
 	migrator             *sql.MigrationManager
 	dbOptsModifier       []func(details *pop.ConnectionDetails)
 
-	keyManager     jwk.Manager
-	consentManager consent.Manager
-
+	keyManager  jwk.Manager
 	initialPing func(ctx context.Context, l *logrusx.Logger, p *sql.BasePersister) error
 	middlewares []negroni.Handler
 }
@@ -265,12 +263,7 @@ func (m *RegistrySQL) PingContext(ctx context.Context) error { return m.basePers
 
 func (m *RegistrySQL) BasePersister() *sql.BasePersister { return m.basePersister }
 func (m *RegistrySQL) ClientManager() client.Manager     { return m.Persister() }
-func (m *RegistrySQL) ConsentManager() consent.Manager {
-	if m.consentManager != nil {
-		return m.consentManager
-	}
-	return &sql.ConsentPersister{BasePersister: m.basePersister}
-}
+func (m *RegistrySQL) ConsentManager() consent.Manager   { return m.Persister() }
 func (m *RegistrySQL) ObfuscatedSubjectManager() consent.ObfuscatedSubjectManager {
 	return m.Persister()
 }
@@ -387,14 +380,8 @@ func (m *RegistrySQL) HealthHandler() *healthx.Handler {
 				}
 
 				if status.HasPending() {
-					var notApplied []string
-					for _, s := range status {
-						if s.State != "Applied" {
-							notApplied = append(notApplied, s.Version)
-						}
-					}
-					err := errors.Errorf("migrations have not yet been fully applied: %+v", notApplied)
-					m.Logger().WithField("not_applied", fmt.Sprintf("%+v", notApplied)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
+					err := errors.Errorf("migrations have not yet been fully applied: %+v", status)
+					m.Logger().WithField("status", fmt.Sprintf("%+v", status)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
 					return err
 				}
 				return nil

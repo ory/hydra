@@ -16,6 +16,7 @@ import (
 
 type (
 	Persister interface {
+		consent.Manager
 		consent.ObfuscatedSubjectManager
 		consent.LoginManager
 		consent.LogoutManager

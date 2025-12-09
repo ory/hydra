@@ -228,7 +228,7 @@ type Flow struct {
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context sqlxx.NullJSONRawMessage `db:"context" json:"ct"`
+	Context sqlxx.JSONRawMessage `db:"context" json:"ct"`
 
 	LoginError           *RequestDeniedError `db:"-" json:"le,omitempty"`
 	LoginAuthenticatedAt sqlxx.NullTime      `db:"-" json:"la,omitempty"`
@@ -317,7 +317,7 @@ func (f *Flow) HandleLoginRequest(h *HandledLoginRequest) error {
 	f.State = FlowStateLoginUnused
 
 	if f.Context != nil {
-		f.Context = sqlxx.NullJSONRawMessage(h.Context)
+		f.Context = h.Context
 	}
 
 	f.Subject = h.Subject
@@ -398,7 +398,7 @@ func (f *Flow) HandleConsentRequest(r *AcceptOAuth2ConsentRequest) error {
 	f.ConsentHandledAt = sqlxx.NullTime(time.Now().UTC())
 	f.ConsentError = nil
 	if r.Context != nil {
-		f.Context = sqlxx.NullJSONRawMessage(r.Context)
+		f.Context = r.Context
 	}
 
 	if r.Session != nil {
@@ -455,7 +455,7 @@ func (f *Flow) GetConsentRequest(challenge string) *OAuth2ConsentRequest {
 		LoginSessionID:       f.SessionID,
 		ACR:                  f.ACR,
 		AMR:                  f.AMR,
-		Context:              sqlxx.JSONRawMessage(f.Context),
+		Context:              f.Context,
 	}
 	// set some defaults for the API
 	if cs.RequestedAudience == nil {
@@ -474,6 +474,9 @@ func (Flow) TableName() string {
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	if f.Client != nil {
 		f.ClientID = f.Client.GetID()
+	}
+	if f.State == FlowStateLoginUnused && string(f.Context) == "" {
+		f.Context = sqlxx.JSONRawMessage("{}")
 	}
 	return nil
 }
@@ -553,7 +556,7 @@ func (f Flow) ToListConsentSessionResponse() *OAuth2ConsentSession {
 		Session:          &AcceptOAuth2ConsentRequestSession{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
 		Remember:         f.ConsentRemember,
 		HandledAt:        f.ConsentHandledAt,
-		Context:          sqlxx.JSONRawMessage(f.Context),
+		Context:          f.Context,
 		ConsentRequest:   f.GetConsentRequest( /* No longer available and no longer needed: challenge =  */ ""),
 	}
 	s.ConsentRequest.Client.Secret = "" // do not leak client secret in response

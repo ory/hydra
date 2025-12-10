@@ -27,7 +27,7 @@ import (
 	"github.com/ory/x/uuidx"
 )
 
-func mockConsentRequest(remember bool, rememberFor int, skip bool) *flow.Flow {
+func MockConsentFlow(remember bool, rememberFor int, skip bool) *flow.Flow {
 	return &flow.Flow{
 		ID:               uuidx.NewV4().String(),
 		Client:           &client.Client{ID: uuidx.NewV4().String()},
@@ -219,8 +219,8 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 			{"6", true, 120, true, false},
 		} {
 			t.Run("key="+tc.key, func(t *testing.T) {
-				f := mockConsentRequest(tc.remember, tc.rememberFor, tc.skip)
-				_ = clientManager.CreateClient(t.Context(), f.Client) // Ignore errors that are caused by duplication
+				f := MockConsentFlow(tc.remember, tc.rememberFor, tc.skip)
+				require.NoError(t, clientManager.CreateClient(t.Context(), f.Client))
 				f.NID = deps.Networker().NetworkID(t.Context())
 
 				require.NoError(t, m.CreateConsentSession(t.Context(), f))
@@ -234,7 +234,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 						// unfortunately the interface does not allow us to set the absolute time, so we have to wait
 						time.Sleep(2 * time.Second)
 					}
-					actual, err := m.FindGrantedAndRememberedConsentRequest(t.Context(), f.ClientID, f.Subject)
+					actual, err := m.FindGrantedAndRememberedConsentRequest(t.Context(), f.Client.ID, f.Subject)
 					if !tc.expectRemembered {
 						assert.Nil(t, actual)
 						assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
@@ -260,35 +260,44 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 
 	t.Run("case=revoke consent request", func(t *testing.T) {
 		type tc struct {
-			at, rt, subject, client string
-			revoke                  func(*testing.T)
+			f      *flow.Flow
+			at, rt string
+			revoke func(*testing.T, tc)
 		}
-		tcs := make([]tc, 2)
+		revokeFuncs := []func(*testing.T, tc){
+			func(t *testing.T, c tc) {
+				require.NoError(t, m.RevokeSubjectConsentSession(t.Context(), c.f.Subject))
+			},
+			func(t *testing.T, c tc) {
+				require.NoError(t, m.RevokeSubjectClientConsentSession(t.Context(), c.f.Subject, c.f.Client.ID))
+			},
+			func(t *testing.T, c tc) {
+				require.NoError(t, m.RevokeConsentSessionByID(t.Context(), c.f.ConsentRequestID.String()))
+			},
+		}
+		tcs := make([]tc, 2*len(revokeFuncs))
 		for i := range tcs {
-			f := mockConsentRequest(true, 0, false)
+			f := MockConsentFlow(i < len(revokeFuncs), 0, true)
 			f.NID = deps.Networker().NetworkID(t.Context())
 
 			tcs[i] = tc{
-				subject: f.Subject,
-				client:  f.Client.ID,
-				at:      uuidx.NewV4().String(),
-				rt:      uuidx.NewV4().String(),
+				f:      f,
+				at:     uuidx.NewV4().String(),
+				rt:     uuidx.NewV4().String(),
+				revoke: revokeFuncs[i%len(revokeFuncs)],
 			}
 
 			require.NoError(t, clientManager.CreateClient(t.Context(), f.Client))
 			require.NoError(t, m.CreateConsentSession(t.Context(), f))
+			sess := &oauth2.Session{DefaultSession: openid.NewDefaultSession()}
+			sess.Subject = f.Subject
+			sess.ConsentChallenge = f.ConsentRequestID.String()
 			require.NoError(t, fositeManager.CreateAccessTokenSession(t.Context(), tcs[i].at,
-				&fosite.Request{Client: f.Client, ID: f.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
-			))
+				&fosite.Request{Client: f.Client, ID: f.ConsentRequestID.String(), RequestedAt: time.Now(), Session: sess}),
+			)
 			require.NoError(t, fositeManager.CreateRefreshTokenSession(t.Context(), tcs[i].rt, tcs[i].at,
-				&fosite.Request{Client: f.Client, ID: f.ConsentRequestID.String(), RequestedAt: time.Now(), Session: &oauth2.Session{DefaultSession: openid.NewDefaultSession()}},
+				&fosite.Request{Client: f.Client, ID: f.ConsentRequestID.String(), RequestedAt: time.Now(), Session: sess},
 			))
-		}
-		tcs[0].revoke = func(t *testing.T) {
-			require.NoError(t, m.RevokeSubjectConsentSession(t.Context(), tcs[0].subject))
-		}
-		tcs[1].revoke = func(t *testing.T) {
-			require.NoError(t, m.RevokeSubjectClientConsentSession(t.Context(), tcs[1].subject, tcs[1].client))
 		}
 
 		for i, tc := range tcs {
@@ -298,7 +307,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 				_, err = fositeManager.GetRefreshTokenSession(t.Context(), tc.rt, nil)
 				require.NoError(t, err)
 
-				tc.revoke(t)
+				tc.revoke(t, tc)
 
 				r, err := fositeManager.GetAccessTokenSession(t.Context(), tc.at, nil)
 				assert.ErrorIsf(t, err, fosite.ErrNotFound, "%+v", r)
@@ -316,7 +325,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 	t.Run("case=list consents", func(t *testing.T) {
 		flows := make([]*flow.Flow, 2)
 		for i := range flows {
-			f := mockConsentRequest(true, 0, false)
+			f := MockConsentFlow(true, 0, false)
 			f.NID = deps.Networker().NetworkID(t.Context())
 			f.SessionID = sqlxx.NullString(uuidx.NewV4().String())
 			flows[i] = f
@@ -345,8 +354,8 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 			}
 
 			t.Run("random subject", func(t *testing.T) {
-				_, _, err := m.FindSubjectsSessionGrantedConsentRequests(t.Context(), uuidx.NewV4().String(), flows[0].SessionID.String())
-				assert.ErrorIs(t, err, consent.ErrNoPreviousConsentFound)
+				res, _, err := m.FindSubjectsSessionGrantedConsentRequests(t.Context(), uuidx.NewV4().String(), flows[0].SessionID.String())
+				assert.ErrorIsf(t, err, consent.ErrNoPreviousConsentFound, "%+v", res)
 			})
 		})
 
@@ -426,6 +435,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 						SessionID:          sqlxx.NullString(ls.ID),
 						ConsentRequestID:   sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
 						GrantedScope:       sqlxx.StringSliceJSONFormat{"scopea", "scopeb"},
+						ConsentRemember:    true,
 						ConsentRememberFor: pointerx.Ptr(0),
 					}
 

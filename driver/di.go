@@ -4,6 +4,7 @@
 package driver
 
 import (
+	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/handler/oauth2"
 	"github.com/ory/hydra/v2/jwk"
@@ -56,5 +57,12 @@ func RegistryWithAuthorizeCodeStorage(s func(r *RegistrySQL) oauth2.AuthorizeCod
 	return func(r *RegistrySQL) error {
 		r.authorizeCodeStorage = s(r)
 		return nil
+	}
+}
+
+func RegistryWithConsentManager(cm func(r *RegistrySQL) (consent.Manager, error)) RegistryModifier {
+	return func(r *RegistrySQL) (err error) {
+		r.consentManager, err = cm(r)
+		return err
 	}
 }

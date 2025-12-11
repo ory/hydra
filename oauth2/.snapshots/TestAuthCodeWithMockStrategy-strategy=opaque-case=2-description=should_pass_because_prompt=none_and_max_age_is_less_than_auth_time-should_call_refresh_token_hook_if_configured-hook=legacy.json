@@ -19,7 +19,8 @@
         }
       },
       "headers": {
-        "extra": {}
+        "extra": {
+        }
       },
       "subject": "foo"
     },

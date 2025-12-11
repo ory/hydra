@@ -14,7 +14,6 @@
     "client_id": "64f78bf1-f388-4eeb-9fee-e7207226c6be-jwt",
     "client_name": "",
     "client_secret_expires_at": 0,
-    "contacts": [],
     "grant_types": [
       "implicit",
       "refresh_token",
@@ -35,8 +34,7 @@
     ],
     "scope": "hydra offline openid",
     "skip_consent": false,
-    "subject_type": "",
-    "tos_uri": ""
+    "subject_type": ""
   },
   "oidc_context": {},
   "requested_access_token_audience": [],

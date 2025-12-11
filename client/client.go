@@ -110,7 +110,7 @@ type Client struct {
 	// PolicyURI is a URL string that points to a human-readable privacy policy document
 	// that describes how the deployment organization collects, uses,
 	// retains, and discloses personal data.
-	PolicyURI string `json:"policy_uri" db:"policy_uri"`
+	PolicyURI string `json:"policy_uri,omitempty" db:"policy_uri"`
 
 	// OAuth 2.0 Client Allowed CORS Origins
 	//
@@ -126,19 +126,19 @@ type Client struct {
 	// document for the client that describes a contractual relationship
 	// between the end-user and the client that the end-user accepts when
 	// authorizing the client.
-	TermsOfServiceURI string `json:"tos_uri" db:"tos_uri"`
+	TermsOfServiceURI string `json:"tos_uri,omitempty" db:"tos_uri"`
 
 	// OAuth 2.0 Client URI
 	//
 	// ClientURI is a URL string of a web page providing information about the client.
 	// If present, the server SHOULD display this URL to the end-user in
 	// a clickable fashion.
-	ClientURI string `json:"client_uri" db:"client_uri"`
+	ClientURI string `json:"client_uri,omitempty" db:"client_uri"`
 
 	// OAuth 2.0 Client Logo URI
 	//
 	// A URL string referencing the client's logo.
-	LogoURI string `json:"logo_uri" db:"logo_uri"`
+	LogoURI string `json:"logo_uri,omitempty" db:"logo_uri"`
 
 	// OAuth 2.0 Client Contact
 	//
@@ -146,7 +146,7 @@ type Client struct {
 	// for this client, typically email addresses.
 	//
 	// Example: help@example.org
-	Contacts sqlxx.StringSliceJSONFormat `json:"contacts" db:"contacts"`
+	Contacts sqlxx.StringSliceJSONFormat `json:"contacts,omitempty" db:"contacts"`
 
 	// OAuth 2.0 Client Secret Expires At
 	//

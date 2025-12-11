@@ -1,12 +1,9 @@
 {
   "client_name": "",
   "client_secret_expires_at": 0,
-  "client_uri": "",
   "jwks": {},
-  "logo_uri": "",
   "metadata": {},
   "owner": "",
-  "policy_uri": "",
   "scope": "",
   "skip_consent": false,
   "subject_type": "",

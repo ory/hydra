@@ -4,17 +4,13 @@
     "audience": [],
     "client_name": "",
     "client_secret_expires_at": 0,
-    "client_uri": "",
     "jwks": {},
-    "logo_uri": "",
     "metadata": {},
     "owner": "",
-    "policy_uri": "",
     "scope": "foo",
     "skip_consent": false,
     "subject_type": "public",
     "token_endpoint_auth_method": "client_secret_basic",
-    "tos_uri": "",
     "userinfo_signed_response_alg": "none"
   },
   {
@@ -22,17 +18,13 @@
     "audience": [],
     "client_name": "",
     "client_secret_expires_at": 0,
-    "client_uri": "",
     "jwks": {},
-    "logo_uri": "",
     "metadata": {},
     "owner": "",
-    "policy_uri": "",
     "scope": "bar",
     "skip_consent": false,
     "subject_type": "public",
     "token_endpoint_auth_method": "client_secret_basic",
-    "tos_uri": "",
     "userinfo_signed_response_alg": "none"
   }
 ]

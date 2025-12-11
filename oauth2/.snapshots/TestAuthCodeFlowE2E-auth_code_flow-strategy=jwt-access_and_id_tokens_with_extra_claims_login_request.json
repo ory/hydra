@@ -9,7 +9,6 @@
     "client_id": "64f78bf1-f388-4eeb-9fee-e7207226c6be-jwt",
     "client_name": "",
     "client_secret_expires_at": 0,
-    "client_uri": "",
     "contacts": [],
     "grant_types": [
       "implicit",
@@ -19,10 +18,8 @@
       "client_credentials"
     ],
     "jwks": {},
-    "logo_uri": "",
     "metadata": {},
     "owner": "",
-    "policy_uri": "",
     "redirect_uris": [
       "https://client.ory/callback"
     ],

@@ -1,12 +1,10 @@
 {
-  "client_name": "",
   "client_secret_expires_at": 0,
   "grant_types": [
     "authorization_code"
   ],
   "jwks": {},
   "metadata": {},
-  "owner": "",
   "request_object_signing_alg": "RS256",
   "response_types": [
     "code"

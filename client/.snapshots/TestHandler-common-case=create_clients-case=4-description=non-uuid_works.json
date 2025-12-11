@@ -1,6 +1,5 @@
 {
   "client_id": "not-a-uuid",
-  "client_name": "",
   "client_secret": "averylongsecret",
   "redirect_uris": [
     "http://localhost:3000/cb"
@@ -9,7 +8,6 @@
   "response_types": null,
   "scope": "offline_access offline openid",
   "audience": [],
-  "owner": "",
   "allowed_cors_origins": [],
   "client_secret_expires_at": 0,
   "subject_type": "public",

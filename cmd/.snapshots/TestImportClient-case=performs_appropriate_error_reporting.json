@@ -2,11 +2,9 @@
   {
     "allowed_cors_origins": [],
     "audience": [],
-    "client_name": "",
     "client_secret_expires_at": 0,
     "jwks": {},
     "metadata": {},
-    "owner": "",
     "scope": "foo",
     "skip_consent": false,
     "subject_type": "public",
@@ -16,11 +14,9 @@
   {
     "allowed_cors_origins": [],
     "audience": [],
-    "client_name": "",
     "client_secret_expires_at": 0,
     "jwks": {},
     "metadata": {},
-    "owner": "",
     "scope": "bar",
     "skip_consent": false,
     "subject_type": "public",

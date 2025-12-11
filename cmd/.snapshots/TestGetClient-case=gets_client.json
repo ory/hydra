@@ -1,11 +1,7 @@
 {
-  "client_name": "",
   "client_secret_expires_at": 0,
   "jwks": {},
   "metadata": {},
-  "owner": "",
-  "scope": "",
   "skip_consent": false,
-  "subject_type": "",
   "token_endpoint_auth_method": "client_secret_post"
 }

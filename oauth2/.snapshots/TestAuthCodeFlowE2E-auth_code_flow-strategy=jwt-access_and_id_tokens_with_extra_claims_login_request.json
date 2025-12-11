@@ -7,7 +7,6 @@
       "audience-2"
     ],
     "client_id": "64f78bf1-f388-4eeb-9fee-e7207226c6be-jwt",
-    "client_name": "",
     "client_secret_expires_at": 0,
     "grant_types": [
       "implicit",
@@ -18,7 +17,6 @@
     ],
     "jwks": {},
     "metadata": {},
-    "owner": "",
     "redirect_uris": [
       "https://client.ory/callback"
     ],
@@ -28,8 +26,7 @@
       "token"
     ],
     "scope": "hydra offline openid",
-    "skip_consent": false,
-    "subject_type": ""
+    "skip_consent": false
   },
   "oidc_context": {},
   "requested_access_token_audience": [],

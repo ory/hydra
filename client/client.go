@@ -43,7 +43,7 @@ type Client struct {
 	//
 	// The human-readable name of the client to be presented to the
 	// end-user during authorization.
-	Name string `json:"client_name" db:"client_name"`
+	Name string `json:"client_name,omitempty" db:"client_name"`
 
 	// OAuth 2.0 Client Secret
 	//
@@ -89,7 +89,7 @@ type Client struct {
 	// can use when requesting access tokens.
 	//
 	// Example: scope1 scope-2 scope.3 scope:4
-	Scope string `json:"scope" db:"scope"`
+	Scope string `json:"scope,omitempty" db:"scope"`
 
 	// OAuth 2.0 Client Audience
 	//
@@ -103,7 +103,7 @@ type Client struct {
 	// OAuth 2.0 Client Owner
 	//
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
-	Owner string `json:"owner" db:"owner"`
+	Owner string `json:"owner,omitempty" db:"owner"`
 
 	// OAuth 2.0 Client Policy URI
 	//
@@ -157,7 +157,7 @@ type Client struct {
 	//
 	// The `subject_types_supported` Discovery parameter contains a
 	// list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
-	SubjectType string `json:"subject_type" db:"subject_type" faker:"len=15"`
+	SubjectType string `json:"subject_type,omitempty" db:"subject_type" faker:"len=15"`
 
 	// OpenID Connect Sector Identifier URI
 	//

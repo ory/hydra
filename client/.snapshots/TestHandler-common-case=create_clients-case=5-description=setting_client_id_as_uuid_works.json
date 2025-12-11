@@ -1,6 +1,5 @@
 {
   "client_id": "98941dac-f963-4468-8a23-9483b1e04e3c",
-  "client_name": "",
   "client_secret": "not too short",
   "redirect_uris": [
     "http://localhost:3000/cb"
@@ -9,7 +8,6 @@
   "response_types": null,
   "scope": "offline_access offline openid",
   "audience": [],
-  "owner": "",
   "allowed_cors_origins": [],
   "client_secret_expires_at": 0,
   "subject_type": "public",

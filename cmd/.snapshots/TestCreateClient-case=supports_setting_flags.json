@@ -3,7 +3,6 @@
     "https://www.ory.sh/audience1",
     "https://www.ory.sh/audience2"
   ],
-  "client_name": "",
   "client_secret_expires_at": 0,
   "grant_types": [
     "authorization_code"
@@ -12,7 +11,6 @@
   "metadata": {
     "foo": "bar"
   },
-  "owner": "",
   "request_object_signing_alg": "RS256",
   "response_types": [
     "code"

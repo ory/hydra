@@ -6,7 +6,6 @@
   ],
   "jwks": {},
   "metadata": {},
-  "owner": "",
   "request_object_signing_alg": "RS256",
   "response_types": [
     "code"

@@ -3,13 +3,12 @@ package hasherx
 import (
 	"context"
 
-	"github.com/ory/x/otelx"
 	"github.com/pkg/errors"
-
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/ory/x/otelx"
 )
 
 // ErrBcryptPasswordLengthReached is returned when the password is longer than 72 bytes.

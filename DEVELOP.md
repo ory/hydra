@@ -1,10 +1,13 @@
 # Development
 
-This document explains how to develop Ory Hydra, run tests, and work with the tooling around it.
+This document explains how to develop Ory Hydra, run tests, and work with the
+tooling around it.
 
 ## Upgrading and changelog
 
-New releases might introduce breaking changes. To help you identify and incorporate those changes, we document these changes in [CHANGELOG.md](./CHANGELOG.md).
+New releases might introduce breaking changes. To help you identify and
+incorporate those changes, we document these changes in
+[CHANGELOG.md](./CHANGELOG.md).
 
 ## Command line documentation
 
@@ -18,7 +21,8 @@ hydra help
 
 ## Contribution guidelines
 
-We encourage all contributions. Before opening a pull request, read the [contribution guidelines](./CONTRIBUTING.md).
+We encourage all contributions. Before opening a pull request, read the
+[contribution guidelines](./CONTRIBUTING.md).
 
 ## Prerequisites
 
@@ -28,7 +32,8 @@ You need Go 1.13+ with `GO111MODULE=on` and, for the test suites:
 - Makefile
 - Node.js and npm
 
-It is possible to develop Ory Hydra on Windows, but please be aware that all guides assume a Unix shell like bash or zsh.
+It is possible to develop Ory Hydra on Windows, but please be aware that all
+guides assume a Unix shell like bash or zsh.
 
 ## Formatting code
 
@@ -52,7 +57,8 @@ There are three types of tests:
 
 Short tests run fairly quickly and use SQLite in-memory.
 
-All tests run against a sqlite in-memory database, thus it is required to use the `-tags sqlite` build tag.
+All tests run against a sqlite in-memory database, thus it is required to use
+the `-tags sqlite` build tag.
 
 Run all short tests:
 
@@ -76,7 +82,10 @@ go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
 
 Regular tests require a database setup.
 
-The test suite can use [ory/dockertest](https://github.com/ory/dockertest) to work with docker directly, but we encourage using the Makefile instead. Using dockertest can bloat the number of Docker Images on your system and are quite slow.
+The test suite can use [ory/dockertest](https://github.com/ory/dockertest) to
+work with docker directly, but we encourage using the Makefile instead. Using
+dockertest can bloat the number of Docker Images on your system and are quite
+slow.
 
 Run the full test suite:
 
@@ -84,7 +93,9 @@ Run the full test suite:
 make test
 ```
 
-> Note: `make test` recreates the databases every time. This can be annoying if you are trying to fix something very specific and need the database tests all the time.
+> Note: `make test` recreates the databases every time. This can be annoying if
+> you are trying to fix something very specific and need the database tests all
+> the time.
 
 If you want to reuse databases across test runs, initialize them once:
 
@@ -115,7 +126,9 @@ Run e2e tests:
 make e2e
 ```
 
-The runner will not show the Browser window, as it runs in the CI Mode (background). That makes debugging these type of tests very difficult, but thankfully you can run the e2e test in the browser which helps with debugging:
+The runner will not show the Browser window, as it runs in the CI Mode
+(background). That makes debugging these type of tests very difficult, but
+thankfully you can run the e2e test in the browser which helps with debugging:
 
 ```shell
 ./test/e2e/circle-ci.bash memory --watch
@@ -139,9 +152,14 @@ export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslm
 # ...
 ```
 
-Once you run the script, a Cypress window will appear. Hit the button "Run all Specs"!
+Once you run the script, a Cypress window will appear. Hit the button "Run all
+Specs"!
 
-The code for these tests is located in [./cypress/integration](./cypress/integration) and [./cypress/support](./cypress/support) and [./cypress/helpers](./cypress/helpers). The website you're seeing is located in [./test/e2e/oauth2-client](./test/e2e/oauth2-client).
+The code for these tests is located in
+[./cypress/integration](./cypress/integration) and
+[./cypress/support](./cypress/support) and
+[./cypress/helpers](./cypress/helpers). The website you're seeing is located in
+[./test/e2e/oauth2-client](./test/e2e/oauth2-client).
 
 #### OpenID Connect conformity tests
 
@@ -157,7 +175,8 @@ and then in a separate shell:
 ./test/conformity/test.sh
 ```
 
-Running these tests will take a significant amount of time which is why they are not part of the CI pipeline.
+Running these tests will take a significant amount of time which is why they are
+not part of the CI pipeline.
 
 ## Build Docker image
 
@@ -167,13 +186,16 @@ To build a development Docker Image:
 make docker
 ```
 
-> [!WARNING] If you already have a production image (e.g. `oryd/hydra:v2.2.0`) pulled, the above `make docker` command will replace it with a local build of the image that is more equivalent to the `-distroless` variant on Docker Hub.
+> [!WARNING] If you already have a production image (e.g. `oryd/hydra:v2.2.0`)
+> pulled, the above `make docker` command will replace it with a local build of
+> the image that is more equivalent to the `-distroless` variant on Docker Hub.
 >
 > You can pull the production image any time using `docker pull`
 
 ## Run the Docker Compose quickstarts
 
-If you wish to check your code changes against any of the docker-compose quickstart files, run:
+If you wish to check your code changes against any of the docker-compose
+quickstart files, run:
 
 ```shell
 docker compose -f quickstart.yml up --build
@@ -182,7 +204,18 @@ docker compose -f quickstart.yml up --build
 ## Add a new migration
 
 1. `mkdir persistence/sql/src/YYYYMMDD000001_migration_name/`
-2. Put the migration files into this directory, following the standard naming conventions. If you wish to execute different parts of a migration in separate transactions, add split marks (lines with the text `--split`) where desired. Why this might be necessary is explained in https://github.com/gobuffalo/fizz/issues/104.
-3. Run `make persistence/sql/migrations/<migration_id>` to generate migration fragments.
-4. If an update causes the migration to have fewer fragments than the number already generated, run `make persistence/sql/migrations/<migration_id>-clean`. This is equivalent to a `rm` command with the right parameters, but comes with better tab completion.
-5. Before committing generated migration fragments, run the above clean command and generate a fresh copy of migration fragments to make sure the `sql/src` and `sql/migrations` directories are consistent.
+2. Put the migration files into this directory, following the standard naming
+   conventions. If you wish to execute different parts of a migration in
+   separate transactions, add split marks (lines with the text `--split`) where
+   desired. Why this might be necessary is explained in
+   https://github.com/gobuffalo/fizz/issues/104.
+3. Run `make persistence/sql/migrations/<migration_id>` to generate migration
+   fragments.
+4. If an update causes the migration to have fewer fragments than the number
+   already generated, run
+   `make persistence/sql/migrations/<migration_id>-clean`. This is equivalent to
+   a `rm` command with the right parameters, but comes with better tab
+   completion.
+5. Before committing generated migration fragments, run the above clean command
+   and generate a fresh copy of migration fragments to make sure the `sql/src`
+   and `sql/migrations` directories are consistent.

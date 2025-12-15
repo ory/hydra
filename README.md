@@ -11,7 +11,10 @@
   <a href="https://www.ory.sh/jobs/">Jobs</a>
 </h4>
 
-Ory Hydra is a hardened, OpenID Certified OAuth 2.0 Server and OpenID Connect Provider optimized for low-latency, high throughput, and low resource consumption. It connects to your existing identity provider through a login and consent app, giving you absolute control over the user interface and experience.
+Ory Hydra is a hardened, OpenID Certified OAuth 2.0 Server and OpenID Connect
+Provider optimized for low-latency, high throughput, and low resource
+consumption. It connects to your existing identity provider through a login and
+consent app, giving you absolute control over the user interface and experience.
 
 ---
 
@@ -43,7 +46,10 @@ Ory Hydra is a hardened, OpenID Certified OAuth 2.0 Server and OpenID Connect Pr
 
 ## What is Ory Hydra?
 
-Ory Hydra is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. It follows [cloud architecture best practices](https://www.ory.sh/docs/ecosystem/software-architecture-philosophy) and focuses on:
+Ory Hydra is a server implementation of the OAuth 2.0 authorization framework
+and the OpenID Connect Core 1.0. It follows
+[cloud architecture best practices](https://www.ory.sh/docs/ecosystem/software-architecture-philosophy)
+and focuses on:
 
 - OAuth 2.0 and OpenID Connect flows
 - Token issuance and validation
@@ -52,7 +58,9 @@ Ory Hydra is a server implementation of the OAuth 2.0 authorization framework an
 - JWKS management
 - Low latency and high throughput
 
-We recommend starting with the [Ory Hydra introduction docs](https://www.ory.sh/docs/hydra) to learn more about its architecture, feature set, and how it compares to other systems.
+We recommend starting with the
+[Ory Hydra introduction docs](https://www.ory.sh/docs/hydra) to learn more about
+its architecture, feature set, and how it compares to other systems.
 
 ### Why Ory Hydra
 
@@ -61,9 +69,13 @@ Ory Hydra is designed to:
 - Be a standalone OAuth 2.0 and OpenID Connect server without user management
 - Connect to any existing identity provider through a login and consent app
 - Give you absolute control over the user interface and experience flows
-- Work with any authentication endpoint: [Ory Kratos](https://github.com/ory/kratos), [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/), or your proprietary system
+- Work with any authentication endpoint:
+  [Ory Kratos](https://github.com/ory/kratos),
+  [authboss](https://github.com/go-authboss/authboss),
+  [User Frosting](https://www.userfrosting.com/), or your proprietary system
 - Scale to large numbers of clients and tokens
-- Fit into modern cloud native environments such as Kubernetes and managed platforms
+- Fit into modern cloud native environments such as Kubernetes and managed
+  platforms
 
 ### OAuth2 and OpenID Connect: Open Standards
 
@@ -89,7 +101,8 @@ and the OpenID Foundation:
 
 ### OpenID Connect Certified
 
-Ory Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
+Ory Hydra is an OpenID Foundation
+[certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
 
 <p align="center">
     <img src="https://github.com/ory/docs/blob/master/docs/hydra/images/oidc-cert.png" alt="Ory Hydra is a certified OpenID Providier" width="256px">
@@ -97,65 +110,96 @@ Ory Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid
 
 The following OpenID profiles are certified:
 
-- [Basic OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth) (response types `code`)
-- [Implicit OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth) (response types `id_token`, `id_token+token`)
-- [Hybrid OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth) (response types `code+id_token`, `code+id_token+token`, `code+token`)
+- [Basic OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+  (response types `code`)
+- [Implicit OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#ImplicitFlowAuth)
+  (response types `id_token`, `id_token+token`)
+- [Hybrid OpenID Provider](http://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth)
+  (response types `code+id_token`, `code+id_token+token`, `code+token`)
 - [OpenID Provider Publishing Configuration Information](https://openid.net/specs/openid-connect-discovery-1_0.html)
 - [Dynamic OpenID Provider](https://openid.net/specs/openid-connect-registration-1_0.html)
 
-To obtain certification, we deployed the [reference user login and consent app](https://github.com/ory/hydra-login-consent-node) (unmodified) and Ory Hydra v1.0.0.
+To obtain certification, we deployed the
+[reference user login and consent app](https://github.com/ory/hydra-login-consent-node)
+(unmodified) and Ory Hydra v1.0.0.
 
 ## Deployment options
 
 You can run Ory Hydra in two main ways:
 
 - As a managed service on the Ory Network
-- As a self hosted service under your own control, with or without the Ory Enterprise License
+- As a self hosted service under your own control, with or without the Ory
+  Enterprise License
 
 ### Use Ory Hydra on the Ory Network
 
-The [Ory Network](https://www.ory.sh/cloud) is the fastest way to use Ory services in production. **Ory OAuth2 & OpenID Connect** is powered by the open source Ory Hydra server and is API compatible.
+The [Ory Network](https://www.ory.sh/cloud) is the fastest way to use Ory
+services in production. **Ory OAuth2 & OpenID Connect** is powered by the open
+source Ory Hydra server and is API compatible.
 
 The Ory Network provides:
 
-- OAuth2 and OpenID Connect for single sign on, API access, and machine to machine authorization
-- Identity and credential management that scales to billions of users and devices
-- Registration, login, and account management flows for passkeys, biometrics, social login, SSO, and multi factor authentication
+- OAuth2 and OpenID Connect for single sign on, API access, and machine to
+  machine authorization
+- Identity and credential management that scales to billions of users and
+  devices
+- Registration, login, and account management flows for passkeys, biometrics,
+  social login, SSO, and multi factor authentication
 - Prebuilt login, registration, and account management pages and components
-- Low latency permission checks based on the Zanzibar model with the Ory Permission Language
+- Low latency permission checks based on the Zanzibar model with the Ory
+  Permission Language
 - GDPR friendly storage with data locality and compliance in mind
 - Web based Ory Console and Ory CLI for administration and operations
 - Cloud native APIs compatible with the open source servers
 - Fair, usage based [pricing](https://www.ory.sh/pricing)
 
-Sign up for a [free developer account](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme) to get started.
+Sign up for a
+[free developer account](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme)
+to get started.
 
 ### Self-host Ory Hydra
 
-You can run Ory Hydra yourself for full control over infrastructure, deployment, and customization.
+You can run Ory Hydra yourself for full control over infrastructure, deployment,
+and customization.
 
 The [install guide](https://www.ory.sh/docs/hydra/install) explains how to:
 
-* Install Hydra on Linux, macOS, Windows, and Docker
-* Configure databases such as PostgreSQL, MySQL, and CockroachDB
-* Deploy to Kubernetes and other orchestration systems
-* Build Hydra from source
+- Install Hydra on Linux, macOS, Windows, and Docker
+- Configure databases such as PostgreSQL, MySQL, and CockroachDB
+- Deploy to Kubernetes and other orchestration systems
+- Build Hydra from source
 
-This guide uses the open source distribution to get you started without license requirements. It is a great fit for individuals, researchers, hackers, and companies that want to experiment, prototype, or run unimportant workloads without SLAs. You get the full core engine, and you are free to inspect, extend, and build it from source.
+This guide uses the open source distribution to get you started without license
+requirements. It is a great fit for individuals, researchers, hackers, and
+companies that want to experiment, prototype, or run unimportant workloads
+without SLAs. You get the full core engine, and you are free to inspect, extend,
+and build it from source.
 
-If you run Hydra as part of a business-critical system, for example OAuth2 and OpenID Connect for all your users, you should use a commercial agreement to reduce operational and security risk. The **Ory Enterprise License (OEL)** layers on top of self-hosted Hydra and provides:
+If you run Hydra as part of a business-critical system, for example OAuth2 and
+OpenID Connect for all your users, you should use a commercial agreement to
+reduce operational and security risk. The **Ory Enterprise License (OEL)**
+layers on top of self-hosted Hydra and provides:
 
-* Additional enterprise features that are not available in the open source version
-* Regular security releases, including CVE patches, with service level agreements
-* Support for advanced scaling, multi-tenancy, and complex deployments
-* Premium support options with SLAs, direct access to engineers, and onboarding help
-* Access to a private Docker registry with frequent and vetted, up-to-date enterprise builds
+- Additional enterprise features that are not available in the open source
+  version
+- Regular security releases, including CVE patches, with service level
+  agreements
+- Support for advanced scaling, multi-tenancy, and complex deployments
+- Premium support options with SLAs, direct access to engineers, and onboarding
+  help
+- Access to a private Docker registry with frequent and vetted, up-to-date
+  enterprise builds
 
-For guaranteed CVE fixes, current enterprise builds, advanced features, and support in production, you need a valid [Ory Enterprise License](https://www.ory.com/ory-enterprise-license) and access to the Ory Enterprise Docker registry. To learn more, [contact the Ory team](https://www.ory.sh/contact/).
+For guaranteed CVE fixes, current enterprise builds, advanced features, and
+support in production, you need a valid
+[Ory Enterprise License](https://www.ory.com/ory-enterprise-license) and access
+to the Ory Enterprise Docker registry. To learn more,
+[contact the Ory team](https://www.ory.sh/contact/).
 
 ## Quickstart
 
-Install the [Ory CLI](https://www.ory.sh/docs/guides/cli/installation) and create a new project to try Ory OAuth2 & OpenID Connect.
+Install the [Ory CLI](https://www.ory.sh/docs/guides/cli/installation) and
+create a new project to try Ory OAuth2 & OpenID Connect.
 
 ```bash
 # Install the Ory CLI if you do not have it yet:
@@ -601,7 +645,8 @@ to perform a certain action on a resource.
 
 ## Documentation
 
-The full Ory Hydra documentation is available at [www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra), including:
+The full Ory Hydra documentation is available at
+[www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra), including:
 
 - [Installation guides](https://www.ory.sh/docs/hydra/install)
 - [Configuration reference](https://www.ory.sh/docs/hydra/reference/configuration)
@@ -609,7 +654,9 @@ The full Ory Hydra documentation is available at [www.ory.sh/docs/hydra](https:/
 - [Security architecture](https://www.ory.sh/docs/hydra/security-architecture)
 - [Performance benchmarks](https://www.ory.sh/docs/performance/hydra)
 
-For upgrading and changelogs, check [releases tab](https://github.com/ory/hydra/releases) and [CHANGELOG.md](./CHANGELOG.md).
+For upgrading and changelogs, check
+[releases tab](https://github.com/ory/hydra/releases) and
+[CHANGELOG.md](./CHANGELOG.md).
 
 ## Developing Ory Hydra
 
@@ -624,15 +671,24 @@ See [DEVELOP.md](./DEVELOP.md) for information on:
 
 ## Security
 
-OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard. Ory Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production each day. Read [the security guide](https://www.ory.sh/docs/hydra/security-architecture) for more details on cryptography and security concepts.
+OAuth2 and OAuth2 related specifications are over 400 written pages.
+Implementing OAuth2 is easy, getting it right is hard. Ory Hydra is trusted by
+companies all around the world, has a vibrant community and faces millions of
+requests in production each day. Read
+[the security guide](https://www.ory.sh/docs/hydra/security-architecture) for
+more details on cryptography and security concepts.
 
 ### Disclosing vulnerabilities
 
-If you think you found a security vulnerability, please refrain from posting it publicly on the forums, the chat, or GitHub. You can find all info for responsible disclosure in our [security.txt](https://www.ory.sh/.well-known/security.txt).
+If you think you found a security vulnerability, please refrain from posting it
+publicly on the forums, the chat, or GitHub. You can find all info for
+responsible disclosure in our
+[security.txt](https://www.ory.sh/.well-known/security.txt).
 
 ## Telemetry
 
-Our services collect summarized, anonymized data that can optionally be turned off. Click [here](https://www.ory.sh/docs/ecosystem/sqa) to learn more.
+Our services collect summarized, anonymized data that can optionally be turned
+off. Click [here](https://www.ory.sh/docs/ecosystem/sqa) to learn more.
 
 ## Libraries and third-party projects
 

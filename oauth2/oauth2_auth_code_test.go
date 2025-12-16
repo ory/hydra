@@ -171,7 +171,6 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Parallel()
 
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	ctx := context.Background()
 
 	for dbName, reg := range testhelpers.ConnectDatabases(t, true, driver.WithConfigOptions(configx.WithValues(map[string]any{
@@ -180,6 +179,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}))) {
 		t.Run("registry="+dbName, func(t *testing.T) {
 			t.Parallel()
+
+			rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OpenIDConnectKeyName)
 			jwk.EnsureAsymmetricKeypairExists(t, reg, string(jose.ES256), x.OAuth2JWTKeyName)
@@ -1451,7 +1452,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					// - In the first scenario, all token generations are created at the same time.
 					// - In the second scenario, we create token generations with a delay that is longer than the grace period between them.
 					//
-					// Tokens for each generation are created in parallel to ensure we have no state leak anywhere.0
+					// Tokens for each generation are created in parallel to ensure we have no state leak anywhere.
 					t.Run("token generations", func(t *testing.T) {
 						gracePeriod := time.Second
 						aboveGracePeriod := 2 * time.Second
@@ -1465,12 +1466,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							generations[0] = []*oauth2.Token{issueTokens(t)}
 							// Start from the first generation. For every next generation, we refresh all the tokens of the previous generation twice.
 							for i := range len(generations) - 1 {
+								// Loop invariants:
+								// - `generations` is constant is size (it is right-sized when created), thus it is safe to index it concurrently.
+								// - The current generation (`generations[i]`) is constant in size, thus it is safe to iterate over it.
+								// - The next generation (`generations[i+1]`) is *not* constant in size. Elements are appended to it concurrently, and thus it is guarded by `mtx`.
+								// - Elements of the current generation *are* modified in `refreshToken` (!), and thus are guarded by `mtx`.
+								// - Elements of the current and next generation are concurrently read/written inside the `gen` function, and thus are guarded by `mtx`.
 								generations[i+1] = make([]*oauth2.Token, 0, len(generations[i])*2)
+								mtx := sync.Mutex{}
 
 								var wg sync.WaitGroup
 								gen := func(token *oauth2.Token) {
 									defer wg.Done()
+
+									mtx.Lock()
 									generations[i+1] = append(generations[i+1], refreshTokens(t, token))
+									mtx.Unlock()
 								}
 
 								for _, token := range generations[i] {

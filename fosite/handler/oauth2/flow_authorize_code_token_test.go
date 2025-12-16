@@ -910,8 +910,6 @@ func TestAuthorizeCodeTransactional_HandleTokenEndpointRequest(t *testing.T) {
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, c.description), func(t *testing.T) {
-			t.Parallel()
-
 			ctrl := gomock.NewController(t)
 			t.Cleanup(ctrl.Finish)
 

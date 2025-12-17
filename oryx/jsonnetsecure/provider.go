@@ -18,8 +18,7 @@ type (
 		JsonnetVM(context.Context) (VM, error)
 	}
 
-	// TestProvider provides a secure VM by running go build on github.
-	// com/ory/x/jsonnetsecure/cmd.
+	// TestProvider provides a secure VM by running go build on github.com/ory/x/jsonnetsecure/cmd
 	TestProvider struct {
 		jsonnetBinary string
 		pool          Pool

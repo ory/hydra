@@ -17,7 +17,7 @@ services:
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
   cockroachd:
-    image: cockroachdb/cockroach:latest-v25.3
+    image: cockroachdb/cockroach:latest-v25.4
     ports:
       - "26257:26257"
     command: start-single-node --insecure

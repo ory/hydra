@@ -207,7 +207,7 @@ func RunTestMySQLWithVersion(t testing.TB, version string) string {
 func startCockroachDB(version string) (*dockertest.Resource, error) {
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "cockroachdb/cockroach",
-		Tag:        cmp.Or(version, "latest-v25.3"),
+		Tag:        cmp.Or(version, "latest-v25.4"),
 		Cmd:        []string{"start-single-node", "--insecure"},
 	})
 	if err == nil {

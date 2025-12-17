@@ -36,7 +36,7 @@ resetdb:
 	docker rm -f hydra_test_database_cockroach || true
 	docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:8.0
 	docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:11.8
-	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.3 start-single-node --insecure
+	docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:latest-v25.4 start-single-node --insecure
 
 .PHONY: lint
 lint: .bin/golangci-lint

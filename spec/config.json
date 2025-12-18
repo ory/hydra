@@ -1091,7 +1091,8 @@
     "feature_flags": {
       "title": "Feature flags",
       "type": "object",
-      "additionalProperties": true
+      "additionalProperties": true,
+      "properties": {}
     }
   },
   "additionalProperties": false

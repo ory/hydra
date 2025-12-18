@@ -93,6 +93,22 @@ func ExtractSchemeFromDSN(dsn string) (string, string, error) {
 	return scheme, afterSchemeSeparator, nil
 }
 
+// ExtractDbNameFromDSN returns the database name component in a DSN string.
+func ExtractDbNameFromDSN(dsn string) (string, error) {
+	_, afterScheme, err := ExtractSchemeFromDSN(dsn)
+	if err != nil {
+		return "", err
+	}
+
+	_, afterSlash, slashFound := strings.Cut(afterScheme, "/")
+	if !slashFound {
+		return "", nil
+	}
+
+	dbName, _, _ := strings.Cut(afterSlash, "?")
+	return dbName, nil
+}
+
 // ReplaceSchemeInDSN replaces the scheme (e.g. `mysql`, `postgres`, etc) in a DSN string with another one.
 // This is necessary for example when using `cockroach` as a scheme, but using the postgres driver to connect to the database,
 // and this driver only accepts `postgres` as a scheme.

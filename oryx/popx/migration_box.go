@@ -211,12 +211,12 @@ func (mb *MigrationBox) findMigrations(
 		}
 
 		if !info.Type().IsRegular() {
-			mb.l.Tracef("ignoring non file %s", info.Name())
+			mb.l.Tracef("ignoring non file: %s", info.Name())
 			return nil
 		}
 
 		if path.Ext(info.Name()) != ".sql" {
-			mb.l.Tracef("ignoring non SQL file %s", info.Name())
+			mb.l.Tracef("ignoring non SQL file: %s", info.Name())
 			return nil
 		}
 

@@ -20,6 +20,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/urlx"
 )
@@ -27,17 +28,25 @@ import (
 func TestHandlerWellKnown(t *testing.T) {
 	t.Parallel()
 
-	reg := testhelpers.NewRegistryMemory(t, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
-	router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
-	h := jwk.NewHandler(reg)
-	h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
-		return h
-	})
-	testServer := httptest.NewServer(router)
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
 		t.Parallel()
+
+		dsn := dbal.NewSQLiteTestDatabase(t)
+		var testServer *httptest.Server
+		{
+			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
+			router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
+			h := jwk.NewHandler(reg)
+			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
+				return h
+			})
+			testServer = httptest.NewServer(router)
+			t.Cleanup(testServer.Close)
+		}
+
+		reg := testhelpers.NewRegistrySQLFromURL(t, dsn, false, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
 		if reg.Config().HSMEnabled() {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
@@ -64,6 +73,21 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
 		t.Parallel()
+
+		dsn := dbal.NewSQLiteTestDatabase(t)
+		var testServer *httptest.Server
+		{
+			reg := testhelpers.NewRegistrySQLFromURL(t, dsn, true, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
+			router := x.NewRouterPublic(prometheusx.NewMetricsManager("", "", "", ""))
+			h := jwk.NewHandler(reg)
+			h.SetPublicRoutes(router, func(h http.Handler) http.Handler {
+				return h
+			})
+			testServer = httptest.NewServer(router)
+			t.Cleanup(testServer.Close)
+		}
+
+		reg := testhelpers.NewRegistrySQLFromURL(t, dsn, false, true, driver.WithConfigOptions(configx.WithValue(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})))
 		var IDKS *jose.JSONWebKeySet
 
 		if reg.Config().HSMEnabled() {

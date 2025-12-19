@@ -750,10 +750,10 @@ func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *
 	// (see https://github.com/ory/hydra/pull/3851#discussion_r1843678761)
 	f, err := h.r.ConsentStrategy().HandleOAuth2DeviceAuthorizationRequest(ctx, w, r)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
-		x.LogAudit(r, nil, h.r.AuditLogger())
+		x.LogError(r, err, h.r.Logger())
 		return
 	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogAudit(r, err, h.r.AuditLogger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.Writer().WriteError(w, r, err)
 		return
 	} else if err != nil {
@@ -1001,7 +1001,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) 
 
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
-		x.LogAudit(r, err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
@@ -1147,7 +1147,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 	if err != nil {
-		h.logOrAudit(err, r)
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 		// NewAccessRequest sometimes returns the accessRequest even if an error occurs
 		// If that is the case, we want to log it to get information about the client
@@ -1166,7 +1166,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTSigner().GetPublicKeyID(ctx)
 			if err != nil {
-				h.logOrAudit(err, r)
+				x.LogError(r, err, h.r.Logger())
 				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 				events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 				return
@@ -1218,7 +1218,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 
 	for _, hook := range h.r.AccessRequestHooks() {
 		if err := hook(ctx, accessRequest); err != nil {
-			h.logOrAudit(err, r)
+			x.LogError(r, err, h.r.Logger())
 			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 			events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 			return
@@ -1230,7 +1230,7 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 		accessResponse, err = h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 		return err
 	}); err != nil {
-		h.logOrAudit(err, r)
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 		events.Trace(ctx, events.TokenExchangeError, events.WithRequest(accessRequest), events.WithError(err))
 		return
@@ -1270,11 +1270,11 @@ func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 
 	fl, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
-		x.LogAudit(r, nil, h.r.AuditLogger())
+		x.LogError(r, err, h.r.Logger())
 		// do nothing
 		return
 	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogAudit(r, err, h.r.AuditLogger())
+		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	} else if err != nil {
@@ -1394,10 +1394,7 @@ func (h *Handler) updateSessionWithRequest(
 	}
 
 	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, request.GetClient(), flow.Subject, flow.ForceSubjectIdentifier)
-	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
-		x.LogAudit(r, err, h.r.AuditLogger())
-		return nil, err
-	} else if err != nil {
+	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		return nil, err
 	}
@@ -1444,14 +1441,6 @@ func (h *Handler) updateSessionWithRequest(
 	session.MirrorTopLevelClaims = h.c.MirrorTopLevelClaims(ctx)
 
 	return session, nil
-}
-
-func (h *Handler) logOrAudit(err error, r *http.Request) {
-	if errors.Is(err, fosite.ErrServerError) || errors.Is(err, fosite.ErrTemporarilyUnavailable) || errors.Is(err, fosite.ErrMisconfiguration) {
-		x.LogError(r, err, h.r.Logger())
-	} else {
-		x.LogAudit(r, err, h.r.Logger())
-	}
 }
 
 // swagger:route POST /credentials oidc createVerifiableCredential

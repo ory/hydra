@@ -803,7 +803,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 		if errors.Is(err, ErrNoAuthenticationSessionFound) {
 			// OP initiated log out but no session was found. Since we can not identify the user we can not call
 			// any RPs.
-			s.r.AuditLogger().
+			s.r.Logger().
 				WithRequest(r).
 				Info("User logout skipped because no authentication session exists.")
 			http.Redirect(w, r, redir, http.StatusFound)
@@ -829,7 +829,7 @@ func (s *defaultStrategy) issueLogoutVerifier(ctx context.Context, w http.Respon
 			return nil, err
 		}
 
-		s.r.AuditLogger().
+		s.r.Logger().
 			WithRequest(r).
 			Info("User logout requires user confirmation, redirecting to Logout UI.")
 		http.Redirect(w, r, urlx.SetQuery(s.r.Config().LogoutURL(ctx), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
@@ -1033,7 +1033,7 @@ func (s *defaultStrategy) completeLogout(ctx context.Context, w http.ResponseWri
 		return nil, err
 	}
 
-	s.r.AuditLogger().
+	s.r.Logger().
 		WithRequest(r).
 		WithField("subject", lr.Subject).
 		Info("User logout completed!")
@@ -1068,7 +1068,7 @@ func (s *defaultStrategy) HandleHeadlessLogout(ctx context.Context, _ http.Respo
 		return err
 	}
 
-	s.r.AuditLogger().
+	s.r.Logger().
 		WithRequest(r).
 		WithField("subject", loginSession.Subject).
 		WithField("sid", sid).

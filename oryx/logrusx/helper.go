@@ -13,8 +13,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ory/pop/v6/logging"
-
 	"github.com/sirupsen/logrus"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
@@ -31,8 +29,6 @@ type (
 		redactionText             string
 		additionalRedactedHeaders map[string]struct{}
 		opts                      []Option
-		name                      string
-		version                   string
 	}
 	Provider interface {
 		Logger() *Logger
@@ -40,10 +36,6 @@ type (
 )
 
 var opts = otelhttptrace.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-
-func (l *Logger) LeakSensitiveData() bool {
-	return l.leakSensitive
-}
 
 func (l *Logger) Logrus() *logrus.Logger {
 	return l.Entry.Logger
@@ -177,16 +169,8 @@ func (l *Logger) Infof(format string, args ...interface{}) {
 	l.Logf(logrus.InfoLevel, format, args...)
 }
 
-func (l *Logger) Printf(format string, args ...interface{}) {
-	l.Infof(format, args...)
-}
-
 func (l *Logger) Warnf(format string, args ...interface{}) {
 	l.Logf(logrus.WarnLevel, format, args...)
-}
-
-func (l *Logger) Warningf(format string, args ...interface{}) {
-	l.Warnf(format, args...)
 }
 
 func (l *Logger) Errorf(format string, args ...interface{}) {
@@ -261,21 +245,6 @@ func (l *Logger) WithError(err error) *Logger {
 	}
 
 	return l.WithField("error", ctx)
-}
-
-var popLevelTranslations = map[logging.Level]logrus.Level{
-	// logging.SQL:   logrus.TraceLevel, we never want to log SQL statements, see https://github.com/ory/keto/issues/454
-	logging.Debug: logrus.DebugLevel,
-	logging.Info:  logrus.InfoLevel,
-	logging.Warn:  logrus.WarnLevel,
-	logging.Error: logrus.ErrorLevel,
-}
-
-func (l *Logger) PopLogger(lvl logging.Level, s string, args ...interface{}) {
-	level, ok := popLevelTranslations[lvl]
-	if ok {
-		l.WithField("source", "pop").Logf(level, s, args...)
-	}
 }
 
 func (l *Logger) StdLogger(lvl logrus.Level) *log.Logger {

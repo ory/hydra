@@ -59,7 +59,7 @@ import (
 )
 
 type RegistrySQL struct {
-	l, al                *logrusx.Logger
+	l                    *logrusx.Logger
 	conf                 *config.DefaultProvider
 	fh                   fosite.Hasher
 	cv                   *client.Validator
@@ -350,14 +350,6 @@ func (m *RegistrySQL) Logger() *logrusx.Logger {
 		m.l = logrusx.New("Ory Hydra", config.Version)
 	}
 	return m.l
-}
-
-func (m *RegistrySQL) AuditLogger() *logrusx.Logger {
-	if m.al == nil {
-		m.al = logrusx.NewAudit("Ory Hydra", config.Version)
-		m.al.UseConfig(m.Config().Source(contextx.RootContext))
-	}
-	return m.al
 }
 
 func (m *RegistrySQL) ClientHasher() fosite.Hasher {

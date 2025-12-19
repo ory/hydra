@@ -224,8 +224,6 @@ func New(name string, version string, opts ...Option) *Logger {
 	o := newOptions(opts)
 	return &Logger{
 		opts:          opts,
-		name:          name,
-		version:       version,
 		leakSensitive: o.leakSensitive || o.c.Bool("log.leak_sensitive_values"),
 		redactionText: cmp.Or(o.redactionText, `Value is sensitive and has been redacted. To see the value set config key "log.leak_sensitive_values = true" or environment variable "LOG_LEAK_SENSITIVE_VALUES=true".`),
 		additionalRedactedHeaders: toHeaderMap(func() []string {
@@ -247,10 +245,6 @@ func NewT(t testing.TB, opts ...Option) *Logger {
 	l := New(t.Name(), "test", opts...)
 	l.Logger.Out = t.Output()
 	return l
-}
-
-func NewAudit(name string, version string, opts ...Option) *Logger {
-	return New(name, version, opts...).WithField("audience", "audit")
 }
 
 func (l *Logger) UseConfig(c configurator) {

@@ -82,6 +82,50 @@ func TestValidate(t *testing.T) {
 			assertErr: assert.Error,
 		},
 		{
+			in:        &Client{ID: "foo", TermsOfServiceURI: "file://i-am-a-file"},
+			assertErr: assert.Error,
+		},
+		{
+			in:        &Client{ID: "foo", PolicyURI: "file://you-are-a-file"},
+			assertErr: assert.Error,
+		},
+		{
+			in:        &Client{ID: "foo", ClientURI: "file://i-am-a-file"},
+			assertErr: assert.Error,
+		},
+		{
+			in:        &Client{ID: "foo", LogoURI: "file://you-are-a-file"},
+			assertErr: assert.Error,
+		},
+		{
+			in:        &Client{ID: "foo", PolicyURI: "javascript://ory.com/?%0d\\u{61}\\u{6c}\\u{65}\\u{72}\\u{74}\\`\\u{31}\\`"},
+			assertErr: assert.Error,
+		},
+		{
+			in: &Client{ID: "foo", PolicyURI: "https://example.org/policy"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "https://example.org/policy", c.PolicyURI)
+			},
+		},
+		{
+			in: &Client{ID: "foo", TermsOfServiceURI: "https://example.org/terms"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "https://example.org/terms", c.TermsOfServiceURI)
+			},
+		},
+		{
+			in: &Client{ID: "foo", ClientURI: "https://example.org/client"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "https://example.org/client", c.ClientURI)
+			},
+		},
+		{
+			in: &Client{ID: "foo", LogoURI: "https://example.org/logo.png"},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "https://example.org/logo.png", c.LogoURI)
+			},
+		},
+		{
 			in: &Client{ID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "https://example.org/jwks.json"},
 			assertErr: func(t assert.TestingT, err error, msg ...interface{}) bool {
 				e := new(fosite.RFC6749Error)
@@ -166,7 +210,6 @@ func TestValidate(t *testing.T) {
 			assertErr: assert.Error,
 		},
 	} {
-		tc := tc
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			if tc.v == nil {
 				tc.v = func(t *testing.T) *Validator {

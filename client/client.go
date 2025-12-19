@@ -271,7 +271,7 @@ type Client struct {
 
 	// OAuth 2.0 Client Metadata
 	//
-	// Use this field to story arbitrary data about the OAuth 2.0 Client. Can not be modified using OpenID Connect Dynamic Client Registration protocol.
+	// Use this field to store arbitrary data about the OAuth 2.0 Client. Can not be modified using OpenID Connect Dynamic Client Registration protocol.
 	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata" faker:"-"`
 
 	// OpenID Connect Dynamic Client Registration Access Token

@@ -89,16 +89,30 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 		}
 	}
 
-	if c.TermsOfServiceURI != "" {
-		u, err := url.ParseRequestURI(c.TermsOfServiceURI)
+	// TODO: For clients that support dynamic registration, validate that each of these URIs are part of the redirect_uris, as per the spec.
+	//    The authorization server SHOULD check to see if the "logo_uri", "tos_uri", "client_uri", and "policy_uri" have the same host and scheme as the those defined in the array of "redirect_uris" and that all of these URIs resolve to valid web pages.
+	//    https://datatracker.ietf.org/doc/html/rfc7591#section-5
+
+	// TODO: In addition, the logo_uri should be a valid image.
+	//    The value of this field MUST point to a valid image file.
+
+	for f, uri := range map[string]string{
+		"tos_uri":    c.TermsOfServiceURI,
+		"policy_uri": c.PolicyURI,
+		"logo_uri":   c.LogoURI,
+		"client_uri": c.ClientURI,
+	} {
+		if uri == "" {
+			continue
+		}
+		u, err := url.ParseRequestURI(uri)
 		if err != nil {
-			return errors.WithStack(ErrInvalidClientMetadata.WithHint("Field tos_uri must be a valid URI."))
+			return errors.WithStack(ErrInvalidClientMetadata.WithHintf("Field %s must be a valid URI.", f))
 		}
 
 		if u.Scheme != "https" && u.Scheme != "http" {
-			return errors.WithStack(ErrInvalidClientMetadata.WithHintf("tos_uri %s must use https:// or http:// as HTTP scheme.", c.TermsOfServiceURI))
+			return errors.WithStack(ErrInvalidClientMetadata.WithHintf("%s must use https:// or http:// as HTTP scheme for field %s.", uri, f))
 		}
-
 	}
 
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {

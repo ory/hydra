@@ -3,8 +3,9 @@ package hasherx
 import (
 	"context"
 
-	"github.com/ory/x/otelx"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/otelx"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

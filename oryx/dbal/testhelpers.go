@@ -10,9 +10,10 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/fsx"

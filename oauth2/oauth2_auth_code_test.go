@@ -1308,7 +1308,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				assert.NotEqual(t, consentRequestID, at2.Get("ext.crid").Str, "%s", at2)
 				assert.NotEqual(t, consentRequestID, rt2.Get("ext.crid").Str, "%s", rt2)
 
-				// revoken the first token chain by consent request id
+				// revoke the first token chain by consent request id
 				_, err = adminClient.OAuth2API.
 					RevokeOAuth2ConsentSessions(context.Background()).
 					ConsentRequestId(consentRequestID).

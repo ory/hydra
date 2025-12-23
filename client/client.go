@@ -43,7 +43,7 @@ type Client struct {
 	//
 	// The human-readable name of the client to be presented to the
 	// end-user during authorization.
-	Name string `json:"client_name" db:"client_name"`
+	Name string `json:"client_name,omitempty" db:"client_name"`
 
 	// OAuth 2.0 Client Secret
 	//
@@ -89,7 +89,7 @@ type Client struct {
 	// can use when requesting access tokens.
 	//
 	// Example: scope1 scope-2 scope.3 scope:4
-	Scope string `json:"scope" db:"scope"`
+	Scope string `json:"scope,omitempty" db:"scope"`
 
 	// OAuth 2.0 Client Audience
 	//
@@ -103,14 +103,14 @@ type Client struct {
 	// OAuth 2.0 Client Owner
 	//
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
-	Owner string `json:"owner" db:"owner"`
+	Owner string `json:"owner,omitempty" db:"owner"`
 
 	// OAuth 2.0 Client Policy URI
 	//
 	// PolicyURI is a URL string that points to a human-readable privacy policy document
 	// that describes how the deployment organization collects, uses,
 	// retains, and discloses personal data.
-	PolicyURI string `json:"policy_uri" db:"policy_uri"`
+	PolicyURI string `json:"policy_uri,omitempty" db:"policy_uri"`
 
 	// OAuth 2.0 Client Allowed CORS Origins
 	//
@@ -126,19 +126,19 @@ type Client struct {
 	// document for the client that describes a contractual relationship
 	// between the end-user and the client that the end-user accepts when
 	// authorizing the client.
-	TermsOfServiceURI string `json:"tos_uri" db:"tos_uri"`
+	TermsOfServiceURI string `json:"tos_uri,omitempty" db:"tos_uri"`
 
 	// OAuth 2.0 Client URI
 	//
 	// ClientURI is a URL string of a web page providing information about the client.
 	// If present, the server SHOULD display this URL to the end-user in
 	// a clickable fashion.
-	ClientURI string `json:"client_uri" db:"client_uri"`
+	ClientURI string `json:"client_uri,omitempty" db:"client_uri"`
 
 	// OAuth 2.0 Client Logo URI
 	//
 	// A URL string referencing the client's logo.
-	LogoURI string `json:"logo_uri" db:"logo_uri"`
+	LogoURI string `json:"logo_uri,omitempty" db:"logo_uri"`
 
 	// OAuth 2.0 Client Contact
 	//
@@ -146,7 +146,7 @@ type Client struct {
 	// for this client, typically email addresses.
 	//
 	// Example: help@example.org
-	Contacts sqlxx.StringSliceJSONFormat `json:"contacts" db:"contacts"`
+	Contacts sqlxx.StringSliceJSONFormat `json:"contacts,omitempty" db:"contacts"`
 
 	// OAuth 2.0 Client Secret Expires At
 	//
@@ -157,7 +157,7 @@ type Client struct {
 	//
 	// The `subject_types_supported` Discovery parameter contains a
 	// list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
-	SubjectType string `json:"subject_type" db:"subject_type" faker:"len=15"`
+	SubjectType string `json:"subject_type,omitempty" db:"subject_type" faker:"len=15"`
 
 	// OpenID Connect Sector Identifier URI
 	//

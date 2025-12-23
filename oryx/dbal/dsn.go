@@ -36,7 +36,7 @@ func NewSQLiteTestDatabase(t testing.TB) string {
 // NewSQLiteInMemoryDatabase creates a new in-memory, unique SQLite database
 // which is shared amongst all callers and identified by an individual file name.
 func NewSQLiteInMemoryDatabase(name string) string {
-	return fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared", name)
+	return fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared&_busy_timeout=1000", name)
 }
 
 // NewSQLiteDatabase creates a new on-disk, unique SQLite database
@@ -47,5 +47,5 @@ func NewSQLiteInMemoryDatabase(name string) string {
 // Additionally, shared cache mode is deprecated and discouraged, and the problem is better solved with the WAL,
 // according to official docs.
 func NewSQLiteDatabase(name string) string {
-	return fmt.Sprintf("sqlite://file:%s/test.db?_fk=true&_journal=WAL", name)
+	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&_journal_mode=WAL&_busy_timeout=1000", name)
 }

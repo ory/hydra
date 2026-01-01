@@ -13,7 +13,7 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.8.0
 	github.com/cenkalti/backoff/v3 v3.2.2
 	github.com/cristalhq/jwt/v4 v4.0.2
-	github.com/dgraph-io/ristretto v1.0.0
+	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/fatih/structs v1.1.0
 	github.com/go-faker/faker/v4 v4.6.0
 	github.com/go-jose/go-jose/v3 v3.0.4
@@ -100,7 +100,6 @@ require (
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v28.3.3+incompatible // indirect

@@ -9,14 +9,14 @@ import (
 	"github.com/ory/x/serverx"
 )
 
-func NewRouterPublic(metricsHandler *prometheusx.MetricsManager) *httprouterx.RouterPublic {
-	router := httprouterx.NewRouterPublic(metricsHandler)
+func NewRouterPublic(metricsManager *prometheusx.MetricsManager) *httprouterx.RouterPublic {
+	router := httprouterx.NewRouterPublic(metricsManager)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router
 }
 
-func NewRouterAdmin(metricsHandler *prometheusx.MetricsManager) *httprouterx.RouterAdmin {
-	router := httprouterx.NewRouterAdminWithPrefix(metricsHandler)
+func NewRouterAdmin(metricsManager *prometheusx.MetricsManager) *httprouterx.RouterAdmin {
+	router := httprouterx.NewRouterAdminWithPrefix(metricsManager)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	return router
 }

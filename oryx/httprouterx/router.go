@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"testing"
 
 	"github.com/ory/x/prometheusx"
 )
@@ -23,12 +24,22 @@ type (
 	RouterPublic struct{ router }
 )
 
+var DefaultTestMetricsManager = prometheusx.NewMetricsManager("", "", "", "")
+
 // NewRouterAdmin creates a new admin router.
 func NewRouterAdmin(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
 	return &RouterAdmin{router: router{
 		Mux:            http.NewServeMux(),
 		metricsManager: metricsManager,
 	}}
+}
+
+func NewTestRouterAdmin(_ *testing.T) *RouterAdmin {
+	return NewRouterAdmin(DefaultTestMetricsManager)
+}
+
+func NewTestRouterAdminWithPrefix(_ *testing.T) *RouterAdmin {
+	return NewRouterAdminWithPrefix(DefaultTestMetricsManager)
 }
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
@@ -46,9 +57,13 @@ func NewRouterPublic(metricsManager *prometheusx.MetricsManager) *RouterPublic {
 	}}
 }
 
+func NewTestRouterPublic(_ *testing.T) *RouterPublic {
+	return NewRouterPublic(DefaultTestMetricsManager)
+}
+
 // NewRouterAdminWithPrefix creates a new router with the admin prefix.
-func NewRouterAdminWithPrefix(metricsHandler *prometheusx.MetricsManager) *RouterAdmin {
-	r := NewRouterAdmin(metricsHandler)
+func NewRouterAdminWithPrefix(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
+	r := NewRouterAdmin(metricsManager)
 	r.prefix = AdminPrefix
 	return r
 }

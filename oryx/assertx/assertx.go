@@ -19,7 +19,7 @@ import (
 func PrettifyJSONPayload(t testing.TB, payload interface{}) string {
 	t.Helper()
 	o, err := json.MarshalIndent(payload, "", "  ")
-	require.NoError(t, err)
+	require.NoErrorf(t, err, "%+v", payload)
 	return string(o)
 }
 

@@ -16,7 +16,7 @@ const (
 
 var RootContext = context.WithValue(context.Background(), ValidContextKey, true)
 
-func TestRootContext(t *testing.T) context.Context {
+func TestRootContext(t testing.TB) context.Context {
 	return context.WithValue(t.Context(), ValidContextKey, true)
 }
 

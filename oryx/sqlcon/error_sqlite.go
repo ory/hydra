@@ -33,6 +33,11 @@ func handleSqlite(err error) error {
 			return errors.WithStack(ErrConcurrentUpdate.WithWrap(err))
 		}
 
+		if strings.HasPrefix(e.Error(), "no such column:") ||
+			strings.Contains(e.Error(), "has no column named") {
+			return errors.WithStack(ErrNoSuchColumn.WithWrap(err))
+		}
+
 		return errors.WithStack(err)
 	}
 

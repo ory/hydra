@@ -108,7 +108,10 @@ func (r *router) handle(method string, route string, handler http.Handler) {
 func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.Mux.ServeHTTP(w, req) }
 
 func TrimTrailingSlashNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+	// Don't trim the root path to avoid redirect loops
+	if r.URL.Path != "/" {
+		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+	}
 
 	next(rw, r)
 }

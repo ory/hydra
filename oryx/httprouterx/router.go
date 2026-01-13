@@ -16,20 +16,39 @@ const AdminPrefix = "/admin"
 
 type (
 	router struct {
-		Mux            *http.ServeMux
+		mux            *http.ServeMux
 		prefix         string
 		metricsManager *prometheusx.MetricsManager
 	}
 	RouterAdmin  struct{ router }
 	RouterPublic struct{ router }
+
+	Router interface {
+		http.Handler
+		GET(route string, handle http.HandlerFunc)
+		HEAD(route string, handle http.HandlerFunc)
+		POST(route string, handle http.HandlerFunc)
+		PUT(route string, handle http.HandlerFunc)
+		PATCH(route string, handle http.HandlerFunc)
+		DELETE(route string, handle http.HandlerFunc)
+		Handler(method, route string, handler http.Handler)
+	}
 )
+
+// NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
+func NewRouter(metricsManager *prometheusx.MetricsManager) Router {
+	return &router{
+		mux:            http.NewServeMux(),
+		metricsManager: metricsManager,
+	}
+}
 
 var DefaultTestMetricsManager = prometheusx.NewMetricsManager("", "", "", "")
 
 // NewRouterAdmin creates a new admin router.
 func NewRouterAdmin(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
 	return &RouterAdmin{router: router{
-		Mux:            http.NewServeMux(),
+		mux:            http.NewServeMux(),
 		metricsManager: metricsManager,
 	}}
 }
@@ -44,7 +63,7 @@ func NewTestRouterAdminWithPrefix(_ *testing.T) *RouterAdmin {
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
 	return &RouterPublic{router: router{
-		Mux:            r.Mux,
+		mux:            r.mux,
 		metricsManager: r.metricsManager,
 	}}
 }
@@ -52,7 +71,7 @@ func (r *RouterAdmin) ToPublic() *RouterPublic {
 // NewRouterPublic returns a public router.
 func NewRouterPublic(metricsManager *prometheusx.MetricsManager) *RouterPublic {
 	return &RouterPublic{router: router{
-		Mux:            http.NewServeMux(),
+		mux:            http.NewServeMux(),
 		metricsManager: metricsManager,
 	}}
 }
@@ -97,7 +116,7 @@ func (r *router) Handler(method, route string, handler http.Handler) {
 }
 
 func (r *router) handle(method string, route string, handler http.Handler) {
-	r.Mux.HandleFunc(method+" "+path.Join(r.prefix, route), func(w http.ResponseWriter, req *http.Request) {
+	r.mux.HandleFunc(method+" "+path.Join(r.prefix, route), func(w http.ResponseWriter, req *http.Request) {
 		// In order the get the right metrics for the right path, `req.Pattern` must have been filled by the http router.
 		// This is the case at this point, but not before e.g. when the prometheus middleware runs as a negroni middleware:
 		// the http router has not run yet and `req.Pattern` is empty.
@@ -105,7 +124,7 @@ func (r *router) handle(method string, route string, handler http.Handler) {
 	})
 }
 
-func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.Mux.ServeHTTP(w, req) }
+func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.mux.ServeHTTP(w, req) }
 
 func TrimTrailingSlashNegroni(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")

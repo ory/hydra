@@ -17,20 +17,16 @@ const (
 )
 
 // Handler handles HTTP requests to health and version endpoints.
-type Handler struct {
-	H             herodot.Writer
-	VersionString string
-}
+// Deprecated: use the standalone SetMuxRoutes function instead
+type Handler struct{}
 
 // NewHandler instantiates a handler.
+// Deprecated: use SetMuxRoutes instead
 func NewHandler(
-	h herodot.Writer,
-	version string,
+	_ herodot.Writer,
+	_ string,
 ) *Handler {
-	return &Handler{
-		H:             h,
-		VersionString: version,
-	}
+	return &Handler{}
 }
 
 type router interface {
@@ -38,6 +34,7 @@ type router interface {
 }
 
 // SetRoutes registers this handler's routes.
+// Deprecated: use SetMuxRoutes instead
 func (h *Handler) SetRoutes(r router) {
 	r.GET(MetricsPrometheusPath, h.Metrics)
 }
@@ -47,7 +44,13 @@ type muxrouter interface {
 }
 
 // SetMuxRoutes registers this handler's routes on a ServeMux.
+// Deprecated: use the standalone SetMuxRoutes function instead
 func (h *Handler) SetMuxRoutes(mux muxrouter) {
+	mux.GET(MetricsPrometheusPath, promhttp.Handler().ServeHTTP)
+}
+
+// SetMuxRoutes registers the prometheus handler.
+func SetMuxRoutes(mux muxrouter) {
 	mux.GET(MetricsPrometheusPath, promhttp.Handler().ServeHTTP)
 }
 

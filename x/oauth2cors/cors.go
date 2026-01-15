@@ -7,19 +7,18 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/hydra/v2/client"
-	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
-
 	"github.com/gobwas/glob"
 	"github.com/rs/cors"
 
+	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/fosite"
+	"github.com/ory/hydra/v2/oauth2"
+	"github.com/ory/x/logrusx"
 )
 
 func Middleware(
 	reg interface {
-		x.RegistryLogger
+		logrusx.Provider
 		oauth2.Registry
 		client.Registry
 	}) func(h http.Handler) http.Handler {

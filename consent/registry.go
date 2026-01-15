@@ -9,14 +9,17 @@ import (
 	"github.com/ory/hydra/v2/fosite/handler/openid"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
 )
 
 type InternalRegistry interface {
-	x.RegistryWriter
+	httpx.WriterProvider
 	x.RegistryCookieStore
-	x.RegistryLogger
-	x.HTTPClientProvider
-	x.TracingProvider
+	logrusx.Provider
+	httpx.ClientProvider
+	otelx.Provider
 	x.NetworkProvider
 	kratos.Provider
 	Registry

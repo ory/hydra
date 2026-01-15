@@ -24,18 +24,6 @@ type noInternalIPRoundTripper struct {
 	internalIPExceptions        []string
 }
 
-// NewNoInternalIPRoundTripper creates a RoundTripper that disallows
-// non-publicly routable IP addresses, except for URLs matching the given
-// exception globs.
-// Deprecated: Use ResilientClientDisallowInternalIPs instead.
-func NewNoInternalIPRoundTripper(exceptions []string) http.RoundTripper {
-	return &noInternalIPRoundTripper{
-		onWhitelist:          allowInternalAllowIPv6,
-		notOnWhitelist:       prohibitInternalAllowIPv6,
-		internalIPExceptions: exceptions,
-	}
-}
-
 // RoundTrip implements http.RoundTripper.
 func (n noInternalIPRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
 	incoming := IncomingRequestURL(request)

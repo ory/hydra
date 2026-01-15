@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/x/otelx"
+
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
@@ -92,7 +94,7 @@ func LoginNIDTest(t1ValidNID, t2InvalidNID consent.LoginManager) func(t *testing
 
 type Deps interface {
 	contextx.Provider
-	x.TracingProvider
+	otelx.Provider
 	x.NetworkProvider
 	config.Provider
 }

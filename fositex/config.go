@@ -12,6 +12,8 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 
+	"github.com/ory/x/httpx"
+
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/fosite/compose"
@@ -28,7 +30,7 @@ type (
 	configDependencies interface {
 		config.Provider
 		persistence.Provider
-		x.HTTPClientProvider
+		httpx.ClientProvider
 		ClientHasher() fosite.Hasher
 		ExtraFositeFactories() []Factory
 	}

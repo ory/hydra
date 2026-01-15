@@ -53,8 +53,8 @@ type (
 		FlowCipher() *aead.XChaCha20Poly1305
 		Kratos() kratos.Client
 		contextx.Provider
-		x.RegistryLogger
-		x.TracingProvider
+		logrusx.Provider
+		otelx.Provider
 		config.Provider
 	}
 	BasePersister struct {
@@ -63,8 +63,8 @@ type (
 		d           baseDependencies
 	}
 	baseDependencies interface {
-		x.RegistryLogger
-		x.TracingProvider
+		logrusx.Provider
+		otelx.Provider
 		contextx.Provider
 		config.Provider
 		jwk.ManagerProvider

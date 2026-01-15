@@ -198,17 +198,9 @@ func toHeaderMap(headers []string) map[string]struct{} {
 	return m
 }
 
-func (c *nullConfigurator) Bool(_ string) bool {
-	return false
-}
-
-func (c *nullConfigurator) String(_ string) string {
-	return ""
-}
-
-func (c *nullConfigurator) Strings(_ string) []string {
-	return []string{}
-}
+func (c *nullConfigurator) Bool(_ string) bool        { return false }
+func (c *nullConfigurator) String(_ string) string    { return "" }
+func (c *nullConfigurator) Strings(_ string) []string { return []string{} }
 
 func newOptions(opts []Option) *options {
 	o := new(options)

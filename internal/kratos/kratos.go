@@ -11,9 +11,10 @@ import (
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
 
+	"github.com/ory/x/logrusx"
+
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
-	"github.com/ory/hydra/v2/x"
 	client "github.com/ory/kratos-client-go"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/otelx"
@@ -22,9 +23,9 @@ import (
 type (
 	dependencies interface {
 		config.Provider
-		x.HTTPClientProvider
-		x.TracingProvider
-		x.RegistryLogger
+		httpx.ClientProvider
+		otelx.Provider
+		logrusx.Provider
 	}
 	Provider interface {
 		Kratos() Client

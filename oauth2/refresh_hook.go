@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httpx"
 
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
@@ -50,7 +50,7 @@ type RefreshTokenHookRequest struct {
 // RefreshTokenHook is an AccessRequestHook called for `refresh_token` grant type.
 func RefreshTokenHook(reg interface {
 	config.Provider
-	x.HTTPClientProvider
+	httpx.ClientProvider
 }) AccessRequestHook {
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
 		hookConfig := reg.Config().TokenRefreshHookConfig(ctx)

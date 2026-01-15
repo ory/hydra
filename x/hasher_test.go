@@ -27,7 +27,7 @@ func (c hasherConfig) HasherBcryptConfig(_ context.Context) *hasherx.BCryptConfi
 }
 
 func (c hasherConfig) GetHasherAlgorithm(_ context.Context) string { return hashAlgorithmPBKDF2 }
-func (c hasherConfig) Tracer(_ context.Context) *otelx.Tracer      { return otelx.NewNoop(nil, nil) }
+func (c hasherConfig) Tracer(_ context.Context) *otelx.Tracer      { return otelx.NewNoop() }
 
 func TestHasher(t *testing.T) {
 	for _, cost := range []uint32{1, 8, 10} {

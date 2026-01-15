@@ -15,9 +15,10 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httpx"
+
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/ipx"
 )
 
@@ -38,7 +39,7 @@ func isSupportedAuthTokenSigningAlg(alg string) bool {
 }
 
 type validatorRegistry interface {
-	x.HTTPClientProvider
+	httpx.ClientProvider
 	config.Provider
 }
 

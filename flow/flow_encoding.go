@@ -19,7 +19,7 @@ type decodeDependencies interface {
 	CipherProvider
 	x.NetworkProvider
 	config.Provider
-	x.TracingProvider
+	otelx.Provider
 }
 
 func decodeFlow(ctx context.Context, d decodeDependencies, enc string, p purpose) (_ *Flow, err error) {

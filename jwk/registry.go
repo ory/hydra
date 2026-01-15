@@ -4,13 +4,15 @@
 package jwk
 
 import (
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/logrusx"
+
 	"github.com/ory/hydra/v2/driver/config"
-	"github.com/ory/hydra/v2/x"
 )
 
 type InternalRegistry interface {
-	x.RegistryWriter
-	x.RegistryLogger
+	httpx.WriterProvider
+	logrusx.Provider
 	Registry
 }
 

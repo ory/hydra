@@ -13,15 +13,18 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2/trust"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
 )
 
 type InternalRegistry interface {
 	client.Registry
 	jwk.Registry
 	trust.Registry
-	x.RegistryWriter
-	x.RegistryLogger
-	x.TracingProvider
+	httpx.WriterProvider
+	logrusx.Provider
+	otelx.Provider
 	x.Transactor
 	consent.Registry
 	Registry

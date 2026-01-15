@@ -14,7 +14,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus/hooks/test"
 
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/fsx"
 	"github.com/ory/x/logrusx"
@@ -39,7 +38,7 @@ type (
 		mbs popx.MigrationStatuses
 	}
 	migrationDependencies interface {
-		x.RegistryLogger
+		logrusx.Provider
 	}
 )
 

@@ -16,15 +16,6 @@ import (
 // ErrPrivateIPAddressDisallowed is returned when a private IP address is disallowed.
 type ErrPrivateIPAddressDisallowed error
 
-// DisallowPrivateIPAddressesWhenSet is a wrapper for DisallowIPPrivateAddresses which returns valid
-// when ipOrHostnameOrURL is empty.
-func DisallowPrivateIPAddressesWhenSet(ipOrHostnameOrURL string) error {
-	if ipOrHostnameOrURL == "" {
-		return nil
-	}
-	return DisallowIPPrivateAddresses(ipOrHostnameOrURL)
-}
-
 // DisallowIPPrivateAddresses returns nil for a domain (with NS lookup), IP, or IPv6 address if it
 // does not resolve to a private IP subnet. This is a first level of defense against
 // SSRF attacks by disallowing any domain or IP to resolve to a private network range.

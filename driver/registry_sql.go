@@ -597,7 +597,7 @@ func (m *RegistrySQL) Tracer(_ context.Context) *otelx.Tracer {
 		}
 	}
 	if m.trc == nil || m.trc.Tracer() == nil {
-		m.trc = otelx.NewNoop(m.l, m.Config().Tracing())
+		m.trc = otelx.NewNoop()
 	}
 
 	return m.trc

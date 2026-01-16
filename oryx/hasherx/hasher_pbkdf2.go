@@ -11,12 +11,13 @@ import (
 	"fmt"
 	"hash"
 
-	"github.com/ory/x/otelx"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/sha3"
+
+	"github.com/ory/x/otelx"
 )
 
 type (

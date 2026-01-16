@@ -29,9 +29,6 @@ import (
 )
 
 type (
-	// HTTP decodes json and form-data from HTTP Request Bodies.
-	HTTP struct{}
-
 	httpDecoderOptions struct {
 		keepRequestBody           bool
 		allowedContentTypes       []string
@@ -218,12 +215,7 @@ func newHTTPDecoderOptions(fs []HTTPDecoderOption) *httpDecoderOptions {
 	return o
 }
 
-// NewHTTP creates a new HTTP decoder.
-func NewHTTP() *HTTP {
-	return new(HTTP)
-}
-
-func (t *HTTP) validateRequest(r *http.Request, c *httpDecoderOptions) error {
+func validateRequest(r *http.Request, c *httpDecoderOptions) error {
 	method := strings.ToUpper(r.Method)
 
 	if !slices.Contains(c.allowedHTTPMethods, method) {
@@ -243,7 +235,7 @@ func (t *HTTP) validateRequest(r *http.Request, c *httpDecoderOptions) error {
 	return nil
 }
 
-func (t *HTTP) validatePayload(ctx context.Context, raw json.RawMessage, c *httpDecoderOptions) error {
+func validatePayload(ctx context.Context, raw json.RawMessage, c *httpDecoderOptions) error {
 	if !c.jsonSchemaValidate {
 		return nil
 	}
@@ -258,7 +250,7 @@ func (t *HTTP) validatePayload(ctx context.Context, raw json.RawMessage, c *http
 	}
 
 	if err := schema.Validate(bytes.NewBuffer(raw)); err != nil {
-		if _, ok := err.(*jsonschema.ValidationError); ok {
+		if errors.As(err, new(*jsonschema.ValidationError)) {
 			return errors.WithStack(err)
 		}
 		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to process JSON Schema and input: %s", err).WithDebug(err.Error()))
@@ -267,28 +259,28 @@ func (t *HTTP) validatePayload(ctx context.Context, raw json.RawMessage, c *http
 	return nil
 }
 
-// Decode takes a HTTP Request Body and decodes it into destination.
-func (t *HTTP) Decode(r *http.Request, destination interface{}, opts ...HTTPDecoderOption) error {
+// Decode takes an HTTP Request Body and decodes it into destination.
+func Decode(r *http.Request, destination any, opts ...HTTPDecoderOption) error {
 	c := newHTTPDecoderOptions(opts)
-	if err := t.validateRequest(r, c); err != nil {
+	if err := validateRequest(r, c); err != nil {
 		return err
 	}
 
 	if r.Method == "GET" {
-		return t.decodeForm(r, destination, c)
+		return decodeForm(r, destination, c)
 	} else if httpx.HasContentType(r, httpContentTypeJSON) {
 		if c.expectJSONFlattened {
-			return t.decodeJSONForm(r, destination, c)
+			return decodeJSONForm(r, destination, c)
 		}
-		return t.decodeJSON(r, destination, c)
+		return decodeJSON(r, destination, c)
 	} else if httpx.HasContentType(r, httpContentTypeMultipartForm, httpContentTypeURLEncodedForm) {
-		return t.decodeForm(r, destination, c)
+		return decodeForm(r, destination, c)
 	}
 
 	return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to determine decoder for content type: %s", r.Header.Get("Content-Type")))
 }
 
-func (t *HTTP) requestBody(r *http.Request, o *httpDecoderOptions) (reader io.ReadCloser, err error) {
+func requestBody(r *http.Request, o *httpDecoderOptions) (reader io.ReadCloser, err error) {
 	if strings.ToUpper(r.Method) == "GET" {
 		return io.NopCloser(bytes.NewBufferString(r.URL.Query().Encode())), nil
 	}
@@ -308,7 +300,7 @@ func (t *HTTP) requestBody(r *http.Request, o *httpDecoderOptions) (reader io.Re
 	return io.NopCloser(bytes.NewBuffer(bodyBytes)), nil
 }
 
-func (t *HTTP) decodeJSONForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
+func decodeJSONForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
 	if o.jsonSchemaCompiler == nil {
 		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
 	}
@@ -318,7 +310,7 @@ func (t *HTTP) decodeJSONForm(r *http.Request, destination interface{}, o *httpD
 		return errors.WithStack(herodot.ErrInternalServerError.WithTrace(err).WithReasonf("Unable to prepare JSON Schema for HTTP Post Body Form parsing: %s", err).WithDebugf("%+v", err))
 	}
 
-	reader, err := t.requestBody(r, o)
+	reader, err := requestBody(r, o)
 	if err != nil {
 		return err
 	}
@@ -346,7 +338,7 @@ func (t *HTTP) decodeJSONForm(r *http.Request, destination interface{}, o *httpD
 		}
 	}
 
-	raw, err := t.decodeURLValues(values, paths, o)
+	raw, err := decodeURLValues(values, paths, o)
 	if err != nil {
 		return err
 	}
@@ -355,15 +347,15 @@ func (t *HTTP) decodeJSONForm(r *http.Request, destination interface{}, o *httpD
 		return errors.WithStack(err)
 	}
 
-	return t.validatePayload(r.Context(), raw, o)
+	return validatePayload(r.Context(), raw, o)
 }
 
-func (t *HTTP) decodeForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
+func decodeForm(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
 	if o.jsonSchemaCompiler == nil {
 		return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Unable to decode HTTP Form Body because no validation schema was provided. This is a code bug."))
 	}
 
-	reader, err := t.requestBody(r, o)
+	reader, err := requestBody(r, o)
 	if err != nil {
 		return err
 	}
@@ -386,7 +378,7 @@ func (t *HTTP) decodeForm(r *http.Request, destination interface{}, o *httpDecod
 		values = r.Form
 	}
 
-	raw, err := t.decodeURLValues(values, paths, o)
+	raw, err := decodeURLValues(values, paths, o)
 	if err != nil && !errors.Is(err, errKeyNotFound) {
 		return err
 	}
@@ -395,10 +387,10 @@ func (t *HTTP) decodeForm(r *http.Request, destination interface{}, o *httpDecod
 		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode JSON payload: %s", err))
 	}
 
-	return t.validatePayload(r.Context(), raw, o)
+	return validatePayload(r.Context(), raw, o)
 }
 
-func (t *HTTP) decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoderOptions) (json.RawMessage, error) {
+func decodeURLValues(values url.Values, paths []jsonschemax.Path, o *httpDecoderOptions) (json.RawMessage, error) {
 	raw := json.RawMessage(`{}`)
 	for key := range values {
 		for _, path := range paths {
@@ -542,8 +534,8 @@ func (t *HTTP) decodeURLValues(values url.Values, paths []jsonschemax.Path, o *h
 	return raw, nil
 }
 
-func (t *HTTP) decodeJSON(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
-	reader, err := t.requestBody(r, o)
+func decodeJSON(r *http.Request, destination interface{}, o *httpDecoderOptions) error {
+	reader, err := requestBody(r, o)
 	if err != nil {
 		return err
 	}
@@ -558,9 +550,9 @@ func (t *HTTP) decodeJSON(r *http.Request, destination interface{}, o *httpDecod
 		return errors.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode JSON payload: %s", err).WithDebugf("Received request body: %s", string(raw)))
 	}
 
-	if err := t.validatePayload(r.Context(), raw, o); err != nil {
+	if err := validatePayload(r.Context(), raw, o); err != nil {
 		if o.expectJSONFlattened && strings.Contains(err.Error(), "json: unknown field") {
-			return t.decodeJSONForm(r, destination, o)
+			return decodeJSONForm(r, destination, o)
 		}
 		return err
 	}

@@ -28,7 +28,7 @@ type OTLPConfig struct {
 
 type JaegerSampling struct {
 	ServerURL    string  `json:"server_url"`
-	TraceIdRatio float64 `json:"trace_id_ratio"`
+	TraceIDRatio float64 `json:"trace_id_ratio"`
 }
 
 type ZipkinSampling struct {
@@ -53,7 +53,7 @@ type Config struct {
 }
 
 //go:embed config.schema.json
-var ConfigSchema string
+var ConfigSchema []byte
 
 const ConfigSchemaID = "ory://tracing-config"
 
@@ -61,6 +61,7 @@ const ConfigSchemaID = "ory://tracing-config"
 // The interface is specified instead of `jsonschema.Compiler` to allow the use of any jsonschema library fork or version.
 func AddConfigSchema(c interface {
 	AddResource(url string, r io.Reader) error
-}) error {
-	return c.AddResource(ConfigSchemaID, bytes.NewBufferString(ConfigSchema))
+},
+) error {
+	return c.AddResource(ConfigSchemaID, bytes.NewReader(ConfigSchema))
 }

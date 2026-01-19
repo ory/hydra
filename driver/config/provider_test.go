@@ -221,12 +221,12 @@ func TestProviderValidates(t *testing.T) {
 	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-public-api",
-		Mode:  0775,
+		Mode:  0o775,
 	}
 	expectedAdminPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-admin-api",
-		Mode:  0770,
+		Mode:  0o770,
 	}
 	assert.Equal(t, expectedPublicPermission, &servePublic.Socket)
 	assert.Equal(t, expectedAdminPermission, &serveAdmin.Socket)
@@ -353,7 +353,7 @@ func TestProviderValidates(t *testing.T) {
 				LocalAgentAddress: "127.0.0.1:6831",
 				Sampling: otelx.JaegerSampling{
 					ServerURL:    "http://sampling",
-					TraceIdRatio: 1,
+					TraceIDRatio: 1,
 				},
 			},
 			Zipkin: otelx.ZipkinConfig{
@@ -380,13 +380,13 @@ func TestSetPerm(t *testing.T) {
 	_ = (&configx.UnixPermission{
 		Owner: "",
 		Group: "",
-		Mode:  0654,
+		Mode:  0o654,
 	}).SetPermission(path)
 
 	stat, err := f.Stat()
 	require.NoError(t, err)
 
-	assert.Equal(t, os.FileMode(0654), stat.Mode())
+	assert.Equal(t, os.FileMode(0o654), stat.Mode())
 
 	require.NoError(t, f.Close())
 	require.NoError(t, os.Remove(path))

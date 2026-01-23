@@ -5,6 +5,7 @@ package sql
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gofrs/uuid"
 	"go.opentelemetry.io/otel/trace"
@@ -77,11 +78,33 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 
 		if cl.Secret == "" {
 			cl.Secret = string(o.GetHashedSecret())
+			if cl.RotatedSecrets == "" {
+				cl.RotatedSecrets = o.RotatedSecrets
+			}
 		} else {
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
 				return err
 			}
+
+			oldSecret := string(o.GetHashedSecret())
+			if oldSecret != "" && oldSecret != string(h) {
+				var rotated []string
+				if o.RotatedSecrets != "" {
+					if err := json.Unmarshal([]byte(o.RotatedSecrets), &rotated); err != nil {
+						rotated = []string{}
+					}
+				}
+				rotated = append(rotated, oldSecret)
+				rotatedJSON, err := json.Marshal(rotated)
+				if err != nil {
+					return err
+				}
+				cl.RotatedSecrets = string(rotatedJSON)
+			} else {
+				cl.RotatedSecrets = o.RotatedSecrets
+			}
+
 			cl.Secret = string(h)
 		}
 

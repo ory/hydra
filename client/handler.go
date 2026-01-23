@@ -891,6 +891,24 @@ func (h *Handler) rotateOAuth2ClientSecret(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// Move current secret to rotated secrets
+	oldSecret := string(c.GetHashedSecret())
+	if oldSecret != "" {
+		var rotated []string
+		if c.RotatedSecrets != "" {
+			if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+				rotated = []string{}
+			}
+		}
+		rotated = append(rotated, oldSecret)
+		rotatedJSON, err := json.Marshal(rotated)
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+		c.RotatedSecrets = string(rotatedJSON)
+	}
+
 	secretb, err := x.GenerateSecret(26)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

@@ -56,6 +56,21 @@ func TestSecretRotation_E2E(t *testing.T) {
 			c, err := reg.ClientManager().GetConcreteClient(ctx, clientID)
 			require.NoError(t, err)
 
+			// Move current secret to rotated secrets (simulating what the rotate endpoint does)
+			oldSecret := string(c.GetHashedSecret())
+			if oldSecret != "" {
+				var rotated []string
+				if c.RotatedSecrets != "" {
+					if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+						rotated = []string{}
+					}
+				}
+				rotated = append(rotated, oldSecret)
+				rotatedJSON, err := json.Marshal(rotated)
+				require.NoError(t, err)
+				c.RotatedSecrets = string(rotatedJSON)
+			}
+
 			c.Secret = newSecret
 			err = reg.ClientManager().UpdateClient(ctx, c)
 			require.NoError(t, err)
@@ -146,6 +161,22 @@ func TestSecretRotation_E2E(t *testing.T) {
 		secret2 := uuid.Must(uuid.NewV4()).String()
 		c, err := reg.ClientManager().GetConcreteClient(ctx, clientID)
 		require.NoError(t, err)
+
+		// Move current secret to rotated secrets
+		oldSecret := string(c.GetHashedSecret())
+		if oldSecret != "" {
+			var rotated []string
+			if c.RotatedSecrets != "" {
+				if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+					rotated = []string{}
+				}
+			}
+			rotated = append(rotated, oldSecret)
+			rotatedJSON, err := json.Marshal(rotated)
+			require.NoError(t, err)
+			c.RotatedSecrets = string(rotatedJSON)
+		}
+
 		c.Secret = secret2
 		err = reg.ClientManager().UpdateClient(ctx, c)
 		require.NoError(t, err)
@@ -154,6 +185,22 @@ func TestSecretRotation_E2E(t *testing.T) {
 		secret3 := uuid.Must(uuid.NewV4()).String()
 		c, err = reg.ClientManager().GetConcreteClient(ctx, clientID)
 		require.NoError(t, err)
+
+		// Move current secret to rotated secrets
+		oldSecret = string(c.GetHashedSecret())
+		if oldSecret != "" {
+			var rotated []string
+			if c.RotatedSecrets != "" {
+				if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+					rotated = []string{}
+				}
+			}
+			rotated = append(rotated, oldSecret)
+			rotatedJSON, err := json.Marshal(rotated)
+			require.NoError(t, err)
+			c.RotatedSecrets = string(rotatedJSON)
+		}
+
 		c.Secret = secret3
 		err = reg.ClientManager().UpdateClient(ctx, c)
 		require.NoError(t, err)

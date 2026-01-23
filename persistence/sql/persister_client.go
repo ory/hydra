@@ -5,7 +5,6 @@ package sql
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/gofrs/uuid"
 	"go.opentelemetry.io/otel/trace"
@@ -77,35 +76,24 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) (err er
 		}
 
 		if cl.Secret == "" {
+			// Secret not being changed, preserve it and rotated secrets
 			cl.Secret = string(o.GetHashedSecret())
 			if cl.RotatedSecrets == "" {
 				cl.RotatedSecrets = o.RotatedSecrets
 			}
 		} else {
+			// New secret provided - hash it and clear rotated secrets
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
 				return err
 			}
 
-			oldSecret := string(o.GetHashedSecret())
-			if oldSecret != "" && oldSecret != string(h) {
-				var rotated []string
-				if o.RotatedSecrets != "" {
-					if err := json.Unmarshal([]byte(o.RotatedSecrets), &rotated); err != nil {
-						rotated = []string{}
-					}
-				}
-				rotated = append(rotated, oldSecret)
-				rotatedJSON, err := json.Marshal(rotated)
-				if err != nil {
-					return err
-				}
-				cl.RotatedSecrets = string(rotatedJSON)
-			} else {
-				cl.RotatedSecrets = o.RotatedSecrets
-			}
-
 			cl.Secret = string(h)
+			// Clear rotated secrets when secret is replaced (not rotated)
+			// Only preserve if explicitly set by the rotate endpoint
+			if cl.RotatedSecrets == "" {
+				cl.RotatedSecrets = ""
+			}
 		}
 
 		// Ensure ID is the same

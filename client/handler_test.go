@@ -561,7 +561,7 @@ func TestHandler(t *testing.T) {
 				payload, _ := sjson.Set(expected, "redirect_uris", []string{"http://localhost:3000/cb", "https://foobar.com"})
 				body, res := makeJSON(t, adminTs, "PUT", urlx.MustJoin(client.ClientsHandlerPath, url.PathEscape(expectedID)), json.RawMessage(payload))
 				assert.Equal(t, http.StatusOK, res.StatusCode)
-				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token"))
+				snapshotx.SnapshotT(t, newResponseSnapshot(body, res), snapshotx.ExceptPaths("body.created_at", "body.updated_at", "body.client_id", "body.registration_client_uri", "body.registration_access_token", "body.rotated_secrets"))
 			})
 
 			t.Run("endpoint=dynamic client registration", func(t *testing.T) {

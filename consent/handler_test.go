@@ -17,14 +17,13 @@ import (
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
 	. "github.com/ory/hydra/v2/consent"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/flow"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/ioutilx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/uuidx"
 )
@@ -35,7 +34,7 @@ func TestGetLogoutRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -101,7 +100,7 @@ func TestGetLoginRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -168,7 +167,7 @@ func TestGetConsentRequest(t *testing.T) {
 	reg := testhelpers.NewRegistryMemory(t)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -245,7 +244,7 @@ func TestAcceptLoginRequestDouble(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	defer ts.Close()
@@ -286,7 +285,7 @@ func TestAcceptCodeDeviceRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	h := NewHandler(reg)
-	r := x.NewRouterAdmin(prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date))
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetRoutes(r)
 	ts := httptest.NewServer(r)
 	t.Cleanup(ts.Close)

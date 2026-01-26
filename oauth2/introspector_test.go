@@ -23,7 +23,7 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
-	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/httprouterx"
 )
 
 func TestIntrospectorSDK(t *testing.T) {
@@ -44,8 +44,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	c.Scope = "fosite,openid,photos,offline,foo.*"
 	require.NoError(t, reg.ClientManager().UpdateClient(context.TODO(), c))
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	router := x.NewRouterAdmin(metrics)
+	router := httprouterx.NewTestRouterAdminWithPrefix(t)
 	handler := oauth2.NewHandler(reg)
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

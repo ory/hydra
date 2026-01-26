@@ -5,19 +5,17 @@ package prometheusx
 
 import (
 	"net/http"
-	"strconv"
+	"regexp"
+	"strings"
 
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-
-	"github.com/ory/x/httpx"
-
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/urfave/negroni"
 )
 
-// Metrics prototypes
-type Metrics struct {
+type HTTPMetrics struct {
 	responseTime    *prometheus.HistogramVec
 	totalRequests   *prometheus.CounterVec
 	duration        *prometheus.HistogramVec
@@ -26,11 +24,9 @@ type Metrics struct {
 	handlerStatuses *prometheus.CounterVec
 }
 
-const HTTPMetrics = "http"
-const GRPCMetrics = "grpc"
+const HTTPPrefix = "http"
 
-// NewMetrics creates new custom Prometheus metrics
-func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
+func NewHTTPMetrics(app, metricsPrefix, version, hash, date string) *HTTPMetrics {
 	labels := map[string]string{
 		"app":       app,
 		"version":   version,
@@ -42,7 +38,7 @@ func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
 		metricsPrefix += "_"
 	}
 
-	pm := &Metrics{
+	pm := &HTTPMetrics{
 		responseTime: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name:        metricsPrefix + "response_time_seconds",
@@ -91,7 +87,7 @@ func NewMetrics(app, metricsPrefix, version, hash, date string) *Metrics {
 }
 
 // Describe implements prometheus Collector interface.
-func (h *Metrics) Describe(in chan<- *prometheus.Desc) {
+func (h *HTTPMetrics) Describe(in chan<- *prometheus.Desc) {
 	h.duration.Describe(in)
 	h.totalRequests.Describe(in)
 	h.requestSize.Describe(in)
@@ -101,7 +97,7 @@ func (h *Metrics) Describe(in chan<- *prometheus.Desc) {
 }
 
 // Collect implements prometheus Collector interface.
-func (h *Metrics) Collect(in chan<- prometheus.Metric) {
+func (h *HTTPMetrics) Collect(in chan<- prometheus.Metric) {
 	h.duration.Collect(in)
 	h.totalRequests.Collect(in)
 	h.requestSize.Collect(in)
@@ -110,14 +106,13 @@ func (h *Metrics) Collect(in chan<- prometheus.Metric) {
 	h.responseTime.Collect(in)
 }
 
-func (h Metrics) instrumentHandlerStatusBucket(next http.Handler) http.HandlerFunc {
+func (h *HTTPMetrics) instrumentHandlerStatusBucket(next http.Handler) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(rw, r)
-
-		status, _ := httpx.GetResponseMeta(rw)
+		rr := negroni.NewResponseWriter(rw)
+		next.ServeHTTP(rr, r)
 
 		statusBucket := "unknown"
-		switch {
+		switch status := rr.Status(); {
 		case status >= 200 && status <= 299:
 			statusBucket = "2xx"
 		case status >= 300 && status <= 399:
@@ -133,14 +128,10 @@ func (h Metrics) instrumentHandlerStatusBucket(next http.Handler) http.HandlerFu
 	}
 }
 
-// Instrument will instrument any http.HandlerFunc with custom metrics
-func (h Metrics) Instrument(rw http.ResponseWriter, next http.HandlerFunc, endpoint string) http.HandlerFunc {
+// Instrument will instrument any http.Handler with custom metrics
+func (h *HTTPMetrics) Instrument(next http.Handler, endpoint string) http.Handler {
 	labels := prometheus.Labels{}
 	labelsWithEndpoint := prometheus.Labels{"endpoint": endpoint}
-	if status, _ := httpx.GetResponseMeta(rw); status != 0 {
-		labels = prometheus.Labels{"code": strconv.Itoa(status)}
-		labelsWithEndpoint["code"] = labels["code"]
-	}
 	wrapped := promhttp.InstrumentHandlerResponseSize(h.responseSize.MustCurryWith(labels), next)
 	wrapped = promhttp.InstrumentHandlerCounter(h.totalRequests.MustCurryWith(labelsWithEndpoint), wrapped)
 	wrapped = promhttp.InstrumentHandlerDuration(h.duration.MustCurryWith(labelsWithEndpoint), wrapped)
@@ -148,5 +139,11 @@ func (h Metrics) Instrument(rw http.ResponseWriter, next http.HandlerFunc, endpo
 	wrapped = promhttp.InstrumentHandlerRequestSize(h.requestSize.MustCurryWith(labels), wrapped)
 	wrapped = h.instrumentHandlerStatusBucket(wrapped)
 
-	return wrapped.ServeHTTP
+	return wrapped
+}
+
+var paramPlaceHolderRE = regexp.MustCompile(`\{[a-zA-Z0-9_-]+}`)
+
+func GetLabelForPattern(pattern string) string {
+	return paramPlaceHolderRE.ReplaceAllString(strings.TrimSuffix(pattern, "/{$}"), "{param}")
 }

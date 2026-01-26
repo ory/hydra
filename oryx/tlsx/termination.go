@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/x/httpx"
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/prometheusx"
 )

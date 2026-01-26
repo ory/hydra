@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -53,7 +52,7 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
 	"github.com/ory/x/popx"
-	prometheus "github.com/ory/x/prometheusx"
+	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/resilience"
 	"github.com/ory/x/sqlcon"
 )
@@ -327,7 +326,7 @@ func (m *RegistrySQL) RegisterPublicRoutes(ctx context.Context, public *httprout
 func (m *RegistrySQL) RegisterAdminRoutes(admin *httprouterx.RouterAdmin) {
 	m.HealthHandler().SetHealthRoutes(admin, true)
 	m.HealthHandler().SetVersionRoutes(admin)
-	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
+	prometheusx.SetMuxRoutes(admin)
 
 	consent.NewHandler(m).SetRoutes(admin)
 	jwk.NewHandler(m).SetAdminRoutes(admin)

@@ -30,7 +30,6 @@ import (
 	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/reqlog"
 )
 
@@ -69,7 +68,6 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 	MustEnsureRegistryKeys(t, reg, x.OpenIDConnectKeyName)
 	MustEnsureRegistryKeys(t, reg, x.OAuth2JWTKeyName)
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	{
 		n := negroni.New()
 		n.Use(reqlog.NewMiddleware())
@@ -77,7 +75,7 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 		n.UseFunc(httprouterx.NoCacheNegroni)
 		n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 
-		router := x.NewRouterAdmin(metrics)
+		router := httprouterx.NewTestRouterAdminWithPrefix(t)
 		reg.RegisterAdminRoutes(router)
 		n.UseHandler(router)
 
@@ -91,7 +89,7 @@ func NewConfigurableOAuth2Server(ctx context.Context, t testing.TB, reg *driver.
 		n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 		n.UseFunc(httprouterx.NoCacheNegroni)
 
-		router := x.NewRouterPublic(metrics)
+		router := httprouterx.NewTestRouterPublic(t)
 		reg.RegisterPublicRoutes(ctx, router)
 		n.UseHandler(router)
 

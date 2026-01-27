@@ -84,7 +84,7 @@ func NewRegistrySQLFromURL(t testing.TB, dsn string, migrate, initNetwork bool, 
 func ConnectToMySQL(t testing.TB) string { return dockertest.RunTestMySQLWithVersion(t, "8.0") }
 func ConnectToPG(t testing.TB) string    { return dockertest.RunTestPostgreSQLWithVersion(t, "16") }
 func ConnectToCRDB(t testing.TB) string {
-	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v24.1")
+	return dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.4")
 }
 
 func ConnectDatabasesURLs(t *testing.T) (pgURL, mysqlURL, crdbURL string) {

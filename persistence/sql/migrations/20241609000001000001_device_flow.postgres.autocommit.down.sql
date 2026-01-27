@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY IF EXISTS hydra_oauth2_flow_device_challenge_idx;

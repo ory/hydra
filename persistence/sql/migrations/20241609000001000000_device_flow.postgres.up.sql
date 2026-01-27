@@ -38,7 +38,6 @@ ALTER TABLE hydra_oauth2_flow
   ADD COLUMN IF NOT EXISTS device_handled_at TIMESTAMP NULL,
   ADD COLUMN IF NOT EXISTS device_error VARCHAR(2048) NULL;
 
-CREATE UNIQUE INDEX IF NOT EXISTS hydra_oauth2_flow_device_challenge_idx ON hydra_oauth2_flow (device_challenge_id);
 
 ALTER TABLE hydra_client
   ADD COLUMN IF NOT EXISTS device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL,

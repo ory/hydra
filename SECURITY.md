@@ -7,7 +7,7 @@ This policy outlines Ory's security commitments and practices for users across
 different licensing and deployment models.
 
 To learn more about Ory's security service level agreements (SLAs) and
-processes, please [contact us](https://www.ory.sh/contact/).
+processes, please [contact us](https://www.ory.com/contact/).
 
 ## Ory Network Users
 
@@ -53,4 +53,4 @@ processes, please [contact us](https://www.ory.sh/contact/).
 ## Reporting a Vulnerability
 
 For details on how to report security vulnerabilities, visit our
-[security policy documentation](https://www.ory.sh/docs/ecosystem/security).
+[security policy documentation](https://www.ory.com/docs/ecosystem/security).

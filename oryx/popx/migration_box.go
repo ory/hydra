@@ -108,7 +108,7 @@ func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
 				flavor = pop.CanonicalDialect(strings.TrimPrefix(match[2], "."))
 			}
 
-			//t.Logf("Found test migration \"%s\" (%s, %+v): %s", flavor, match, err, info.Name())
+			// t.Logf("Found test migration \"%s\" (%s, %+v): %s", flavor, match, err, info.Name())
 
 			m.migrationsUp = append(m.migrationsUp, Migration{
 				Version:   version + "9", // run testdata after version

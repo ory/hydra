@@ -159,7 +159,8 @@ func (a *Request) Merge(request Requester) {
 	}
 }
 
-var defaultAllowedParameters = []string{"grant_type", "response_type", "scope", "client_id"}
+// defaultAllowedParameters lists form parameter names allowed in Sanitize. Do not add subject_token, actor_token (raw tokens must not be persisted).
+var defaultAllowedParameters = []string{"grant_type", "response_type", "scope", "client_id", "subject_token_type", "resource", "requested_token_type", "actor_token_type"}
 
 func (a *Request) Sanitize(allowedParameters []string) Requester {
 	b := new(Request)

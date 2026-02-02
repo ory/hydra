@@ -32,6 +32,7 @@ type ClientLifespanConfig struct {
 	ImplicitGrantAccessTokenLifespan           *time.Duration `json:"implicit_grant_access_token_lifespan"`
 	ImplicitGrantIDTokenLifespan               *time.Duration `json:"implicit_grant_id_token_lifespan"`
 	JwtBearerGrantAccessTokenLifespan          *time.Duration `json:"jwt_bearer_grant_access_token_lifespan"`
+	TokenExchangeGrantAccessTokenLifespan       *time.Duration `json:"token_exchange_grant_access_token_lifespan"` // RFC 8693
 	PasswordGrantAccessTokenLifespan           *time.Duration `json:"password_grant_access_token_lifespan"`
 	PasswordGrantRefreshTokenLifespan          *time.Duration `json:"password_grant_refresh_token_lifespan"`
 	RefreshTokenGrantIDTokenLifespan           *time.Duration `json:"refresh_token_grant_id_token_lifespan"`
@@ -80,6 +81,10 @@ func (c *DefaultClientWithCustomTokenLifespans) GetEffectiveLifespan(gt GrantTyp
 	} else if gt == GrantTypeJWTBearer {
 		if tt == AccessToken {
 			cl = c.TokenLifespans.JwtBearerGrantAccessTokenLifespan
+		}
+	} else if gt == GrantTypeTokenExchange {
+		if tt == AccessToken {
+			cl = c.TokenLifespans.TokenExchangeGrantAccessTokenLifespan
 		}
 	} else if gt == GrantTypePassword {
 		if tt == AccessToken {

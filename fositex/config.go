@@ -67,6 +67,7 @@ var (
 		compose.OAuth2TokenIntrospectionFactory,
 		compose.OAuth2PKCEFactory,
 		compose.RFC7523AssertionGrantFactory,
+		compose.RFC8693TokenExchangeFactory,
 		compose.OIDCUserinfoVerifiableCredentialFactory,
 		compose.RFC8628DeviceFactory,
 		compose.RFC8628DeviceAuthorizationTokenFactory,
@@ -142,6 +143,10 @@ func (c *Config) GetDeviceEndpointHandlers(context.Context) fosite.DeviceEndpoin
 }
 
 func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(context.Context) bool {
+	return false
+}
+
+func (c *Config) GetGrantTypeTokenExchangeCanSkipClientAuth(context.Context) bool {
 	return false
 }
 

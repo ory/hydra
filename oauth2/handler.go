@@ -526,7 +526,7 @@ func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Reque
 		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
 		IDTokenSignedResponseAlg:               []string{key.Algorithm},
 		UserinfoSignedResponseAlg:              []string{key.Algorithm},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code"},
+		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token", "urn:ietf:params:oauth:grant-type:device_code", "urn:ietf:params:oauth:grant-type:token-exchange"},
 		ResponseModesSupported:                 []string{"query", "fragment", "form_post"},
 		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,
@@ -1075,6 +1075,7 @@ func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) 
 type _ struct {
 	// in: formData
 	// required: true
+	// Use grant_type=urn:ietf:params:oauth:grant-type:token-exchange for RFC 8693 token exchange (subject_token, subject_token_type required).
 	GrantType string `json:"grant_type"`
 
 	// in: formData
@@ -1088,6 +1089,24 @@ type _ struct {
 
 	// in: formData
 	ClientID string `json:"client_id"`
+
+	// in: formData (RFC 8693 token exchange)
+	SubjectToken string `json:"subject_token"`
+
+	// in: formData (RFC 8693 token exchange). e.g. urn:ietf:params:oauth:token-type:access_token or urn:ietf:params:oauth:token-type:jwt
+	SubjectTokenType string `json:"subject_token_type"`
+
+	// in: formData (RFC 8693, optional)
+	Resource string `json:"resource"`
+
+	// in: formData (RFC 8693, optional)
+	RequestedTokenType string `json:"requested_token_type"`
+
+	// in: formData (RFC 8693, optional, for delegation)
+	ActorToken string `json:"actor_token"`
+
+	// in: formData (RFC 8693, required when actor_token is present)
+	ActorTokenType string `json:"actor_token_type"`
 }
 
 // OAuth2 Token Exchange Result
@@ -1114,6 +1133,9 @@ type _ struct {
 
 	// The type of the token issued
 	TokenType string `json:"token_type"`
+
+	// Issued token type (RFC 8693). Present when grant_type is urn:ietf:params:oauth:grant-type:token-exchange.
+	IssuedTokenType string `json:"issued_token_type,omitempty"`
 }
 
 // swagger:route POST /oauth2/token oAuth2 oauth2TokenExchange
@@ -1161,7 +1183,8 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 
 	if accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeClientCredentials)) ||
 		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeJWTBearer)) ||
-		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) {
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypePassword)) ||
+		accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeTokenExchange)) {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx, client.AccessTokenStrategySource(accessRequest.GetClient())) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTSigner().GetPublicKeyID(ctx)
@@ -1189,29 +1212,32 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 				accessRequest.GrantAudience(aud)
 			}
 		}
+		// For token exchange (RFC 8693), subject and scopes/audience are already set by the handler from the subject token; do not overwrite.
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
 		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(ctx).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
-		scopes := accessRequest.GetRequestedScopes()
+		if !accessRequest.GetGrantTypes().ExactOne(string(fosite.GrantTypeTokenExchange)) {
+			scopes := accessRequest.GetRequestedScopes()
 
-		// Added for compatibility with MITREid
-		if h.c.GrantAllClientCredentialsScopesPerDefault(ctx) && len(scopes) == 0 {
-			for _, scope := range accessRequest.GetClient().GetScopes() {
-				accessRequest.GrantScope(scope)
+			// Added for compatibility with MITREid
+			if h.c.GrantAllClientCredentialsScopesPerDefault(ctx) && len(scopes) == 0 {
+				for _, scope := range accessRequest.GetClient().GetScopes() {
+					accessRequest.GrantScope(scope)
+				}
 			}
-		}
 
-		for _, scope := range scopes {
-			if h.r.Config().GetScopeStrategy(ctx)(accessRequest.GetClient().GetScopes(), scope) {
-				accessRequest.GrantScope(scope)
+			for _, scope := range scopes {
+				if h.r.Config().GetScopeStrategy(ctx)(accessRequest.GetClient().GetScopes(), scope) {
+					accessRequest.GrantScope(scope)
+				}
 			}
-		}
 
-		for _, audience := range accessRequest.GetRequestedAudience() {
-			if fosite.DefaultAudienceMatchingStrategy(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
-				accessRequest.GrantAudience(audience)
+			for _, audience := range accessRequest.GetRequestedAudience() {
+				if fosite.DefaultAudienceMatchingStrategy(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
+					accessRequest.GrantAudience(audience)
+				}
 			}
 		}
 	}

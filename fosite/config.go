@@ -173,6 +173,12 @@ type GrantTypeJWTBearerCanSkipClientAuthProvider interface {
 	GetGrantTypeJWTBearerCanSkipClientAuth(ctx context.Context) bool
 }
 
+// GrantTypeTokenExchangeCanSkipClientAuthProvider returns the provider for configuring whether token exchange (RFC 8693) can skip client authentication.
+type GrantTypeTokenExchangeCanSkipClientAuthProvider interface {
+	// GetGrantTypeTokenExchangeCanSkipClientAuth returns whether client authentication can be skipped for token exchange.
+	GetGrantTypeTokenExchangeCanSkipClientAuth(ctx context.Context) bool
+}
+
 // GrantTypeJWTBearerIDOptionalProvider returns the provider for configuring the grant type JWT bearer ID optional.
 type GrantTypeJWTBearerIDOptionalProvider interface {
 	// GetGrantTypeJWTBearerIDOptional returns the grant type JWT bearer ID optional.

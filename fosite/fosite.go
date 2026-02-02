@@ -106,6 +106,7 @@ type Configurator interface {
 	EnforcePKCEForPublicClientsProvider
 	EnablePKCEPlainChallengeMethodProvider
 	GrantTypeJWTBearerCanSkipClientAuthProvider
+	GrantTypeTokenExchangeCanSkipClientAuthProvider
 	GrantTypeJWTBearerIDOptionalProvider
 	GrantTypeJWTBearerIssuedDateOptionalProvider
 	GetJWTMaxDurationProvider

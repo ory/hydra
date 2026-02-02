@@ -44,6 +44,7 @@ var (
 	_ EnablePKCEPlainChallengeMethodProvider       = (*Config)(nil)
 	_ EnforcePKCEProvider                          = (*Config)(nil)
 	_ GrantTypeJWTBearerCanSkipClientAuthProvider  = (*Config)(nil)
+	_ GrantTypeTokenExchangeCanSkipClientAuthProvider = (*Config)(nil)
 	_ GrantTypeJWTBearerIDOptionalProvider         = (*Config)(nil)
 	_ GrantTypeJWTBearerIssuedDateOptionalProvider = (*Config)(nil)
 	_ GetJWTMaxDurationProvider                    = (*Config)(nil)
@@ -153,6 +154,9 @@ type Config struct {
 
 	// GrantTypeJWTBearerCanSkipClientAuth indicates, if client authentication can be skipped, when using jwt as assertion.
 	GrantTypeJWTBearerCanSkipClientAuth bool
+
+	// GrantTypeTokenExchangeCanSkipClientAuth indicates, if client authentication can be skipped for token exchange (RFC 8693). Default false.
+	GrantTypeTokenExchangeCanSkipClientAuth bool
 
 	// GrantTypeJWTBearerIDOptional indicates, if jti (JWT ID) claim required or not in JWT.
 	GrantTypeJWTBearerIDOptional bool
@@ -326,6 +330,11 @@ func (c *Config) GetGrantTypeJWTBearerIDOptional(ctx context.Context) bool {
 // GetGrantTypeJWTBearerCanSkipClientAuth returns the GrantTypeJWTBearerCanSkipClientAuth field.
 func (c *Config) GetGrantTypeJWTBearerCanSkipClientAuth(ctx context.Context) bool {
 	return c.GrantTypeJWTBearerCanSkipClientAuth
+}
+
+// GetGrantTypeTokenExchangeCanSkipClientAuth returns the GrantTypeTokenExchangeCanSkipClientAuth field.
+func (c *Config) GetGrantTypeTokenExchangeCanSkipClientAuth(ctx context.Context) bool {
+	return c.GrantTypeTokenExchangeCanSkipClientAuth
 }
 
 // GetEnforcePKCE If set to true, public clients must use PKCE.

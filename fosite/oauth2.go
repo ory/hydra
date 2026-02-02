@@ -35,6 +35,7 @@ const (
 	GrantTypeClientCredentials GrantType = "client_credentials"
 	GrantTypeJWTBearer         GrantType = "urn:ietf:params:oauth:grant-type:jwt-bearer"  //nolint:gosec // this is not a hardcoded credential
 	GrantTypeDeviceCode        GrantType = "urn:ietf:params:oauth:grant-type:device_code" //nolint:gosec // this is not a hardcoded credential
+	GrantTypeTokenExchange     GrantType = "urn:ietf:params:oauth:grant-type:token-exchange" //nolint:gosec // RFC 8693
 
 	BearerAccessToken string = "bearer"
 )

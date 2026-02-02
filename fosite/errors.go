@@ -210,6 +210,12 @@ var (
 		ErrorField:       errJTIKnownName,
 		CodeField:        http.StatusBadRequest,
 	}
+	// ErrInvalidTarget is used when the authorization server is unwilling or unable to issue a token for the requested resource/audience (RFC 8693 section 2.2.2).
+	ErrInvalidTarget = &RFC6749Error{
+		ErrorField:       errInvalidTargetName,
+		DescriptionField: "The authorization server is unwilling or unable to issue a token for the requested resource or audience.",
+		CodeField:        http.StatusBadRequest,
+	}
 	ErrAuthorizationPending = &RFC6749Error{
 		DescriptionField: "The authorization request is still pending as the end user hasn't yet completed the user-interaction steps.",
 		ErrorField:       errAuthorizationPending,
@@ -266,6 +272,7 @@ const (
 	errAuthorizationPending         = "authorization_pending"
 	errSlowDown                     = "slow_down"
 	errDeviceExpiredToken           = "expired_token"
+	errInvalidTargetName            = "invalid_target" // RFC 8693
 )
 
 type (

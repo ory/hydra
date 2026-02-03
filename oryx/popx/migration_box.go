@@ -30,7 +30,6 @@ type (
 		migrationsUp        Migrations
 		migrationsDown      Migrations
 		perMigrationTimeout time.Duration
-		dumpMigrations      bool
 		l                   *logrusx.Logger
 		migrationContent    MigrationContent
 	}
@@ -74,12 +73,6 @@ func WithGoMigrations(migrations Migrations) MigrationBoxOption {
 func WithPerMigrationTimeout(timeout time.Duration) MigrationBoxOption {
 	return func(m *MigrationBox) {
 		m.perMigrationTimeout = timeout
-	}
-}
-
-func WithDumpMigrations() MigrationBoxOption {
-	return func(m *MigrationBox) {
-		m.dumpMigrations = true
 	}
 }
 

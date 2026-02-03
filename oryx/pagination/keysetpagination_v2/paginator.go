@@ -103,9 +103,11 @@ func ResultFunc[I any](items []I, p *Paginator, extractor func(last I, colName s
 	newCols := make([]Column, len(currentCols))
 	for i, col := range currentCols {
 		newCols[i] = Column{
-			Name:  col.Name,
-			Order: col.Order,
-			Value: extractor(lastItem, col.Name),
+			Name:          col.Name,
+			Order:         col.Order,
+			Nullable:      col.Nullable,
+			HasConstraint: col.HasConstraint,
+			Value:         extractor(lastItem, col.Name),
 		}
 	}
 
@@ -121,18 +123,23 @@ func ResultFunc[I any](items []I, p *Paginator, extractor func(last I, colName s
 func WithSize(size int) Option {
 	return func(p *Paginator) { p.size = size }
 }
+
 func WithDefaultSize(size int) Option {
 	return func(p *Paginator) { p.defaultSize = size }
 }
+
 func WithMaxSize(size int) Option {
 	return func(p *Paginator) { p.maxSize = size }
 }
+
 func WithToken(t PageToken) Option {
 	return func(p *Paginator) { p.token = t }
 }
+
 func WithDefaultToken(t PageToken) Option {
 	return func(p *Paginator) { p.defaultToken = t }
 }
+
 func withIsLast(isLast bool) Option {
 	return func(p *Paginator) { p.isLast = isLast }
 }

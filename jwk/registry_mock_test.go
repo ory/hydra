@@ -10,7 +10,7 @@ package jwk_test
 import (
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 
 	herodot "github.com/ory/herodot"
 	aead "github.com/ory/hydra/v2/aead"

@@ -12,7 +12,7 @@ import (
 	http "net/http"
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 
 	fosite "github.com/ory/hydra/v2/fosite"
 )

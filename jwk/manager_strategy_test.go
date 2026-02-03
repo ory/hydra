@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/go-jose/go-jose/v3"
-	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"

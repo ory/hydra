@@ -67,6 +67,7 @@ func OpenIDConnectHybridFactory(config fosite.Configurator, storage fosite.Stora
 				oauth2.RefreshTokenStrategyProvider
 			}),
 			Storage: storage.(interface {
+				fosite.Transactional
 				oauth2.AuthorizeCodeStorageProvider
 				oauth2.AccessTokenStorageProvider
 				oauth2.RefreshTokenStorageProvider

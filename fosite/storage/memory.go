@@ -609,3 +609,8 @@ func (s *MemoryStore) InvalidateDeviceCodeSession(_ context.Context, code string
 	delete(s.DeviceAuths, code)
 	return nil
 }
+
+// Transaction runs f but cannot provide any transactional guarantees in memory, so it is a no-op.
+func (s *MemoryStore) Transaction(ctx context.Context, f func(ctx context.Context) error) error {
+	return f(ctx)
+}

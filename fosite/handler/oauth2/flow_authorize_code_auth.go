@@ -22,6 +22,7 @@ var (
 // as defined in https://tools.ietf.org/html/rfc6749#section-4.1
 type AuthorizeExplicitGrantHandler struct {
 	Storage interface {
+		fosite.Transactional
 		AuthorizeCodeStorageProvider
 		AccessTokenStorageProvider
 		RefreshTokenStorageProvider

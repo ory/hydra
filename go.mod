@@ -20,7 +20,6 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.0
-	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/sessions v1.4.0
@@ -44,7 +43,6 @@ require (
 	github.com/parnurzeal/gorequest v0.3.0
 	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.23.0
 	github.com/rs/cors v1.11.1
 	github.com/sawadashota/encrypta v0.0.5
 	github.com/sirupsen/logrus v1.9.3
@@ -206,6 +204,7 @@ require (
 	github.com/peterhellberg/link v1.2.0 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/prometheus/client_golang v1.23.0 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.65.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
@@ -261,7 +260,7 @@ require (
 
 tool (
 	github.com/go-swagger/go-swagger/cmd/swagger
-	github.com/golang/mock/mockgen
 	github.com/mikefarah/yq/v4
+	go.uber.org/mock/mockgen
 	golang.org/x/tools/cmd/goimports
 )

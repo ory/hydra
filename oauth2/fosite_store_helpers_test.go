@@ -827,76 +827,51 @@ func testFositeSqlStoreTransactionRollbackPKCERequest(m *driver.RegistrySQL) fun
 // different from the other getter methods
 func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-		require.True(t, ok)
-		ctx := t.Context()
-		ctx, err := txnStore.BeginTX(ctx)
-		require.NoError(t, err)
 		signature := uuid.Must(uuid.NewV4()).String()
 		testRequest := createTestRequest(signature)
-		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
-		require.NoError(t, err)
-		err = txnStore.Commit(ctx)
-		require.NoError(t, err)
+		require.NoError(t, m.OAuth2Storage().CreateOpenIDConnectSession(t.Context(), signature, testRequest))
 
-		// Require a new context, since the old one contains the transaction.
-		res, err := m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
+		res, err := m.OAuth2Storage().GetOpenIDConnectSession(t.Context(), signature, testRequest)
 		// session should have been created successfully because Commit did not return an error
 		require.NoError(t, err)
 		assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
 
-		// test delete within a transaction
-		ctx, err = txnStore.BeginTX(context.Background())
-		require.NoError(t, err)
-		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature)
-		require.NoError(t, err)
-		err = txnStore.Commit(ctx)
-		require.NoError(t, err)
+		require.NoError(t, m.OAuth2Storage().DeleteOpenIDConnectSession(t.Context(), signature))
 
-		// Require a new context, since the old one contains the transaction.
-		_, err = m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature, testRequest)
-		// Since commit worked for delete, we should get an error here.
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(t.Context(), signature, testRequest)
 		require.Error(t, err)
 	}
 }
 
 func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m *driver.RegistrySQL) func(t *testing.T) {
 	return func(t *testing.T) {
-		txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-		require.True(t, ok)
-		ctx := t.Context()
-		ctx, err := txnStore.BeginTX(ctx)
-		require.NoError(t, err)
-
 		signature := uuid.Must(uuid.NewV4()).String()
 		testRequest := createTestRequest(signature)
-		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest)
-		require.NoError(t, err)
-		err = txnStore.Rollback(ctx)
-		require.NoError(t, err)
 
-		// Require a new context, since the old one contains the transaction.
-		ctx = context.Background()
-		_, err = m.OAuth2Storage().GetOpenIDConnectSession(ctx, signature, testRequest)
+		err := m.Transaction(t.Context(), func(ctx context.Context) error {
+			require.NoError(t, m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature, testRequest))
+			return errors.New("force rollback")
+		})
+		require.ErrorContains(t, err, "force rollback")
+
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(t.Context(), signature, testRequest)
 		// Since we rolled back above, the session should not exist and getting it should result in an error
 		require.Error(t, err)
 
-		// create a new session, delete it, then rollback the delete. We should be able to then get it.
+		// create a new session, delete it, then roll back the deletion. We should be able to then get it.
 		signature2 := uuid.Must(uuid.NewV4()).String()
 		testRequest2 := createTestRequest(signature2)
-		err = m.OAuth2Storage().CreateOpenIDConnectSession(ctx, signature2, testRequest2)
-		require.NoError(t, err)
-		_, err = m.OAuth2Storage().GetOpenIDConnectSession(ctx, signature2, testRequest2)
+		require.NoError(t, m.OAuth2Storage().CreateOpenIDConnectSession(t.Context(), signature2, testRequest2))
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(t.Context(), signature2, testRequest2)
 		require.NoError(t, err)
 
-		ctx, err = txnStore.BeginTX(context.Background())
-		require.NoError(t, err)
-		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature2)
-		require.NoError(t, err)
-		err = txnStore.Rollback(ctx)
+		err = m.Transaction(t.Context(), func(ctx context.Context) error {
+			require.NoError(t, m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature2))
+			return errors.New("force rollback")
+		})
+		require.ErrorContains(t, err, "force rollback")
 
-		require.NoError(t, err)
-		_, err = m.OAuth2Storage().GetOpenIDConnectSession(context.Background(), signature2, testRequest2)
+		_, err = m.OAuth2Storage().GetOpenIDConnectSession(t.Context(), signature2, testRequest2)
 		require.NoError(t, err)
 	}
 }
@@ -1281,34 +1256,24 @@ func doTestCommit(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-	require.True(t, ok)
-	ctx := t.Context()
-	ctx, err := txnStore.BeginTX(ctx)
-	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature, createTestRequest(signature))
-	require.NoError(t, err)
-	err = txnStore.Commit(ctx)
+
+	err := m.Transaction(t.Context(), func(ctx context.Context) error {
+		return createFn(ctx, signature, createTestRequest(signature))
+	})
 	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	res, err := getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
-	// token should have been created successfully because Commit did not return an error
+	res, err := getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 	assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
-	// AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 	// testrevoke within a transaction
-	ctx, err = txnStore.BeginTX(context.Background())
-	require.NoError(t, err)
-	err = revokeFn(ctx, signature)
-	require.NoError(t, err)
-	err = txnStore.Commit(ctx)
+	err = m.Transaction(t.Context(), func(ctx context.Context) error {
+		return revokeFn(ctx, signature)
+	})
 	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	_, err = getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
+	_, err = getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since commit worked for revoke, we should get an error here.
 	require.Error(t, err)
 }
@@ -1318,34 +1283,24 @@ func doTestCommitRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-	require.True(t, ok)
-	ctx := t.Context()
-	ctx, err := txnStore.BeginTX(ctx)
-	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature, "", createTestRequest(signature))
-	require.NoError(t, err)
-	err = txnStore.Commit(ctx)
+
+	err := m.Transaction(t.Context(), func(ctx context.Context) error {
+		return createFn(ctx, signature, "", createTestRequest(signature))
+	})
 	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	res, err := getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
-	// token should have been created successfully because Commit did not return an error
+	res, err := getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 	assertx.EqualAsJSONExcept(t, newDefaultRequest(t, "blank"), res, defaultIgnoreKeys)
-	// AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 	// testrevoke within a transaction
-	ctx, err = txnStore.BeginTX(context.Background())
-	require.NoError(t, err)
-	err = revokeFn(ctx, signature)
-	require.NoError(t, err)
-	err = txnStore.Commit(ctx)
+	err = m.Transaction(t.Context(), func(ctx context.Context) error {
+		return revokeFn(ctx, signature)
+	})
 	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	_, err = getFn(context.Background(), signature, oauth2.NewTestSession(t, "bar"))
+	_, err = getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since commit worked for revoke, we should get an error here.
 	require.Error(t, err)
 }
@@ -1355,39 +1310,31 @@ func doTestRollback(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-	require.True(t, ok)
-
-	ctx := t.Context()
-	ctx, err := txnStore.BeginTX(ctx)
-	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature, createTestRequest(signature))
-	require.NoError(t, err)
-	err = txnStore.Rollback(ctx)
-	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	ctx = context.Background()
-	_, err = getFn(ctx, signature, oauth2.NewTestSession(t, "bar"))
+	err := m.Transaction(t.Context(), func(ctx context.Context) error {
+		require.NoError(t, createFn(ctx, signature, createTestRequest(signature)))
+		return errors.New("force rollback")
+	})
+	require.ErrorContains(t, err, "force rollback")
+
+	_, err = getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since we rolled back above, the token should not exist and getting it should result in an error
 	require.Error(t, err)
 
 	// create a new token, revoke it, then rollback the revoke. We should be able to then get it successfully.
 	signature2 := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature2, createTestRequest(signature2))
-	require.NoError(t, err)
-	_, err = getFn(ctx, signature2, oauth2.NewTestSession(t, "bar"))
-	require.NoError(t, err)
-
-	ctx, err = txnStore.BeginTX(context.Background())
-	require.NoError(t, err)
-	err = revokeFn(ctx, signature2)
-	require.NoError(t, err)
-	err = txnStore.Rollback(ctx)
+	require.NoError(t, createFn(t.Context(), signature2, createTestRequest(signature2)))
+	_, err = getFn(t.Context(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 
-	_, err = getFn(context.Background(), signature2, oauth2.NewTestSession(t, "bar"))
+	err = m.Transaction(t.Context(), func(ctx context.Context) error {
+		require.NoError(t, revokeFn(ctx, signature2))
+		return errors.New("force rollback")
+	})
+	require.ErrorContains(t, err, "force rollback")
+
+	_, err = getFn(t.Context(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 }
 
@@ -1396,39 +1343,31 @@ func doTestRollbackRefresh(m *driver.RegistrySQL, t *testing.T,
 	getFn func(context.Context, string, fosite.Session) (fosite.Requester, error),
 	revokeFn func(context.Context, string) error,
 ) {
-	txnStore, ok := m.OAuth2Storage().(fosite.Transactional)
-	require.True(t, ok)
-
-	ctx := t.Context()
-	ctx, err := txnStore.BeginTX(ctx)
-	require.NoError(t, err)
 	signature := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature, "", createTestRequest(signature))
-	require.NoError(t, err)
-	err = txnStore.Rollback(ctx)
-	require.NoError(t, err)
 
-	// Require a new context, since the old one contains the transaction.
-	ctx = context.Background()
-	_, err = getFn(ctx, signature, oauth2.NewTestSession(t, "bar"))
+	err := m.Transaction(t.Context(), func(ctx context.Context) error {
+		require.NoError(t, createFn(ctx, signature, "", createTestRequest(signature)))
+		return errors.New("force rollback")
+	})
+	require.ErrorContains(t, err, "force rollback")
+
+	_, err = getFn(t.Context(), signature, oauth2.NewTestSession(t, "bar"))
 	// Since we rolled back above, the token should not exist and getting it should result in an error
 	require.Error(t, err)
 
 	// create a new token, revoke it, then rollback the revoke. We should be able to then get it successfully.
 	signature2 := uuid.Must(uuid.NewV4()).String()
-	err = createFn(ctx, signature2, "", createTestRequest(signature2))
-	require.NoError(t, err)
-	_, err = getFn(ctx, signature2, oauth2.NewTestSession(t, "bar"))
-	require.NoError(t, err)
-
-	ctx, err = txnStore.BeginTX(context.Background())
-	require.NoError(t, err)
-	err = revokeFn(ctx, signature2)
-	require.NoError(t, err)
-	err = txnStore.Rollback(ctx)
+	require.NoError(t, createFn(t.Context(), signature2, "", createTestRequest(signature2)))
+	_, err = getFn(t.Context(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 
-	_, err = getFn(context.Background(), signature2, oauth2.NewTestSession(t, "bar"))
+	err = m.Transaction(t.Context(), func(ctx context.Context) error {
+		require.NoError(t, revokeFn(ctx, signature2))
+		return errors.New("force rollback")
+	})
+	require.ErrorContains(t, err, "force rollback")
+
+	_, err = getFn(t.Context(), signature2, oauth2.NewTestSession(t, "bar"))
 	require.NoError(t, err)
 }
 

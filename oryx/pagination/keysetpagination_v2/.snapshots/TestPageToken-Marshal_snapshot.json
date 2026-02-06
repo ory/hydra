@@ -1,0 +1,59 @@
+{
+  "e": "2023-01-01T01:00:00Z",
+  "c": [
+    {
+      "n": "id",
+      "v": "token"
+    },
+    {
+      "n": "string",
+      "o": 1,
+      "v": "str"
+    },
+    {
+      "n": "string-zero",
+      "o": 1,
+      "v": ""
+    },
+    {
+      "n": "time",
+      "vt": "2023-01-01T00:00:00Z"
+    },
+    {
+      "n": "uuid",
+      "vu": "b652bbbd-1a84-4fb7-9437-6b78ba2686db"
+    },
+    {
+      "n": "nulluuid",
+      "vu": "b652bbbd-1a84-4fb7-9437-6b78ba2686da"
+    },
+    {
+      "n": "int64",
+      "vi": 64
+    },
+    {
+      "n": "nullint64",
+      "vi": 64
+    },
+    {
+      "n": "nullstring",
+      "v": "str"
+    },
+    {
+      "n": "empty-nullstring",
+      "v": ""
+    },
+    {
+      "n": "null-nulluuid",
+      "vn": true
+    },
+    {
+      "n": "null-nullstring",
+      "vn": true
+    },
+    {
+      "n": "null-nullint64",
+      "vn": true
+    }
+  ]
+}

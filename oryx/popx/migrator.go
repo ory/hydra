@@ -471,7 +471,7 @@ func (mb *MigrationBox) Status(ctx context.Context) (MigrationStatuses, error) {
 func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 	c := mb.c.WithContext(ctx)
 	schema := "schema.sql"
-	f, err := os.Create(schema) //#nosec:G304) //#nosec:G304
+	f, err := os.Create(schema) //#nosec:G304
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -485,15 +485,6 @@ func (mb *MigrationBox) DumpMigrationSchema(ctx context.Context) error {
 
 func (mb *MigrationBox) exec(ctx context.Context, fn func() error) error {
 	now := time.Now()
-	defer func() {
-		if !mb.dumpMigrations {
-			return
-		}
-		err := mb.DumpMigrationSchema(ctx)
-		if err != nil {
-			mb.l.WithError(err).Error("Migrator: unable to dump schema")
-		}
-	}()
 	defer mb.printTimer(now)
 
 	err := mb.CreateSchemaMigrations(ctx)

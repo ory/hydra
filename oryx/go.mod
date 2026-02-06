@@ -30,9 +30,9 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/inhies/go-bytesize v0.0.0-20220417184213-4913239db9cf
 	github.com/jackc/pgconn v1.14.3
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jackc/puddle/v2 v2.2.2
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/julienschmidt/httprouter v1.3.1-0.20240130105656-484018016424
 	github.com/knadh/koanf/maps v0.1.2
 	github.com/knadh/koanf/parsers/json v0.1.0
 	github.com/knadh/koanf/parsers/toml v0.1.0
@@ -86,7 +86,6 @@ require (
 	go.uber.org/mock v0.5.2
 	golang.org/x/crypto v0.45.0
 	golang.org/x/mod v0.29.0
-	golang.org/x/net v0.47.0
 	golang.org/x/oauth2 v0.33.0
 	golang.org/x/sync v0.18.0
 	google.golang.org/grpc v1.74.2
@@ -156,7 +155,6 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.3 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jaegertracing/jaeger-idl v0.5.0 // indirect
 	github.com/jandelgado/gcov2lcov v1.1.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
@@ -206,6 +204,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
+	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251008203120-078029d740a8 // indirect
 	golang.org/x/text v0.31.0 // indirect

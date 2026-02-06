@@ -10,12 +10,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"golang.org/x/oauth2"
 
 	"github.com/ory/herodot"
-
-	"github.com/hashicorp/go-retryablehttp"
-
 	"github.com/ory/x/logrusx"
 )
 

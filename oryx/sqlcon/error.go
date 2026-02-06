@@ -7,12 +7,12 @@ import (
 	"database/sql"
 	"net/http"
 
-	"google.golang.org/grpc/codes"
-
 	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgconn"
+	pgxconn "github.com/jackc/pgx/v5/pgconn"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
 
 	"github.com/ory/herodot"
 )
@@ -86,6 +86,8 @@ func HandleError(err error) error {
 	} else if e := new(pq.Error); errors.As(err, &e) {
 		return errors.WithStack(handlePostgres(err, string(e.Code)))
 	} else if e := new(pgconn.PgError); errors.As(err, &e) {
+		return errors.WithStack(handlePostgres(err, e.Code))
+	} else if e := new(pgxconn.PgError); errors.As(err, &e) {
 		return errors.WithStack(handlePostgres(err, e.Code))
 	} else if e := new(mysql.MySQLError); errors.As(err, &e) {
 		switch e.Number {

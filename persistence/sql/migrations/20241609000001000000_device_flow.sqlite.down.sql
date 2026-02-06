@@ -1,7 +1,6 @@
 DROP TABLE hydra_oauth2_device_auth_codes;
 
 DROP INDEX hydra_oauth2_flow_device_challenge_idx;
-
 ALTER TABLE hydra_oauth2_flow DROP COLUMN device_challenge_id;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN device_code_request_id;
 ALTER TABLE hydra_oauth2_flow DROP COLUMN device_verifier;

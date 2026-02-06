@@ -22,12 +22,11 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/httprouterx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/uuidx"
 )
 
@@ -68,9 +67,8 @@ func TestClientSDK(t *testing.T) {
 		config.KeyPublicAllowDynamicRegistration: true,
 	})))
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	routerAdmin := x.NewRouterAdmin(metrics)
-	routerPublic := x.NewRouterPublic(metrics)
+	routerAdmin := httprouterx.NewTestRouterAdminWithPrefix(t)
+	routerPublic := httprouterx.NewTestRouterPublic(t)
 	clHandler := client.NewHandler(r)
 	clHandler.SetPublicRoutes(routerPublic)
 	clHandler.SetAdminRoutes(routerAdmin)

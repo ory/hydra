@@ -149,26 +149,22 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 		}
 	}
 
-	ctx, err = fosite.MaybeBeginTx(ctx, c.Storage)
-	if err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	}
-	defer func() {
-		if err != nil {
-			if rollBackTxnErr := fosite.MaybeRollbackTx(ctx, c.Storage); rollBackTxnErr != nil {
-				err = errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebugf("error: %s; rollback error: %s", err, rollBackTxnErr))
+	err = c.Storage.Transaction(ctx, func(ctx context.Context) error {
+		if err := c.Storage.AuthorizeCodeStorage().InvalidateAuthorizeCodeSession(ctx, signature); err != nil {
+			return err
+		}
+		if err := c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessSignature, requester.Sanitize([]string{})); err != nil {
+			return err
+		}
+		if refreshSignature != "" {
+			if err := c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshSignature, accessSignature, requester.Sanitize([]string{})); err != nil {
+				return err
 			}
 		}
-	}()
-
-	if err = c.Storage.AuthorizeCodeStorage().InvalidateAuthorizeCodeSession(ctx, signature); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	} else if err = c.Storage.AccessTokenStorage().CreateAccessTokenSession(ctx, accessSignature, requester.Sanitize([]string{})); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-	} else if refreshSignature != "" {
-		if err = c.Storage.RefreshTokenStorage().CreateRefreshTokenSession(ctx, refreshSignature, accessSignature, requester.Sanitize([]string{})); err != nil {
-			return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
-		}
+		return nil
+	})
+	if err != nil {
+		return errors.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	responder.SetAccessToken(access)
@@ -178,10 +174,6 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	responder.SetScopes(requester.GetGrantedScopes())
 	if refresh != "" {
 		responder.SetExtra("refresh_token", refresh)
-	}
-
-	if err = fosite.MaybeCommitTx(ctx, c.Storage); err != nil {
-		return errorsx.WithStack(fosite.ErrServerError.WithWrap(err).WithDebug(err.Error()))
 	}
 
 	return nil

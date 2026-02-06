@@ -24,7 +24,7 @@
 
 _Please note_: We take Ory Hydra's security and our users' trust very seriously.
 If you believe you have found a security issue in Ory Hydra, please disclose it
-by contacting us at security@ory.sh.
+by contacting us at security@ory.com.
 
 There are many ways in which you can contribute. The goal of this document is to
 provide a high-level overview of how you can get involved in Ory.
@@ -42,7 +42,7 @@ That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
 won't clash with Ory Hydra's direction. A great way to do this is via
 [Ory Hydra Discussions](https://github.com/ory/hydra/discussions) or the
-[Ory Chat](https://www.ory.sh/chat).
+[Ory Chat](https://www.ory.com/chat).
 
 ## FAQ
 
@@ -64,7 +64,7 @@ won't clash with Ory Hydra's direction. A great way to do this is via
   [a Contributors License Agreement?](https://cla-assistant.io/ory/hydra)
 
 - I would like updates about new versions of Ory Hydra.
-  [How are new releases announced?](https://www.ory.sh/l/sign-up-newsletter)
+  [How are new releases announced?](https://www.ory.com/l/sign-up-newsletter)
 
 ## How can I contribute?
 
@@ -106,7 +106,7 @@ to help out:
 
 ## Communication
 
-We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
+We use [Slack](https://www.ory.com/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of Ory, etc.
 
 Check out [Ory Hydra Discussions](https://github.com/ory/hydra/discussions).
@@ -115,7 +115,7 @@ and similar data.
 
 You can also join our community calls if you want to speak to the Ory team
 directly or ask some questions. You can find more info and participate in
-[Slack](https://www.ory.sh/chat) in the #community-call channel.
+[Slack](https://www.ory.com/chat) in the #community-call channel.
 
 If you want to receive regular notifications about updates to Ory Hydra,
 consider joining the mailing list. We will _only_ send you vital information on
@@ -137,7 +137,7 @@ to add your example or Ory-related project to the awesome-ory README.
 ## Contribute code
 
 Unless you are fixing a known bug, we **strongly** recommend discussing it with
-the core team via a GitHub issue or [in our chat](https://www.ory.sh/chat)
+the core team via a GitHub issue or [in our chat](https://www.ory.com/chat)
 before getting started to ensure your work is consistent with Ory Hydra's
 roadmap and architecture.
 
@@ -206,7 +206,7 @@ instructions please head over to the Ory Documentation
 ## Disclosing vulnerabilities
 
 Please disclose vulnerabilities exclusively to
-[security@ory.sh](mailto:security@ory.sh). Do not use GitHub issues.
+[security@ory.com](mailto:security@ory.com). Do not use GitHub issues.
 
 ## Code style
 
@@ -248,4 +248,4 @@ community a safe place for you and we've got your back.
 
 We welcome discussion about creating a welcoming, safe, and productive
 environment for the community. If you have any questions, feedback, or concerns
-[please let us know](https://www.ory.sh/chat).
+[please let us know](https://www.ory.com/chat).

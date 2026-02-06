@@ -16,9 +16,9 @@ const AdminPrefix = "/admin"
 
 type (
 	router struct {
-		mux            *http.ServeMux
-		prefix         string
-		metricsManager *prometheusx.MetricsManager
+		mux     *http.ServeMux
+		prefix  string
+		metrics *prometheusx.HTTPMetrics
 	}
 	RouterAdmin  struct{ router }
 	RouterPublic struct{ router }
@@ -35,53 +35,40 @@ type (
 	}
 )
 
-// NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
-func NewRouter(metricsManager *prometheusx.MetricsManager) Router {
+func newRouter(metrics *prometheusx.HTTPMetrics) *router {
 	return &router{
-		mux:            http.NewServeMux(),
-		metricsManager: metricsManager,
+		mux:     http.NewServeMux(),
+		metrics: metrics,
 	}
 }
 
-var DefaultTestMetricsManager = prometheusx.NewMetricsManager("", "", "", "")
+// NewRouter creates a new general purpose router. It should only be used when neither the admin nor the public router is applicable.
+func NewRouter(metrics *prometheusx.HTTPMetrics) Router { return newRouter(metrics) }
 
 // NewRouterAdmin creates a new admin router.
-func NewRouterAdmin(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
-	return &RouterAdmin{router: router{
-		mux:            http.NewServeMux(),
-		metricsManager: metricsManager,
-	}}
+func NewRouterAdmin(metrics *prometheusx.HTTPMetrics) *RouterAdmin {
+	return &RouterAdmin{router: *newRouter(metrics)}
 }
 
-func NewTestRouterAdmin(_ *testing.T) *RouterAdmin {
-	return NewRouterAdmin(DefaultTestMetricsManager)
-}
-
-func NewTestRouterAdminWithPrefix(_ *testing.T) *RouterAdmin {
-	return NewRouterAdminWithPrefix(DefaultTestMetricsManager)
-}
+func NewTestRouterAdmin(_ testing.TB) *RouterAdmin           { return NewRouterAdmin(nil) }
+func NewTestRouterAdminWithPrefix(_ testing.TB) *RouterAdmin { return NewRouterAdminWithPrefix(nil) }
+func NewTestRouterPublic(_ testing.TB) *RouterPublic         { return NewRouterPublic(nil) }
 
 func (r *RouterAdmin) ToPublic() *RouterPublic {
 	return &RouterPublic{router: router{
-		mux:            r.mux,
-		metricsManager: r.metricsManager,
+		mux:     r.mux,
+		metrics: r.metrics,
+		prefix:  "", // do not copy the admin prefix
 	}}
 }
 
 // NewRouterPublic returns a public router.
-func NewRouterPublic(metricsManager *prometheusx.MetricsManager) *RouterPublic {
-	return &RouterPublic{router: router{
-		mux:            http.NewServeMux(),
-		metricsManager: metricsManager,
-	}}
-}
-
-func NewTestRouterPublic(_ *testing.T) *RouterPublic {
-	return NewRouterPublic(DefaultTestMetricsManager)
+func NewRouterPublic(metrics *prometheusx.HTTPMetrics) *RouterPublic {
+	return &RouterPublic{router: *newRouter(metrics)}
 }
 
 // NewRouterAdminWithPrefix creates a new router with the admin prefix.
-func NewRouterAdminWithPrefix(metricsManager *prometheusx.MetricsManager) *RouterAdmin {
+func NewRouterAdminWithPrefix(metricsManager *prometheusx.HTTPMetrics) *RouterAdmin {
 	r := NewRouterAdmin(metricsManager)
 	r.prefix = AdminPrefix
 	return r
@@ -116,12 +103,11 @@ func (r *router) Handler(method, route string, handler http.Handler) {
 }
 
 func (r *router) handle(method string, route string, handler http.Handler) {
-	r.mux.HandleFunc(method+" "+path.Join(r.prefix, route), func(w http.ResponseWriter, req *http.Request) {
-		// In order the get the right metrics for the right path, `req.Pattern` must have been filled by the http router.
-		// This is the case at this point, but not before e.g. when the prometheus middleware runs as a negroni middleware:
-		// the http router has not run yet and `req.Pattern` is empty.
-		r.metricsManager.ServeHTTP(w, req, handler.ServeHTTP)
-	})
+	route = path.Join(r.prefix, route)
+	if r.metrics != nil {
+		handler = r.metrics.Instrument(handler, prometheusx.GetLabelForPattern(route))
+	}
+	r.mux.Handle(method+" "+route, handler)
 }
 
 func (r *router) ServeHTTP(w http.ResponseWriter, req *http.Request) { r.mux.ServeHTTP(w, req) }

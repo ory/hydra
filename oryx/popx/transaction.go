@@ -6,8 +6,11 @@ package popx
 import (
 	"context"
 	"runtime"
+	"strings"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/jackc/pgconn"
+	pgxconn "github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -52,6 +55,26 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 				return errors.WithStack(callback(WithTransaction(ctx, transaction), transaction))
 			}))
 		})
+	}
+	if strings.HasPrefix(connection.Dialect.Name(), "postgres") {
+		var err error
+		for attempt := range 10 {
+			_ = attempt
+			err = connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {
+				return callback(WithTransaction(ctx, tx), tx)
+			})
+			if err == nil {
+				return nil
+			}
+			if e := new(pgconn.PgError); errors.As(err, &e) && e.Code == "40001" {
+				continue
+			}
+			if e := new(pgxconn.PgError); errors.As(err, &e) && e.Code == "40001" {
+				continue
+			}
+			return err
+		}
+		return err
 	}
 
 	return errors.WithStack(connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {

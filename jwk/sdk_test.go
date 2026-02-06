@@ -16,8 +16,7 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	. "github.com/ory/hydra/v2/jwk"
-	"github.com/ory/hydra/v2/x"
-	"github.com/ory/x/prometheusx"
+	"github.com/ory/x/httprouterx"
 )
 
 func TestJWKSDK(t *testing.T) {
@@ -25,8 +24,7 @@ func TestJWKSDK(t *testing.T) {
 	ctx := context.Background()
 	reg := testhelpers.NewRegistryMemory(t)
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	router := x.NewRouterAdmin(metrics)
+	router := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h := NewHandler(reg)
 	h.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

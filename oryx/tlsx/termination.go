@@ -14,6 +14,7 @@ import (
 	"github.com/ory/x/httpx"
 
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/prometheusx"
 )

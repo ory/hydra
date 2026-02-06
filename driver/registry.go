@@ -15,6 +15,7 @@ import (
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/consent"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal/kratos"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
@@ -45,6 +46,8 @@ type registry interface {
 	x.NetworkProvider
 
 	kratos.Provider
+
+	fosite.Transactional
 }
 
 func newRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (*RegistrySQL, error) {

@@ -16,7 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	hydra "github.com/ory/hydra-client-go/v2"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/internal"
 	"github.com/ory/hydra/v2/internal/testhelpers"
@@ -25,7 +24,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/pop/v6"
 	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/prometheusx"
 )
 
 func createAccessTokenSession(t testing.TB, subject, client, token string, expiresAt time.Time, fs x.FositeStorer, scopes fosite.Arguments) {
@@ -68,9 +66,8 @@ func TestRevoke(t *testing.T) {
 	tokens := Tokens(reg.OAuth2ProviderConfig(), 4)
 	now := time.Now().UTC().Round(time.Second)
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
 	handler := oauth2.NewHandler(reg)
-	router := httprouterx.NewRouterAdminWithPrefix(metrics)
+	router := httprouterx.NewTestRouterAdminWithPrefix(t)
 	handler.SetPublicRoutes(router.ToPublic(), func(h http.Handler) http.Handler { return h })
 	handler.SetAdminRoutes(router)
 	server := httptest.NewServer(router)

@@ -29,6 +29,7 @@ import (
 	"github.com/ory/x/otelx/semconv"
 	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/reqlog"
+	"github.com/ory/x/serverx"
 	"github.com/ory/x/tlsx"
 	"github.com/ory/x/urlx"
 
@@ -38,7 +39,6 @@ import (
 	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/oauth2"
-	"github.com/ory/hydra/v2/x"
 )
 
 func ensureNoMemoryDSN(r *driver.RegistrySQL) {
@@ -116,7 +116,7 @@ func RunServeAll(dOpts []driver.OptionsModifier) func(cmd *cobra.Command, args [
 	}
 }
 
-var prometheusManager = prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
+var httpMetrics = prometheusx.NewHTTPMetrics("hydra", prometheusx.HTTPPrefix, config.Version, config.Commit, config.Date)
 
 func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServeAdmin(contextx.RootContext)
@@ -157,7 +157,8 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 	})
 	n.Use(sqaMetrics)
 
-	router := httprouterx.NewRouterAdminWithPrefix(prometheusManager)
+	router := httprouterx.NewRouterAdminWithPrefix(httpMetrics)
+	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	d.RegisterAdminRoutes(router)
 
 	n.UseHandler(router)
@@ -206,7 +207,8 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 	})
 	n.Use(sqaMetrics)
 
-	router := x.NewRouterPublic(prometheusManager)
+	router := httprouterx.NewRouterPublic(httpMetrics)
+	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	d.RegisterPublicRoutes(ctx, router)
 
 	n.UseHandler(router)

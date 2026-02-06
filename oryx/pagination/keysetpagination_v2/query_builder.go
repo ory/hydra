@@ -4,6 +4,7 @@
 package keysetpagination
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strings"
 
@@ -40,7 +41,8 @@ func Paginate[I any](p *Paginator) pop.ScopeFunc {
 			quote := q.Connection.Dialect.Quote
 			return quote(tableName) + "." + quote(name)
 		}
-		where, args, order := BuildWhereAndOrder(p.PageToken().Columns(), quoteAndContextualize)
+		dialect := q.Connection.Dialect.Name()
+		where, args, order := BuildWhereAndOrder(p.PageToken().Columns(), quoteAndContextualize, dialect)
 		// IMPORTANT: Ensures correct query logic by grouping conditions.
 		// Without parentheses, `WHERE otherCond AND pageCond1 OR pageCond2` would be
 		// evaluated as `(otherCond = ? AND pageCond1) OR pageCond2`, potentially returning
@@ -55,43 +57,106 @@ func Paginate[I any](p *Paginator) pop.ScopeFunc {
 	}
 }
 
-func BuildWhereAndOrder(columns []Column, quote func(string) string) (string, []any, string) {
+func BuildWhereAndOrder(columns []Column, quote func(string) string, dialect string) (string, []any, string) {
 	var whereBuilder, orderByBuilder, prevEqual strings.Builder
-	args := make([]any, 0, len(columns)*(len(columns)+1)/2)
-	prevEqualArgs := make([]any, 0, len(columns))
+
+	keysetCols := make([]Column, 0, len(columns))
+
+	// ORDER BY includes all columns (even constrained ones)
+	for i, part := range columns {
+		column := quote(part.Name)
+		_, keyword := part.Order.extract()
+
+		if i > 0 {
+			orderByBuilder.WriteString(", ")
+		}
+
+		orderByBuilder.WriteString(column + " " + keyword)
+
+		// Postgres orders NULLs differently depending on sort direction;
+		// (ASC → NULLS LAST, DESC → NULLS FIRST), which does not match the
+		// assumptions of our keyset pagination logic and other supported DBs.
+		// We therefore make NULL ordering explicit on Postgres to keep pagination
+		// stable and consistent with sqlite/mysql/cockroachdb.
+		if dialect == "postgres" && part.Nullable {
+			if part.Order == OrderAscending {
+				orderByBuilder.WriteString(" NULLS FIRST")
+			} else {
+				orderByBuilder.WriteString(" NULLS LAST")
+			}
+		}
+
+		// Build keyset WHERE only from unconstrained columns
+		if !part.HasConstraint {
+			keysetCols = append(keysetCols, part)
+		}
+	}
+
+	// If everything is constrained, no keyset predicate is needed.
+	if len(keysetCols) == 0 {
+		return "", nil, orderByBuilder.String()
+	}
+
+	args := make([]any, 0, len(keysetCols)*(len(keysetCols)+1)/2)
+	prevEqualArgs := make([]any, 0, len(keysetCols))
 
 	whereBuilder.WriteRune('(')
 
-	for i, part := range columns {
+	for i, part := range keysetCols {
 		column := quote(part.Name)
-		sign, keyword := part.Order.extract()
+		sign, _ := part.Order.extract()
 
-		// Build query
 		if i > 0 {
 			whereBuilder.WriteString(") OR (")
 		}
+
 		whereBuilder.WriteString(prevEqual.String())
 		if prevEqual.Len() > 0 {
 			whereBuilder.WriteString(" AND ")
 		}
-		whereBuilder.WriteString(fmt.Sprintf("%s %s ?", column, sign))
 
-		// Build orderBy
-		if i > 0 {
-			orderByBuilder.WriteString(", ")
+		isNull := part.Nullable && isSQLNull(part.Value)
+
+		if !part.Nullable {
+			whereBuilder.WriteString(column + " " + sign + " ?")
+		} else if !isNull {
+			whereBuilder.WriteString(column + " IS NOT NULL AND " + column + " " + sign + " ?")
+		} else {
+			whereBuilder.WriteString(column + " IS NOT NULL")
 		}
-		orderByBuilder.WriteString(column + " " + keyword)
 
-		// Update prevEqual
 		if i > 0 {
 			prevEqual.WriteString(" AND ")
 		}
-		prevEqual.WriteString(fmt.Sprintf("%s = ?", column))
-		prevEqualArgs = append(prevEqualArgs, part.Value)
+
+		if !part.Nullable {
+			prevEqual.WriteString(column + " = ?")
+			prevEqualArgs = append(prevEqualArgs, part.Value)
+		} else if !isNull {
+			prevEqual.WriteString(column + " = ?")
+			prevEqualArgs = append(prevEqualArgs, part.Value)
+		} else {
+			prevEqual.WriteString(column + " IS NULL")
+		}
+
 		args = append(args, prevEqualArgs...)
 	}
 
 	whereBuilder.WriteRune(')')
 
 	return whereBuilder.String(), args, orderByBuilder.String()
+}
+
+// isSQLNull reports whether v represents a SQL NULL value.
+func isSQLNull(v any) bool {
+	if v == nil {
+		return true
+	}
+
+	if valuer, ok := v.(driver.Valuer); ok {
+		val, err := valuer.Value()
+		return err == nil && val == nil
+	}
+
+	return false
 }

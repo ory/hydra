@@ -17,10 +17,10 @@ import (
 
 	"github.com/ory/hydra/v2/driver"
 
-	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/client"
@@ -34,7 +34,6 @@ import (
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/httprouterx"
-	"github.com/ory/x/prometheusx"
 	"github.com/ory/x/snapshotx"
 )
 
@@ -63,8 +62,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(ctx, deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(ctx, deleteRequest.ID, deleteRequest))
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	r := httprouterx.NewRouterAdminWithPrefix(metrics)
+	r := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(r)
 	ts := httptest.NewServer(r)
@@ -99,8 +97,7 @@ func TestUserinfo(t *testing.T) {
 
 	h := oauth2.NewHandler(reg)
 
-	metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-	router := httprouterx.NewRouterAdminWithPrefix(metrics)
+	router := httprouterx.NewTestRouterAdminWithPrefix(t)
 	h.SetPublicRoutes(router.ToPublic(), func(h http.Handler) http.Handler { return h })
 	h.SetAdminRoutes(router)
 	ts := httptest.NewServer(router)
@@ -309,7 +306,7 @@ func TestUserinfo(t *testing.T) {
 				})
 				require.NoError(t, err)
 				assert.EqualValues(t, "alice", claims.Claims["sub"])
-				assert.EqualValues(t, []interface{}{"foobar-client"}, claims.Claims["aud"], "%#v", claims.Claims)
+				assert.EqualValuesf(t, []any{"foobar-client"}, claims.Claims["aud"], "%#v", claims.Claims)
 				assert.NotEmpty(t, claims.Claims["jti"])
 			},
 		},
@@ -322,10 +319,10 @@ func TestUserinfo(t *testing.T) {
 			req.Header.Set("Authorization", "Bearer access-token")
 			resp, err := http.DefaultClient.Do(req)
 			require.NoError(t, err)
-			defer resp.Body.Close() //nolint:errcheck
-			require.EqualValues(t, tc.expectStatusCode, resp.StatusCode)
+			t.Cleanup(func() { _ = resp.Body.Close() })
 			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
+			require.Equalf(t, tc.expectStatusCode, resp.StatusCode, "body: %s", body)
 			if tc.expectStatusCode == http.StatusOK {
 				tc.checkForSuccess(t, body)
 			} else if tc.expectStatusCode == http.StatusUnauthorized {
@@ -351,8 +348,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-		r := httprouterx.NewRouterAdminWithPrefix(metrics)
+		r := httprouterx.NewTestRouterAdminWithPrefix(t)
 		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)
@@ -397,8 +393,7 @@ func TestHandlerOauthAuthorizationServer(t *testing.T) {
 
 		h := oauth2.NewHandler(reg)
 
-		metrics := prometheusx.NewMetricsManagerWithPrefix("hydra", prometheusx.HTTPMetrics, config.Version, config.Commit, config.Date)
-		r := httprouterx.NewRouterAdminWithPrefix(metrics)
+		r := httprouterx.NewTestRouterAdminWithPrefix(t)
 		h.SetPublicRoutes(r.ToPublic(), func(h http.Handler) http.Handler { return h })
 		h.SetAdminRoutes(r)
 		ts := httptest.NewServer(r)

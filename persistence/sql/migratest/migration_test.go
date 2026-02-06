@@ -67,7 +67,7 @@ func TestMigrations(t *testing.T) {
 		for db, dsn := range map[string]string{
 			"postgres":  dockertest.RunTestPostgreSQL(t),
 			"mysql":     dockertest.RunTestMySQL(t),
-			"cockroach": dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.1"),
+			"cockroach": dockertest.RunTestCockroachDBWithVersion(t, "latest-v25.4"),
 		} {
 			wg.Add(1)
 			go func() {
@@ -108,7 +108,10 @@ func TestMigrations(t *testing.T) {
 				c, l,
 				popx.WithTestdata(t, os.DirFS("./testdata")))
 			require.NoError(t, err)
-			require.NoError(t, tm.Up(t.Context()))
+			if !assert.NoError(t, tm.Up(t.Context())) {
+				_ = tm.DumpMigrationSchema(t.Context())
+				t.FailNow()
+			}
 
 			t.Run("suite=fixtures", func(t *testing.T) {
 				t.Run("case=hydra_client", func(t *testing.T) {
@@ -288,7 +291,9 @@ func TestMigrations(t *testing.T) {
 					}
 				}
 
-				assert.NoError(t, tm.Down(t.Context(), stepsDown))
+				if !assert.NoError(t, tm.Down(t.Context(), stepsDown)) {
+					_ = tm.DumpMigrationSchema(t.Context())
+				}
 			})
 		})
 	}

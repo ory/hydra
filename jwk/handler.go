@@ -88,6 +88,9 @@ func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	eg, ctx := errgroup.WithContext(r.Context())
 	wellKnownKeys := h.r.Config().WellKnownKeys(ctx)
@@ -158,6 +161,9 @@ type _ struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getJsonWebKey(w http.ResponseWriter, r *http.Request) {
 	var setName = r.PathValue("set")
 	var keyName = r.PathValue("key")
@@ -202,6 +208,9 @@ type _ struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var setName = r.PathValue("set")
 
@@ -277,6 +286,9 @@ type createJsonWebKeySetBody struct {
 //	Responses:
 //	  201: jsonWebKeySet
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) createJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keyRequest createJsonWebKeySetBody
 	var set = r.PathValue("set")
@@ -327,6 +339,9 @@ type _ struct {
 //	Responses:
 //	  200: jsonWebKeySet
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) setJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var keySet jose.JSONWebKeySet
 	var set = r.PathValue("set")
@@ -383,6 +398,9 @@ type _ struct {
 //	Responses:
 //	  200: jsonWebKey
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request) {
 	var key jose.JSONWebKey
 	var set = r.PathValue("set")
@@ -429,6 +447,9 @@ type _ struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request) {
 	var setName = r.PathValue("set")
 
@@ -478,6 +499,9 @@ type _ struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) deleteJsonWebKey(w http.ResponseWriter, r *http.Request) {
 	setName, keyName := r.PathValue("set"), r.PathValue("key")
 

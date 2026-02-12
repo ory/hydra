@@ -88,6 +88,9 @@ type createOAuth2Client struct {
 //	  201: oAuth2Client
 //	  400: errorOAuth2BadRequest
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -139,6 +142,9 @@ type createOidcDynamicClient struct {
 //	  201: oAuth2Client
 //	  400: errorOAuth2BadRequest
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -246,6 +252,9 @@ type setOAuth2Client struct {
 //	  400: errorOAuth2BadRequest
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -334,6 +343,9 @@ type setOidcDynamicClient struct {
 //	  200: oAuth2Client
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -417,6 +429,9 @@ type patchOAuth2Client struct {
 //	  200: oAuth2Client
 //	  404: errorOAuth2NotFound
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -506,6 +521,9 @@ type listOAuth2ClientsParameters struct {
 //	Responses:
 //	  200: listOAuth2Clients
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) listOAuth2Clients(w http.ResponseWriter, r *http.Request) {
 	pageKeys := h.r.Config().GetPaginationEncryptionKeys(r.Context())
 	pagination, err := keysetpagination.ParseQueryParams(pageKeys, r.URL.Query())
@@ -570,6 +588,9 @@ type adminGetOAuth2Client struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -621,6 +642,9 @@ type getOidcDynamicClient struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: errorOAuth2Default
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -680,6 +704,9 @@ type deleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -720,6 +747,9 @@ type setOAuth2ClientLifespans struct {
 //	Responses:
 //	  200: oAuth2Client
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -783,6 +813,9 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-high
 func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)

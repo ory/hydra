@@ -49,7 +49,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/.well-known/openid-configuration": {
@@ -80,7 +81,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/admin/clients": {
@@ -138,7 +140,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "post": {
         "description": "Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret\nis generated. The secret is echoed in the response. It is not possible to retrieve it later on.",
@@ -181,7 +184,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/clients/{id}": {
@@ -221,7 +225,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "put": {
         "description": "Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,\notherwise the existing secret is used.\n\nIf set, the secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -274,7 +279,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "delete": {
         "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nMake sure that this endpoint is well protected and only callable by first-party components.",
@@ -312,7 +318,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "patch": {
         "description": "Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -362,7 +369,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/clients/{id}/lifespans": {
@@ -409,7 +417,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/keys/{set}": {
@@ -452,7 +461,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -500,7 +510,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "post": {
         "description": "This endpoint is capable of generating JSON Web Key Sets for you. There are different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymmetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -549,7 +560,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "delete": {
         "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -587,7 +599,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/keys/{set}/{kid}": {
@@ -637,7 +650,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -692,7 +706,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "delete": {
         "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A\nJWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses\nthis functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens),\nand allows storing user-defined keys as well.",
@@ -737,7 +752,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/consent": {
@@ -786,7 +802,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/consent/accept": {
@@ -836,7 +853,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/consent/reject": {
@@ -886,7 +904,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/device/accept": {
@@ -935,7 +954,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login": {
@@ -984,7 +1004,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login/accept": {
@@ -1034,7 +1055,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login/reject": {
@@ -1084,7 +1106,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout": {
@@ -1129,7 +1152,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout/accept": {
@@ -1169,7 +1193,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout/reject": {
@@ -1205,7 +1230,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/sessions/consent": {
@@ -1272,7 +1298,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "delete": {
         "description": "This endpoint revokes a subject's granted consent sessions and invalidates all\nassociated OAuth 2.0 Access Tokens. You may also only revoke sessions for a specific OAuth 2.0 Client ID.",
@@ -1327,7 +1354,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/sessions/login": {
@@ -1372,7 +1400,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/introspect": {
@@ -1421,7 +1450,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/tokens": {
@@ -1458,7 +1488,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers": {
@@ -1516,7 +1547,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "post": {
         "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
@@ -1557,7 +1589,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers/{id}": {
@@ -1600,7 +1633,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "delete": {
         "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
@@ -1638,7 +1672,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/credentials": {
@@ -1684,7 +1719,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       }
     },
     "/health/alive": {
@@ -1766,7 +1802,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/device/auth": {
@@ -1797,7 +1834,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/oauth2/device/verify": {
@@ -1825,7 +1863,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/oauth2/register": {
@@ -1870,7 +1909,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/oauth2/register/{id}": {
@@ -1915,7 +1955,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "put": {
         "security": [
@@ -1970,7 +2011,8 @@
           "default": {
             "$ref": "#/responses/errorOAuth2Default"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       },
       "delete": {
         "security": [
@@ -2010,7 +2052,8 @@
               "$ref": "#/definitions/genericError"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/oauth2/revoke": {
@@ -2064,7 +2107,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/sessions/logout": {
@@ -2083,7 +2127,8 @@
           "302": {
             "$ref": "#/responses/emptyResponse"
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/token": {
@@ -2153,7 +2198,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/userinfo": {
@@ -2189,7 +2235,8 @@
               "$ref": "#/definitions/errorOAuth2"
             }
           }
-        }
+        },
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/version": {

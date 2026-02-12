@@ -148,6 +148,9 @@ func (h *Handler) SetAdminRoutes(admin *httprouterx.RouterAdmin) {
 //
 //	Responses:
 //	  302: emptyResponse
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-medium
 func (h *Handler) performOidcFrontOrBackChannelLogout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -502,6 +505,9 @@ type CredentialSupportedDraft00 struct {
 //	Responses:
 //	  200: oidcConfiguration
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	key, err := h.r.OpenIDJWTSigner().GetPublicKey(ctx)
@@ -638,6 +644,9 @@ type _ struct {
 //	Responses:
 //	  200: oidcUserInfo
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-medium
 func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
@@ -731,6 +740,9 @@ func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 //	Responses:
 //	  302: emptyResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) performOAuth2DeviceVerificationFlow(w http.ResponseWriter, r *http.Request) {
 	var (
 		ctx = r.Context()
@@ -867,6 +879,9 @@ type _ struct {
 //	Responses:
 //	  200: deviceAuthorization
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) oAuth2DeviceFlow(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -925,6 +940,9 @@ type _ struct {
 //	Responses:
 //	  200: emptyResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-medium
 func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -979,6 +997,9 @@ type _ struct {
 //	Responses:
 //	  200: introspectedOAuth2Token
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) introspectOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
@@ -1141,6 +1162,9 @@ type _ struct {
 //	Responses:
 //	  200: oAuth2TokenExchange
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-medium
 func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")
@@ -1258,6 +1282,9 @@ func (h *Handler) oauth2TokenExchange(w http.ResponseWriter, r *http.Request) {
 //
 //	302: emptyResponse
 //	default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-public-medium
 func (h *Handler) oAuth2Authorize(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -1327,6 +1354,9 @@ type _ struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) deleteOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	clientID := r.URL.Query().Get("client_id")
 	if clientID == "" {
@@ -1463,6 +1493,9 @@ func (h *Handler) updateSessionWithRequest(
 //	  200: verifiableCredentialResponse
 //	  400: verifiableCredentialPrimingResponse
 //	  default: errorOAuth2
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) createVerifiableCredential(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims(ctx, h.c, "")

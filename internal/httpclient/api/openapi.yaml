@@ -48,6 +48,7 @@ paths:
       summary: Discover Well-Known JSON Web Keys
       tags:
       - wellknown
+      x-ory-ratelimit-bucket: hydra-public-low
   /.well-known/openid-configuration:
     get:
       description: |-
@@ -72,6 +73,7 @@ paths:
       summary: OpenID Connect Discovery
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-low
   /admin/clients:
     get:
       description: |-
@@ -131,6 +133,7 @@ paths:
       summary: List OAuth 2.0 Clients
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-medium
     post:
       description: |-
         Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret
@@ -158,6 +161,7 @@ paths:
       summary: Create OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/clients/{id}:
     delete:
       description: |-
@@ -189,6 +193,7 @@ paths:
       summary: Delete OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
     get:
       description: |-
         Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
@@ -217,6 +222,7 @@ paths:
       summary: Get an OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
     patch:
       description: |-
         Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`
@@ -257,6 +263,7 @@ paths:
       summary: Patch OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
     put:
       description: |-
         Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,
@@ -300,6 +307,7 @@ paths:
       summary: Set OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/clients/{id}/lifespans:
     put:
       description: Set lifespans of different token types issued for this OAuth 2.0
@@ -336,6 +344,7 @@ paths:
       summary: Set OAuth2 Client Token Lifespans
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/keys/{set}:
     delete:
       description: |-
@@ -364,6 +373,7 @@ paths:
       summary: Delete JSON Web Key Set
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-high
     get:
       description: |-
         This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
@@ -395,6 +405,7 @@ paths:
       summary: Retrieve a JSON Web Key Set
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-medium
     post:
       description: |-
         This endpoint is capable of generating JSON Web Key Sets for you. There are different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymmetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
@@ -433,6 +444,7 @@ paths:
       summary: Create JSON Web Key
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-high
     put:
       description: |-
         Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -470,6 +482,7 @@ paths:
       summary: Update a JSON Web Key Set
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/keys/{set}/{kid}:
     delete:
       description: |-
@@ -509,6 +522,7 @@ paths:
       summary: Delete JSON Web Key
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-high
     get:
       description: This endpoint returns a singular JSON Web Key contained in a set.
         It is identified by the set and the specific key ID (kid).
@@ -546,6 +560,7 @@ paths:
       summary: Get JSON Web Key
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-medium
     put:
       description: |-
         Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -591,6 +606,7 @@ paths:
       summary: Set JSON Web Key
       tags:
       - jwk
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/oauth2/auth/requests/consent:
     get:
       description: |-
@@ -636,6 +652,7 @@ paths:
       summary: Get OAuth 2.0 Consent Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/consent/accept:
     put:
       description: |-
@@ -687,6 +704,7 @@ paths:
       summary: Accept OAuth 2.0 Consent Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/consent/reject:
     put:
       description: |-
@@ -737,6 +755,7 @@ paths:
       summary: Reject OAuth 2.0 Consent Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/device/accept:
     put:
       description: Accepts a device grant user_code request
@@ -771,6 +790,7 @@ paths:
       summary: Accepts a device grant user_code request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/login:
     get:
       description: |-
@@ -815,6 +835,7 @@ paths:
       summary: Get OAuth 2.0 Login Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/login/accept:
     put:
       description: |-
@@ -861,6 +882,7 @@ paths:
       summary: Accept OAuth 2.0 Login Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/login/reject:
     put:
       description: |-
@@ -906,6 +928,7 @@ paths:
       summary: Reject OAuth 2.0 Login Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/logout:
     get:
       description: Use this endpoint to fetch an Ory OAuth 2.0 logout request.
@@ -940,6 +963,7 @@ paths:
       summary: Get OAuth 2.0 Session Logout Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/logout/accept:
     put:
       description: |-
@@ -972,6 +996,7 @@ paths:
       summary: Accept OAuth 2.0 Session Logout Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/requests/logout/reject:
     put:
       description: |-
@@ -1000,6 +1025,7 @@ paths:
       summary: Reject OAuth 2.0 Session Logout Request
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/sessions/consent:
     delete:
       description: |-
@@ -1063,6 +1089,7 @@ paths:
       summary: Revoke OAuth 2.0 Consent Sessions of a Subject
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
     get:
       description: |-
         This endpoint lists all subject's granted consent sessions, including client and granted scope.
@@ -1132,6 +1159,7 @@ paths:
       summary: List OAuth 2.0 Consent Sessions of a Subject
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/auth/sessions/login:
     delete:
       description: |-
@@ -1181,6 +1209,7 @@ paths:
       summary: Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/oauth2/introspect:
     post:
       description: |-
@@ -1209,6 +1238,7 @@ paths:
       summary: Introspect OAuth2 Access and Refresh Tokens
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /admin/oauth2/tokens:
     delete:
       description: This endpoint deletes OAuth2 access tokens issued to an OAuth 2.0
@@ -1235,6 +1265,7 @@ paths:
       summary: Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/trust/grants/jwt-bearer/issuers:
     get:
       description: Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
@@ -1293,6 +1324,7 @@ paths:
       summary: List Trusted OAuth2 JWT Bearer Grant Type Issuers
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-medium
     post:
       description: |-
         Use this endpoint to establish a trust relationship for a JWT issuer
@@ -1321,6 +1353,7 @@ paths:
       summary: Trust OAuth2 JWT Bearer Grant Type Issuer
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
   /admin/trust/grants/jwt-bearer/issuers/{id}:
     delete:
       description: |-
@@ -1351,6 +1384,7 @@ paths:
       summary: Delete Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-high
     get:
       description: |-
         Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
@@ -1381,6 +1415,7 @@ paths:
       summary: Get Trusted OAuth2 JWT Bearer Grant Type Issuer
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-medium
   /credentials:
     post:
       description: |-
@@ -1419,6 +1454,7 @@ paths:
       summary: Issues a Verifiable Credential
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-admin-medium
   /health/alive:
     get:
       description: |-
@@ -1496,6 +1532,7 @@ paths:
       summary: OAuth 2.0 Authorize Endpoint
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-public-medium
   /oauth2/device/auth:
     post:
       description: |-
@@ -1520,6 +1557,7 @@ paths:
       summary: The OAuth 2.0 Device Authorize Endpoint
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-public-low
   /oauth2/device/verify:
     get:
       description: This is the device user verification endpoint. The user is redirected
@@ -1537,6 +1575,7 @@ paths:
       summary: OAuth 2.0 Device Verification Endpoint
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-admin-low
   /oauth2/register:
     post:
       description: |-
@@ -1574,6 +1613,7 @@ paths:
       summary: Register OAuth2 Client using OpenID Dynamic Client Registration
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-high
   /oauth2/register/{id}:
     delete:
       description: |-
@@ -1613,6 +1653,7 @@ paths:
         Management Protocol
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-high
     get:
       description: |-
         This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
@@ -1646,6 +1687,7 @@ paths:
       summary: Get OAuth2 Client using OpenID Dynamic Client Registration
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-admin-low
     put:
       description: |-
         This endpoint behaves like the administrative counterpart (`setOAuth2Client`) but is capable of facing the
@@ -1697,6 +1739,7 @@ paths:
       summary: Set OAuth2 Client using OpenID Dynamic Client Registration
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-high
   /oauth2/revoke:
     post:
       description: |-
@@ -1725,6 +1768,7 @@ paths:
       summary: Revoke OAuth 2.0 Access or Refresh Token
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-public-medium
   /oauth2/sessions/logout:
     get:
       description: |-
@@ -1741,6 +1785,7 @@ paths:
       summary: OpenID Connect Front- and Back-channel Enabled Logout
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-medium
   /oauth2/token:
     post:
       description: |-
@@ -1774,6 +1819,7 @@ paths:
       summary: The OAuth 2.0 Token Endpoint
       tags:
       - oAuth2
+      x-ory-ratelimit-bucket: hydra-public-medium
   /userinfo:
     get:
       description: |-
@@ -1802,6 +1848,7 @@ paths:
       summary: OpenID Connect Userinfo
       tags:
       - oidc
+      x-ory-ratelimit-bucket: hydra-public-medium
   /version:
     get:
       description: |-

@@ -1849,7 +1849,8 @@
         "summary": "Discover Well-Known JSON Web Keys",
         "tags": [
           "wellknown"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/.well-known/openid-configuration": {
@@ -1881,7 +1882,8 @@
         "summary": "OpenID Connect Discovery",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/admin/clients": {
@@ -1937,7 +1939,8 @@
         "summary": "List OAuth 2.0 Clients",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "post": {
         "description": "Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret\nis generated. The secret is echoed in the response. It is not possible to retrieve it later on.",
@@ -1975,7 +1978,8 @@
         "summary": "Create OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/clients/{id}": {
@@ -2011,7 +2015,8 @@
         "summary": "Delete OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "get": {
         "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2045,7 +2050,8 @@
         "summary": "Get an OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "patch": {
         "description": "Patch an existing OAuth 2.0 Client using JSON Patch. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2094,7 +2100,8 @@
         "summary": "Patch OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "put": {
         "description": "Replaces an existing OAuth 2.0 Client with the payload you send. If you pass `client_secret` the secret is used,\notherwise the existing secret is used.\n\nIf set, the secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 Clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -2146,7 +2153,8 @@
         "summary": "Set OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/clients/{id}/lifespans": {
@@ -2199,7 +2207,8 @@
         "summary": "Set OAuth2 Client Token Lifespans",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/keys/{set}": {
@@ -2235,7 +2244,8 @@
         "summary": "Delete JSON Web Key Set",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "get": {
         "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2276,7 +2286,8 @@
         "summary": "Retrieve a JSON Web Key Set",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "post": {
         "description": "This endpoint is capable of generating JSON Web Key Sets for you. There are different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymmetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2328,7 +2339,8 @@
         "summary": "Create JSON Web Key",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2379,7 +2391,8 @@
         "summary": "Update a JSON Web Key Set",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/keys/{set}/{kid}": {
@@ -2424,7 +2437,8 @@
         "summary": "Delete JSON Web Key",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "get": {
         "description": "This endpoint returns a singular JSON Web Key contained in a set. It is identified by the set and the specific key ID (kid).",
@@ -2474,7 +2488,8 @@
         "summary": "Get JSON Web Key",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "put": {
         "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
@@ -2534,7 +2549,8 @@
         "summary": "Set JSON Web Key",
         "tags": [
           "jwk"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/auth/requests/consent": {
@@ -2587,7 +2603,8 @@
         "summary": "Get OAuth 2.0 Consent Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/consent/accept": {
@@ -2640,7 +2657,8 @@
         "summary": "Accept OAuth 2.0 Consent Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/consent/reject": {
@@ -2693,7 +2711,8 @@
         "summary": "Reject OAuth 2.0 Consent Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/device/accept": {
@@ -2745,7 +2764,8 @@
         "summary": "Accepts a device grant user_code request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login": {
@@ -2798,7 +2818,8 @@
         "summary": "Get OAuth 2.0 Login Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login/accept": {
@@ -2851,7 +2872,8 @@
         "summary": "Accept OAuth 2.0 Login Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/login/reject": {
@@ -2904,7 +2926,8 @@
         "summary": "Reject OAuth 2.0 Login Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout": {
@@ -2956,7 +2979,8 @@
         "summary": "Get OAuth 2.0 Session Logout Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout/accept": {
@@ -2999,7 +3023,8 @@
         "summary": "Accept OAuth 2.0 Session Logout Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/requests/logout/reject": {
@@ -3034,7 +3059,8 @@
         "summary": "Reject OAuth 2.0 Session Logout Request",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/sessions/consent": {
@@ -3093,7 +3119,8 @@
         "summary": "Revoke OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "get": {
         "description": "This endpoint lists all subject's granted consent sessions, including client and granted scope.\nIf the subject is unknown or has not granted any consent sessions yet, the endpoint returns an\nempty JSON array with status code 200 OK.",
@@ -3164,7 +3191,8 @@
         "summary": "List OAuth 2.0 Consent Sessions of a Subject",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/auth/sessions/login": {
@@ -3207,7 +3235,8 @@
         "summary": "Revokes OAuth 2.0 Login Sessions by either a Subject or a SessionID",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/oauth2/introspect": {
@@ -3266,7 +3295,8 @@
         "summary": "Introspect OAuth2 Access and Refresh Tokens",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/admin/oauth2/tokens": {
@@ -3302,7 +3332,8 @@
         "summary": "Delete OAuth 2.0 Access Tokens from specific OAuth 2.0 Client",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers": {
@@ -3364,7 +3395,8 @@
         "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       },
       "post": {
         "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
@@ -3404,7 +3436,8 @@
         "summary": "Trust OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       }
     },
     "/admin/trust/grants/jwt-bearer/issuers/{id}": {
@@ -3440,7 +3473,8 @@
         "summary": "Delete Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-high"
       },
       "get": {
         "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
@@ -3481,7 +3515,8 @@
         "summary": "Get Trusted OAuth2 JWT Bearer Grant Type Issuer",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       }
     },
     "/credentials": {
@@ -3533,7 +3568,8 @@
         "summary": "Issues a Verifiable Credential",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-medium"
       }
     },
     "/health/alive": {
@@ -3637,7 +3673,8 @@
         "summary": "OAuth 2.0 Authorize Endpoint",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/device/auth": {
@@ -3669,7 +3706,8 @@
         "summary": "The OAuth 2.0 Device Authorize Endpoint",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-low"
       }
     },
     "/oauth2/device/verify": {
@@ -3694,7 +3732,8 @@
         "summary": "OAuth 2.0 Device Verification Endpoint",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       }
     },
     "/oauth2/register": {
@@ -3734,7 +3773,8 @@
         "summary": "Register OAuth2 Client using OpenID Dynamic Client Registration",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/oauth2/register/{id}": {
@@ -3775,7 +3815,8 @@
         "summary": "Delete OAuth 2.0 Client using the OpenID Dynamic Client Registration Management Protocol",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       },
       "get": {
         "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.",
@@ -3814,7 +3855,8 @@
         "summary": "Get OAuth2 Client using OpenID Dynamic Client Registration",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-admin-low"
       },
       "put": {
         "description": "This endpoint behaves like the administrative counterpart (`setOAuth2Client`) but is capable of facing the\npublic internet directly to be used by third parties. It implements the OpenID Connect\nDynamic Client Registration Protocol.\n\nThis feature is disabled per default. It can be enabled by a system administrator.\n\nIf you pass `client_secret` the secret is used, otherwise the existing secret is used. If set, the secret is echoed in the response.\nIt is not possible to retrieve it later on.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -3868,7 +3910,8 @@
         "summary": "Set OAuth2 Client using OpenID Dynamic Client Registration",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-high"
       }
     },
     "/oauth2/revoke": {
@@ -3930,7 +3973,8 @@
         "summary": "Revoke OAuth 2.0 Access or Refresh Token",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/sessions/logout": {
@@ -3945,7 +3989,8 @@
         "summary": "OpenID Connect Front- and Back-channel Enabled Logout",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/oauth2/token": {
@@ -4022,7 +4067,8 @@
         "summary": "The OAuth 2.0 Token Endpoint",
         "tags": [
           "oAuth2"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/userinfo": {
@@ -4059,7 +4105,8 @@
         "summary": "OpenID Connect Userinfo",
         "tags": [
           "oidc"
-        ]
+        ],
+        "x-ory-ratelimit-bucket": "hydra-public-medium"
       }
     },
     "/version": {

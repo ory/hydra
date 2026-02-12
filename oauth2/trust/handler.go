@@ -105,6 +105,9 @@ type trustOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  201: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) trustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	var grantRequest createGrantRequest
 
@@ -176,6 +179,9 @@ type getTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuer
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) getTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
@@ -227,6 +233,9 @@ type deleteTrustedOAuth2JwtGrantIssuer struct {
 //	Responses:
 //	  204: emptyResponse
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) deleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request) {
 	rawID := r.PathValue("id")
 	id, err := uuid.FromString(rawID)
@@ -276,6 +285,9 @@ type listTrustedOAuth2JwtGrantIssuers struct {
 //	Responses:
 //	  200: trustedOAuth2JwtGrantIssuers
 //	  default: genericError
+//
+//	Extensions:
+//	  x-ory-ratelimit-bucket: hydra-admin-medium
 func (h *Handler) adminListTrustedOAuth2JwtGrantIssuers(w http.ResponseWriter, r *http.Request) {
 	optionalIssuer := r.URL.Query().Get("issuer")
 

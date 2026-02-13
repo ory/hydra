@@ -32,6 +32,14 @@
       "vi": 64
     },
     {
+      "n": "int64-zero",
+      "vi": 0
+    },
+    {
+      "n": "empty-nullint64",
+      "vi": 0
+    },
+    {
       "n": "nullint64",
       "vi": 64
     },

@@ -141,6 +141,10 @@ type Column struct {
 	name string
 }
 
+func (c Column) Name() string {
+	return c.name
+}
+
 type ColumnConstraint uint8
 
 const (
@@ -163,15 +167,16 @@ type Query map[Column]ColumnConstraint
 func NewQuery() Query { return make(Query) }
 
 func (qc Query) SetEq(cols ...Column) Query {
-	for _, col := range cols {
-		qc[col] = colConstraintEq
-	}
-	return qc
+	return qc.set(colConstraintEq, cols...)
 }
 
 func (qc Query) SetIsNull(cols ...Column) Query {
+	return qc.set(colConstraintIsNull, cols...)
+}
+
+func (qc Query) set(c ColumnConstraint, cols ...Column) Query {
 	for _, col := range cols {
-		qc[col] = colConstraintIsNull
+		qc[col] = c
 	}
 	return qc
 }

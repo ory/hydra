@@ -130,18 +130,11 @@ func (t *PageToken) UnmarshalJSON(data []byte) error {
 			t.cols[i].Value = nil
 		case col.ValueAny != nil:
 			t.cols[i].Value = col.ValueAny
-
-		// zero-value checks needed for backward compatibility.
-		// Old format: {"vt": "2023-01-01...", "vu": "00000...", "vi": 0} - all fields are present.
-		// To avoid breaking existing tokens, we need to check for zero value as old logic did.
-		// The next release can drop the 2nd part of the case conditions.
-		case col.ValueTime != nil && !col.ValueTime.IsZero():
-			t.cols[i].Value = *col.ValueTime
-		case col.ValueUUID != nil && *col.ValueUUID != uuid.Nil:
+		case col.ValueUUID != nil:
 			t.cols[i].Value = *col.ValueUUID
-		case col.ValueAny != nil:
-			t.cols[i].Value = col.ValueAny
-		case col.ValueInt64 != nil && *col.ValueInt64 != 0:
+		case col.ValueTime != nil:
+			t.cols[i].Value = *col.ValueTime
+		case col.ValueInt64 != nil:
 			t.cols[i].Value = *col.ValueInt64
 		}
 	}

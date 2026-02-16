@@ -13,6 +13,9 @@ services:
   hydra-migrate:
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
+    depends_on:
+      "mysqld":
+        condition: service_healthy
   hydra:
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
@@ -24,3 +27,18 @@ services:
       - MYSQL_ROOT_PASSWORD=secret
     networks:
       - intranet
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "--user=root",
+          "--protocol=tcp",
+          "--password=secret",
+        ]
+      interval: 1s
+      timeout: 30s
+      retries: 30

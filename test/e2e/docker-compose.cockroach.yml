@@ -7,10 +7,14 @@ services:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
     command: migrate sql up -e --yes
     restart: on-failure
+    depends_on:
+      "cockroachd":
+        condition: service_healthy
 
   hydra:
     depends_on:
-      - hydra-migrate
+      hydra-migrate:
+        condition: service_completed_successfully
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
 
@@ -19,3 +23,12 @@ services:
     ports:
       - "26257:26257"
     command: start-single-node --insecure
+    volumes:
+      - cockroach-data:/cockroach/cockroach-data:rw
+    healthcheck:
+      test: ["CMD", "cockroach", "node", "status", "--insecure"]
+      interval: 1s
+      timeout: 30s
+      retries: 30
+volumes:
+  cockroach-data:

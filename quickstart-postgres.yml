@@ -13,6 +13,9 @@ services:
   hydra-migrate:
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+    depends_on:
+      "postgresd":
+        condition: service_healthy
   hydra:
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
@@ -20,7 +23,13 @@ services:
     image: postgres:16
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hydra"]
+      interval: 1s
+      timeout: 30s
+      retries: 30
     environment:
+      - PGUSER=hydra
       - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=hydra

@@ -16,7 +16,7 @@ services:
       - hydra-sqlite:/mnt/sqlite
     command: "chmod -R 777 /mnt/sqlite"
   hydra:
-    image: oryd/hydra:v25.4.0
+    # image: oryd/hydra:v25.4.0
     build:
       context: .
       dockerfile: .docker/Dockerfile-local-build
@@ -40,7 +40,7 @@ services:
     networks:
       - intranet
   hydra-migrate:
-    image: oryd/hydra:v25.4.0
+    # image: oryd/hydra:v25.4.0
     build:
       context: .
       dockerfile: .docker/Dockerfile-local-build

@@ -35,6 +35,7 @@ func New(name string, l *logrusx.Logger, c *Config) (*Tracer, error) {
 	return t, nil
 }
 
+// NewNoop creates a new no-op tracer.
 func NewNoop() *Tracer {
 	tp := noop.NewTracerProvider()
 	t := &Tracer{tracer: tp.Tracer("")}

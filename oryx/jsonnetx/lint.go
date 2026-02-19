@@ -15,10 +15,6 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-// LintCommand represents the lint command
-// Deprecated: use NewLintCommand instead.
-var LintCommand = NewLintCommand()
-
 func NewLintCommand() *cobra.Command {
 	var verbose bool
 	cmd := &cobra.Command{

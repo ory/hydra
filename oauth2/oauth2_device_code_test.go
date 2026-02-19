@@ -292,8 +292,8 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  subject,
-				Remember: pointerx.Ptr(!rr.Skip),
-				Acr:      pointerx.Ptr("1"),
+				Remember: new(!rr.Skip),
+				Acr:      new("1"),
 				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
@@ -333,7 +333,7 @@ func TestDeviceCodeWithDefaultStrategy(t *testing.T) {
 			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(context.Background()).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: scopes, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
+					GrantScope: scopes, Remember: new(true), RememberFor: new(int64(0)),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},

@@ -18,14 +18,13 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/pop/v6"
 
 	"github.com/ory/dockertest/v3"
 	dc "github.com/ory/dockertest/v3/docker"
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/resilience"
 	"github.com/ory/x/stringsx"
 )
 
@@ -72,22 +71,15 @@ func Register() *OnExit {
 }
 
 func ConnectPop(t require.TestingT, url string) (c *pop.Connection) {
-	require.NoError(t, resilience.Retry(logrusx.New("", ""), time.Second*5, time.Minute*5, func() error {
+	require.EventuallyWithT(t, func(t *assert.CollectT) {
 		var err error
 		c, err = pop.NewConnection(&pop.ConnectionDetails{
 			URL: url,
 		})
-		if err != nil {
-			log.Printf("could not create pop connection")
-			return err
-		}
-		if err := c.Open(); err != nil {
-			// an Open error probably means we have a problem with the connections config
-			log.Printf("could not open pop connection: %+v", err)
-			return err
-		}
-		return c.RawQuery("select version()").Exec()
-	}))
+		require.NoError(t, err)
+		require.NoError(t, c.Open())
+		require.NoError(t, c.RawQuery("select version()").Exec())
+	}, 5*time.Minute, time.Second*5, "could not connect to database at %s", url)
 	return
 }
 

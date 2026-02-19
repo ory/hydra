@@ -26,7 +26,7 @@ We encourage all contributions. Before opening a pull request, read the
 
 ## Prerequisites
 
-You need Go 1.13+ with `GO111MODULE=on` and, for the test suites:
+You need Go 1.26+. For the test suites:
 
 - Docker and Docker Compose
 - Makefile

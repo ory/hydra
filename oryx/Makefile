@@ -13,7 +13,7 @@ format: .bin/ory node_modules
 	npm exec -- prettier --write .
 
 .bin/golangci-lint: Makefile
-	curl --retry 7 --retry-connrefused -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v2.4.0
+	curl --retry 7 --retry-connrefused -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v2.10.1
 
 .bin/licenses: Makefile
 	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/licenses/install | sh
@@ -40,7 +40,7 @@ resetdb:
 
 .PHONY: lint
 lint: .bin/golangci-lint
-	GO111MODULE=on .bin/golangci-lint run -v ./...
+	.bin/golangci-lint run -v ./...
 
 .PHONY: migrations-render
 migrations-render: .bin/ory

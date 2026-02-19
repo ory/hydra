@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -24,8 +25,6 @@ import (
 	hydrac "github.com/ory/hydra-client-go/v2"
 
 	"github.com/ory/x/httpx"
-
-	"github.com/ory/x/stringslice"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -191,7 +190,7 @@ func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
 
 func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 	planName := extra.Get("planName")
-	if stringslice.Has(skipWhenShort, planName) && testing.Short() {
+	if slices.Contains(skipWhenShort, planName) && testing.Short() {
 		t.Skipf("Skipping test plan '%s' because short tests", planName)
 		return
 	}

@@ -14,10 +14,6 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-// FormatCommand represents the format command
-// Deprecated: use NewFormatCommand instead.
-var FormatCommand = NewFormatCommand()
-
 func NewFormatCommand() *cobra.Command {
 	var verbose, write bool
 	cmd := &cobra.Command{
@@ -61,7 +57,7 @@ Use -w or --write to write output back to files instead of stdout.
 					}
 
 					if write {
-						err := os.WriteFile(file, []byte(output), 0644) // #nosec
+						err := os.WriteFile(file, []byte(output), 0o644) // #nosec
 						if err != nil {
 							_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Unable to write file %q: %s\n", file, err)
 							return cmdx.FailSilently(cmd)

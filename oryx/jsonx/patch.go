@@ -12,8 +12,6 @@ import (
 	jsonpatch "github.com/evanphx/json-patch/v5"
 	"github.com/gobwas/glob"
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/pointerx"
 )
 
 var opAllowList = map[string]struct{}{
@@ -77,7 +75,7 @@ func ApplyJSONPatch[T any](p json.RawMessage, object T, denyPaths ...string) (re
 		// JSON patch officially rejects replacing paths that don't exist, but we want to be more tolerant.
 		// Therefore, we will ensure that all paths that we want to replace exist in the original document.
 		if op.Kind() == "replace" && !isElementAccess(path) {
-			op["op"] = pointerx.Ptr(json.RawMessage(`"add"`))
+			op["op"] = new(json.RawMessage(`"add"`))
 		}
 	}
 

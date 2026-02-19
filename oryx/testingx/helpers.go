@@ -5,26 +5,12 @@
 package testingx
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 )
-
-// ReadAll reads all bytes from the reader and returns them as a byte slice.
-func ReadAll(t testing.TB, r io.Reader) []byte {
-	body, err := io.ReadAll(r)
-	require.NoError(t, err)
-	return body
-}
-
-// ReadAllString reads all bytes from the reader and returns them as a string.
-func ReadAllString(t testing.TB, r io.Reader) string {
-	return string(ReadAll(t, r))
-}
 
 // RepoRootPath returns the absolute path of the closest parent directory that has a go.mod file relative to the caller.
 func RepoRootPath(t require.TestingT) (repoRoot string) {

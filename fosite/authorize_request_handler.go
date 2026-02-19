@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/go-jose/go-jose/v3"
@@ -15,7 +16,6 @@ import (
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/ory/go-convenience/stringslice"
 	"github.com/ory/hydra/v2/fosite/i18n"
 	"github.com/ory/hydra/v2/fosite/token/jwt"
 	"github.com/ory/x/errorsx"
@@ -60,7 +60,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 
 	assertion := request.Form.Get("request")
 	if location := request.Form.Get("request_uri"); len(location) > 0 {
-		if !stringslice.Has(oidcClient.GetRequestURIs(), location) {
+		if !slices.Contains(oidcClient.GetRequestURIs(), location) {
 			return errorsx.WithStack(ErrInvalidRequestURI.WithHintf("Request URI '%s' is not whitelisted by the OAuth 2.0 Client.", location))
 		}
 
@@ -155,7 +155,7 @@ func (f *Fosite) authorizeRequestParametersFromOpenIDConnectRequest(ctx context.
 
 	claimScope := RemoveEmpty(strings.Split(request.Form.Get("scope"), " "))
 	for _, s := range scope {
-		if !stringslice.Has(claimScope, s) {
+		if !slices.Contains(claimScope, s) {
 			claimScope = append(claimScope, s)
 		}
 	}

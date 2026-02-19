@@ -25,11 +25,11 @@ func (outputOAuth2Client) Header() []string {
 
 func (i outputOAuth2Client) Columns() []string {
 	data := [7]string{
-		fmt.Sprintf("%v", pointerx.StringR(i.ClientId)),
-		fmt.Sprintf("%v", pointerx.StringR(i.ClientSecret)),
+		fmt.Sprintf("%v", pointerx.Deref(i.ClientId)),
+		fmt.Sprintf("%v", pointerx.Deref(i.ClientSecret)),
 		strings.Join(i.GrantTypes, ", "),
 		strings.Join(i.ResponseTypes, ", "),
-		fmt.Sprintf("%v", pointerx.StringR(i.Scope)),
+		fmt.Sprintf("%v", pointerx.Deref(i.Scope)),
 		strings.Join(i.Audience, ","),
 		strings.Join(i.RedirectUris, ", "),
 	}

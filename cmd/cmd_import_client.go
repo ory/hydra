@@ -17,7 +17,6 @@ import (
 	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
-	"github.com/ory/x/pointerx"
 )
 
 func NewImportClientCmd() *cobra.Command {
@@ -118,7 +117,7 @@ Please be aware that this command does not update existing clients. If the clien
 							return cmdx.FailSilently(cmd)
 						}
 
-						result.ClientSecret = pointerx.String(enc.Base64Encode())
+						result.ClientSecret = new(enc.Base64Encode())
 					}
 
 					imported = append(imported, *result)

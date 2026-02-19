@@ -121,7 +121,7 @@ func (p *BasePersister) Ping(ctx context.Context) error { return p.c.Store.SQLDB
 func (p *BasePersister) mustSetNetwork(ctx context.Context, v interface{}) {
 	rv := reflect.ValueOf(v)
 
-	if rv.Kind() != reflect.Ptr || (rv.Kind() == reflect.Ptr && rv.Elem().Kind() != reflect.Struct) {
+	if rv.Kind() != reflect.Pointer || (rv.Kind() == reflect.Pointer && rv.Elem().Kind() != reflect.Struct) {
 		panic("v must be a pointer to a struct")
 	}
 	nf := rv.Elem().FieldByName("NID")

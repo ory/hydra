@@ -23,7 +23,6 @@ import (
 	"github.com/ory/hydra/v2/oauth2"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/pointerx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/uuidx"
@@ -48,7 +47,7 @@ func MockConsentFlow(remember bool, rememberFor int, skip bool) *flow.Flow {
 		RequestURL:         "https://request-url/path",
 		RequestedAt:        time.Now().UTC(),
 		ConsentRemember:    remember,
-		ConsentRememberFor: pointerx.Ptr(rememberFor),
+		ConsentRememberFor: new(rememberFor),
 		GrantedScope:       []string{"scope_a", "scope_b"},
 		GrantedAudience:    []string{"aud_a", "aud_b"},
 		ConsentHandledAt:   sqlxx.NullTime(time.Now().UTC()),
@@ -438,7 +437,7 @@ func ConsentManagerTests(t *testing.T, deps Deps, m consent.Manager, loginManage
 						ConsentRequestID:   sqlxx.NullString(uuid.Must(uuid.NewV4()).String()),
 						GrantedScope:       sqlxx.StringSliceJSONFormat{"scopea", "scopeb"},
 						ConsentRemember:    true,
-						ConsentRememberFor: pointerx.Ptr(0),
+						ConsentRememberFor: new(0),
 					}
 
 					require.NoError(t, m.CreateConsentSession(t.Context(), f))

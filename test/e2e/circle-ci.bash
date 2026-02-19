@@ -20,7 +20,6 @@ killall hydra || true
 ! nc -zv 127.0.0.1 5003
 
 # Install Ory Hydra
-export GO111MODULE=on
 if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi

@@ -15,7 +15,6 @@ import (
 	hydra "github.com/ory/hydra-client-go/v2"
 	"github.com/ory/hydra/v2/cmd/cli"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
 )
 
 func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
@@ -37,35 +36,35 @@ func clientFromFlags(cmd *cobra.Command) (hydra.OAuth2Client, error) {
 	}
 
 	return hydra.OAuth2Client{
-		AccessTokenStrategy:               pointerx.Ptr(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
+		AccessTokenStrategy:               new(flagx.MustGetString(cmd, flagClientAccessTokenStrategy)),
 		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, flagClientAllowedCORSOrigin),
 		Audience:                          flagx.MustGetStringSlice(cmd, flagClientAudience),
-		BackchannelLogoutSessionRequired:  pointerx.Ptr(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
-		BackchannelLogoutUri:              pointerx.Ptr(flagx.MustGetString(cmd, flagClientBackchannelLogoutCallback)),
-		ClientName:                        pointerx.Ptr(flagx.MustGetString(cmd, flagClientName)),
-		ClientSecret:                      pointerx.Ptr(flagx.MustGetString(cmd, flagClientSecret)),
-		ClientUri:                         pointerx.Ptr(flagx.MustGetString(cmd, flagClientClientURI)),
+		BackchannelLogoutSessionRequired:  new(flagx.MustGetBool(cmd, flagClientBackChannelLogoutSessionRequired)),
+		BackchannelLogoutUri:              new(flagx.MustGetString(cmd, flagClientBackchannelLogoutCallback)),
+		ClientName:                        new(flagx.MustGetString(cmd, flagClientName)),
+		ClientSecret:                      new(flagx.MustGetString(cmd, flagClientSecret)),
+		ClientUri:                         new(flagx.MustGetString(cmd, flagClientClientURI)),
 		Contacts:                          flagx.MustGetStringSlice(cmd, flagClientContact),
-		FrontchannelLogoutSessionRequired: pointerx.Ptr(flagx.MustGetBool(cmd, flagClientFrontChannelLogoutSessionRequired)),
-		FrontchannelLogoutUri:             pointerx.Ptr(flagx.MustGetString(cmd, flagClientFrontChannelLogoutCallback)),
+		FrontchannelLogoutSessionRequired: new(flagx.MustGetBool(cmd, flagClientFrontChannelLogoutSessionRequired)),
+		FrontchannelLogoutUri:             new(flagx.MustGetString(cmd, flagClientFrontChannelLogoutCallback)),
 		GrantTypes:                        flagx.MustGetStringSlice(cmd, flagClientGrantType),
-		JwksUri:                           pointerx.Ptr(flagx.MustGetString(cmd, flagClientJWKSURI)),
-		LogoUri:                           pointerx.Ptr(flagx.MustGetString(cmd, flagClientLogoURI)),
+		JwksUri:                           new(flagx.MustGetString(cmd, flagClientJWKSURI)),
+		LogoUri:                           new(flagx.MustGetString(cmd, flagClientLogoURI)),
 		Metadata:                          json.RawMessage(flagx.MustGetString(cmd, flagClientMetadata)),
-		Owner:                             pointerx.Ptr(flagx.MustGetString(cmd, flagClientOwner)),
-		PolicyUri:                         pointerx.Ptr(flagx.MustGetString(cmd, flagClientPolicyURI)),
+		Owner:                             new(flagx.MustGetString(cmd, flagClientOwner)),
+		PolicyUri:                         new(flagx.MustGetString(cmd, flagClientPolicyURI)),
 		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, flagClientPostLogoutCallback),
 		RedirectUris:                      flagx.MustGetStringSlice(cmd, flagClientRedirectURI),
-		RequestObjectSigningAlg:           pointerx.Ptr(flagx.MustGetString(cmd, flagClientRequestObjectSigningAlg)),
+		RequestObjectSigningAlg:           new(flagx.MustGetString(cmd, flagClientRequestObjectSigningAlg)),
 		RequestUris:                       flagx.MustGetStringSlice(cmd, flagClientRequestURI),
 		ResponseTypes:                     flagx.MustGetStringSlice(cmd, flagClientResponseType),
-		Scope:                             pointerx.Ptr(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
-		SkipConsent:                       pointerx.Ptr(flagx.MustGetBool(cmd, flagClientSkipConsent)),
-		SkipLogoutConsent:                 pointerx.Ptr(flagx.MustGetBool(cmd, flagClientLogoutSkipConsent)),
-		SectorIdentifierUri:               pointerx.Ptr(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
-		SubjectType:                       pointerx.Ptr(flagx.MustGetString(cmd, flagClientSubjectType)),
-		TokenEndpointAuthMethod:           pointerx.Ptr(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
-		TosUri:                            pointerx.Ptr(flagx.MustGetString(cmd, flagClientTOSURI)),
+		Scope:                             new(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
+		SkipConsent:                       new(flagx.MustGetBool(cmd, flagClientSkipConsent)),
+		SkipLogoutConsent:                 new(flagx.MustGetBool(cmd, flagClientLogoutSkipConsent)),
+		SectorIdentifierUri:               new(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
+		SubjectType:                       new(flagx.MustGetString(cmd, flagClientSubjectType)),
+		TokenEndpointAuthMethod:           new(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),
+		TosUri:                            new(flagx.MustGetString(cmd, flagClientTOSURI)),
 	}, nil
 }
 

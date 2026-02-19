@@ -90,8 +90,8 @@ func acceptLoginHandler(t *testing.T, c *client.Client, adminClient *hydra.APICl
 
 		acceptBody := hydra.AcceptOAuth2LoginRequest{
 			Subject:  subject,
-			Remember: pointerx.Ptr(!rr.Skip),
-			Acr:      pointerx.Ptr("1"),
+			Remember: new(!rr.Skip),
+			Acr:      new("1"),
 			Amr:      []string{"pwd"},
 			Context:  map[string]interface{}{"context": "bar"},
 		}
@@ -131,8 +131,8 @@ func acceptConsentHandler(t *testing.T, c *client.Client, adminClient *hydra.API
 		acceptBody := hydra.AcceptOAuth2ConsentRequest{
 			GrantScope:               []string{"hydra", "offline", "openid"},
 			GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
-			Remember:                 pointerx.Ptr(true),
-			RememberFor:              pointerx.Ptr[int64](0),
+			Remember:                 new(true),
+			RememberFor:              new(int64(0)),
 			Session: &hydra.AcceptOAuth2ConsentRequestSession{
 				AccessToken: map[string]interface{}{"foo": "bar"},
 				IdToken:     map[string]interface{}{"bar": "baz", "email": "foo@bar.com"},
@@ -421,7 +421,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						func(w http.ResponseWriter, r *http.Request) {
 							acceptBody := hydra.AcceptOAuth2LoginRequest{
 								Subject: subject,
-								Acr:     pointerx.Ptr("1"),
+								Acr:     new("1"),
 								Amr:     []string{"pwd"},
 								Context: map[string]interface{}{"context": "bar"},
 							}
@@ -561,7 +561,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								require.EqualError(t, err, "invalid_request")
 							})
 						}
-
 					})
 
 					t.Run("followup=access token and id token are valid", func(t *testing.T) {
@@ -686,7 +685,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 					_, res, err := adminClient.OAuth2API.AcceptOAuth2LoginRequest(ctx).
 						LoginChallenge(r.URL.Query().Get("login_challenge")).
-						AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: pointerx.Ptr(true)}).Execute()
+						AcceptOAuth2LoginRequest(hydra.AcceptOAuth2LoginRequest{Subject: "", Remember: new(true)}).Execute()
 					require.Error(t, err) // expects 400
 					body := string(ioutilx.MustReadAll(res.Body))
 					assert.Contains(t, body, "Field 'subject' must not be empty", "%s", body)
@@ -1266,8 +1265,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						return &hydra.AcceptOAuth2ConsentRequest{
 							GrantScope:               ocr.RequestedScope,
 							GrantAccessTokenAudience: ocr.RequestedAccessTokenAudience,
-							Remember:                 pointerx.Ptr(true),
-							RememberFor:              pointerx.Ptr[int64](0),
+							Remember:                 new(true),
+							RememberFor:              new(int64(0)),
 							Session: &hydra.AcceptOAuth2ConsentRequestSession{
 								AccessToken: map[string]interface{}{"crid": ocr.ConsentRequestId},
 								IdToken:     map[string]interface{}{"crid": ocr.ConsentRequestId},
@@ -2104,13 +2103,13 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					}
 
 					t.Run("case=userinfo", func(t *testing.T) {
-						var makeRequest = func(req *http.Request) *http.Response {
+						makeRequest := func(req *http.Request) *http.Response {
 							resp, err = http.DefaultClient.Do(req)
 							require.NoError(t, err)
 							return resp
 						}
 
-						var testSuccess = func(response *http.Response) {
+						testSuccess := func(response *http.Response) {
 							defer resp.Body.Close() //nolint:errcheck
 
 							require.Equal(t, http.StatusOK, resp.StatusCode)

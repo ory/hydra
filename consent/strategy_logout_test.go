@@ -30,7 +30,6 @@ import (
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/ioutilx"
-	"github.com/ory/x/pointerx"
 )
 
 func TestLogoutFlows(t *testing.T) {
@@ -66,7 +65,8 @@ func TestLogoutFlows(t *testing.T) {
 	createSampleClient := func(t *testing.T) *client.Client {
 		return createClient(t, reg, &client.Client{
 			RedirectURIs:           []string{testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler)},
-			PostLogoutRedirectURIs: []string{customPostLogoutURL}})
+			PostLogoutRedirectURIs: []string{customPostLogoutURL},
+		})
 	}
 
 	createClientWithBackchannelLogout := func(t *testing.T, wg *sync.WaitGroup, cb func(t *testing.T, logoutToken gjson.Result)) *client.Client {
@@ -88,7 +88,8 @@ func TestLogoutFlows(t *testing.T) {
 		return createClient(t, reg, &client.Client{
 			BackChannelLogoutURI:   server.URL,
 			RedirectURIs:           []string{testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler)},
-			PostLogoutRedirectURIs: []string{customPostLogoutURL}})
+			PostLogoutRedirectURIs: []string{customPostLogoutURL},
+		})
 	}
 
 	makeLogoutRequest := func(t *testing.T, hc *http.Client, method string, values url.Values) (body string, resp *http.Response) {
@@ -188,8 +189,8 @@ func TestLogoutFlows(t *testing.T) {
 				require.NoError(t, err)
 				// res.Payload.SessionID
 				return hydra.AcceptOAuth2LoginRequest{
-					Remember:                  pointerx.Ptr(true),
-					IdentityProviderSessionId: pointerx.Ptr(kratos.FakeSessionID),
+					Remember:                  new(true),
+					IdentityProviderSessionId: new(kratos.FakeSessionID),
 				}
 			}),
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
@@ -199,9 +200,8 @@ func TestLogoutFlows(t *testing.T) {
 						sid <- *res.LoginSessionId
 					}
 				}
-				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Bool(remember)}
+				return hydra.AcceptOAuth2ConsentRequest{Remember: new(remember)}
 			}))
-
 	}
 
 	acceptLoginAsAndWatchSid := func(t *testing.T, subject string) <-chan string {
@@ -386,7 +386,6 @@ func TestLogoutFlows(t *testing.T) {
 			},
 		} {
 			t.Run("case="+tc.d, func(t *testing.T) {
-
 				c := createSampleClient(t)
 				sid := acceptLoginAsAndWatchSid(t, subject)
 				browser := createBrowserWithSession(t, c)
@@ -558,11 +557,11 @@ func TestLogoutFlows(t *testing.T) {
 				defer wg.Done()
 				require.NoError(t, err)
 				assert.False(t, res.Skip)
-				return hydra.AcceptOAuth2LoginRequest{Remember: pointerx.Ptr(true)}
+				return hydra.AcceptOAuth2LoginRequest{Remember: new(true)}
 			}),
 			checkAndAcceptConsentHandler(t, adminApi, func(t *testing.T, res *hydra.OAuth2ConsentRequest, err error) hydra.AcceptOAuth2ConsentRequest {
 				require.NoError(t, err)
-				return hydra.AcceptOAuth2ConsentRequest{Remember: pointerx.Ptr(true)}
+				return hydra.AcceptOAuth2ConsentRequest{Remember: new(true)}
 			}))
 
 		// Make an oauth 2 request to trigger the login check.

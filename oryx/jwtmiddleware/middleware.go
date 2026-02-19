@@ -21,9 +21,6 @@ import (
 	"github.com/ory/x/jwksx"
 )
 
-// Deprecated: use jwtmiddleware.ContextKey{} instead.
-var SessionContextKey = jwtmiddleware.ContextKey{}
-
 type Middleware struct {
 	o   *middlewareOptions
 	wku string
@@ -47,7 +44,7 @@ func SessionFromContext(ctx context.Context) (json.RawMessage, error) {
 
 	token, ok := raw.(*jwt.Token)
 	if !ok {
-		return nil, errors.WithStack(herodot.ErrInternalServerError.WithDebugf(`Expected context key "%s" to transport value of type *jwt.MapClaims but got type: %T`, SessionContextKey, raw))
+		return nil, errors.WithStack(herodot.ErrInternalServerError.WithDebugf(`Expected context key "%T" to transport value of type *jwt.MapClaims but got type: %T`, jwtmiddleware.ContextKey{}, raw))
 	}
 
 	session, err := json.Marshal(token.Claims)

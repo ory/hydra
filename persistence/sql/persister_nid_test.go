@@ -32,7 +32,6 @@ import (
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/networkx"
-	"github.com/ory/x/pointerx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
@@ -662,7 +661,7 @@ func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 
 			key, err := jwk.GenerateJWK("RS256", "kid", "use")
 			require.NoError(t, err)
-			require.NoError(t, r.KeyManager().AddKey(s.t1, "ks", pointerx.Ptr(key.Keys[0].Public())))
+			require.NoError(t, r.KeyManager().AddKey(s.t1, "ks", new(key.Keys[0].Public())))
 
 			err = sqlcon.HandleError(r.Persister().Connection(t.Context()).Where("sid = ? AND kid = ? AND nid = ?", "ks", "kid", s.t2NID).First(actual))
 			require.ErrorIs(t, err, sqlcon.ErrNoRows)

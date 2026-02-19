@@ -4,7 +4,7 @@ export PATH 		:= .bin:${PATH}
 export PWD 			:= $(shell pwd)
 export IMAGE_TAG 	:= $(if $(IMAGE_TAG),$(IMAGE_TAG),latest)
 
-GOLANGCI_LINT_VERSION = 2.4.0
+GOLANGCI_LINT_VERSION = 2.10.1
 
 .bin/golangci-lint: Makefile
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b .bin v$(GOLANGCI_LINT_VERSION)
@@ -72,12 +72,12 @@ quicktest:
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
-	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm  --target test-hsm -t oryd/hydra:${IMAGE_TAG} --target test-hsm .
+	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm --target test-hsm -t oryd/hydra:${IMAGE_TAG} --target test-hsm .
 
 .PHONY: test-refresh
 test-refresh:
 	UPDATE_SNAPSHOTS=true go test -short -tags sqlite,sqlite_omit_load_extension ./...
-	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm  --target test-refresh-hsm -t oryd/hydra:${IMAGE_TAG} --target test-refresh-hsm .
+	DOCKER_CONTENT_TRUST=1 docker build --progress=plain -f .docker/Dockerfile-test-hsm --target test-refresh-hsm -t oryd/hydra:${IMAGE_TAG} --target test-refresh-hsm .
 
 authors:  # updates the AUTHORS file
 	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash

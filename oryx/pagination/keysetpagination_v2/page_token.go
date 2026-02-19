@@ -13,7 +13,6 @@ import (
 	"github.com/ssoready/hyrumtoken"
 
 	"github.com/ory/herodot"
-	"github.com/ory/x/pointerx"
 )
 
 var fallbackEncryptionKey = &[32]byte{}
@@ -80,26 +79,26 @@ func (t PageToken) MarshalJSON() ([]byte, error) {
 		}
 		switch v := col.Value.(type) {
 		case time.Time:
-			toEncode.Cols[i].ValueTime = pointerx.Ptr(v)
+			toEncode.Cols[i].ValueTime = new(v)
 		case uuid.UUID:
-			toEncode.Cols[i].ValueUUID = pointerx.Ptr(v)
+			toEncode.Cols[i].ValueUUID = new(v)
 		case uuid.NullUUID:
 			if v.Valid {
-				toEncode.Cols[i].ValueUUID = pointerx.Ptr(v.UUID)
+				toEncode.Cols[i].ValueUUID = new(v.UUID)
 			} else {
 				toEncode.Cols[i].ValueNull = true
 			}
 		case sql.NullString:
 			if v.Valid {
-				toEncode.Cols[i].ValueAny = pointerx.Ptr(v.String)
+				toEncode.Cols[i].ValueAny = new(v.String)
 			} else {
 				toEncode.Cols[i].ValueNull = true
 			}
 		case int64:
-			toEncode.Cols[i].ValueInt64 = pointerx.Ptr(v)
+			toEncode.Cols[i].ValueInt64 = new(v)
 		case sql.NullInt64:
 			if v.Valid {
-				toEncode.Cols[i].ValueInt64 = pointerx.Ptr(v.Int64)
+				toEncode.Cols[i].ValueInt64 = new(v.Int64)
 			} else {
 				toEncode.Cols[i].ValueNull = true
 			}

@@ -235,7 +235,7 @@ func ParseWithClaims(rawToken string, claims MapClaims, keyFunc Keyfunc) (*Token
 // if underline value of v is not a pointer
 // it creates a pointer of it and returns it
 func pointer(v interface{}) interface{} {
-	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+	if reflect.ValueOf(v).Kind() != reflect.Pointer {
 		value := reflect.New(reflect.ValueOf(v).Type())
 		value.Elem().Set(reflect.ValueOf(v))
 		return value.Interface()

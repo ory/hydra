@@ -164,8 +164,8 @@ func BenchmarkAuthCode(b *testing.B) {
 
 			acceptBody := hydra.AcceptOAuth2LoginRequest{
 				Subject:  uuid.New(),
-				Remember: pointerx.Ptr(!rr.Skip),
-				Acr:      pointerx.Ptr("1"),
+				Remember: new(!rr.Skip),
+				Acr:      new("1"),
 				Amr:      []string{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
@@ -208,7 +208,7 @@ func BenchmarkAuthCode(b *testing.B) {
 			v, _, err := adminClient.OAuth2API.AcceptOAuth2ConsentRequest(ctx).
 				ConsentChallenge(r.URL.Query().Get("consent_challenge")).
 				AcceptOAuth2ConsentRequest(hydra.AcceptOAuth2ConsentRequest{
-					GrantScope: []string{"hydra", "offline", "openid"}, Remember: pointerx.Ptr(true), RememberFor: pointerx.Ptr[int64](0),
+					GrantScope: []string{"hydra", "offline", "openid"}, Remember: new(true), RememberFor: new(int64(0)),
 					GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
 					Session: &hydra.AcceptOAuth2ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},

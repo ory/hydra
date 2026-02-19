@@ -10,7 +10,7 @@ install:
   - go install github.com/ory/go-acc
   - curl -sSfL
     https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh |
-    sh -s -- -b $(go env GOPATH)/bin v1.24.0
+    sh -s -- -b $(go env GOPATH)/bin v2.10.1
 
 script:
   - golangci-lint run

@@ -30,7 +30,6 @@ import (
 	"github.com/ory/hydra/v2/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
 	"github.com/ory/x/randx"
 	"github.com/ory/x/tlsx"
 	"github.com/ory/x/urlx"
@@ -206,7 +205,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 				Scopes:      scopes,
 			}
 
-			var generateAuthCodeURL = func() (string, string) {
+			generateAuthCodeURL := func() (string, string) {
 				state := flagx.MustGetString(cmd, "state")
 				if len(state) == 0 {
 					generatedState, err := randx.RuneSequence(24, randx.AlphaLower)
@@ -420,8 +419,8 @@ func (rt *router) loginPOST(w http.ResponseWriter, r *http.Request) {
 			LoginChallenge(r.FormValue("ls")).
 			AcceptOAuth2LoginRequest(openapi.AcceptOAuth2LoginRequest{
 				Subject:     r.FormValue("username"),
-				Remember:    pointerx.Ptr(r.FormValue("remember") == "on"),
-				RememberFor: pointerx.Int64(3600),
+				Remember:    new(r.FormValue("remember") == "on"),
+				RememberFor: new(int64(3600)),
 				Context: map[string]string{
 					"context from": "login step",
 				},
@@ -463,8 +462,8 @@ func (rt *router) consentGET(w http.ResponseWriter, r *http.Request) {
 			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
 				GrantScope:               req.GetRequestedScope(),
 				GrantAccessTokenAudience: req.GetRequestedAccessTokenAudience(),
-				Remember:                 pointerx.Ptr(true),
-				RememberFor:              pointerx.Int64(3600),
+				Remember:                 new(true),
+				RememberFor:              new(int64(3600)),
 				Session: &openapi.AcceptOAuth2ConsentRequestSession{
 					AccessToken: map[string]string{
 						"foo": "bar",
@@ -534,8 +533,8 @@ func (rt *router) consentPOST(w http.ResponseWriter, r *http.Request) {
 			AcceptOAuth2ConsentRequest(openapi.AcceptOAuth2ConsentRequest{
 				GrantScope:               r.Form["scope"],
 				GrantAccessTokenAudience: r.Form["audience"],
-				Remember:                 pointerx.Ptr(r.FormValue("remember") == "on"),
-				RememberFor:              pointerx.Int64(3600),
+				Remember:                 new(r.FormValue("remember") == "on"),
+				RememberFor:              new(int64(3600)),
 				Session: &openapi.AcceptOAuth2ConsentRequestSession{
 					AccessToken: map[string]string{
 						"foo": "bar",

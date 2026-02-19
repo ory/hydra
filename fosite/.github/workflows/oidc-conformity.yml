@@ -17,7 +17,8 @@ jobs:
           ref: master
       - uses: actions/setup-go@v2
         with:
-          go-version: "1.21"
+          check-latest: true
+          go-version-file: go.mod
       - name: Update fosite
         run: |
           go mod edit -replace github.com/ory/fosite=github.com/${{ github.event.pull_request.head.repo.full_name }}@${{ github.event.pull_request.head.sha }}

@@ -70,6 +70,7 @@ CREATE TABLE public.hydra_client (
 	device_authorization_grant_id_token_lifespan INT8 NULL,
 	device_authorization_grant_access_token_lifespan INT8 NULL,
 	device_authorization_grant_refresh_token_lifespan INT8 NULL,
+	rotated_secrets STRING NOT NULL DEFAULT '':::STRING,
 	CONSTRAINT hydra_client_pkey PRIMARY KEY (id ASC, nid ASC),
 	UNIQUE INDEX hydra_client_id_key (id ASC, nid ASC),
 	UNIQUE INDEX hydra_client_pk_key (pk ASC)

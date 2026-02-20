@@ -4,6 +4,7 @@
 package client
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 	"time"
@@ -21,8 +22,9 @@ import (
 )
 
 var (
-	_ fosite.OpenIDConnectClient = (*Client)(nil)
-	_ fosite.Client              = (*Client)(nil)
+	_ fosite.OpenIDConnectClient      = (*Client)(nil)
+	_ fosite.Client                   = (*Client)(nil)
+	_ fosite.ClientWithSecretRotation = (*Client)(nil)
 )
 
 // OAuth 2.0 Client
@@ -50,6 +52,12 @@ type Client struct {
 	// The secret will be included in the create request as cleartext, and then
 	// never again. The secret is kept in hashed format and is not recoverable once lost.
 	Secret string `json:"client_secret,omitempty" db:"client_secret"`
+
+	// OAuth 2.0 Client Rotated Secrets
+	//
+	// RotatedSecrets holds previously rotated secrets that are still valid for authentication.
+	// This allows for secret rotation without downtime. Secrets are stored in hashed format.
+	RotatedSecrets string `json:"rotated_secrets,omitempty" db:"rotated_secrets"`
 
 	// OAuth 2.0 Client Redirect URIs
 	//
@@ -430,6 +438,23 @@ func (c *Client) GetRedirectURIs() []string {
 
 func (c *Client) GetHashedSecret() []byte {
 	return []byte(c.Secret)
+}
+
+func (c *Client) GetRotatedHashes() [][]byte {
+	if c.RotatedSecrets == "" {
+		return nil
+	}
+
+	var rotated []string
+	if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+		return nil
+	}
+
+	hashes := make([][]byte, len(rotated))
+	for i, secret := range rotated {
+		hashes[i] = []byte(secret)
+	}
+	return hashes
 }
 
 func (c *Client) GetScopes() fosite.Arguments {

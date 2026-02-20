@@ -76,7 +76,8 @@ CREATE TABLE public.hydra_client (
     skip_logout_consent boolean,
     device_authorization_grant_id_token_lifespan bigint,
     device_authorization_grant_access_token_lifespan bigint,
-    device_authorization_grant_refresh_token_lifespan bigint
+    device_authorization_grant_refresh_token_lifespan bigint,
+    rotated_secrets text DEFAULT ''::text NOT NULL
 );
 
 ALTER TABLE public.hydra_client OWNER TO postgres;

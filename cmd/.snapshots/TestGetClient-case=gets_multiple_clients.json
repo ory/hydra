@@ -2,43 +2,25 @@
   {
     "allowed_cors_origins": [],
     "audience": [],
-    "client_name": "",
     "client_secret_expires_at": 0,
-    "client_uri": "",
-    "contacts": [],
     "grant_types": [],
     "jwks": {},
-    "logo_uri": "",
     "metadata": {},
-    "owner": "",
-    "policy_uri": "",
     "redirect_uris": [],
     "response_types": [],
-    "scope": "",
     "skip_consent": false,
-    "subject_type": "",
-    "token_endpoint_auth_method": "client_secret_post",
-    "tos_uri": ""
+    "token_endpoint_auth_method": "client_secret_post"
   },
   {
     "allowed_cors_origins": [],
     "audience": [],
-    "client_name": "",
     "client_secret_expires_at": 0,
-    "client_uri": "",
-    "contacts": [],
     "grant_types": [],
     "jwks": {},
-    "logo_uri": "",
     "metadata": {},
-    "owner": "",
-    "policy_uri": "",
     "redirect_uris": [],
     "response_types": [],
-    "scope": "",
     "skip_consent": false,
-    "subject_type": "",
-    "token_endpoint_auth_method": "client_secret_post",
-    "tos_uri": ""
+    "token_endpoint_auth_method": "client_secret_post"
   }
 ]

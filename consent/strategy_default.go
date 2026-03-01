@@ -711,14 +711,20 @@ func (s *defaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
 		// sub := s.obfuscateSubjectIdentifier(c, subject, )
 
-		t, _, err := s.r.OpenIDJWTSigner().Generate(ctx, jwt.MapClaims{
+		now := time.Now().UTC()
+		claims := jwt.MapClaims{
 			"iss":    s.r.Config().IssuerURL(ctx).String(),
 			"aud":    []string{c.ID},
-			"iat":    time.Now().UTC().Unix(),
+			"iat":    now.Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
 			"sid":    sid,
-		}, &jwt.Headers{
+		}
+		if logoutTokenLifespan := s.r.Config().GetLogoutTokenLifespan(ctx); logoutTokenLifespan > 0 {
+			claims["exp"] = now.Add(logoutTokenLifespan).Unix()
+		}
+
+		t, _, err := s.r.OpenIDJWTSigner().Generate(ctx, claims, &jwt.Headers{
 			Extra: map[string]interface{}{"kid": openIDKeyID},
 		})
 		if err != nil {

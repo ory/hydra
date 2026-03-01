@@ -726,6 +726,15 @@
               "$ref": "#/definitions/duration"
             }
           ]
+        },
+        "logout_token": {
+          "description": "Configures how long logout tokens are valid. If set to 0 or left unset, no exp claim will be added to the logout token (preserving backward compatibility). The OpenID Connect Back-Channel Logout specification recommends a value of at most two minutes (e.g. \"2m\").",
+          "type": "string",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
         }
       }
     },

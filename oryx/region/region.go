@@ -5,8 +5,9 @@ package region
 import (
 	"database/sql/driver"
 
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
+
+	"github.com/ory/herodot"
 )
 
 // Region is an Ory Network region. Specific regions map to a single CRDB

@@ -76,9 +76,10 @@ func WithPerMigrationTimeout(timeout time.Duration) MigrationBoxOption {
 	}
 }
 
+var testdataPattern = regexp.MustCompile(`^(\d+)_testdata(|\.[a-zA-Z0-9]+).sql$`)
+
 // WithTestdata adds testdata to the migration box.
 func WithTestdata(t *testing.T, testdata fs.FS) MigrationBoxOption {
-	testdataPattern := regexp.MustCompile(`^(\d+)_testdata(|\.[a-zA-Z0-9]+).sql$`)
 	return func(m *MigrationBox) {
 		require.NoError(t, fs.WalkDir(testdata, ".", func(path string, info fs.DirEntry, err error) error {
 			if err != nil {

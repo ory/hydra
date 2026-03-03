@@ -108,6 +108,7 @@ type Configurator interface {
 	GrantTypeJWTBearerCanSkipClientAuthProvider
 	GrantTypeJWTBearerIDOptionalProvider
 	GrantTypeJWTBearerIssuedDateOptionalProvider
+	GrantTypeJWTBearerCopyAssertionAudienceProvider
 	GetJWTMaxDurationProvider
 	AudienceStrategyProvider
 	ScopeStrategyProvider

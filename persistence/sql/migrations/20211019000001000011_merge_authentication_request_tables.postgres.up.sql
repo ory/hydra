@@ -1,2 +1,2 @@
--- This blank migration was generated to meet ory/x/popx validation criteria, see https://github.com/ory/x/pull/509; DO NOT EDIT.
+-- This blank migration was generated to meet ory/x/popx validation criteria; DO NOT EDIT.
 -- hydra:generate hydra migrate gen

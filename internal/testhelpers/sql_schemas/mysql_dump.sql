@@ -71,6 +71,7 @@ CREATE TABLE `hydra_client` (
   `device_authorization_grant_id_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_access_token_lifespan` bigint DEFAULT NULL,
   `device_authorization_grant_refresh_token_lifespan` bigint DEFAULT NULL,
+  `rotated_secrets` text NOT NULL,
   PRIMARY KEY (`id`,`nid`),
   UNIQUE KEY `hydra_client_id_key` (`id`,`nid`),
   KEY `pk_deprecated` (`pk_deprecated`),

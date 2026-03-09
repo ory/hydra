@@ -105,7 +105,7 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	serve := p.ServeAdmin(t.Context())
 	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p = newProvider(t, configx.WithValue("serve.admin.requestlog.disable_health", true))
+	p = newProvider(t, configx.WithValue("serve.admin.request_log.disable_for_health", true))
 	serve = p.ServeAdmin(t.Context())
 	assert.True(t, serve.RequestLog.DisableHealth)
 }
@@ -115,7 +115,7 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	serve := p.ServePublic(t.Context())
 	assert.False(t, serve.RequestLog.DisableHealth)
 
-	p = newProvider(t, configx.WithValue("serve.public.requestlog.disable_health", true))
+	p = newProvider(t, configx.WithValue("serve.public.request_log.disable_for_health", true))
 	serve = p.ServePublic(t.Context())
 	assert.True(t, serve.RequestLog.DisableHealth)
 }

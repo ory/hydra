@@ -332,6 +332,7 @@ func TestLogoutFlows(t *testing.T) {
 			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
 			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
 			assert.Empty(t, logoutToken.Get("nonce").String(), logoutToken.Raw)
+			assert.False(t, logoutToken.Get("exp").Exists(), "exp claim should not be present when ttl.logout_token is not set")
 		})
 
 		t.Run("method=get", testExpectPostLogoutPage(createBrowserWithSession(t, c), http.MethodGet, url.Values{}, defaultRedirectedMessage))
@@ -340,6 +341,36 @@ func TestLogoutFlows(t *testing.T) {
 
 		logoutWg.Wait()      // we want to ensure that logout ui was called!
 		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+	})
+
+	t.Run("case=should include exp claim in logout token when ttl.logout_token is set", func(t *testing.T) {
+		require.NoError(t, reg.Config().Source(ctx).Set(config.KeyLogoutTokenLifespan, "2m"))
+		t.Cleanup(func() {
+			require.NoError(t, reg.Config().Source(ctx).Set(config.KeyLogoutTokenLifespan, "0s"))
+		})
+
+		sid := acceptLoginAsAndWatchSid(t, subject)
+
+		logoutWg := newWg(2)
+		setupCheckAndAcceptLogoutHandler(t, logoutWg, nil)
+
+		backChannelWG := newWg(2)
+		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
+			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
+			assert.True(t, logoutToken.Get("exp").Exists(), "exp claim should be present when ttl.logout_token is set")
+
+			iat := logoutToken.Get("iat").Int()
+			exp := logoutToken.Get("exp").Int()
+			diff := exp - iat
+			assert.InDelta(t, 120, diff, 2, "exp should be approximately iat + 120 seconds")
+		})
+
+		t.Run("method=get", testExpectPostLogoutPage(createBrowserWithSession(t, c), http.MethodGet, url.Values{}, defaultRedirectedMessage))
+
+		t.Run("method=post", testExpectPostLogoutPage(createBrowserWithSession(t, c), http.MethodPost, url.Values{}, defaultRedirectedMessage))
+
+		logoutWg.Wait()
+		backChannelWG.Wait()
 	})
 
 	// Only do GET requests from here on out, POST should be tested enough to ensure that it is working fine already.

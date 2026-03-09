@@ -75,6 +75,7 @@ const (
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
 	KeyDeviceAndUserCodeLifespan                 = "ttl.device_user_code"
+	KeyLogoutTokenLifespan                       = "ttl.logout_token" // #nosec G101
 	KeyAuthenticationSessionLifespan             = "ttl.authentication_session"
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
@@ -412,6 +413,11 @@ func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, serve *c
 // GetDeviceAndUserCodeLifespan returns the device_code and user_code lifespan. Defaults to 15 minutes.
 func (p *DefaultProvider) GetDeviceAndUserCodeLifespan(ctx context.Context) time.Duration {
 	return p.p.DurationF(KeyDeviceAndUserCodeLifespan, time.Minute*15)
+}
+
+// GetLogoutTokenLifespan returns the logout_token lifespan. Defaults to 0 (no exp claim).
+func (p *DefaultProvider) GetLogoutTokenLifespan(ctx context.Context) time.Duration {
+	return p.p.DurationF(KeyLogoutTokenLifespan, 0)
 }
 
 // GetAuthenticationSessionLifespan returns the authentication_session lifespan.

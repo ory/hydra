@@ -129,9 +129,12 @@ func (p *Persister) GetGrants(ctx context.Context, optionalIssuer string, pageOp
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetGrants")
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(pageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(pageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "id", Value: uuid.Nil})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var grantsData []SQLGrant
 	query := p.QueryWithNetwork(ctx).Scope(keysetpagination.Paginate[SQLGrant](paginator))

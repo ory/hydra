@@ -347,9 +347,12 @@ func (p *ConsentPersister) FindSubjectsGrantedConsentRequests(ctx context.Contex
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsGrantedConsentRequests")
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(pageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(pageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).
@@ -374,9 +377,12 @@ func (p *ConsentPersister) FindSubjectsSessionGrantedConsentRequests(ctx context
 	ctx, span := p.d.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.FindSubjectsSessionGrantedConsentRequests", trace.WithAttributes(attribute.String("sid", sid)))
 	defer otelx.End(span, &err)
 
-	paginator := keysetpagination.NewPaginator(append(pageOpts,
+	paginator, err := keysetpagination.NewPaginator(append(pageOpts,
 		keysetpagination.WithDefaultToken(keysetpagination.NewPageToken(keysetpagination.Column{Name: "login_challenge", Value: ""})),
 	)...)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var fs []flow.Flow
 	err = p.QueryWithNetwork(ctx).

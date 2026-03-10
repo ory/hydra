@@ -8,7 +8,10 @@ import (
 	"reflect"
 
 	"github.com/jmoiron/sqlx/reflectx"
+	"github.com/ory/herodot"
 )
+
+var ErrInvalidPaginationToken = herodot.ErrBadRequest.WithReason("invalid pagination token")
 
 type (
 	Paginator struct {
@@ -144,7 +147,7 @@ func withIsLast(isLast bool) Option {
 	return func(p *Paginator) { p.isLast = isLast }
 }
 
-func NewPaginator(modifiers ...Option) *Paginator {
+func NewPaginator(modifiers ...Option) (*Paginator, error) {
 	p := &Paginator{
 		// these can still be overridden by the modifiers, but they should never be unset
 		maxSize:     DefaultMaxSize,
@@ -153,5 +156,34 @@ func NewPaginator(modifiers ...Option) *Paginator {
 	for _, f := range modifiers {
 		f(p)
 	}
-	return p
+	if err := p.validatePageToken(); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// validatePageToken ensures the page token columns strictly match DefaultToken's schema in order.
+func (p *Paginator) validatePageToken() error {
+	tokenCols := p.PageToken().Columns()
+	if len(tokenCols) == 0 {
+		return nil
+	}
+
+	if columnsMatch(tokenCols, p.defaultToken.Columns()) {
+		return nil
+	}
+	return ErrInvalidPaginationToken
+}
+
+func columnsMatch(tokenCols, templateCols []Column) bool {
+	if len(templateCols) == 0 || len(tokenCols) != len(templateCols) {
+		return false
+	}
+	for i, col := range tokenCols {
+		def := templateCols[i]
+		if def.Name != col.Name || def.Order != col.Order || def.Nullable != col.Nullable {
+			return false
+		}
+	}
+	return true
 }

@@ -237,7 +237,7 @@ func (vm *processPoolVM) EvaluateAnonymousSnippet(filename string, snippet strin
 		return "", errors.Wrap(err, "jsonnetsecure: acquire")
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	ctx, cancel := context.WithTimeoutCause(ctx, 1*time.Second, errors.Errorf("failed to run jsonnet within 1s: filename=%s", filename))
 	defer cancel()
 	result, err := worker.Value().eval(ctx, pp)
 	if err != nil {

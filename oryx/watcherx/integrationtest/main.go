@@ -18,14 +18,12 @@ func main() {
 		os.Exit(1)
 	}
 	c := make(chan watcherx.Event)
-	ctx, cancel := context.WithCancel(context.Background())
-	_, err := watcherx.WatchFile(ctx, os.Args[1], c)
+	_, err := watcherx.WatchFile(context.Background(), os.Args[1], c)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "could not initialize file watcher: %+v\n", err)
 		os.Exit(1)
 	}
 	fmt.Printf("watching file %s\n", os.Args[1])
-	defer cancel()
 	for {
 		switch e := (<-c).(type) {
 		case *watcherx.ChangeEvent:

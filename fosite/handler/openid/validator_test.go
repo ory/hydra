@@ -179,6 +179,34 @@ func TestValidatePrompt(t *testing.T) {
 			},
 		},
 		{
+			d:         "should pass because select_account consent is a valid space-separated prompt per OIDC spec",
+			prompt:    "select_account consent",
+			isPublic:  false,
+			expectErr: false,
+			s: &openid.DefaultSession{
+				Subject: "foo",
+				Claims: &jwt.IDTokenClaims{
+					Subject:     "foo",
+					RequestedAt: time.Now().UTC(),
+					AuthTime:    time.Now().UTC().Add(-time.Minute),
+				},
+			},
+		},
+		{
+			d:         "should pass because select_account consent works with public clients",
+			prompt:    "select_account consent",
+			isPublic:  true,
+			expectErr: false,
+			s: &openid.DefaultSession{
+				Subject: "foo",
+				Claims: &jwt.IDTokenClaims{
+					Subject:     "foo",
+					RequestedAt: time.Now().UTC(),
+					AuthTime:    time.Now().UTC().Add(-time.Minute),
+				},
+			},
+		},
+		{
 			d:         "should pass because requesting consent and login works with confidential clients",
 			prompt:    "login consent",
 			isPublic:  false,

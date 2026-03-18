@@ -136,10 +136,24 @@ to add your example or Ory-related project to the awesome-ory README.
 
 ## Contribute code
 
-Unless you are fixing a known bug, we **strongly** recommend discussing it with
-the core team via a GitHub issue or [in our chat](https://www.ory.com/chat)
-before getting started to ensure your work is consistent with Ory Hydra's
-roadmap and architecture.
+**All code contributions require prior discussion and agreement with maintainers
+before opening a pull request.**
+
+This applies to bug fixes, new features, and refactoring. Before writing code:
+
+1. Open a [Discussion](https://github.com/ory/hydra/discussions/new/choose) or
+   [Issue](https://github.com/ory/hydra/issues/new/choose) describing the
+   problem and your proposed solution.
+2. Wait for maintainer feedback and explicit agreement on the implementation
+   approach.
+3. Only then begin writing code.
+
+Pull requests without prior discussion may be closed without review. This policy
+exists to protect your time and maintainer time.
+
+"Drive-by" PRs, even well-intentioned ones, often conflict with the project
+roadmap, duplicate ongoing work, or introduce architectural inconsistencies. A
+quick conversation can help avoid these problems.
 
 All contributions are made via pull requests. To make a pull request, you will
 need a GitHub account; if you are unclear on this process, see GitHub's
@@ -194,6 +208,34 @@ you should change the status to "Ready for review" and
 [request review from a maintainer](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review).
 
 Reviewers will approve the pull request once they are satisfied with the patch.
+
+### AI-assisted contributions
+
+AI can be a valuable aid for writing code, documentation, and tests. However, to
+maintain the quality and reliability of Ory Hydra, please follow these
+guidelines:
+
+- When submitting a pull request or issue that involved AI assistance, mention
+  the tools you used and the extent of their involvement. This helps reviewers
+  understand the context of your contribution.
+
+- Pull requests created with AI assistance should address an existing, accepted
+  issue. If you have an idea for a new feature or improvement, please open a
+  discussion or issue first to ensure alignment with the project's direction
+  before investing time in implementation.
+
+- You must use AI responsibly when writing code. All contributions must be
+  tested and verified before submission. Unreviewed AI-generated code will not
+  be accepted, and repeated submissions of this nature may result in restricted
+  contribution privileges.
+
+- When using AI to help draft issues, discussions, or documentation, review and
+  edit the output before submitting. AI tends to be verbose. Trim unnecessary
+  content and ensure your submission is clear and focused.
+
+Contributors must use AI responsibly. These guidelines exist to ensure that
+every contribution meets the high standards our community expects, while still
+embracing the productivity benefits that AI tools can provide.
 
 ## Contribute documentation
 

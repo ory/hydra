@@ -7,11 +7,9 @@ import (
 	"cmp"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"regexp"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -23,52 +21,9 @@ import (
 
 	"github.com/ory/pop/v6"
 
-	"github.com/ory/dockertest/v3"
-	dc "github.com/ory/dockertest/v3/docker"
+	"github.com/ory/dockertest/v4"
 	"github.com/ory/x/stringsx"
 )
-
-type dockerPool interface {
-	Purge(r *dockertest.Resource) error
-	Run(repository, tag string, env []string) (*dockertest.Resource, error)
-	RunWithOptions(opts *dockertest.RunOptions, hcOpts ...func(*dc.HostConfig)) (*dockertest.Resource, error)
-}
-
-var (
-	pool      dockerPool
-	resources []*dockertest.Resource
-	mux       sync.Mutex
-)
-
-func init() {
-	var err error
-	pool, err = dockertest.NewPool("")
-	if err != nil {
-		panic(err)
-	}
-}
-
-// KillAllTestDatabases deletes all test databases.
-func KillAllTestDatabases() {
-	mux.Lock()
-	defer mux.Unlock()
-	for _, r := range resources {
-		if err := pool.Purge(r); err != nil {
-			log.Printf("Failed to purge resource: %s", err)
-		}
-	}
-
-	resources = nil
-}
-
-// Register sets up OnExit.
-func Register() *OnExit {
-	onexit := NewOnExit()
-	onexit.Add(func() {
-		KillAllTestDatabases()
-	})
-	return onexit
-}
 
 func ConnectPop(t require.TestingT, url string) (c *pop.Connection) {
 	require.EventuallyWithT(t, func(t *assert.CollectT) {
@@ -85,14 +40,13 @@ func ConnectPop(t require.TestingT, url string) (c *pop.Connection) {
 
 // ## PostgreSQL ##
 
-func startPostgreSQL(version string) (*dockertest.Resource, error) {
-	resource, err := pool.Run("postgres", cmp.Or(version, "16"), []string{"PGUSER=postgres", "POSTGRES_PASSWORD=secret", "POSTGRES_DB=postgres"})
-	if err == nil {
-		mux.Lock()
-		resources = append(resources, resource)
-		mux.Unlock()
-	}
-	return resource, err
+func startPostgreSQL(t testing.TB, version string) dockertest.Resource {
+	pool := dockertest.NewPoolT(t, "")
+	return pool.RunT(t, "postgres",
+		dockertest.WithTag(cmp.Or(version, "16")),
+		dockertest.WithoutReuse(),
+		dockertest.WithEnv([]string{"PGUSER=postgres", "POSTGRES_PASSWORD=secret", "POSTGRES_DB=postgres"}),
+	)
 }
 
 // RunTestPostgreSQL runs a PostgreSQL database and returns the URL to it.
@@ -103,63 +57,31 @@ func RunTestPostgreSQL(t testing.TB) string {
 		t.Logf("Skipping Docker setup because environment variable TEST_DATABASE_POSTGRESQL is set to: %s", dsn)
 		return dsn
 	}
-
-	u, cleanup, err := runPosgreSQLCleanup("")
-	require.NoError(t, err)
-	t.Cleanup(cleanup)
-
-	return u
+	r := startPostgreSQL(t, "")
+	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", r.GetPort("5432/tcp"))
 }
 
-func runPosgreSQLCleanup(version string) (string, func(), error) {
-	resource, err := startPostgreSQL(version)
-	if err != nil {
-		return "", func() {}, err
-	}
-
-	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", resource.GetPort("5432/tcp")),
-		func() { _ = pool.Purge(resource) }, nil
-}
-
-// RunTestPostgreSQLWithVersion connects to a PostgreSQL database .
+// RunTestPostgreSQLWithVersion connects to a PostgreSQL database.
 func RunTestPostgreSQLWithVersion(t testing.TB, version string) string {
 	if dsn := os.Getenv("TEST_DATABASE_POSTGRESQL"); dsn != "" {
 		return dsn
 	}
-
-	resource, err := startPostgreSQL(version)
-	require.NoError(t, err)
-	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", resource.GetPort("5432/tcp"))
+	r := startPostgreSQL(t, version)
+	return fmt.Sprintf("postgres://postgres:secret@127.0.0.1:%s/postgres?sslmode=disable", r.GetPort("5432/tcp"))
 }
 
 // ## MySQL ##
 
-func startMySQL(version string) (*dockertest.Resource, error) {
-	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "mysql",
-		Tag:        cmp.Or(version, "8.0"),
-		Env: []string{
+func startMySQL(t testing.TB, version string) dockertest.Resource {
+	pool := dockertest.NewPoolT(t, "")
+	return pool.RunT(t, "mysql",
+		dockertest.WithTag(cmp.Or(version, "8.0")),
+		dockertest.WithoutReuse(),
+		dockertest.WithEnv([]string{
 			"MYSQL_ROOT_PASSWORD=secret",
 			"MYSQL_ROOT_HOST=%",
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	mux.Lock()
-	resources = append(resources, resource)
-	mux.Unlock()
-	return resource, nil
-}
-
-func runMySQLCleanup(version string) (string, func(), error) {
-	resource, err := startMySQL(version)
-	if err != nil {
-		return "", func() {}, err
-	}
-
-	return fmt.Sprintf("mysql://root:secret@tcp(localhost:%s)/mysql?parseTime=true&multiStatements=true", resource.GetPort("3306/tcp")),
-		func() { _ = pool.Purge(resource) }, nil
+		}),
+	)
 }
 
 // RunTestMySQL runs a MySQL database and returns the URL to it.
@@ -170,12 +92,8 @@ func RunTestMySQL(t testing.TB) string {
 		t.Logf("Skipping Docker setup because environment variable TEST_DATABASE_MYSQL is set to: %s", dsn)
 		return dsn
 	}
-
-	u, cleanup, err := runMySQLCleanup("")
-	require.NoError(t, err)
-	t.Cleanup(cleanup)
-
-	return u
+	r := startMySQL(t, "")
+	return fmt.Sprintf("mysql://root:secret@tcp(localhost:%s)/mysql?parseTime=true&multiStatements=true", r.GetPort("3306/tcp"))
 }
 
 // RunTestMySQLWithVersion runs a MySQL database in the specified version and returns the URL to it.
@@ -186,39 +104,19 @@ func RunTestMySQLWithVersion(t testing.TB, version string) string {
 		t.Logf("Skipping Docker setup because environment variable TEST_DATABASE_MYSQL is set to: %s", dsn)
 		return dsn
 	}
-
-	u, cleanup, err := runMySQLCleanup(version)
-	require.NoError(t, err)
-	t.Cleanup(cleanup)
-
-	return u
+	r := startMySQL(t, version)
+	return fmt.Sprintf("mysql://root:secret@tcp(localhost:%s)/mysql?parseTime=true&multiStatements=true", r.GetPort("3306/tcp"))
 }
 
 // ## CockroachDB
 
-func startCockroachDB(version string) (*dockertest.Resource, error) {
-	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "cockroachdb/cockroach",
-		Tag:        cmp.Or(version, "latest-v25.4"),
-		Cmd:        []string{"start-single-node", "--insecure"},
-	})
-	if err == nil {
-		mux.Lock()
-		resources = append(resources, resource)
-		mux.Unlock()
-	}
-	return resource, err
-}
-
-func runCockroachDBWithVersionCleanup(version string) (string, func(), error) {
-	resource, err := startCockroachDB(version)
-	if err != nil {
-		return "", func() {}, err
-	}
-
-	return fmt.Sprintf("cockroach://root@localhost:%s/defaultdb?sslmode=disable", resource.GetPort("26257/tcp")),
-		func() { _ = pool.Purge(resource) },
-		nil
+func startCockroachDB(t testing.TB, version string) dockertest.Resource {
+	pool := dockertest.NewPoolT(t, "")
+	return pool.RunT(t, "cockroachdb/cockroach",
+		dockertest.WithTag(cmp.Or(version, "latest-v25.4")),
+		dockertest.WithoutReuse(),
+		dockertest.WithCmd([]string{"start-single-node", "--insecure"}),
+	)
 }
 
 // RunTestCockroachDB runs a CockroachDB database and returns the URL to it.
@@ -236,12 +134,8 @@ func RunTestCockroachDBWithVersion(t testing.TB, version string) string {
 		t.Logf("Skipping Docker setup because environment variable TEST_DATABASE_COCKROACHDB is set to: %s", dsn)
 		return dsn
 	}
-
-	u, cleanup, err := runCockroachDBWithVersionCleanup(version)
-	require.NoError(t, err)
-	t.Cleanup(cleanup)
-
-	return u
+	r := startCockroachDB(t, version)
+	return fmt.Sprintf("cockroach://root@localhost:%s/defaultdb?sslmode=disable", r.GetPort("26257/tcp"))
 }
 
 func DumpSchema(t testing.TB, c *pop.Connection) string {

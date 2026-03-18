@@ -214,6 +214,36 @@ func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			description: "should pass because prompt=select_account consent is valid space-separated per OIDC spec",
+			setup: func() {
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
+					Claims: &jwt.IDTokenClaims{
+						Subject:     "peter",
+						AuthTime:    time.Now().Add(-time.Hour).UTC(),
+						RequestedAt: time.Now().Add(-time.Minute),
+					},
+					Headers: &jwt.Headers{},
+				})
+				req.Form.Set("prompt", "select_account consent")
+			},
+			expectErr: false,
+		},
+		{
+			description: "should fail because prompt includes login in space-separated list and auth_time indicates old login",
+			setup: func() {
+				req = fosite.NewAccessRequest(&openid.DefaultSession{
+					Claims: &jwt.IDTokenClaims{
+						Subject:     "peter",
+						AuthTime:    time.Now().Add(-time.Hour).UTC(),
+						RequestedAt: time.Now().Add(-time.Minute),
+					},
+					Headers: &jwt.Headers{},
+				})
+				req.Form.Set("prompt", "login consent")
+			},
+			expectErr: true,
+		},
+		{
 			description: "should pass because id_token_hint subject matches subject from claims",
 			setup: func() {
 				req = fosite.NewAccessRequest(&openid.DefaultSession{

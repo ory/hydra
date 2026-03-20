@@ -15,7 +15,6 @@ services:
     volumes:
       - hydra-sqlite:/mnt/sqlite
     command: "chmod -R 777 /mnt/sqlite"
-
   hydra:
     # image: oryd/hydra:v25.4.0
     build:
@@ -40,6 +39,7 @@ services:
         condition: service_completed_successfully
     networks:
       - intranet
+    image: oryd/hydra:v26.2.0
   hydra-migrate:
     # image: oryd/hydra:v25.4.0
     build:
@@ -60,10 +60,11 @@ services:
     depends_on:
       sqlite:
         condition: service_completed_successfully
+    image: oryd/hydra:v26.2.0
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v25.4.0
+    image: oryd/hydra-login-consent-node:v26.2.0
     ports:
       - "3000:3000"
     restart: unless-stopped

@@ -121,8 +121,6 @@ var httpMetrics = prometheusx.NewHTTPMetrics("hydra", prometheusx.HTTPPrefix, co
 func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServeAdmin(contextx.RootContext)
 
-	n := negroni.New()
-
 	logger := reqlog.
 		NewMiddlewareFromLogger(d.Logger(),
 			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL(ctx).String()))
@@ -130,10 +128,13 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheusx.MetricsPrometheusPath)
 	}
 
+	router := httprouterx.NewRouterAdminWithPrefix()
+	n := negroni.New(httprouterx.PopulatePatternNegroni(router))
 	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 	n.UseFunc(httprouterx.NoCacheNegroni)
 	n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
 	n.UseFunc(semconv.Middleware)
+	n.Use(httpMetrics)
 	n.Use(logger)
 
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
@@ -157,7 +158,6 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 	})
 	n.Use(sqaMetrics)
 
-	router := httprouterx.NewRouterAdminWithPrefix(httpMetrics)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	d.RegisterAdminRoutes(router)
 
@@ -172,8 +172,6 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metricsx.Service) (func() error, error) {
 	cfg := d.Config().ServePublic(contextx.RootContext)
 
-	n := negroni.New()
-
 	logger := reqlog.NewMiddlewareFromLogger(
 		d.Logger(),
 		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL(ctx).String()),
@@ -182,10 +180,14 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
+	router := httprouterx.NewRouterPublic()
+	n := negroni.New(httprouterx.PopulatePatternNegroni(router))
 	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
 	n.UseFunc(httprouterx.NoCacheNegroni)
 	n.UseFunc(semconv.Middleware)
+	n.Use(httpMetrics)
 	n.Use(logger)
+
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
 		if err != nil {
@@ -207,7 +209,6 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 	})
 	n.Use(sqaMetrics)
 
-	router := httprouterx.NewRouterPublic(httpMetrics)
 	router.Handler("", "/", serverx.DefaultNotFoundHandler)
 	d.RegisterPublicRoutes(ctx, router)
 

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/jmoiron/sqlx/reflectx"
+
 	"github.com/ory/herodot"
 )
 

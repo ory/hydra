@@ -45,8 +45,8 @@ func ResilientClientWithMaxRetry(retryMax int) ResilientOptions {
 	return func(o *resilientOptions) { o.retryMax = retryMax }
 }
 
-// ResilientClientWithMinxRetryWait sets the minimum wait time between retries.
-func ResilientClientWithMinxRetryWait(retryWaitMin time.Duration) ResilientOptions {
+// ResilientClientWithMinRetryWait sets the minimum wait time between retries.
+func ResilientClientWithMinRetryWait(retryWaitMin time.Duration) ResilientOptions {
 	return func(o *resilientOptions) { o.retryWaitMin = retryWaitMin }
 }
 
@@ -74,6 +74,15 @@ func ResilientClientDisallowInternalIPs() ResilientOptions {
 // if they are internal IPs.
 func ResilientClientAllowInternalIPRequestsTo(urlGlobs ...string) ResilientOptions {
 	return func(o *resilientOptions) { o.internalIPExceptions = urlGlobs }
+}
+
+// ResilientClientNoFollowRedirects configures the client to not follow redirects.
+func ResilientClientNoFollowRedirects() ResilientOptions {
+	return func(o *resilientOptions) {
+		o.c.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse // don't follow redirects
+		}
+	}
 }
 
 // NewResilientClient creates a new ResilientClient.

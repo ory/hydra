@@ -105,7 +105,7 @@ var (
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _  = os.ReadFile("./config.json")
-	httpClient = httpx.NewResilientClient(httpx.ResilientClientWithMinxRetryWait(time.Second * 5))
+	httpClient = httpx.NewResilientClient(httpx.ResilientClientWithMinRetryWait(time.Second * 5))
 	workdir    string
 
 	hydra = hydrac.NewAPIClient(hydrac.NewConfiguration())

@@ -90,7 +90,7 @@ type createOAuth2Client struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) createOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
@@ -144,7 +144,7 @@ type createOidcDynamicClient struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-public-high
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) createOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -254,7 +254,7 @@ type setOAuth2Client struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) setOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -345,7 +345,7 @@ type setOidcDynamicClient struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-public-high
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) setOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -431,7 +431,7 @@ type patchOAuth2Client struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) patchOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -590,7 +590,7 @@ type adminGetOAuth2Client struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -644,7 +644,7 @@ type getOidcDynamicClient struct {
 //	  default: errorOAuth2Default
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) getOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -706,7 +706,7 @@ type deleteOAuth2Client struct {
 //	  default: genericError
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) deleteOAuth2Client(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
@@ -749,7 +749,7 @@ type setOAuth2ClientLifespans struct {
 //	  default: genericError
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) setOAuth2ClientLifespans(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
@@ -815,7 +815,7 @@ type dynamicClientRegistrationDeleteOAuth2Client struct {
 //	  default: genericError
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-public-high
+//	  x-ory-ratelimit-bucket: hydra-public-low
 func (h *Handler) deleteOidcDynamicClient(w http.ResponseWriter, r *http.Request) {
 	if err := h.requireDynamicAuth(r); err != nil {
 		h.r.Writer().WriteError(w, r, err)

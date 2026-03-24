@@ -114,7 +114,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) revokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	var (
 		subject          = r.URL.Query().Get("subject")
@@ -193,7 +193,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) listOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -280,7 +280,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-high
+//	  x-ory-ratelimit-bucket: hydra-admin-low
 func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request) {
 	sid := r.URL.Query().Get("sid")
 	subject := r.URL.Query().Get("subject")
@@ -347,7 +347,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) getOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2LoginRequest")
@@ -426,7 +426,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) acceptOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.acceptOAuth2LoginRequest")
@@ -545,7 +545,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.rejectOAuth2LoginRequest")
@@ -639,7 +639,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) getOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.getOAuth2ConsentRequest")
@@ -721,7 +721,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) acceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	var err error
 	ctx, span := h.r.Tracer(r.Context()).Tracer().Start(r.Context(), "consent.acceptOAuth2ConsentRequest")
@@ -818,7 +818,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) rejectOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -898,7 +898,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) acceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
@@ -944,7 +944,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) rejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
@@ -985,7 +985,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) getOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request) {
 	challenge := cmp.Or(
 		r.URL.Query().Get("logout_challenge"),
@@ -1044,7 +1044,7 @@ type _ struct {
 //	  default: errorOAuth2
 //
 //	Extensions:
-//	  x-ory-ratelimit-bucket: hydra-admin-low
+//	  x-ory-ratelimit-bucket: hydra-admin-high
 func (h *Handler) acceptUserCodeRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

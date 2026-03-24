@@ -231,6 +231,7 @@ func (c *Config) GetTokenURLs(ctx context.Context) []string {
 	return stringslice.Unique([]string{
 		c.deps.Config().OAuth2TokenURL(ctx).String(),
 		urlx.AppendPaths(c.deps.Config().PublicURL(ctx), oauth2.TokenPath).String(),
+		urlx.AppendPaths(c.deps.Config().IssuerURL(ctx), oauth2.TokenPath).String(),
 	})
 }
 

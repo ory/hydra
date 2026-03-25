@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/ssoready/hyrumtoken"
 )
 
 // Pagination Request Parameters
@@ -110,15 +109,18 @@ func ParseQueryParams(keys [][32]byte, q url.Values) ([]Option, error) {
 }
 
 // ParsePageToken parses a page token from the given raw string using the provided keys.
-// It panics if no keys are provided.
+// If decryption fails with all provided keys (including when no keys are given), it
+// falls back to using the fallbackEncryptionKey and returns an error if that also fails.
 func ParsePageToken(keys [][32]byte, raw string) (t PageToken, err error) {
 	for i := range keys {
-		err = errors.WithStack(hyrumtoken.Unmarshal(&keys[i], raw, &t))
-		if err == nil {
-			return
+		err = errors.WithStack(t.decrypt(&keys[i], raw))
+		if errors.Is(err, ErrInvalidPaginationToken) {
+			continue
 		}
+		// either we successfully decrypted the token, or we got an error that is not ErrInvalidPaginationToken, in both cases we should return immediately
+		return t, err
 	}
 	// as a last resort, try the fallback key
-	err = hyrumtoken.Unmarshal(fallbackEncryptionKey, raw, &t)
+	err = t.decrypt(fallbackEncryptionKey, raw)
 	return t, errors.WithStack(err)
 }

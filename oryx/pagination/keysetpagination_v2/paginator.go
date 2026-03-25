@@ -12,7 +12,7 @@ import (
 	"github.com/ory/herodot"
 )
 
-var ErrInvalidPaginationToken = herodot.ErrBadRequest.WithReason("invalid pagination token")
+var ErrInvalidPaginationToken = herodot.ErrBadRequest.WithError("invalid pagination token")
 
 type (
 	Paginator struct {

@@ -128,14 +128,20 @@ func adminServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metrics
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath, "/admin"+prometheusx.MetricsPrometheusPath)
 	}
 
+	recovery := negroni.NewRecovery()
+	recovery.Logger = d.Logger()
+
 	router := httprouterx.NewRouterAdminWithPrefix()
-	n := negroni.New(httprouterx.PopulatePatternNegroni(router))
-	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
-	n.UseFunc(httprouterx.NoCacheNegroni)
-	n.UseFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni)
-	n.UseFunc(semconv.Middleware)
-	n.Use(httpMetrics)
-	n.Use(logger)
+	n := negroni.New(
+		recovery,
+		httprouterx.PopulatePatternNegroni(router),
+		negroni.HandlerFunc(httprouterx.TrimTrailingSlashNegroni),
+		negroni.HandlerFunc(httprouterx.NoCacheNegroni),
+		negroni.HandlerFunc(httprouterx.AddAdminPrefixIfNotPresentNegroni),
+		negroni.HandlerFunc(semconv.Middleware),
+		httpMetrics,
+		logger,
+	)
 
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)
@@ -180,13 +186,19 @@ func publicServer(ctx context.Context, d *driver.RegistrySQL, sqaMetrics *metric
 		logger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
+	recovery := negroni.NewRecovery()
+	recovery.Logger = d.Logger()
+
 	router := httprouterx.NewRouterPublic()
-	n := negroni.New(httprouterx.PopulatePatternNegroni(router))
-	n.UseFunc(httprouterx.TrimTrailingSlashNegroni)
-	n.UseFunc(httprouterx.NoCacheNegroni)
-	n.UseFunc(semconv.Middleware)
-	n.Use(httpMetrics)
-	n.Use(logger)
+	n := negroni.New(
+		recovery,
+		httprouterx.PopulatePatternNegroni(router),
+		negroni.HandlerFunc(httprouterx.TrimTrailingSlashNegroni),
+		negroni.HandlerFunc(httprouterx.NoCacheNegroni),
+		negroni.HandlerFunc(semconv.Middleware),
+		httpMetrics,
+		logger,
+	)
 
 	if cfg.TLS.Enabled && !networkx.AddressIsUnixSocket(cfg.Host) {
 		mw, err := tlsx.EnforceTLSRequests(d, cfg.TLS.AllowTerminationFrom)

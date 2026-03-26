@@ -80,6 +80,17 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	// for every other claim that was already reserved and for mirroring, add original extra under "ext"
 	if s.MirrorTopLevelClaims {
 		topLevelExtraWithMirrorExt["ext"] = s.Extra
+	} else {
+		// include only claims that were not promoted to top level in ext
+		notTopLevel := make(map[string]interface{})
+		for k, v := range s.Extra {
+			if !slices.Contains(allowedClaimsFromConfigWithoutReserved, k) {
+				notTopLevel[k] = v
+			}
+		}
+		if len(notTopLevel) > 0 {
+			topLevelExtraWithMirrorExt["ext"] = notTopLevel
+		}
 	}
 
 	claims := &jwt.JWTClaims{

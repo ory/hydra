@@ -280,7 +280,7 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, signature string, 
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
 		ID:                signature,
-		RequestedAt:       r.GetRequestedAt(),
+		RequestedAt:       r.GetRequestedAt().UTC(),
 		InternalExpiresAt: sqlxx.NullTime(expiresAt),
 		Client:            r.GetClient().GetID(),
 		Scopes:            strings.Join(r.GetRequestedScopes(), "|"),
@@ -388,7 +388,7 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 			fmt.Sprintf(`DELETE FROM %s WHERE signature in (
 				SELECT signature FROM (SELECT signature FROM %s hoa WHERE requested_at < ? and nid = ? ORDER BY requested_at LIMIT %d ) as s
 			)`, OAuth2RequestSQL{Table: table}.TableName(), OAuth2RequestSQL{Table: table}.TableName(), d),
-			notAfter,
+			notAfter.UTC(),
 			p.NetworkID(ctx),
 		).ExecWithCount()
 		totalDeletedCount += deletedRecords

@@ -18,13 +18,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/x/configx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/servicelocatorx"
 	"github.com/ory/x/tlsx"
 
 	"github.com/ory/hydra/v2/cmd/server"
 	"github.com/ory/hydra/v2/driver"
-	"github.com/ory/hydra/v2/driver/config"
 	"github.com/ory/hydra/v2/internal/testhelpers"
 	"github.com/ory/hydra/v2/jwk"
 )
@@ -35,11 +35,12 @@ func TestGetOrCreateTLSCertificate(t *testing.T) {
 	logger.Logger.ExitFunc = func(code int) { t.Fatalf("Logger called os.Exit(%v)", code) }
 	d, err := driver.New(t.Context(),
 		driver.WithConfigOptions(configx.WithValues(map[string]interface{}{
-			"dsn":                 config.DSNMemory,
+			"dsn":                 dbal.NewSQLiteTestDatabase(t),
 			"serve.tls.enabled":   true,
 			"serve.tls.cert.path": certPath,
 			"serve.tls.key.path":  keyPath,
 		})),
+		driver.WithAutoMigrate(),
 		driver.WithServiceLocatorOptions(servicelocatorx.WithLogger(logger)),
 	)
 	require.NoError(t, err)
@@ -107,12 +108,15 @@ func TestGetOrCreateTLSCertificateBase64(t *testing.T) {
 	require.NoError(t, err)
 	keyBase64 := base64.StdEncoding.EncodeToString(keyPEM)
 
-	d, err := driver.New(t.Context(), driver.WithConfigOptions(configx.WithValues(map[string]interface{}{
-		"dsn":                   config.DSNMemory,
-		"serve.tls.enabled":     true,
-		"serve.tls.cert.base64": certBase64,
-		"serve.tls.key.base64":  keyBase64,
-	})))
+	d, err := driver.New(t.Context(),
+		driver.WithConfigOptions(configx.WithValues(map[string]interface{}{
+			"dsn":                   dbal.NewSQLiteTestDatabase(t),
+			"serve.tls.enabled":     true,
+			"serve.tls.cert.base64": certBase64,
+			"serve.tls.key.base64":  keyBase64,
+		})),
+		driver.WithAutoMigrate(),
+	)
 	require.NoError(t, err)
 	getCert := server.GetOrCreateTLSCertificate(t.Context(), d, d.Config().ServeAdmin(t.Context()).TLS, "admin")
 	require.NotNil(t, getCert)

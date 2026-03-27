@@ -32,6 +32,7 @@ import (
 	"github.com/ory/hydra/v2/jwk"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/logrusx"
 )
 
@@ -41,10 +42,11 @@ func TestDefaultKeyManager_HSMEnabled(t *testing.T) {
 	defer ctrl.Finish()
 	reg, err := driver.New(t.Context(),
 		driver.WithConfigOptions(configx.WithValues(map[string]any{
-			config.KeyDSN:     "memory",
+			config.KeyDSN:     dbal.NewSQLiteTestDatabase(t),
 			config.HSMEnabled: true,
 		})),
 		driver.WithHSMContext(mockHsmContext),
+		driver.WithAutoMigrate(),
 	)
 	require.NoError(t, err)
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
@@ -77,7 +79,7 @@ func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	ecdsaKeyPair := NewMockSignerDecrypter(ctrl)
 	ecdsaKeyPair.EXPECT().Public().Return(&ecdsaKey.PublicKey).AnyTimes()
 
-	var kid = uuid.New()
+	kid := uuid.New()
 
 	expectedPrefixedOpenIDConnectKeyName := fmt.Sprintf("%s%s", keySetPrefix, x.OpenIDConnectKeyName)
 
@@ -172,7 +174,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	ecdsaKeyPair := NewMockSignerDecrypter(ctrl)
 	ecdsaKeyPair.EXPECT().Public().Return(&ecdsaKey.PublicKey).AnyTimes()
 
-	var kid = uuid.New()
+	kid := uuid.New()
 
 	type args struct {
 		ctx context.Context
@@ -361,7 +363,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 	ecdsaP224KeyPair := NewMockSignerDecrypter(ctrl)
 	ecdsaP224KeyPair.EXPECT().Public().Return(&ecdsaP224Key.PublicKey).AnyTimes()
 
-	var kid = uuid.New()
+	kid := uuid.New()
 
 	type args struct {
 		ctx context.Context

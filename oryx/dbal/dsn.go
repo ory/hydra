@@ -33,12 +33,6 @@ func NewSQLiteTestDatabase(t testing.TB) string {
 	return NewSQLiteDatabase(fn)
 }
 
-// NewSQLiteInMemoryDatabase creates a new in-memory, unique SQLite database
-// which is shared amongst all callers and identified by an individual file name.
-func NewSQLiteInMemoryDatabase(name string) string {
-	return fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared&_busy_timeout=100000", name)
-}
-
 // NewSQLiteDatabase creates a new on-disk, unique SQLite database
 // which is shared amongst all callers and identified by an individual file name.
 // This is sometimes necessary over a in-memory database, for example when multiple tests/goroutines run in parallel
@@ -46,6 +40,8 @@ func NewSQLiteInMemoryDatabase(name string) string {
 // This would result in a locking error from SQLite when running in-memory.
 // Additionally, shared cache mode is deprecated and discouraged, and the problem is better solved with the WAL,
 // according to official docs.
+//
+// In tests, use [NewSQLiteTestDatabase] instead.
 func NewSQLiteDatabase(name string) string {
-	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&_journal_mode=WAL&_busy_timeout=100000", name)
+	return fmt.Sprintf("sqlite://file:%s/db.sqlite?_fk=true&_busy_timeout=100000&_pragma=journal_mode(WAL)&_time_format=sqlite", name)
 }

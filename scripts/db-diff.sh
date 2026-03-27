@@ -107,7 +107,7 @@ function dump_sqlite {
 	hydra::util::ensure-sqlite
 
 	rm "$SQLITE_PATH" > /dev/null 2>&1 || true
-	go run -tags sqlite,sqlite_omit_load_extension . migrate sql up "sqlite://$SQLITE_PATH?_fk=true" --yes > /dev/null 2>&1 || true
+	go run . migrate sql up "sqlite://$SQLITE_PATH?_fk=true" --yes > /dev/null 2>&1 || true
 	echo '.dump' | sqlite3 "$SQLITE_PATH"
 }
 

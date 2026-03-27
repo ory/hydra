@@ -162,7 +162,7 @@ func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time,
 
 	deleteUntil := time.Now().UTC()
 	if deleteUntil.After(notAfter) {
-		deleteUntil = notAfter
+		deleteUntil = notAfter.UTC()
 	}
 	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("expires_at < ?", deleteUntil).Delete(&SQLGrant{}))
 }

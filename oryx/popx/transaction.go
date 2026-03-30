@@ -10,8 +10,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgconn"
-	pgxconn "github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -69,9 +68,6 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 				return nil
 			}
 			if e := new(pgconn.PgError); errors.As(err, &e) && e.Code == "40001" {
-				continue
-			}
-			if e := new(pgxconn.PgError); errors.As(err, &e) && e.Code == "40001" {
 				continue
 			}
 			return err

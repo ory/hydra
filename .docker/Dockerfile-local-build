@@ -12,12 +12,10 @@ RUN apt-get update && apt-get upgrade -y &&\
 COPY go.mod go.sum ./
 COPY internal/httpclient/go.* ./internal/httpclient/
 
-ENV CGO_ENABLED=1
-
 RUN go mod download
 
 COPY . .
-RUN go build -ldflags="-extldflags=-static" -tags sqlite,sqlite_omit_load_extension -o /usr/bin/hydra
+RUN go build -ldflags="-extldflags=-static" -o /usr/bin/hydra
 
 #########################
 

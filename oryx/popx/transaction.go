@@ -7,15 +7,16 @@ import (
 	"context"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgconn"
-	pgxconn "github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/pop/v6"
+	"github.com/ory/x/sqlcon"
 )
 
 type transactionContextKey int
@@ -69,12 +70,37 @@ func Transaction(ctx context.Context, connection *pop.Connection, callback func(
 			if e := new(pgconn.PgError); errors.As(err, &e) && e.Code == "40001" {
 				continue
 			}
-			if e := new(pgxconn.PgError); errors.As(err, &e) && e.Code == "40001" {
-				continue
-			}
 			return err
 		}
 		return err
+	}
+
+	if connection.Dialect.Name() == "sqlite3" {
+		var (
+			err      error
+			wait     = 25 * time.Millisecond
+			deadline = time.Now().Add(10 * time.Second)
+		)
+		for {
+			err = connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {
+				return callback(WithTransaction(ctx, tx), tx)
+			})
+			if err == nil {
+				return nil
+			}
+			if !errors.Is(sqlcon.HandleError(err), sqlcon.ErrConcurrentUpdate) {
+				return err
+			}
+			remaining := time.Until(deadline)
+			if remaining <= 0 {
+				return err
+			}
+			if wait > time.Millisecond*200 {
+				wait = time.Millisecond * 200
+			}
+			time.Sleep(min(wait, time.Second, remaining))
+			wait *= 2
+		}
 	}
 
 	return errors.WithStack(connection.WithContext(ctx).Transaction(func(tx *pop.Connection) error {

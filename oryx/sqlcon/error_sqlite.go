@@ -1,35 +1,34 @@
 // Copyright © 2023 Ory Corp
 // SPDX-License-Identifier: Apache-2.0
 
-//go:build sqlite
-// +build sqlite
-
 package sqlcon
 
 import (
 	"strings"
 
-	"github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	sqlite "modernc.org/sqlite"
+	sqlite3lib "modernc.org/sqlite/lib"
 )
 
 // handleSqlite handles the error iff (if and only if) it is an sqlite error
 func handleSqlite(err error) error {
-	if e := new(sqlite3.Error); errors.As(err, e) {
-		switch e.ExtendedCode {
-		case sqlite3.ErrConstraintUnique:
-			fallthrough
-		case sqlite3.ErrConstraintPrimaryKey:
+	var e *sqlite.Error
+	if errors.As(err, &e) {
+		// Code() returns the full extended error code.
+		switch e.Code() {
+		case sqlite3lib.SQLITE_CONSTRAINT_UNIQUE,
+			sqlite3lib.SQLITE_CONSTRAINT_PRIMARYKEY:
 			return errors.WithStack(ErrUniqueViolation.WithWrap(err))
-
-		}
-
-		switch e.Code {
-		case sqlite3.ErrError:
+		case sqlite3lib.SQLITE_ERROR:
 			if strings.Contains(err.Error(), "no such table") {
 				return errors.WithStack(ErrNoSuchTable.WithWrap(err))
 			}
-		case sqlite3.ErrLocked:
+		case sqlite3lib.SQLITE_LOCKED,
+			sqlite3lib.SQLITE_BUSY,
+			sqlite3lib.SQLITE_BUSY_RECOVERY,
+			sqlite3lib.SQLITE_BUSY_SNAPSHOT,
+			sqlite3lib.SQLITE_BUSY_TIMEOUT:
 			return errors.WithStack(ErrConcurrentUpdate.WithWrap(err))
 		}
 

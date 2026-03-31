@@ -5,11 +5,11 @@ package sqlcon
 
 import (
 	"database/sql"
+	stderrs "errors"
 	"net/http"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/jackc/pgconn"
-	pgxconn "github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -68,28 +68,30 @@ func handlePostgres(err error, sqlState string) error {
 	return errors.WithStack(err)
 }
 
-type stater interface {
-	SQLState() string
-}
-
 // HandleError returns the right sqlcon.Err* depending on the input error.
 func HandleError(err error) error {
 	if err == nil {
 		return nil
 	}
 
-	var st stater
+	type stater = interface {
+		error
+		SQLState() string
+	}
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return errors.WithStack(ErrNoRows)
-	} else if errors.As(err, &st) {
-		return errors.WithStack(handlePostgres(err, st.SQLState()))
-	} else if e := new(pq.Error); errors.As(err, &e) {
+	}
+	if e, ok := stderrs.AsType[stater](err); ok {
+		return errors.WithStack(handlePostgres(err, e.SQLState()))
+	}
+	if e, ok := stderrs.AsType[*pq.Error](err); ok {
 		return errors.WithStack(handlePostgres(err, string(e.Code)))
-	} else if e := new(pgconn.PgError); errors.As(err, &e) {
+	}
+	if e, ok := stderrs.AsType[*pgconn.PgError](err); ok {
 		return errors.WithStack(handlePostgres(err, e.Code))
-	} else if e := new(pgxconn.PgError); errors.As(err, &e) {
-		return errors.WithStack(handlePostgres(err, e.Code))
-	} else if e := new(mysql.MySQLError); errors.As(err, &e) {
+	}
+	if e, ok := stderrs.AsType[*mysql.MySQLError](err); ok {
 		switch e.Number {
 		case 1062: // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html#error_er_dup_entry
 			return errors.WithStack(ErrUniqueViolation.WithWrap(err))

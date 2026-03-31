@@ -161,7 +161,7 @@ func DumpSchema(t testing.TB, c *pop.Connection) string {
 		return ""
 	}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	require.NoError(t, err)
 	containers, err := cli.ContainerList(t.Context(), container.ListOptions{
 		Filters: filters.NewArgs(filters.Arg("publish", port)),

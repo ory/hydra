@@ -39,9 +39,9 @@ func init() {
 func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	t.Parallel()
 
-	r, err := New(t.Context(), WithConfigOptions(
+	r, err := New(t.Context(), WithAutoMigrate(), WithConfigOptions(
 		configx.WithValues(map[string]any{
-			config.KeyDSN:                         "memory",
+			config.KeyDSN:                         dbal.NewSQLiteTestDatabase(t),
 			config.HSMEnabled:                     "false",
 			config.KeyClientHTTPNoPrivateIPRanges: true,
 		}),
@@ -146,7 +146,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 		WithConfigOptions(
 			configx.SkipValidation(),
 			configx.WithValues(map[string]any{
-				config.KeyDSN:     "memory",
+				config.KeyDSN:     dbal.NewSQLiteTestDatabase(t),
 				config.HSMEnabled: false,
 			}),
 		),

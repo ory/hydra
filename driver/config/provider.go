@@ -11,22 +11,22 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/v2/spec"
 	"github.com/ory/hydra/v2/x"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/contextx"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/hasherx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/otelx"
+
 	"github.com/ory/x/randx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
@@ -130,9 +130,11 @@ var (
 )
 
 type DefaultProvider struct {
-	l *logrusx.Logger
-	p *configx.Provider
-	c contextx.Contextualizer
+	l                 *logrusx.Logger
+	p                 *configx.Provider
+	c                 contextx.Contextualizer
+	dsnOnce           sync.Once
+	sqliteInMemoryDSN string
 }
 
 func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) string {
@@ -299,7 +301,15 @@ func (p *DefaultProvider) DSN() string {
 	dsn := p.getProvider(contextx.RootContext).String(KeyDSN)
 
 	if dsn == DSNMemory {
-		return dbal.NewSQLiteInMemoryDatabase(uuid.Must(uuid.NewV4()).String())
+		p.dsnOnce.Do(func() {
+			fn, err := randx.RuneSequence(12, randx.AlphaNum)
+			if err != nil {
+				p.l.Fatal("could not create temp dir for SQLite database")
+			}
+
+			p.sqliteInMemoryDSN = fmt.Sprintf("sqlite://file:%s?_fk=true&mode=memory&cache=shared&_busy_timeout=100000&_time_format=sqlite", string(fn))
+		})
+		return p.sqliteInMemoryDSN
 	}
 
 	if len(dsn) > 0 {
@@ -513,6 +523,7 @@ func (p *DefaultProvider) KratosAdminURL(ctx context.Context) (*url.URL, bool) {
 
 	return u, u != nil
 }
+
 func (p *DefaultProvider) KratosPublicURL(ctx context.Context) (*url.URL, bool) {
 	u := p.getProvider(ctx).RequestURIF(KeyIdentityProviderPublicURL, nil)
 

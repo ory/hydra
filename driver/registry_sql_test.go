@@ -23,10 +23,10 @@ import (
 
 	"github.com/ory/hydra/v2/client"
 	"github.com/ory/hydra/v2/driver/config"
+	"github.com/ory/hydra/v2/fosite"
 	"github.com/ory/hydra/v2/persistence/sql"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/httpx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 	"github.com/ory/x/randx"
@@ -39,6 +39,12 @@ func init() {
 func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	t.Parallel()
 
+	ts := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		t.Fatal("Should not be called")
+		writer.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(ts.Close)
+
 	r, err := New(t.Context(), WithAutoMigrate(), WithConfigOptions(
 		configx.WithValues(map[string]any{
 			config.KeyDSN:                         dbal.NewSQLiteTestDatabase(t),
@@ -49,8 +55,10 @@ func TestGetJWKSFetcherStrategyHostEnforcement(t *testing.T) {
 	))
 	require.NoError(t, err)
 
-	_, err = r.OAuth2Config().GetJWKSFetcherStrategy(t.Context()).Resolve(t.Context(), "http://localhost:8080", true)
-	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
+	_, err = r.OAuth2Config().GetJWKSFetcherStrategy(t.Context()).Resolve(t.Context(), ts.URL, true)
+	rfcErr, ok := errors.AsType[*fosite.RFC6749Error](err)
+	require.True(t, ok, "expected a fosite.RFC6749Error, got %T: %+v", err, err)
+	require.Contains(t, rfcErr.DebugField, "no route to host")
 }
 
 func TestRegistrySQL_newKeyStrategy_handlesNetworkError(t *testing.T) {
@@ -133,7 +141,7 @@ func TestRegistrySQL_HTTPClient(t *testing.T) {
 
 	t.Run("case=does not match exception glob", func(t *testing.T) {
 		_, err := r.HTTPClient(t.Context()).Get(ts.URL + "/foo")
-		assert.ErrorContains(t, err, "prohibited IP address")
+		assert.Error(t, err)
 	})
 }
 

@@ -31,7 +31,9 @@ func WaitForEndpointWithClient(ctx context.Context, client *http.Client, endpoin
 		if err != nil {
 			return err
 		}
-		defer res.Body.Close()
+		defer func() {
+			_ = res.Body.Close()
+		}()
 
 		body, err := io.ReadAll(res.Body)
 		if err != nil {

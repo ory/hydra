@@ -109,6 +109,21 @@ func TestCustomClaimsInSession(t *testing.T) {
 		},
 		expectNotSet: []string{"ext"},
 	}, {
+		name: "disabled mirror top level claims with non-top-level claims",
+		extra: map[string]any{
+			"foo": "bar",
+			"baz": "qux",
+		},
+		allowedTopLevelClaims: []string{"foo"},
+		mirrorTopLevelClaims:  false,
+		expectedClaims: map[string]any{
+			"sub": "alice",
+			"iss": "hydra.localhost",
+			"foo": "bar",
+			"ext": map[string]any{"baz": "qux"},
+		},
+		expectNotSet: []string{"baz"},
+	}, {
 		name:                  "exclude not before claim",
 		extra:                 map[string]any{},
 		excludeNotBeforeClaim: true,

@@ -52,7 +52,7 @@ CREATE TABLE "hydra_client"
   refresh_token_grant_access_token_lifespan       BIGINT NULL DEFAULT NULL,
   refresh_token_grant_refresh_token_lifespan      BIGINT NULL DEFAULT NULL,
   skip_consent                                    BOOLEAN      NOT NULL DEFAULT false,
-  nid                                             CHAR(36)     NOT NULL, skip_logout_consent BOOLEAN NULL, device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL, device_authorization_grant_access_token_lifespan BIGINT NULL DEFAULT NULL, device_authorization_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL,
+  nid                                             CHAR(36)     NOT NULL, skip_logout_consent BOOLEAN NULL, device_authorization_grant_id_token_lifespan BIGINT NULL DEFAULT NULL, device_authorization_grant_access_token_lifespan BIGINT NULL DEFAULT NULL, device_authorization_grant_refresh_token_lifespan BIGINT NULL DEFAULT NULL, rotated_secrets TEXT NOT NULL DEFAULT '',
   PRIMARY KEY (id, nid)
 );
 CREATE TABLE "hydra_jwk" (

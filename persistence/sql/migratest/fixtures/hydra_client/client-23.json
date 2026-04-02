@@ -117,6 +117,7 @@
     "response-23_1",
     "response-23_2"
   ],
+  "RotatedSecrets": "",
   "Scope": "scope-23",
   "Secret": "secret-23",
   "SecretExpiresAt": 0,

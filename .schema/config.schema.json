@@ -894,6 +894,11 @@
                       "$ref": "#/definitions/duration"
                     }
                   ]
+                },
+                "copy_assertion_audience": {
+                  "type": "boolean",
+                  "description": "Configures whether the audience from the assertion JWT in the jwt-bearer grant type is copied into the resulting access token. When set to `true` (the default), the audience values from the inbound assertion JWT are granted in the access token. Set to `false` to prevent the assertion audience from being copied into the access token.",
+                  "default": true
                 }
               }
             }

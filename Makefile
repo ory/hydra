@@ -82,12 +82,15 @@ test-refresh:
 authors:  # updates the AUTHORS file
 	curl --retry 7 --retry-connrefused https://raw.githubusercontent.com/ory/ci/master/authors/authors.sh | env PRODUCT="Ory Hydra" bash
 
+PRETTIER_VERSION=$(shell cat package.json | jq -r '.devDependencies["prettier"] // .dependencies["prettier"]')
+
 # Formats the code
 .PHONY: format
-format: .bin/ory node_modules
+format: .bin/ory
 	ory dev headers copyright --type=open-source --exclude=internal/httpclient --exclude=oryx
 	go tool goimports -w --local github.com/ory .
-	npm exec -- prettier --write .
+	@echo "Prettier Version: $(PRETTIER_VERSION)"
+	npx --package=prettier@$(PRETTIER_VERSION)  prettier . --write
 
 # Generates mocks
 .PHONY: mocks

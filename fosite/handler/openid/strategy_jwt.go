@@ -5,7 +5,9 @@ package openid
 
 import (
 	"context"
+	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ory/x/errorsx"
@@ -157,20 +159,20 @@ func (h DefaultStrategy) GenerateIDToken(ctx context.Context, lifespan time.Dura
 			}
 		}
 
-		prompt := requester.GetRequestForm().Get("prompt")
-		if prompt != "" {
+		prompts := fosite.RemoveEmpty(strings.Split(requester.GetRequestForm().Get("prompt"), " "))
+		if len(prompts) > 0 {
 			if claims.AuthTime.IsZero() {
 				return "", errorsx.WithStack(fosite.ErrServerError.WithDebug("Unable to determine validity of prompt parameter because auth_time is missing in id token claims."))
 			}
 		}
 
-		switch prompt {
-		case "none":
+		if slices.Contains(prompts, "none") {
 			if !claims.AuthTime.Equal(claims.RequestedAt) && claims.AuthTime.After(claims.RequestedAt) {
 				return "", errorsx.WithStack(fosite.ErrServerError.
 					WithDebugf("Failed to generate id token because prompt was set to 'none' but auth_time ('%s') happened after the authorization request ('%s') was registered, indicating that the user was logged in during this request which is not allowed.", claims.AuthTime, claims.RequestedAt))
 			}
-		case "login":
+		}
+		if slices.Contains(prompts, "login") {
 			if !claims.AuthTime.Equal(claims.RequestedAt) && claims.AuthTime.Before(claims.RequestedAt) {
 				return "", errorsx.WithStack(fosite.ErrServerError.
 					WithDebugf("Failed to generate id token because prompt was set to 'login' but auth_time ('%s') happened before the authorization request ('%s') was registered, indicating that the user was not re-authenticated which is forbidden.", claims.AuthTime, claims.RequestedAt))

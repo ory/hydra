@@ -15,7 +15,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-jose/go-jose/v3 v3.0.4
+	github.com/go-jose/go-jose/v3 v3.0.5
 	github.com/go-openapi/jsonpointer v0.21.2
 	github.com/go-openapi/runtime v0.28.0
 	github.com/go-sql-driver/mysql v1.9.3

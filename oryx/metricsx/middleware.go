@@ -182,7 +182,7 @@ func New(
 	}
 
 	if !optOut {
-		l.Info("Software quality assurance features are enabled. Learn more at: https://www.ory.sh/docs/ecosystem/sqa")
+		l.Info("Software quality assurance features are enabled. Learn more at: https://www.ory.com/docs/ecosystem/sqa")
 	}
 
 	m := &Service{

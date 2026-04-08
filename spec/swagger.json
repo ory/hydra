@@ -110,13 +110,13 @@
             "type": "integer",
             "format": "int64",
             "default": 250,
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_size",
             "in": "query"
           },
           {
             "type": "string",
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_token",
             "in": "query"
           },
@@ -1259,13 +1259,13 @@
             "type": "integer",
             "format": "int64",
             "default": 250,
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_size",
             "in": "query"
           },
           {
             "type": "string",
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_token",
             "in": "query"
           },
@@ -1515,13 +1515,13 @@
             "type": "integer",
             "format": "int64",
             "default": 250,
-            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_size",
             "in": "query"
           },
           {
             "type": "string",
-            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
             "name": "page_token",
             "in": "query"
           },
@@ -2856,12 +2856,12 @@
       }
     },
     "keysetPaginationRequestParameters": {
-      "description": "For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "description": "For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
       "type": "object",
       "title": "Pagination Request Parameters",
       "properties": {
         "page_size": {
-          "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "integer",
           "format": "int64",
           "default": 250,
@@ -2869,13 +2869,13 @@
           "minimum": 1
         },
         "page_token": {
-          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "string"
         }
       }
     },
     "keysetPaginationResponseHeaders": {
-      "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "description": "The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250\u0026page_token=\u003e; rel=\"first\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
       "type": "object",
       "title": "Pagination Response Header",
       "properties": {
@@ -2896,7 +2896,7 @@
       "title": "OAuth 2.0 Client",
       "properties": {
         "access_token_strategy": {
-          "description": "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is the strategy used to generate access tokens.\nValid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token\nSetting the strategy here overrides the global setting in `strategies.access_token`.",
+          "description": "OAuth 2.0 Access Token Strategy\n\nAccessTokenStrategy is the strategy used to generate access tokens.\nValid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.com/docs/oauth2-oidc/jwt-access-token\nSetting the strategy here overrides the global setting in `strategies.access_token`.",
           "type": "string"
         },
         "allowed_cors_origins": {
@@ -3700,7 +3700,7 @@
       "type": "object",
       "properties": {
         "page_size": {
-          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "integer",
           "format": "int64",
           "default": 250,
@@ -3708,7 +3708,7 @@
           "minimum": 1
         },
         "page_token": {
-          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "string"
         }
       }
@@ -3717,7 +3717,7 @@
       "type": "object",
       "properties": {
         "link": {
-          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).\n\nin: header",
           "type": "string"
         },
         "x-total-count": {
@@ -3727,12 +3727,12 @@
       }
     },
     "tokenPaginationRequestParameters": {
-      "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
       "type": "object",
       "title": "Pagination Request Parameters",
       "properties": {
         "page_size": {
-          "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Items per Page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "integer",
           "format": "int64",
           "default": 250,
@@ -3740,13 +3740,13 @@
           "minimum": 1
         },
         "page_token": {
-          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
           "type": "string"
         }
       }
     },
     "tokenPaginationResponseHeaders": {
-      "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+      "description": "The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:\n`\u003chttps://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}\u0026page_token={offset}\u003e; rel=\"{page}\"`\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).",
       "type": "object",
       "title": "Pagination Response Header",
       "properties": {

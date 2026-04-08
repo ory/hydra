@@ -7,7 +7,7 @@ package openapix
 type TokenPaginationHeaders struct {
 	// The link header contains pagination links.
 	//
-	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	//
 	// in: header
 	Link string `json:"link"`
@@ -23,7 +23,7 @@ type TokenPaginationParams struct {
 	// Items per page
 	//
 	// This is the number of items per page to return.
-	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query
@@ -35,7 +35,7 @@ type TokenPaginationParams struct {
 	// Next Page Token
 	//
 	// The next page token.
-	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query

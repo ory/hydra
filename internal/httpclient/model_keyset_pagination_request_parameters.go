@@ -18,11 +18,11 @@ import (
 // checks if the KeysetPaginationRequestParameters type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &KeysetPaginationRequestParameters{}
 
-// KeysetPaginationRequestParameters For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// KeysetPaginationRequestParameters For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 type KeysetPaginationRequestParameters struct {
-	// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	PageSize *int64 `json:"page_size,omitempty"`
-	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 	PageToken *string `json:"page_token,omitempty"`
 }
 

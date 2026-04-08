@@ -1771,13 +1771,13 @@ type ApiListOAuth2ClientsRequest struct {
 	owner      *string
 }
 
-// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListOAuth2ClientsRequest) PageSize(pageSize int64) ApiListOAuth2ClientsRequest {
 	r.pageSize = &pageSize
 	return r
 }
 
-// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListOAuth2ClientsRequest) PageToken(pageToken string) ApiListOAuth2ClientsRequest {
 	r.pageToken = &pageToken
 	return r
@@ -1929,13 +1929,13 @@ func (r ApiListOAuth2ConsentSessionsRequest) Subject(subject string) ApiListOAut
 	return r
 }
 
-// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListOAuth2ConsentSessionsRequest) PageSize(pageSize int64) ApiListOAuth2ConsentSessionsRequest {
 	r.pageSize = &pageSize
 	return r
 }
 
-// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListOAuth2ConsentSessionsRequest) PageToken(pageToken string) ApiListOAuth2ConsentSessionsRequest {
 	r.pageToken = &pageToken
 	return r
@@ -2076,13 +2076,13 @@ type ApiListTrustedOAuth2JwtGrantIssuersRequest struct {
 	issuer     *string
 }
 
-// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Items per Page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) PageSize(pageSize int64) ApiListTrustedOAuth2JwtGrantIssuersRequest {
 	r.pageSize = &pageSize
 	return r
 }
 
-// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 func (r ApiListTrustedOAuth2JwtGrantIssuersRequest) PageToken(pageToken string) ApiListTrustedOAuth2JwtGrantIssuersRequest {
 	r.pageToken = &pageToken
 	return r

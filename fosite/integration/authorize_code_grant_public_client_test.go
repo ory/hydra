@@ -46,7 +46,7 @@ func runAuthorizeCodeGrantWithPublicClientTest(t *testing.T, strategy oauth2.Cor
 	}{
 		{
 			description: "should fail because of audience",
-			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.sh/not-api")},
+			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.com/not-api")},
 			setup: func() {
 				state = "12345678901234567890"
 			},
@@ -63,7 +63,7 @@ func runAuthorizeCodeGrantWithPublicClientTest(t *testing.T, strategy oauth2.Cor
 		},
 		{
 			description: "should pass with proper audience",
-			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.sh/api")},
+			params:      []goauth.AuthCodeOption{goauth.SetAuthURLParam("audience", "https://www.ory.com/api")},
 			setup: func() {
 				state = "12345678901234567890"
 				oauthClient.Scopes = []string{"fosite"}
@@ -73,8 +73,8 @@ func runAuthorizeCodeGrantWithPublicClientTest(t *testing.T, strategy oauth2.Cor
 				b.Client = new(fosite.DefaultClient)
 				b.Session = new(defaultSession)
 				require.NoError(t, json.NewDecoder(r.Body).Decode(&b))
-				assert.EqualValues(t, fosite.Arguments{"https://www.ory.sh/api"}, b.RequestedAudience)
-				assert.EqualValues(t, fosite.Arguments{"https://www.ory.sh/api"}, b.GrantedAudience)
+				assert.EqualValues(t, fosite.Arguments{"https://www.ory.com/api"}, b.RequestedAudience)
+				assert.EqualValues(t, fosite.Arguments{"https://www.ory.com/api"}, b.GrantedAudience)
 				assert.EqualValues(t, "foo-sub", b.Session.(*defaultSession).Subject)
 			},
 			authStatusCode: http.StatusOK,

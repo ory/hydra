@@ -1,7 +1,7 @@
 {
   "audience": [
-    "https://www.ory.sh/audience1",
-    "https://www.ory.sh/audience2"
+    "https://www.ory.com/audience1",
+    "https://www.ory.com/audience2"
   ],
   "client_name": "",
   "client_secret_expires_at": 0,

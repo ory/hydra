@@ -62,7 +62,7 @@ func TestRefreshTokenFlow(t *testing.T) {
 		ResponseTypes: []string{"id_token", "code", "token", "token code", "id_token code", "token id_token", "token code id_token"},
 		GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 		Scopes:        []string{"fosite", "offline", "openid"},
-		Audience:      []string{"https://www.ory.sh/api"},
+		Audience:      []string{"https://www.ory.com/api"},
 	}
 	fositeStore.Clients["refresh-client"] = refreshCheckClient
 
@@ -97,7 +97,7 @@ func TestRefreshTokenFlow(t *testing.T) {
 		},
 		{
 			description: "should pass and yield id token",
-			params:      []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("audience", "https://www.ory.sh/api")},
+			params:      []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("audience", "https://www.ory.com/api")},
 			setup: func(t *testing.T, c *oauth2.Config) {
 				c.Scopes = []string{"fosite", "offline", "openid"}
 			},
@@ -142,7 +142,7 @@ func TestRefreshTokenFlow(t *testing.T) {
 		},
 		{
 			description: "should fail because audience is no longer allowed",
-			params:      []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("audience", "https://www.ory.sh/api")},
+			params:      []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("audience", "https://www.ory.com/api")},
 			setup: func(t *testing.T, c *oauth2.Config) {
 				c.ClientID = refreshCheckClient.ID
 				c.Scopes = []string{"fosite", "offline", "openid"}

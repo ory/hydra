@@ -85,7 +85,7 @@ paths:
           Items per Page
 
           This is the number of items per page to return.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_size
@@ -101,7 +101,7 @@ paths:
           Next Page Token
 
           The next page token.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_token
@@ -1101,7 +1101,7 @@ paths:
           Items per Page
 
           This is the number of items per page to return.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_size
@@ -1117,7 +1117,7 @@ paths:
           Next Page Token
 
           The next page token.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_token
@@ -1273,7 +1273,7 @@ paths:
           Items per Page
 
           This is the number of items per page to return.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_size
@@ -1289,7 +1289,7 @@ paths:
           Next Page Token
 
           The next page token.
-          For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+          For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
         explode: true
         in: query
         name: page_token
@@ -2687,7 +2687,7 @@ components:
       type: object
     keysetPaginationRequestParameters:
       description: "For details on pagination please head over to the [pagination\
-        \ documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination)."
+        \ documentation](https://www.ory.com/docs/ecosystem/api-design#pagination)."
       properties:
         page_size:
           default: 250
@@ -2695,7 +2695,7 @@ components:
             Items per Page
 
             This is the number of items per page to return.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 1000
           minimum: 1
@@ -2705,7 +2705,7 @@ components:
             Next Page Token
 
             The next page token.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           type: string
       title: Pagination Request Parameters
       type: object
@@ -2714,7 +2714,7 @@ components:
         The `Link` HTTP header contains multiple links (`first`, `next`) formatted as:
         `<https://{project-slug}.projects.oryapis.com/admin/sessions?page_size=250&page_token=>; rel="first"`
 
-        For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+        For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
       properties:
         link:
           description: |-
@@ -2859,7 +2859,7 @@ components:
             OAuth 2.0 Access Token Strategy
 
             AccessTokenStrategy is the strategy used to generate access tokens.
-            Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.sh/docs/oauth2-oidc/jwt-access-token
+            Valid options are `jwt` and `opaque`. `jwt` is a bad idea, see https://www.ory.com/docs/oauth2-oidc/jwt-access-token
             Setting the strategy here overrides the global setting in `strategies.access_token`.
           type: string
         allowed_cors_origins:
@@ -4641,7 +4641,7 @@ components:
             Items per page
 
             This is the number of items per page to return.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 1000
           minimum: 1
@@ -4651,7 +4651,7 @@ components:
             Next Page Token
 
             The next page token.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           type: string
       type: object
     tokenPaginationHeaders:
@@ -4660,7 +4660,7 @@ components:
           description: |-
             The link header contains pagination links.
 
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
 
             in: header
           type: string
@@ -4676,7 +4676,7 @@ components:
         The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:
         `<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>; rel="{page}"`
 
-        For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+        For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
       properties:
         page_size:
           default: 250
@@ -4684,7 +4684,7 @@ components:
             Items per Page
 
             This is the number of items per page to return.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           format: int64
           maximum: 500
           minimum: 1
@@ -4694,7 +4694,7 @@ components:
             Next Page Token
 
             The next page token.
-            For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+            For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
           type: string
       title: Pagination Request Parameters
       type: object
@@ -4703,7 +4703,7 @@ components:
         The `Link` HTTP header contains multiple links (`first`, `next`, `last`, `previous`) formatted as:
         `<https://{project-slug}.projects.oryapis.com/admin/clients?page_size={limit}&page_token={offset}>; rel="{page}"`
 
-        For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+        For details on pagination please head over to the [pagination documentation](https://www.ory.com/docs/ecosystem/api-design#pagination).
       properties:
         link:
           description: |-

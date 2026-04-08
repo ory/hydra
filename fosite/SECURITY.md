@@ -7,7 +7,7 @@ This policy outlines Ory's security commitments and practices for users across
 different licensing and deployment models.
 
 To learn more about Ory's security service level agreements (SLAs) and
-processes, please [contact us](https://www.ory.sh/contact/).
+processes, please [contact us](https://www.ory.com/contact/).
 
 ## Ory Network Users
 
@@ -17,8 +17,8 @@ processes, please [contact us](https://www.ory.sh/contact/).
   - High: Typically addressed within 30 days.
   - Medium: Typically addressed within 90 days.
   - Low: Typically addressed within 180 days.
-  - Informational: Addressed as necessary.  
-    These timelines are targets and may vary based on specific circumstances.
+  - Informational: Addressed as necessary. These timelines are targets and may
+    vary based on specific circumstances.
 - **Release Schedule:** Updates are deployed to the Ory Network as
   vulnerabilities are resolved.
 - **Version Support:** The Ory Network always runs the latest version, ensuring
@@ -31,8 +31,8 @@ processes, please [contact us](https://www.ory.sh/contact/).
   - High: Typically addressed within 30 days.
   - Medium: Typically addressed within 90 days.
   - Low: Typically addressed within 180 days.
-  - Informational: Addressed as necessary.  
-    These timelines are targets and may vary based on specific circumstances.
+  - Informational: Addressed as necessary. These timelines are targets and may
+    vary based on specific circumstances.
 - **Release Schedule:** Updates are made available as vulnerabilities are
   resolved. Ory works closely with enterprise customers to ensure timely updates
   that align with their operational needs.
@@ -53,4 +53,4 @@ processes, please [contact us](https://www.ory.sh/contact/).
 ## Reporting a Vulnerability
 
 For details on how to report security vulnerabilities, visit our
-[security policy documentation](https://www.ory.sh/docs/ecosystem/security).
+[security policy documentation](https://www.ory.com/docs/ecosystem/security).

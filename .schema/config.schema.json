@@ -770,6 +770,12 @@
           "default": true,
           "examples": [false]
         },
+        "preserve_ext_claims": {
+          "type": "boolean",
+          "description": "Set to true to keep custom claims that are not promoted to the top level in the 'ext' claim. Only applies when mirror_top_level_claims is false.",
+          "default": false,
+          "examples": [true]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,

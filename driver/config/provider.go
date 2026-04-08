@@ -112,6 +112,7 @@ const (
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyMirrorTopLevelClaims                      = "oauth2.mirror_top_level_claims"
+	KeyPreserveExtClaims                         = "oauth2.preserve_ext_claims"
 	KeyRefreshTokenRotationGracePeriod           = "oauth2.grant.refresh_token.rotation_grace_period"      // #nosec G101
 	KeyRefreshTokenRotationGraceReuseCount       = "oauth2.grant.refresh_token.rotation_grace_reuse_count" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
@@ -252,6 +253,10 @@ func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
 
 func (p *DefaultProvider) MirrorTopLevelClaims(ctx context.Context) bool {
 	return p.getProvider(ctx).BoolF(KeyMirrorTopLevelClaims, true)
+}
+
+func (p *DefaultProvider) PreserveExtClaims(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyPreserveExtClaims, false)
 }
 
 func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context, additionalSources ...AccessTokenStrategySource) []string {

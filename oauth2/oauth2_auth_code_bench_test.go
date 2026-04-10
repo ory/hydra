@@ -75,7 +75,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	ctx, span := tracer.Start(ctx, "BenchmarkAuthCode")
 	defer span.End()
 
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, otelhttp.DefaultClient)
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)})
 
 	dsn := cmp.Or(os.Getenv("DSN"), "postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable&max_conns=20&max_idle_conns=20")
 	// dsn := "mysql://root:secret@tcp(localhost:3444)/mysql?max_conns=16&max_idle_conns=16"
@@ -125,7 +125,7 @@ func BenchmarkAuthCode(b *testing.B) {
 	}
 
 	cfg := hydra.NewConfiguration()
-	cfg.HTTPClient = otelhttp.DefaultClient
+	cfg.HTTPClient = &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	adminClient := hydra.NewAPIClient(cfg)
 	adminClient.GetConfig().Servers = hydra.ServerConfigurations{{URL: adminTS.URL}}
 

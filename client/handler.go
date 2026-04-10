@@ -47,6 +47,8 @@ func (h *Handler) SetAdminRoutes(r *httprouterx.RouterAdmin) {
 	r.PATCH(ClientsHandlerPath+"/{id}", h.patchOAuth2Client)
 	r.DELETE(ClientsHandlerPath+"/{id}", h.deleteOAuth2Client)
 	r.PUT(ClientsHandlerPath+"/{id}/lifespans", h.setOAuth2ClientLifespans)
+	r.POST(ClientsHandlerPath+"/{id}/secret/rotate", h.rotateOAuth2ClientSecret)
+	r.DELETE(ClientsHandlerPath+"/{id}/secret/rotate", h.deleteRotatedOAuth2ClientSecrets)
 }
 
 func (h *Handler) SetPublicRoutes(r *httprouterx.RouterPublic) {
@@ -882,4 +884,126 @@ func (h *Handler) requireDynamicAuth(r *http.Request) *herodot.DefaultError {
 		return herodot.ErrNotFound.WithReason("Dynamic registration is not enabled.")
 	}
 	return nil
+}
+
+// Rotate OAuth2 Client Secret Parameters
+//
+// swagger:parameters rotateOAuth2ClientSecret
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
+type rotateOAuth2ClientSecret struct {
+	// OAuth 2.0 Client ID
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route POST /admin/clients/{id}/secret/rotate oAuth2 rotateOAuth2ClientSecret
+//
+// # Rotate OAuth 2.0 Client Secret
+//
+// Rotates the client secret for an OAuth 2.0 client. The old secret will be moved to the rotated_secrets
+// array and will remain valid for authentication, allowing for zero-downtime secret rotation.
+// A new secret will be generated and returned in the response.
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: oAuth2Client
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+func (h *Handler) rotateOAuth2ClientSecret(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	// Move current secret to rotated secrets
+	oldSecret := string(c.GetHashedSecret())
+	if oldSecret != "" {
+		var rotated []string
+		if c.RotatedSecrets != "" {
+			if err := json.Unmarshal([]byte(c.RotatedSecrets), &rotated); err != nil {
+				rotated = []string{}
+			}
+		}
+		rotated = append(rotated, oldSecret)
+		rotatedJSON, err := json.Marshal(rotated)
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+		c.RotatedSecrets = string(rotatedJSON)
+	}
+
+	secretb, err := x.GenerateSecret(26)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	newSecret := string(secretb)
+	c.Secret = newSecret
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	c.Secret = newSecret
+	h.r.Writer().Write(w, r, c)
+}
+
+// Delete Rotated OAuth2 Client Secrets Parameters
+//
+// swagger:parameters deleteRotatedOAuth2ClientSecrets
+//
+//lint:ignore U1000 Used to generate Swagger and OpenAPI definitions
+type deleteRotatedOAuth2ClientSecrets struct {
+	// OAuth 2.0 Client ID
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route DELETE /admin/clients/{id}/secret/rotated oAuth2 deleteRotatedOAuth2ClientSecrets
+//
+// # Delete Rotated OAuth 2.0 Client Secrets
+//
+// Removes all rotated secrets from an OAuth 2.0 client. This should be called after all services
+// have been updated to use the new secret and the old secrets are no longer needed.
+//
+//	Produces:
+//	- application/json
+//
+//	Schemes: http, https
+//
+//	Responses:
+//	  200: oAuth2Client
+//	  404: errorOAuth2NotFound
+//	  default: errorOAuth2Default
+func (h *Handler) deleteRotatedOAuth2ClientSecrets(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	c.RotatedSecrets = "[]"
+	c.Secret = ""
+
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	c.Secret = ""
+	h.r.Writer().Write(w, r, c)
 }

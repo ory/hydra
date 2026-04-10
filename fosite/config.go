@@ -185,12 +185,12 @@ type GrantTypeJWTBearerIssuedDateOptionalProvider interface {
 	GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Context) bool
 }
 
-// GrantTypeJWTBearerCopyAssertionAudienceProvider returns the provider for configuring whether the audience from the
-// assertion JWT is copied into the resulting access token in the jwt-bearer grant type.
-type GrantTypeJWTBearerCopyAssertionAudienceProvider interface {
-	// GetGrantTypeJWTBearerCopyAssertionAudience returns whether the audience from the assertion JWT should be
-	// copied into the resulting access token. Defaults to true for backwards compatibility.
-	GetGrantTypeJWTBearerCopyAssertionAudience(ctx context.Context) bool
+// GrantTypeJWTBearerOmitAssertionAudienceProvider returns the provider for configuring whether the audience from the
+// assertion JWT is omitted from the resulting access token in the jwt-bearer grant type.
+type GrantTypeJWTBearerOmitAssertionAudienceProvider interface {
+	// GetGrantTypeJWTBearerOmitAssertionAudience returns whether the audience from the assertion JWT should be
+	// omitted from the resulting access token. Defaults to false for backwards compatibility.
+	GetGrantTypeJWTBearerOmitAssertionAudience(ctx context.Context) bool
 }
 
 // GetJWTMaxDurationProvider returns the provider for configuring the JWT max duration.

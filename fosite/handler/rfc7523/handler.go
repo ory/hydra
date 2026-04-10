@@ -34,7 +34,7 @@ type Handler struct {
 		fosite.GrantTypeJWTBearerCanSkipClientAuthProvider
 		fosite.GrantTypeJWTBearerIDOptionalProvider
 		fosite.GrantTypeJWTBearerIssuedDateOptionalProvider
-		fosite.GrantTypeJWTBearerCopyAssertionAudienceProvider
+		fosite.GrantTypeJWTBearerOmitAssertionAudienceProvider
 		fosite.GetJWTMaxDurationProvider
 		fosite.AudienceStrategyProvider
 		fosite.ScopeStrategyProvider
@@ -104,7 +104,7 @@ func (c *Handler) HandleTokenEndpointRequest(ctx context.Context, request fosite
 		request.GrantScope(scope)
 	}
 
-	if c.Config.GetGrantTypeJWTBearerCopyAssertionAudience(ctx) {
+	if !c.Config.GetGrantTypeJWTBearerOmitAssertionAudience(ctx) {
 		for _, audience := range claims.Audience {
 			request.GrantAudience(audience)
 		}

@@ -502,7 +502,7 @@ func TestJWTBearer(t *testing.T) {
 	assert.Equal(t, 1.0, p.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, false, p.GetGrantTypeJWTBearerIDOptional(ctx))
-	assert.Equal(t, true, p.GetGrantTypeJWTBearerCopyAssertionAudience(ctx), "should default to true when not set")
+	assert.Equal(t, false, p.GetGrantTypeJWTBearerOmitAssertionAudience(ctx), "should default to false when not set")
 
 	p2 := MustNew(t, l)
 
@@ -510,13 +510,13 @@ func TestJWTBearer(t *testing.T) {
 	p2.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "24h")
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, true)
 	p2.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, true)
-	p2.MustSet(ctx, KeyOAuth2GrantJWTCopyAssertionAudience, false)
+	p2.MustSet(ctx, KeyOAuth2GrantJWTOmitAssertionAudience, true)
 
 	// assert.Equal(t, true, p2.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
 	assert.Equal(t, 24.0, p2.GetJWTMaxDuration(ctx).Hours())
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
 	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIDOptional(ctx))
-	assert.Equal(t, false, p2.GetGrantTypeJWTBearerCopyAssertionAudience(ctx))
+	assert.Equal(t, true, p2.GetGrantTypeJWTBearerOmitAssertionAudience(ctx))
 }
 
 func TestJWTScopeClaimStrategy(t *testing.T) {

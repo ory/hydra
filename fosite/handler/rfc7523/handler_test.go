@@ -763,8 +763,7 @@ func (s *AuthorizeJWTGrantRequestHandlerTestSuite) TestValidAssertionDoesNotCopy
 	keyID := "my_key"
 	pubKey := s.createJWK(s.privateKey.Public(), keyID)
 	cl := s.createStandardClaim()
-	copyAudience := false
-	s.handler.Config.(*fosite.Config).GrantTypeJWTBearerCopyAssertionAudience = &copyAudience
+	s.handler.Config.(*fosite.Config).GrantTypeJWTBearerOmitAssertionAudience = true
 
 	s.accessRequest.Form.Add("assertion", s.createTestAssertion(cl, keyID))
 	s.accessRequest.RequestedScope = []string{"valid_scope"}

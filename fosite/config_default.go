@@ -46,7 +46,7 @@ var (
 	_ GrantTypeJWTBearerCanSkipClientAuthProvider     = (*Config)(nil)
 	_ GrantTypeJWTBearerIDOptionalProvider            = (*Config)(nil)
 	_ GrantTypeJWTBearerIssuedDateOptionalProvider    = (*Config)(nil)
-	_ GrantTypeJWTBearerCopyAssertionAudienceProvider = (*Config)(nil)
+	_ GrantTypeJWTBearerOmitAssertionAudienceProvider = (*Config)(nil)
 	_ GetJWTMaxDurationProvider                       = (*Config)(nil)
 	_ IDTokenLifespanProvider                         = (*Config)(nil)
 	_ IDTokenIssuerProvider                           = (*Config)(nil)
@@ -161,9 +161,9 @@ type Config struct {
 	// GrantTypeJWTBearerIssuedDateOptional indicates, if "iat" (issued at) claim required or not in JWT.
 	GrantTypeJWTBearerIssuedDateOptional bool
 
-	// GrantTypeJWTBearerCopyAssertionAudience indicates whether the audience from the assertion JWT should be
-	// copied into the resulting access token. Defaults to true for backwards compatibility.
-	GrantTypeJWTBearerCopyAssertionAudience *bool
+	// GrantTypeJWTBearerOmitAssertionAudience indicates whether the audience from the assertion JWT should be
+	// omitted from the resulting access token. Defaults to false for backwards compatibility.
+	GrantTypeJWTBearerOmitAssertionAudience bool
 
 	// GrantTypeJWTBearerMaxDuration sets the maximum time after JWT issued date, during which the JWT is considered valid.
 	GrantTypeJWTBearerMaxDuration time.Duration
@@ -328,13 +328,9 @@ func (c *Config) GetGrantTypeJWTBearerIDOptional(ctx context.Context) bool {
 	return c.GrantTypeJWTBearerIDOptional
 }
 
-// GetGrantTypeJWTBearerCopyAssertionAudience returns GrantTypeJWTBearerCopyAssertionAudience.
-// Defaults to true if not explicitly set, for backwards compatibility.
-func (c *Config) GetGrantTypeJWTBearerCopyAssertionAudience(ctx context.Context) bool {
-	if c.GrantTypeJWTBearerCopyAssertionAudience == nil {
-		return true
-	}
-	return *c.GrantTypeJWTBearerCopyAssertionAudience
+// GetGrantTypeJWTBearerOmitAssertionAudience returns GrantTypeJWTBearerOmitAssertionAudience.
+func (c *Config) GetGrantTypeJWTBearerOmitAssertionAudience(ctx context.Context) bool {
+	return c.GrantTypeJWTBearerOmitAssertionAudience
 }
 
 // GetGrantTypeJWTBearerCanSkipClientAuth returns the GrantTypeJWTBearerCanSkipClientAuth field.
